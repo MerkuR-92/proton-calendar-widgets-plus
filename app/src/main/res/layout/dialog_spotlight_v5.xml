@@ -61,17 +61,17 @@
             android:text="@string/spotlight_v5_dialog_rebranding_description" />
 
         <me.proton.core.presentation.ui.view.ProtonButton
-            android:id="@+id/dialog_spotlight_v5_read_more_button"
+            android:id="@+id/dialog_spotlight_v5_got_it_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="24dp"
             android:layout_marginTop="24dp"
             android:layout_marginEnd="24dp"
-            android:text="@string/spotlight_v5_dialog_read_more_button" />
+            android:text="@string/spotlight_v5_dialog_got_it_button" />
 
         <me.proton.core.presentation.ui.view.ProtonButton
-            android:id="@+id/dialog_spotlight_v5_close_button"
+            android:id="@+id/dialog_spotlight_v5_learn_more_button"
             style="@style/ProtonButton.Borderless.Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -79,8 +79,54 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="24dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/spotlight_v5_dialog_close_button" />
+            android:text="@string/spotlight_v5_dialog_learn_more_button" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:paddingBottom="24dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_logo_background_shape"
+                android:elevation="8dp"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_logo_mail"/>
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_logo_background_shape"
+                android:elevation="8dp"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_logo_calendar"/>
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_logo_background_shape"
+                android:elevation="8dp"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_logo_drive"/>
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/ic_logo_background_shape"
+                android:elevation="8dp"
+                android:layout_marginHorizontal="8dp"
+                android:src="@drawable/ic_logo_vpn"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

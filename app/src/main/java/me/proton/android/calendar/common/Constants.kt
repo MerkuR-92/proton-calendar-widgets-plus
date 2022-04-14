@@ -66,6 +66,8 @@ const val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 const val PROTON_UID = "@proton.me"
 const val PROTON_OLD_UID = "proton-calendar"
 
+const val REBRANDING_UPDATED_PROTON_URL = "http://proton.me/news/updated-proton"
+
 const val MAX_EMAILS_PER_QUERY: Int = 8
 
 const val DAY_VIEW_ALL_DAY_MAX = 3

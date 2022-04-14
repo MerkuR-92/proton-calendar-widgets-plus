@@ -1,18 +1,22 @@
 package me.proton.android.calendar.common.utils
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.dialog_spotlight.view.*
-import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_close_button
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_learn_more_button
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_description
+import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_got_it_button
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
+import me.proton.android.calendar.common.REBRANDING_UPDATED_PROTON_URL
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -118,7 +122,12 @@ object SpotlightUtils {
         view.dialog_spotlight_v5_description.text = description
 
         var dialog: AlertDialog? = null
-        view.dialog_spotlight_v5_close_button.setOnSingleClickListener {
+        view.dialog_spotlight_v5_got_it_button.setOnSingleClickListener {
+            dialog?.dismiss()
+        }
+        view.dialog_spotlight_v5_learn_more_button.setOnSingleClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(REBRANDING_UPDATED_PROTON_URL))
+            startActivity(browserIntent)
             dialog?.dismiss()
         }
 
