@@ -937,7 +937,11 @@ class CalendarsRepositoryImpl @Inject constructor(
             eventsByCalendar.forEach {
                 if (database.calendarsDao().hasCalendar(it.key)) {
                     try {
-                        database.eventsDao().updateOrInsert(*it.value.toTypedArray())
+                        it.value.forEach {
+                            if (!database.eventsDao().hasEvent(it.id, it.calendarId, it.modifyTime)) {
+                                database.eventsDao().updateOrInsert(it)
+                            }
+                        }
                     } catch (e: SQLiteConstraintException) {
                         // hack for different SQLite implementations formatting message differently
                         if (e.message?.contains("787") == true

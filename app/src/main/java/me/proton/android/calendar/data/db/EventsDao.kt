@@ -54,6 +54,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId)")
     abstract suspend fun hasEvent(eventId: String, calendarId: String): Boolean
 
+    @Query("SELECT EXISTS(SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId AND modifyTime = :modifyTime)")
+    abstract suspend fun hasEvent(eventId: String, calendarId: String, modifyTime: Long): Boolean
+
     @Query("SELECT COUNT(id) FROM events WHERE calendarId = :calendarId")
     abstract suspend fun count(calendarId: String): Int
 
