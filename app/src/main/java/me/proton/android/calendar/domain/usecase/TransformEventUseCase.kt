@@ -185,6 +185,7 @@ class TransformEventUseCase @Inject constructor(
                 calendarEntity.type
             ),
             iCalendar = iCalendar,
+            modifyTime = eventEntity.modifyTime,
             verificationStatus = when {
                 verificationStatuses.all { it == Event.SignatureVerification.SUCCESS } -> {
                     Event.SignatureVerification.SUCCESS

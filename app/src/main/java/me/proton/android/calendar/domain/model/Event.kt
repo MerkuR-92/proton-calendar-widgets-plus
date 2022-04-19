@@ -28,6 +28,7 @@ data class Event private constructor(
     override val id: String, // ID from API and local database
     val calendar: Calendar,
     val iCalendar: ICalendar,
+    val modifyTime: Long,
     val verificationStatus: SignatureVerification? = null,
     val decryptionStatus: DecryptionStatus? = null,
     val currentUserAttendeeId: String? = null,
@@ -41,6 +42,7 @@ data class Event private constructor(
             id: String, // ID from API and local database
             calendar: Calendar,
             iCalendar: ICalendar,
+            modifyTime: Long,
             verificationStatus: SignatureVerification? = null,
             decryptionStatus: DecryptionStatus? = null,
             currentUserAttendeeId: String? = null,
@@ -55,6 +57,7 @@ data class Event private constructor(
                     id,
                     calendar,
                     iCalendar,
+                    modifyTime,
                     verificationStatus,
                     decryptionStatus,
                     currentUserAttendeeId,
@@ -117,7 +120,8 @@ data class Event private constructor(
                 Event(
                     "",
                     Calendar("", "", "", 1, true, 0),
-                    iCalendar
+                    iCalendar,
+                    0
                 )
             } else null
 

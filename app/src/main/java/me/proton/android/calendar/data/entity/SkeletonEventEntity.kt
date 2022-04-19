@@ -17,21 +17,23 @@ data class SkeletonEventEntity(
     @SerialName("CalendarID")
     val calendarId: String,
     @SerialName("SharedEvents")
-    val sharedEvents: List<JsonElement>
+    val sharedEvents: List<JsonElement>,
+    @SerialName("ModifyTime")
+    val modifyTime: Long
 )
 
 /**
  * Skeleton Event contains only data created using plaintext Shared Part,
- * valid Calendar ID and Calendar Color, but the rest is dummy data.
+ * valid Calendar ID and Calendar Color, and modifyTime, but the rest is dummy data.
  */
-fun SkeletonEventEntity.toSkeletonEvent(json: Json, calendarColor: String? = null): SkeletonEvent? =
+fun SkeletonEventEntity.toSkeletonEvent(json: Json, calendarColor: String? = null, calendarType: Int? = 0): SkeletonEvent? =
     toICalendarFromPlaintextSharedPart(json, this.sharedEvents)?.let {
         if (it.events.firstOrNull()?.sanitise() == true) {
             Event.from(
                 this.id,
-                Calendar(this.calendarId, "", calendarColor ?: "", 0, false, 0),
+                Calendar(this.calendarId, "", calendarColor ?: "", 0, false, calendarType ?: 0),
                 it,
-                null,
+                modifyTime,
                 null,
                 null
             )

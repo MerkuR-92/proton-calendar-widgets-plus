@@ -34,6 +34,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -259,7 +260,7 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1,
                 existingCalendar?.type ?: defaultCalendar.type
-            ), iCalendar) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
+            ), iCalendar, Instant.now().epochSecond) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
         val isNewSingleEditCancelled = isNew && existingEvent == null && iCalendar.method.isCancel

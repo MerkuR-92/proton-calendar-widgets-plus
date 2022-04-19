@@ -37,7 +37,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
@@ -67,7 +68,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
@@ -97,7 +99,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isFalse()
@@ -127,7 +130,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isTrue()
@@ -157,7 +161,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.spansSingleDay(timeZoneId = timeZoneId)).isFalse()
@@ -187,7 +192,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 15), timeZoneId)).isEqualTo(Pair(1, 1))
@@ -217,7 +223,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 15), timeZoneId)).isEqualTo(Pair(1, 2))
@@ -248,7 +255,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 9, 15), timeZoneId)).isEqualTo(Pair(1, 1))
@@ -278,7 +286,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 1, 7), timeZoneId)).isEqualTo(Pair(1, 1))
@@ -308,7 +317,8 @@ internal class EventUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         assertThat(event.calculateFullDayCounter(LocalDate.of(2021, 1, 7), timeZoneId)).isEqualTo(Pair(1, 2))

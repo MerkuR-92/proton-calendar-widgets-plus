@@ -102,6 +102,7 @@ object EventMocks {
             if (isSingleEdit) singleEditEventId else eventId,
             provideCalendar(hasDisabledCalendar, hasHiddenCalendar),
             iCalendar,
+            0,
             null, // TODO
             isProtonProtonInvite = isProtonProtonInvite,
             currentUserAttendeeId = if (isAttendee) attendeeId else null

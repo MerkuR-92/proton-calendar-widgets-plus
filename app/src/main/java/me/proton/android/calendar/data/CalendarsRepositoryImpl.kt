@@ -19,8 +19,8 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlap
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
-import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.data.api.ApiResponse
@@ -118,7 +118,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
-                    calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color) }
+                    calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
                 }
 
                 emit(skeletonEvents)
@@ -531,6 +531,9 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
+            // TODO hack for hiding duplicated events from subscribed Calendars
+            val deduplicatedEventSkeletons = eventSkeletons.filterOutDuplicatesInSubscribedCalendars()
+
             logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
 
             coroutineScope {
@@ -538,7 +541,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
                 // all we need to do is decrypt EventEntity and return full Events with correct occurrences
 
-                val eventIds = eventSkeletons.map { it.id }
+                val eventIds = deduplicatedEventSkeletons.map { it.id }
                 val chunkedEventIds = eventIds.chunked(100)
                 val eventEntities = chunkedEventIds.flatMap {
                     database.eventsDao().selectAllById(it)
@@ -552,7 +555,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                             transformEventUseCase.execute(eventEntity)
                         }
 
-                        val skeletons = eventSkeletons.filter { it.id == eventEntity.id }
+                        val skeletons = deduplicatedEventSkeletons.filter { it.id == eventEntity.id }
 
                         if (transformedEvent != null) {
                             skeletons.map {
@@ -903,7 +906,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         return if (eventsSharingUidResponse is ApiResponse.Success) {
 
             val skeletonEvents = eventsSharingUidResponse.data.events.mapNotNull { eventEntity ->
-                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents)
+                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents, eventEntity.modifyTime)
                 skeletonEventEntity.toSkeletonEvent(json)
             }
 

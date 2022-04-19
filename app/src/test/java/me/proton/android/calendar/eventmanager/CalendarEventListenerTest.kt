@@ -319,15 +319,15 @@ class CalendarEventListenerDelegateTest {
     }
 }
 
-fun createEventEntity(id: String, modifyTime: Long? = null) = EventEntity(
+fun createEventEntity(id: String, modifyTime: Long? = null, paramCalendarId: String? = null, paramSharedKeyPacket: String? = null) = EventEntity(
     id,
-    calendarId,
+    paramCalendarId ?: calendarId,
     sharedEventId,
     calendarKeyPacket,
     0L,
     modifyTime ?: 0L,
     0,
-    sharedKeyPacket,
+    paramSharedKeyPacket ?: sharedKeyPacket,
     emptyList(),
     emptyList(),
     emptyList(),

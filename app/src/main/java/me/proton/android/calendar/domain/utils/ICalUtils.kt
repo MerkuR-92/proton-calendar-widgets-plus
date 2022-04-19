@@ -17,6 +17,7 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.utils.CalendarSplit
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SkeletonEvent
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -132,6 +133,15 @@ interface ICalUtils {
     fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event>
     fun List<Event.Occurrence>.filterOutEventOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event.Occurrence>
     fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity>
+
+    /**
+     * TODO this is a hack for hiding duplicated Events in Subscribed Calendars
+     *
+     * Events are considered duplicated if they have the same UID, CalendarID and Calendar is of type "subscribed" (1).
+     *
+     * Out of all duplicates, we return the one with highest "modifyTime" value.
+     */
+    fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent>
 
     /**
      * Returns event ZonedDateTime on Date format

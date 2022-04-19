@@ -15,7 +15,6 @@ import biweekly.util.*
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.android.synthetic.main.fragment_event_form.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
@@ -407,7 +406,7 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.flags,
                 defaultCalendar.display == 1,
                 defaultCalendar.type
-            ), newICalendar
+            ), newICalendar, 0
         ) ?: return InitResult.Error("could not create Event using factory method")
 
         setDefaultAlarms(newEvent, this.calendarSettings)

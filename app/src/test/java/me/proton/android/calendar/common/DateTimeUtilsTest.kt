@@ -181,7 +181,8 @@ internal class DateTimeUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         // the actual dateTimes should always be the same, no matter when Biweekly parsed the ICS (during standard
@@ -245,7 +246,8 @@ internal class DateTimeUtilsTest {
         val event = Event.from(
             "id",
             Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0),
-            ICalUtilsImpl.parseICalString(iCalString)!!
+            ICalUtilsImpl.parseICalString(iCalString)!!,
+            0
         )!!
 
         event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {

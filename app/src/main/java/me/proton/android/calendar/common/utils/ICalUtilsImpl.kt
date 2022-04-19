@@ -40,6 +40,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealO
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
 import java.security.MessageDigest
 import java.time.*
@@ -570,6 +571,34 @@ object ICalUtilsImpl : ICalUtils {
 
     override fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity> {
         return this.distinctBy { "${it.eventId} ${it.occurrence} ${Duration.parse(it.trigger).toMillis()} ${it.action}" }
+    }
+
+    override fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent> {
+
+        val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.getStart("UTC")}" }
+
+        val result = mutableListOf<SkeletonEvent>()
+        grouped.forEach {
+
+            val skeletons = it.value
+
+            // Calendar is subscribed, find the best Skeleton
+            if (skeletons.first().calendar.isSubscribed) {
+                // find max modifyTime
+                val maxModifyTime = skeletons.maxByOrNull { it.modifyTime }?.modifyTime
+
+                // in case of different Skeletons with the same modifyTime, make sure to always return the same one
+                skeletons.filter { it.modifyTime == maxModifyTime }.maxByOrNull { it.id }?.let {
+                    result.add(it)
+                }
+            } else {
+                // Calendar is regular type, add all Skeletons to result (in theory it should be only one)
+                result.addAll(skeletons)
+            }
+
+        }
+
+        return result
     }
 
     /**

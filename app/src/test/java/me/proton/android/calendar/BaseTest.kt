@@ -13,7 +13,7 @@ internal abstract class BaseTest {
             1,
             true,
             0
-        ), ICalUtilsImpl.parseICalString(iCalString)!!, null, null)!!
+        ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!
     }
 
 }
