@@ -59,6 +59,7 @@ import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
@@ -734,8 +735,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_norm
             window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
         } else {
-            val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_navigation_bar
-            window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+            window.navigationBarColor =
+                if (display) resources.getColor(R.color.splash_screen_color, null)
+                else getColorFromAttr(R.attr.proton_background_norm)
         }
     }
 

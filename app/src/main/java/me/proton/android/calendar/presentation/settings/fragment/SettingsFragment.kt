@@ -34,6 +34,7 @@ import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
@@ -263,12 +264,13 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         // Workaround to make sure we have the correct navigation bar color.
         // TODO update once we change splash screen and how we handle navigation bar colors
         val window = bottomSheetDialog.window
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             val navigationBarBackgroundColor = R.color.background_norm
             window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
         } else {
-            val navigationBarBackgroundColor = R.color.background_navigation_bar
-            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+            window?.navigationBarColor = requireContext().getColorFromAttr(
+                R.attr.proton_background_norm
+            )
         }
 
         bottomSheetDialog.setContentView(R.layout.dialog_calendar_settings)

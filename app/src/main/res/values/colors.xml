@@ -15,7 +15,4 @@
     <!-- constant colors, do not change in dark mode -->
     <color name="text_on_calendar_color">#FFFFFF</color>
 
-    <!-- navigation bar color used for api < 27 -->
-    <color name="background_navigation_bar">?proton_background_norm</color>
-
 </resources>
