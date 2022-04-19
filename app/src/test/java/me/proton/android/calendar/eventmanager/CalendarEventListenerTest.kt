@@ -298,7 +298,7 @@ class CalendarEventListenerDelegateTest {
 
             delegate.onCompletion(config, metadata.map { it.id })
 
-            coVerify(exactly = 1) { fetchPublicKeysUseCase.execute(any(), any()) }
+            //coVerify(exactly = 1) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 1) { updateAlarmsUseCase.execute(any(), any()) }
             coVerify(exactly = 1) { widgetRefresher.refreshEventList() }
         }
@@ -313,7 +313,7 @@ class CalendarEventListenerDelegateTest {
 
             delegate.onCompletion(config, emptyList())
 
-            coVerify(exactly = 0) { fetchPublicKeysUseCase.execute(any(), any()) }
+            //coVerify(exactly = 0) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 0) { widgetRefresher.refreshEventList() }
         }
     }

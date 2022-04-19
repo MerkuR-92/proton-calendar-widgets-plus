@@ -63,7 +63,7 @@ class HandleEventsMetadataUseCase @Inject constructor(
                                 calendarsRepository.persistEvents(*entities.toTypedArray())
 
                                 updateAlarmsUseCase.execute(userId.id, entities.map { it.id })
-                                fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, eventEntities)
+                                //fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, eventEntities)
                                 widgetRefresher.refreshEventList()
                             }
 
