@@ -6,19 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import biweekly.ICalendar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
-import kotlinx.android.synthetic.main.item_calendar_day_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,10 +31,8 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.presentation.calendar.adapter.DayViewAllDayEventAdapter
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.core.user.domain.entity.UserAddress
 import java.time.LocalDate
 import javax.inject.Inject
 import java.util.*
@@ -53,7 +48,7 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var position: Int? = null
     private var date: LocalDate? = null
 
-    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", 1, true, 0), ICalendar())
+    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", 1, true, 0), ICalendar(), 0)
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
