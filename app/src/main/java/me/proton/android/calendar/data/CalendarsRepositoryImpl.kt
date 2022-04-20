@@ -534,6 +534,10 @@ class CalendarsRepositoryImpl @Inject constructor(
             // TODO hack for hiding duplicated events from subscribed Calendars
             val deduplicatedEventSkeletons = eventSkeletons.filterOutDuplicatesInSubscribedCalendars()
 
+            if (eventSkeletons.size != deduplicatedEventSkeletons.size) {
+                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars")
+            }
+
             logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
 
             coroutineScope {
