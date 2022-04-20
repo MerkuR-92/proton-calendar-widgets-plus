@@ -97,6 +97,8 @@ class ShowNotificationUseCase @Inject constructor(
 
                     } else null
 
+                    val notificationTag = (eventWithOccurrence ?: dbEvent).generateNotificationTag()
+
                     val intent = MainViewModel.createMainIntentToShowEventDetails(
                         context,
                         dbEvent.id,
@@ -120,8 +122,16 @@ class ShowNotificationUseCase @Inject constructor(
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setAutoCancel(true)
 
+                    // cancel all notifications for this particular Event before showing new one
+                    notificationManager.activeNotifications.filter {
+                        it.tag == notificationTag
+                    }.forEach {
+                        notificationManager.cancel(notificationTag, it.id)
+                    }
+
                     notificationManager.notify(
-                        generateNotificationId(notificationManager, eventAlarm),
+                        notificationTag,
+                        eventAlarm.occurrence.toInt(), // this is Epoch seconds
                         notificationBuilder.build()
                     )
 
@@ -144,17 +154,11 @@ class ShowNotificationUseCase @Inject constructor(
 
     }
 
-    // Alarm's occurrence timestamp can be identical for multiple Alarms, but notification IDs
-    //  have to be distinct for each one of them
-    private fun generateNotificationId(notificationManager: NotificationManager, alarmEntity: EventAlarmEntity): Int {
-
-        val activeNotifications = notificationManager.activeNotifications
-        var notificationId = alarmEntity.occurrence
-        while (activeNotifications.find { it.id == notificationId.toInt() } != null) {
-            notificationId++
-        }
-
-        return notificationId.toInt()
+    /**
+     * Generates Notification TAG using CalendarID, EventID, OccurrenceNumber
+     */
+    private fun Event.generateNotificationTag(): String {
+        return "${this.calendar.id}:${this.id}:${this.occurrence?.occurrenceNumber ?: 0}"
     }
 
     /**
