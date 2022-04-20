@@ -100,7 +100,7 @@ class SettingsCalendarListAdapter(
             }
 
             // Display disabled badge
-            if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), R.color.background_secondary, R.color.text_norm)
+            if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), itemView.context.getColor(R.color.background_secondary), R.color.text_norm)
 
             calendarEntityItemHelper.visibleOrGone(false)
             if (calendarEntity.isSubscribed) {
@@ -122,7 +122,7 @@ class SettingsCalendarListAdapter(
                                     R.string.settings_calendar_syncing
                             else R.string.settings_calendar_not_synced
                         ),
-                        R.color.notification_warning
+                        itemView.context.getColor(R.color.notification_warning)
                     )
                     val helperMessage =
                         if (calendarSubscription.isLastSyncOld)
@@ -180,13 +180,13 @@ class SettingsCalendarListAdapter(
             }
         }
 
-        private fun addBadge(text: String, colorId: Int, textColor: Int? = null) {
+        private fun addBadge(text: String, color: Int, textColor: Int? = null) {
             val badgeView = LayoutInflater.from(itemView.context).inflate(R.layout.item_badge, calendarEntityItemBadgeLayout, false) as TextView
             badgeView.text = text
             textColor?.let {
                 badgeView.setTextColor(ContextCompat.getColor(itemView.context, it))
             }
-            badgeView.backgroundTintList = ColorStateList.valueOf(itemView.context.getColor(colorId))
+            badgeView.backgroundTintList = ColorStateList.valueOf(color)
             calendarEntityItemBadgeLayout.addView(badgeView)
         }
     }
