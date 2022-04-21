@@ -92,7 +92,7 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onSuccess(config: EventManagerConfig) {
         val actions = getActionMap(config)
-        val alarmEvents = actions[Action.Create].orEmpty() + actions[Action.Update].orEmpty() + actions[Action.Delete]
+        val alarmEvents = actions[Action.Create].orEmpty() + actions[Action.Update].orEmpty() + actions[Action.Delete].orEmpty()
         if (alarmEvents.isEmpty()) return
         handleAlarmsUseCase.execute(config.userId)
     }
