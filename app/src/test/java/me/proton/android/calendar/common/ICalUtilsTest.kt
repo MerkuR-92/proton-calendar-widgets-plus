@@ -58,7 +58,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -66,6 +65,8 @@ import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.mocks.EventMocks
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import java.time.*
 import java.util.*
 
@@ -4485,6 +4486,61 @@ internal class ICalUtilsTest {
         assertThat(ics1Filtered.size).isEqualTo(3)
         assertThat(ics1Filtered.count { it.calendar == calendarSubscribed }).isEqualTo(2)
         assertThat(ics1Filtered.count { it.calendar == calendarRegular }).isEqualTo(1)
+
+    }
+
+    @Test
+    fun `filter out Event duplicates in Subscribed Calendars if there are different occurrences of the same event`() {
+
+        val iCalString = """
+            BEGIN:VCALENDAR
+            VERSION:2.0
+            PRODID:-//Proton AG//AndroidCalendar 0.30.3//EN
+            BEGIN:VEVENT
+            DTSTAMP:20220124T115649Z
+            DTSTART;TZID=Europe/Vilnius:20220227T010000
+            DTEND;TZID=Europe/Vilnius:20220227T050000
+            RRULE:FREQ=MONTHLY
+            SEQUENCE:0
+            SUMMARY:01:00-05:00 every 27th
+            STATUS:CONFIRMED
+            UID:sch4mDryiYH6aDkw3VsklnzfhKoW@proton.me
+            END:VEVENT
+            END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            1
+        ), iCal, 0, null)!!
+
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 3)!!
+
+        val eventsWithOccurrences = occurrences.map { Event.withOccurrence(event, it) }
+
+        val skeletonEntities = eventsWithOccurrences.map {
+            listOf(
+                // add each Event twice to get duplicates
+                SkeletonEvent.from(SkeletonEvent.from(it)),
+                SkeletonEvent.from(SkeletonEvent.from(it))
+            )
+        }.flatten()
+
+        val filtered = skeletonEntities.filterOutDuplicatesInSubscribedCalendars()
+
+        assertThat(filtered.size).isEqualTo(3)
+
+        assertThat(filtered[0].getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2022, 2, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(filtered[1].getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2022, 3, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+
+        assertThat(filtered[2].getStart(displayTimeZoneId)).isEqualTo(ZonedDateTime.of(2022, 4, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
     }
 
