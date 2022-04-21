@@ -1112,6 +1112,7 @@ object AndroidUtils {
         val vDrawable = AppCompatResources.getDrawable(context, R.drawable.vector_stripes) // vector drawable
         vDrawable?.setTint(stripeColor)
         if (fullyOpaque == false) vDrawable?.alpha = 51 // decimal value for 20% opacity
+        else vDrawable?.alpha = 255 // fully opaque
 
         if (vDrawable != null) {
             val bitmap = Bitmap.createBitmap(
