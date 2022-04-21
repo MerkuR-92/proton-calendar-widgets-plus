@@ -343,13 +343,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun attachActionHandlers() {
-        section_location.text_header.setOnSingleClickListener {
-            eventViewModel.eventLiveData.value?.location?.let {
-                if (!mainViewModel.handleEventLocationShow(it)) {
-                    logger.i("could not show location on map")
-                }
-            }
-        }
+        // This opens google maps with the location field data
+//        section_location.text_header.setOnSingleClickListener {
+//            eventViewModel.eventLiveData.value?.location?.let {
+//                if (!mainViewModel.handleEventLocationShow(it)) {
+//                    logger.i("could not show location on map")
+//                }
+//            }
+//        }
         section_location.image_button_action.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
@@ -500,15 +501,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 with(section_location) {
                     text_header.text = event.location
                     Linkify.addLinks(text_header, Linkify.WEB_URLS)
-                    val typedValue = TypedValue()
-                    requireContext().theme.resolveAttribute(
-                        android.R.attr.selectableItemBackground,
-                        typedValue,
-                        true
-                    )
-                    text_header.isClickable = true
-                    text_header.setBackgroundResource(typedValue.resourceId)
-
                     image_icon.setImageResource(R.drawable.ic_map_marker)
                     image_button_action.setImageResource(R.drawable.ic_copy_clipboard)
                     image_button_action.visibleOrInvisible(true)
