@@ -500,7 +500,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             event.location?.nullIfBlank()?.let {
                 with(section_location) {
                     text_header.text = event.location
-                    Linkify.addLinks(text_header, Linkify.WEB_URLS)
+                    Linkify.addLinks(text_header, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS)
                     image_icon.setImageResource(R.drawable.ic_map_marker)
                     image_button_action.setImageResource(R.drawable.ic_copy_clipboard)
                     image_button_action.visibleOrInvisible(true)
