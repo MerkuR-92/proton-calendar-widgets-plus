@@ -2932,6 +2932,48 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of all-day event spanning three weeks and over dst, display tz different from device tz`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VTIMEZONE
+    TZID:Europe/Vilnius
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    RRULE:FREQ=MONTHLY;INTERVAL=4;BYDAY=18
+    SEQUENCE:8
+    STATUS:CONFIRMED
+    DTSTAMP:20201203T172430Z
+    UID:nRjwqQ67EeB0AXahfOe-Yohnr-ZY_R20210107T133000@proton.me
+    DTSTART;VALUE=DATE:20230318
+    DTEND;VALUE=DATE:20230407
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        // To properly test this, device running the test needs to be over UTC (ex: Europe/Zurich)
+
+        val iCal = parseICalString(iCalString)!!
+        val displayTimeZoneId = "America/Cayenne" // Tested with: UTC, America/Santiago, America/Cayenne
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, 0, null)!!
+
+        val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 1)
+
+        assertThat(occurrences!!.size).isEqualTo(1)
+        assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2023, 3, 18), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2023, 4, 7), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
     fun `generate n-th occurrence of partial-day event, display in different timezone`() {
 
         val iCalString = """
