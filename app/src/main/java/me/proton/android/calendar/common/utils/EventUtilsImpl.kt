@@ -259,8 +259,8 @@ object EventUtilsImpl : EventUtils {
         val eventEnd = Instant.ofEpochMilli(iCalEvent.dateEnd.value.time).atZone(iteratorZoneId)
 
         // take into account TimeZone UTC offsets when calculating how many full days the event lasts (only used for All-Day Events)
-        val eventStartTZOffset = ZoneId.of(timeZoneId).rules.getOffset(eventStart.toInstant())
-        val eventEndTZOffset = ZoneId.of(timeZoneId).rules.getOffset(eventEnd.toInstant())
+        val eventStartTZOffset = ZoneId.systemDefault().rules.getOffset(eventStart.toInstant())
+        val eventEndTZOffset = ZoneId.systemDefault().rules.getOffset(eventEnd.toInstant())
         val eventStartEndOffsetDifference = eventStartTZOffset.compareTo(eventEndTZOffset)
         val eventDurationInDays = Duration.ofSeconds(ChronoUnit.SECONDS.between(eventStart, eventEnd).plus(eventStartEndOffsetDifference)).toDays()
 
