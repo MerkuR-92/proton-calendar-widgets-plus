@@ -1116,7 +1116,7 @@ internal class ICalUtilsTest {
 
         assertThat(occurrences[1].occurrenceNumber).isEqualTo(2)
         assertThat(occurrences[1].startDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
-        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 5, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
+        assertThat(occurrences[1].endDateTime).isEqualTo(ZonedDateTime.of(2022, 3, 27, 6, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
 
         assertThat(occurrences[2].occurrenceNumber).isEqualTo(3)
         assertThat(occurrences[2].startDateTime).isEqualTo(ZonedDateTime.of(2022, 4, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)))
@@ -2971,6 +2971,126 @@ internal class ICalUtilsTest {
         assertThat(occurrences!!.size).isEqualTo(1)
         assertThat(occurrences.first().startDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2023, 3, 18), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
         assertThat(occurrences.first().endDateTime).isEqualTo(ZonedDateTime.of(LocalDate.of(2023, 4, 7), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))
+
+    }
+
+    @Test
+    fun `generate n-th occurrence of partial-day weekly event, DST happening during event, display in different timezone that has no DST`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar 1.0.3//EN
+    BEGIN:VEVENT
+    DTSTAMP:20220407T075929Z
+    RRULE:FREQ=WEEKLY;BYDAY=SU
+    SEQUENCE:0
+    SUMMARY:Weekly on Sundays during DST change (with duration)
+    TRANSP:OPAQUE
+    UID:0qv22ol3j4ici7epqp11n7q78d2@google.com
+    CREATED:20220407T075928Z
+    LAST-MODIFIED:20220407T075928Z
+    DTSTART;TZID=Europe/Vilnius:20220306T010000
+    DTEND;TZID=Europe/Vilnius:20220306T110000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Africa/Tripoli"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, 0, null)!!
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId) // Before DST
+        val occurrence4 = event.generateOccurrence(4, displayTimeZoneId) // During DST
+        val occurrence6 = event.generateOccurrence(6, displayTimeZoneId) // After DST
+
+        assertThat(occurrence1).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 3, 6, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 3, 6, 11, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrence4).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 3, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 3, 27, 11, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            4))
+
+        assertThat(occurrence6).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 4, 10, 0, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 4, 10, 10, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            6))
+
+    }
+
+    @Test
+    fun `generate n-th occurrence of partial-day weekly event, DST happening during event`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar 1.0.3//EN
+    BEGIN:VEVENT
+    DTSTAMP:20220407T075929Z
+    RRULE:FREQ=WEEKLY;BYDAY=SU
+    SEQUENCE:0
+    SUMMARY:Weekly on Sundays during DST change (with duration)
+    TRANSP:OPAQUE
+    UID:0qv22ol3j4ici7epqp11n7q78d2@google.com
+    CREATED:20220407T075928Z
+    LAST-MODIFIED:20220407T075928Z
+    DTSTART;TZID=Europe/Vilnius:20220306T010000
+    DTEND;TZID=Europe/Vilnius:20220306T110000
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Vilnius"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "",
+            1,
+            true,
+            0
+        ), iCal, 0, null)!!
+
+        val occurrence1 = event.generateOccurrence(1, displayTimeZoneId) // Before DST (Winter time)
+        val occurrence4 = event.generateOccurrence(4, displayTimeZoneId) // During DST
+        val occurrence6 = event.generateOccurrence(6, displayTimeZoneId) // After DST (Summer time)
+        val occurrence35 = event.generateOccurrence(35, displayTimeZoneId) // During DST
+        val occurrence37 = event.generateOccurrence(37, displayTimeZoneId) // After DST (Winter time)
+
+        assertThat(occurrence1).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 3, 6, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 3, 6, 11, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            1))
+
+        assertThat(occurrence4).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 3, 27, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 3, 27, 12, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            4))
+
+        assertThat(occurrence6).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 4, 10, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 4, 10, 11, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            6))
+
+        assertThat(occurrence35).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 10, 30, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 10, 30, 10, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            35))
+
+        assertThat(occurrence37).isEqualTo(Event.Occurrence(
+            ZonedDateTime.of(2022, 11, 13, 1, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            ZonedDateTime.of(2022, 11, 13, 11, 0, 0, 0, ZoneId.of(displayTimeZoneId)),
+            37))
 
     }
 
