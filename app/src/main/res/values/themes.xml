@@ -5,6 +5,7 @@
         <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
         <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
     </style>
 
     <style name="ProtonTheme.Splash.Calendar.V5" parent="ProtonTheme.Splash.Calendar">
