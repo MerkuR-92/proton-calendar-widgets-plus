@@ -92,7 +92,7 @@ object FeatureFlag {
     const val CHANGE_LANGUAGE = true
     const val MONTH_VIEW = true
     const val SPOTLIGHT = true
-    const val SUBSCRIPTION = true
+    const val SUBSCRIPTION = false
 }
 
 object ApiResponseCode {
