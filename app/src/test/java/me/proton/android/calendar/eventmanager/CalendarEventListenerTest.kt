@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import io.mockk.*
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.WidgetRefresher
@@ -148,7 +147,7 @@ class CalendarEventListenerTest {
     fun `onComplete calls delegate's onCompletion with events that were either created or updated`() {
         runBlocking {
             val capturedIds = slot<List<String>>()
-            coEvery { delegate.onCompletion(any(), capture(capturedIds)) } returns Unit
+            coEvery { delegate.onSuccess(any(), capture(capturedIds)) } returns Unit
 
             listener.setActionMap(config,
                 listOf(
@@ -160,7 +159,7 @@ class CalendarEventListenerTest {
 
             listener.onComplete(config)
 
-            coVerify(exactly = 1) { delegate.onCompletion(any(), any()) }
+            coVerify(exactly = 1) { delegate.onSuccess(any(), any()) }
             assertThat(capturedIds.captured).isEqualTo(listOf("id_1", "id_2"))
         }
     }
@@ -296,7 +295,7 @@ class CalendarEventListenerDelegateTest {
             // Needed to populate the entity cache
             delegate.onPrepare(config, metadata)
 
-            delegate.onCompletion(config, metadata.map { it.id })
+            delegate.onSuccess(config, metadata.map { it.id })
 
             //coVerify(exactly = 1) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 1) { updateAlarmsUseCase.execute(any(), any()) }
@@ -311,7 +310,7 @@ class CalendarEventListenerDelegateTest {
             // Needed to populate the entity cache
             delegate.onPrepare(config, metadata)
 
-            delegate.onCompletion(config, emptyList())
+            delegate.onSuccess(config, emptyList())
 
             //coVerify(exactly = 0) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 0) { widgetRefresher.refreshEventList() }
