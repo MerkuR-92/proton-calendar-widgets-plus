@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d da</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d poate</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nu</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d fără răspuns</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d în așteptare</string>
     <string name="event_attendee_is_organizer">Sunteți organizatorul</string>
     <string name="event_attendee_organizer">Organizator</string>
     <string name="event_attendee_optional">Opțional</string>
