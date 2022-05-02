@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d Ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d Vielleicht</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d Nein</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d Unbeantwortet</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d ausstehend</string>
     <string name="event_attendee_is_organizer">Du bist der Organisator</string>
     <string name="event_attendee_organizer">Organisator</string>
     <string name="event_attendee_optional">Optional</string>
@@ -143,7 +143,7 @@
     <string name="event_text_add_alarm">Benachrichtigung hinzufügen</string>
     <string name="event_text_description">Beschreibung</string>
     <string name="event_hint_description">Beschreibung hinzufügen</string>
-    <string name="event_text_custom">benutzerdefiniert</string>
+    <string name="event_text_custom">Benutzerdefiniert</string>
     <string name="event_alert_invalid_start_end_date">Startdatum des Termins darf nicht später als das Enddatum sein</string>
     <string name="event_alarms_title">Benachrichtigungen</string>
     <string name="event_custom_alarms_field">Benachrichtigen</string>
@@ -249,14 +249,14 @@
     <string name="snack_event_changing_answer">Antwort wird aktualisiert</string>
     <string name="snack_event_updated">Termin aktualisiert</string>
     <string name="snack_event_updated_error_failed_mail">Einladung konnte nicht gesendet werden</string>
-    <string name="snack_event_updated_error">Fehler beim Aktualisieren des Termines</string>
+    <string name="snack_event_updated_error">Fehler beim Aktualisieren des Termins</string>
     <string name="snack_event_created">Termin erstellt</string>
     <string name="snack_event_created_failed_mail">Termin erstellt, aber Einladung konnte nicht gesendet werden</string>
     <string name="snack_event_created_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_event_opening_edit_error">Fehler beim Öffnen des Termins zur Bearbeitung</string>
     <string name="snack_event_edit_with_attendees_error">Das Bearbeiten von Terminen mit Teilnehmern wird derzeit noch nicht unterstützt</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Teilnehmer hinzufügen und gleichzeitig den Kalender wechseln ist nicht möglich</string>
-    <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termines</string>
+    <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termins</string>
     <string name="snack_event_calendar_error">Fehler beim Wechseln des Kalenders</string>
     <string name="snack_event_maximum_alarm_reached_error">Die maximale Anzahl von Benachrichtigungen wurde erreicht</string>
     <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung</string>
@@ -419,7 +419,7 @@
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar Widget</string>
     <string name="calendar_widget_no_upcoming_events_today">Heute keine anstehenden Termine</string>
-    <string name="calendar_widget_loading_events">Termine werden geladen …</string>
+    <string name="calendar_widget_loading_events">Termine werden geladen…</string>
     <string name="calendar_widget_loading_events_error">Termine konnten nicht geladen werden</string>
     <string name="calendar_widget_no_upcoming_events">Keine anstehenden Termine</string>
     <string name="calendar_widget_please_log_in">Anmelden, um deine Termine anzuzeigen</string>
@@ -490,7 +490,7 @@
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
         <item/>
-        <item>Erster</item>
+        <item>ersten</item>
         <item>Zweiter</item>
         <item>Dritter</item>
         <item>Vierter</item>

@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d oui</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d peut-être</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d non</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d non répondu</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d en attente</string>
     <string name="event_attendee_is_organizer">Vous êtes l\'organisateur</string>
     <string name="event_attendee_organizer">Organisateur</string>
     <string name="event_attendee_optional">Facultatif</string>
@@ -394,14 +394,14 @@
     <string name="create_calendar_limit_reached_close">Fermer</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ?</string>
-    <string name="delete_default_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ? \"%1$s\" deviendra votre calendrier par défaut.</string>
+    <string name="delete_default_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
     <string name="delete_calendar_snack_deleted">Calendrier supprimé</string>
     <string name="delete_calendar_snack_error">Erreur lors de la suppression du calendrier</string>
     <string name="delete_calendar_snack_error_password_confirmation">La confirmation du mot de passe a échoué</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Il n\'y a aucun calendrier associé à ce compte.</string>
-    <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_no_calendar_message">Pour en créer un maintenant, visitez <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Erreur lors de la préparation des calendriers</string>
     <string name="bootstrap_error_some_calendars_failed_message">Les calendriers suivants n\'ont pas pu être configurés</string>
     <string name="bootstrap_error_no_active_calendar_title">Il n\'y a pas de calendrier actif associé à ce compte.</string>

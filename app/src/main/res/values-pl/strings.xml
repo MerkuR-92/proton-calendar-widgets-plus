@@ -60,7 +60,7 @@
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s o godzinie %2$s przez wiadomość</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s wcześniej o godzinie %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s wcześniej o godzinie %2$s przez wiadomość</string>
-    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s on %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s w: %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d. dnia miesiąca</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s w %2$s</string>
     <string name="event_recurrence_none">Nie powtarza się</string>

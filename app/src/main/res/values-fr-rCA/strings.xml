@@ -78,7 +78,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d oui</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d peut-être</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d non</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d en attente</string>
     <string name="event_attendee_is_organizer">Vous êtes l\'organisateur·rice</string>
     <string name="event_attendee_organizer">Organisateur·rice</string>
     <string name="event_attendee_optional">Facultatif</string>
@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a></string>
+    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur·rice seront perdues.</string>
@@ -392,20 +392,20 @@
     <string name="create_calendar_limit_reached_paid_message">Supprimez les calendriers inutilisés pour en créer de nouveaux.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gérer les calendriers</string>
     <string name="create_calendar_limit_reached_close">Fermer</string>
-    <string name="delete_calendar_dialog_title">Delete calendar</string>
-    <string name="delete_calendar_dialog_message">Are you sure you want to delete this calendar?</string>
-    <string name="delete_default_calendar_dialog_message">Are you sure you want to delete this calendar? \"%1$s\" will be set as default calendar.</string>
-    <string name="delete_calendar_snack_deleted">Calendar deleted</string>
-    <string name="delete_calendar_snack_error">Error deleting calendar</string>
-    <string name="delete_calendar_snack_error_password_confirmation">Password confirmation failed</string>
+    <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
+    <string name="delete_calendar_dialog_message">Êtes-vous sûr·e de vouloir supprimer ce calendrier?</string>
+    <string name="delete_default_calendar_dialog_message">Êtes-vous sûr·e de vouloir supprimer ce calendrier? « %1$s » deviendra votre calendrier par défaut.</string>
+    <string name="delete_calendar_snack_deleted">Calendrier supprimé</string>
+    <string name="delete_calendar_snack_error">Erreur lors de la suppression du calendrier</string>
+    <string name="delete_calendar_snack_error_password_confirmation">La confirmation du mot de passe a échoué</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Il n\'y a aucun calendrier associé à ce compte.</string>
-    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Erreur lors de la préparation des calendriers</string>
     <string name="bootstrap_error_some_calendars_failed_message">Les calendriers suivants n\'ont pas pu être configurés</string>
     <string name="bootstrap_error_no_active_calendar_title">Il n\'y a pas de calendrier actif associé à ce compte.</string>
-    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Pour savoir comment activer un calendrier, visitez notre <a href="https://protonmail.com/support/">base de connaissances</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Il n\'y a plus d\'espace de stockage disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">En savoir plus</string>
     <string name="bootstrap_error_reset_needed_title">Réinitialiser les clés des calendriers</string>
@@ -468,20 +468,20 @@
         <item quantity="other">participant·e·s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">Tous les jours</item>
+        <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">Toutes les semaines</item>
+        <item quantity="other">Toutes les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">Tous les mois</item>
+        <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">Tous les ans</item>
+        <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minute</item>
