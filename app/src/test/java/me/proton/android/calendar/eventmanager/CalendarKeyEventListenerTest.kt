@@ -4,6 +4,7 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
@@ -11,10 +12,12 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarKeyEventListener
 import me.proton.android.calendar.mocks.calendarId
+import me.proton.android.calendar.mocks.eventId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -29,7 +32,7 @@ class CalendarKeyEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarKeyEventListener(db, calendarsRepository, logger)
+        listener = spyk(CalendarKeyEventListener(db, calendarsRepository, logger))
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -78,7 +81,10 @@ class CalendarKeyEventListenerTest {
     fun `onSuccess calls refreshCalendarsFlags`() {
         runBlocking {
             val entity = CalendarKeyEntity("key_id", 0, "", "", calendarId)
-            listener.setActionMap(config, listOf(Event(Action.Create, "id", entity)))
+
+            coEvery { listener.getActionMap(any()) } returns listOf(
+                Event(Action.Create, "id", entity)
+            ).groupByAction()
 
             listener.onSuccess(config)
 

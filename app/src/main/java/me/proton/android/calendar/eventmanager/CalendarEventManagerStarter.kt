@@ -40,7 +40,7 @@ class CalendarEventManagerStarter @Inject constructor(
             .onAccountDisabled { eventManagerProvider.get(Core(it.userId)).stop() }
 
         accountManager.getAccounts(AccountState.Ready)
-            .flatMapLatest { accounts -> observeAllUserCalendars(accounts.map { it.userId }) }
+            .flatMapLatest { accounts -> observeAllCalendarsForUsers(accounts.map { it.userId }) }
             .onEach { allUserCalendars ->
                 for ((userId, calendars) in allUserCalendars) {
                     val managers = eventManagerProvider.getAll(userId).filter { it.config.listenerType == Calendar }
@@ -54,7 +54,7 @@ class CalendarEventManagerStarter @Inject constructor(
             }.launchIn(coroutineScope)
     }
 
-    private fun observeAllUserCalendars(userIds: List<UserId>): Flow<Map<UserId, Set<CalendarEntity>>> =
+    private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<CalendarEntity>>> =
         combine(
             userIds.map { userId -> observeUserCalendars(userId).map { userId to it } }
         ) {
