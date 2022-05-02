@@ -88,7 +88,7 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         }
 
         val dataPacket = sessionKey.encrypt(
-            PlainMessage(plainText)
+            PlainMessage(plainText.toByteArray())
         )
 
         // TODO Update CipherText to handle multiple key packets
@@ -111,7 +111,7 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         armoredPublicKey: String
     ): String? {
         return try {
-            Helper.encryptMessageArmored(armoredPublicKey, plainText)
+            Helper.encryptBinaryMessageArmored(armoredPublicKey, plainText.toByteArray())
         } catch (e: Exception) {
             logger.i("encrypt text with public key failed", e)
             null

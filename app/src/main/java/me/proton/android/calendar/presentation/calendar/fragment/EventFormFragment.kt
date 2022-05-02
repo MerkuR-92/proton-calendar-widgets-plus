@@ -410,6 +410,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             event.location?.let { event_form_location.setText(it) } ?: event_form_location.clearText()
             event.description?.let { event_form_description.setText(it) } ?: event_form_description.clearText()
 
+            event_form_title.doAfterTextChanged { if (event_form_title.hasFocus()) persistFormData() }
+            event_form_location.doAfterTextChanged { if (event_form_location.hasFocus()) persistFormData() }
+            event_form_description.doAfterTextChanged { if (event_form_description.hasFocus()) persistFormData() }
+
             ImageViewCompat.setImageTintList(
                 event_form_location_icon,
                 ColorStateList.valueOf(
@@ -558,9 +562,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun attachActionHandlers() {
-        event_form_title.doAfterTextChanged { if (event_form_title.hasFocus()) persistFormData() }
-        event_form_location.doAfterTextChanged { if (event_form_location.hasFocus()) persistFormData() }
-        event_form_description.doAfterTextChanged { if (event_form_description.hasFocus()) persistFormData() }
 
         event_form_location.setOnFocusChangeListener { _, hasFocus ->
             when {

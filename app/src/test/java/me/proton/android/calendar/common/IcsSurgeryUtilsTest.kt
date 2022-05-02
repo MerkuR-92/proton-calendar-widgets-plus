@@ -2834,7 +2834,7 @@ END:VCALENDAR
     }
 
     @Test
-    fun `cleanAttendees ATTENDEE with Apple garbage`() {
+    fun `cleanAttendees ATTENDEE with Apple formatting`() {
 
         val iCalString = """
     BEGIN:VCALENDAR

@@ -285,13 +285,7 @@ object EventUtilsImpl : EventUtils {
             val occurrenceEnd = if (isAllDay()) {
                 occurrenceStart.plus(eventDurationInDays, ChronoUnit.DAYS)
             } else {
-                val calculatedEnd = occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
-
-                val startTZOffset = ZoneId.of(timeZoneId).rules.getOffset(occurrenceStart.toInstant())
-                val endTZOffset = ZoneId.of(timeZoneId).rules.getOffset(calculatedEnd.toInstant())
-                val startEndOffsetDifference = startTZOffset.compareTo(endTZOffset)
-
-                calculatedEnd.minusSeconds(startEndOffsetDifference.toLong())
+                occurrenceStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
             }
 
             // we generated enough occurrences already

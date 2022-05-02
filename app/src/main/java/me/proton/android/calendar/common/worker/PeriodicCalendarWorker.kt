@@ -5,6 +5,7 @@ import androidx.work.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.BuildConfig
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -20,6 +21,7 @@ class PeriodicCalendarWorker(appContext: Context, workerParams: WorkerParameters
 
     private val logger: Logger by inject()
     private val accountManager: AccountManager by inject()
+    private val widgetRefresher: WidgetRefresher by inject()
 
     private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
 
@@ -27,7 +29,13 @@ class PeriodicCalendarWorker(appContext: Context, workerParams: WorkerParameters
 
         forceShowLateAlarms()
 
+        forceRefreshWidget()
+
         return Result.success()
+    }
+
+    private fun forceRefreshWidget() {
+        widgetRefresher.broadcastRefresh()
     }
 
     private suspend fun forceShowLateAlarms() {
