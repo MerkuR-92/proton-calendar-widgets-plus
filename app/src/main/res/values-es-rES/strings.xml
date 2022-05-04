@@ -392,6 +392,10 @@
     <string name="create_calendar_limit_reached_paid_message">Elimine calendarios no usados para crear nuevos.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
+    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
     <string name="delete_calendar_dialog_title">Borrar calendario</string>
     <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
@@ -426,10 +430,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Empieza a las %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_header">Novedades</string>
+    <string name="spotlight_dialog_header">What\'s new</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Vista del mes</string>
-    <string name="spotlight_dialog_month_view_description">De un vistazo a sus eventos con nuestra nueva vista mensual. Cambie entre vistas usando el menú.</string>
+    <string name="spotlight_dialog_month_view_title">Month view</string>
+    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Got it</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>

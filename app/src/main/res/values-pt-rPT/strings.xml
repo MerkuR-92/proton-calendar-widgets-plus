@@ -392,6 +392,10 @@
     <string name="create_calendar_limit_reached_paid_message">Delete unused calendars to create new calendars.</string>
     <string name="create_calendar_limit_reached_paid_manage">Manage calendars</string>
     <string name="create_calendar_limit_reached_close">Close</string>
+    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
     <string name="delete_calendar_dialog_title">Delete calendar</string>
     <string name="delete_calendar_dialog_message">Are you sure you want to delete this calendar?</string>
     <string name="delete_default_calendar_dialog_message">Are you sure you want to delete this calendar? \"%1$s\" will be set as default calendar.</string>
@@ -430,6 +434,10 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Month view</string>
     <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Got it</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
