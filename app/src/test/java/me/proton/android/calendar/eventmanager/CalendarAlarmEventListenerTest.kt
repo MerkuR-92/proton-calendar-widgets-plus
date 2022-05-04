@@ -6,12 +6,12 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
@@ -26,6 +26,7 @@ import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
+import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
@@ -46,13 +47,13 @@ class CalendarAlarmEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarAlarmEventListener(
+        listener = spyk(CalendarAlarmEventListener(
             db,
             calendarsRepository,
             handleAlarmsUseCase,
             syncAlarmsUseCase,
             logger,
-        )
+        ))
     }
 
     @Test
@@ -135,7 +136,9 @@ class CalendarAlarmEventListenerTest {
     @Test
     fun `onSuccess post-process the alarms calling HandleAlarmsUseCase`() {
         runBlocking {
-            listener.setActionMap(config, listOf(Event(Action.Create, eventId, createAlarmEntity("alarm_id"))))
+            coEvery { listener.getActionMap(any()) } returns listOf(
+                Event(Action.Create, eventId, createAlarmEntity("alarm_id"))
+            ).groupByAction()
 
             listener.onSuccess(config)
 

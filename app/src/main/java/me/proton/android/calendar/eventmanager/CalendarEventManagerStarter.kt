@@ -1,19 +1,26 @@
 package me.proton.android.calendar.eventmanager
 
-import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.accountmanager.domain.getAccounts
 import me.proton.core.accountmanager.presentation.observe
+import me.proton.core.accountmanager.presentation.onAccountDisabled
 import me.proton.core.accountmanager.presentation.onAccountReady
-import me.proton.core.accountmanager.presentation.onAccountRemoved
+import me.proton.core.domain.entity.UserId
+import me.proton.core.eventmanager.data.EventManagerCoroutineScope
+import me.proton.core.eventmanager.domain.EventListener.Type.Calendar
 import me.proton.core.eventmanager.domain.EventManagerConfig
+import me.proton.core.eventmanager.domain.EventManagerConfig.Core
 import me.proton.core.eventmanager.domain.EventManagerProvider
 import me.proton.core.presentation.app.AppLifecycleProvider
 import javax.inject.Inject
@@ -21,53 +28,44 @@ import javax.inject.Singleton
 
 @Singleton
 class CalendarEventManagerStarter @Inject constructor(
+    @EventManagerCoroutineScope private val coroutineScope: CoroutineScope,
     private val appLifecycleProvider: AppLifecycleProvider,
     private val eventManagerProvider: EventManagerProvider,
     private val accountManager: AccountManager,
     private val calendarsRepository: CalendarsRepository,
 ) {
-    private val observedCalendarIdsForUser = mutableMapOf<String, Set<String>>()
-    private var observedCalendarScopes = mutableMapOf<String, CoroutineScope>()
-
     fun start() {
-        accountManager.observe(appLifecycleProvider.lifecycle, minActiveState = Lifecycle.State.CREATED)
-            .onAccountReady { account ->
-                val userId = account.userId
-                eventManagerProvider.get(EventManagerConfig.Core(userId)).start()
+        accountManager.observe(appLifecycleProvider.lifecycle)
+            .onAccountReady { eventManagerProvider.get(Core(it.userId)).start() }
+            .onAccountDisabled { eventManagerProvider.get(Core(it.userId)).stop() }
 
-                val scope = CoroutineScope(Dispatchers.Default).also {
-                    observedCalendarScopes[userId.id] = it
-                }
-
-                combine(
-                    calendarsRepository.flowUserCalendars(userId.id),
-                    calendarsRepository.flowSubscribedCalendars(userId.id),
-                ) { calendars, subscriptions ->
-                    (calendars + subscriptions).map { it.id }
-                }
-                    .distinctUntilChanged()
-                    .onEach { calendarIds ->
-                        val newCalendarIds = calendarIds.map { it }.toSet()
-                        val oldCalendarIds = observedCalendarIdsForUser[userId.id].orEmpty()
-                        val calendarIdsToRemove = oldCalendarIds - newCalendarIds
-                        val calendarsToAdd = newCalendarIds - oldCalendarIds
-                        calendarIdsToRemove.forEach {
-                            eventManagerProvider.get(EventManagerConfig.Calendar(userId, it)).stop()
-                        }
-                        calendarsToAdd.forEach {
-                            eventManagerProvider.get(EventManagerConfig.Calendar(userId, it)).start()
-                        }
-                        observedCalendarIdsForUser[userId.id] = newCalendarIds
+        accountManager.getAccounts(AccountState.Ready)
+            .flatMapLatest { accounts -> observeAllCalendarsForUsers(accounts.map { it.userId }) }
+            .onEach { allUserCalendars ->
+                for ((userId, calendars) in allUserCalendars) {
+                    val managers = eventManagerProvider.getAll(userId).filter { it.config.listenerType == Calendar }
+                    // Stop all calendars managers, for this userId.
+                    managers.forEach { manager -> manager.stop() }
+                    // Start all enabled calendars, for this userId.
+                    calendars.filter { it.display == 1 }.forEach {
+                        eventManagerProvider.get(EventManagerConfig.Calendar(userId, it.id)).start()
                     }
-                    .launchIn(scope)
-            }
-            .onAccountRemoved { account ->
-                val userId = account.userId.id
-                // There is no need to stop Core or Calendar managers, they'll be stopped when the account is removed
-                // However, we should remove their ids from our set of running managers
-                observedCalendarIdsForUser.remove(userId)
-                // And stop listening to their calendars' updates until they authenticate again
-                observedCalendarScopes.remove(userId)?.cancel()
-            }
+                }
+            }.launchIn(coroutineScope)
     }
+
+    private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<CalendarEntity>>> =
+        combine(
+            userIds.map { userId -> observeUserCalendars(userId).map { userId to it } }
+        ) {
+            it.toMap()
+        }
+
+    private fun observeUserCalendars(userId: UserId): Flow<Set<CalendarEntity>> =
+        combine(
+            calendarsRepository.flowUserCalendars(userId.id),
+            calendarsRepository.flowSubscribedCalendars(userId.id)
+        ) { calendars, subscriptions ->
+            (calendars + subscriptions).toSet()
+        }.distinctUntilChanged()
 }

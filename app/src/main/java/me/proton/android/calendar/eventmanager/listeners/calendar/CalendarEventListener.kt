@@ -75,11 +75,11 @@ class CalendarEventListener @Inject constructor(
         eventIds?.let { updateAlarmsUseCase.execute(config.userId.id, it) }
     }
 
-    override suspend fun onComplete(config: EventManagerConfig) {
+    override suspend fun onSuccess(config: EventManagerConfig) {
         val entityIds = getActionMap(config)[Action.Create]?.mapNotNull { it.entity?.id }.orEmpty() +
                 getActionMap(config)[Action.Update]?.mapNotNull { it.entity?.id }.orEmpty()
 
-        delegate.onCompletion(config, entityIds)
+        delegate.onSuccess(config, entityIds)
     }
 }
 
@@ -123,11 +123,12 @@ class CalendarEventListenerDelegate @Inject constructor(
         calendarsRepository.deleteEventsById(ids)
     }
 
-    suspend fun onCompletion(config: EventManagerConfig, entityIds: List<String>) {
+    suspend fun onSuccess(config: EventManagerConfig, entityIds: List<String>) {
         val entitiesToPostProcess = entityIds.mapNotNull { entities[it] }
         if (entitiesToPostProcess.isEmpty()) return
         // Post process received events
-        //fetchPublicKeysUseCase.execute(config.userId, entitiesToPostProcess)
+        // TODO We are not using the result of that use case for now
+        // fetchPublicKeysUseCase.execute(config.userId, entitiesToPostProcess)
         updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
         widgetRefresher.refreshEventList()
         // Clean cached entities

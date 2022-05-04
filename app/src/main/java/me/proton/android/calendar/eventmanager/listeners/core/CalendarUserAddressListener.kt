@@ -23,7 +23,7 @@ class CalendarUserAddressListener @Inject constructor(
 ) : UserAddressEventListener(db, userAddressRepository) {
 
     override val type = Type.Core
-    override val order = 1
+    override val order = 2
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,

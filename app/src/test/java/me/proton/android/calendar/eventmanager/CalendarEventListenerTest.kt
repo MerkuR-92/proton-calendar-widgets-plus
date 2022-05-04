@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import io.mockk.*
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.WidgetRefresher
@@ -26,6 +25,7 @@ import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
+import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -45,14 +45,14 @@ class CalendarEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarEventListener(
+        listener = spyk(CalendarEventListener(
             db,
             calendarsRepository,
             delegate,
             getMinimalCalendarEventsUseCase,
             updateAlarmsUseCase,
             logger,
-        )
+        ))
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -145,22 +145,20 @@ class CalendarEventListenerTest {
     }
 
     @Test
-    fun `onComplete calls delegate's onCompletion with events that were either created or updated`() {
+    fun `onSuccess calls delegate's onSuccess with events that were either created or updated`() {
         runBlocking {
             val capturedIds = slot<List<String>>()
-            coEvery { delegate.onCompletion(any(), capture(capturedIds)) } returns Unit
+            coEvery { delegate.onSuccess(any(), capture(capturedIds)) } returns Unit
 
-            listener.setActionMap(config,
-                listOf(
-                    Event(Action.Create, "id_1", createEventMetadata("id_1")),
-                    Event(Action.Update, "id_2", createEventMetadata("id_2")),
-                    Event(Action.Delete, "id_3", null),
-                )
+            coEvery { listener.getActionMap(any()) } returns mapOf(
+                Action.Create to listOf(Event(Action.Create, "id_1", createEventMetadata("id_1"))),
+                Action.Update to listOf(Event(Action.Update, "id_2", createEventMetadata("id_2"))),
+                Action.Delete to listOf(Event(Action.Delete, "id_3", null)),
             )
 
-            listener.onComplete(config)
+            listener.onSuccess(config)
 
-            coVerify(exactly = 1) { delegate.onCompletion(any(), any()) }
+            coVerify(exactly = 1) { delegate.onSuccess(any(), any()) }
             assertThat(capturedIds.captured).isEqualTo(listOf("id_1", "id_2"))
         }
     }
@@ -296,7 +294,7 @@ class CalendarEventListenerDelegateTest {
             // Needed to populate the entity cache
             delegate.onPrepare(config, metadata)
 
-            delegate.onCompletion(config, metadata.map { it.id })
+            delegate.onSuccess(config, metadata.map { it.id })
 
             //coVerify(exactly = 1) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 1) { updateAlarmsUseCase.execute(any(), any()) }
@@ -311,7 +309,7 @@ class CalendarEventListenerDelegateTest {
             // Needed to populate the entity cache
             delegate.onPrepare(config, metadata)
 
-            delegate.onCompletion(config, emptyList())
+            delegate.onSuccess(config, emptyList())
 
             //coVerify(exactly = 0) { fetchPublicKeysUseCase.execute(any(), any()) }
             coVerify(exactly = 0) { widgetRefresher.refreshEventList() }

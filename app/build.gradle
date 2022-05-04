@@ -311,7 +311,7 @@ dependencies {
 
     testImplementation "org.koin:koin-test:${rootProject.ext.version.koin}"
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
     // Core library
     testImplementation "androidx.arch.core:core-testing:2.1.0"
