@@ -86,7 +86,7 @@
                             android:layout_height="10dp"
                             android:layout_marginTop="2dp"
                             android:layout_marginStart="6dp"
-                            android:src="@drawable/ic_proton_chevron_down_filled"
+                            app:srcCompat="@drawable/ic_proton_chevron_down_filled"
                             app:tint="@color/icon_norm"
                             android:background="@null"
                             android:visibility="gone"

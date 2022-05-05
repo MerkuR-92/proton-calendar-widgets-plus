@@ -50,7 +50,7 @@
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="@dimen/widget_padding"
         android:background="@drawable/ripple_action_button_oval"
-        android:src="@drawable/ic_proton_plus"
+        app:srcCompat="@drawable/ic_proton_plus"
         android:tint="@color/icon_norm"
         android:visibility="invisible"
         tools:ignore="UseAppTint"
@@ -62,7 +62,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_toStartOf="@id/ib_plus"
-        android:src="@drawable/ic_proton_arrows_rotate" />
+        app:srcCompat="@drawable/ic_proton_arrows_rotate" />
 
 
     <ListView

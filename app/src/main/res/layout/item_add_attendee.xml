@@ -31,7 +31,7 @@
             app:tint="@color/icon_hint"
             android:visibility="gone"
             tools:visibility="visible"
-            android:src="@drawable/ic_proton_checkmark"/>
+            app:srcCompat="@drawable/ic_proton_checkmark"/>
 
         <ProgressBar
             android:id="@+id/item_add_attendee_loading_icon"
@@ -48,7 +48,7 @@
             style="@style/Icon"
             android:visibility="gone"
             tools:visibility="visible"
-            android:src="@drawable/ic_proton_cross"
+            app:srcCompat="@drawable/ic_proton_cross"
             android:clickable="true"
             android:focusable="true"
             android:background="?android:selectableItemBackgroundBorderless"/>

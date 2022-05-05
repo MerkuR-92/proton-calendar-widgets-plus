@@ -88,7 +88,7 @@
                 android:background="@drawable/ic_logo_background_shape"
                 android:elevation="8dp"
                 android:layout_marginHorizontal="8dp"
-                android:src="@drawable/ic_logo_mail"/>
+                app:srcCompat="@drawable/ic_logo_mail"/>
 
             <ImageView
                 android:layout_width="32dp"
@@ -96,7 +96,7 @@
                 android:background="@drawable/ic_logo_background_shape"
                 android:elevation="8dp"
                 android:layout_marginHorizontal="8dp"
-                android:src="@drawable/ic_logo_calendar"/>
+                app:srcCompat="@drawable/ic_logo_calendar"/>
 
             <ImageView
                 android:layout_width="32dp"
@@ -104,7 +104,7 @@
                 android:background="@drawable/ic_logo_background_shape"
                 android:elevation="8dp"
                 android:layout_marginHorizontal="8dp"
-                android:src="@drawable/ic_logo_drive"/>
+                app:srcCompat="@drawable/ic_logo_drive"/>
 
             <ImageView
                 android:layout_width="32dp"
@@ -112,7 +112,7 @@
                 android:background="@drawable/ic_logo_background_shape"
                 android:elevation="8dp"
                 android:layout_marginHorizontal="8dp"
-                android:src="@drawable/ic_logo_vpn"/>
+                app:srcCompat="@drawable/ic_logo_vpn"/>
 
         </LinearLayout>
 

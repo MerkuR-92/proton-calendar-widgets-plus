@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/event_form_alarm_icon"
         style="@style/Icon.Form"
-        android:src="@drawable/ic_proton_bell"
+        app:srcCompat="@drawable/ic_proton_bell"
         app:layout_constraintBottom_toBottomOf="@+id/item_simple_text_button_title"
         app:layout_constraintTop_toTopOf="@+id/item_simple_text_button_title"
         app:layout_constraintStart_toStartOf="parent" />

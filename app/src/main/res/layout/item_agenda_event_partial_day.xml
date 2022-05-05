@@ -64,7 +64,7 @@
         android:visibility="gone"
         android:layout_width="@dimen/default_icon_size"
         android:layout_height="@dimen/default_icon_size"
-        android:src="@drawable/ic_lock_exclamation_filled"
+        app:srcCompat="@drawable/ic_lock_exclamation_filled"
         app:layout_constraintStart_toStartOf="@+id/text_header"
         app:layout_constraintTop_toBottomOf="@+id/text_header"/>
 
