@@ -434,10 +434,10 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Month view</string>
     <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
-    <string name="spotlight_v5_dialog_got_it_button">Got it</string>
-    <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
-    <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
+    <string name="spotlight_v5_dialog_got_it_button">Rozumiem</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Dowiedz się więcej</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Nowy Proton, ujednolicona ochrona</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Przedstawiamy odświeżony wygląd Protona. Wiele usług, jeden cel. Witaj w Internecie, w którym prywatność jest oczywistością. <a href="http://proton.me/news/updated-proton">Dowiedz się więcej</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minuta</item>
