@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_add_layout
@@ -330,7 +331,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
                 } else {
                     bottomSheetDialog.dismiss()
-                    with (AlertDialog.Builder(requireContext())) {
+                    with (MaterialAlertDialogBuilder(requireContext())) {
                         setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
                         setMessage(dialogMessage)
                         setPositiveButton(R.string.dialog_button_delete, object : DialogInterface.OnClickListener {
