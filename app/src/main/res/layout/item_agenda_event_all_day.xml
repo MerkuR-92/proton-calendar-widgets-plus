@@ -104,7 +104,7 @@
         android:visibility="gone"
         android:layout_width="@dimen/default_icon_size"
         android:layout_height="@dimen/default_icon_size"
-        app:srcCompat="@drawable/ic_lock_exclamation_filled"
+        app:srcCompat="@drawable/ic_proton_lock_exclamation_filled"
         android:layout_marginStart="32dp"
         android:layout_marginTop="@dimen/spacing_element_small"
         android:layout_marginBottom="@dimen/spacing_element_small"
