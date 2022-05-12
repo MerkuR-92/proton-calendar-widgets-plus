@@ -70,6 +70,7 @@ val networkModule = module {
     single<SettingsApi> { SettingsApiImpl(get()) }
     single<ReportsApi> { ReportsApiImpl(get()) }
     single<MailSettingsApi> { MailSettingsApiImpl(get()) }
+    single<FeedbackApi> { FeedbackApiImpl(get()) }
 }
 
 val repositoryModule = module {
@@ -81,6 +82,7 @@ val viewModelModule = module {
     viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
+            get(),
             get(),
             get(),
             get(),
