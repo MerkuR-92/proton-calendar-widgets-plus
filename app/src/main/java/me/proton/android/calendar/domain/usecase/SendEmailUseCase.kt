@@ -258,7 +258,7 @@ class SendEmailUseCase @Inject constructor(
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase")
 
-        val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
+        val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket!! /* TODO FIXME */, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
 
         return UseCase.Result.Success(
             Pair(sharedEventId, sharedSessionKey)

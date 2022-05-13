@@ -422,13 +422,13 @@ class EditCreateEventUseCase @Inject constructor(
 
     private fun extractSessionKeys(eventEntity: EventEntity, calendarKey: CalendarKey): UseCase.Result {
 
-        val sharedSessionKey = crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarKey.privateKeys, calendarKey.passphrase)
+        val sharedSessionKey = crypto.decryptSessionKey(eventEntity.sharedKeyPacket!! /* TODO FIXME */, calendarKey.privateKeys, calendarKey.passphrase)
 
         val calendarSessionKey = if (eventEntity.calendarKeyPacket != null) {
             crypto.decryptSessionKey(eventEntity.calendarKeyPacket, calendarKey.privateKeys, calendarKey.passphrase)
         } else null
 
-        if (sharedSessionKey == null && eventEntity.sharedKeyPacket.isNotBlank()) {
+        if (sharedSessionKey == null && eventEntity.sharedKeyPacket?.isNotBlank() == true) {
             return UseCase.Result.InvalidParams("EditCreateEventUseCase: failed to decrypt shared session key")
         }
 

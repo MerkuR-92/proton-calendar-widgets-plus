@@ -19,9 +19,11 @@
 package me.proton.android.calendar.data.db
 
 import android.content.Context
+import androidx.room.RenameColumn
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
@@ -221,6 +223,27 @@ object AppDatabaseMigrations {
     val MIGRATION_37_38 = object : Migration(37, 38) {
         override fun migrate(database: SupportSQLiteDatabase) {
             ChallengeDatabase.MIGRATION_1.migrate(database)
+        }
+    }
+
+    val MIGRATION_38_39 = object : Migration(38, 39) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            // create temporary table with new schema
+            database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_EVENTS + "_temp"}` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `sharedEventId` TEXT, `calendarKeyPacket` TEXT, `createTime` INTEGER NOT NULL, `modifyTime` INTEGER NOT NULL, `permissions` INTEGER NOT NULL, `addressKeyPacket` TEXT, `addressId` TEXT, `sharedKeyPacket` TEXT, `sharedEvents` TEXT NOT NULL, `calendarEvents` TEXT NOT NULL, `personalEvents` TEXT NOT NULL, `attendeesEvents` TEXT NOT NULL, `attendees` TEXT NOT NULL, `isProtonProtonInvite` INTEGER, PRIMARY KEY(`id`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+
+            // copy data from old to new, without non-yet-existing columns
+            database.execSQL("INSERT INTO `${TABLE_EVENTS + "_temp"}`(id, calendarId, sharedEventId, calendarKeyPacket, createTime, modifyTime, permissions, sharedKeyPacket, sharedEvents, calendarEvents, personalEvents, attendeesEvents, attendees, isProtonProtonInvite) SELECT id, calendarId, sharedEventId, calendarKeyPacket, createTime, modifyTime, permissions, sharedKeyPacket, sharedEvents, calendarEvents, personalEvents, attendeesEvents, attendees, isProtonProtonInvite FROM `${TABLE_EVENTS}`")
+
+            // drop old table
+            database.execSQL("DROP TABLE `${TABLE_EVENTS}`")
+
+            // rename temporary table to old name
+            database.execSQL("ALTER TABLE `${TABLE_EVENTS + "_temp"}` RENAME TO `${TABLE_EVENTS}`")
+
+            // recreate index that we had on original table
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_events_calendarId` ON `${TABLE_EVENTS}` (`calendarId`)")
+
         }
     }
 }
