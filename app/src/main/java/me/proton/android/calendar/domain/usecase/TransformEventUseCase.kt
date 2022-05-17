@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import com.google.crypto.tink.subtle.Base64
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -20,15 +21,16 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.decryptDataOrNull
+import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.entity.key.PublicKey
-import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.repository.PublicAddressRepository
-import me.proton.core.key.domain.repository.Source
+import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 class TransformEventUseCase @Inject constructor(
@@ -47,26 +49,33 @@ class TransformEventUseCase @Inject constructor(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
+
         val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
         if (calendarPrivateKeys.isNullOrEmpty()) {
             logger.e("TransformEventUseCase, calendarKey is null")
             return null
         }
+
         val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(json) }.firstOrNull() { it.isActive }
         if (calendarPassphrase == null) {
             logger.e("TransformEventUseCase, calendarPassphrase is null")
             return null
         }
+
         val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id)
         if (keyPassphrase == null) {
             logger.e("TransformEventUseCase, keyPassphrase is null")
             return null
         }
+
         val userAddresses = userManager.getAddressesOrNull(UserId(userId))
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
             return null
         }
+
+        // used for decryption instead of CalendarKey if Event's SharedPart is encrypted with AddressKey
+        val userAddressForAddressKeyPacket = userAddresses.find { it.addressId.id == eventEntity.addressId }
 
         val calendarParts = mutableListOf<String>()
         val verificationStatuses: MutableList<Event.SignatureVerification> = mutableListOf()
@@ -79,13 +88,26 @@ class TransformEventUseCase @Inject constructor(
                 eventEntity.sharedEvents.map {
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }.map { sharedEvent ->
-                    getPlainText(
-                        eventEntity.sharedKeyPacket,
-                        calendarPrivateKeys,
-                        keyPassphrase,
-                        sharedEvent,
-                        getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
-                    )
+
+                    if (eventEntity.addressKeyPacket != null) { // use Address Key with AddressKeyPacket
+                        if (userAddressForAddressKeyPacket != null) {
+                            getPlainText(
+                                eventEntity.addressKeyPacket,
+                                userAddressForAddressKeyPacket,
+                                cryptoContext,
+                                sharedEvent
+                            )
+                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                    } else { // use Calendar Key with SharedKeyPacket
+                        getPlainText(
+                            eventEntity.sharedKeyPacket,
+                            calendarPrivateKeys,
+                            keyPassphrase,
+                            sharedEvent,
+                            getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                        )
+                    }
+
                 }
             }
 
@@ -120,21 +142,34 @@ class TransformEventUseCase @Inject constructor(
             }
 
             // process Attendees Events
-            val processedAttendeesEvemts = async {
+            val processedAttendeesEvents = async {
                 eventEntity.attendeesEvents.map {
                     json.decodeFromJsonElement<Event.EventPart.Attendee>(it)
                 }.map { attendeeEvent ->
-                    getPlainText(
-                        eventEntity.sharedKeyPacket,
-                        calendarPrivateKeys,
-                        keyPassphrase,
-                        attendeeEvent,
-                        getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
-                    )
+
+                    if (eventEntity.addressKeyPacket != null) { // use Address Key with AddressKeyPacket
+                        if (userAddressForAddressKeyPacket != null) {
+                            getPlainText(
+                                eventEntity.addressKeyPacket,
+                                userAddressForAddressKeyPacket,
+                                cryptoContext,
+                                attendeeEvent
+                            )
+                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                    } else { // use Calendar Key with SharedKeyPacket
+                        getPlainText(
+                            eventEntity.sharedKeyPacket,
+                            calendarPrivateKeys,
+                            keyPassphrase,
+                            attendeeEvent,
+                            getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                        )
+                    }
+
                 }
             }
 
-            listOf(processedSharedEvents, processedCalendarEvents, processedPersonalEvents, processedAttendeesEvemts)
+            listOf(processedSharedEvents, processedCalendarEvents, processedPersonalEvents, processedAttendeesEvents)
                 .awaitAll().flatten().forEach { processResult ->
                     processResult.plainText?.let { calendarParts.add(it) }
                     decryptionStatuses.add(processResult.decryptionStatus)
@@ -304,5 +339,31 @@ class TransformEventUseCase @Inject constructor(
             ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
         }
 
+    }
+
+    /**
+     * Get plaintext payload or decrypt using AddressKeys.
+     */
+    private fun getPlainText(keyPacket: String,
+                             userAddress: UserAddress,
+                             cryptoContext: CryptoContext,
+                             eventPart: Event.EventPart
+    ): ProcessResult {
+
+        // decrypt if necessary
+        val plainText = if (eventPart.isEncrypted) {
+            userAddress.useKeys(cryptoContext) {
+                decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
+                    it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
+                }?.toString(StandardCharsets.UTF_8)
+            }
+        } else {
+            eventPart.data
+        }
+
+        // TODO verify signature for author if (eventPart.isSigned) when we fix signatures, not refactoring it now because
+        //  we're not sure how it's going to look like
+
+        return ProcessResult(plainText, if (plainText != null) Event.DecryptionStatus.SUCCESS else Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
     }
 }
