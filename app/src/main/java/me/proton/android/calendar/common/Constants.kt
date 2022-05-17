@@ -75,7 +75,7 @@ const val MAX_CALENDAR_FREE = 1
 
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
-    143 // Rebranding (2.0.0)
+    144 // Rebranding (2.0.1)
 )
 
 object FeatureFlag {
