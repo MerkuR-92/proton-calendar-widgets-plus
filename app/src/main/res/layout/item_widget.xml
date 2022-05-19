@@ -111,7 +111,7 @@
             style="@style/Icon"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/ic_proton_lock_exclamation_filled" />
+            android:src="@drawable/ic_lock_exclamation_filled_android_six_compat" />
 
         <FrameLayout
             android:id="@+id/decryption_error_view"
