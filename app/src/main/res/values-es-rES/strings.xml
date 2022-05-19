@@ -528,4 +528,12 @@
         <item>Sábado</item>
         <item>Domingo</item>
     </string-array>
+    <string name="dialog_feedback_header">Danos tu opinión</string>
+    <string name="dialog_feedback_text">¿Cómo describirías tu experiencia con Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Horrible</string>
+    <string name="dialog_feedback_rating_best">Maravillosa</string>
+    <string name="dialog_feedback_hint">Cuéntenos su experiencia. (Opcional)</string>
+    <string name="dialog_feedback_submit_thank_you">Gracias. Sus comentarios nos ayudan a mejorar Proton.</string>
+    <string name="dialog_feedback_submit">Enviar</string>
+    <string name="nav_view_feedback">Danos tu opinión</string>
 </resources>

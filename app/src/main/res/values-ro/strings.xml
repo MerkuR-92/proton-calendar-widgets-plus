@@ -542,4 +542,12 @@
         <item>Sâmbătă</item>
         <item>Duminică</item>
     </string-array>
+    <string name="dialog_feedback_header">Dați-ne feedback</string>
+    <string name="dialog_feedback_text">Cum ați descrie experiența dumneavoastră cu Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Îngrozitor</string>
+    <string name="dialog_feedback_rating_best">Minunat</string>
+    <string name="dialog_feedback_hint">Povestiți-ne despre experiența dumneavoastră. (Opțional)</string>
+    <string name="dialog_feedback_submit_thank_you">Vă mulțumim! Feedback-ul dvs. ne ajută să îmbunătățim Proton.</string>
+    <string name="dialog_feedback_submit">Trimitere</string>
+    <string name="nav_view_feedback">Dați-ne feedback</string>
 </resources>

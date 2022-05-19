@@ -528,4 +528,12 @@
         <item>Dissabte</item>
         <item>Diumenge</item>
     </string-array>
+    <string name="dialog_feedback_header">Compartiu la vostra opinió</string>
+    <string name="dialog_feedback_text">Com descriurieu la vostra experiència amb Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Horrible</string>
+    <string name="dialog_feedback_rating_best">Fantàstica</string>
+    <string name="dialog_feedback_hint">Explica\'ns la teva experiència. (Opcional)</string>
+    <string name="dialog_feedback_submit_thank_you">Gràcies! Els vostres comentaris ens ajuden a millorar Proton.</string>
+    <string name="dialog_feedback_submit">Enviar</string>
+    <string name="nav_view_feedback">Compartiu la vostra opinió</string>
 </resources>
