@@ -60,7 +60,7 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 const val SESSION_KEY_ALGO = "aes256"
 
-val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
+val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me", "proton.me")
 const val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
 const val PROTON_UID = "@proton.me"
