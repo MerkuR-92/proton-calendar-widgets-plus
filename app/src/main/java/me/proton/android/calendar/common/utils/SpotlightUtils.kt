@@ -64,7 +64,7 @@ object SpotlightUtils {
                     monthViewContent.second
                 )
             }
-            144 -> {
+            145 -> {
                 // Rebranding
                 val monthViewContent = this.resources.getRebrandingDialogContent()
                 this.displayV5SpotlightDialog(
