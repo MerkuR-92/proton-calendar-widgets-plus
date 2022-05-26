@@ -10,7 +10,7 @@
 
     <ImageView
         android:id="@+id/item_calendar_dialog_icon"
-        android:src="@drawable/ic_dot"
+        app:srcCompat="@drawable/ic_dot"
         style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/item_calendar_dialog_title"
         app:layout_constraintBottom_toBottomOf="@+id/item_calendar_dialog_title"

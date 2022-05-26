@@ -11,8 +11,8 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
@@ -56,9 +56,10 @@ import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
-import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
@@ -78,10 +79,9 @@ import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.core.util.kotlin.nullIfBlank
+import me.proton.android.calendar.presentation.subscription.PlansViewModel
+import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.util.kotlin.toBoolean
-import org.koin.android.ext.android.inject
-import org.koin.android.viewmodel.ext.android.viewModel
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -108,6 +108,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val eventViewModel: EventViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
+    private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
+    private val plansViewModel: PlansViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
@@ -196,51 +198,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         Runtime.getRuntime().exit(0)
     }
 
-    fun getAppTheme(): AppTheme {
-        return AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(this).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]
-    }
-
-    fun changeAppTheme(theme: AppTheme) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val editor = sharedPreferences.edit()
-        editor.putInt(SharedPreferencesKeys.THEME, theme.value)
-        editor.apply()
-
-        handleAppTheme()
-
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
-    }
-
-    private fun handleAppTheme() {
-        val defaultNightMode = AppCompatDelegate.getDefaultNightMode()
-        when (getAppTheme()) {
-            AppTheme.LIGHT -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                    restartActivity()
-                }
-            }
-            AppTheme.DARK -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
-                    restartActivity()
-                }
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                if (defaultNightMode == AppCompatDelegate.MODE_NIGHT_NO ||
-                    defaultNightMode == AppCompatDelegate.MODE_NIGHT_YES) {
-                    restartActivity()
-                }
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         intent?.let {
@@ -274,7 +231,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        handleAppTheme()
+        installSplashScreen().setKeepOnScreenCondition {
+            accountViewModel.state.value in listOf(
+                AccountViewModel.State.Initial,
+                AccountViewModel.State.StepNeeded,
+            )
+        }
         super.onCreate(savedInstanceState)
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
@@ -319,6 +281,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         intent?.let {
             if (savedInstanceState == null && mainViewModel.shouldHandleIntent(intent)) mainViewModel.handleIntent(intent)
         }
+
+        plansViewModel.register(this)
 
         with(accountViewModel) {
             init(this@MainActivity)
@@ -430,14 +394,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             BuildConfig.VERSION_NAME
         )
 
+        initDrawerHeader()
         initDrawerListeners()
-
         initDrawerCalendarsList()
 
         calendarViewModel.initialised.observe(this@MainActivity, Observer { initialised ->
             if (initialised) {
                 // Refresh drawer content now that we are logged in.
-                initDrawerHeader()
                 initDrawerCalendarsListContent()
             }
         })
@@ -772,8 +735,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_norm
             window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
         } else {
-            val navigationBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_navigation_bar
-            window.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+            window.navigationBarColor =
+                if (display) resources.getColor(R.color.splash_screen_color, null)
+                else getColorFromAttr(R.attr.proton_background_norm)
         }
     }
 
@@ -787,6 +751,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
             drawer_layout.close()
         }
+
+        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(SUBSCRIPTION)
+        nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
+            plansViewModel.onCurrentPlanClicked(this)
+            drawer_layout.close()
+        }
+
         // TODO Remove feature flag
         nav_view_main_content.nav_view_more_settings_layout.visibleOrGone(FeatureFlag.SETTINGS_DRAWER)
         nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
@@ -890,44 +861,46 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
-                CalendarViewModel.UserCalendarLimit.FREE_REACHED,
-                CalendarViewModel.UserCalendarLimit.PAID_REACHED-> {
-                    // Display limit reached for free user dialog
+                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                    // Display upgrade dialog for free user dialog
+                    if (SUBSCRIPTION) {
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setTitle(R.string.create_calendar_limit_reached_free_title)
+                            .setMessage(R.string.create_calendar_limit_reached_free_description)
+                            .setPositiveButton(R.string.create_calendar_limit_reached_free_upgrade) { _, _ ->
+                                plansViewModel.onPlansUpgradeClicked(this@MainActivity)
+                            }
+                            .setNegativeButton(R.string.create_calendar_limit_reached_free_not_now) { _, _ ->
+                            }
+                            .show()
+                    } else {
+                        MaterialAlertDialogBuilder(this@MainActivity)
+                            .setMessage(R.string.create_calendar_limit_reached)
+                            .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                            }
+                            .show()
+                    }
+                }
+                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+                    // Display limit reached for paid user dialog
                     MaterialAlertDialogBuilder(this@MainActivity)
-                        .setMessage(R.string.create_calendar_limit_reached_free)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
+                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
+                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
+                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
+                            // Open calendar settings view
+                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                            drawer_layout.close()
+                        }
+                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
                         }
                         .show()
                 }
-                // TODO Use this dialog once we enable delete calendars
-//                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
-//                    // Display limit reached for paid user dialog
-//                    MaterialAlertDialogBuilder(this@MainActivity)
-//                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-//                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-//                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-//                            // Open calendar settings view
-//                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-//                            drawer_layout.close()
-//                        }
-//                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-//                        }
-//                        .show()
-//                }
             }
         }
     }
 
     private fun initDrawerHeader() {
-        lifecycleScope.launch {
-            val user = calendarViewModel.selectUser()
-            if (user != null) {
-                nav_view_main_content.nav_view_user_name.text = user.displayName?.nullIfBlank() ?: resources.getString(R.string.default_user_display_name)
-                nav_view_main_content.nav_view_user_mail.text = user.email?.nullIfBlank() ?: resources.getString(R.string.default_user_email)
-                val initials: String = getInitials(user.displayName ?: " ", true)
-                nav_view_main_content.nav_view_user_initials.text = initials
-            }
-        }
+        nav_view_user_layout.setViewModel(accountSwitcherViewModel)
     }
 
     private fun initDrawerCalendarsList() {

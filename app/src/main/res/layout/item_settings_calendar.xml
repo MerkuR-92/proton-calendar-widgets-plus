@@ -18,8 +18,8 @@
 
     <ImageView
         android:id="@+id/item_settings_calendar_icon"
-        android:src="@drawable/ic_dot"
-        tools:tint="@color/brand_norm"
+        app:srcCompat="@drawable/ic_dot"
+        tools:tint="?attr/brand_norm"
         android:layout_marginStart="19dp"
         style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/item_settings_calendar_title"
@@ -55,7 +55,7 @@
         android:layout_height="40dp"
         android:scaleType="center"
         tools:visibility="visible"
-        android:src="@drawable/ic_three_dots_vertical"
+        app:srcCompat="@drawable/ic_proton_three_dots_vertical"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginEnd="8dp"

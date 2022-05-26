@@ -40,7 +40,7 @@ const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
-const val DEFAULT_CALENDAR_COLOR = "#657EE4"
+const val DEFAULT_CALENDAR_COLOR: Int = 0x657EE4
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
@@ -74,7 +74,8 @@ const val MAX_CALENDAR_PAID = 20
 const val MAX_CALENDAR_FREE = 1
 
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
-    112 // Month view (0.30.3)
+    112, // Month view (0.30.3)
+    143 // Rebranding (2.0.0)
 )
 
 object FeatureFlag {
@@ -90,7 +91,8 @@ object FeatureFlag {
     const val USE_EVENT_DECRYPTOR = true
     const val CHANGE_LANGUAGE = true
     const val MONTH_VIEW = true
-    const val SPOTLIGHT = false
+    const val SPOTLIGHT = true
+    const val SUBSCRIPTION = false
 }
 
 object ApiResponseCode {

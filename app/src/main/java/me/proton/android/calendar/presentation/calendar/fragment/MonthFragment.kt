@@ -51,6 +51,7 @@ import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.animateGuidelineHeightChange
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWeek
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -120,11 +121,11 @@ class MonthFragment : BaseFragment() {
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
         with (buttonCreate) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_plus))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_plus))
         }
         buttonToday = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
         with (buttonToday) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_today))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_calendar_today_indicator))
         }
 
         // TODO extract somewhere to remove boilerplate
@@ -848,7 +849,7 @@ class MonthFragment : BaseFragment() {
         )
         val textView = weekDayHeaderView as TextView
         textView.text = dayOfWeek.format(firstLetter = true)
-        if (highlight) textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_norm))
+        if (highlight) textView.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
         else textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
         headerLayout.addView(weekDayHeaderView)
     }

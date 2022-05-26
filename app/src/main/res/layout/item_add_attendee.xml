@@ -31,7 +31,7 @@
             app:tint="@color/icon_hint"
             android:visibility="gone"
             tools:visibility="visible"
-            android:src="@drawable/ic_check"/>
+            app:srcCompat="@drawable/ic_proton_checkmark"/>
 
         <ProgressBar
             android:id="@+id/item_add_attendee_loading_icon"
@@ -48,7 +48,7 @@
             style="@style/Icon"
             android:visibility="gone"
             tools:visibility="visible"
-            android:src="@drawable/ic_cross_close"
+            app:srcCompat="@drawable/ic_proton_cross"
             android:clickable="true"
             android:focusable="true"
             android:background="?android:selectableItemBackgroundBorderless"/>
@@ -76,7 +76,7 @@
         app:layout_constraintEnd_toEndOf="@+id/item_add_attendee_photo"
         android:gravity="center"
         android:visibility="visible"
-        android:background="@drawable/shape_background_square_rounded_outlined"
+        android:background="@drawable/shape_background_square_rounded_avatar"
         tools:text="JD" />
 
     <LinearLayout

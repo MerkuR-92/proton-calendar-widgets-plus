@@ -9,8 +9,8 @@
 
     <ImageView
         android:id="@+id/dialog_calendar_settings_calendar_icon"
-        android:src="@drawable/ic_dot"
-        tools:tint="@color/brand_norm"
+        app:srcCompat="@drawable/ic_dot"
+        tools:tint="@color/purple_base"
         android:layout_marginStart="19dp"
         style="@style/ColoredDot"
         app:layout_constraintTop_toTopOf="@+id/dialog_calendar_settings_calendar_title"
@@ -58,7 +58,7 @@
 
         <ImageView
             android:id="@+id/dialog_calendar_settings_edit_icon"
-            android:src="@drawable/ic_pen"
+            app:srcCompat="@drawable/ic_proton_pencil"
             android:layout_marginStart="16dp"
             style="@style/Icon"
             app:layout_constraintTop_toTopOf="@+id/dialog_calendar_settings_edit_title"
@@ -109,7 +109,7 @@
 
         <ImageView
             android:id="@+id/dialog_calendar_settings_default_icon"
-            android:src="@drawable/ic_calendar_checkmark"
+            app:srcCompat="@drawable/ic_proton_calendar_checkmark"
             android:layout_marginStart="16dp"
             style="@style/Icon"
             app:layout_constraintTop_toTopOf="@+id/dialog_calendar_settings_default_title"
@@ -160,7 +160,7 @@
 
         <ImageView
             android:id="@+id/dialog_calendar_settings_delete_icon"
-            android:src="@drawable/ic_trash"
+            app:srcCompat="@drawable/ic_proton_trash"
             android:layout_marginStart="16dp"
             style="@style/Icon"
             app:layout_constraintTop_toTopOf="@+id/dialog_calendar_settings_delete_title"

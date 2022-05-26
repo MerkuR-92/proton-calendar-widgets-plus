@@ -17,6 +17,7 @@ import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,8 +36,9 @@ import android.widget.RadioGroup
 import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatCheckedTextView
 import androidx.appcompat.widget.ListPopupWindow
@@ -55,7 +57,6 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
 import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
@@ -74,6 +75,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
+import me.proton.core.presentation.utils.normSnack
 import okhttp3.internal.toHexString
 import java.text.Normalizer
 import java.time.Duration
@@ -142,7 +144,7 @@ object AndroidUtils {
         selectedIndex: Int,
         callback: (selectedIndex: Int) -> Unit
     ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
             callback(item)
@@ -160,7 +162,7 @@ object AndroidUtils {
         callback: (selectedIndex: Int, isCancel: Boolean) -> Unit
     ) {
         var selectedItem = 0
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
             selectedItem = item
@@ -183,7 +185,7 @@ object AndroidUtils {
         message: String,
         title: String? = null
     ) {
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setMessage(message)
         builder.setPositiveButton(R.string.dialog_button_ok, null)
@@ -229,7 +231,7 @@ object AndroidUtils {
 
         }
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setAdapter(adapter, null)
         builder.setNegativeButton(R.string.dialog_button_close, null)
@@ -284,7 +286,7 @@ object AndroidUtils {
 
         }
 
-        val builder: AlertDialog.Builder = AlertDialog.Builder(context)
+        val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
         builder.setAdapter(adapter, null)
         builder.setNegativeButton(R.string.dialog_button_cancel, null)
@@ -702,7 +704,7 @@ object AndroidUtils {
         data.add(
             hashMapOf(
                 "text" to view.resources.getText(R.string.action_delete),
-                "icon" to R.drawable.ic_trash
+                "icon" to R.drawable.ic_proton_trash
             )
         )
 
@@ -1146,20 +1148,12 @@ object AndroidUtils {
 
     // Call this method to display SnackBar in a Fragment
     fun Activity.displaySnackBar(message: String, length: Int? = null) {
-        Snackbar.make(
-            this.findViewById<View>(android.R.id.content),
-            message,
-            length ?: Snackbar.LENGTH_SHORT
-        ).show()
+        this.findViewById<View>(android.R.id.content).normSnack(message)
     }
 
     // Call this method to display SnackBar in a DialogFragment
     fun View.displaySnackBar(message: String, length: Int? = null) {
-        Snackbar.make(
-            this,
-            message,
-            length ?: Snackbar.LENGTH_SHORT
-        ).show()
+        this.normSnack(message)
     }
 
     @BindingAdapter("onSingleClick")
@@ -1300,6 +1294,16 @@ object AndroidUtils {
         }
         addTextChangedListener(watcher)
         return watcher
+    }
+
+    @ColorInt
+    fun Context.getColorFromAttr(
+        @AttrRes attrColor: Int,
+        typedValue: TypedValue = TypedValue(),
+        resolveRefs: Boolean = true
+    ): Int {
+        theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+        return typedValue.data
     }
 }
 

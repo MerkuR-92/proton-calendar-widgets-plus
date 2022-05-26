@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.getAddressesOrNull
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CreateCalendarApiRequest
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
@@ -27,7 +28,7 @@ class CreateCalendarUseCase @Inject constructor(
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, name: String, description: String = "", color: String = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String? = null) : UseCase.Result {
+    suspend fun execute(userId: UserId, name: String, description: String = "", color: Int = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String? = null) : UseCase.Result {
 
         val address = userManager.getAddressesOrNull(userId, refresh = true)?.firstOrNull { address ->
             email?.let { address.email == it } ?: address.canSend && address.canReceive
@@ -38,7 +39,7 @@ class CreateCalendarUseCase @Inject constructor(
                 name = name,
                 description = description,
                 addressId = address.addressId.id,
-                color = color,
+                color = color.toHexColor(),
                 display = display
             )
 

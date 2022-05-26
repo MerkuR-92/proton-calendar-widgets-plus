@@ -3,6 +3,7 @@ package me.proton.android.calendar.presentation.calendar.adapter
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import biweekly.property.Attendee
 import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -80,11 +82,22 @@ class AddAttendeeListAdapter(
 
             if (query.isNotEmpty() && title.contains(query, true)) {
                 val spannableStringBuilder = SpannableStringBuilder(title)
+                val start = title.indexOf(query, ignoreCase = true)
+                val end = title.indexOf(query, ignoreCase = true) + query.length
+                // Set text bold style
                 spannableStringBuilder.setSpan(
                     StyleSpan(Typeface.BOLD),
-                    title.indexOf(query, ignoreCase = true),
-                    title.indexOf(query, ignoreCase = true) + query.length,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    start,
+                    end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                // Set text highlight color
+                spannableStringBuilder.setSpan(
+                    ForegroundColorSpan(itemView.context.getColorFromAttr(R.attr.proton_text_accent)),
+                    start,
+                    end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
                 attendeeItemTitle.text = spannableStringBuilder
             } else attendeeItemTitle.text = title
 

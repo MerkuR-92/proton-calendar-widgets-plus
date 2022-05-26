@@ -84,6 +84,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToId
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
@@ -566,7 +567,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_location.setOnFocusChangeListener { _, hasFocus ->
             when {
                 hasFocus ->
-                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.interaction_norm)))
+                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
                 event_form_location.text.isNotEmpty() ->
                     ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
                 else ->
@@ -576,7 +577,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_description.setOnFocusChangeListener { _, hasFocus ->
             when {
                 hasFocus ->
-                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.interaction_norm)))
+                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
                 event_form_description.text.isNotEmpty() ->
                     ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
                 else ->

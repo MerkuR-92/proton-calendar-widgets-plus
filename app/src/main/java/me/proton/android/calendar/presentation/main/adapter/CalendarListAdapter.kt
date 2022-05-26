@@ -61,26 +61,26 @@ class CalendarListAdapter(
             if (calendarEntity.isDisabled) {
                 // For subscribed calendars we prioritize displaying disabled label over not synced
                 calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendarEntity.name)
-                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
             } else if (calendarEntity.isSubscribed) {
                 val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
 
                 if (calendarSubscription?.lastUpdateTime == 0 || calendarSubscription?.isSyncing == true) {
                     // Calendar is syncing
                     calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_syncing_calendars, calendarEntity.name)
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 } else if (calendarSubscription?.isSynced == true) {
                     // Synced
                     calendarEntityItemTitle.text = calendarEntity.name
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
                 } else {
                     // Not synced
                     calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
+                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 }
             } else {
                 calendarEntityItemTitle.text = calendarEntity.name
-                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.white))
+                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
             }
             calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
             calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))

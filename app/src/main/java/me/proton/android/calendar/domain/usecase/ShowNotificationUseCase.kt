@@ -115,7 +115,7 @@ class ShowNotificationUseCase @Inject constructor(
                     ) // formatting in phone's timezone
 
                     notificationBuilder
-                        .setSmallIcon(R.drawable.ic_day)
+                        .setSmallIcon(R.drawable.ic_brand_proton_calendar)
                         .setContentTitle(dbEvent.summary ?: context.getString(R.string.default_event_summary))
                         .setContentText(text)
                         .setContentIntent(pendingIntent)

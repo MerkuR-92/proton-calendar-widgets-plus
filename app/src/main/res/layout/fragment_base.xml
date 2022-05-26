@@ -29,7 +29,7 @@
                 android:visibility="invisible"
                 tools:visibility="visible"
                 android:indeterminateOnly="true"
-                android:indeterminateTint="@color/brand_norm"
+                android:indeterminateTint="?attr/proton_icon_accent"
                 android:indeterminateTintMode="src_in"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="-4dp"/>
@@ -38,7 +38,6 @@
                 android:id="@+id/fragment_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:theme="@style/AppTheme.Toolbar"
                 app:contentInsetStartWithNavigation="0dp"
                 app:layout_scrollFlags="noScroll"
                 android:background="@null">
@@ -68,6 +67,7 @@
                         android:gravity="start"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/fragment_toolbar_content"
                         android:orientation="horizontal"
                         android:background="?attr/selectableItemBackground">
@@ -82,10 +82,12 @@
 
                         <ImageView
                             android:id="@+id/mini_calendar_chevron"
-                            style="@style/Icon.Small"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_marginTop="2dp"
                             android:layout_marginStart="6dp"
-                            android:src="@drawable/ic_chevron_small_down"
-                            app:tint="@color/text_norm"
+                            app:srcCompat="@drawable/ic_proton_chevron_down_filled"
+                            app:tint="@color/icon_norm"
                             android:background="@null"
                             android:visibility="gone"
                             tools:visibility="visible"

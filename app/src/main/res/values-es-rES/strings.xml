@@ -387,11 +387,15 @@
     <string name="calendar_form_name_hint">Añadir nombre al calendario</string>
     <string name="calendar_form_name_required_error">Nombre requerido</string>
     <string name="add_calendar_text">Añadir calendario</string>
-    <string name="create_calendar_limit_reached_free">Has alcanzado el màximo número de calendarios.</string>
+    <string name="create_calendar_limit_reached">Has alcanzado el màximo número de calendarios.</string>
     <string name="create_calendar_limit_reached_paid_title">se ha alcanzado el límite de 20 calendario</string>
     <string name="create_calendar_limit_reached_paid_message">Elimine calendarios no usados para crear nuevos.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
+    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
     <string name="delete_calendar_dialog_title">Borrar calendario</string>
     <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
@@ -426,10 +430,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Empieza a las %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_month_header">Novedades</string>
-    <string name="spotlight_dialog_month_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Vista del mes</string>
-    <string name="spotlight_dialog_month_view_description">De un vistazo a sus eventos con nuestra nueva vista mensual. Cambie entre vistas usando el menú.</string>
+    <string name="spotlight_dialog_header">What\'s new</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
+    <string name="spotlight_dialog_month_view_title">Month view</string>
+    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Quiero saber más</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Te presentamos la nueva imagen de Proton, con varios servicios, pero una misma misión. Bienvenido al Internet donde la privacidad es la norma. <a href="http://proton.me/news/updated-proton">Quiero saber más</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>

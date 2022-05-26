@@ -53,9 +53,9 @@
         <ImageView
             android:id="@+id/calendar_form_color_icon"
             style="@style/ColoredDot"
-            android:src="@drawable/ic_dot"
+            app:srcCompat="@drawable/ic_dot"
             app:tint="@color/background_norm"
-            android:layout_marginStart="@dimen/default_inner_padding_start"
+            android:layout_marginStart="19dp"
             app:layout_constraintBottom_toBottomOf="@+id/calendar_form_color"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_color"
             app:layout_constraintStart_toStartOf="parent" />
@@ -104,7 +104,7 @@
         <ImageView
             android:id="@+id/calendar_form_default_email_icon"
             style="@style/Icon.Form"
-            android:src="@drawable/ic_email_addresses"
+            app:srcCompat="@drawable/ic_proton_at"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_default_email"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -163,7 +163,7 @@
         <ImageView
             android:id="@+id/calendar_form_default_event_duration_icon"
             style="@style/Icon.Form"
-            android:src="@drawable/ic_clock"
+            app:srcCompat="@drawable/ic_proton_clock"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_default_event_duration"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -246,7 +246,7 @@
             android:id="@+id/calendar_form_default_event_notifications_icon"
             style="@style/Icon.Form"
             app:tint="@color/icon_hint"
-            android:src="@drawable/ic_bell"
+            app:srcCompat="@drawable/ic_proton_bell"
             app:layout_constraintBottom_toBottomOf="@+id/calendar_form_default_event_notifications"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_default_event_notifications"
             app:layout_constraintStart_toStartOf="parent" />
@@ -320,7 +320,7 @@
             android:id="@+id/calendar_form_default_all_day_event_notifications_icon"
             style="@style/Icon.Form"
             app:tint="@color/icon_hint"
-            android:src="@drawable/ic_bell"
+            app:srcCompat="@drawable/ic_proton_bell"
             app:layout_constraintBottom_toBottomOf="@+id/calendar_form_default_all_day_event_notifications"
             app:layout_constraintTop_toTopOf="@+id/calendar_form_default_all_day_event_notifications"
             app:layout_constraintStart_toStartOf="parent" />

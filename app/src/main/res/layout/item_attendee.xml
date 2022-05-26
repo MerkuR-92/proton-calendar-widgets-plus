@@ -28,7 +28,7 @@
             app:layout_constraintEnd_toEndOf="@+id/item_attendee_photo"
             android:gravity="center"
             android:visibility="visible"
-            android:background="@drawable/shape_background_square_rounded_outlined"
+            android:background="@drawable/shape_background_square_rounded_avatar"
             tools:text="JD" />
 
         <ImageView
@@ -47,7 +47,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_marginTop="@dimen/spacing_element"
             android:layout_marginStart="14dp"
             android:layout_marginEnd="@dimen/spacing_element_small"
             app:layout_constraintEnd_toEndOf="parent"

@@ -29,6 +29,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCo
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter.EventViewHolder.HeaderViewHolder
@@ -67,7 +68,7 @@ class EventAdapter(
         class HeaderViewHolder(itemView: View) : EventViewHolder(itemView) {
             fun bind(date: LocalDate, timeZoneId: String) {
                 if (date == LocalDate.now(ZoneId.of(timeZoneId))) {
-                    itemView.text_header.setTextColor(ContextCompat.getColor(itemView.context, R.color.brand_norm))
+                    itemView.text_header.setTextColor(itemView.context.getColorFromAttr(R.attr.proton_text_accent))
                 } else {
                     itemView.text_header.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                 }

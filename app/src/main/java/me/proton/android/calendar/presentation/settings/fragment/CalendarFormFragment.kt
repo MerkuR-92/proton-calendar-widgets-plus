@@ -57,6 +57,7 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.presentation.utils.onTextChange
+import okhttp3.internal.toHexString
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
@@ -187,7 +188,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 requireContext().showKeyboard()
 
                 // Use random color from array as calendar color
-                val calendarColors = resources.getStringArray(R.array.calendar_colors)
+                val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
                 calendarFormViewModel.initCreateCalendarForm(calendarColors[(0..calendarColors.lastIndex).random()])
             }
@@ -223,13 +224,13 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
-            if (calendarColor.isEmpty()) {
+            if (calendarColor == 0) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
                 calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarColor))
+            calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(calendarColor)
         }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
             calendar_form_default_event_notifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
@@ -344,7 +345,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             var dialog: AlertDialog? = null
 
             // Get calendar color list
-            val calendarColors = resources.getStringArray(R.array.calendar_colors)
+            val calendarColors = resources.getIntArray(R.array.accent_colors_base)
 
             // Get dialog custom view
             val view = LayoutInflater.from(context)

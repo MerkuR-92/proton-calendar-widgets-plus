@@ -74,12 +74,12 @@ abstract class BaseDialogFragment : DialogFragment() {
             title = ""
             // navigation
             if (isTopLevel) {
-                setNavigationIcon(R.drawable.ic_hamburger)
+                setNavigationIcon(R.drawable.ic_proton_hamburger)
             } else {
                 if (navigateUp) {
-                    setNavigationIcon(R.drawable.ic_arrow_left)
+                    setNavigationIcon(R.drawable.ic_proton_arrow_left)
                 } else {
-                    setNavigationIcon(R.drawable.ic_close)
+                    setNavigationIcon(R.drawable.ic_proton_cross)
                 }
             }
 
@@ -171,7 +171,7 @@ abstract class BaseDialogFragment : DialogFragment() {
             ) {
                 lifecycleScope.launch {
                     var selectedItem = defaultSelectedItem
-                    AlertDialog.Builder(requireContext())
+                    MaterialAlertDialogBuilder(requireContext())
                         .setTitle(title)
                         .setSingleChoiceItems(items, defaultSelectedItem) { _, item ->
                             selectedItem = item

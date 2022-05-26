@@ -73,7 +73,7 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonSend = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
         with (buttonSend) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_paper_plane))
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_paper_plane))
             setOnSingleClickListener {
                 requireActivity().clearFocusAndHideKeyboard(view)
 

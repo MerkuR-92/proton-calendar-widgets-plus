@@ -1,56 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-        <item name="colorAccent">@color/brand_norm</item>
-
-        <item name="appBarLayoutStyle">@style/AppTheme.Toolbar</item>
-        <item name="popupTheme">@style/AppTheme.PopupOverlay</item>
-
-        <item name="android:textColorLink">@color/interaction_norm</item>
-        <item name="android:textColorPrimary">@color/text_norm</item>
-        <item name="android:textColor">@color/text_norm</item>
-
-        <item name="android:colorControlHighlight">@color/interaction_weak_pressed</item>
-
-        <item name="android:windowBackground">@color/background_norm</item>
-
+    <style name="ProtonTheme.Calendar.V5" parent="ProtonTheme.Calendar">
         <item name="android:datePickerDialogTheme">@style/PickerDialog</item>
         <item name="android:timePickerDialogTheme">@style/PickerDialog</item>
-
-        <item name="alertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
-
-        <item name="android:colorEdgeEffect">@color/brand_norm</item>
-
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.App.MaterialAlertDialog</item>
     </style>
 
-    <style name="AppTheme.DayNight">
-        <!-- Styling specific to light mode -->
-        <!-- TODO windowLightStatusBar is API 23 Minimum, check if we need to support below APIs -->
-        <item name="android:statusBarColor">@color/background_norm</item>
-        <item name="android:windowLightStatusBar">true</item>
-
-        <item name="android:navigationBarColor">@color/background_navigation_bar</item>
-    </style>
-
-    <style name="AppTheme.DayNight.Splash">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:statusBarColor">@color/splash_screen_color</item>
-        <item name="android:navigationBarColor">@color/splash_screen_color</item>
-    </style>
-
-    <style name="AppTheme.Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
-        <item name="tint">@color/icon_norm</item>
-    </style>
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+    <style name="ProtonTheme.Splash.Calendar.V5" parent="ProtonTheme.Splash.Calendar">
+        <item name="postSplashScreenTheme">@style/ProtonTheme.Calendar.V5</item>
     </style>
 
     <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
-        <item name="colorAccent">@color/brand_norm</item>
+        <item name="colorAccent">?attr/proton_icon_accent</item>
         <item name="alertDialogStyle">@style/MaterialAlertDialog.App</item>
         <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
@@ -58,18 +21,19 @@
         <item name="buttonBarPositiveButtonStyle">@style/MaterialDialogButtonStyle</item>
         <item name="buttonBarNegativeButtonStyle">@style/MaterialDialogButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/MaterialDialogButtonStyle</item>
+        <item name="colorControlHighlight">@color/ripple_norm_workaround</item>
     </style>
 
     <style name="PickerDialog" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="colorAccent">@color/brand_norm</item>
-        <item name="colorControlActivated">@color/brand_norm</item>
-        <item name="colorControlHighlight">@color/brand_norm</item>
+        <item name="colorAccent">?attr/proton_icon_accent</item>
+        <item name="colorControlActivated">?attr/proton_icon_accent</item>
+        <item name="colorControlHighlight">?attr/proton_icon_accent</item>
         <item name="android:windowBackground">@drawable/shape_dialogs_rounded</item>
         <item name="android:buttonBarPositiveButtonStyle">@style/PickerDialogButtonStyle</item>
         <item name="android:buttonBarNegativeButtonStyle">@style/PickerDialogButtonStyle</item>
     </style>
 
-    <style name="AppTheme.DayNight.AppWidgetContainer">
+    <style name="ProtonTheme.Calendar.V5.AppWidgetContainer">
         <!-- use @android:dimen/system_app_widget_background_radius in dimens-31 when we switch to targetSdk 31 -->
         <item name="appWidgetRadius">@dimen/widget_background_corner_radius</item>
         <item name="appWidgetPadding">@dimen/widget_padding</item>

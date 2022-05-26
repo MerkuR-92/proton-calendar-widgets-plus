@@ -2,7 +2,9 @@ package me.proton.android.calendar
 
 import android.app.Application
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.logger.LoggerImpl
@@ -197,5 +199,25 @@ class ProtonCalendarApplication : Application() {
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(CustomLocale.apply(base))
+    }
+
+    fun getAppTheme(): AppTheme {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val appTheme = sharedPreferences.getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)
+        return AppTheme.values()[appTheme]
+    }
+
+    fun changeAppTheme(theme: AppTheme) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val editor = sharedPreferences.edit()
+        editor.putInt(SharedPreferencesKeys.THEME, theme.value)
+        editor.apply()
+
+        when (theme) {
+            AppTheme.LIGHT -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            AppTheme.DARK -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            else -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        }
     }
 }

@@ -28,6 +28,7 @@ import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_nu
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_value
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
@@ -59,6 +60,9 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val application: ProtonCalendarApplication by lazy {
+        requireContext().applicationContext as ProtonCalendarApplication
+    }
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -127,7 +131,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val appThemes = resources.getStringArray(R.array.app_themes)
-        settings_theme_value.text = appThemes[(activity as MainActivity).getAppTheme().value]
+        settings_theme_value.text = appThemes[application.getAppTheme().value]
 
         // TODO Handle themes for Android P and below
         settings_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -137,10 +141,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                     requireContext(),
                     getString(R.string.settings_theme_title),
                     appThemes,
-                    AppTheme.values().indexOf((activity as MainActivity).getAppTheme())
+                    AppTheme.values().indexOf(application.getAppTheme())
                 ) { index ->
                     settings_theme_value.text = appThemes[index]
-                    (activity as MainActivity).changeAppTheme(AppTheme.values()[index])
+                    application.changeAppTheme(AppTheme.values()[index])
                 }
             }
         }
@@ -197,7 +201,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_week_start_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
-                null,
+                getString(R.string.settings_week_start_title),
                 weekStartValues,
                 weekStartValues.indexOf(settings_week_start_value.text)) { index ->
                 if (!mainViewModel.isConnectedToNetwork) {

@@ -181,7 +181,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
         toolbarTitle = toolbar.findViewById(R.id.dialog_toolbar_title)
         toolbarTitle.text = getString(R.string.event_alarms_title)
-        toolbar.setNavigationIcon(R.drawable.ic_close)
+        toolbar.setNavigationIcon(R.drawable.ic_proton_cross)
 
         isAllDay = navigationArguments.isAllDay
         isCalendarDefaultEventNotification = navigationArguments.isCalendarDefaultEventNotification

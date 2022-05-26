@@ -58,6 +58,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -4360,7 +4362,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getInviteIcs(
             event,
@@ -4421,7 +4423,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getCancelIcs(
             event,
@@ -4516,9 +4518,9 @@ internal class ICalUtilsTest {
         val displayTimeZoneId = "Europe/Zurich"
 
         val events = listOf(
-            Event.from("event-all-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
-            Event.from("event-part-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
-            Event.from("event-1-hour", Calendar("id", "name", DEFAULT_CALENDAR_COLOR, 1, true, 0), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
+            Event.from("event-all-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
+            Event.from("event-part-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
+            Event.from("event-1-hour", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
         )
 
         val explodedEvents = events.explodeDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)

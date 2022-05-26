@@ -85,7 +85,7 @@
     </style>
 
     <style name="Text.DefaultSmall.Strong.Brand">
-        <item name="android:textColor">@color/brand_norm</item>
+        <item name="android:textColor">?attr/proton_text_accent</item>
     </style>
 
     <style name="Text.Caption">
@@ -145,7 +145,7 @@
     </style>
 
     <style name="InputText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/brand_norm</item>
+        <item name="boxStrokeColor">?attr/proton_icon_accent</item>
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">1dp</item>
         <item name="boxCornerRadiusTopStart">8dp</item>
@@ -188,7 +188,7 @@
 
     <style name="PickerDialogButtonStyle" parent="Base.Widget.AppCompat.Button.Borderless">
         <item name="android:textAppearance">@style/Text.Default.Strong</item>
-        <item name="android:textColor">@color/brand_norm</item>
+        <item name="android:textColor">?attr/proton_text_accent</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAllCaps">false</item>
     </style>
@@ -215,14 +215,14 @@
 
     <style name="MaterialDialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textAppearance">@style/Text.Default.Strong</item>
-        <item name="android:textColor">@color/brand_norm</item>
+        <item name="android:textColor">?attr/proton_text_accent</item>
         <item name="android:lineSpacingExtra">4sp</item>
         <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.MaterialComponents.MediumComponent">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">6dp</item>
+        <item name="cornerSize">8dp</item>
     </style>
 
     <style name="TextviewStyle" parent="@android:style/Widget.TextView">
@@ -246,7 +246,7 @@
         <item name="android:textSize">15dp</item>
     </style>
 
-    <style name="AppFullscreenDialogTheme" parent="AppTheme.DayNight">
+    <style name="AppFullscreenDialogTheme" parent="ProtonTheme.Calendar.V5">
         <item name="android:windowEnterAnimation">@anim/custom_fade_in</item>
         <item name="android:windowExitAnimation">@anim/custom_fade_out</item>
     </style>
@@ -271,9 +271,8 @@
     </style>
 
     <style name="TextViewWarning" parent="Text.DefaultSmall">
-        <!-- TODO temporary woodsmoke color until we switch to V5 (change back to text_inverted) -->
-        <item name="android:textColor">@color/woodsmoke</item>
-        <item name="android:textColorLink">@color/woodsmoke</item>
+        <item name="android:textColor">@color/text_inverted</item>
+        <item name="android:textColorLink">@color/text_inverted</item>
         <item name="android:padding">16dp</item>
         <item name="android:background">@drawable/shape_background_warning</item>
     </style>

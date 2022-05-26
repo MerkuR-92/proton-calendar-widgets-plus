@@ -10,6 +10,9 @@
         android:layout_height="@dimen/attendee_avatar_size"
         android:indeterminate="true"
         android:layout_gravity="center"
+        android:indeterminateOnly="true"
+        android:indeterminateTint="?attr/proton_icon_accent"
+        android:indeterminateTintMode="src_in"
         android:clickable="false"
         android:focusable="false" />
 
