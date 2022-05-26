@@ -12,14 +12,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
-import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.domain.api.FeedbackApi
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
@@ -29,7 +31,6 @@ import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.io.BufferedReader
 import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,7 +40,8 @@ class MainViewModel @Inject constructor(
     private val handleIcsUseCase: HandleIcsUseCase,
     private val networkManager: NetworkManager,
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
-    private val userSettingsRepository: UserSettingsRepository
+    private val userSettingsRepository: UserSettingsRepository,
+    private val feedbackApi: FeedbackApi
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -131,6 +133,20 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Sends feedback to API.
+     */
+    suspend fun handleFeedback(userId: UserId, logger: me.proton.android.calendar.domain.Logger, score: Int, feedback: String): UseCase.Result =
+        withContext(ioScope.coroutineContext) {
+            when (val response = feedbackApi.sendFeedback(userId, score, feedback)) {
+                is ApiResponse.Error, is ApiResponse.Exception -> {
+                    response.logErrorIfNeeded("error sending feedback", logger)
+                    UseCase.Result.Error("")
+                }
+                is ApiResponse.Success -> UseCase.Result.Success<Unit>()
+            }
+        }
 
     private var viewModelJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)

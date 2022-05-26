@@ -60,6 +60,10 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
+    abstract fun bindFeedbackApi(feedbackApi: FeedbackApiImpl): FeedbackApi
+
+    @Binds
+    @Singleton
     abstract fun bindServerEventsApi(serverEventsApiImpl: ServerEventsApiImpl): ServerEventsApi
 
     @Binds

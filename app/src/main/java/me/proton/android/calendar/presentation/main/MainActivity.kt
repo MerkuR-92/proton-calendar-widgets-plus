@@ -4,10 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
@@ -32,6 +37,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.parameter.ParticipationStatus
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -54,6 +60,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
+import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
@@ -81,6 +88,8 @@ import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
+import me.proton.core.presentation.ui.view.ProtonInput
+import me.proton.core.presentation.ui.view.ProtonProgressButton
 import me.proton.core.util.kotlin.toBoolean
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
@@ -752,6 +761,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(FEEDBACK)
+        nav_view_main_content.nav_view_more_feedback_press.setOnSingleClickListener {
+            showFeedbackDialog()
+            drawer_layout.close()
+        }
+
         nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(SUBSCRIPTION)
         nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
@@ -897,6 +912,108 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
         }
+    }
+
+    private fun showFeedbackDialog() {
+
+        // toggles rating button styles and enables "submit" button
+        fun onRatingClicked(bottomSheetDialog: BottomSheetDialog, button: View) {
+            with (bottomSheetDialog) {
+                listOf<ImageView?>(
+                    findViewById(R.id.button_feedback_rating_1),
+                    findViewById(R.id.button_feedback_rating_2),
+                    findViewById(R.id.button_feedback_rating_3),
+                    findViewById(R.id.button_feedback_rating_4),
+                    findViewById(R.id.button_feedback_rating_5)
+                ).forEach {
+                    if (it?.id == button.id) {
+                        it.setBackgroundResource(R.drawable.shape_feedback_rounded_bg_enabled)
+                    } else {
+                        it?.setBackgroundResource(R.drawable.shape_feedback_rounded_bg_disabled)
+                    }
+                }
+
+                findViewById<ProtonProgressButton>(R.id.button_submit_feedback)?.isEnabled = true
+
+                findViewById<ProtonInput>(R.id.input_feeedback_form)?.visibleOrGone(true)
+            }
+        }
+
+        val bottomSheetDialog = BottomSheetDialog(this)
+
+        // Workaround to make sure we have the correct navigation bar color.
+        // TODO update once we change splash screen and how we handle navigation bar colors
+        val window = bottomSheetDialog.window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val navigationBarBackgroundColor = R.color.background_norm
+            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        } else {
+            window?.navigationBarColor = getColorFromAttr(
+                R.attr.proton_background_norm
+            )
+        }
+
+        var rating: Int? = null
+
+        with (bottomSheetDialog) {
+
+            setContentView(R.layout.dialog_feedback)
+
+            findViewById<ImageButton>(R.id.dialog_calendar_feedback_close_icon)?.setOnSingleClickListener {
+                bottomSheetDialog.dismiss()
+            }
+
+            findViewById<ImageView>(R.id.button_feedback_rating_1)?.setOnSingleClickListener {
+                rating = 1
+                onRatingClicked(this, it)
+            }
+            findViewById<ImageView>(R.id.button_feedback_rating_2)?.setOnSingleClickListener {
+                rating = 2
+                onRatingClicked(this, it)
+            }
+            findViewById<ImageView>(R.id.button_feedback_rating_3)?.setOnSingleClickListener {
+                rating = 3
+                onRatingClicked(this, it)
+            }
+            findViewById<ImageView>(R.id.button_feedback_rating_4)?.setOnSingleClickListener {
+                rating = 4
+                onRatingClicked(this, it)
+            }
+            findViewById<ImageView>(R.id.button_feedback_rating_5)?.setOnSingleClickListener {
+                rating = 5
+                onRatingClicked(this, it)
+            }
+
+            findViewById<ProtonProgressButton>(R.id.button_submit_feedback)?.let { progressButton ->
+
+                progressButton.setIdle()
+
+                progressButton.setOnSingleClickListener {
+
+                    if (!mainViewModel.isConnectedToNetwork) {
+                        displaySnackBar(progressButton.context.getString(R.string.snack_network_error))
+                    } else {
+                        lifecycleScope.launch {
+                            (it as ProtonProgressButton).setLoading()
+
+                            val userId = accountViewModel.getPrimaryUserId()
+                            val feedback = findViewById<ProtonInput>(R.id.input_feeedback_form)?.text?.toString() ?: ""
+                            if (userId != null && mainViewModel.handleFeedback(userId, logger, rating!!, feedback) is UseCase.Result.Success<*>) {
+                                it.setIdle()
+                                displaySnackBar(progressButton.context.getString(R.string.dialog_feedback_submit_thank_you))
+                                bottomSheetDialog.dismiss()
+                            } else {
+                                it.setIdle()
+                                displaySnackBar(progressButton.context.getString(R.string.snack_network_error))
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        bottomSheetDialog.show()
     }
 
     private fun initDrawerHeader() {
