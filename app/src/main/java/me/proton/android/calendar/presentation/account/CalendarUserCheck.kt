@@ -29,7 +29,7 @@ class CalendarUserCheck(
         localizedMessage = context.getString(R.string.bootstrap_error_store_quota_reached_message),
         action = UserCheckAction.OpenUrl(
             name = context.getString(R.string.bootstrap_error_store_quota_reached_learn_more),
-            url = "https://protonmail.com/support/knowledge-base/increase-my-storage-space"
+            url = "https://proton.me/support/increase-storage-space"
         )
     )
 

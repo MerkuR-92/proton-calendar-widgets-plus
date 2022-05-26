@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Delete event</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Delete events</string>
     <string name="event_decryption_error_dialog_close">Close</string>
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Learn more</a>
+    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a>
     </string>
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
@@ -408,12 +408,12 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>
-    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.protonmail.com">calendar.protonmail.com</a>
+    <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.proton.me">calendar.proton.me</a>
     </string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
     <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
     <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
-    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://protonmail.com/support/">knowledge base</a>
+    <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://proton.me/support">knowledge base</a>
     </string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Learn more</string>

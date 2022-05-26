@@ -60,7 +60,7 @@ const val CONTACTS_SEARCH_QUERY = "CONTACTS_SEARCH_QUERY"
 
 const val SESSION_KEY_ALGO = "aes256"
 
-val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me")
+val PROTON_MAIL_DOMAINS = arrayListOf("protonmail.ch", "protonmail.com", "pm.me", "proton.me")
 const val PROTON_MAIL_SHORT_DOMAIN = "@pm.me"
 
 const val PROTON_UID = "@proton.me"
@@ -75,7 +75,7 @@ const val MAX_CALENDAR_FREE = 1
 
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
-    144 // Rebranding (2.0.1)
+    145 // Rebranding (2.0.2)
 )
 
 object FeatureFlag {
