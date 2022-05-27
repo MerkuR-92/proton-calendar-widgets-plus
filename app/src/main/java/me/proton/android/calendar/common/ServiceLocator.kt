@@ -99,7 +99,8 @@ val viewModelModule = module {
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get()) }
-    factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<UpgradeEventUseCase> { UpgradeEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarUseCase> { BootstrapCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
@@ -122,7 +123,7 @@ val useCaseModule = module {
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
     factory<UpdateParticipationStatusUseCase> { UpdateParticipationStatusUseCase(get(), get(), get(), get()) }
-    factory<SendEmailUseCase> { SendEmailUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<SendEmailUseCase> { SendEmailUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleIcsUseCase> { HandleIcsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdatePersonalPartUseCase> { UpdatePersonalPartUseCase(get(), get(), get(), get()) }
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }

@@ -52,13 +52,14 @@ class EditCreateEventUseCase @Inject constructor(
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val upgradeEventUseCase: UpgradeEventUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
 
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
-            database.eventsDao().selectById(newEvent.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: could not get old EventEntity from DB")
+            (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
         } else null
 
         val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
@@ -422,7 +423,11 @@ class EditCreateEventUseCase @Inject constructor(
 
     private fun extractSessionKeys(eventEntity: EventEntity, calendarKey: CalendarKey): UseCase.Result {
 
-        val sharedSessionKey = crypto.decryptSessionKey(eventEntity.sharedKeyPacket!! /* TODO FIXME */, calendarKey.privateKeys, calendarKey.passphrase)
+        if (eventEntity.sharedKeyPacket == null) {
+            return UseCase.Result.InvalidParams("EditCreateEventUseCase: EventEntity is not upgraded")
+        }
+
+        val sharedSessionKey = crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarKey.privateKeys, calendarKey.passphrase)
 
         val calendarSessionKey = if (eventEntity.calendarKeyPacket != null) {
             crypto.decryptSessionKey(eventEntity.calendarKeyPacket, calendarKey.privateKeys, calendarKey.passphrase)
