@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Termin löschen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
-    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
+    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Mehr erfahren</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
     <string name="event_change_answer_recurring_overwrite_description">Möchtest du deine Antwort für alle Termine in dieser Serie ändern?\nEinige deiner Antworten auf Wiederholungen, die zuvor vom Organisator aktualisiert wurden, gehen dabei verloren.</string>
@@ -231,8 +231,10 @@
     <string name="nav_view_switcher_month">Monat</string>
     <string name="nav_view_timezone">Zeitzone</string>
     <string name="nav_view_settings">Einstellungen</string>
+    <string name="nav_view_feedback">Gib uns Feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Allgemein</string>
     <string name="nav_view_more_bug">Fehler melden</string>
+    <string name="nav_view_more_subscription">Abonnement</string>
     <string name="nav_view_more_logout">Abmelden</string>
     <string name="nav_view_more_login">Anmelden</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
@@ -387,14 +389,14 @@
     <string name="calendar_form_name_hint">Kalendername hinzufügen</string>
     <string name="calendar_form_name_required_error">Bitte Namen angeben</string>
     <string name="add_calendar_text">Kalender hinzufügen</string>
-    <string name="create_calendar_limit_reached">Du hast die maximale Anzahl an Kalender erreicht.</string>
+    <string name="create_calendar_limit_reached">Du hast die maximale Anzahl an Kalendern erreicht.</string>
     <string name="create_calendar_limit_reached_paid_title">Höchstwert von 20 Kalendern erreicht</string>
     <string name="create_calendar_limit_reached_paid_message">Lösche ungenutzte Kalender, um neue Kalender erstellen zu können.</string>
     <string name="create_calendar_limit_reached_paid_manage">Kalender verwalten</string>
     <string name="create_calendar_limit_reached_close">Schließen</string>
-    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
+    <string name="create_calendar_limit_reached_free_title">Proton Calendar upgraden</string>
+    <string name="create_calendar_limit_reached_free_description">Erstelle bis zu 20 Kalender. Wenn du ein Upgrade deines Abonnements vornimmst, erhältst du Zugang zu vielen weiteren exklusiven Funktionen.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Nicht jetzt</string>
     <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
     <string name="delete_calendar_dialog_title">Kalender löschen</string>
     <string name="delete_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen?</string>
@@ -405,11 +407,11 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Mit diesem Konto sind keine Kalender verknüpft.</string>
-    <string name="bootstrap_error_no_calendar_message">Um jetzt einen einzurichten, besuche <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_no_calendar_message">Um jetzt einen einzurichten, besuche <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Fehler beim Einrichten der Kalender</string>
     <string name="bootstrap_error_some_calendars_failed_message">Die folgenden Kalender konnten nicht eingerichtet werden</string>
     <string name="bootstrap_error_no_active_calendar_title">Derzeit ist kein aktiver Kalender mit diesem Konto verknüpft.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Um zu erfahren, wie du einen Kalender aktivieren kannst, besuche unsere <a href="https://proton.me/support">Wissensdatenbank</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Um zu erfahren, wie du einen Kalender aktivieren kannst, besuche unsere <a href="https://protonmail.com/support/">Wissensdatenbank</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Kein Speicherplatz mehr verfügbar.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Mehr erfahren</string>
     <string name="bootstrap_error_reset_needed_title">Kalenderschlüssel zurücksetzen</string>
@@ -420,6 +422,14 @@
     <string name="splash_after_login_init">Kalender werden vorbereitet</string>
     <string name="splash_init">Termine werden entschlüsselt</string>
     <string name="default_calendar_name">Meine Kalender</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Gib uns Feedback</string>
+    <string name="dialog_feedback_text">Wie würdest du deine Erfahrungen mit Proton Calendar beschreiben?</string>
+    <string name="dialog_feedback_rating_worst">Furchtbar</string>
+    <string name="dialog_feedback_rating_best">Wunderbar</string>
+    <string name="dialog_feedback_hint">Erzähle uns von deinen Erfahrungen. (Optional)</string>
+    <string name="dialog_feedback_submit">Absenden</string>
+    <string name="dialog_feedback_submit_thank_you">Vielen Dank! Dein Feedback hilft uns, Proton zu verbessern.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar Widget</string>
     <string name="calendar_widget_no_upcoming_events_today">Heute keine anstehenden Termine</string>
@@ -430,14 +440,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Beginnt um %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Endet um %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_header">What\'s new</string>
+    <string name="spotlight_dialog_header">Neuigkeiten</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Month view</string>
-    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_dialog_month_view_title">Monatsansicht</string>
+    <string name="spotlight_dialog_month_view_description">Verschaffe dir einen Überblick über deine Termine mit unserer neuen Monatsansicht. Wechsle über das Menü zwischen den Ansichten.</string>
     <string name="spotlight_v5_dialog_got_it_button">Verstanden</string>
     <string name="spotlight_v5_dialog_learn_more_button">Mehr erfahren</string>
-    <string name="spotlight_v5_dialog_rebranding_title">Verbessertes Proton, einheitlicher Schutz</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sein neues Design. Viele Dienste, eine Mission. Willkommen in einem Internet, in dem Datenschutz Standard ist. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
+    <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">Minute</item>
@@ -528,12 +538,7 @@
         <item>Samstag</item>
         <item>Sonntag</item>
     </string-array>
-    <string name="dialog_feedback_header">Geben Sie uns Feedback</string>
-    <string name="dialog_feedback_text">Wie würden Sie Ihre Erfahrungen mit Proton Calendar beschreiben?</string>
-    <string name="dialog_feedback_rating_worst">Schrecklich</string>
-    <string name="dialog_feedback_rating_best">Wunderbar</string>
-    <string name="dialog_feedback_hint">Erzählen Sie uns von Ihren Erfahrungen. (fakultativ)</string>
-    <string name="dialog_feedback_submit_thank_you">Wir danken Ihnen! Ihr Feedback hilft uns, Proton zu verbessern.</string>
-    <string name="dialog_feedback_submit">Senden</string>
-    <string name="nav_view_feedback">Geben Sie uns Feedback</string>
+    <string name="listPremiumCountries_new_plans">Plus-Standorte (%1$d)</string>
+    <string name="new_look_dialog_title_new_plans">Verbessertes Proton, einheitlicher Schutz</string>
+    <string name="new_look_dialog_message_new_plans"><![CDATA[Proton präsentiert sein neues Design. Viele Dienste, eine Mission. Willkommen bei einem Internet, bei dem der Schutz der Privatsphäre Standard ist.<a href="%1$s">Mehr&nbsp;erfahren</a>]]></string>
 </resources>

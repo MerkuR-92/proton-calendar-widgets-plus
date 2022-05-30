@@ -30,7 +30,7 @@
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Se mantendrán las ocurrencias actualizadas previamente por el organizador, pero tus respuestas se perderán</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Se mantendrán las ocurrencias actualizadas previamente por el organizador</string>
-    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">El organizador no pudo ser notificado de que declinó la invitación:\n\n• %1$s\n\n¿Desea eliminar el evento de todas formas?</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">El organizador no pudo ser notificado de que declinaste la invitación:\n\n• %1$s\n\n¿Deseas eliminar el evento de todas formas?</string>
     <string name="dialog_button_set">Establecer</string>
     <string name="dialog_button_ok">OK</string>
     <string name="action_save">Guardar</string>
@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Eliminar evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Eliminar eventos</string>
     <string name="event_decryption_error_dialog_close">Cerrar</string>
-    <string name="event_signature_verification_warning">La verificación de la firma del evento ha fallado. <a href="https://proton.me/support/what-is-a-digital-signature">Más información</a></string>
+    <string name="event_signature_verification_warning">La verificación de la firma del evento ha fallado. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Más información</a></string>
     <string name="event_change_answer_recurring_title">Actualizar evento recurrente</string>
     <string name="event_change_answer_recurring_description">¿Quieres cambiar tu respuesta para todos los eventos de la serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">¿Quieres cambiar tu respuesta para todos los eventos de esta serie?\nAlgunas de tus respuestas a ocurrencias previamente actualizadas por el organizador se perderán.</string>
@@ -231,8 +231,10 @@
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Zona horaria</string>
     <string name="nav_view_settings">Ajustes</string>
+    <string name="nav_view_feedback">Give us feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
     <string name="nav_view_more_bug">Notificar un error</string>
+    <string name="nav_view_more_subscription">Subscription</string>
     <string name="nav_view_more_logout">Cerrar sesión</string>
     <string name="nav_view_more_login">Iniciar sesión</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
@@ -254,8 +256,8 @@
     <string name="snack_event_created_failed_mail">Se ha creado el evento pero no se ha podido enviar la invitación</string>
     <string name="snack_event_created_error">Error al crear el evento</string>
     <string name="snack_event_opening_edit_error">Error al abrir el evento para editar</string>
-    <string name="snack_event_edit_with_attendees_error">La edición de eventos con invitados aún no está soportado</string>
-    <string name="snack_event_edit_calendar_with_attendees_error">No se puede añadir participantes y cambiar el calendario al mismo tiempo</string>
+    <string name="snack_event_edit_with_attendees_error">La edición de eventos con invitados aún no está soportada</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">No se pueden añadir participantes y cambiar el calendario al mismo tiempo</string>
     <string name="snack_event_init_error">Error al inicializar el nuevo evento</string>
     <string name="snack_event_calendar_error">Error al cambiar el calendario</string>
     <string name="snack_event_maximum_alarm_reached_error">Se ha alcanzado el número máximo de notificaciones</string>
@@ -270,12 +272,12 @@
     <string name="snack_change_attendee_answer_error">Error al enviar la respuesta, inténtalo de nuevo más tarde</string>
     <string name="snack_network_error">Error de red. Inténtalo de nuevo más tarde</string>
     <string name="snack_import_event_signed_out">Necesitas iniciar sesión para importar eventos</string>
-    <string name="snack_app_link_signed_out">Necesitas iniciar sesión para acceder al eventos</string>
+    <string name="snack_app_link_signed_out">Necesitas iniciar sesión para acceder al evento</string>
     <string name="snack_update_default_calendar">Calendario por defecto actualizado</string>
     <string name="snack_update_default_calendar_error">Error actualizando el calendario, inténtalo de nuevo más tarde</string>
     <string name="snack_calendar_init_error">Error al cargar la información del calendario</string>
     <string name="snack_update_calendar_error">Error actualizando el calendario, inténtalo de nuevo más tarde</string>
-    <string name="snack_update_calendar_settings_error">Error actualizando la información de calendarios, inténtelo de nuevo más tarde</string>
+    <string name="snack_update_calendar_settings_error">Error actualizando la información del calendario, inténtelo de nuevo más tarde</string>
     <string name="snack_update_calendar_success">Calendario actualizado</string>
     <string name="snack_create_calendar_success">Calendario creado</string>
     <string name="snack_calendar_saving">Guardando calendario</string>
@@ -333,7 +335,7 @@
     <string name="bug_report_hint_title">Asunto</string>
     <string name="bug_report_hint_description">Por favor describa el problema e incluya cualquier mensaje de error.</string>
     <string name="bug_report_discard_changes_title">Cambios sin guardar</string>
-    <string name="bug_report_discard_changes_description">Hay entradas sin guardar en el formulario. ¿Está seguro de querer descartarlos?</string>
+    <string name="bug_report_discard_changes_description">Hay entradas sin guardar en el formulario. ¿Está seguro de querer descartarlas?</string>
     <string name="bug_report_discard_changes_cancel">Seguir escribiendo</string>
     <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
@@ -385,10 +387,10 @@
     <string name="calendar_form_default_email">Dirección de correo electrónico</string>
     <string name="calendar_form_default_email_value_error">No se pudo cargar el correo electrónico por defecto</string>
     <string name="calendar_form_name_hint">Añadir nombre al calendario</string>
-    <string name="calendar_form_name_required_error">Nombre requerido</string>
+    <string name="calendar_form_name_required_error">Nombre obligatorio</string>
     <string name="add_calendar_text">Añadir calendario</string>
-    <string name="create_calendar_limit_reached">Has alcanzado el màximo número de calendarios.</string>
-    <string name="create_calendar_limit_reached_paid_title">se ha alcanzado el límite de 20 calendario</string>
+    <string name="create_calendar_limit_reached">You have reached the maximum number of calendars.</string>
+    <string name="create_calendar_limit_reached_paid_title">Se ha alcanzado el límite de 20 calendarios</string>
     <string name="create_calendar_limit_reached_paid_message">Elimine calendarios no usados para crear nuevos.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
@@ -396,20 +398,20 @@
     <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
     <string name="create_calendar_limit_reached_free_not_now">Not now</string>
     <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
-    <string name="delete_calendar_dialog_title">Borrar calendario</string>
+    <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
-    <string name="delete_calendar_snack_deleted">Calendario borrado</string>
+    <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
     <string name="delete_calendar_snack_error_password_confirmation">Error de confirmación de contraseña</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">No hay ningún calendario asociado con esta cuenta.</string>
-    <string name="bootstrap_error_no_calendar_message">Para configurar uno ahora, visite <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_no_calendar_message">Para configurar uno ahora, visite <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparando calendarios</string>
     <string name="bootstrap_error_some_calendars_failed_message">Los siguientes calendarios no pudieron configurarse</string>
     <string name="bootstrap_error_no_active_calendar_title">No hay ningún calendario activo asociado con esta cuenta.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Para saber como activar un calendario visite nuestra <a href="https://proton.me/support">base de conocimiento</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Para saber como activar un calendario visite nuestra <a href="https://protonmail.com/support/">base de conocimiento</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hay más espacio de almacenamiento disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Más información</string>
     <string name="bootstrap_error_reset_needed_title">Restablecer claves del calendario</string>
@@ -420,6 +422,14 @@
     <string name="splash_after_login_init">Preparando calendarios</string>
     <string name="splash_init">Descifrando eventos</string>
     <string name="default_calendar_name">Mi calendario</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Give us feedback</string>
+    <string name="dialog_feedback_text">How would you describe your experience with Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Awful</string>
+    <string name="dialog_feedback_rating_best">Wonderful</string>
+    <string name="dialog_feedback_hint">Tell us about your experience. (Optional)</string>
+    <string name="dialog_feedback_submit">Submit</string>
+    <string name="dialog_feedback_submit_thank_you">Thank you! Your feedback helps us improve Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget de Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">No hay eventos hoy</string>
@@ -432,12 +442,12 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">What\'s new</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Month view</string>
-    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
-    <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
-    <string name="spotlight_v5_dialog_learn_more_button">Quiero saber más</string>
-    <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Te presentamos la nueva imagen de Proton, con varios servicios, pero una misma misión. Bienvenido al Internet donde la privacidad es la norma. <a href="http://proton.me/news/updated-proton">Quiero saber más</a></string>
+    <string name="spotlight_dialog_month_view_title">Vista del mes</string>
+    <string name="spotlight_dialog_month_view_description">De un vistazo a sus eventos con nuestra nueva vista mensual. Cambie entre vistas usando el menú.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Got it</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>
@@ -528,12 +538,7 @@
         <item>Sábado</item>
         <item>Domingo</item>
     </string-array>
-    <string name="dialog_feedback_header">Danos tu opinión</string>
-    <string name="dialog_feedback_text">¿Cómo describirías tu experiencia con Proton Calendar?</string>
-    <string name="dialog_feedback_rating_worst">Horrible</string>
-    <string name="dialog_feedback_rating_best">Maravillosa</string>
-    <string name="dialog_feedback_hint">Cuéntenos su experiencia. (Opcional)</string>
-    <string name="dialog_feedback_submit_thank_you">Gracias. Sus comentarios nos ayudan a mejorar Proton.</string>
-    <string name="dialog_feedback_submit">Enviar</string>
-    <string name="nav_view_feedback">Danos tu opinión</string>
+    <string name="listPremiumCountries_new_plans">Ubicaciones Plus (%1$d)</string>
+    <string name="new_look_dialog_title_new_plans">Proton actualizado, protección unificada</string>
+    <string name="new_look_dialog_message_new_plans"><![CDATA[Presentamos la nueva imagen de Proton, con varios servicios, pero una misma misión. Has llegado al internet cimentado sobre la base de la privacidad. <a href="%1$s">Más información</a>]]></string>
 </resources>

@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/support/what-is-a-digital-signature">Detalii</a></string>
+    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Detalii</a></string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>
@@ -231,8 +231,10 @@
     <string name="nav_view_switcher_month">lună</string>
     <string name="nav_view_timezone">Fus orar</string>
     <string name="nav_view_settings">Setări</string>
+    <string name="nav_view_feedback">Oferiți-ne feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
     <string name="nav_view_more_bug">Raportare eroare</string>
+    <string name="nav_view_more_subscription">Abonament</string>
     <string name="nav_view_more_logout">Deconectare</string>
     <string name="nav_view_more_login">Autentificare</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
@@ -393,8 +395,8 @@
     <string name="create_calendar_limit_reached_paid_manage">Gestionare calendare</string>
     <string name="create_calendar_limit_reached_close">Închidere</string>
     <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
+    <string name="create_calendar_limit_reached_free_description">Creați până la 20 de calendare și accesați multe alte funcții exclusive când treceți la alt plan.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Nu acum</string>
     <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
     <string name="delete_calendar_dialog_title">Ștergere calendar</string>
     <string name="delete_calendar_dialog_message">Sigur doriți să ștergeți acest calendar?</string>
@@ -405,11 +407,11 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Nu există calendare asociate cu acest cont.</string>
-    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
     <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
     <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://proton.me/support">baza de cunoștințe</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://protonmail.com/support/">baza de cunoștințe</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
     <string name="bootstrap_error_reset_needed_title">Resetare chei calendar</string>
@@ -420,6 +422,14 @@
     <string name="splash_after_login_init">Se pregătesc calendarele</string>
     <string name="splash_init">Se decriptează evenimentele</string>
     <string name="default_calendar_name">Calendarul meu</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Oferiți-ne feedback</string>
+    <string name="dialog_feedback_text">Cum ați descrie experiența avută cu Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Îngrozitoare</string>
+    <string name="dialog_feedback_rating_best">Minunată</string>
+    <string name="dialog_feedback_hint">Povestiți-ne despre experiența avută. (opțional)</string>
+    <string name="dialog_feedback_submit">Trimitere</string>
+    <string name="dialog_feedback_submit_thank_you">Vă mulțumim! Informațiile trimise ne ajută să îmbunătățim Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Proton Calendar widget</string>
     <string name="calendar_widget_no_upcoming_events_today">Astăzi nu sunt evenimente</string>
@@ -430,14 +440,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Începe la %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Se încheie la %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_header">What\'s new</string>
+    <string name="spotlight_dialog_header">Ce este nou</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Month view</string>
-    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
-    <string name="spotlight_v5_dialog_got_it_button">Got it</string>
-    <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
-    <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
+    <string name="spotlight_dialog_month_view_title">Vedere lunară</string>
+    <string name="spotlight_dialog_month_view_description">Obțineți o imagine de ansamblu a evenimentelor cu noua vizualizare lunară. Comutați între vizualizări folosind meniul.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Am înțeles</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Proton actualizat, protecție unificată</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="http://proton.me/news/updated-proton">Detalii</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
@@ -542,12 +552,4 @@
         <item>Sâmbătă</item>
         <item>Duminică</item>
     </string-array>
-    <string name="dialog_feedback_header">Dați-ne feedback</string>
-    <string name="dialog_feedback_text">Cum ați descrie experiența dumneavoastră cu Proton Calendar?</string>
-    <string name="dialog_feedback_rating_worst">Îngrozitor</string>
-    <string name="dialog_feedback_rating_best">Minunat</string>
-    <string name="dialog_feedback_hint">Povestiți-ne despre experiența dumneavoastră. (Opțional)</string>
-    <string name="dialog_feedback_submit_thank_you">Vă mulțumim! Feedback-ul dvs. ne ajută să îmbunătățim Proton.</string>
-    <string name="dialog_feedback_submit">Trimitere</string>
-    <string name="nav_view_feedback">Dați-ne feedback</string>
 </resources>
