@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.calendarFormViewModel
 
+import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import biweekly.component.VAlarm
@@ -59,7 +60,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.calendarName.value == calendarName)
 
-        assert(calendarFormViewModel.calendarColor.value == calendarColor)
+        assert(calendarFormViewModel.calendarColor.value == Color.parseColor(calendarColor))
 
         assert(calendarFormViewModel.calendarEmail.value == userEmail)
 
@@ -182,7 +183,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarTest() = runBlocking {
 
-        val customCalendarColor = "#ABCDEF"
+        val customCalendarColor = Color.parseColor("#ABCDEF")
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -241,7 +242,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarErrorTest() = runBlocking {
 
-        val customCalendarColor = "#ABCDEF"
+        val customCalendarColor = Color.parseColor("#ABCDEF")
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -299,7 +300,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarSettingsErrorTest() = runBlocking {
 
-        val customCalendarColor = "#ABCDEF"
+        val customCalendarColor = Color.parseColor("#ABCDEF")
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -401,7 +402,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         assert(calendarFormViewModel.calendarSettingsSnackState.value == null)
 
         coVerify(exactly = 0) {
-            updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = calendarName, color = calendarColor)
+            updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = calendarName, color = Color.parseColor(calendarColor))
         }
         coVerify(exactly = 1) {
             updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm))
