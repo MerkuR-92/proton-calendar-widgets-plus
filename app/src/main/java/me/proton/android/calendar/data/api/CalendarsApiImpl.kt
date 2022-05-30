@@ -463,6 +463,8 @@ data class SyncEvent(
     val attendeesEventContent: List<Event.EventPart.Attendee>? = null,
     @SerialName("Attendees")
     val attendees: List<Event.AttendeeStatusEvent>? = null,
+    @SerialName("AddedProtonAttendees")
+    val addedProtonAttendees: List<Event.AddedAttendee>? = null,
     @SerialName("SharedEventID")
     val sharedEventId: String? = null,
     @SerialName("UID")

@@ -30,11 +30,18 @@ import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.PackageType
+import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.key.domain.decryptSessionKey
+import me.proton.core.key.domain.encryptSessionKey
 import me.proton.core.key.domain.entity.key.PrivateKey
+import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
+import me.proton.core.key.domain.useKeys
+import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
@@ -56,7 +63,12 @@ class EditCreateEventUseCase @Inject constructor(
     private val upgradeEventUseCase: UpgradeEventUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false) : UseCase.Result {
+    /**
+     * @param [sendPreferences] needed for Auto-Added Invites to encrypt SharedKeyPacket with attendee's Public Address Key
+     */
+    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false, sendPreferences: Map<Email, SendPreferences> = emptyMap()) : UseCase.Result {
+
+        logger.e("sendPreferences: $sendPreferences")
 
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
             (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
@@ -191,7 +203,19 @@ class EditCreateEventUseCase @Inject constructor(
                 )
             } else null
 
-        // 9. assemble API request, depending on action we're taking
+        // 9. generate AddedProtonAttendees part if applicable
+        val sharedSessionKey = crypto.decryptSessionKey(
+            encryptedSharedPartCiphertext.encodedKeyPacket
+                ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"),
+            newCalendarKey.privateKeys,
+            newCalendarKey.passphrase
+        )?.key ?: return UseCase.Result.InvalidParams("could not decrypt shared key for added proton attendees")
+        val addedProtonAttendees = createAddedProtonAttendees(
+            sendPreferences,
+            sharedSessionKey
+        )
+
+        // 10. assemble API request, depending on action we're taking
         val sharedEventContent =
             if (createLinkedEventAsAttendee) null
             else {
@@ -313,7 +337,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 calendarEventContent = calendarEventContent,
                                 personalEventContent = personalEventContent,
                                 attendeesEventContent = attendeesEventContent,
-                                attendees = attendees.takeIfNotEmpty() // TODO to remove all attendees from event, send null value
+                                attendees = attendees.takeIfNotEmpty(), // TODO to remove all attendees from event, send null value
+                                addedProtonAttendees = addedProtonAttendees
                             )
                         )
                     )
@@ -472,6 +497,20 @@ class EditCreateEventUseCase @Inject constructor(
         val memberAddressKey = memberAddress.keys.primary()?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Primary Address Key for Member")
 
         return UseCase.Result.Success(MemberKey(member.id, memberAddressKey))
+    }
+
+    /**
+     * Encrypts SharedKeyPacket with Attendee's public Address Keys
+     */
+    private fun createAddedProtonAttendees(sendPreferences: Map<Email, SendPreferences>, sharedSessionKey: ByteArray): List<Event.AddedAttendee>? {
+        return sendPreferences.mapNotNull { (email, sendPreferences) ->
+            if (sendPreferences.pgpScheme == PackageType.ProtonMail && sendPreferences.publicKey != null) {
+                Event.AddedAttendee(
+                    email,
+                    Base64.encodeToString(PublicKey(sendPreferences.publicKey, true, true, true, true).encryptSessionKey(cryptoContext, me.proton.core.crypto.common.pgp.SessionKey(sharedSessionKey)), Base64.DEFAULT)
+                )
+            } else null
+        }.takeIfNotEmpty()
     }
 
 }

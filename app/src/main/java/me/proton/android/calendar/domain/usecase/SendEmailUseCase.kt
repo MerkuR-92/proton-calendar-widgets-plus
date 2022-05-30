@@ -189,7 +189,8 @@ class SendEmailUseCase @Inject constructor(
 
                 // Edit same event to add attendees if mail(s) have been sent
 
-                val editEventResult = editCreateEventUseCase.execute(userId, event)
+                // we need to pass SendPreferences for Auto-Added Invites
+                val editEventResult = editCreateEventUseCase.execute(userId, event, sendPreferences = sendPreferences)
 
                 if (editEventResult is UseCase.Result.InvalidParams) {
                     logger.e("SendEmailUseCase sendInviteToAttendees invalid params in edit event: ${editEventResult.message}")
