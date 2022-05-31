@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
+    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/supportknowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série ?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série ?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur seront perdues.</string>
@@ -231,8 +231,10 @@
     <string name="nav_view_switcher_month">Mois</string>
     <string name="nav_view_timezone">Fuseau horaire</string>
     <string name="nav_view_settings">Paramètres</string>
+    <string name="nav_view_feedback">Donnez-nous votre avis</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Général</string>
     <string name="nav_view_more_bug">Signaler un bug</string>
+    <string name="nav_view_more_subscription">Abonnement</string>
     <string name="nav_view_more_logout">Déconnexion</string>
     <string name="nav_view_more_login">Se connecter</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
@@ -392,10 +394,10 @@
     <string name="create_calendar_limit_reached_paid_message">Supprimez les calendriers inutilisés pour en créer de nouveaux.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gérer les calendriers</string>
     <string name="create_calendar_limit_reached_close">Fermer</string>
-    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Not now</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
+    <string name="create_calendar_limit_reached_free_title">Mettre à jour Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Créez jusqu\'à 20 calendriers et accédez à de nombreuses autres fonctionnalités exclusives lorsque vous passez votre abonnement à l\'offre supérieure.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Pas maintenant</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Changer d’offre</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ?</string>
     <string name="delete_default_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
@@ -420,6 +422,14 @@
     <string name="splash_after_login_init">Préparation des calendriers</string>
     <string name="splash_init">Déchiffrement des événements</string>
     <string name="default_calendar_name">Mon calendrier</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Donnez-nous votre avis</string>
+    <string name="dialog_feedback_text">Comment décririez-vous votre expérience avec Proton Calendar ?</string>
+    <string name="dialog_feedback_rating_worst">Affreux</string>
+    <string name="dialog_feedback_rating_best">Merveilleux</string>
+    <string name="dialog_feedback_hint">Parlez nous de votre expérience. (optionnel)</string>
+    <string name="dialog_feedback_submit">Envoyer</string>
+    <string name="dialog_feedback_submit_thank_you">Merci ! Vos retours nous aident à améliorer Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">Aucun événement prévu aujourd\'hui</string>
@@ -430,14 +440,14 @@
     <string name="calendar_widget_part_day_event_starts_at">Commence à %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Se termine à %1$s</string>
     <!-- Spotlight Dialogs -->
-    <string name="spotlight_dialog_header">What\'s new</string>
+    <string name="spotlight_dialog_header">Nouveautés</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Month view</string>
-    <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_dialog_month_view_title">Vue mensuelle</string>
+    <string name="spotlight_dialog_month_view_description">Obtenez un aperçu de vos événements avec notre nouvelle vue mensuelle. Basculez entre les vues à l\'aide du menu.</string>
     <string name="spotlight_v5_dialog_got_it_button">J\'ai compris</string>
     <string name="spotlight_v5_dialog_learn_more_button">En savoir plus</string>
-    <string name="spotlight_v5_dialog_rebranding_title">Proton mis à jour, protection unifiée</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Voici la nouvelle apparence de Proton. De nombreux services, une seule mission. Bienvenue dans un Internet où la confidentialité est la règle. <a href="http://proton.me/news/updated-proton">En savoir plus</a></string>
+    <string name="spotlight_v5_dialog_rebranding_title">Nouvelle version, protection unifiée</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Présentation du nouveau design de Proton. Plusieurs services, une seule mission. Bienvenue sur un Internet où la confidentialité est la valeur par défaut. <a href="http://proton.me/news/updated-proton">En savoir plus</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
@@ -528,12 +538,4 @@
         <item>Samedi</item>
         <item>Dimanche</item>
     </string-array>
-    <string name="dialog_feedback_header">Donnez nous votre avis</string>
-    <string name="dialog_feedback_text">Comment décririez vous votre expérience avec Proton Calendar?</string>
-    <string name="dialog_feedback_rating_worst">Terrible</string>
-    <string name="dialog_feedback_rating_best">Merveilleux</string>
-    <string name="dialog_feedback_hint">Parlez-nous nous votre expérience (facultatif)</string>
-    <string name="dialog_feedback_submit_thank_you">Merci beaucoup! Votre avis nous aide à améliorer Proton.</string>
-    <string name="dialog_feedback_submit">Envoyer</string>
-    <string name="nav_view_feedback">Donnez nous votre avis</string>
 </resources>
