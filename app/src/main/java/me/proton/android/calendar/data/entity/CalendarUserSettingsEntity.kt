@@ -42,7 +42,9 @@ data class CalendarUserSettingsEntity(
     @SerialName("ViewPreference")
     val viewPreference: Int, /* 0 - DAILY, 1 - WEEKLY, 2 - MONTHLY, 3 - YEARLY, 4 - PLANNING */
     @SerialName("DefaultCalendarID")
-    val defaultCalendarId: String? // TODO we still get null for old accounts (even when web says there is default calendar)
+    val defaultCalendarId: String?, // TODO we still get null for old accounts (even when web says there is default calendar)
+    @SerialName("AutoImportInvite")
+    val autoImportInvite: Int, // 0 off, 1 on
 
 ) {
 

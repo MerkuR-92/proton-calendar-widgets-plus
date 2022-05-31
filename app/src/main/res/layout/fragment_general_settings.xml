@@ -361,18 +361,18 @@
 
         <TextView
             android:id="@+id/settings_week_numbers_title"
+            style="@style/Text.Default"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/settings_week_numbers_title"
-            style="@style/Text.Default"
+            android:layout_marginStart="@dimen/spacing_page"
             android:layout_marginTop="@dimen/default_separator_margin_top"
             android:layout_marginBottom="@dimen/default_separator_margin_top"
-            android:layout_marginStart="@dimen/spacing_page"
             android:layout_marginEnd="@dimen/spacing_page"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/settings_week_numbers_title"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settings_week_numbers_switch"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Switch
             android:id="@+id/settings_week_numbers_switch"
@@ -393,10 +393,65 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_alternative_routing"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/settings_auto_invites"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/settings_week_numbers_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/settings_auto_invites_press"
+            layout="@layout/view_press_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/settings_auto_invites_title"
+            style="@style/Text.Default"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_page"
+            android:layout_marginTop="@dimen/default_separator_margin_top"
+            android:layout_marginBottom="@dimen/default_separator_margin_top"
+            android:layout_marginEnd="@dimen/spacing_page"
+            android:text="@string/settings_auto_invites_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settings_auto_invites_switch"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Switch
+            android:id="@+id/settings_auto_invites_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/default_icon_size"
+            android:layout_marginEnd="@dimen/default_inner_padding_end"
+            app:layout_constraintBottom_toBottomOf="@+id/settings_auto_invites_title"
+            app:layout_constraintTop_toTopOf="@+id/settings_auto_invites_title"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:id="@+id/settings_auto_invites_separator"
+        style="@style/Separator"
+        app:layout_constraintTop_toBottomOf="@+id/settings_auto_invites"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_alternative_routing"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/settings_auto_invites_separator"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 

@@ -207,7 +207,11 @@ interface CalendarsRepository {
 
     fun flowCalendarUserSettingsDisplayWeekNumber(userId: String): Flow<Int?>
 
+    fun flowCalendarUserSettingsAutoImportInvite(userId: String): Flow<Int?>
+
     suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String)
+
+    suspend fun updateCalendarUserAutoImportInvite(userId: String, autoImportInvite: Boolean)
 
     fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String?>
 

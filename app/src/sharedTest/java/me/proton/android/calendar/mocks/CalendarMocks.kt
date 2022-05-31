@@ -42,7 +42,8 @@ object CalendarMocks {
             displaySecondaryTimezone = 0, // TODO
             secondaryTimezone = null, // TODO
             viewPreference = viewPreference,
-            defaultCalendarId = calendarId
+            defaultCalendarId = calendarId,
+            autoImportInvite = 0
         )
     }
 

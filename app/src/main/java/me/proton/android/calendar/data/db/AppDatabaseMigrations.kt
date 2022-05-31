@@ -246,4 +246,10 @@ object AppDatabaseMigrations {
 
         }
     }
+
+    val MIGRATION_39_40 = object : Migration(39, 40) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.addTableColumn(AppDatabase.TABLE_CALENDAR_USER_SETTINGS, "autoImportInvite", "INTEGER NOT NULL" , "0")
+        }
+    }
 }

@@ -33,6 +33,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_DETECT
             const val UPDATE_DISPLAY_WEEK_NUMBER = UpdateCalendarUserSettingsUseCase.WORKER_ID_WEEK_NUMBER
+            const val UPDATE_AUTO_IMPORT_INVITE = UpdateCalendarUserSettingsUseCase.WORKER_ID_AUTO_IMPORT_INVITE
             const val UPDATE_DEFAULT_CALENDAR_ID = UpdateCalendarUserSettingsUseCase.WORKER_ID_DEFAULT_CALENDAR_ID
             const val UPDATE_TIME_FORMAT = UpdateUserSettingsUseCase.WORKER_ID_TIME_FORMAT
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
@@ -55,6 +56,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
         const val INPUT_AUTO_DETECT_PRIMARY_TIMEZONE = "INPUT_AUTO_DETECT_PRIMARY_TIMEZONE"
         const val INPUT_DISPLAY_WEEK_NUMBER = "INPUT_DISPLAY_WEEK_NUMBER"
+        const val INPUT_AUTO_IMPORT_INVITE = "INPUT_AUTO_IMPORT_INVITE"
         const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
         const val INPUT_PERSONAL_ICAL_STRING = "INPUT_PERSONAL_ICAL_STRING"
@@ -87,6 +89,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
             const val UPDATE_DISPLAY_WEEK_NUMBER = "UPDATE_DISPLAY_WEEK_NUMBER"
+            const val UPDATE_AUTO_IMPORT_INVITE = "UPDATE_AUTO_IMPORT_INVITE"
             const val UPDATE_DEFAULT_CALENDAR_ID = "UPDATE_DEFAULT_CALENDAR_ID"
             const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
@@ -159,6 +162,15 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     userId,
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_DISPLAY_WEEK_NUMBER))
                         inputData.getBoolean(INPUT_DISPLAY_WEEK_NUMBER, true)
+                    else return Result.failure()
+                )
+            }
+            UseCaseId.UPDATE_AUTO_IMPORT_INVITE -> {
+                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
+                updateCalendarUserSettingsUseCase.executeAutoImportInvite(
+                    userId,
+                    if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_AUTO_IMPORT_INVITE))
+                        inputData.getBoolean(INPUT_AUTO_IMPORT_INVITE, true)
                     else return Result.failure()
                 )
             }

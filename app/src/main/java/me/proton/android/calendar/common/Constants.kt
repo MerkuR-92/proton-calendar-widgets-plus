@@ -94,6 +94,7 @@ object FeatureFlag {
     const val SPOTLIGHT = true
     const val SUBSCRIPTION = false
     const val FEEDBACK = true
+    const val AUTO_INVITES_SETTING = false
 }
 
 object ApiResponseCode {
