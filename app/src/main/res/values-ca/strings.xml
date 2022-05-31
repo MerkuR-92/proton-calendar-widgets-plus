@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Suprimir esdeveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Suprimir esdeveniments</string>
     <string name="event_decryption_error_dialog_close">Tancar</string>
-    <string name="event_signature_verification_warning">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">Saber-ne més</a></string>
+    <string name="event_signature_verification_warning">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
     <string name="event_change_answer_recurring_title">Actualitzar esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador/a es perdran.</string>
@@ -407,11 +407,11 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">D\'acord</string>
     <string name="bootstrap_error_no_calendar_title">No hi ha calendaris associats amb aquest compte.</string>
-    <string name="bootstrap_error_no_calendar_message">Per configurar-ne un ara, visiteu <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_no_calendar_message">Per configurar-ne un ara, visiteu <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparant els calendaris</string>
     <string name="bootstrap_error_some_calendars_failed_message">Els calendaris següents no s\'han pogut configurar</string>
     <string name="bootstrap_error_no_active_calendar_title">No hi ha un calendari actiu associat amb aquest compte.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Per aprendre com activar un calendari, visiteu la nostra <a href="https://protonmail.com/support/">base de coneixements</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Per aprendre com activar un calendari, visiteu la nostra <a href="https://proton.me/support">base de coneixements</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hi ha més espai d\'emmagatzematge disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Saber-ne més</string>
     <string name="bootstrap_error_reset_needed_title">Restaurar claus de calendari</string>

@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
+    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/supportknowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur·rice seront perdues.</string>
@@ -407,11 +407,11 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Il n\'y a aucun calendrier associé à ce compte.</string>
-    <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.protonmail.com">calendar.protonmail.com</a></string>
+    <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Erreur lors de la préparation des calendriers</string>
     <string name="bootstrap_error_some_calendars_failed_message">Les calendriers suivants n\'ont pas pu être configurés</string>
     <string name="bootstrap_error_no_active_calendar_title">Il n\'y a pas de calendrier actif associé à ce compte.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Pour savoir comment activer un calendrier, visitez notre <a href="https://protonmail.com/support/">base de connaissances</a></string>
+    <string name="bootstrap_error_no_active_calendar_message">Pour savoir comment activer un calendrier, visitez notre <a href="https://proton.me/support">base de connaissances</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Il n\'y a plus d\'espace de stockage disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">En savoir plus</string>
     <string name="bootstrap_error_reset_needed_title">Réinitialiser les clés des calendriers</string>
