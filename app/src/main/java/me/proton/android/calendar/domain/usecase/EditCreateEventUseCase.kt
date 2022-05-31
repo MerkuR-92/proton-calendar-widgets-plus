@@ -204,16 +204,16 @@ class EditCreateEventUseCase @Inject constructor(
             } else null
 
         // 9. generate AddedProtonAttendees part if applicable
-        val sharedSessionKey = crypto.decryptSessionKey(
-            encryptedSharedPartCiphertext.encodedKeyPacket
-                ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"),
-            newCalendarKey.privateKeys,
-            newCalendarKey.passphrase
-        )?.key ?: return UseCase.Result.InvalidParams("could not decrypt shared key for added proton attendees")
-        val addedProtonAttendees = createAddedProtonAttendees(
-            sendPreferences,
-            sharedSessionKey
-        )
+        val addedProtonAttendees = if (sendPreferences.isNotEmpty()) {
+            val sharedSessionKey = crypto.decryptSessionKey(
+                encryptedSharedPartCiphertext.encodedKeyPacket
+                    ?: return UseCase.Result.InvalidParams("encoded shared key packet was null when encrypting attendees"),
+                newCalendarKey.privateKeys,
+                newCalendarKey.passphrase
+            )?.key ?: return UseCase.Result.InvalidParams("could not decrypt shared key for added proton attendees")
+
+            createAddedProtonAttendees(sendPreferences, sharedSessionKey)
+        } else null
 
         // 10. assemble API request, depending on action we're taking
         val sharedEventContent =
@@ -338,6 +338,10 @@ class EditCreateEventUseCase @Inject constructor(
                                 personalEventContent = personalEventContent,
                                 attendeesEventContent = attendeesEventContent,
                                 attendees = attendees.takeIfNotEmpty(), // TODO to remove all attendees from event, send null value
+
+                                // We don't allow for editing invitations yet so we only really add new attendees when creating new invitation or editing non-invitation event.
+                                // In both cases adding attendees happens in the "second call to /sync after the first one that created event", which is right here.
+                                // If we sent the SharedSessionKey already before, the attendee has the event auto-created in their calendar already, so we are done.
                                 addedProtonAttendees = addedProtonAttendees
                             )
                         )
