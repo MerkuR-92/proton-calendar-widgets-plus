@@ -538,7 +538,4 @@
         <item>Sábado</item>
         <item>Domingo</item>
     </string-array>
-    <string name="listPremiumCountries_new_plans">Ubicaciones Plus (%1$d)</string>
-    <string name="new_look_dialog_title_new_plans">Nuevo diseño, protección unificada</string>
-    <string name="new_look_dialog_message_new_plans"><![CDATA[Proton tiene un nuevo look. Muchos servicios, una sola misión. Te damos la bienvenida a un Internet en el que prima la privacidad. <a href="%1$s">Más información</a>]]></string>
 </resources>
