@@ -9,7 +9,6 @@ import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
-import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOriginalOccurrenceNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
@@ -211,7 +210,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 // TODO check .isSuccessful on Proton Responses, this will still crash in case of malformed request etc.
 
                 val errorEventIds = syncResponse.data.responses.mapNotNull {
-                    if (it.response.code == ApiResponseCode.EVENT_DOES_NOT_EXIST) {
+                    if (it.response.code == ApiResponseCode.DOES_NOT_EXIST) {
                         // ignore error if event didn't exist on server
                         logger.i("HandleDeleteUseCase event didn't exist on server anymore")
                         null

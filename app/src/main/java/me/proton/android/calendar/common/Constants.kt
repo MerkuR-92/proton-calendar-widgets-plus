@@ -97,8 +97,13 @@ object FeatureFlag {
     const val AUTO_INVITES_SETTING = false
 }
 
+object HttpResponseCode {
+    const val NOT_FOUND = 404
+    const val UNPROCESSABLE_ENTITY = 422
+}
+
 object ApiResponseCode {
-    const val EVENT_DOES_NOT_EXIST = 2501
+    const val DOES_NOT_EXIST = 2501
 }
 
 object SharedPreferencesKeys {

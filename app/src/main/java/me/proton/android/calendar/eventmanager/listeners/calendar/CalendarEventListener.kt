@@ -2,6 +2,7 @@ package me.proton.android.calendar.eventmanager.listeners.calendar
 
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
@@ -140,7 +141,7 @@ class CalendarEventListenerDelegate @Inject constructor(
             is ApiResponse.Success<EventApiResponse> -> result.data.event
             is ApiResponse.Error -> {
                 // If event was not found just omit it, otherwise we'll retry this indefinitely
-                if (result.httpCode == 404) return null
+                if (result.isNotFound()) return null
                 else throw IllegalStateException(result.error)
             }
             is ApiResponse.Exception -> throw result.exception

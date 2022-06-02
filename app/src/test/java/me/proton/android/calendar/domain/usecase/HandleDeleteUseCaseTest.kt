@@ -119,7 +119,7 @@ internal class HandleDeleteUseCaseTest {
                 SyncResponseWrapper(
                     index = 0,
                     response = SyncResponse(
-                        code = ApiResponseCode.EVENT_DOES_NOT_EXIST,
+                        code = ApiResponseCode.DOES_NOT_EXIST,
                         event = provideEventEntity()
                     )
                 )
