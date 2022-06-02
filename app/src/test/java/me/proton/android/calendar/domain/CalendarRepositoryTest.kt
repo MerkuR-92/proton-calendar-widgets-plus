@@ -371,6 +371,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 1,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -399,6 +401,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 1,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -419,6 +423,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -447,6 +453,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 1,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -467,6 +475,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -487,6 +497,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -507,6 +519,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -535,6 +549,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 1,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -555,6 +571,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -575,6 +593,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -602,6 +622,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 1,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(
@@ -622,6 +644,8 @@ internal class CalendarRepositoryTest {
                     createTime = 0L,
                     modifyTime = 0L,
                     permissions = 3,
+                    addressKeyPacket = null,
+                    addressId = null,
                     sharedKeyPacket = "sharedKeyPacket",
                     sharedEvents = listOf(
                         Json.decodeFromString<JsonElement>(

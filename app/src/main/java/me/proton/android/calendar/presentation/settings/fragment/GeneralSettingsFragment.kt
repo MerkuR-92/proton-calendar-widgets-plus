@@ -11,6 +11,10 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_switch
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_press
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_separator
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_switch
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_value
@@ -31,6 +35,7 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AppTheme
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -91,6 +96,23 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
             lifecycleScope.launch {
                 calendarViewModel.updateDisplayWeekNumber(settings_week_numbers_switch.isChecked)
+            }
+        }
+
+        settings_auto_invites_separator.visibleOrGone(FeatureFlag.AUTO_INVITES_SETTING)
+        settings_auto_invites.visibleOrGone(FeatureFlag.AUTO_INVITES_SETTING)
+
+        settings_auto_invites_press.setOnClickListener {
+            settings_auto_invites_switch.performClick()
+        }
+        settings_auto_invites_switch.setOnClickListener {
+            if (!mainViewModel.isConnectedToNetwork) {
+                displayNetworkError()
+                settings_auto_invites_switch.isChecked = !settings_auto_invites_switch.isChecked
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                calendarViewModel.updateAutoImportInvite(settings_auto_invites_switch.isChecked)
             }
         }
 
@@ -251,6 +273,11 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
             settings_week_numbers_switch.isChecked = displayWeekNumber
             settings_week_numbers_switch.jumpDrawablesToCurrentState()
+        }
+
+        calendarViewModel.autoImportInvite.observe(viewLifecycleOwner) { autoImportInvite ->
+            settings_auto_invites_switch.isChecked = autoImportInvite
+            settings_auto_invites_switch.jumpDrawablesToCurrentState()
         }
 
         calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.data.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -39,8 +40,12 @@ data class EventEntity(
     // 1 (number) - Can invite
     //2 (number) - Can modify event
     //4 (number) - Can see attendees list
+    @SerialName("AddressKeyPacket")
+    val addressKeyPacket: String?, // shared session key encrypted with the Address Key
+    @SerialName("AddressID")
+    val addressId: String?, // which Address contains the Address Key ^
     @SerialName("SharedKeyPacket")
-    val sharedKeyPacket: String, // base64
+    val sharedKeyPacket: String?, // base64, shared session key encrypted with Calendar Key
     @SerialName("SharedEvents")
     val sharedEvents: List<JsonElement>, // shared between all calendars
     @SerialName("CalendarEvents")

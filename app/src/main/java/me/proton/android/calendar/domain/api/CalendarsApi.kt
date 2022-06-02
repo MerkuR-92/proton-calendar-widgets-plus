@@ -1,13 +1,7 @@
 package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
-import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.core.domain.entity.UserId
-import me.proton.core.network.data.protonApi.GenericResponse
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.Path
 
 interface CalendarsApi {
 
@@ -39,6 +33,11 @@ interface CalendarsApi {
      * Get single event.
      */
     suspend fun getEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<EventApiResponse>
+
+    /**
+     * Upgrades Event using AddressKeyPacket to use SharedKeyPacket (applicable for auto-added invites).
+     */
+    suspend fun upgradeEvent(userId: UserId, calendarId: String, eventId: String, body: UpgradeEventApiRequest): ApiResponse<UpgradeEventApiResponse>
 
     /**
      * Gets bootstrap for calendar setup.

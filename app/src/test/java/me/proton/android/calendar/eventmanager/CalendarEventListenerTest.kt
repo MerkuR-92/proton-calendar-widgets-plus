@@ -325,6 +325,8 @@ fun createEventEntity(id: String, modifyTime: Long? = null, paramCalendarId: Str
     0L,
     modifyTime ?: 0L,
     0,
+    addressKeyPacket = null,
+    addressId = null,
     paramSharedKeyPacket ?: sharedKeyPacket,
     emptyList(),
     emptyList(),

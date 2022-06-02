@@ -43,7 +43,8 @@ class CalendarUserSettingsEventListenerTest {
                     0,
                     null,
                     0,
-                    null
+                    null,
+                    autoImportInvite = 0
                 )
             )
 

@@ -68,6 +68,8 @@ internal class TransformEventUseCaseTest {
                 0,
                 0,
                 3,
+                addressKeyPacket = null,
+                addressId = null,
                 "sharedKeyPacket",
                 getMockedNonEncryptedSharedEvents(),
                 getMockedNonEncryptedCalendarEvents(),

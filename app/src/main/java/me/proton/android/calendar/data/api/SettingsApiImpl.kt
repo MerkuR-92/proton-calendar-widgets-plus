@@ -8,6 +8,7 @@ import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
+import me.proton.core.util.kotlin.toInt
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PUT
@@ -28,6 +29,9 @@ interface SettingsApiService : BaseRetrofitApi {
 
     @PUT("settings/calendar")
     suspend fun updateCalendarUserDefaultCalendarId(@Body body: UpdateCalendarUserDefaultCalendarIdApiRequest): CalendarUserSettingsApiResponse
+
+    @PUT("settings/calendar")
+    suspend fun updateCalendarUserAutoImportInvite(@Body body: UpdateCalendarUserAutoImportInviteApiRequest): CalendarUserSettingsApiResponse
 
     @GET("settings")
     suspend fun getUserSettings(): UserSettingsApiResponse
@@ -72,6 +76,16 @@ class SettingsApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
         apiProvider.get<SettingsApiService>(userId).invoke {
             updateCalendarUserDefaultCalendarId(
                 UpdateCalendarUserDefaultCalendarIdApiRequest(defaultCalendarId)
+            )
+        }.toApiResponse()
+
+    override suspend fun updateCalendarUserAutoImportInvite(
+        userId: UserId,
+        autoImportInvite: Boolean
+    ): ApiResponse<CalendarUserSettingsApiResponse> =
+        apiProvider.get<SettingsApiService>(userId).invoke {
+            updateCalendarUserAutoImportInvite(
+                UpdateCalendarUserAutoImportInviteApiRequest(autoImportInvite.toInt())
             )
         }.toApiResponse()
 
@@ -124,6 +138,12 @@ data class UpdateCalendarUserDisplayWeekNumberApiRequest(
 data class UpdateCalendarUserDefaultCalendarIdApiRequest(
     @SerialName("DefaultCalendarID")
     val defaultCalendarId: String
+)
+
+@Serializable
+data class UpdateCalendarUserAutoImportInviteApiRequest(
+    @SerialName("AutoImportInvite")
+    val autoImportInvite: Int
 )
 
 @Serializable

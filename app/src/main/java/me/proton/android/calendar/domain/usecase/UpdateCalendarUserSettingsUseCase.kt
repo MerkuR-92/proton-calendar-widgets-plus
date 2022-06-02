@@ -21,6 +21,7 @@ class UpdateCalendarUserSettingsUseCase @Inject constructor(
         const val WORKER_ID_TZ = "WORKER_ID_TZ"
         const val WORKER_ID_AUTO_DETECT = "WORKER_ID_AUTO_DETECT"
         const val WORKER_ID_WEEK_NUMBER = "WORKER_ID_WEEK_NUMBER"
+        const val WORKER_ID_AUTO_IMPORT_INVITE = "WORKER_ID_AUTO_IMPORT_INVITE"
         const val WORKER_ID_DEFAULT_CALENDAR_ID = "WORKER_ID_DEFAULT_CALENDAR_ID"
     }
 
@@ -107,6 +108,29 @@ class UpdateCalendarUserSettingsUseCase @Inject constructor(
             is ApiResponse.Exception -> {
                 logger.e("api error updating calendar user default calendar id: $updateCalendarUserDefaultCalendarIdResponse")
                 UseCase.Result.Error(updateCalendarUserDefaultCalendarIdResponse.exception.message ?: "(no exception message)")
+            }
+        }
+    }
+
+    suspend fun executeAutoImportInvite(userId: UserId, autoImportInvite: Boolean): UseCase.Result {
+        return when (
+            val updateCalendarUserAutoImportInviteResponse =
+                settingsApi.updateCalendarUserAutoImportInvite(userId, autoImportInvite)
+        ) {
+            is ApiResponse.Success -> {
+                calendarsRepository.updateCalendarUserAutoImportInvite(
+                    userId.id,
+                    autoImportInvite
+                )
+                UseCase.Result.Success<Unit>()
+            }
+            is ApiResponse.Error -> {
+                logger.e("api error updating calendar user auto import invite: $updateCalendarUserAutoImportInviteResponse")
+                UseCase.Result.Error(updateCalendarUserAutoImportInviteResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                logger.e("api error updating calendar user auto import invite: $updateCalendarUserAutoImportInviteResponse")
+                UseCase.Result.Error(updateCalendarUserAutoImportInviteResponse.exception.message ?: "(no exception message)")
             }
         }
     }

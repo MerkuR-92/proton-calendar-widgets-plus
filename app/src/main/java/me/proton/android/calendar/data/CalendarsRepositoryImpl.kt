@@ -1072,8 +1072,16 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
     }
 
+    override fun flowCalendarUserSettingsAutoImportInvite(userId: String): Flow<Int?> {
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
+    }
+
     override suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String) {
         return database.calendarUserSettingsDao().updateDefaultCalendarId(userId, defaultCalendarId)
+    }
+
+    override suspend fun updateCalendarUserAutoImportInvite(userId: String, autoImportInvite: Boolean) {
+        return database.calendarUserSettingsDao().updateAutoImportInvite(userId, autoImportInvite.toInt())
     }
 
     override fun flowCalendarUserDefaultCalendarId(userId: String): Flow<String?> {

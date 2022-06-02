@@ -9,6 +9,8 @@ import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
@@ -46,7 +48,8 @@ class SendEmailUseCase @Inject constructor(
     private val crypto: Crypto,
     private val editCreateEventUseCase: EditCreateEventUseCase,
     private val resourceProvider: ResourceProvider,
-    private val cryptoContext: CryptoContext
+    private val cryptoContext: CryptoContext,
+    private val upgradeEventUseCase: UpgradeEventUseCase
 ): UseCase {
 
     suspend fun sendReplyToOrganizer(
@@ -68,7 +71,10 @@ class SendEmailUseCase @Inject constructor(
         val mailContent = getEmailContent(event, defaultTimeZone, timeFormatIs24Hours, MailType.REPLY, participationStatus, userAttendeeEmail)
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
-            val sharedPropertiesResult = getSharedProperties(userId, eventEntity)
+
+            val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event")
+
+            val sharedPropertiesResult = getSharedProperties(userId, upgradedEventEntity)
             if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
 
             getResponseIcs(
@@ -132,7 +138,8 @@ class SendEmailUseCase @Inject constructor(
 
         val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE)
 
-        val newEventEntity = calendarsRepository.selectEventEntity(newEvent.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees failed to select event entity")
+        val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event")
+
         val sharedPropertiesResult = getSharedProperties(userId, newEventEntity)
         if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
 
@@ -182,7 +189,8 @@ class SendEmailUseCase @Inject constructor(
 
                 // Edit same event to add attendees if mail(s) have been sent
 
-                val editEventResult = editCreateEventUseCase.execute(userId, event)
+                // we need to pass SendPreferences for Auto-Added Invites
+                val editEventResult = editCreateEventUseCase.execute(userId, event, sendPreferences = sendPreferences)
 
                 if (editEventResult is UseCase.Result.InvalidParams) {
                     logger.e("SendEmailUseCase sendInviteToAttendees invalid params in edit event: ${editEventResult.message}")
@@ -257,6 +265,10 @@ class SendEmailUseCase @Inject constructor(
         if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: there are no passphrase for calendar")
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase")
+
+        if (eventEntity.sharedKeyPacket == null) {
+            return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: EventEntity is not upgraded")
+        }
 
         val sharedSessionKey = Base64.encode(crypto.decryptSessionKey(eventEntity.sharedKeyPacket, calendarPrivateKeys, keyPassphrase.toByteArray())?.key)
 

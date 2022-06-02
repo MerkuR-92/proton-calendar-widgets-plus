@@ -108,6 +108,7 @@ class CalendarViewModel @Inject constructor(
     var autoDetectPrimaryTimezone: LiveData<Boolean> = MutableLiveData()
     var weekStart: LiveData<Int> = MutableLiveData()
     var displayWeekNumber: LiveData<Boolean> = MutableLiveData()
+    var autoImportInvite: LiveData<Boolean> = MutableLiveData()
 
     var viewMode: MutableLiveData<ViewMode> = MutableLiveData(ViewMode.AGENDA)
 
@@ -201,6 +202,10 @@ class CalendarViewModel @Inject constructor(
 
             displayWeekNumber = calendarsRepository.flowCalendarUserSettingsDisplayWeekNumber(userId.id).map {
                 it?.toBoolean() ?: true // Show week numbers by default
+            }.asLiveData(Dispatchers.Default)
+
+            autoImportInvite = calendarsRepository.flowCalendarUserSettingsAutoImportInvite(userId.id).map {
+                it?.toBoolean() ?: false
             }.asLiveData(Dispatchers.Default)
 
             defaultCalendarId = calendarsRepository.flowCalendarUserDefaultCalendarId(userId.id).map {
@@ -449,6 +454,25 @@ class CalendarViewModel @Inject constructor(
             .build()
 
         return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+    }
+
+    fun updateAutoImportInvite(autoImportInvite: Boolean) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_AUTO_IMPORT_INVITE,
+                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
+                    UseCaseWorker.INPUT_AUTO_IMPORT_INVITE to autoImportInvite
+                )
+            )
+            .build()
+
+        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_IMPORT_INVITE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {

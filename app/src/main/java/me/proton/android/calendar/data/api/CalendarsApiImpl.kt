@@ -37,6 +37,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : EventApiResponse
 
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/upgrade")
+    suspend fun upgradeEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String, @Body body: UpgradeEventApiRequest): UpgradeEventApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/bootstrap")
     suspend fun getBootstrap(@Path("calendarId") calendarId: String): BootstrapApiResponse
 
@@ -146,6 +149,15 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     ): ApiResponse<EventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getEvent(calendarId, eventId)
     }.toApiResponse()
+
+    override suspend fun upgradeEvent(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        body: UpgradeEventApiRequest
+    ): ApiResponse<UpgradeEventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+            upgradeEvent(calendarId, eventId, body)
+        }.toApiResponse()
 
     override suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
@@ -296,6 +308,20 @@ data class SyncEventsUpdateApiRequest(
 )
 
 @Serializable
+data class UpgradeEventApiRequest(
+    @SerialName("SharedKeyPacket")
+    val sharedKeyPacket: String
+)
+
+@Serializable
+data class UpgradeEventApiResponse(
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Event")
+    val event: EventEntity
+): BaseApiResponse()
+
+@Serializable
 data class UpdateCalendarApiRequest(
     @SerialName("Name")
     val name: String? = null,
@@ -437,6 +463,8 @@ data class SyncEvent(
     val attendeesEventContent: List<Event.EventPart.Attendee>? = null,
     @SerialName("Attendees")
     val attendees: List<Event.AttendeeStatusEvent>? = null,
+    @SerialName("AddedProtonAttendees")
+    val addedProtonAttendees: List<Event.AddedAttendee>? = null,
     @SerialName("SharedEventID")
     val sharedEventId: String? = null,
     @SerialName("UID")

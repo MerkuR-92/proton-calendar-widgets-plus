@@ -419,6 +419,17 @@ data class Event private constructor(
         }
     }
 
+    /**
+     * Used for sending SharedSessionKey encrypted with Attendee's AddressKey
+     */
+    @Serializable
+    data class AddedAttendee(
+        @SerialName("Email")
+        val email: String,
+        @SerialName("AddressKeyPacket")
+        val AddressKeyPacket: String
+    )
+
     enum class SignatureVerification {
         SUCCESS,
         FAILURE,
