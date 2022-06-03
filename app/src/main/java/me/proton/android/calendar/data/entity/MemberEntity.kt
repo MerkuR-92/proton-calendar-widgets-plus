@@ -33,19 +33,19 @@ data class MemberEntity(
 ) {
     enum class Permission(val value: Int) { // TODO see if this is even deserialized
         /** has financial responsibility. There must always be exactly one owner but it can be transferred */
-        SUPEROWNER(64),
+        SUPEROWNER(1),
         /** can edit permissions of all other users, and can acquire super-ownership */
-        OWNER(32),
+        OWNER(2),
         /** can edit the permissions of all other users except for admins, can add or remove members to the calendar */
-        ADMIN(16),
-        /** can create new events, edit calendar-specific notes, edit events owned by the calendar, delete events, share events owned by that calendar */
-        WRITE(8),
+        ADMIN(4),
         /** can view who has access to the calendar */
-        READ_MEMBER_LIST(4),
+        READ_MEMBER_LIST(8),
+        /** can create new events, edit calendar-specific notes, edit events owned by the calendar, delete events, share events owned by that calendar */
+        WRITE(16),
         /** can read event information */
-        READ(2),
+        READ(32),
         /** can see when events are, but no further event information. Every user has availability access */
-        AVAILABILITY(1)
+        AVAILABILITY(64)
     }
 
     fun hasPermission(permission: Permission): Boolean { // TODO add test
