@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">This event has been updated by the organizer. Would you like to delete this event?</string>
     <string name="dialog_button_delete">Delete</string>
     <string name="dialog_button_cancel">Cancel</string>
+    <string name="dialog_button_continue">Continue</string>
     <string name="dialog_button_close">Close</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
@@ -308,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
+    <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">The notification has already been added</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
+    <string name="dialog_import_from_google_title">Import from Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Event Notifications</string>
     <string name="notification_channel_sync">Calendar Synchronisation</string>
@@ -445,10 +448,20 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Month view</string>
     <string name="spotlight_dialog_month_view_description">Get an overview of your events with our new month view. Switch between views using the menu.</string>
+    <string name="spotlight_dialog_easy_switch_title">Import from Google</string>
+    <string name="spotlight_dialog_easy_switch_description">Importing events and other data from Google Calendar to Proton Calendar is easier than ever. Our Easy Switch importer will guide you each step of the way.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Start import</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Not now</string>
     <string name="spotlight_v5_dialog_got_it_button">Got it</string>
     <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
     <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Learn more</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Allow access</string>
+    <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
+    <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
+    <string name="import_assistant_summary_title">Import summary</string>
+    <string name="import_assistant_summary_count">Import %d of %d calendars from</string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

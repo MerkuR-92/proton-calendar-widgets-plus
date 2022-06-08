@@ -1,12 +1,16 @@
 package me.proton.android.calendar.common.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_negative_button
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_positive_button
 import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_description
 import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_title
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_description
@@ -18,6 +22,8 @@ import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.presentation.main.MainActivity
 
 object SpotlightUtils {
 
@@ -46,7 +52,14 @@ object SpotlightUtils {
         )
     }
 
-    fun Context.showLastSpotlightDialog() {
+    private fun Resources.getEasySwitchDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_easy_switch_title,
+            R.string.spotlight_dialog_easy_switch_description
+        )
+    }
+
+    fun Activity.showLastSpotlightDialog() {
         if (!SPOTLIGHT) return
 
         val lastSpotlightShown = this.getLastSpotlightShown()
@@ -66,10 +79,25 @@ object SpotlightUtils {
             }
             145 -> {
                 // Rebranding
-                val monthViewContent = this.resources.getRebrandingDialogContent()
+                val rebrandingContent = this.resources.getRebrandingDialogContent()
                 this.displayV5SpotlightDialog(
-                    monthViewContent.first,
-                    monthViewContent.second
+                    rebrandingContent.first,
+                    rebrandingContent.second
+                )
+            }
+            146 -> {
+                // Easy switch
+                val easySwitchContent = this.resources.getMonthViewDialogContent()
+                val positiveButtonCallback = View.OnClickListener {
+                    // Open import from google view
+                    (this as MainActivity).showImportGoogleAuthDialog()
+                }
+                this.displaySpotlightDialog(
+                    easySwitchContent.first,
+                    easySwitchContent.second,
+                    R.string.spotlight_dialog_easy_switch_positive_button,
+                    R.string.spotlight_dialog_easy_switch_negative_button,
+                    positiveButtonCallback
                 )
             }
             else -> {
@@ -80,13 +108,13 @@ object SpotlightUtils {
 
     private fun Context.displaySpotlightDialog(
         title: Int,
-        description: Int
+        description: Int,
+        customPositiveButtonText: Int? = null,
+        customNegativeButtonText: Int? = null,
+        customPositiveButtonCallback: View.OnClickListener? = null
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
-            .setPositiveButton(R.string.spotlight_dialog_confirmation_button) { _, _ ->
-                // Nothing to do here
-            }
             .setOnDismissListener {
                 // Set current version name as last spotlight shown
                 this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
@@ -101,8 +129,33 @@ object SpotlightUtils {
         // Support click on link in text
         view.dialog_spotlight_description.movementMethod = LinkMovementMethod.getInstance()
 
+        var dialog: AlertDialog? = null
+
+        view.dialog_spotlight_custom_positive_button.visibleOrGone(customPositiveButtonText != null)
+        if (customPositiveButtonText != null) {
+            // Use custom positive button if text is provided
+            view.dialog_spotlight_custom_positive_button.text = getText(customPositiveButtonText)
+            view.dialog_spotlight_custom_positive_button.setOnSingleClickListener {
+                dialog?.dismiss()
+                customPositiveButtonCallback?.onClick(it)
+            }
+        } else {
+            materialDialogBuilder.setPositiveButton(R.string.spotlight_dialog_confirmation_button) { _, _ ->
+                // Nothing to do here
+            }
+        }
+
+        view.dialog_spotlight_custom_negative_button.visibleOrGone(customNegativeButtonText != null)
+        if (customNegativeButtonText != null) {
+            // Use custom negative button if text is provided
+            view.dialog_spotlight_custom_negative_button.text = getText(customNegativeButtonText)
+            view.dialog_spotlight_custom_negative_button.setOnSingleClickListener {
+                dialog?.dismiss()
+            }
+        }
+
         materialDialogBuilder.setView(view)
-        materialDialogBuilder.show()
+        dialog = materialDialogBuilder.show()
     }
 
     private fun Context.displayV5SpotlightDialog(

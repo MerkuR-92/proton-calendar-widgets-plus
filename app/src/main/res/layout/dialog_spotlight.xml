@@ -37,4 +37,29 @@
         android:layout_marginEnd="@dimen/material_dialog_inset_end"
         android:layout_marginTop="@dimen/spacing_large"/>
 
+    <me.proton.core.presentation.ui.view.ProtonButton
+        android:id="@+id/dialog_spotlight_custom_positive_button"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        tools:text="OK" />
+
+    <me.proton.core.presentation.ui.view.ProtonButton
+        android:id="@+id/dialog_spotlight_custom_negative_button"
+        style="@style/ProtonButton.Borderless.Text"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="18dp"
+        tools:text="Cancel" />
+
 </LinearLayout>

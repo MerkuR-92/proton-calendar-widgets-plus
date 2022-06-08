@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_import_calendar_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <View
+        android:id="@+id/item_import_calendar_press"
+        android:background="@layout/view_press_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <me.proton.core.presentation.ui.view.ProtonCheckbox
+        android:id="@+id/item_import_calendar_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:layout_marginStart="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/item_import_calendar_source_title"
+        app:layout_constraintBottom_toBottomOf="@+id/item_import_calendar_source_title"/>
+
+    <TextView
+        android:id="@+id/item_import_calendar_source_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Proton.Text.Default"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/item_import_calendar_checkbox"
+        tools:text="Holidays"/>
+
+    <TextView
+        android:id="@+id/item_import_calendar_source_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        style="@style/Proton.Text.DefaultSmall.Weak"
+        android:ellipsize="end"
+        app:layout_constraintTop_toBottomOf="@+id/item_import_calendar_source_title"
+        app:layout_constraintStart_toStartOf="@+id/item_import_calendar_source_title"
+        app:layout_constraintEnd_toEndOf="@+id/item_import_calendar_source_title"
+        tools:text="eric@gmail.com"/>
+
+    <View
+        android:id="@+id/item_import_calendar_layout_separator"
+        style="@style/Separator"
+        android:background="@color/sidebar_separator"
+        android:visibility="invisible"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/item_import_calendar_source_email"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

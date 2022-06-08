@@ -7,15 +7,17 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -43,6 +45,12 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.dialog_google_auth.view.dialog_google_auth_description
+import kotlinx.android.synthetic.main.dialog_google_auth.view.dialog_google_auth_title
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_negative_button
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_positive_button
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_description
+import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_title
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.*
@@ -56,11 +64,16 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
+import me.proton.android.calendar.common.AppLinksQueryParameters.CODE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
+import me.proton.android.calendar.common.AppLinksQueryParameters.SCOPE
+import me.proton.android.calendar.common.CalendarImport.ERROR
+import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
@@ -479,7 +492,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
                         handleIcsIntent(openIcsIntent)
-                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS) {
+                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS || IMPORT_FROM_GOOGLE) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                         if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && OPEN_ICS_FILES) {
                             // Handle ics file
@@ -487,14 +500,26 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         } else if (actionViewIntent != null && APP_LINKS) {
                             // Handle app link
                             val appLinkData: Uri? = actionViewIntent.data
+
+                            // Handle open event details link
                             val eventId = appLinkData?.getQueryParameter(EVENT_ID)
                             val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
                             val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
                             val action = appLinkData?.getQueryParameter(ACTION)
+
+                            // Handle import redirect link
+                            val code = appLinkData?.getQueryParameter(CODE)
+                            val scope = appLinkData?.getQueryParameter(SCOPE)
+
                             if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
-                                handleAppLinkIntent(eventId, calendarId, recurrenceId)
+                                handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
+                            } else if (code != null && scope != null) {
+                                val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(code)
+                                safeNavigateToDialogFragment(importAssistantDeepLink)
                             } else {
-                                this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                                val error = appLinkData?.getQueryParameter(ERROR)
+                                if (error == ERROR_ACCESS_DENIED) this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_import_error))
+                                else this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
                                 safeNavigateToMonth()
                             }
                         } else safeNavigateToMonth()
@@ -531,6 +556,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun safeNavigateToDialogFragment(uri: Uri) {
         when (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id) {
+            R.id.nav_import_assistant,
             R.id.nav_settings,
             R.id.nav_general_settings,
             R.id.nav_calendar_form,
@@ -555,7 +581,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else safeNavigateToMonth()
     }
 
-    private fun handleAppLinkIntent(eventId: String, calendarId: String, recurrenceId: String) {
+    private fun handleEventDetailsAppLink(eventId: String, calendarId: String, recurrenceId: String) {
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             if (userId == null) {
@@ -824,7 +850,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
-            onClickCreateCalendar()
+            if (IMPORT_FROM_GOOGLE) showCalendarsCreateOrImportDialog()
+            else onClickCreateCalendar()
+            drawer_layout.close()
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
@@ -913,6 +941,77 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
         }
+    }
+
+    private fun showCalendarsCreateOrImportDialog() {
+        val bottomSheetDialog = BottomSheetDialog(this)
+
+        // Workaround to make sure we have the correct navigation bar color.
+        // TODO update once we change splash screen and how we handle navigation bar colors
+        val window = bottomSheetDialog.window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val navigationBarBackgroundColor = R.color.background_norm
+            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        } else {
+            window?.navigationBarColor = this.getColorFromAttr(
+                R.attr.proton_background_norm
+            )
+        }
+
+        bottomSheetDialog.setContentView(R.layout.dialog_calendars_create_import)
+
+        val createCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_create_press)
+        val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
+
+        createCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar()
+            bottomSheetDialog.dismiss()
+        }
+
+        importFromGooglePress?.setOnSingleClickListener {
+            if (!mainViewModel.isConnectedToNetwork) {
+                bottomSheetDialog.dismiss()
+                this@MainActivity.displaySnackBar(this.getString(R.string.snack_network_error), Snackbar.LENGTH_LONG)
+                return@setOnSingleClickListener
+            }
+
+            showImportGoogleAuthDialog()
+            bottomSheetDialog.dismiss()
+        }
+
+        val importFromGoogleLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendars_import)
+        importFromGoogleLayout?.visibleOrGone(IMPORT_FROM_GOOGLE)
+
+        bottomSheetDialog.show()
+    }
+
+    fun showImportGoogleAuthDialog() {
+        val materialDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setCancelable(true)
+            .setPositiveButton(R.string.dialog_button_continue) { dialog, _ ->
+                lifecycleScope.launch {
+                    val userId = accountViewModel.getPrimaryUserId()
+                    if (userId != null) {
+                        val googleAuthenticationUrl = mainViewModel.getGoogleAuthenticationUrl(userId)
+                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
+                        startActivity(browserIntent)
+                    } else {
+                        displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
+                    }
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setOnDismissListener {
+            }
+
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_google_auth, null, false)
+
+        materialDialogBuilder.setView(view)
+        materialDialogBuilder.show()
     }
 
     private fun showFeedbackDialog() {

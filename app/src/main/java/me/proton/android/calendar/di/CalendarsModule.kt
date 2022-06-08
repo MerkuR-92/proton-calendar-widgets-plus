@@ -64,6 +64,10 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
+    abstract fun bindImporterApi(importerApi: ImporterApiImpl): ImporterApi
+
+    @Binds
+    @Singleton
     abstract fun bindServerEventsApi(serverEventsApiImpl: ServerEventsApiImpl): ServerEventsApi
 
     @Binds

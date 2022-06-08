@@ -15,13 +15,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CalendarImport.ACCESS_TYPE
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_AUTH_BASE_URL
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_SCOPES
+import me.proton.android.calendar.common.CalendarImport.PROMPT
+import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
+import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.ExternalCalendarEntity
 import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.FeedbackApi
+import me.proton.android.calendar.domain.api.ImporterApi
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
@@ -41,7 +50,10 @@ class MainViewModel @Inject constructor(
     private val networkManager: NetworkManager,
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     private val userSettingsRepository: UserSettingsRepository,
-    private val feedbackApi: FeedbackApi
+    private val feedbackApi: FeedbackApi,
+    private val importerApi: ImporterApi,
+    private val logger: Logger,
+    private val importFromGoogleUseCase: ImportFromGoogleUseCase
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -206,5 +218,86 @@ class MainViewModel @Inject constructor(
         val iCalString = bufferedReader.use { it.readText() }
         if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
+    }
+
+    private suspend fun getGoogleClientId(userId: UserId): String? {
+        importerApi.getGoogleClientId(userId)
+        return when (val googleClientIdApiResponse = importerApi.getGoogleClientId(userId)) {
+            is ApiResponse.Success -> {
+                googleClientIdApiResponse.data.config.googleClientId
+            }
+            is ApiResponse.Error -> {
+                logger.e(googleClientIdApiResponse.error)
+                null
+            }
+            is ApiResponse.Exception -> {
+                logger.e(googleClientIdApiResponse.exception.message ?: "(no exception message)")
+                null
+            }
+        }
+    }
+
+    suspend fun getGoogleAuthenticationUrl(userId: UserId): String {
+
+        val baseUrl = GOOGLE_AUTH_BASE_URL
+        val scopes = GOOGLE_SCOPES
+        val accessType = ACCESS_TYPE
+        val redirectUri = REDIRECT_URI
+        val responseType = RESPONSE_TYPE
+        val clientId = getGoogleClientId(userId)
+        val prompt = PROMPT
+
+        return "${baseUrl}scope=${scopes}&accessType=${accessType}&redirect_uri=${redirectUri}&response_type=${responseType}&client_id=${clientId}&prompt=${prompt}"
+    }
+
+    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String): Pair<String, List<ExternalCalendarEntity>>? {
+        // Create Access token resource
+        when (val createAccessTokenApiResponse = importerApi.createAccessToken(userId, code)) {
+            is ApiResponse.Success -> {
+                val tokenId = createAccessTokenApiResponse.data.token.id
+                val account = createAccessTokenApiResponse.data.token.account
+
+                // Create the importer for the required products
+                when (val createCalendarImporterApiResponse = importerApi.createCalendarImporter(userId, tokenId)) {
+                    is ApiResponse.Success -> {
+                        val importerId = createCalendarImporterApiResponse.data.importerID
+
+                        // Get all the importer mapping info
+                        when (val getCalendarImportMappingInfoApiResponse = importerApi.getCalendarImportMappingInfo(userId, importerId)) {
+                            is ApiResponse.Success -> {
+                                getCalendarImportMappingInfoApiResponse.data.calendars
+
+                                // Return the list of calendars
+                                return Pair(account, getCalendarImportMappingInfoApiResponse.data.calendars)
+                            }
+                            is ApiResponse.Error -> {
+                                logger.e(getCalendarImportMappingInfoApiResponse.error)
+                                return null
+                            }
+                            is ApiResponse.Exception -> {
+                                logger.e(getCalendarImportMappingInfoApiResponse.exception.message ?: "(no exception message)")
+                                return null
+                            }
+                        }
+                    }
+                    is ApiResponse.Error -> {
+                        logger.e(createCalendarImporterApiResponse.error)
+                        return null
+                    }
+                    is ApiResponse.Exception -> {
+                        logger.e(createCalendarImporterApiResponse.exception.message ?: "(no exception message)")
+                        return null
+                    }
+                }
+            }
+            is ApiResponse.Error -> {
+                logger.e(createAccessTokenApiResponse.error)
+                return null
+            }
+            is ApiResponse.Exception -> {
+                logger.e(createAccessTokenApiResponse.exception.message ?: "(no exception message)")
+                return null
+            }
+        }
     }
 }

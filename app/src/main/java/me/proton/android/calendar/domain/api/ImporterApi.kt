@@ -1,0 +1,39 @@
+package me.proton.android.calendar.domain.api
+
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.CalendarImportMappingInfoApiResponse
+import me.proton.android.calendar.data.api.CalendarMappingEntity
+import me.proton.android.calendar.data.api.CreateAccessTokenApiResponse
+import me.proton.android.calendar.data.api.CreateImporterApiResponse
+import me.proton.android.calendar.data.api.GoogleClientIdApiResponse
+import me.proton.android.calendar.data.api.StartImporterApiResponse
+import me.proton.core.domain.entity.UserId
+
+interface ImporterApi {
+
+    /**
+     *  Return the google ClientID among all the API system config
+     */
+    suspend fun getGoogleClientId(userId: UserId): ApiResponse<GoogleClientIdApiResponse>
+
+    /**
+     *  This route uses the given Token code and redirect URI to get an access token.
+     */
+    suspend fun createAccessToken(userId: UserId, code: String): ApiResponse<CreateAccessTokenApiResponse>
+
+    /**
+     *  Create the Calendar Importer
+     */
+    suspend fun createCalendarImporter(userId: UserId, tokenId: String): ApiResponse<CreateImporterApiResponse>
+
+    /**
+     *  This route looks up the calendars from the remote provider.
+     */
+    suspend fun getCalendarImportMappingInfo(userId: UserId, importerId: String): ApiResponse<CalendarImportMappingInfoApiResponse>
+
+    /**
+     *  This route launches the import in a background task.
+     */
+    suspend fun startImporter(userId: UserId, importerId: String, customCalendarMapping: Boolean, calendarMapping: List<CalendarMappingEntity>): ApiResponse<StartImporterApiResponse>
+}
+

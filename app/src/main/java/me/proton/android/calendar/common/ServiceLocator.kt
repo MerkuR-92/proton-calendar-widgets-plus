@@ -71,6 +71,7 @@ val networkModule = module {
     single<ReportsApi> { ReportsApiImpl(get()) }
     single<MailSettingsApi> { MailSettingsApiImpl(get()) }
     single<FeedbackApi> { FeedbackApiImpl(get()) }
+    single<ImporterApi> { ImporterApiImpl(get()) }
 }
 
 val repositoryModule = module {
@@ -82,6 +83,9 @@ val viewModelModule = module {
     viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
+            get(),
+            get(),
+            get(),
             get(),
             get(),
             get(),
@@ -128,6 +132,7 @@ val useCaseModule = module {
     factory<HandleSaveUseCase> { HandleSaveUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get()) }
     factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
+    factory<ImportFromGoogleUseCase> { ImportFromGoogleUseCase(get(), get()) }
 }
 
 fun coreModule(
