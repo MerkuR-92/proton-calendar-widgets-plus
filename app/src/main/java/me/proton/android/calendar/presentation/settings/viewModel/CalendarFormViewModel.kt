@@ -38,6 +38,7 @@ import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
@@ -356,6 +357,7 @@ class CalendarFormViewModel @Inject constructor(
                     color = _calendarColor.value?.toHexColor()
                 )
                 if (updateCalendarUseCaseResult !is UseCase.Result.Success<*>) {
+                    updateCalendarUseCaseResult.ifSuccessAndLogErrors(logger) {}
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                         resourceProvider.provideString(R.string.snack_update_calendar_error)
                     )
@@ -422,6 +424,7 @@ class CalendarFormViewModel @Inject constructor(
                 email = _calendarEmail.value!!
             )
             if (createCalendarResult !is UseCase.Result.Success<*>) {
+                createCalendarResult.ifSuccessAndLogErrors(logger) {}
                 calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_create_calendar_error)
                 )

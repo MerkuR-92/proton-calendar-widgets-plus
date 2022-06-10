@@ -20,6 +20,7 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
@@ -98,6 +99,7 @@ val viewModelModule = module {
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<ImportAssistantViewModel> { ImportAssistantViewModel(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {

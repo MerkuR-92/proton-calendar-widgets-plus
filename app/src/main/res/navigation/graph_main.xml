@@ -56,7 +56,7 @@
 
     <dialog
         android:id="@+id/nav_import_assistant"
-        android:name="me.proton.android.calendar.presentation.import.ImportAssistantFragment"
+        android:name="me.proton.android.calendar.presentation.importAssistant.fragment.ImportAssistantFragment"
         android:label=""
         tools:layout="@layout/fragment_import_assistant">
         <deepLink

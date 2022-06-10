@@ -462,7 +462,16 @@
     <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
     <string name="import_assistant_summary_title">Import summary</string>
     <string name="import_assistant_summary_count">Import %d of %d calendars from</string>
+    <string name="import_assistant_summary_customize_import">Customize import</string>
+    <string name="import_assistant_error">Error fetching data</string>
+    <string name="import_assistant_import_as">Import as</string>
+    <string name="import_assistant_new_calendar_badge">New</string>
+    <string name="import_assistant_merge_calendar_badge">Merged</string>
     <!--  STRING PLURALS  -->
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Import %d calendar</item>
+        <item quantity="other">Import %d calendars</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
