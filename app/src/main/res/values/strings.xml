@@ -467,6 +467,11 @@
     <string name="import_assistant_import_as">Import as</string>
     <string name="import_assistant_new_calendar_badge">New</string>
     <string name="import_assistant_merge_calendar_badge">Merged</string>
+    <string name="import_assistant_creating_calendars">Creating new calendars</string>
+    <string name="import_assistant_creating_calendars_count">%d of %d created in %s</string>
+    <string name="import_assistant_creating_calendars_finish">Almost there…</string>
+    <string name="import_assistant_new_calendar_header">Create new</string>
+    <string name="import_assistant_merge_calendar_header">Merge with existing</string>
     <!--  STRING PLURALS  -->
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %d calendar</item>

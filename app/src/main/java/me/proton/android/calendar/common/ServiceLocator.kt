@@ -99,7 +99,7 @@ val viewModelModule = module {
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<ImportAssistantViewModel> { ImportAssistantViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<ImportAssistantViewModel> { ImportAssistantViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {

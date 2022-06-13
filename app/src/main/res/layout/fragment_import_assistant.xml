@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/fragment_import_assistant_scroll_view"
         android:overScrollMode="never"
         android:layout_width="0dp"
@@ -43,11 +43,24 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/fragment_import_assistant_loader_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     style="@style/Proton.Text.Headline"
                     android:layout_marginTop="16dp"
-                    android:text="@string/import_assistant_gathering_data_loader_title"/>
+                    tools:text="@string/import_assistant_gathering_data_loader_title"/>
+
+                <TextView
+                    android:id="@+id/fragment_import_assistant_loader_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Proton.Text.DefaultSmall.Weak"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    tools:text="1 of 6 created in adam@proton.me"/>
 
                 <ProgressBar
                     android:id="@+id/fragment_import_assistant_loader"
@@ -168,14 +181,15 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <me.proton.core.presentation.ui.view.ProtonButton
+    <me.proton.core.presentation.ui.view.ProtonProgressButton
         android:id="@+id/fragment_import_assistant_import_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
         tools:visibility="visible"
+        app:initialState="idle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -183,5 +197,19 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         tools:text="Import 5 calendars"/>
+
+    <me.proton.core.presentation.ui.view.ProtonButton
+        android:id="@+id/fragment_import_assistant_close_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/dialog_button_close"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

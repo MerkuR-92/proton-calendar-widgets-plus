@@ -144,8 +144,7 @@
             android:clickable="true"
             android:focusable="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/item_import_calendar_destination_title"
-            android:background="?android:selectableItemBackgroundBorderless"/>
+            app:layout_constraintTop_toTopOf="@+id/item_import_calendar_destination_title"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

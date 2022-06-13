@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_cale
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_badge
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_email
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_layout
+import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_press
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_title
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_press
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_secondary_press
@@ -26,7 +27,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
 
 class ImportCalendarMappingListAdapter(
-    val listener: (ImportCalendarMapping) -> Unit
+    val importListener: (ImportCalendarMapping) -> Unit,
+    val optionsListener: (ImportCalendarMapping) -> Unit
 ) : ListAdapter<ImportCalendarMapping, ImportCalendarMappingListAdapter.ViewHolder>(ExternalCalendarEntityDiffCallback()) {
 
     class ExternalCalendarEntityDiffCallback : DiffUtil.ItemCallback<ImportCalendarMapping>() {
@@ -59,6 +61,7 @@ class ImportCalendarMappingListAdapter(
         private val destinationTitle: TextView = view.item_import_calendar_destination_title
         private val destinationEmail: TextView = view.item_import_calendar_destination_email
         private val destinationBadgeView: View = view.item_import_calendar_destination_badge
+        private val destinationPressOverlay: View = view.item_import_calendar_destination_press
 
         fun bind(importCalendarMapping : ImportCalendarMapping) {
 
@@ -81,7 +84,7 @@ class ImportCalendarMappingListAdapter(
 
             importCheckBox.isChecked = importCalendarMapping.importCalendar
             importCheckBox.setOnSingleClickListener {
-                listener(importCalendarMapping)
+                importListener(importCalendarMapping)
             }
 
             primaryPressOverlay.visibleOrGone(!importCalendarMapping.importCalendar)
@@ -91,6 +94,10 @@ class ImportCalendarMappingListAdapter(
             secondaryPressOverlay.visibleOrGone(importCalendarMapping.importCalendar)
             secondaryPressOverlay.setOnSingleClickListener {
                 importCheckBox.performClick()
+            }
+
+            destinationPressOverlay.setOnSingleClickListener {
+                optionsListener(importCalendarMapping)
             }
         }
 
