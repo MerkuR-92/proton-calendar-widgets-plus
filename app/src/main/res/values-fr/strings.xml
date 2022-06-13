@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/supportknowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
+    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série ?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série ?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur seront perdues.</string>
@@ -153,7 +153,7 @@
     <string name="event_alarm_partial_day_3">30 minutes</string>
     <string name="event_alarm_partial_day_4">1 heure</string>
     <string name="event_alarm_partial_day_5">1 semaine</string>
-    <string name="event_alarm_all_day_1">le même jour à $%1$s</string>
+    <string name="event_alarm_all_day_1">le même jour à %1$s</string>
     <string name="event_alarm_all_day_2">1 jour avant le %1$s</string>
     <string name="event_alarm_all_day_3">1 semaine avant le %1$s</string>
     <string name="event_alarm_all_day_4">3 semaines avant le %1$s</string>
@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Début de la semaine</string>
     <string name="settings_time_format_title">Format de l\'heure</string>
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
+    <string name="settings_auto_invites_title">Ajouter les invitations au calendrier et marquer comme en attente</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un routage réseau alternatif pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de conserver ce paramètre activé pour une plus grande fiabilité.</string>
     <string name="settings_value_placeholder">Touchez pour sélectionner</string>
@@ -395,9 +396,9 @@
     <string name="create_calendar_limit_reached_paid_manage">Gérer les calendriers</string>
     <string name="create_calendar_limit_reached_close">Fermer</string>
     <string name="create_calendar_limit_reached_free_title">Mettre à jour Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Créez jusqu\'à 20 calendriers et accédez à de nombreuses autres fonctionnalités exclusives lorsque vous passez votre abonnement à l\'offre supérieure.</string>
+    <string name="create_calendar_limit_reached_free_description">Créez jusqu\'à 20 calendriers et accédez à de nombreuses autres fonctionnalités exclusives en passant à un abonnement supérieur.</string>
     <string name="create_calendar_limit_reached_free_not_now">Pas maintenant</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Changer d’offre</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Passer à un abonnement supérieur</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ?</string>
     <string name="delete_default_calendar_dialog_message">Êtes-vous sûr de vouloir supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
@@ -407,7 +408,7 @@
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Il n\'y a aucun calendrier associé à ce compte.</string>
-    <string name="bootstrap_error_no_calendar_message">Pour en créer un maintenant, visitez <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Erreur lors de la préparation des calendriers</string>
     <string name="bootstrap_error_some_calendars_failed_message">Les calendriers suivants n\'ont pas pu être configurés</string>
     <string name="bootstrap_error_no_active_calendar_title">Il n\'y a pas de calendrier actif associé à ce compte.</string>

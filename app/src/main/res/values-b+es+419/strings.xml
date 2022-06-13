@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Inicio de semana</string>
     <string name="settings_time_format_title">Formato de hora</string>
     <string name="settings_week_numbers_title">Mostrar números de semana</string>
+    <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcarlas como pendiente</string>
     <string name="settings_alternative_routing_title">Permitir ruta alternativa</string>
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, este ajuste permite a la aplicación probar rutas alternativas para llegar a Proton, lo que puede ser útil para evitar problemas de red o firewalls. Recomendamos mantener este ajuste activado para mayor confiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>

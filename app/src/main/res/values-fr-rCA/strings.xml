@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/supportknowledge-base/what-is-a-digital-signature/">En savoir plus</a></string>
+    <string name="event_signature_verification_warning">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur·rice seront perdues.</string>
@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Début de la semaine</string>
     <string name="settings_time_format_title">Format de l\'heure</string>
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
+    <string name="settings_auto_invites_title">Add invites to calendar and mark as pending</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un routage réseau alternatif pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de conserver ce paramètre activé pour une plus grande fiabilité.</string>
     <string name="settings_value_placeholder">Touchez pour sélectionner</string>
