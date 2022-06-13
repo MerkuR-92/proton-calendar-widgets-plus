@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/supportknowledge-base/what-is-a-digital-signature/">Detalii</a></string>
+    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/support/what-is-a-digital-signature">Detalii</a></string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>
@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Început săptămână</string>
     <string name="settings_time_format_title">Format oră</string>
     <string name="settings_week_numbers_title">Afișare număr săptămână</string>
+    <string name="settings_auto_invites_title">Adăugare invitații în calendar și marcare ca fiind în așteptare</string>
     <string name="settings_alternative_routing_title">Permitere rută alternativă</string>
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
@@ -447,7 +448,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Am înțeles</string>
     <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizat, protecție unificată</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="http://proton.me/news/updated-proton">Detalii</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Detalii</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">minut</item>

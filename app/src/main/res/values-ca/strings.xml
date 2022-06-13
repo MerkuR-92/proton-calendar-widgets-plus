@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Inici de setmana</string>
     <string name="settings_time_format_title">Format d\'hora</string>
     <string name="settings_week_numbers_title">Mostrar el número de setmana</string>
+    <string name="settings_auto_invites_title">Afegir invitacions al calendari i marcar-les com a pendents</string>
     <string name="settings_alternative_routing_title">Permetre encaminament alternatiu</string>
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
     <string name="settings_value_placeholder">Toqueu per seleccionar</string>
@@ -447,14 +448,14 @@
     <string name="spotlight_v5_dialog_got_it_button">Entesos</string>
     <string name="spotlight_v5_dialog_learn_more_button">Saber-ne més</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="http://proton.me/news/updated-proton">Saber-ne més</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Saber-ne més</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
-        <item quantity="one">minute</item>
+        <item quantity="one">minut</item>
         <item quantity="other">minuts</item>
     </plurals>
     <plurals name="plural_hour">
-        <item quantity="one">hour</item>
+        <item quantity="one">hora</item>
         <item quantity="other">hores</item>
     </plurals>
     <plurals name="plural_day">
@@ -466,16 +467,16 @@
         <item quantity="other">setmanes</item>
     </plurals>
     <plurals name="plural_month">
-        <item quantity="one">month</item>
+        <item quantity="one">mes</item>
         <item quantity="other">mesos</item>
     </plurals>
     <plurals name="plural_year">
-        <item quantity="one">year</item>
+        <item quantity="one">any</item>
         <item quantity="other">anys</item>
     </plurals>
     <plurals name="plural_recurrence_count">
         <item quantity="one">una vegada</item>
-        <item quantity="other">times</item>
+        <item quantity="other">vegades</item>
     </plurals>
     <plurals name="plural_occurrence">
         <item quantity="one">ocurrència</item>

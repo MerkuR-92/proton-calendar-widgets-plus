@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_confirmation">Termin löschen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
-    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
+    <string name="event_signature_verification_warning">Die Überprüfung der Ereignissignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
     <string name="event_change_answer_recurring_overwrite_description">Möchtest du deine Antwort für alle Termine in dieser Serie ändern?\nEinige deiner Antworten auf Wiederholungen, die zuvor vom Organisator aktualisiert wurden, gehen dabei verloren.</string>
@@ -350,6 +350,7 @@
     <string name="settings_week_start_title">Wochenanfang</string>
     <string name="settings_time_format_title">Zeitformat</string>
     <string name="settings_week_numbers_title">Kalenderwoche anzeigen</string>
+    <string name="settings_auto_invites_title">Einladungen zum Kalender hinzufügen und als ausstehend markieren</string>
     <string name="settings_alternative_routing_title">Alternatives Routing erlauben</string>
     <string name="settings_alternative_routing_subtitle">Für den Fall, dass Proton-Websites gesperrt sind, ermöglicht diese Einstellung der App, ein alternative Netzwerkweiterleitung auszuprobieren, um Proton zu erreichen, was zur Umgehung von Firewalls oder Netzwerkproblemen nützlich sein kann. Wir empfehlen, diese Einstellung für eine größere Zuverlässigkeit an zu lassen.</string>
     <string name="settings_value_placeholder">Zum Auswählen antippen</string>
@@ -447,7 +448,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Verstanden</string>
     <string name="spotlight_v5_dialog_learn_more_button">Mehr erfahren</string>
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">Minute</item>
