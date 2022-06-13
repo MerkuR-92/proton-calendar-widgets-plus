@@ -448,7 +448,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Verstanden</string>
     <string name="spotlight_v5_dialog_learn_more_button">Mehr erfahren</string>
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an internet where privacy is the default. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="http://proton.me/news/updated-proton">Mehr erfahren</a></string>
     <!--  STRING PLURALS  -->
     <plurals name="plural_minute">
         <item quantity="one">Minute</item>
