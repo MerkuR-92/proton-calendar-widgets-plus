@@ -69,7 +69,7 @@ val networkModule = module {
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
     single<ServerEventsApi> { ServerEventsApiImpl(get()) }
     single<SettingsApi> { SettingsApiImpl(get()) }
-    single<ReportsApi> { ReportsApiImpl(get()) }
+    single<BugReportsApi> { BugReportsApiImpl(get()) }
     single<MailSettingsApi> { MailSettingsApiImpl(get()) }
     single<FeedbackApi> { FeedbackApiImpl(get()) }
     single<ImporterApi> { ImporterApiImpl(get()) }

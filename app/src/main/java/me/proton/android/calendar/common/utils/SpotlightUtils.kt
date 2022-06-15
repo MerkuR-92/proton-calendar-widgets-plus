@@ -54,7 +54,7 @@ object SpotlightUtils {
 
     private fun Resources.getEasySwitchDialogContent(): Pair<Int, Int> {
         return Pair(
-            R.string.spotlight_dialog_easy_switch_title,
+            R.string.import_from_google_title,
             R.string.spotlight_dialog_easy_switch_description
         )
     }

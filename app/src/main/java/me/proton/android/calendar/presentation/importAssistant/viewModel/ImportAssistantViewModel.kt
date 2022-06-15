@@ -52,6 +52,8 @@ class ImportAssistantViewModel @Inject constructor(
     private val _sourceEmail: MutableLiveData<String> = MutableLiveData()
     val sourceEmail: LiveData<String> = _sourceEmail
 
+    val defaultUserEmail: MutableLiveData<String?> = MutableLiveData()
+
     private lateinit var importerId: String
 
     private var viewModelJob = Job()
@@ -108,7 +110,7 @@ class ImportAssistantViewModel @Inject constructor(
                             is ApiResponse.Success -> {
                                 val externalCalendarList = getCalendarImportMappingInfoApiResponse.data.calendars
 
-                                val defaultUserEmail = getDefaultUserEmail() ?: run {
+                                defaultUserEmail.value = getDefaultUserEmail() ?: run {
                                     // TODO HANDLE ERROR
                                     return false
                                 }
@@ -123,7 +125,7 @@ class ImportAssistantViewModel @Inject constructor(
                                             createDestinationCalendar = true,
                                             destinationId = null,
                                             destinationName = it.source,
-                                            destinationEmail = defaultUserEmail,
+                                            destinationEmail = defaultUserEmail.value!!,
                                             destinationColor = calendarColors.random()
                                         )
                                     )
@@ -255,7 +257,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun setCreateNewCalendar(calendarToImport: ImportCalendarMapping, calendarColor: Int) {
-        val defaultUserEmail = getDefaultUserEmail() ?: return // TODO Handle null
+        val defaultUserEmail = defaultUserEmail.value ?: getDefaultUserEmail() ?: return // TODO Handle null
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -289,9 +291,7 @@ class ImportAssistantViewModel @Inject constructor(
             destinationColor = Color.parseColor(calendarEntity.color)
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return // TODO Handle null
-        logger.e("Test test currentList $currentList")
         val indexOfItem = currentList.indexOf(calendarToImport)
-        logger.e("Test test indexOfItem $indexOfItem")
         if (indexOfItem < 0 || indexOfItem > currentList.lastIndex) return // TODO Handle error
         // Replace previous item
         currentList.removeAt(indexOfItem)

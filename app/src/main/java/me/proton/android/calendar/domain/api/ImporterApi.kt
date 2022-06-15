@@ -6,6 +6,7 @@ import me.proton.android.calendar.data.api.CalendarMappingEntity
 import me.proton.android.calendar.data.api.CreateAccessTokenApiResponse
 import me.proton.android.calendar.data.api.CreateImporterApiResponse
 import me.proton.android.calendar.data.api.GoogleClientIdApiResponse
+import me.proton.android.calendar.data.api.ImportersApiResponse
 import me.proton.android.calendar.data.api.StartImporterApiResponse
 import me.proton.core.domain.entity.UserId
 
@@ -35,5 +36,15 @@ interface ImporterApi {
      *  This route launches the import in a background task.
      */
     suspend fun startImporter(userId: UserId, importerId: String, customCalendarMapping: Boolean, calendarMapping: List<CalendarMappingEntity>): ApiResponse<StartImporterApiResponse>
+
+    /**
+     *  Get all the importers. The Active field is present if there is an ongoing import.
+     */
+    suspend fun getImporters(userId: UserId): ApiResponse<ImportersApiResponse>
+
+    /**
+     *  This route returns a history of the finished imports.
+     */
+    suspend fun getReports(userId: UserId): ApiResponse<ImportersApiResponse>
 }
 

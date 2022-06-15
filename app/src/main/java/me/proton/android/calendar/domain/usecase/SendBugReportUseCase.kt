@@ -3,13 +3,13 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.ReportsApiRequest
-import me.proton.android.calendar.domain.api.ReportsApi
+import me.proton.android.calendar.data.api.BugReportsApiRequest
+import me.proton.android.calendar.domain.api.BugReportsApi
 import me.proton.core.domain.entity.UserId
 
 class SendBugReportUseCase(
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
-    private val reportsApi: ReportsApi
+    private val bugReportsApi: BugReportsApi
 ) {
 
     companion object {
@@ -30,7 +30,7 @@ class SendBugReportUseCase(
 
         val installationId = SentryIntegration.getInstallationId(defaultSharedPreferencesProvider.sharedPreferences)
 
-        val reportsApiRequest = ReportsApiRequest(
+        val bugReportsApiRequest = BugReportsApiRequest(
             osName,
             osVersion,
             client,
@@ -40,7 +40,7 @@ class SendBugReportUseCase(
             username,
             email)
 
-        return when (val reportsApiResponse = reportsApi.sendReport(userId, reportsApiRequest)) {
+        return when (val reportsApiResponse = bugReportsApi.sendBugReport(userId, bugReportsApiRequest)) {
             is ApiResponse.Success -> {
                 UseCase.Result.Success<Unit>()
             }

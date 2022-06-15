@@ -32,6 +32,12 @@ interface ImporterApiService : BaseRetrofitApi {
 
     @POST("importer/v1/importers/start")
     suspend fun startImporter(@Body body: StartImporterApiRequest): StartImporterApiResponse
+
+    @GET("importer/v1/importers")
+    suspend fun getImporters(): ImportersApiResponse
+
+    @GET("importer/v1/reports")
+    suspend fun getReports(): ReportsApiResponse
 }
 
 class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) : ImporterApi {
@@ -82,6 +88,16 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
                     )
                 )
             )
+        }.toApiResponse()
+
+    override suspend fun getImporters(userId: UserId): ApiResponse<ImportersApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            getImporters()
+        }.toApiResponse()
+
+    override suspend fun getReports(userId: UserId): ApiResponse<ReportsApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            getReports()
         }.toApiResponse()
 }
 
@@ -196,3 +212,90 @@ data class StartImporterApiResponse(
     @SerialName("Code")
     override val code: Int
 ): BaseApiResponse()
+
+@Serializable
+data class ImportersApiResponse(
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Importers")
+    val importers: List<ImporterEntity>
+): BaseApiResponse()
+
+@Serializable
+data class ImporterEntity(
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Account")
+    val account: String,
+    @SerialName("Product")
+    val product: List<String>,
+    @SerialName("TokenID")
+    val tokenID: String,
+    @SerialName("Active")
+    val active: ActiveImporterEntity // The Active field is present if there is an ongoing import.
+)
+
+@Serializable
+data class ActiveImporterEntity(
+    @SerialName("CreateTime")
+    val createTime: Int,
+    @SerialName("AddressID")
+    val addressID: String,
+    @SerialName("State")
+    val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
+    @SerialName("ErrorCode")
+    val errorCode: Int,
+    @SerialName("FilterStartDate")
+    val filterStartDate: Int,
+    @SerialName("FilterEndDate")
+    val filterEndDate: Int,
+    @SerialName("Mapping")
+    val mapping: List<ActiveImporterMappingEntity>
+)
+
+@Serializable
+data class ActiveImporterMappingEntity(
+    @SerialName("Source")
+    val source: String,
+    @SerialName("Processed")
+    val processed: Int,
+    @SerialName("Total")
+    val total: Int
+)
+
+@Serializable
+data class ReportsApiResponse(
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Imports")
+    val imports: List<ImportEntity>
+): BaseApiResponse()
+
+@Serializable
+data class ImportEntity(
+    @SerialName("ID")
+    val id: String,
+    @SerialName("Provider")
+    val provider: Int,
+    @SerialName("Account")
+    val account: String,
+    @SerialName("State")
+    val state: Int,
+    @SerialName("CreateTime")
+    val createTime: Int,
+    @SerialName("EndTime")
+    val endTime: Int,
+    @SerialName("TotalSize")
+    val totalSize: Int,
+    @SerialName("Summary")
+    val summary: ImportSummaryEntity
+)
+
+@Serializable
+data class ImportSummaryEntity(
+    @SerialName("State")
+    val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
+    @SerialName("NumEvents")
+    val numEvents: Int
+)
+

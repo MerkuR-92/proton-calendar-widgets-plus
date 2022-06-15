@@ -16,7 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_close_button
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_illustration
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_import_button
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_description
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_illustration
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_layout
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_redirect
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_description
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_title
@@ -98,6 +103,12 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         importAssistantViewModel.importCalendarMappingList.observe(viewLifecycleOwner) { importCalendarMappingList ->
+            if (importCalendarMappingList.isNullOrEmpty()) {
+                fragment_import_assistant_summary_layout.visibleOrGone(false)
+                fragment_import_assistant_import_button.visibleOrGone(false)
+                return@observe
+            }
+
             importCalendarMappingListAdapter.submitList(importCalendarMappingList)
 
             // Display summary header
@@ -214,15 +225,41 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 importCalendarMappingList = calendarsToImport
             )
             if (startImportResult) displayImportInProgressView()
+            else {
+                // TODO ERROR display import mapping view again and error snack
+
+            }
         }
     }
 
     private fun displayImportInProgressView() {
+        // Hide loader and display in progress layout
         fragment_import_assistant_loader_layout.visibleOrGone(false)
+        fragment_import_assistant_in_progress_layout.visibleOrGone(true)
+
+        val defaultUserEmail = importAssistantViewModel.defaultUserEmail.value ?: "" // TODO Handle null ?
+        val sourceEmail = importAssistantViewModel.sourceEmail.value ?: "" // TODO Handle null ?
+        fragment_import_assistant_in_progress_description.text = getString(
+            R.string.import_assistant_in_progress_description,
+            sourceEmail,
+            defaultUserEmail
+        )
+
+        // Hide import button and display close button
         fragment_import_assistant_import_button.visibleOrGone(false)
         fragment_import_assistant_close_button.visibleOrGone(true)
 
-        // TODO VIEW
+        // Change illustration
+        fragment_import_assistant_in_progress_illustration.visibleOrGone(true)
+        fragment_import_assistant_illustration.visibleOrGone(false)
+
+        fragment_import_assistant_close_button.setOnSingleClickListener {
+            onNavigationIconClicked()
+        }
+
+        fragment_import_assistant_in_progress_redirect.setOnSingleClickListener {
+            // TODO REDIRECT TO PROGRESS VIEW
+        }
     }
 
     private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, userCalendars: List<CalendarEntity>?) {

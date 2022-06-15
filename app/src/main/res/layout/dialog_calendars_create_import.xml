@@ -89,7 +89,7 @@
             android:id="@+id/dialog_calendars_import_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/dialog_import_from_google_title"
+            android:text="@string/import_from_google_title"
             style="@style/Text.Default"
             android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"

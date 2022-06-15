@@ -26,12 +26,14 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_add_layout_press
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_info
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_press
+import kotlinx.android.synthetic.main.fragment_settings.settings_import_press
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars_list
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -95,6 +97,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         settings_general_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
+        }
+
+        settings_import_press.visibleOrGone(IMPORT_FROM_GOOGLE)
+        settings_import_press.setOnSingleClickListener {
+            findNavController().navigate(R.id.action_nav_settings_to_nav_import_assistant_guide)
         }
 
         // Build the general settings description
