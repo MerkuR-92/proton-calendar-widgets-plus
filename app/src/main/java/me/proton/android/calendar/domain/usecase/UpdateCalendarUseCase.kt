@@ -1,19 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.provider.CalendarContract
-import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpdateCalendarApiRequest
 import me.proton.android.calendar.data.api.UpdateCalendarDisplayApiRequest
-import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.data.api.UpdateMemberApiRequest
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
-import okhttp3.internal.toHexString
 import javax.inject.Inject
 
 class UpdateCalendarUseCase @Inject constructor(
@@ -28,94 +24,109 @@ class UpdateCalendarUseCase @Inject constructor(
         const val WORKER_LIST_ID = "UPDATE_CALENDAR_LIST"
     }
 
-    //TODO Handle other Calendar parameters
-
-    //Update Single Calendar on Server
+    // Update Single Calendar on Server
     suspend fun executeUpdateFromDb(userId: UserId, calendarId: String) : UseCase.Result {
+
         val dbCalendar = database.calendarsDao().selectById(calendarId) ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb DB Calendar was null")
+        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb DB Member was null")
+
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = dbCalendar.name,
-            description = dbCalendar.description,
-            color = dbCalendar.color,
-            display = dbCalendar.display
+            description = dbCalendar.description
         )
 
-        return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
-            is ApiResponse.Success -> {
-                UseCase.Result.Success<Unit>()
-            }
-            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb error in update calendar: ${updateCalendarResponse.error}")
-            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
-        }
+        val updateMemberApiRequest = UpdateMemberApiRequest(
+            color = dbMember.color,
+            display = dbMember.display
+        )
+
+        return updateSingleCalendar(userId, calendarId, updateCalendarApiRequest, dbMember.id, updateMemberApiRequest)
+
     }
 
-    suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: Int? = null, display: Int? = null) : UseCase.Result {
+    suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
         val updateCalendarApiRequest = UpdateCalendarApiRequest(
             name = name,
-            description = description,
-            color = color?.toHexColor(),
+            description = description
+        )
+
+        val updateMemberApiRequest = UpdateMemberApiRequest(
+            color = color,
             display = display
         )
-        return when (val updateCalendarResponse = calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
+
+        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
+
+        return updateSingleCalendar(userId, calendarId, updateCalendarApiRequest, dbMember.id, updateMemberApiRequest)
+    }
+
+    private suspend fun updateSingleCalendar(
+        userId: UserId,
+        calendarId: String,
+        updateCalendarApiRequest: UpdateCalendarApiRequest,
+        memberId: String,
+        updateMemberApiRequest: UpdateMemberApiRequest
+    ): UseCase.Result {
+        val updateCalendarApiResponse = when (val updateCalendarResponse =
+            calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
-                // Copy existing calendar flags as API does not send it back in the response
-                val existingCalendar = calendarsRepository.selectCalendar(calendarId) ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Calendar was null")
-                val updatedCalendar = updateCalendarResponse.data.calendar.copy(flags = existingCalendar.flags)
-                calendarsRepository.updateCalendar(userId.id, updatedCalendar)
+                calendarsRepository.updateCalendar(userId.id, updateCalendarResponse.data.calendar)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
         }
+
+        val updateMemberApiResponse = when (val updateCalendarResponse =
+            calendarsApi.updateMember(userId, calendarId, memberId, updateMemberApiRequest)) {
+            is ApiResponse.Success -> {
+                UseCase.Result.Success<Unit>()
+            }
+            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateCalendarResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
+        }
+
+        val responses = listOf(updateCalendarApiResponse, updateMemberApiResponse)
+
+        return if (responses.all { it is UseCase.Result.Success<*> }) {
+            UseCase.Result.Success<Unit>()
+        } else {
+            responses.first { it !is UseCase.Result.Success<*> }
+        }
     }
 
     //Update Calendars Display values on Server
-    suspend fun executeUpdateList(userId: UserId) : UseCase.Result {
-        val dbCalendars = database.calendarsDao().selectCalendars(userId.id)
-        return when (val calendarsResponse = calendarsApi.getCalendars(userId)) {
-            is ApiResponse.Success -> {
-                val serverCalendarsMap = HashMap<String, Int>()
-                calendarsResponse.data.calendars.forEach {
-                    serverCalendarsMap[it.id] = it.display
-                }
+    suspend fun updateAllCalendarsDisplay(userId: UserId) : UseCase.Result {
+        val dbCalendarMembers = database.membersDao().selectByUserId(userId.id).groupBy { it.calendarId }
 
-                val dbCalendarsMap = HashMap<String, Int>()
-                dbCalendars.forEach {
-                    dbCalendarsMap[it.id] = it.display
-                }
-
-                val updateCalendarDisplayResponses = arrayListOf<UseCase.Result>()
-
-                dbCalendarsMap.forEach {
-                    if (it.value != serverCalendarsMap[it.key]) {
-                        updateCalendarDisplayResponses.add(
-                            when (val updateCalendarDisplayResponse = calendarsApi.updateCalendarDisplay(userId, it.key, UpdateCalendarDisplayApiRequest(display = it.value))) {
-                                is ApiResponse.Success -> {
-                                    UseCase.Result.Success<Unit>()
-                                }
-                                is ApiResponse.Error ->
-                                    UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in update calendar display: ${updateCalendarDisplayResponse.error}")
-                                is ApiResponse.Exception ->
-                                    UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in update calendar display: ${updateCalendarDisplayResponse.exception.message ?: "(no exception message)"}")
-                            }
-                        )
-                    }
-                }
-
-                updateCalendarDisplayResponses.forEach {
-                    if (it !is UseCase.Result.Success<*>) return it
-                }
-
-                return UseCase.Result.Success<Unit>()
-            }
-            is ApiResponse.Error -> {
-                calendarsResponse.logErrorIfNeeded("UpdateCalendarUseCase: executeUpdateList error in fetch calendars", logger)
-                UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in fetch calendars")
-            }
-            is ApiResponse.Exception -> {
-                calendarsResponse.logErrorIfNeeded("UpdateCalendarUseCase: executeUpdateList exception in fetch calendars", logger)
-                UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList exception in fetch calendars")
-            }
+        // Map<CalendarId, Pair<MemberId, DisplayInt>>
+        val serverCalendarMembers = dbCalendarMembers.mapValues {
+            calendarsApi.getMemberList(userId, it.key).valueOrNullAndLogErrors(logger)?.members
         }
+
+        val membersToUpdateDisplay = dbCalendarMembers.filter {
+            it.value.first().display != serverCalendarMembers[it.key]?.firstOrNull()?.display
+        }
+
+        val updateCalendarDisplayResponses = arrayListOf<UseCase.Result>()
+        membersToUpdateDisplay.forEach {
+            updateCalendarDisplayResponses.add(
+                when (val updateCalendarDisplayResponse = calendarsApi.updateCalendarDisplay(userId, calendarId = it.key, memberId = it.value.first().id, UpdateCalendarDisplayApiRequest(display = it.value.first().display))) {
+                    is ApiResponse.Success -> {
+                        UseCase.Result.Success<Unit>()
+                    }
+                    is ApiResponse.Error ->
+                        UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in update calendar display: ${updateCalendarDisplayResponse.error}")
+                    is ApiResponse.Exception ->
+                        UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateList error in update calendar display: ${updateCalendarDisplayResponse.exception.message ?: "(no exception message)"}")
+                }
+            )
+        }
+
+        updateCalendarDisplayResponses.forEach {
+            if (it !is UseCase.Result.Success<*>) return it
+        }
+
+        return UseCase.Result.Success<Unit>()
     }
 }

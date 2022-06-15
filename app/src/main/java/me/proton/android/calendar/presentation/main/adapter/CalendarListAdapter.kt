@@ -14,24 +14,23 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_drawer_calendar.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.core.util.kotlin.toInt
 
 class CalendarListAdapter(
     val calendarViewModel: CalendarViewModel,
-    val listener: (CalendarEntity) -> Unit
-) : ListAdapter<CalendarEntity, CalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
+    val listener: (Calendar) -> Unit
+) : ListAdapter<Calendar, CalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
-    class CalendarEntityDiffCallback : DiffUtil.ItemCallback<CalendarEntity>() {
-        override fun areItemsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+    class CalendarDiffCallback : DiffUtil.ItemCallback<Calendar>() {
+        override fun areItemsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+        override fun areContentsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem == newItem
         }
     }
@@ -55,52 +54,52 @@ class CalendarListAdapter(
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val calendarEntityItemOverlay: View = view.item_drawer_calendar_press
         private val calendarEntityItemTitle: TextView = view.item_drawer_calendar_title
-        private val calendarEntityItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
+        private val calendarItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
 
-        fun bind(calendarEntity : CalendarEntity) {
-            if (calendarEntity.isDisabled) {
+        fun bind(calendar : Calendar) {
+            if (calendar.isDisabled) {
                 // For subscribed calendars we prioritize displaying disabled label over not synced
-                calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendarEntity.name)
+                calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendar.name)
                 calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
-            } else if (calendarEntity.isSubscribed) {
-                val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
+            } else if (calendar.isSubscribed) {
+                val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendar.id }
 
                 if (calendarSubscription?.lastUpdateTime == 0 || calendarSubscription?.isSyncing == true) {
                     // Calendar is syncing
-                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_syncing_calendars, calendarEntity.name)
+                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_syncing_calendars, calendar.name)
                     calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 } else if (calendarSubscription?.isSynced == true) {
                     // Synced
-                    calendarEntityItemTitle.text = calendarEntity.name
+                    calendarEntityItemTitle.text = calendar.name
                     calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
                 } else {
                     // Not synced
-                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendarEntity.name)
+                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendar.name)
                     calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 }
             } else {
-                calendarEntityItemTitle.text = calendarEntity.name
+                calendarEntityItemTitle.text = calendar.name
                 calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
             }
-            calendarEntityItemCheckBox.isChecked = calendarEntity.display == 1
-            calendarEntityItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
-            setCheckboxStyle(calendarEntityItemCheckBox, calendarEntity)
+            calendarItemCheckBox.isChecked = calendar.display
+            calendarItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
+            setCheckboxStyle(calendarItemCheckBox, calendar)
 
-            calendarEntityItemCheckBox.setOnSingleClickListener {
-                setCheckboxStyle(calendarEntityItemCheckBox, calendarEntity)
+            calendarItemCheckBox.setOnSingleClickListener {
+                setCheckboxStyle(calendarItemCheckBox, calendar)
                 listener(
-                    calendarEntity.copy(
-                        display = calendarEntityItemCheckBox.isChecked.toInt()
+                    calendar.copy(
+                        display = calendarItemCheckBox.isChecked
                     )
                 )
             }
 
             calendarEntityItemOverlay.setOnSingleClickListener {
-                calendarEntityItemCheckBox.performClick()
+                calendarItemCheckBox.performClick()
             }
         }
 
-        private fun setCheckboxStyle(checkBox: CheckBox, calendarEntity: CalendarEntity) {
+        private fun setCheckboxStyle(checkBox: CheckBox, calendar: Calendar) {
             if (checkBox.isChecked) {
                 checkBox.background =
                     ContextCompat.getDrawable(itemView.context, R.drawable.shape_checkbox_nav_drawer)
@@ -109,7 +108,7 @@ class CalendarListAdapter(
                 checkBox.background =
                     ContextCompat.getDrawable(itemView.context, R.drawable.ic_checkbox_off)
                 checkBox.backgroundTintList =
-                    ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+                    ColorStateList.valueOf(Color.parseColor(calendar.color))
             }
         }
     }

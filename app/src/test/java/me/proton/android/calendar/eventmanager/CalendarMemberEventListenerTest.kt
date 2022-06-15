@@ -10,6 +10,9 @@ import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarMemberEventListener
+import me.proton.android.calendar.mocks.calendarColor
+import me.proton.android.calendar.mocks.calendarDisplay
+import me.proton.android.calendar.mocks.calendarFlags
 import me.proton.android.calendar.mocks.calendarId
 import me.proton.android.calendar.mocks.memberId
 import me.proton.android.calendar.mocks.userEmail
@@ -36,7 +39,7 @@ class CalendarMemberEventListenerTest {
     @Test
     fun `onCreateOrUpdate persists the members if calendar is present`() {
         runBlocking {
-            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId))
+            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags))
 
             listener.onCreateOrUpdate(config, entities)
 
@@ -48,7 +51,7 @@ class CalendarMemberEventListenerTest {
     fun `onCreateOrUpdate doesn't persist the members if calendar is not present`() {
         runBlocking {
             coEvery { calendarsRepository.hasCalendar(any()) } returns false
-            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId))
+            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags))
 
             listener.onCreateOrUpdate(config, entities)
 

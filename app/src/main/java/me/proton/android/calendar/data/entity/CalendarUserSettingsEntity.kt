@@ -34,7 +34,7 @@ data class CalendarUserSettingsEntity(
     @SerialName("AutoDetectPrimaryTimezone")
     val autoDetectPrimaryTimezone: Int, // 0 off, 1 on
     @SerialName("PrimaryTimezone")
-    val primaryTimezone: String, // "Europe/Budapest", NO LONGER NULL AFTER 12/06/2020: "Can be null if AutoDetectPrimaryTimezone is 0"
+    val primaryTimezone: String, // "Europe/Budapest"
     @SerialName("DisplaySecondaryTimezone")
     val displaySecondaryTimezone: Int, // 0 off, 1 on
     @SerialName("SecondaryTimezone")

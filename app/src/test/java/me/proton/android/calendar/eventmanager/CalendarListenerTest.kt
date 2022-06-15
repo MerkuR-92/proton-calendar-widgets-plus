@@ -12,8 +12,10 @@ import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarFlags
+import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -156,7 +158,10 @@ class CalendarListenerTest {
                 CalendarEntity("calendar_id", "Name", "Description", "#fff", display = 1, flags = 0),
             )
 
-            coEvery { calendarsRepository.selectCalendar(any()) } returns CalendarEntity("calendar_id", "Previous name", "Description", "#fff", display = 1, flags = 0)
+            coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar.from(
+                CalendarEntity("calendar_id", "Previous name", "Description", "#fff", display = 1, flags = 0),
+                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1)
+            )
 
             listener.onUpdate(config, entities)
 
@@ -243,6 +248,7 @@ private const val validResponse = """
                 "Email": "pro@burbank.proton.black",
                 "AddressID": "p5DPgsgSOQhwxfZmy4A-vVIxHd40lH8xRVg_4ulz69pz7Ox7ibSa2QXEbMg151clLRB-CQQTCRNteaIBHL_iUg==",
                 "CalendarID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
+                "Flags": 1,
                 "Color": "#9DB99F",
                 "Display": 1
             }

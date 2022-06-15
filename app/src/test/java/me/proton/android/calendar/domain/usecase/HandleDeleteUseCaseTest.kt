@@ -69,7 +69,10 @@ internal class HandleDeleteUseCaseTest {
                 id = "id",
                 permissions = 64,
                 email = "email@pm.me",
-                calendarId = "calendarId"
+                calendarId = "calendarId",
+                color = calendarColor,
+                display = calendarDisplay,
+                flags = calendarFlags
             )
         )
 

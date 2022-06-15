@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProto
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -49,6 +50,7 @@ class TransformEventUseCase @Inject constructor(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
+        val calendar = database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database) ?: return null
 
         val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
         if (calendarPrivateKeys.isNullOrEmpty()) {
@@ -214,9 +216,9 @@ class TransformEventUseCase @Inject constructor(
             calendar = Calendar(
                 calendarEntity.id,
                 calendarEntity.name,
-                calendarEntity.color,
-                calendarEntity.flags,
-                calendarEntity.display == 1,
+                calendar.color,
+                calendar.flags,
+                calendar.display,
                 calendarEntity.type
             ),
             iCalendar = iCalendar,

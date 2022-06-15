@@ -24,6 +24,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
@@ -250,6 +251,14 @@ object AppDatabaseMigrations {
     val MIGRATION_39_40 = object : Migration(39, 40) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.addTableColumn(AppDatabase.TABLE_CALENDAR_USER_SETTINGS, "autoImportInvite", "INTEGER NOT NULL" , "0")
+        }
+    }
+
+    val MIGRATION_40_41 = object : Migration(40, 41) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            // TODO FIXME, I think we need for-each loop here
+
         }
     }
 }

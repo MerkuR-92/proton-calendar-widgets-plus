@@ -37,13 +37,13 @@ class EventDecryptorImpl @Inject constructor(
 
             val cachedValue = cacheValue.event
 
-            database.calendarsDao().selectById(eventEntity.calendarId)?.let { calendarEntity ->
+            database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database)?.let { calendarEntity ->
                 val calendar = Calendar(
                     calendarEntity.id,
                     calendarEntity.name,
                     calendarEntity.color,
                     calendarEntity.flags,
-                    calendarEntity.display == 1,
+                    calendarEntity.display,
                     calendarEntity.type
                 )
 

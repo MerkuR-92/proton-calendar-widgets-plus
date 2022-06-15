@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
@@ -42,6 +41,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -71,8 +71,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var settingsUserCalendarListAdapter: SettingsCalendarListAdapter
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
 
-    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
-    private var subscribedCalendars: List<CalendarEntity>? = null
+    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
+    private var subscribedCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     private var defaultCalendarId: String? = null
@@ -226,7 +226,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
      * Refreshes the user calendar list with the new set of data. Get the emails linked to each calendar and
      * get the current default calendar id. Sort the list by following order: default / active / disabled.
      */
-    private fun refreshUserCalendarList(userCalendars: List<CalendarEntity>) {
+    private fun refreshUserCalendarList(userCalendars: List<Calendar>) {
         lifecycleScope.launch {
             val calendarEmails = hashMapOf<String, String>()
             userCalendars.forEach { userCalendar ->
@@ -259,7 +259,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
      * Edit, Mark as default, Delete.
      * Buttons visibility varies with the calendar type and status.
      */
-    private fun showBottomSheetDialog(calendarEntity: CalendarEntity) {
+    private fun showBottomSheetDialog(calendar: Calendar) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
         // Workaround to make sure we have the correct navigation bar color.
@@ -277,10 +277,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         bottomSheetDialog.setContentView(R.layout.dialog_calendar_settings)
 
         val calendarIcon = bottomSheetDialog.findViewById<ImageView>(R.id.dialog_calendar_settings_calendar_icon)
-        calendarIcon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+        calendarIcon?.imageTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
 
         val calendarName = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_settings_calendar_title)
-        calendarName?.text = calendarEntity.name
+        calendarName?.text = calendar.name
 
         val editPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_edit_press)
         val markDefaultPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_default_press)
@@ -288,7 +288,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         editPress?.setOnSingleClickListener {
             val bundle = Bundle().apply {
-                putString(CALENDAR_ID_ARG, calendarEntity.id)
+                putString(CALENDAR_ID_ARG, calendar.id)
             }
             findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form, bundle)
             bottomSheetDialog.dismiss()
@@ -302,7 +302,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             lifecycleScope.launch {
-                val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendarEntity.id)
+                val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendar.id)
                 if (updateDefaultCalendarId) {
                     calendarViewModel.getUserCalendars()?.let { userCalendars ->
                         refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
@@ -317,7 +317,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         deletePress?.setOnSingleClickListener {
             lifecycleScope.launch {
-                val prepareOption = calendarViewModel.prepareDeleteCalendar(calendarEntity.id)
+                val prepareOption = calendarViewModel.prepareDeleteCalendar(calendar.id)
 
                 val dialogMessage = when (prepareOption) {
                     is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultLastActive -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
@@ -357,7 +357,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         deleteLayout?.visibleOrGone(DELETE_CALENDAR)
 
         val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
-        markAsDefaultLayout?.visibleOrGone(calendarEntity.id != defaultCalendarId && calendarEntity.isActive && calendarEntity.isSubscribed.not())
+        markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not())
 
         bottomSheetDialog.show()
     }

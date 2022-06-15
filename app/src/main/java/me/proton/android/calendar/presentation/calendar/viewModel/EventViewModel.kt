@@ -108,7 +108,7 @@ class EventViewModel @Inject constructor(
         object OccurrenceDoesNotExist : InitResult()
         object EventDoesNotExist : InitResult()
         class InitEventSuccess(val event: Event) : InitResult()
-        class InitDefaultCalendarSuccess(val calendar: CalendarEntity?) : InitResult()
+        class InitDefaultCalendarSuccess(val calendar: Calendar?) : InitResult()
         class Error(val message: String) : InitResult()
     }
 
@@ -257,7 +257,7 @@ class EventViewModel @Inject constructor(
         this.isCreate = eventId == null
 
         // Default calendar and its settings is only needed in create mode
-        val defaultCalendar: CalendarEntity? =
+        val defaultCalendar: Calendar? =
             if (isCreate) {
                 // Get default calendar and its settings if we are in create mode
                 val initializeDefaultCalendarResult = initializeDefaultCalendar()
@@ -341,7 +341,7 @@ class EventViewModel @Inject constructor(
      * @returns Initialised new event or InitResult error
      */
     private fun initialiseNewEvent(
-        defaultCalendar: CalendarEntity,
+        defaultCalendar: Calendar,
         initStartDate: String?,
         initStartTime: String?
     ): InitResult {
@@ -404,7 +404,7 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.name,
                 defaultCalendar.color,
                 defaultCalendar.flags,
-                defaultCalendar.display == 1,
+                defaultCalendar.display,
                 defaultCalendar.type
             ), newICalendar, 0
         ) ?: return InitResult.Error("could not create Event using factory method")
@@ -685,7 +685,7 @@ class EventViewModel @Inject constructor(
         this.tempAlarmTime = LocalTime.of(9, 0)
     }
 
-    suspend fun handleCalendar(calendar: CalendarEntity): Boolean {
+    suspend fun handleCalendar(calendar: Calendar): Boolean {
         val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != calendar.id
 
         // If user choice has been saved then we don't set calendar's default alarms
@@ -704,7 +704,7 @@ class EventViewModel @Inject constructor(
                     calendar.name,
                     calendar.color,
                     calendar.flags,
-                    calendar.display == 1,
+                    calendar.display,
                     calendar.type
                 )
             )

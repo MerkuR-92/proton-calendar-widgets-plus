@@ -16,10 +16,15 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.data.joinToCalendar
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
+import me.proton.android.calendar.mocks.CalendarMocks
+import me.proton.android.calendar.mocks.calendarColor
+import me.proton.android.calendar.mocks.calendarDisplay
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
@@ -27,6 +32,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.toBoolean
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -101,6 +107,10 @@ internal class TransformEventUseCaseTest {
                 database.calendarKeysDao().select(any())
             } returns listOf(calendarKeyEntity)
 
+            coEvery {
+                database.membersDao().select(any())
+            } returns listOf(CalendarMocks.provideMemberEntity("member email"))
+
             // calendarPassphrase
             val memberPassphrase = MemberPassphrase(
                 "memberId",
@@ -167,6 +177,10 @@ internal class TransformEventUseCaseTest {
             assertThat(event.iCalEvent.attendees[2].participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
 
             assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.SIGNED_BUT_NO_KEYS)
+
+            assertThat(event.calendar.color).isEqualTo(calendarColor)
+            assertThat(event.calendar.display).isEqualTo(calendarDisplay.toBoolean())
+
         }
     }
 

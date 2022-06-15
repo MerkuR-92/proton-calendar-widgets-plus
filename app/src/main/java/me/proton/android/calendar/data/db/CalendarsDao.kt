@@ -84,13 +84,7 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("DELETE FROM calendars WHERE id = :id")
     abstract suspend fun deleteById(id: String)
 
-    @Query("SELECT * FROM calendars WHERE fkUserId = :userId AND calendars.display = 1")
-    abstract suspend fun selectDisplayedCalendars(userId: String): List<CalendarEntity>
-
     @Query("UPDATE calendars SET flags = :flags WHERE id = :calendarId")
     abstract suspend fun updateCalendarFlags(calendarId: String, flags: Int)
-
-    @Query("UPDATE calendars SET display = :display WHERE id = :calendarId")
-    abstract suspend fun updateCalendarDisplay(calendarId: String, display: Int)
 
 }

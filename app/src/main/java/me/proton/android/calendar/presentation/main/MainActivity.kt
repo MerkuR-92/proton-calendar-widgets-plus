@@ -78,6 +78,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -122,9 +123,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
-    private var subscribedCalendars: List<CalendarEntity>? = null
+    private var subscribedCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
-    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<CalendarEntity>, List<CalendarSubscriptionEntity>>>()
+    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
 
     // Save the current view mode so that we know if we are navigating to day view from the month view
     private var currentViewMode: ViewMode? = null
@@ -1024,10 +1025,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val userCalendarListView = nav_view_main_content.nav_view_calendars_list
         val userCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         userCalendarListView.layoutManager = userCalendarsLayoutManager
-        userCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
+        userCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendar ->
             //On Calendar click event
             lifecycleScope.launch {
-                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display.toBoolean())
+                calendarViewModel.updateCalendarVisibility(calendar.id, calendar.display)
                 updateCalendarsDelayed()
             }
         }
@@ -1037,10 +1038,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val subscribedCalendarListView = nav_view_main_content.nav_view_subscribed_calendars_list
         val subscribedCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         subscribedCalendarListView.layoutManager = subscribedCalendarLayoutManager
-        subscribedCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendarEntity ->
+        subscribedCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendar ->
             //On Calendar click event
             lifecycleScope.launch {
-                calendarViewModel.updateCalendarVisibility(calendarEntity.id, calendarEntity.display.toBoolean())
+                calendarViewModel.updateCalendarVisibility(calendar.id, calendar.display)
                 updateCalendarsDelayed()
             }
         }
@@ -1120,7 +1121,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
     }
 
-    private fun setUserCalendarsList(userCalendars: List<CalendarEntity>, defaultCalendarId: String? = null) {
+    private fun setUserCalendarsList(userCalendars: List<Calendar>, defaultCalendarId: String? = null) {
         // We only keep active and disabled calendars for the navigation drawer calendar list
         val filteredUserCalendars = userCalendars.filter { it.isActive || it.isDisabled }
         nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())

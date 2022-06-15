@@ -6,6 +6,7 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.util.kotlin.toBoolean
+import me.proton.core.util.kotlin.toInt
 
 object CalendarMocks {
 
@@ -63,7 +64,10 @@ object CalendarMocks {
             id = memberId,
             permissions = MemberEntity.Permission.SUPEROWNER.value,
             email = memberEmail,
-            calendarId = calendarId
+            calendarId = calendarId,
+            color = calendarColor,
+            display = calendarDisplay,
+            flags = calendarFlags
         )
     }
 }

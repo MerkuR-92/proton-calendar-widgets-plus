@@ -29,7 +29,13 @@ data class MemberEntity(
     @SerialName("Email")
     val email: String, // plaintext email address
     @SerialName("CalendarID")
-    val calendarId: String
+    val calendarId: String,
+    @SerialName("Color")
+    val color: String,
+    @SerialName("Display")
+    val display: Int, // 0: hide, 1: show
+    @SerialName("Flags")
+    val flags: Int
 ) {
     enum class Permission(val value: Int) { // TODO see if this is even deserialized
         /** has financial responsibility. There must always be exactly one owner but it can be transferred */

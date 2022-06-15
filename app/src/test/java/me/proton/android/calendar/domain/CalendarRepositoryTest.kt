@@ -67,6 +67,7 @@ internal class CalendarRepositoryTest {
 
         coEvery { appDatabaseMock.calendarsDao().flowCalendars() } returns flowOf(listOf())
         coEvery { appDatabaseMock.eventsDao().selectSkeletonEventsFlow() } returns flowOf(listOf())
+        coEvery { appDatabaseMock.membersDao().selectMembersFlow() } returns flowOf(listOf())
     }
 
     @Test

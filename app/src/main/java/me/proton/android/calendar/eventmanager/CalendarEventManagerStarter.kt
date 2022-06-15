@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getAccounts
@@ -18,7 +18,6 @@ import me.proton.core.accountmanager.presentation.onAccountDisabled
 import me.proton.core.accountmanager.presentation.onAccountReady
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.data.EventManagerCoroutineScope
-import me.proton.core.eventmanager.domain.EventListener.Type.Calendar
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.EventManagerConfig.Core
 import me.proton.core.eventmanager.domain.EventManagerProvider
@@ -43,25 +42,25 @@ class CalendarEventManagerStarter @Inject constructor(
             .flatMapLatest { accounts -> observeAllCalendarsForUsers(accounts.map { it.userId }) }
             .onEach { allUserCalendars ->
                 for ((userId, calendars) in allUserCalendars) {
-                    val managers = eventManagerProvider.getAll(userId).filter { it.config.listenerType == Calendar }
+                    val managers = eventManagerProvider.getAll(userId).filter { it.config.listenerType == me.proton.core.eventmanager.domain.EventListener.Type.Calendar }
                     // Stop all calendars managers, for this userId.
                     managers.forEach { manager -> manager.stop() }
                     // Start all enabled calendars, for this userId.
-                    calendars.filter { it.display == 1 }.forEach {
+                    calendars.filter { it.display }.forEach {
                         eventManagerProvider.get(EventManagerConfig.Calendar(userId, it.id)).start()
                     }
                 }
             }.launchIn(coroutineScope)
     }
 
-    private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<CalendarEntity>>> =
+    private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<Calendar>>> =
         combine(
             userIds.map { userId -> observeUserCalendars(userId).map { userId to it } }
         ) {
             it.toMap()
         }
 
-    private fun observeUserCalendars(userId: UserId): Flow<Set<CalendarEntity>> =
+    private fun observeUserCalendars(userId: UserId): Flow<Set<Calendar>> =
         combine(
             calendarsRepository.flowUserCalendars(userId.id),
             calendarsRepository.flowSubscribedCalendars(userId.id)

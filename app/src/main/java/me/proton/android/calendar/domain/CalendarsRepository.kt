@@ -7,6 +7,7 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
@@ -31,13 +32,13 @@ interface CalendarsRepository {
     suspend fun shutdown()
 
     // calendars
-    suspend fun selectCalendar(calendarId: String): CalendarEntity?
+    suspend fun selectCalendar(calendarId: String): Calendar?
 
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
-    suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectActiveUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectActiveUserCalendars(userId: String): List<Calendar>
 
     suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity>
 
@@ -45,15 +46,15 @@ interface CalendarsRepository {
 
     suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
 
-    fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
     fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
 
-    fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>>
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
