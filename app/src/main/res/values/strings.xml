@@ -479,6 +479,13 @@
     <string name="import_assistant_guide_description">Move your events and other data from Google to Proton. The Easy Switch importer guides you each step of the way and encrypts your data as it\'s moved.</string>
     <string name="import_assistant_new_import">New import</string>
     <string name="import_assistant_previous_import">Previous imports</string>
+    <string name="import_assistant_ongoing_import">%d ongoing import</string>
+    <string name="import_assistant_report_details">%d KB • %s</string>
+    <string name="import_assistant_status_in_progress">In progress</string>
+    <string name="import_assistant_status_completed">Completed</string>
+    <string name="import_assistant_status_canceled">Canceled</string>
+    <string name="import_assistant_status_paused">Paused</string>
+    <string name="import_assistant_status_failed">Failed</string>
     <!--  STRING PLURALS  -->
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %d calendar</item>

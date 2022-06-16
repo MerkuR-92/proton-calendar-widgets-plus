@@ -5,12 +5,12 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fragment_import_assistant_summary_list"
+        android:id="@+id/fragment_import_assistant_status_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:nestedScrollingEnabled="false"
-        tools:listitem="@layout/item_import_calendar"
+        tools:listitem="@layout/item_import_status"
         tools:itemCount="3"
         android:overScrollMode="never"/>
 

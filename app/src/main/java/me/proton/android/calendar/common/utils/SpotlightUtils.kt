@@ -87,7 +87,7 @@ object SpotlightUtils {
             }
             146 -> {
                 // Easy switch
-                val easySwitchContent = this.resources.getMonthViewDialogContent()
+                val easySwitchContent = this.resources.getEasySwitchDialogContent()
                 val positiveButtonCallback = View.OnClickListener {
                     // Open import from google view
                     (this as MainActivity).showImportGoogleAuthDialog()

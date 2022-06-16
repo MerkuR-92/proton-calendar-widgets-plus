@@ -7,6 +7,7 @@ import me.proton.android.calendar.data.api.CreateAccessTokenApiResponse
 import me.proton.android.calendar.data.api.CreateImporterApiResponse
 import me.proton.android.calendar.data.api.GoogleClientIdApiResponse
 import me.proton.android.calendar.data.api.ImportersApiResponse
+import me.proton.android.calendar.data.api.ReportsApiResponse
 import me.proton.android.calendar.data.api.StartImporterApiResponse
 import me.proton.core.domain.entity.UserId
 
@@ -45,6 +46,6 @@ interface ImporterApi {
     /**
      *  This route returns a history of the finished imports.
      */
-    suspend fun getReports(userId: UserId): ApiResponse<ImportersApiResponse>
+    suspend fun getReports(userId: UserId): ApiResponse<ReportsApiResponse>
 }
 

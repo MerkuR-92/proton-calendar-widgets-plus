@@ -15,6 +15,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
+import me.proton.android.calendar.data.api.ImporterEntity
+import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -51,6 +53,12 @@ class ImportAssistantViewModel @Inject constructor(
 
     private val _sourceEmail: MutableLiveData<String> = MutableLiveData()
     val sourceEmail: LiveData<String> = _sourceEmail
+
+    private val _importerList: MutableLiveData<List<ImporterEntity>> = MutableLiveData()
+    val importerList: LiveData<List<ImporterEntity>> = _importerList
+
+    private val _reportList: MutableLiveData<List<ReportEntity>> = MutableLiveData()
+    val reportList: LiveData<List<ReportEntity>> = _reportList
 
     val defaultUserEmail: MutableLiveData<String?> = MutableLiveData()
 
@@ -303,5 +311,51 @@ class ImportAssistantViewModel @Inject constructor(
         return calendarsRepository.selectMembers(calendarId).firstOrNull {
             it.hasPermission(MemberEntity.Permission.SUPEROWNER)
         }?.email
+    }
+
+    suspend fun getImporters() {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
+            _userId.value = userId
+        }
+
+        when (val getImportersApiResponse = importerApi.getImporters(userId)) {
+            is ApiResponse.Success -> {
+                logger.e("Test test getImporters ${getImportersApiResponse.data.importers}")
+                _importerList.value = getImportersApiResponse.data.importers
+            }
+            is ApiResponse.Error -> {
+                logger.e("Test test getImporters error ${getImportersApiResponse.error}")
+                logger.e(getImportersApiResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                logger.e("Test test getImporters exception ${getImportersApiResponse.exception.message}")
+                logger.e(getImportersApiResponse.exception.message ?: "(no exception message)")
+            }
+        }
+    }
+
+    suspend fun getReports() {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
+            _userId.value = userId
+        }
+
+        when (val getReportsApiResponse = importerApi.getReports(userId)) {
+            is ApiResponse.Success -> {
+                logger.e("Test test getReports ${getReportsApiResponse.data.reports}")
+                _reportList.value = getReportsApiResponse.data.reports
+            }
+            is ApiResponse.Error -> {
+                logger.e("Test test getReports error ${getReportsApiResponse.error}")
+                logger.e(getReportsApiResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                logger.e("Test test getReports exception ${getReportsApiResponse.exception.message}")
+                logger.e(getReportsApiResponse.exception.message ?: "(no exception message)")
+            }
+        }
     }
 }

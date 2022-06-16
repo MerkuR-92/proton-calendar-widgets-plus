@@ -228,27 +228,27 @@ data class ImporterEntity(
     @SerialName("Account")
     val account: String,
     @SerialName("Product")
-    val product: List<String>,
+    val product: List<String>, // "Mail", "Contacts", "Calendar"
     @SerialName("TokenID")
     val tokenID: String,
     @SerialName("Active")
-    val active: ActiveImporterEntity // The Active field is present if there is an ongoing import.
+    val active: ActiveImporterEntity? = null // The Active field is present if there is an ongoing import.
 )
 
 @Serializable
 data class ActiveImporterEntity(
+    @SerialName("Calendar")
+    val calendar: ActiveCalendarImporterEntity? = null
+)
+
+@Serializable
+data class ActiveCalendarImporterEntity(
     @SerialName("CreateTime")
     val createTime: Int,
-    @SerialName("AddressID")
-    val addressID: String,
     @SerialName("State")
     val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
     @SerialName("ErrorCode")
     val errorCode: Int,
-    @SerialName("FilterStartDate")
-    val filterStartDate: Int,
-    @SerialName("FilterEndDate")
-    val filterEndDate: Int,
     @SerialName("Mapping")
     val mapping: List<ActiveImporterMappingEntity>
 )
@@ -257,22 +257,24 @@ data class ActiveImporterEntity(
 data class ActiveImporterMappingEntity(
     @SerialName("Source")
     val source: String,
+    @SerialName("Destination")
+    val destination: String,
     @SerialName("Processed")
     val processed: Int,
-    @SerialName("Total")
-    val total: Int
+    @SerialName("State")
+    val state: Int // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
 )
 
 @Serializable
 data class ReportsApiResponse(
     @SerialName("Code")
     override val code: Int,
-    @SerialName("Imports")
-    val imports: List<ImportEntity>
+    @SerialName("Reports")
+    val reports: List<ReportEntity>
 ): BaseApiResponse()
 
 @Serializable
-data class ImportEntity(
+data class ReportEntity(
     @SerialName("ID")
     val id: String,
     @SerialName("Provider")
@@ -288,14 +290,22 @@ data class ImportEntity(
     @SerialName("TotalSize")
     val totalSize: Int,
     @SerialName("Summary")
-    val summary: ImportSummaryEntity
+    val summary: ReportSummaryEntity
 )
 
 @Serializable
-data class ImportSummaryEntity(
+data class ReportSummaryEntity(
+    @SerialName("Calendar")
+    val calendar: ReportCalendarSummaryEntity? = null
+)
+
+@Serializable
+data class ReportCalendarSummaryEntity(
     @SerialName("State")
     val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
     @SerialName("NumEvents")
-    val numEvents: Int
+    val numEvents: Int,
+    @SerialName("TotalSize")
+    val totalSize: Int
 )
 

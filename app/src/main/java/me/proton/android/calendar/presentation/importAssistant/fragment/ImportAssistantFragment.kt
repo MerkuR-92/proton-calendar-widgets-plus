@@ -258,7 +258,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         fragment_import_assistant_in_progress_redirect.setOnSingleClickListener {
-            // TODO REDIRECT TO PROGRESS VIEW
+            findNavController().navigate(R.id.action_nav_import_assistant_to_nav_import_assistant_status)
         }
     }
 

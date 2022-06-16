@@ -5,13 +5,16 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_press
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_subtitle
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_new_import_button
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.CalendarImport.PRODUCT_CALENDAR
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -56,12 +59,28 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+        lifecycleScope.launch {
+            importAssistantViewModel.getImporters()
         }
 
-        // TODO If ongoing import set text on this
+        // Hidden by default
         import_assistant_status_guide_imports_subtitle.visibleOrGone(false)
-//        import_assistant_status_guide_imports_subtitle.text = ""
+
+        importAssistantViewModel.importerList.observe(viewLifecycleOwner) { importerList ->
+            importerList ?: return@observe
+
+            val ongoingImports = importerList.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
+            import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports > 0)
+            if (ongoingImports > 0) {
+                import_assistant_status_guide_imports_subtitle.text = getString(
+                    R.string.import_assistant_ongoing_import,
+                    ongoingImports
+                )
+            }
+        }
+
+        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+        }
 
         import_assistant_status_guide_new_import_button.setOnSingleClickListener {
             (requireActivity() as MainActivity).showImportGoogleAuthDialog()
