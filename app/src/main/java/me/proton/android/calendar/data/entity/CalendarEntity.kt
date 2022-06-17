@@ -30,29 +30,12 @@ data class CalendarEntity(
     val name: String,
     @SerialName("Description")
     val description: String,
-    @SerialName("Color")
-    val color: String,
-    @SerialName("Display")
-    val display: Int, // 0: hide, 1: show //CalendarDisplay, TODO maybe parse it as boolean?
-    @SerialName("Flags")
-    val flags: Int = 1, // Flag not returned for Update/Create calendar. Default for create is 1 but on Update we keep the previous value
     @SerialName("Type")
     val type: Int = 0, // normal calendar: 0, subscribed calendar: 1
     @NonNull
     @kotlinx.serialization.Transient
     val fkUserId: String = "" // TODO Split in two classes: One RemoteEntity and one DBEntity
 ) {
-
-    // TODO remove all of the flags below and 3 props above
-
-    //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
-    val isActive: Boolean get() = flags == 1
-    val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
-    val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
-    val isSuperOwnerDisabled: Boolean get() = flags and 64 == 64
-    val hasIncompleteKeySetup: Boolean get() = flags and 8 == 8
-    val isResetNeeded: Boolean get() = flags and 4 == 4
-    val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 
     val isSubscribed: Boolean get() = type == 1
 }

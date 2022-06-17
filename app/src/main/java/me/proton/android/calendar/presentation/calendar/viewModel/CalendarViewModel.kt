@@ -98,8 +98,8 @@ class CalendarViewModel @Inject constructor(
     // userCalendars contains all non-subscribed calendars regardless of their flags
     var userCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var activeUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var disabledUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var inactiveUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var disabledUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var inactiveUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var subscribedCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
@@ -620,7 +620,7 @@ class CalendarViewModel @Inject constructor(
         updatingCalendarPassphrase = false
     }
 
-    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
+    suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
         return calendarsRepository.fetchCalendars(userId)
     }
 
@@ -821,7 +821,7 @@ class CalendarViewModel @Inject constructor(
         return activeUserCalendars.value ?: calendarsRepository.selectActiveUserCalendars(userId.id)
     }
 
-    suspend fun getDisabledUserCalendars(): List<CalendarEntity>? {
+    suspend fun getDisabledUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getDisabledUserCalendars")
@@ -830,7 +830,7 @@ class CalendarViewModel @Inject constructor(
         return disabledUserCalendars.value ?: calendarsRepository.selectDisabledUserCalendars(userId.id)
     }
 
-    suspend fun getInactiveUserCalendars(): List<CalendarEntity>? {
+    suspend fun getInactiveUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getInactiveUserCalendars")

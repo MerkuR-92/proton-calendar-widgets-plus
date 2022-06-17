@@ -10,14 +10,11 @@ import me.proton.core.util.kotlin.toInt
 
 object CalendarMocks {
 
-    fun provideCalendarEntity(id: String = calendarId, isDisabled: Boolean = false, isHidden: Boolean = false): CalendarEntity {
+    fun provideCalendarEntity(id: String = calendarId): CalendarEntity {
         return CalendarEntity(
             id = id,
             name = calendarName,
             description = calendarDescription,
-            color = calendarColor,
-            display = if (isHidden) 0 else calendarDisplay,
-            flags = if (isDisabled) CalendarFlags.DISABLED.value else calendarFlags,
             type = calendarType,
             fkUserId = userId.id
         )

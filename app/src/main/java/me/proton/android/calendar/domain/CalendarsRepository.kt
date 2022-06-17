@@ -32,6 +32,8 @@ interface CalendarsRepository {
     suspend fun shutdown()
 
     // calendars
+    suspend fun selectCalendarEntity(calendarId: String): CalendarEntity?
+
     suspend fun selectCalendar(calendarId: String): Calendar?
 
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
@@ -40,17 +42,17 @@ interface CalendarsRepository {
 
     suspend fun selectActiveUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectDisabledUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectInactiveUserCalendars(userId: String): List<Calendar>
 
     suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
 
     fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowUserCalendars(userId: String): Flow<List<Calendar>>
 
@@ -64,9 +66,13 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendars(userId: UserId): Boolean
 
-    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
+    suspend fun fetchCalendars(userId: UserId): List<Calendar>?
 
-    suspend fun fetchCalendar(userId: UserId, calendarId: String): CalendarEntity?
+    suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>?
+
+    suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar?
+
+    suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity?
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 

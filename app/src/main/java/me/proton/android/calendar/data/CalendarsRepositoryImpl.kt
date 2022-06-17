@@ -27,6 +27,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -38,13 +39,11 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
-import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -148,31 +147,40 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCalendarsFlags(userId: UserId) {
-        val dbCalendars = selectCalendars(userId.id)
+        val dbMembers = database.membersDao().selectMembers()
         val remoteCalendars = fetchCalendars(userId)
         remoteCalendars?.forEach { remoteCalendar ->
-            dbCalendars.find { it.id == remoteCalendar.id }?.let { dbCalendar ->
-                if (dbCalendar.flags != remoteCalendar.flags) {
-                    database.calendarsDao().updateCalendarFlags(dbCalendar.id, remoteCalendar.flags)
+            val remoteMembers = fetchMembers(userId, remoteCalendar.id)
+            remoteMembers?.forEach { remoteMember ->
+                dbMembers.find { it.id == remoteMember.id }?.let { dbMember ->
+                    if (dbMember.flags != remoteMember.flags) {
+                        database.membersDao().updateFlags(remoteMember.id, remoteMember.calendarId, remoteMember.flags)
+                    }
                 }
             }
         }
     }
 
+    // TODO we should probably get rid of this and re-query Member from API to get the flags
     override suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String) {
         // Members objects are used to link an Address and the Calendars that are part of it
         val members = database.membersDao().selectByAddress(address)
-        val calendarIds = ArrayList<String>()
-        members.forEach { calendarIds.add(it.calendarId) }
-        calendarIds.forEach {
+        members.map { it.calendarId }.forEach {
             selectCalendar(it)?.let { dbCalendar ->
-                var flags = dbCalendar.flags
-                if (!enabled && !dbCalendar.isDisabled) {
-                    flags = addDisabledFlag(flags, dbCalendar)
-                } else if (enabled && dbCalendar.isDisabled) {
-                    flags = removeDisabledFlag(flags, dbCalendar)
+
+                val dbMember = selectMembers(dbCalendar.id).firstOrNull()
+
+                if (dbMember == null) {
+                    logger.e("could not find member in refreshCalendarsFlagsForAddress")
+                } else {
+                    var flags = dbMember.flags
+                    if (!enabled && !dbCalendar.isDisabled) {
+                        flags = addDisabledFlag(flags, dbCalendar)
+                    } else if (enabled && dbCalendar.isDisabled) {
+                        flags = removeDisabledFlag(flags, dbCalendar)
+                    }
+                    database.membersDao().updateFlags(dbMember.id, dbMember.calendarId, flags)
                 }
-                database.calendarsDao().updateCalendarFlags(dbCalendar.id, flags)
             }
         }
     }
@@ -321,6 +329,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun selectCalendarEntity(calendarId: String): CalendarEntity? {
+        return database.calendarsDao().selectById(calendarId)
+    }
+
     override suspend fun selectCalendar(calendarId: String): Calendar? {
         return database.calendarsDao().selectById(calendarId)?.joinToCalendar(database)
     }
@@ -334,15 +346,15 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun selectActiveUserCalendars(userId: String): List<Calendar> {
-        return database.calendarsDao().selectActiveUserCalendars(userId).joinToCalendars(database) // TODO FIXME get rid of flags in CalendarEntity
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isActive }
     }
 
-    override suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity> {
-        return database.calendarsDao().selectDisabledUserCalendars(userId)
+    override suspend fun selectDisabledUserCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isDisabled }
     }
 
-    override suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity> {
-        return database.calendarsDao().selectInactiveUserCalendars(userId)
+    override suspend fun selectInactiveUserCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isInactive }
     }
 
     override suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity> {
@@ -350,15 +362,15 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowActiveUserCalendars(userId).joinToCalendars(database).distinctUntilChanged()
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isActive } }.distinctUntilChanged()
     }
 
-    override fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowDisabledUserCalendars(userId).distinctUntilChanged()
+    override fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isDisabled } }.distinctUntilChanged()
     }
 
-    override fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>> {
-        return database.calendarsDao().flowInactiveUserCalendars(userId).distinctUntilChanged()
+    override fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isInactive } }.distinctUntilChanged()
     }
 
     override fun flowUserCalendars(userId: String): Flow<List<Calendar>> {
@@ -396,25 +408,35 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
-        val calendarsResponse = calendarsApi.getCalendars(userId)
-        return if (calendarsResponse !is ApiResponse.Success) {
-            logger.e("error getting calendars from API in CalendarsRepositoryImpl")
-            null
-        } else {
-            calendarsResponse.data.calendars
+    override suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
+        val calendarEntities = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars ?: return null
+
+        return calendarEntities.map {
+            val member = fetchMembers(userId, it.id)?.firstOrNull() ?: return null
+            Calendar.from(it, member)
         }
     }
 
-    override suspend fun fetchCalendar(userId: UserId, calendarId: String): CalendarEntity? {
-        val calendarsResponse = calendarsApi.getCalendar(userId, calendarId)
-        return if (calendarsResponse !is ApiResponse.Success) {
-            logger.e("error getting calendar from API in CalendarsRepositoryImpl")
+    override suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>? {
+        val membersResponse = calendarsApi.getMemberList(userId, calendarId)
+        return if (membersResponse !is ApiResponse.Success) {
+            logger.e("error getting members from API in CalendarsRepositoryImpl")
             null
         } else {
-            calendarsResponse.data.calendar
+            membersResponse.data.members
         }
     }
+
+    override suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar? {
+
+        val fetchedCalendar = calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar ?: return null
+        val fetchedMember = calendarsApi.getMemberList(userId, calendarId).valueOrNullAndLogErrors(logger)?.members?.firstOrNull() ?: return null
+
+        return Calendar.from(fetchedCalendar, fetchedMember)
+    }
+
+    override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
+        calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
         val member = selectMembers(calendarId).firstOrNull()

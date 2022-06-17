@@ -300,7 +300,7 @@ object AndroidUtils {
         title: Int,
         message: Int,
         cancellable: Boolean,
-        items: List<CalendarEntity>,
+        items: List<Calendar>,
         callback: DialogInterface.OnClickListener
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
@@ -308,7 +308,7 @@ object AndroidUtils {
             .setCancelable(cancellable)
             .setPositiveButton(R.string.bootstrap_error_continue_button, callback)
 
-        val adapter = object : ArrayAdapter<CalendarEntity>(this, R.layout.item_calendar_dialog, items) {
+        val adapter = object : ArrayAdapter<Calendar>(this, R.layout.item_calendar_dialog, items) {
 
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 var view = convertView

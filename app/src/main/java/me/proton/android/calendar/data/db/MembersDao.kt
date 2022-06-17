@@ -29,4 +29,7 @@ abstract class MembersDao : BaseDao<MemberEntity> {
     @Query("UPDATE members SET display = :display WHERE calendarId = :calendarId")
     abstract suspend fun updateDisplay(calendarId: String, display: Int)
 
+    @Query("UPDATE members SET flags = :flags WHERE id = :memberId AND calendarId = :calendarId")
+    abstract suspend fun updateFlags(memberId: String, calendarId: String, flags: Int)
+
 }

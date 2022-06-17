@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 41,
-    "identityHash": "c8afff56b5ac806be19c8379d7016b45",
+    "identityHash": "c3fcd7fcb29abf99301df3f1661e30a9",
     "entities": [
       {
         "tableName": "AccountEntity",
@@ -2124,7 +2124,7 @@
       },
       {
         "tableName": "calendars",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `color` TEXT NOT NULL, `display` INTEGER NOT NULL, `flags` INTEGER NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -2142,24 +2142,6 @@
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "color",
-            "columnName": "color",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "display",
-            "columnName": "display",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "flags",
-            "columnName": "flags",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -2913,7 +2895,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8afff56b5ac806be19c8379d7016b45')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c3fcd7fcb29abf99301df3f1661e30a9')"
     ]
   }
 }

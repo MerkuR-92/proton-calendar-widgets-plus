@@ -23,6 +23,7 @@ import androidx.room.RenameColumn
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
 import me.proton.core.account.data.db.AccountDatabase
@@ -257,7 +258,45 @@ object AppDatabaseMigrations {
     val MIGRATION_40_41 = object : Migration(40, 41) {
         override fun migrate(database: SupportSQLiteDatabase) {
 
-            // TODO FIXME, I think we need for-each loop here
+            // 1. add new columns to Member
+            database.addTableColumn(
+                table = TABLE_MEMBERS,
+                column = "color",
+                type = "TEXT NOT NULL",
+                defaultValue = "#8080FF" // purple_base as of 20.06.2022
+            )
+            database.addTableColumn(
+                table = TABLE_MEMBERS,
+                column = "display",
+                type = "INTEGER NOT NULL",
+                defaultValue = "0"
+            )
+            database.addTableColumn(
+                table = TABLE_MEMBERS,
+                column = "flags",
+                type = "INTEGER NOT NULL",
+                defaultValue = "1" // legacy default was 1 if not present
+            )
+
+            // 2. copy the values from Calendar to Member
+            database.query("SELECT id, color, display, flags FROM $TABLE_CALENDARS").let {
+                while (it.moveToNext()) {
+                    database.execSQL("UPDATE $TABLE_MEMBERS SET color = \"${it.getString(1)}\", display = ${it.getInt(2)}, flags = ${it.getInt(3)} WHERE calendarId = \"${it.getString(0)}\"")
+                }
+            }
+
+            // 3. create temp Calendar table with new schema and copy values
+            database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_CALENDARS + "_temp"}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `description` TEXT NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            database.execSQL("INSERT INTO `${TABLE_CALENDARS + "_temp"}`(id, name, description, type, fkUserId) SELECT id, name, description, type, fkUserId FROM `${TABLE_CALENDARS}`")
+
+            // 4. drop old Calendar table
+            database.execSQL("DROP TABLE `${TABLE_CALENDARS}`")
+
+            // 5. rename temp Calendar to new Calendar table
+            database.execSQL("ALTER TABLE `${TABLE_CALENDARS + "_temp"}` RENAME TO `${TABLE_CALENDARS}`")
+
+            // 6. recreate index
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_calendars_fkUserId` ON `${TABLE_CALENDARS}` (`fkUserId`)")
 
         }
     }
