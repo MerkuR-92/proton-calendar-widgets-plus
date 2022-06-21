@@ -57,4 +57,6 @@ data class MemberEntity(
     fun hasPermission(permission: Permission): Boolean { // TODO add test
         return this.permissions.and(permission.value) >= 1
     }
+
+    val hasIncompleteKeySetup: Boolean get() = flags and 8 == 8
 }

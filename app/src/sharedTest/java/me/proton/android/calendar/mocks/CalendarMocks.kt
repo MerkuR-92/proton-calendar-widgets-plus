@@ -56,7 +56,7 @@ object CalendarMocks {
         )
     }
 
-    fun provideMemberEntity(memberEmail: String = userEmail): MemberEntity {
+    fun provideMemberEntity(memberEmail: String = userEmail, flags: Int = calendarFlags): MemberEntity {
         return MemberEntity(
             id = memberId,
             permissions = MemberEntity.Permission.SUPEROWNER.value,
@@ -64,7 +64,7 @@ object CalendarMocks {
             calendarId = calendarId,
             color = calendarColor,
             display = calendarDisplay,
-            flags = calendarFlags
+            flags = flags
         )
     }
 }
