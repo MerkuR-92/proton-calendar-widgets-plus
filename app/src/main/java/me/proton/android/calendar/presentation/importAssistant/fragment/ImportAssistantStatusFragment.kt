@@ -1,6 +1,10 @@
 package me.proton.android.calendar.presentation.importAssistant.fragment
 
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -10,13 +14,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_list
+import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_refresh
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
@@ -26,6 +33,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.importAssistant.adapter.ImportStatusListAdapter
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import org.koin.core.KoinComponent
 import java.time.Instant
 import java.time.LocalDateTime
@@ -44,6 +52,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val importAssistantViewModel: ImportAssistantViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
@@ -91,10 +100,8 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
         }
 
-        lifecycleScope.launch {
-            importAssistantViewModel.getReports()
-            importAssistantViewModel.getImporters()
-        }
+        fragment_import_assistant_status_refresh.isRefreshing = true
+        refreshList()
 
         val importListMediator = MediatorLiveData<Triple<List<ImporterEntity>, List<ReportEntity>, ZoneId>>()
         importListMediator.addSource(importAssistantViewModel.importerList) { importerList ->
@@ -116,12 +123,15 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
             }
         }
         importListMediator.observe(viewLifecycleOwner) {
+            fragment_import_assistant_status_refresh.isRefreshing = false
+
             val importerList = it.first
             val reportList = it.second
             val zoneId = it.third
             it?.let {
                 val importList = arrayListOf<Import>()
                 importerList.filter { it.product.contains(CalendarImport.PRODUCT_CALENDAR) && it.active?.calendar != null }.forEach { importerEntity ->
+                    // Importers
                     importList.add(
                         Import(
                             importerEntity.id,
@@ -132,12 +142,13 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             },
                             importerEntity.active?.calendar?.state?.let { state ->
                                 Import.ImportState.values()[state]
-                            }
-
+                            },
+                            importerEntity.active?.calendar?.errorCode
                         )
                     )
                 }
                 reportList.filter { it.summary.calendar != null }.forEach { reporterEntity ->
+                    // Reports
                     importList.add(
                         Import(
                             reporterEntity.id,
@@ -150,7 +161,9 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                         )
                     )
                 }
-                importStatusListAdapter.submitList(importList)
+                importStatusListAdapter.submitList(
+                    importList.sortedByDescending { it.dateTime }
+                )
             }
         }
     }
@@ -159,13 +172,90 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         val importListView = fragment_import_assistant_status_list
         val importLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         importListView.layoutManager = importLayoutManager
-        importStatusListAdapter = ImportStatusListAdapter {
-
+        importStatusListAdapter = ImportStatusListAdapter { import, action ->
+            when (action) {
+                ImportStatusListAdapter.Action.CANCEL -> {
+                    showConfirmationDialog(
+                        R.string.import_assistant_cancel_import_title,
+                        R.string.import_assistant_cancel_import_message,
+                        R.string.import_assistant_cancel_import_positive_button,
+                        R.string.import_assistant_cancel_import_negative_button
+                    ) { dialog, _ ->
+                        dialog.dismiss()
+                        lifecycleScope.launch {
+                            if (importAssistantViewModel.cancelImport(import.id)) refreshList()
+                        }
+                    }
+                }
+                ImportStatusListAdapter.Action.RESUME -> {
+                    lifecycleScope.launch {
+                        // No confirmation dialog for resume
+                        if (import.errorCode == 1) {
+                            // Lost connection, we need to sign in to Google and create a new token to update importer
+                            val userId = accountViewModel.getPrimaryUserId()
+                            if (userId != null) {
+                                val googleAuthenticationUrl = mainViewModel.getGoogleAuthenticationUrl(userId, import.id)
+                                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
+                                startActivity(browserIntent)
+                            } else {
+                                view?.displaySnackBar(getString(R.string.snack_network_error))
+                            }
+                        } else {
+                            if (importAssistantViewModel.resumeImport(import.id)) refreshList()
+                        }
+                    }
+                }
+                ImportStatusListAdapter.Action.DELETE -> {
+                    showConfirmationDialog(
+                        R.string.import_assistant_delete_report_title,
+                        R.string.import_assistant_delete_report_message,
+                        R.string.import_assistant_delete_report_positive_button,
+                        R.string.import_assistant_delete_report_negative_button
+                    ) { dialog, _ ->
+                        dialog.dismiss()
+                        lifecycleScope.launch {
+                            // Import.id is the reportId since we mapped both reports and active importers to the Import object
+                            importAssistantViewModel.deleteReport(import.id)
+                        }
+                    }
+                }
+            }
         }
         importListView.adapter = importStatusListAdapter
+
+        fragment_import_assistant_status_refresh.setOnRefreshListener {
+            refreshList()
+        }
+    }
+
+    private fun refreshList() {
+        lifecycleScope.launch {
+            importAssistantViewModel.getReports()
+            importAssistantViewModel.getImporters()
+            // TODO Handle error and cancel loading animation
+        }
     }
 
     private fun displayNetworkError() {
         view?.displaySnackBar(getString(R.string.snack_network_error))
+    }
+
+    private fun showConfirmationDialog(
+        title: Int,
+        message: Int,
+        positiveButtonText: Int,
+        negativeButtonText: Int,
+        listener: DialogInterface.OnClickListener
+    ) {
+        val materialDialogBuilder = MaterialAlertDialogBuilder(requireContext())
+            .setCancelable(true)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(positiveButtonText, listener)
+            .setNegativeButton(negativeButtonText) { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        materialDialogBuilder.show()
     }
 }

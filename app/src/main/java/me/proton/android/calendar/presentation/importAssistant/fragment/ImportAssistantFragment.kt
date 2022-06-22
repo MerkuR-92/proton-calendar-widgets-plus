@@ -25,15 +25,19 @@ import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_description
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_title
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_scroll_view
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_count
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_customize_import_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_email
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_list
+import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_checkbox
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -45,6 +49,7 @@ import me.proton.android.calendar.presentation.importAssistant.adapter.ImportCal
 import me.proton.android.calendar.presentation.importAssistant.adapter.MergeCalendarListAdapter
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.core.presentation.ui.view.ProtonProgressButton
 import org.koin.core.KoinComponent
 
 @AndroidEntryPoint
@@ -89,12 +94,19 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         fragment_import_assistant_summary_customize_import_layout.setOnSingleClickListener {
-            // TODO Smooth scroll through the view
+            fragment_import_assistant_scroll_view.smoothScrollTo(
+                0,
+                fragment_import_assistant_summary_customize_import_layout.bottom + fragment_import_assistant_illustration.bottom + requireContext().dpToPixel(34)
+            )
         }
 
         fragment_import_assistant_import_button.setOnSingleClickListener {
+            if (fragment_import_assistant_import_button.currentState == ProtonProgressButton.State.LOADING) return@setOnSingleClickListener
             onStartImportClick()
         }
+
+        // Show loader view by default
+        showGatheringDataView()
 
         initExternalCalendarList()
 
@@ -103,35 +115,14 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         importAssistantViewModel.importCalendarMappingList.observe(viewLifecycleOwner) { importCalendarMappingList ->
-            if (importCalendarMappingList.isNullOrEmpty()) {
-                fragment_import_assistant_summary_layout.visibleOrGone(false)
-                fragment_import_assistant_import_button.visibleOrGone(false)
-                return@observe
-            }
+            importCalendarMappingList ?: return@observe
 
             importCalendarMappingListAdapter.submitList(importCalendarMappingList)
 
-            // Display summary header
-            fragment_import_assistant_summary_layout.visibleOrGone(true)
-            val calendarsToImport = importCalendarMappingList.filter { it.importCalendar }
-            fragment_import_assistant_summary_count.text = getString(
-                R.string.import_assistant_summary_count,
-                calendarsToImport.size,
-                importCalendarMappingList.size
-            )
-            fragment_import_assistant_import_button.text = resources.getQuantityString(
-                R.plurals.import_assistant_import_button,
-                calendarsToImport.size,
-                calendarsToImport.size
-            )
-            fragment_import_assistant_import_button.visibleOrGone(true)
+            showImportSummaryView(importCalendarMappingList)
         }
 
         lifecycleScope.launch {
-            // Display loader
-            fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_gathering_data_loader_title)
-            fragment_import_assistant_loader_layout.visibleOrGone(true)
-
             val userId = accountViewModel.getPrimaryUserId()
             if (userId != null) {
                 // Create importer and fetch external calendars
@@ -140,11 +131,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     navigationArguments.code,
                     resources.getIntArray(R.array.accent_colors_base)
                 )
-
-                // Hide loader
-                fragment_import_assistant_loader_layout.visibleOrGone(false)
             } else {
                 view.displaySnackBar(getString(R.string.snack_network_error))
+                // TODO Handle view state if error
             }
         }
     }
@@ -178,64 +167,65 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             // Display loading state on import button
             fragment_import_assistant_import_button.setLoading()
-            // Display loader layout
-            fragment_import_assistant_loader_layout.visibleOrGone(true)
-            // Hide summary layout
-            fragment_import_assistant_summary_layout.visibleOrGone(false)
 
             if (calendarsToImport.any { it.createDestinationCalendar }) {
-                // Display Creating calendars loader
-                fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_creating_calendars)
-
                 // Create new calendars
-                val calendarsToCreateCount = calendarsToImport.count { it.createDestinationCalendar }
-                var calendarsCreatedCount = 0
-                // Set initial loader description text
-                fragment_import_assistant_loader_description.text = getString(
-                    R.string.import_assistant_creating_calendars_count,
-                    calendarsCreatedCount,
-                    calendarsToCreateCount,
-                    calendarsToImport.first { it.createDestinationCalendar }.destinationEmail
-                )
-                fragment_import_assistant_loader_description.visibleOrGone(true)
-                calendarsToImport.forEachIndexed { index, calendarToImport ->
-                    if (calendarToImport.createDestinationCalendar && calendarToImport.destinationId == null) {
-                        // Create calendar
-                        val newCalendarId = importAssistantViewModel.createCalendar(
-                            calendarToImport.destinationName,
-                            calendarToImport.destinationEmail,
-                            calendarToImport.destinationColor
-                        )
-                        // Set newly created calendar ID
-                        calendarsToImport[index].destinationId = newCalendarId
-                        // Update loader description text
-                        calendarsCreatedCount++
-                        fragment_import_assistant_loader_description.text = getString(
-                            R.string.import_assistant_creating_calendars_count,
-                            calendarsCreatedCount,
-                            calendarsToCreateCount,
-                            calendarToImport.destinationEmail
-                        )
-                    }
-                }
-                fragment_import_assistant_loader_description.text = getString(R.string.import_assistant_creating_calendars_finish)
+                createCalendars(calendarsToImport)
             }
+
+            // Start the import
             val startImportResult = importAssistantViewModel.startImport(
-                customCalendarMapping = true, // TODO HANDLE THIS FIELD
+                customCalendarMapping = calendarsToImport.any { !it.createDestinationCalendar }, // If we're merging a calendar then user has custom mapping
                 importCalendarMappingList = calendarsToImport
             )
-            if (startImportResult) displayImportInProgressView()
-            else {
-                // TODO ERROR display import mapping view again and error snack
 
+            // Reset import button state
+            fragment_import_assistant_import_button.setIdle()
+
+            if (startImportResult) {
+                showImportInProgressView()
+            } else {
+                // TODO ERROR display import mapping view again and error snack
             }
         }
     }
 
-    private fun displayImportInProgressView() {
-        // Hide loader and display in progress layout
+    private suspend fun createCalendars(calendarsToImport: List<ImportCalendarMapping>) {
+        // Create new calendars
+        val calendarsToCreateCount = calendarsToImport.count { it.createDestinationCalendar }
+        var calendarsCreatedCount = 0
+
+        // Display creating new calendars loader view
+        showCreatingCalendarsView(
+            calendarsToCreateCount,
+            calendarsCreatedCount,
+            calendarsToImport.first { it.createDestinationCalendar }.destinationEmail
+        )
+
+        calendarsToImport.forEachIndexed { index, calendarToImport ->
+            if (calendarToImport.createDestinationCalendar && calendarToImport.destinationId == null) {
+                // Create calendar
+                val newCalendarId = importAssistantViewModel.createCalendar(
+                    calendarToImport.destinationName,
+                    calendarToImport.destinationEmail,
+                    calendarToImport.destinationColor
+                )
+                // Set newly created calendar ID
+                calendarsToImport[index].destinationId = newCalendarId
+
+                calendarsCreatedCount++
+                // Update loader description text
+                updateCalendarCreatedView(calendarsToCreateCount, calendarsCreatedCount, calendarToImport.destinationEmail)
+            }
+        }
+        fragment_import_assistant_loader_description.text = getString(R.string.import_assistant_creating_calendars_finish)
+    }
+
+    private fun showImportInProgressView() {
+        // Display import in progress layout
         fragment_import_assistant_loader_layout.visibleOrGone(false)
         fragment_import_assistant_in_progress_layout.visibleOrGone(true)
+        fragment_import_assistant_summary_layout.visibleOrGone(false)
 
         val defaultUserEmail = importAssistantViewModel.defaultUserEmail.value ?: "" // TODO Handle null ?
         val sourceEmail = importAssistantViewModel.sourceEmail.value ?: "" // TODO Handle null ?
@@ -245,7 +235,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             defaultUserEmail
         )
 
-        // Hide import button and display close button
+        // Show close button
         fragment_import_assistant_import_button.visibleOrGone(false)
         fragment_import_assistant_close_button.visibleOrGone(true)
 
@@ -260,6 +250,72 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         fragment_import_assistant_in_progress_redirect.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_import_assistant_to_nav_import_assistant_status)
         }
+    }
+
+    private fun showGatheringDataView() {
+        // Set loader title
+        fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_gathering_data_loader_title)
+
+        // Display loader layout
+        fragment_import_assistant_loader_layout.visibleOrGone(true)
+        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
+        fragment_import_assistant_summary_layout.visibleOrGone(false)
+
+        // Hide the buttons
+        fragment_import_assistant_import_button.visibleOrGone(false)
+        fragment_import_assistant_close_button.visibleOrGone(false)
+    }
+
+    private fun showImportSummaryView(importCalendarMappingList: List<ImportCalendarMapping>) {
+        // Display summary layout
+        fragment_import_assistant_loader_layout.visibleOrGone(false)
+        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
+        fragment_import_assistant_summary_layout.visibleOrGone(true)
+
+        val calendarsToImport = importCalendarMappingList.filter { it.importCalendar }
+        fragment_import_assistant_summary_count.text = getString(
+            R.string.import_assistant_summary_count,
+            calendarsToImport.size,
+            importCalendarMappingList.size
+        )
+        fragment_import_assistant_import_button.text = resources.getQuantityString(
+            R.plurals.import_assistant_import_button,
+            calendarsToImport.size,
+            calendarsToImport.size
+        )
+
+        // Show the import button
+        fragment_import_assistant_import_button.visibleOrGone(true)
+        fragment_import_assistant_close_button.visibleOrGone(false)
+    }
+
+    private fun showCreatingCalendarsView(calendarsToCreateCount: Int, calendarsCreatedCount: Int, destinationEmail: String) {
+        // Set loader title
+        fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_creating_calendars)
+
+        // Hide the buttons
+        fragment_import_assistant_import_button.visibleOrGone(false)
+        fragment_import_assistant_close_button.visibleOrGone(false)
+
+        // Display loader layout
+        fragment_import_assistant_loader_layout.visibleOrGone(true)
+        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
+        fragment_import_assistant_summary_layout.visibleOrGone(false)
+
+        // Set initial loader description text
+        updateCalendarCreatedView(calendarsToCreateCount, calendarsCreatedCount,destinationEmail)
+
+        // Display loader description
+        fragment_import_assistant_loader_description.visibleOrGone(true)
+    }
+
+    private fun updateCalendarCreatedView(calendarsToCreateCount: Int, calendarsCreatedCount: Int, destinationEmail: String) {
+        fragment_import_assistant_loader_description.text = getString(
+            R.string.import_assistant_creating_calendars_count,
+            calendarsCreatedCount,
+            calendarsToCreateCount,
+            destinationEmail
+        )
     }
 
     private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, userCalendars: List<CalendarEntity>?) {

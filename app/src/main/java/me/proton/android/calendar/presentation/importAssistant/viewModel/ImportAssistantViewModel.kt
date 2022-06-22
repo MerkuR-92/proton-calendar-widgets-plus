@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -101,65 +102,17 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, calendarColors: IntArray): Boolean {
+    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, calendarColors: IntArray, importerId: String? = null): Boolean {
         // Create Access token resource
         return when (val createAccessTokenApiResponse = importerApi.createAccessToken(userId, code)) {
             is ApiResponse.Success -> {
                 val tokenId = createAccessTokenApiResponse.data.token.id
                 _sourceEmail.value = createAccessTokenApiResponse.data.token.account
 
-                // Create the importer for the required products
-                when (val createCalendarImporterApiResponse = importerApi.createCalendarImporter(userId, tokenId)) {
-                    is ApiResponse.Success -> {
-                        importerId = createCalendarImporterApiResponse.data.importerID
-
-                        // Get all the importer mapping info
-                        when (val getCalendarImportMappingInfoApiResponse = importerApi.getCalendarImportMappingInfo(userId, importerId)) {
-                            is ApiResponse.Success -> {
-                                val externalCalendarList = getCalendarImportMappingInfoApiResponse.data.calendars
-
-                                defaultUserEmail.value = getDefaultUserEmail() ?: run {
-                                    // TODO HANDLE ERROR
-                                    return false
-                                }
-                                val importCalendarMappingList = arrayListOf<ImportCalendarMapping>()
-                                externalCalendarList.forEach {
-                                    importCalendarMappingList.add(
-                                        ImportCalendarMapping(
-                                            importCalendar = true, // Set to true by default
-                                            sourceId = it.id,
-                                            sourceName = it.source,
-                                            sourceEmail = createAccessTokenApiResponse.data.token.account,
-                                            createDestinationCalendar = true,
-                                            destinationId = null,
-                                            destinationName = it.source,
-                                            destinationEmail = defaultUserEmail.value!!,
-                                            destinationColor = calendarColors.random()
-                                        )
-                                    )
-                                }
-                                _importCalendarMappingList.value = importCalendarMappingList
-
-                                true
-                            }
-                            is ApiResponse.Error -> {
-                                logger.e(getCalendarImportMappingInfoApiResponse.error)
-                                return false
-                            }
-                            is ApiResponse.Exception -> {
-                                logger.e(getCalendarImportMappingInfoApiResponse.exception.message ?: "(no exception message)")
-                                return false
-                            }
-                        }
-                    }
-                    is ApiResponse.Error -> {
-                        logger.e(createCalendarImporterApiResponse.error)
-                        return false
-                    }
-                    is ApiResponse.Exception -> {
-                        logger.e(createCalendarImporterApiResponse.exception.message ?: "(no exception message)")
-                        return false
-                    }
+                if (importerId != null) {
+                    updateImporter(userId, tokenId, importerId)
+                } else {
+                    createImporter(userId, tokenId, createAccessTokenApiResponse.data.token.account, calendarColors)
                 }
             }
             is ApiResponse.Error -> {
@@ -168,6 +121,83 @@ class ImportAssistantViewModel @Inject constructor(
             }
             is ApiResponse.Exception -> {
                 logger.e(createAccessTokenApiResponse.exception.message ?: "(no exception message)")
+                return false
+            }
+        }
+    }
+
+    private suspend fun createImporter(userId: UserId, tokenId: String, account: String, calendarColors: IntArray): Boolean {
+        // Create the importer for the required products
+        return when (val createCalendarImporterApiResponse = importerApi.createCalendarImporter(userId, tokenId)) {
+            is ApiResponse.Success -> {
+                importerId = createCalendarImporterApiResponse.data.importerID
+
+                // Get all the importer mapping info
+                when (val getCalendarImportMappingInfoApiResponse = importerApi.getCalendarImportMappingInfo(userId, importerId)) {
+                    is ApiResponse.Success -> {
+                        val externalCalendarList = getCalendarImportMappingInfoApiResponse.data.calendars
+
+                        defaultUserEmail.value = getDefaultUserEmail() ?: run {
+                            // TODO HANDLE ERROR
+                            return false
+                        }
+                        val importCalendarMappingList = arrayListOf<ImportCalendarMapping>()
+                        externalCalendarList.forEach {
+                            importCalendarMappingList.add(
+                                ImportCalendarMapping(
+                                    importCalendar = true, // Set to true by default
+                                    sourceId = it.id,
+                                    sourceName = it.source,
+                                    sourceEmail = account,
+                                    createDestinationCalendar = true,
+                                    destinationId = null,
+                                    destinationName = it.source,
+                                    destinationEmail = defaultUserEmail.value!!,
+                                    destinationColor = calendarColors.random()
+                                )
+                            )
+                        }
+                        _importCalendarMappingList.value = importCalendarMappingList
+
+                        true
+                    }
+                    is ApiResponse.Error -> {
+                        logger.e(getCalendarImportMappingInfoApiResponse.error)
+                        return false
+                    }
+                    is ApiResponse.Exception -> {
+                        logger.e(getCalendarImportMappingInfoApiResponse.exception.message ?: "(no exception message)")
+                        return false
+                    }
+                }
+            }
+            is ApiResponse.Error -> {
+                logger.e(createCalendarImporterApiResponse.error)
+                return false
+            }
+            is ApiResponse.Exception -> {
+                logger.e(createCalendarImporterApiResponse.exception.message ?: "(no exception message)")
+                return false
+            }
+        }
+    }
+
+    private suspend fun updateImporter(userId: UserId, tokenId: String, importerId: String): Boolean {
+        // Update the importer with the new token id
+        return when (val updateCalendarImporterApiResponse = importerApi.updateCalendarImporter(userId, importerId, tokenId)) {
+            is ApiResponse.Success -> {
+                // Resume import
+                if (resumeImport(importerId)) {
+                    if (_importerList.value?.any { it.id == importerId } == true) getImporters() // Refresh importers list if it has the importer
+                    true
+                } else false
+            }
+            is ApiResponse.Error -> {
+                logger.e(updateCalendarImporterApiResponse.error)
+                return false
+            }
+            is ApiResponse.Exception -> {
+                logger.e(updateCalendarImporterApiResponse.exception.message ?: "(no exception message)")
                 return false
             }
         }
@@ -188,20 +218,15 @@ class ImportAssistantViewModel @Inject constructor(
                 )
             } else null
         }
-        logger.e("Test test calendarMapping $calendarMapping")
         return when (val startImporterApiResponse = importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping)) {
             is ApiResponse.Success -> {
-                logger.e("Test test Import started")
-                // TODO
                 true
             }
             is ApiResponse.Error -> {
-                logger.e("Test test Import error ${startImporterApiResponse.error}")
                 logger.e(startImporterApiResponse.error)
                 false
             }
             is ApiResponse.Exception -> {
-                logger.e("Test test Import exception ${startImporterApiResponse.exception.message}")
                 logger.e(startImporterApiResponse.exception.message ?: "(no exception message)")
                 false
             }
@@ -226,7 +251,6 @@ class ImportAssistantViewModel @Inject constructor(
             createCalendarResult.ifSuccessAndLogErrors(logger) {}
             return null
         }
-        logger.e("Test test created calendar $calendarName")
 
         createCalendarResult.returnValue.tryCast<String> {
             val calendarId = this
@@ -248,7 +272,6 @@ class ImportAssistantViewModel @Inject constructor(
                 // TODO HANDLE ERROR
                 return calendarId // Calendar has still been created
             }
-            logger.e("Test test updated calendar settings for $calendarName")
 
             return calendarId
         }
@@ -322,15 +345,12 @@ class ImportAssistantViewModel @Inject constructor(
 
         when (val getImportersApiResponse = importerApi.getImporters(userId)) {
             is ApiResponse.Success -> {
-                logger.e("Test test getImporters ${getImportersApiResponse.data.importers}")
                 _importerList.value = getImportersApiResponse.data.importers
             }
             is ApiResponse.Error -> {
-                logger.e("Test test getImporters error ${getImportersApiResponse.error}")
                 logger.e(getImportersApiResponse.error)
             }
             is ApiResponse.Exception -> {
-                logger.e("Test test getImporters exception ${getImportersApiResponse.exception.message}")
                 logger.e(getImportersApiResponse.exception.message ?: "(no exception message)")
             }
         }
@@ -345,16 +365,79 @@ class ImportAssistantViewModel @Inject constructor(
 
         when (val getReportsApiResponse = importerApi.getReports(userId)) {
             is ApiResponse.Success -> {
-                logger.e("Test test getReports ${getReportsApiResponse.data.reports}")
                 _reportList.value = getReportsApiResponse.data.reports
             }
             is ApiResponse.Error -> {
-                logger.e("Test test getReports error ${getReportsApiResponse.error}")
                 logger.e(getReportsApiResponse.error)
             }
             is ApiResponse.Exception -> {
-                logger.e("Test test getReports exception ${getReportsApiResponse.exception.message}")
                 logger.e(getReportsApiResponse.exception.message ?: "(no exception message)")
+            }
+        }
+    }
+
+    suspend fun cancelImport(importId: String): Boolean {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
+            _userId.value = userId
+        }
+
+        return when (val cancelImportApiResponse = importerApi.cancelImport(userId, importId)) {
+            is ApiResponse.Success -> {
+                false
+            }
+            is ApiResponse.Error -> {
+                logger.e(cancelImportApiResponse.error)
+                true
+            }
+            is ApiResponse.Exception -> {
+                logger.e(cancelImportApiResponse.exception.message ?: "(no exception message)")
+                true
+            }
+        }
+    }
+
+    suspend fun resumeImport(importId: String): Boolean {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
+            _userId.value = userId
+        }
+
+        return when (val resumeImportApiResponse = importerApi.resumeImport(userId, importId)) {
+            is ApiResponse.Success -> {
+                true
+            }
+            is ApiResponse.Error -> {
+                logger.e(resumeImportApiResponse.error)
+                false
+            }
+            is ApiResponse.Exception -> {
+                logger.e(resumeImportApiResponse.exception.message ?: "(no exception message)")
+                false
+            }
+        }
+    }
+
+    suspend fun deleteReport(reportId: String) {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
+            _userId.value = userId
+        }
+
+        when (val deleteReportApiResponse = importerApi.deleteReport(userId, reportId)) {
+            is ApiResponse.Success -> {
+                val currentList = _reportList.value?.let { ArrayList(it) }
+                currentList?.removeIf { it.id == reportId }
+                _reportList.value = currentList
+            }
+            is ApiResponse.Error -> {
+                logger.e(deleteReportApiResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                logger.e(deleteReportApiResponse.exception.message ?: "(no exception message)")
             }
         }
     }

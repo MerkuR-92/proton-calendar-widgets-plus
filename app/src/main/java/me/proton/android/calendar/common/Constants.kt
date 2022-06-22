@@ -196,6 +196,7 @@ object AppLinksQueryParameters {
 
     const val CODE = "code"
     const val SCOPE = "scope"
+    const val STATE = "state"
 }
 
 object CalendarImport {

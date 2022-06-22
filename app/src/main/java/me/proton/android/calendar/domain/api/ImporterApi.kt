@@ -3,12 +3,16 @@ package me.proton.android.calendar.domain.api
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarImportMappingInfoApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
+import me.proton.android.calendar.data.api.CancelImportApiResponse
 import me.proton.android.calendar.data.api.CreateAccessTokenApiResponse
 import me.proton.android.calendar.data.api.CreateImporterApiResponse
+import me.proton.android.calendar.data.api.DeleteReportApiResponse
 import me.proton.android.calendar.data.api.GoogleClientIdApiResponse
 import me.proton.android.calendar.data.api.ImportersApiResponse
 import me.proton.android.calendar.data.api.ReportsApiResponse
+import me.proton.android.calendar.data.api.ResumeImportApiResponse
 import me.proton.android.calendar.data.api.StartImporterApiResponse
+import me.proton.android.calendar.data.api.UpdateImporterApiResponse
 import me.proton.core.domain.entity.UserId
 
 interface ImporterApi {
@@ -29,6 +33,11 @@ interface ImporterApi {
     suspend fun createCalendarImporter(userId: UserId, tokenId: String): ApiResponse<CreateImporterApiResponse>
 
     /**
+     *  Update the Calendar Importer
+     */
+    suspend fun updateCalendarImporter(userId: UserId, importerId: String, tokenId: String): ApiResponse<UpdateImporterApiResponse>
+
+    /**
      *  This route looks up the calendars from the remote provider.
      */
     suspend fun getCalendarImportMappingInfo(userId: UserId, importerId: String): ApiResponse<CalendarImportMappingInfoApiResponse>
@@ -47,5 +56,19 @@ interface ImporterApi {
      *  This route returns a history of the finished imports.
      */
     suspend fun getReports(userId: UserId): ApiResponse<ReportsApiResponse>
-}
 
+    /**
+     *  This route cancels an ongoing import.
+     */
+    suspend fun cancelImport(userId: UserId, importerId: String): ApiResponse<CancelImportApiResponse>
+
+    /**
+     *  This route resumes a paused import.
+     */
+    suspend fun resumeImport(userId: UserId, importerId: String): ApiResponse<ResumeImportApiResponse>
+
+    /**
+     *  This route deletes the given import report.
+     */
+    suspend fun deleteReport(userId: UserId, reportId: String): ApiResponse<DeleteReportApiResponse>
+}

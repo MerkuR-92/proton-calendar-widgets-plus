@@ -16,14 +16,22 @@ import kotlinx.android.synthetic.main.item_import_status.view.item_import_status
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_icon
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountSI
+import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.domain.model.Import
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 class ImportStatusListAdapter(
-    val listener: (Import) -> Unit
+    val listener: (Import, Action) -> Unit
 ): ListAdapter<Import, ImportStatusListAdapter.ViewHolder>(ImportDiffCallback()) {
+
+    enum class Action {
+        CANCEL,
+        RESUME,
+        DELETE
+    }
 
     class ImportDiffCallback : DiffUtil.ItemCallback<Import>() {
         override fun areItemsTheSame(oldItem: Import, newItem: Import): Boolean {
@@ -54,11 +62,19 @@ class ImportStatusListAdapter(
         fun bind(import : Import) {
 
             account.text = import.account
-            details.text = itemView.context.getString(
-                R.string.import_assistant_report_details,
-                import.size ?: 0, // TODO handle null
-                import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)) ?: "" // TODO handle null
-            )
+            val importSize = humanReadableByteCountSI(import.size?.toLong() ?: 0L)
+            details.text =
+                if (import.size != null) {
+                    itemView.context.getString(
+                        R.string.import_assistant_report_details,
+                        importSize,
+                        import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                            ?: "" // TODO handle null
+                    )
+                } else {
+                    import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                        ?: ""
+                }
 
             icon.visibleOrGone(import.state != null)
             badge.visibleOrGone(import.state != null)
@@ -113,6 +129,17 @@ class ImportStatusListAdapter(
                         }
                     )
                 )
+
+                icon.setOnSingleClickListener {
+                    when (import.state) {
+                        Import.ImportState.QUEUED,
+                        Import.ImportState.RUNNING -> listener(import, Action.CANCEL)
+                        Import.ImportState.PAUSED -> listener(import, Action.RESUME)
+                        Import.ImportState.DONE,
+                        Import.ImportState.FAILED,
+                        Import.ImportState.CANCELED -> listener(import, Action.DELETE)
+                    }
+                }
             }
         }
 

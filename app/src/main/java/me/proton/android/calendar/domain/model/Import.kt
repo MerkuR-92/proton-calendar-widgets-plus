@@ -7,7 +7,8 @@ data class Import(
     val account: String,
     val size: Int?,
     val dateTime: LocalDateTime?,
-    val state: ImportState?
+    val state: ImportState?,
+    val errorCode: Int? = null // 1: Lost connection, 2: Storage limit reached
 ) {
     enum class ImportState(val value: Int) {
         QUEUED(0),

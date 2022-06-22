@@ -78,7 +78,9 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.core.presentation.utils.normSnack
 import okhttp3.internal.toHexString
+import java.text.CharacterIterator
 import java.text.Normalizer
+import java.text.StringCharacterIterator
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
@@ -1305,6 +1307,36 @@ object AndroidUtils {
     ): Int {
         theme.resolveAttribute(attrColor, typedValue, resolveRefs)
         return typedValue.data
+    }
+
+    fun humanReadableByteCountSI(bytesRaw: Long): String {
+        var bytes = bytesRaw
+        if (-1000 < bytes && bytes < 1000) {
+            return "$bytes B"
+        }
+        val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
+        while (bytes <= -999950 || bytes >= 999950) {
+            bytes /= 1000
+            ci.next()
+        }
+        return String.format("%.1f %cB", bytes / 1000.0, ci.current())
+    }
+
+    fun humanReadableByteCountBin(bytes: Long): String {
+        val absB = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else Math.abs(bytes)
+        if (absB < 1024) {
+            return "$bytes B"
+        }
+        var value = absB
+        val ci: CharacterIterator = StringCharacterIterator("KMGTPE")
+        var i = 40
+        while (i >= 0 && absB > 0xfffccccccccccccL shr i) {
+            value = value shr 10
+            ci.next()
+            i -= 10
+        }
+        value *= java.lang.Long.signum(bytes).toLong()
+        return String.format("%.1f %ciB", value / 1024.0, ci.current())
     }
 }
 

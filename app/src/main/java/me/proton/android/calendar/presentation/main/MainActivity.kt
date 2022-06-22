@@ -68,6 +68,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CODE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.SCOPE
+import me.proton.android.calendar.common.AppLinksQueryParameters.STATE
 import me.proton.android.calendar.common.CalendarImport.ERROR
 import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
@@ -77,6 +78,7 @@ import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -98,6 +100,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
+import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
@@ -130,6 +133,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by viewModels()
     private val eventViewModel: EventViewModel by viewModels()
     private val mainViewModel: MainViewModel by viewModels()
+    private val importAssistantViewModel: ImportAssistantViewModel by viewModels()
     private val accountViewModel: AccountViewModel by viewModels()
     private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
     private val plansViewModel: PlansViewModel by viewModels()
@@ -514,8 +518,24 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
                                 handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
                             } else if (code != null && scope != null) {
-                                val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(code)
-                                safeNavigateToDialogFragment(importAssistantDeepLink)
+                                val importerId = appLinkData.getQueryParameter(STATE) // Contains importerId when doing resume import process
+                                if (importerId != null) {
+                                    lifecycleScope.launch {
+                                        // Update importer with the new token id and resume importer
+                                        val userId = accountViewModel.getPrimaryUserId()
+                                        if (userId != null) {
+                                            importAssistantViewModel.handleGoogleSignInRedirect(
+                                                userId,
+                                                code,
+                                                resources.getIntArray(R.array.accent_colors_base),
+                                                importerId
+                                            )
+                                        } else this@MainActivity.displaySnackBar(getString(R.string.snack_network_error))
+                                    }
+                                } else {
+                                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(code)
+                                    safeNavigateToDialogFragment(importAssistantDeepLink)
+                                }
                             } else {
                                 val error = appLinkData?.getQueryParameter(ERROR)
                                 if (error == ERROR_ACCESS_DENIED) this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_import_error))

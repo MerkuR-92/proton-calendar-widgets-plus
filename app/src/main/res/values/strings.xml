@@ -480,12 +480,24 @@
     <string name="import_assistant_new_import">New import</string>
     <string name="import_assistant_previous_import">Previous imports</string>
     <string name="import_assistant_ongoing_import">%d ongoing import</string>
-    <string name="import_assistant_report_details">%d KB • %s</string>
+    <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_status_in_progress">In progress</string>
     <string name="import_assistant_status_completed">Completed</string>
     <string name="import_assistant_status_canceled">Canceled</string>
     <string name="import_assistant_status_paused">Paused</string>
     <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_delete_report_title">Remove from the list?</string>
+    <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
+    <string name="import_assistant_delete_report_positive_button">Remove</string>
+    <string name="import_assistant_delete_report_negative_button">Keep</string>
+    <string name="import_assistant_cancel_import_title">Import is incomplete!</string>
+    <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
+    <string name="import_assistant_cancel_import_positive_button">Cancel</string>
+    <string name="import_assistant_cancel_import_negative_button">Continue</string>
+    <string name="import_assistant_resume_import_title">Resume</string>
+    <string name="import_assistant_resume_import_message">Resume</string>
+    <string name="import_assistant_resume_import_positive_button">Resume</string>
+    <string name="import_assistant_resume_import_negative_button">Resume</string>
     <!--  STRING PLURALS  -->
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %d calendar</item>

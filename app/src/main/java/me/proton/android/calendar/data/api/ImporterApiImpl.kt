@@ -11,8 +11,10 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import me.proton.core.util.kotlin.toInt
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import javax.inject.Inject
 
@@ -33,11 +35,23 @@ interface ImporterApiService : BaseRetrofitApi {
     @POST("importer/v1/importers/start")
     suspend fun startImporter(@Body body: StartImporterApiRequest): StartImporterApiResponse
 
+    @PUT("importer/v1/importers/{importerId}")
+    suspend fun updateImporter(@Path("importerId") importerId: String, @Body body: UpdateImporterApiRequest): UpdateImporterApiResponse
+
     @GET("importer/v1/importers")
     suspend fun getImporters(): ImportersApiResponse
 
     @GET("importer/v1/reports")
     suspend fun getReports(): ReportsApiResponse
+
+    @PUT("importer/v1/importers/cancel")
+    suspend fun cancelImport(@Body body: CancelImportApiRequest): CancelImportApiResponse
+
+    @PUT("importer/v1/importers/resume")
+    suspend fun resumeImport(@Body body: ResumeImportApiRequest): ResumeImportApiResponse
+
+    @DELETE("importer/v1/calendar/importers/reports/{reportId}")
+    suspend fun deleteReport(@Path("reportId") reportId: String): DeleteReportApiResponse
 }
 
 class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) : ImporterApi {
@@ -70,6 +84,16 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
             )
         }.toApiResponse()
 
+    override suspend fun updateCalendarImporter(userId: UserId, importerId: String, tokenId: String): ApiResponse<UpdateImporterApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            updateImporter(
+                importerId,
+                UpdateImporterApiRequest(
+                    tokenId = tokenId
+                )
+            )
+        }.toApiResponse()
+
     override suspend fun getCalendarImportMappingInfo(userId: UserId, importerId: String): ApiResponse<CalendarImportMappingInfoApiResponse> =
         apiProvider.get<ImporterApiService>(userId).invoke {
             getCalendarImportMappingInfo(
@@ -98,6 +122,33 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
     override suspend fun getReports(userId: UserId): ApiResponse<ReportsApiResponse> =
         apiProvider.get<ImporterApiService>(userId).invoke {
             getReports()
+        }.toApiResponse()
+
+    override suspend fun cancelImport(userId: UserId, importerId: String): ApiResponse<CancelImportApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            cancelImport(
+                CancelImportApiRequest(
+                    importerId,
+                    listOf("Calendar")
+                )
+            )
+        }.toApiResponse()
+
+    override suspend fun resumeImport(userId: UserId, importerId: String): ApiResponse<ResumeImportApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            resumeImport(
+                ResumeImportApiRequest(
+                    importerId,
+                    listOf("Calendar")
+                )
+            )
+        }.toApiResponse()
+
+    override suspend fun deleteReport(userId: UserId, reportId: String): ApiResponse<DeleteReportApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            deleteReport(
+                reportId
+            )
         }.toApiResponse()
 }
 
@@ -248,7 +299,7 @@ data class ActiveCalendarImporterEntity(
     @SerialName("State")
     val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
     @SerialName("ErrorCode")
-    val errorCode: Int,
+    val errorCode: Int, // 1: Lost connection, 2: Storage limit reached
     @SerialName("Mapping")
     val mapping: List<ActiveImporterMappingEntity>
 )
@@ -309,3 +360,50 @@ data class ReportCalendarSummaryEntity(
     val totalSize: Int
 )
 
+@Serializable
+data class CancelImportApiRequest(
+    @SerialName("ImporterID")
+    val importerId: String,
+    @SerialName("Products")
+    val products: List<String>
+)
+
+@Serializable
+data class CancelImportApiResponse(
+    @SerialName("Code")
+    override val code: Int
+): BaseApiResponse()
+
+@Serializable
+data class ResumeImportApiRequest(
+    @SerialName("ImporterID")
+    val importerId: String,
+    @SerialName("Products")
+    val products: List<String>
+)
+
+@Serializable
+data class ResumeImportApiResponse(
+    @SerialName("Code")
+    override val code: Int
+): BaseApiResponse()
+
+@Serializable
+data class DeleteReportApiResponse(
+    @SerialName("Code")
+    override val code: Int
+): BaseApiResponse()
+
+@Serializable
+data class UpdateImporterApiRequest(
+    @SerialName("TokenID")
+    val tokenId: String
+)
+
+@Serializable
+data class UpdateImporterApiResponse(
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Importer")
+    val importer: ImporterEntity
+): BaseApiResponse()

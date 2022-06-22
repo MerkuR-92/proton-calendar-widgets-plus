@@ -18,6 +18,7 @@ import me.proton.android.calendar.common.CalendarImport.PRODUCT_CALENDAR
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
@@ -68,15 +69,7 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
         importAssistantViewModel.importerList.observe(viewLifecycleOwner) { importerList ->
             importerList ?: return@observe
-
-            val ongoingImports = importerList.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
-            import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports > 0)
-            if (ongoingImports > 0) {
-                import_assistant_status_guide_imports_subtitle.text = getString(
-                    R.string.import_assistant_ongoing_import,
-                    ongoingImports
-                )
-            }
+            refreshOngoingImportText(importerList)
         }
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
@@ -88,6 +81,24 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
         import_assistant_status_guide_imports_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_import_assistant_guide_to_nav_import_assistant_status)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        importAssistantViewModel.importerList.value?.let { importerList ->
+            refreshOngoingImportText(importerList)
+        }
+    }
+
+    private fun refreshOngoingImportText(importerList: List<ImporterEntity>) {
+        val ongoingImports = importerList.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
+        import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports > 0)
+        if (ongoingImports > 0) {
+            import_assistant_status_guide_imports_subtitle.text = getString(
+                R.string.import_assistant_ongoing_import,
+                ongoingImports
+            )
         }
     }
 

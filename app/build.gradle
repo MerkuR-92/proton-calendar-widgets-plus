@@ -242,6 +242,7 @@ dependencies {
 //    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "com.google.android.material:material:${rootProject.ext.version.material}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.version.constraint_layout}"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
     implementation "androidx.viewpager2:viewpager2:${rootProject.ext.version.viewpager2}"
 //    implementation 'androidx.navigation:navigation-fragment:2.2.1'

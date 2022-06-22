@@ -28,7 +28,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="24dp"
-                tools:visibility="gone"
+                tools:visibility="visible"
                 android:src="@drawable/ic_import_assistant_illu"/>
 
             <ImageView
@@ -40,7 +40,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:layout_marginTop="24dp"
                 android:visibility="gone"
-                tools:visibility="visible"
+                tools:visibility="gone"
                 android:src="@drawable/ic_import_in_progress_illu"/>
 
             <LinearLayout
@@ -96,7 +96,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center_horizontal"
                 android:visibility="gone"
-                tools:visibility="visible"
+                tools:visibility="gone"
                 android:orientation="vertical">
 
                 <TextView
@@ -146,7 +146,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:gravity="center_horizontal"
                 android:visibility="gone"
-                tools:visibility="gone"
+                tools:visibility="visible"
                 android:orientation="vertical">
 
                 <TextView

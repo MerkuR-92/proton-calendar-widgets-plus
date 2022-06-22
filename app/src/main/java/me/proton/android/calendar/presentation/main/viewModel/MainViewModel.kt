@@ -237,7 +237,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    suspend fun getGoogleAuthenticationUrl(userId: UserId): String {
+    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String {
 
         val baseUrl = GOOGLE_AUTH_BASE_URL
         val scopes = GOOGLE_SCOPES
@@ -246,7 +246,8 @@ class MainViewModel @Inject constructor(
         val responseType = RESPONSE_TYPE
         val clientId = getGoogleClientId(userId)
         val prompt = PROMPT
+        val state = if (importerId.isNullOrBlank()) "" else "&state=$importerId"
 
-        return "${baseUrl}scope=${scopes}&accessType=${accessType}&redirect_uri=${redirectUri}&response_type=${responseType}&client_id=${clientId}&prompt=${prompt}"
+        return "${baseUrl}scope=${scopes}&accessType=${accessType}&redirect_uri=${redirectUri}&response_type=${responseType}&client_id=${clientId}&prompt=${prompt}$state"
     }
 }
