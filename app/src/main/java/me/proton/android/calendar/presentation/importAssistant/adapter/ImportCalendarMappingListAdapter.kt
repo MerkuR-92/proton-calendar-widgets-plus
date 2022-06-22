@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -15,6 +16,7 @@ import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_cale
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_badge
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_email
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_layout
+import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_options
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_press
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_title
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_press
@@ -30,6 +32,14 @@ class ImportCalendarMappingListAdapter(
     val importListener: (ImportCalendarMapping) -> Unit,
     val optionsListener: (ImportCalendarMapping) -> Unit
 ) : ListAdapter<ImportCalendarMapping, ImportCalendarMappingListAdapter.ViewHolder>(ExternalCalendarEntityDiffCallback()) {
+
+    private var limitReached = false
+
+    fun setLimitReached(limitReached: Boolean) {
+        val valueChanged = this.limitReached != limitReached
+        this.limitReached = limitReached
+        if (valueChanged) notifyDataSetChanged()
+    }
 
     class ExternalCalendarEntityDiffCallback : DiffUtil.ItemCallback<ImportCalendarMapping>() {
         override fun areItemsTheSame(oldItem: ImportCalendarMapping, newItem: ImportCalendarMapping): Boolean {
@@ -62,6 +72,7 @@ class ImportCalendarMappingListAdapter(
         private val destinationEmail: TextView = view.item_import_calendar_destination_email
         private val destinationBadgeView: View = view.item_import_calendar_destination_badge
         private val destinationPressOverlay: View = view.item_import_calendar_destination_press
+        private val destinationOptionsButton: ImageView = view.item_import_calendar_destination_options
 
         fun bind(importCalendarMapping : ImportCalendarMapping) {
 
@@ -98,6 +109,22 @@ class ImportCalendarMappingListAdapter(
 
             destinationPressOverlay.setOnSingleClickListener {
                 optionsListener(importCalendarMapping)
+            }
+
+            destinationOptionsButton.setOnSingleClickListener {
+                optionsListener(importCalendarMapping)
+            }
+
+            if (limitReached && importCalendarMapping.createDestinationCalendar) {
+                destinationPressOverlay.background = ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.shape_background_secondary_rounded_error
+                )
+            } else {
+                destinationPressOverlay.background = ContextCompat.getDrawable(
+                    itemView.context,
+                    R.drawable.shape_background_secondary_rounded
+                )
             }
         }
 

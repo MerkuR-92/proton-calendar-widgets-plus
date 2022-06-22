@@ -1,5 +1,6 @@
 package me.proton.android.calendar.presentation.importAssistant.fragment
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -14,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_close_button
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_illustration
@@ -27,15 +30,20 @@ import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_title
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_scroll_view
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_count
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_create_details
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_customize_import_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_email
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_error
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_error_layout
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_header_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_list
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_checkbox
+import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_merge_details
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.MAX_CALENDAR_FREE
+import me.proton.android.calendar.common.MAX_CALENDAR_PAID
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -75,7 +83,22 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var importCalendarMappingListAdapter: ImportCalendarMappingListAdapter
 
     override fun onBackPressedCustom() {
-        findNavController().navigateUp()
+        if (fragment_import_assistant_import_button.currentState == ProtonProgressButton.State.LOADING) {
+            view?.displaySnackBar(getString(R.string.import_assistant_in_progress_snack))
+            return
+        }
+        displayDiscardChangesConfirmationDialog { _, _ ->
+            findNavController().navigateUp()
+        }
+    }
+
+    private fun displayDiscardChangesConfirmationDialog(callback: DialogInterface.OnClickListener) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.import_assistant_discard_import_title)
+            .setMessage(R.string.import_assistant_discard_import_message)
+            .setPositiveButton(R.string.import_assistant_discard_import_positive, callback)
+            .setNegativeButton(R.string.import_assistant_discard_import_negative) { _, _ -> }
+            .show()
     }
 
     override fun onNavigationIconClicked(): Boolean {
@@ -91,6 +114,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         super.onViewCreated(view, savedInstanceState)
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+            userCalendars ?: return@observe
+
+            checkCalendarLimit()
         }
 
         fragment_import_assistant_summary_customize_import_layout.setOnSingleClickListener {
@@ -120,6 +146,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             importCalendarMappingListAdapter.submitList(importCalendarMappingList)
 
             showImportSummaryView(importCalendarMappingList)
+
+            checkCalendarLimit()
         }
 
         lifecycleScope.launch {
@@ -159,6 +187,51 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             }
         )
         externalCalendarListView.adapter = importCalendarMappingListAdapter
+    }
+
+    private fun checkCalendarLimit() {
+        val userCalendars = calendarViewModel.userCalendars.value ?: return
+        val userCalendarsCount = userCalendars.size
+        val importCalendarMappingList = importAssistantViewModel.importCalendarMappingList.value ?: return
+        val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar }.size
+
+        lifecycleScope.launch {
+            val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
+            if (isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
+                !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID) {
+                fragment_import_assistant_summary_header_layout.visibleOrGone(false)
+                fragment_import_assistant_summary_error_layout.visibleOrGone(true)
+                val countCalendarsOverLimit =
+                    if (isFreeUser) {
+                        userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
+                    } else {
+                        userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
+                    }
+                val calendarPluralString = resources.getQuantityString(R.plurals.calendar, countCalendarsOverLimit)
+                fragment_import_assistant_summary_error.text = getString(
+                    R.string.import_assistant_import_summary_error,
+                    countCalendarsOverLimit,
+                    calendarPluralString
+                )
+                fragment_import_assistant_import_button.isEnabled = false
+                // TODO Remove custom disabled style once core ProtonButton has been updated
+                fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
+                fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(R.attr.proton_interaction_norm_disabled)
+                )
+                importCalendarMappingListAdapter.setLimitReached(true)
+            } else {
+                fragment_import_assistant_summary_header_layout.visibleOrGone(true)
+                fragment_import_assistant_summary_error_layout.visibleOrGone(false)
+                fragment_import_assistant_import_button.isEnabled = true
+                // TODO Remove custom disabled style once core ProtonButton has been updated
+                fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
+                fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
+                    requireContext().getColorFromAttr(R.attr.proton_interaction_norm)
+                )
+                importCalendarMappingListAdapter.setLimitReached(false)
+            }
+        }
     }
 
     private fun onStartImportClick() {
@@ -282,6 +355,24 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             R.plurals.import_assistant_import_button,
             calendarsToImport.size,
             calendarsToImport.size
+        )
+
+        // Display calendars to create count
+        val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar }.size
+        fragment_import_assistant_summary_create_details.visibleOrGone(calendarsToCreate > 0)
+        fragment_import_assistant_summary_create_details.text = getString(
+            R.string.fragment_import_assistant_summary_create_details,
+            calendarsToCreate,
+            resources.getQuantityString(R.plurals.calendar, calendarsToCreate)
+        )
+
+        // Display calendars to merge count
+        val calendarsToMerge = importCalendarMappingList.size - calendarsToCreate
+        fragment_import_assistant_summary_merge_details.visibleOrGone(calendarsToMerge > 0)
+        fragment_import_assistant_summary_merge_details.text = getString(
+            R.string.fragment_import_assistant_summary_merge_details,
+            calendarsToMerge,
+            resources.getQuantityString(R.plurals.calendar, calendarsToMerge)
         )
 
         // Show the import button

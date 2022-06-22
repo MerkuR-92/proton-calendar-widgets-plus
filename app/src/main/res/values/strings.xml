@@ -461,6 +461,8 @@
     <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
     <string name="import_assistant_summary_title">Import summary</string>
     <string name="import_assistant_summary_count">Import %d of %d calendars from</string>
+    <string name="fragment_import_assistant_summary_create_details">Create %d new %s in Proton Calendar.</string>
+    <string name="fragment_import_assistant_summary_merge_details">Merge %d %s in Proton Calendar.</string>
     <string name="import_assistant_summary_customize_import">Customize import</string>
     <string name="import_assistant_error">Error fetching data</string>
     <string name="import_assistant_import_as">Import as</string>
@@ -498,7 +500,17 @@
     <string name="import_assistant_resume_import_message">Resume</string>
     <string name="import_assistant_resume_import_positive_button">Resume</string>
     <string name="import_assistant_resume_import_negative_button">Resume</string>
+    <string name="import_assistant_import_summary_error">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d %2$s or\n • Merge at least %1$d %2$s with existing Proton calendars.</string>
+    <string name="import_assistant_in_progress_snack">Import in progress</string>
+    <string name="import_assistant_discard_import_title">Cancel import?</string>
+    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_positive">Cancel import</string>
+    <string name="import_assistant_discard_import_negative">Resume import</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">calendar</item>
+        <item quantity="other">calendars</item>
+    </plurals>
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %d calendar</item>
         <item quantity="other">Import %d calendars</item>

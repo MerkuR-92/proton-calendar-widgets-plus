@@ -156,35 +156,82 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/import_assistant_summary_title"/>
 
-                <TextView
-                    android:id="@+id/fragment_import_assistant_summary_count"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/fragment_import_assistant_summary_header_layout"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/Proton.Text.DefaultSmall.Weak"
-                    android:layout_marginTop="8dp"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    tools:text="Import 6 of 6 calendars from"/>
-
-                <TextView
-                    android:id="@+id/fragment_import_assistant_summary_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Proton.Text.DefaultSmall.Weak"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    tools:text="eric@gmail.com"/>
-
-                <TextView
-                    android:id="@+id/fragment_import_assistant_summary_details"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    style="@style/Proton.Text.DefaultSmall.Weak"
-                    android:layout_gravity="center_horizontal"
-                    android:gravity="center_horizontal"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     tools:visibility="visible"
-                    tools:text="Create 6 new calendars in Proton Calendar."/>
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fragment_import_assistant_summary_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Proton.Text.DefaultSmall.Weak"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        tools:text="Import 6 of 6 calendars from"/>
+
+                    <TextView
+                        android:id="@+id/fragment_import_assistant_summary_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Proton.Text.DefaultSmall.Weak"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        tools:text="eric@gmail.com"/>
+
+                    <TextView
+                        android:id="@+id/fragment_import_assistant_summary_create_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Proton.Text.DefaultSmall.Weak"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="Create 6 new calendars in Proton Calendar."/>
+
+                    <TextView
+                        android:id="@+id/fragment_import_assistant_summary_merge_details"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Proton.Text.DefaultSmall.Weak"
+                        android:layout_gravity="center_horizontal"
+                        android:gravity="center_horizontal"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="Merge 1 calendar in Proton Calendar."/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/fragment_import_assistant_summary_error_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    tools:visibility="visible"
+                    android:background="@drawable/shape_background_secondary_rounded"
+                    android:backgroundTint="@color/notification_error"
+                    android:gravity="start"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fragment_import_assistant_summary_error"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/Proton.Text.DefaultSmall.Weak"
+                        android:textColor="@color/text_inverted"
+                        android:layout_margin="16dp"
+                        tools:text="@string/import_assistant_import_summary_error"/>
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/fragment_import_assistant_summary_customize_import_layout"
