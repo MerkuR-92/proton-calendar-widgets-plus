@@ -10,12 +10,14 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.*
 import androidx.work.*
+import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.android.synthetic.main.dialog_checkbox.view.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -33,6 +35,7 @@ import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -71,7 +74,8 @@ class CalendarViewModel @Inject constructor(
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
     private val resourceProvider: ResourceProvider,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val json: Json
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -745,6 +749,8 @@ class CalendarViewModel @Inject constructor(
         }
         return calendarsRepository.selectCalendarSettings(calendarId)
     }
+
+    suspend fun getDefaultAlarms(calendarId: String, isEventAllDay: Boolean) = getCalendarSettings(calendarId)?.getDefaultAlarms(json, isEventAllDay)
 
     suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
         val userId = userId.value

@@ -24,6 +24,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import biweekly.property.Attendee
@@ -64,6 +65,7 @@ import kotlinx.android.synthetic.main.item_form_section.view.image_dot_icon
 import kotlinx.android.synthetic.main.item_form_section.view.image_icon
 import kotlinx.android.synthetic.main.item_form_section.view.text_header
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -88,6 +90,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -518,23 +521,34 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 visibleOrGone(true)
             }
 
-            val alarmLabels = event.iCalEvent.alarms.filter { it.action == Action.display() || it.action == Action.email() }
-                .sortedBy { it.trigger.duration.toMillis() }
-                .mapNotNull { alarm ->
-                    AndroidUtils.formatAlarm(
-                        resources,
-                        event.isAllDay(),
-                        eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())),
-                        event.getStart(eventViewModel.displayTimeZoneId),
-                        alarm
-                    )
-                }
+            lifecycleScope.launch {
+                val alarmLabels = if (event.calendar.isSubscribed) {
+                    calendarViewModel.getDefaultAlarms(event.calendar.id, event.isAllDay())
+                        ?: emptyList<VAlarm>().also {
+                            logger.e("could not get DefaultAlarms in EventDetailsFragment for subscribed event")
+                        }
+                } else {
+                    event.iCalEvent.alarms
+                }.filter { it.action == Action.display() || it.action == Action.email() }
+                    .sortedBy { it.trigger.duration.toMillis() }
+                    .mapNotNull { alarm ->
+                        AndroidUtils.formatAlarm(
+                            resources,
+                            event.isAllDay(),
+                            eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())),
+                            event.getStart(eventViewModel.displayTimeZoneId),
+                            alarm
+                        )
+                    }
 
-            section_alarms.visibleOrGone(alarmLabels.isNotEmpty())
-            if (alarmLabels.isNotEmpty()) {
-                with(section_alarms) {
-                    text_header.text = alarmLabels.joinToString(separator = "\n")
-                    image_icon.setImageResource(R.drawable.ic_proton_bell)
+                withContext(Dispatchers.Main) {
+                    section_alarms.visibleOrGone(alarmLabels.isNotEmpty())
+                    if (alarmLabels.isNotEmpty()) {
+                        with(section_alarms) {
+                            text_header.text = alarmLabels.joinToString(separator = "\n")
+                            image_icon.setImageResource(R.drawable.ic_proton_bell)
+                        }
+                    }
                 }
             }
 
