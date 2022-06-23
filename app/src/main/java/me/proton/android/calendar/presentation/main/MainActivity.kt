@@ -524,12 +524,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         // Update importer with the new token id and resume importer
                                         val userId = accountViewModel.getPrimaryUserId()
                                         if (userId != null) {
-                                            importAssistantViewModel.handleGoogleSignInRedirect(
+                                            if (!importAssistantViewModel.handleGoogleSignInRedirect(
                                                 userId,
                                                 code,
                                                 resources.getIntArray(R.array.accent_colors_base),
                                                 importerId
-                                            )
+                                            )) {
+                                                this@MainActivity.displaySnackBar(getString(R.string.import_assistant_update_import_error))
+                                            }
                                         } else this@MainActivity.displaySnackBar(getString(R.string.snack_network_error))
                                     }
                                 } else {
@@ -870,8 +872,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
-            if (IMPORT_FROM_GOOGLE) showCalendarsCreateOrImportDialog()
-            else onClickCreateCalendar()
+            lifecycleScope.launch {
+                if (IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false) showCalendarsCreateOrImportDialog()
+                else onClickCreateCalendar()
+            }
             drawer_layout.close()
         }
 

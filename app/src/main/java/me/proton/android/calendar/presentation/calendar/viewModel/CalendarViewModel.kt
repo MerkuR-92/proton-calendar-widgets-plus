@@ -789,6 +789,17 @@ class CalendarViewModel @Inject constructor(
         return user?.hasSubscription() == false
     }
 
+    suspend fun isDelinquentUser(): Boolean? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            return null
+        }
+        val user = userManager.getUserOrNull(userId, logger)
+        val delinquent = user?.delinquent?.value
+        return delinquent != null && delinquent >= 3 // We consider a user delinquent on the calendar side when the state is at least 3
+    }
+
     enum class UserCalendarLimit {
         ERROR,
         NOT_REACHED,

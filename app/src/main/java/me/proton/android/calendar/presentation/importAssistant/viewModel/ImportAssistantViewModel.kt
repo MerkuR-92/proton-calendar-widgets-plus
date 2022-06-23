@@ -72,7 +72,7 @@ class ImportAssistantViewModel @Inject constructor(
         viewModelJob.cancel()
     }
 
-    suspend fun getDefaultUserEmail(): String? {
+    private suspend fun getDefaultUserEmail(): String? {
         var userId = userId.value
         if (userId == null) {
             userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
@@ -138,7 +138,7 @@ class ImportAssistantViewModel @Inject constructor(
                         val externalCalendarList = getCalendarImportMappingInfoApiResponse.data.calendars
 
                         defaultUserEmail.value = getDefaultUserEmail() ?: run {
-                            // TODO HANDLE ERROR
+                            logger.e("ImportAssistantViewModel createImporter failed to get default user email")
                             return false
                         }
                         val importCalendarMappingList = arrayListOf<ImportCalendarMapping>()
@@ -269,7 +269,7 @@ class ImportAssistantViewModel @Inject constructor(
                 defaultAllDayAlarms
             )
             if (updateCalendarSettingsUseCaseResult !is UseCase.Result.Success<*>) {
-                // TODO HANDLE ERROR
+                logger.i("ImportAssistantViewModel createCalendar failed to update calendar settings")
                 return calendarId // Calendar has still been created
             }
 
@@ -281,14 +281,14 @@ class ImportAssistantViewModel @Inject constructor(
 
     fun setImportCalendar(calendarToImport: ImportCalendarMapping, importCalendar: Boolean): Int? {
         val currentList = _importCalendarMappingList.value
-        val indexOfItem = currentList?.indexOf(calendarToImport) ?: return null // TODO Handle null
+        val indexOfItem = currentList?.indexOf(calendarToImport) ?: return null
         currentList[indexOfItem].importCalendar = importCalendar
         _importCalendarMappingList.value = currentList
         return indexOfItem
     }
 
     suspend fun setCreateNewCalendar(calendarToImport: ImportCalendarMapping, calendarColor: Int) {
-        val defaultUserEmail = defaultUserEmail.value ?: getDefaultUserEmail() ?: return // TODO Handle null
+        val defaultUserEmail = defaultUserEmail.value ?: getDefaultUserEmail() ?: return
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -300,7 +300,7 @@ class ImportAssistantViewModel @Inject constructor(
             destinationEmail = defaultUserEmail,
             destinationColor = calendarColor
         )
-        val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return // TODO Handle null
+        val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
         val indexOfItem = currentList.indexOf(calendarToImport)
         // Replace previous item
         currentList.removeAt(indexOfItem)
@@ -309,7 +309,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendarEntity: CalendarEntity) {
-        val calendarEmail = getCalendarEmail(calendarEntity.id) ?: return // TODO Handle null
+        val calendarEmail = getCalendarEmail(calendarEntity.id) ?: return
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -321,9 +321,9 @@ class ImportAssistantViewModel @Inject constructor(
             destinationEmail = calendarEmail,
             destinationColor = Color.parseColor(calendarEntity.color)
         )
-        val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return // TODO Handle null
+        val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
         val indexOfItem = currentList.indexOf(calendarToImport)
-        if (indexOfItem < 0 || indexOfItem > currentList.lastIndex) return // TODO Handle error
+        if (indexOfItem < 0 || indexOfItem > currentList.lastIndex) return
         // Replace previous item
         currentList.removeAt(indexOfItem)
         currentList.add(indexOfItem, updatedCalendarToImport)

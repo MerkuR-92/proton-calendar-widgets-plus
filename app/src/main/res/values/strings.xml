@@ -465,6 +465,10 @@
     <string name="fragment_import_assistant_summary_merge_details">Merge %d %s in Proton Calendar.</string>
     <string name="import_assistant_summary_customize_import">Customize import</string>
     <string name="import_assistant_error">Error fetching data</string>
+    <string name="import_assistant_create_import_error">Failed to create import, please try again later</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later</string>
+    <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as">Import as</string>
     <string name="import_assistant_new_calendar_badge">New</string>
     <string name="import_assistant_merge_calendar_badge">Merged</string>

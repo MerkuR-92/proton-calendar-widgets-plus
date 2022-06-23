@@ -99,7 +99,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
         }
 
-        settings_import_press.visibleOrGone(IMPORT_FROM_GOOGLE)
+        lifecycleScope.launch {
+            settings_import_press.visibleOrGone(IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false)
+        }
         settings_import_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_import_assistant_guide)
         }

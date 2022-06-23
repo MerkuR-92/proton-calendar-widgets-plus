@@ -154,14 +154,19 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             val userId = accountViewModel.getPrimaryUserId()
             if (userId != null) {
                 // Create importer and fetch external calendars
-                importAssistantViewModel.handleGoogleSignInRedirect(
+                if (!importAssistantViewModel.handleGoogleSignInRedirect(
                     userId,
                     navigationArguments.code,
                     resources.getIntArray(R.array.accent_colors_base)
-                )
+                )) {
+                    // Display error snack and navigate back
+                    requireActivity().displaySnackBar(getString(R.string.import_assistant_create_import_error))
+                    findNavController().navigateUp()
+                }
             } else {
-                view.displaySnackBar(getString(R.string.snack_network_error))
-                // TODO Handle view state if error
+                // Display error snack and navigate back
+                requireActivity().displaySnackBar(getString(R.string.snack_network_error))
+                findNavController().navigateUp()
             }
         }
     }
@@ -201,11 +206,13 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID) {
                 fragment_import_assistant_summary_header_layout.visibleOrGone(false)
                 fragment_import_assistant_summary_error_layout.visibleOrGone(true)
-                val countCalendarsOverLimit =
+                var countCalendarsOverLimit =
                     if (isFreeUser) {
-                        userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
+                        if (userCalendarsCount >= MAX_CALENDAR_FREE) importCalendarsToCreateCount
+                        else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
                     } else {
-                        userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
+                        if (userCalendarsCount >= MAX_CALENDAR_PAID) importCalendarsToCreateCount
+                        else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
                 val calendarPluralString = resources.getQuantityString(R.plurals.calendar, countCalendarsOverLimit)
                 fragment_import_assistant_summary_error.text = getString(
@@ -236,7 +243,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
     private fun onStartImportClick() {
         val calendarsToImport = importAssistantViewModel.importCalendarMappingList.value?.filter { it.importCalendar }
-        if (calendarsToImport.isNullOrEmpty()) return // TODO Display Snack ?
+        if (calendarsToImport.isNullOrEmpty()) {
+            view?.displaySnackBar(getString(R.string.import_assistant_start_import_empty_error))
+            return
+        }
         lifecycleScope.launch {
             // Display loading state on import button
             fragment_import_assistant_import_button.setLoading()
@@ -258,7 +268,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             if (startImportResult) {
                 showImportInProgressView()
             } else {
-                // TODO ERROR display import mapping view again and error snack
+                showImportSummaryView(calendarsToImport)
+                view?.displaySnackBar(getString(R.string.import_assistant_start_import_error))
             }
         }
     }

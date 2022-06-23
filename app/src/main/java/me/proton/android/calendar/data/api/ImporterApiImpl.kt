@@ -300,8 +300,6 @@ data class ActiveCalendarImporterEntity(
     val state: Int, // 0: QUEUED, 1: RUNNING, 2: DONE, 3: FAILED, 4: PAUSED, 5: CANCELED
     @SerialName("ErrorCode")
     val errorCode: Int, // 1: Lost connection, 2: Storage limit reached
-    @SerialName("Mapping")
-    val mapping: List<ActiveImporterMappingEntity>
 )
 
 @Serializable
