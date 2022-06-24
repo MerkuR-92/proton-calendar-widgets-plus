@@ -6,6 +6,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
@@ -30,7 +31,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         logger.v("executing BootstrapCalendarsUseCase")
 
-        var allCalendars = calendarsRepository.fetchCalendars(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API")
+        var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
+        var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Member for allCalendars")
         var userCalendars = allCalendars.filterNot { it.isSubscribed }
 
         if (allCalendars.isNotEmpty() && allCalendars.any { it.isResetNeeded }) {
@@ -51,7 +53,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         var redoGetCalendars = false
 
         // We need to create a default calendar if user has none or has only subscribed calendars
-        if (userCalendars.isNullOrEmpty()) {
+        if (userCalendars.isEmpty()) {
 
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
@@ -108,8 +110,9 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         }
 
         if (redoGetCalendars) {
-            // GET the calendar list again after creating default one or fixing incomplete setup
-            allCalendars = calendarsRepository.fetchCalendars(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendars from API in redoGetCalendars")
+            // GET the calendar(entities) list again after creating default one or fixing incomplete setup
+            var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
+            var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Members for allCalendars in redoGetCalendars")
 
             // Subscribed calendars do not count for those checks
             userCalendars = allCalendars.filterNot { it.isSubscribed }
@@ -152,8 +155,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         val failedCalendarIds = mutableListOf<String>()
 
         allCalendars.forEach { calendar ->
-            // TODO this is not optimal, these CalendarEntities have been fetched already, maybe let's address this when we split bootstrap for each Calendar separately
-            val calendarEntity = calendarsRepository.fetchCalendarEntity(userId, calendar.id)
+            val calendarEntity = allCalendarEntities.find { it.id == calendar.id }
 
             val executeBootstrapResult = if (calendarEntity != null) {
                 boostrapCalendarUseCase.executeBootstrap(

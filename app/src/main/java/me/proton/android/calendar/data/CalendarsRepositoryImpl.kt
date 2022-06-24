@@ -191,12 +191,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         // if the calendar is inactive we keep the same flags but remove the disabled flag
         // we also check if the calendar is simply disabled or super owner disabled to correctly update it
         return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
-            flags - CalendarFlags.DISABLED.value
+            flags - MemberEntity.CalendarFlags.DISABLED.value
         } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
-            flags - CalendarFlags.SUPER_OWNER_DISABLED.value
+            flags - MemberEntity.CalendarFlags.SUPER_OWNER_DISABLED.value
         } else {
             // if the calendar is simply disabled we set the flags at active
-            CalendarFlags.ACTIVE.value
+            MemberEntity.CalendarFlags.ACTIVE.value
         }
     }
 
@@ -205,10 +205,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         // if the calendar is inactive we keep the same flags but add the disabled flag
         return if (dbCalendar.isInactive) {
-            flags + CalendarFlags.DISABLED.value
+            flags + MemberEntity.CalendarFlags.DISABLED.value
         } else {
             // if the calendar is simply active we set the flags at disabled
-            CalendarFlags.DISABLED.value
+            MemberEntity.CalendarFlags.DISABLED.value
         }
     }
 
@@ -409,11 +409,20 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
-        val calendarEntities = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars ?: return null
-
-        return calendarEntities.map {
+        return fetchCalendarEntities(userId)?.map {
             val member = fetchMembers(userId, it.id)?.firstOrNull() ?: return null
             Calendar.from(it, member)
+        }
+    }
+
+    override suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>? = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+
+    override suspend fun fetchMembersToCalendarEntities(
+        userId: UserId,
+        calendars: List<CalendarEntity>
+    ): List<Calendar>? {
+        return calendars.map {
+            Calendar.from(it, fetchMembers(userId, it.id)?.firstOrNull() ?: return null)
         }
     }
 

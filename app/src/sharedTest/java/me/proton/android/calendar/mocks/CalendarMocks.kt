@@ -50,7 +50,7 @@ object CalendarMocks {
             calendarId,
             calendarName,
             calendarColor,
-            if (hasDisabledCalendar) CalendarFlags.DISABLED.value else calendarFlags,
+            if (hasDisabledCalendar) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType
         )

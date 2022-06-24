@@ -8,7 +8,6 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -84,9 +83,9 @@ class CalendarMemberEventListenerTest {
     fun `handleIncompleteKeys executes key setup calendars needing it`() {
         runBlocking {
             val entities = listOf(
-                provideMemberEntity(flags = CalendarFlags.INCOMPLETE_SETUP.value),
-                provideMemberEntity(flags = CalendarFlags.ACTIVE.value),
-                provideMemberEntity(flags = CalendarFlags.ACTIVE.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
             )
             val events = entities.map { Event(Action.Create, "id", it) }
             coEvery { keySetupUseCase.execute(any(), any()) } returns UseCase.Result.Success(Unit)
@@ -102,9 +101,9 @@ class CalendarMemberEventListenerTest {
     fun `handleIncompleteKeys will remove the incomplete flag from a calendar and makes it active if it can't be fetched`() {
         runBlocking {
             val entities = listOf(
-                provideMemberEntity(flags = CalendarFlags.INCOMPLETE_SETUP.value),
-                provideMemberEntity(flags = CalendarFlags.ACTIVE.value),
-                provideMemberEntity(flags = CalendarFlags.ACTIVE.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
+                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
             )
             val events = entities.map { Event(Action.Create, "id", it) }
             coEvery { keySetupUseCase.execute(any(), any()) } returns UseCase.Result.Success(Unit)

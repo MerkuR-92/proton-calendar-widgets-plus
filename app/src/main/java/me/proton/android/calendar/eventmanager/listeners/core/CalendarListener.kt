@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase

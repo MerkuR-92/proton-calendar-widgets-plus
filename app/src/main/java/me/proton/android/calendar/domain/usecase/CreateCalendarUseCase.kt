@@ -113,9 +113,9 @@ class CreateCalendarUseCase @Inject constructor(
                                 keySetupResult
                             }
                             is UseCase.Result.Error -> {
-                                // Try and fetch the calendar to check that the key setup wasn't done by another client in the meantime
-                                val fetchedCalendar = calendarsRepository.fetchCalendar(userId, calendarId)
-                                if (fetchedCalendar == null || fetchedCalendar.hasIncompleteKeySetup) {
+                                // Try and fetch the Member to check that the key setup wasn't done by another client in the meantime
+                                val fetchedMember = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull()
+                                if (fetchedMember == null || fetchedMember.hasIncompleteKeySetup) {
                                     logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}")
                                     keySetupResult
                                 } else { // key setup has been done on the server in the meantime

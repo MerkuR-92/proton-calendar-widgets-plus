@@ -50,7 +50,7 @@ class TransformEventUseCase @Inject constructor(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
-        val calendar = database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database) ?: return null
+        val calendar = calendarEntity.joinToCalendar(database) ?: return null
 
         val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
         if (calendarPrivateKeys.isNullOrEmpty()) {

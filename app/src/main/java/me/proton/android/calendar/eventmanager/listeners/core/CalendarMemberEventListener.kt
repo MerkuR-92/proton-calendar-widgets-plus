@@ -3,7 +3,6 @@ package me.proton.android.calendar.eventmanager.listeners.core
 import androidx.annotation.VisibleForTesting
 import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -57,9 +56,9 @@ class CalendarMemberEventListener @Inject constructor(
                             logger.e("CalendarMemberEventListener: error getting member from API after keySetupUseCase success")
 
                             var calendarFlags = entity.flags
-                            calendarFlags -= CalendarFlags.INCOMPLETE_SETUP.value
+                            calendarFlags -= MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value
                             // if calendar is inactive and no other error flags are set, make it active
-                            if (calendarFlags == 0) calendarFlags = CalendarFlags.ACTIVE.value
+                            if (calendarFlags == 0) calendarFlags = MemberEntity.CalendarFlags.ACTIVE.value
 
                             entity.copy(flags = calendarFlags)
                         } else {

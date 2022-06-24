@@ -68,6 +68,13 @@ interface CalendarsRepository {
 
     suspend fun fetchCalendars(userId: UserId): List<Calendar>?
 
+    suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>?
+
+    /**
+     * Fetches and combines MemberEntity with supplied CalendarEntities
+     */
+    suspend fun fetchMembersToCalendarEntities(userId: UserId, calendars: List<CalendarEntity>): List<Calendar>?
+
     suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>?
 
     suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar?
