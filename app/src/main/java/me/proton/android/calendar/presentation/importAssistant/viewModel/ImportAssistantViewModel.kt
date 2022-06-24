@@ -148,7 +148,7 @@ class ImportAssistantViewModel @Inject constructor(
                 _sourceEmail.value = createAccessTokenApiResponse.data.token.account
 
                 if (importerId != null) {
-                    updateImporter(userId, tokenId, importerId)
+                    updateImporter(userId, tokenId, importerId, createAccessTokenApiResponse.data.token.account)
                 } else {
                     createImporter(userId, tokenId, createAccessTokenApiResponse.data.token.account, calendarColors)
                 }
@@ -220,7 +220,18 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    private suspend fun updateImporter(userId: UserId, tokenId: String, importerId: String): Boolean {
+    private suspend fun updateImporter(userId: UserId, tokenId: String, importerId: String, sourceEmail: String): Boolean {
+
+        val importer = getImporter(importerId) ?: run {
+            logger.e("ImportAssistantViewModel updateImporter failed to get importer")
+            return false
+        }
+
+        if (importer.account != sourceEmail) {
+            logger.e("ImportAssistantViewModel updateImporter incorrect google account")
+            return false
+        }
+
         // Update the importer with the new token id
         return when (val updateCalendarImporterApiResponse = importerApi.updateCalendarImporter(userId, importerId, tokenId)) {
             is ApiResponse.Success -> {
@@ -390,6 +401,28 @@ class ImportAssistantViewModel @Inject constructor(
             }
             is ApiResponse.Exception -> {
                 logger.e(getImportersApiResponse.exception.message ?: "(no exception message)")
+            }
+        }
+    }
+
+    suspend fun getImporter(importerId: String): ImporterEntity? {
+        var userId = userId.value
+        if (userId == null) {
+            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
+            _userId.value = userId
+        }
+
+       return when (val getImporterApiResponse = importerApi.getImporter(userId, importerId)) {
+            is ApiResponse.Success -> {
+                return getImporterApiResponse.data.importer
+            }
+            is ApiResponse.Error -> {
+                logger.e(getImporterApiResponse.error)
+                null
+            }
+            is ApiResponse.Exception -> {
+                logger.e(getImporterApiResponse.exception.message ?: "(no exception message)")
+                null
             }
         }
     }

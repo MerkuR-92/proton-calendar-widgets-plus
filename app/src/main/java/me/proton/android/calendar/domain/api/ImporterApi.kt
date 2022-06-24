@@ -8,6 +8,7 @@ import me.proton.android.calendar.data.api.CreateAccessTokenApiResponse
 import me.proton.android.calendar.data.api.CreateImporterApiResponse
 import me.proton.android.calendar.data.api.DeleteReportApiResponse
 import me.proton.android.calendar.data.api.GoogleClientIdApiResponse
+import me.proton.android.calendar.data.api.ImporterApiResponse
 import me.proton.android.calendar.data.api.ImportersApiResponse
 import me.proton.android.calendar.data.api.ReportsApiResponse
 import me.proton.android.calendar.data.api.ResumeImportApiResponse
@@ -51,6 +52,11 @@ interface ImporterApi {
      *  Get all the importers. The Active field is present if there is an ongoing import.
      */
     suspend fun getImporters(userId: UserId): ApiResponse<ImportersApiResponse>
+
+    /**
+     *  Get one importer.
+     */
+    suspend fun getImporter(userId: UserId, importerId: String): ApiResponse<ImporterApiResponse>
 
     /**
      *  This route returns a history of the finished imports.

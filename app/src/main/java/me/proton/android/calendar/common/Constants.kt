@@ -194,9 +194,9 @@ object AppLinksQueryParameters {
     const val RECURRENCE_ID = "RecurrenceID"
     const val ACTION = "Action"
 
-    const val CODE = "code"
-    const val SCOPE = "scope"
-    const val STATE = "state"
+    const val EASY_SWITCH_CODE = "code"
+    const val EASY_SWITCH_SCOPE = "scope"
+    const val EASY_SWITCH_STATE = "state"
 }
 
 object CalendarImport {

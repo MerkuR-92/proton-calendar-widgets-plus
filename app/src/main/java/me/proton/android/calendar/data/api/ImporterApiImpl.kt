@@ -41,6 +41,9 @@ interface ImporterApiService : BaseRetrofitApi {
     @GET("importer/v1/importers")
     suspend fun getImporters(): ImportersApiResponse
 
+    @GET("importer/v1/importers/{importerId}")
+    suspend fun getImporter(@Path("importerId") importerId: String): ImporterApiResponse
+
     @GET("importer/v1/reports")
     suspend fun getReports(): ReportsApiResponse
 
@@ -117,6 +120,11 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
     override suspend fun getImporters(userId: UserId): ApiResponse<ImportersApiResponse> =
         apiProvider.get<ImporterApiService>(userId).invoke {
             getImporters()
+        }.toApiResponse()
+
+    override suspend fun getImporter(userId: UserId, importerId: String): ApiResponse<ImporterApiResponse> =
+        apiProvider.get<ImporterApiService>(userId).invoke {
+            getImporter(importerId)
         }.toApiResponse()
 
     override suspend fun getReports(userId: UserId): ApiResponse<ReportsApiResponse> =
@@ -270,6 +278,14 @@ data class ImportersApiResponse(
     override val code: Int,
     @SerialName("Importers")
     val importers: List<ImporterEntity>
+): BaseApiResponse()
+
+@Serializable
+data class ImporterApiResponse(
+    @SerialName("Code")
+    override val code: Int,
+    @SerialName("Importer")
+    val importer: ImporterEntity
 ): BaseApiResponse()
 
 @Serializable
