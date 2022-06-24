@@ -53,7 +53,7 @@ class CalendarMemberEventListener @Inject constructor(
                 when (val result = keySetupUseCase.execute(config.userId, entity.id)) {
                     is UseCase.Result.Success<*> -> {
                         val fetchedMember = calendarsRepository.fetchMembers(config.userId, entity.calendarId)?.firstOrNull()
-                        if (fetchedMember != null) {
+                        if (fetchedMember == null) {
                             logger.e("CalendarMemberEventListener: error getting member from API after keySetupUseCase success")
 
                             var calendarFlags = entity.flags
