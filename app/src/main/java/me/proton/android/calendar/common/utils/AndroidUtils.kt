@@ -1339,5 +1339,3 @@ object AndroidUtils {
         return String.format("%.1f %ciB", value / 1024.0, ci.current())
     }
 }
-
-

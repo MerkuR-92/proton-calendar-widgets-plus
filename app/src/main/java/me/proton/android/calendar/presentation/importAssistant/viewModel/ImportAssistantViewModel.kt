@@ -9,6 +9,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
+import me.proton.android.calendar.common.CalendarImport
+import me.proton.android.calendar.common.CalendarImport.ACCESS_TYPE
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_AUTH_BASE_URL
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_SCOPES
+import me.proton.android.calendar.common.CalendarImport.PROMPT
+import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
+import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
@@ -70,6 +77,37 @@ class ImportAssistantViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    private suspend fun getGoogleClientId(userId: UserId): String? {
+        importerApi.getGoogleClientId(userId)
+        return when (val googleClientIdApiResponse = importerApi.getGoogleClientId(userId)) {
+            is ApiResponse.Success -> {
+                googleClientIdApiResponse.data.config.googleClientId
+            }
+            is ApiResponse.Error -> {
+                logger.e(googleClientIdApiResponse.error)
+                null
+            }
+            is ApiResponse.Exception -> {
+                logger.e(googleClientIdApiResponse.exception.message ?: "(no exception message)")
+                null
+            }
+        }
+    }
+
+    /**
+     * Use importerId parameter if we need to updated an existing importer
+     */
+    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String {
+        return GOOGLE_AUTH_BASE_URL +
+                "scope=${GOOGLE_SCOPES}" +
+                "&accessType=${ACCESS_TYPE}" +
+                "&redirect_uri=${REDIRECT_URI}" +
+                "&response_type=${RESPONSE_TYPE}"+
+                "&client_id=${getGoogleClientId(userId)}" +
+                "&prompt=${PROMPT}" +
+                if (importerId.isNullOrBlank()) "" else "&state=$importerId" // Specifies any string value that your application uses to maintain state between your authorization request and the authorization server's response
     }
 
     private suspend fun getDefaultUserEmail(): String? {

@@ -194,7 +194,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             // Lost connection, we need to sign in to Google and create a new token to update importer
                             val userId = accountViewModel.getPrimaryUserId()
                             if (userId != null) {
-                                val googleAuthenticationUrl = mainViewModel.getGoogleAuthenticationUrl(userId, import.id)
+                                val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId, import.id)
                                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
                                 startActivity(browserIntent)
                             } else {

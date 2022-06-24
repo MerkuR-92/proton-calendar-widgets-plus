@@ -87,8 +87,11 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             view?.displaySnackBar(getString(R.string.import_assistant_in_progress_snack))
             return
         }
-        displayDiscardChangesConfirmationDialog { _, _ ->
-            findNavController().navigateUp()
+        if (fragment_import_assistant_close_button.visibility == View.VISIBLE) findNavController().navigateUp()
+        else {
+            displayDiscardChangesConfirmationDialog { _, _ ->
+                findNavController().navigateUp()
+            }
         }
     }
 
@@ -198,7 +201,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         val userCalendars = calendarViewModel.userCalendars.value ?: return
         val userCalendarsCount = userCalendars.size
         val importCalendarMappingList = importAssistantViewModel.importCalendarMappingList.value ?: return
-        val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar }.size
+        val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
 
         lifecycleScope.launch {
             val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
@@ -369,7 +372,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
 
         // Display calendars to create count
-        val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar }.size
+        val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
         fragment_import_assistant_summary_create_details.visibleOrGone(calendarsToCreate > 0)
         fragment_import_assistant_summary_create_details.text = getString(
             R.string.fragment_import_assistant_summary_create_details,
@@ -378,7 +381,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
 
         // Display calendars to merge count
-        val calendarsToMerge = importCalendarMappingList.size - calendarsToCreate
+        val calendarsToMerge = importCalendarMappingList.filter { !it.createDestinationCalendar && it.importCalendar }.size
         fragment_import_assistant_summary_merge_details.visibleOrGone(calendarsToMerge > 0)
         fragment_import_assistant_summary_merge_details.text = getString(
             R.string.fragment_import_assistant_summary_merge_details,

@@ -219,35 +219,4 @@ class MainViewModel @Inject constructor(
         if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
     }
-
-    private suspend fun getGoogleClientId(userId: UserId): String? {
-        importerApi.getGoogleClientId(userId)
-        return when (val googleClientIdApiResponse = importerApi.getGoogleClientId(userId)) {
-            is ApiResponse.Success -> {
-                googleClientIdApiResponse.data.config.googleClientId
-            }
-            is ApiResponse.Error -> {
-                logger.e(googleClientIdApiResponse.error)
-                null
-            }
-            is ApiResponse.Exception -> {
-                logger.e(googleClientIdApiResponse.exception.message ?: "(no exception message)")
-                null
-            }
-        }
-    }
-
-    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String {
-
-        val baseUrl = GOOGLE_AUTH_BASE_URL
-        val scopes = GOOGLE_SCOPES
-        val accessType = ACCESS_TYPE
-        val redirectUri = REDIRECT_URI
-        val responseType = RESPONSE_TYPE
-        val clientId = getGoogleClientId(userId)
-        val prompt = PROMPT
-        val state = if (importerId.isNullOrBlank()) "" else "&state=$importerId"
-
-        return "${baseUrl}scope=${scopes}&accessType=${accessType}&redirect_uri=${redirectUri}&response_type=${responseType}&client_id=${clientId}&prompt=${prompt}$state"
-    }
 }

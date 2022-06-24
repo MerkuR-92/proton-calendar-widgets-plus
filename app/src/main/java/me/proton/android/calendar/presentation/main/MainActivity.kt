@@ -15,7 +15,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -45,12 +44,6 @@ import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.dialog_google_auth.view.dialog_google_auth_description
-import kotlinx.android.synthetic.main.dialog_google_auth.view.dialog_google_auth_title
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_negative_button
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_positive_button
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_description
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_title
 import kotlinx.android.synthetic.main.nav_view_main.*
 import kotlinx.android.synthetic.main.nav_view_main.view.*
 import kotlinx.coroutines.*
@@ -64,11 +57,11 @@ import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
-import me.proton.android.calendar.common.AppLinksQueryParameters.CODE
+import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_CODE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
-import me.proton.android.calendar.common.AppLinksQueryParameters.SCOPE
-import me.proton.android.calendar.common.AppLinksQueryParameters.STATE
+import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_SCOPE
+import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_STATE
 import me.proton.android.calendar.common.CalendarImport.ERROR
 import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
@@ -78,7 +71,6 @@ import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -512,13 +504,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             val action = appLinkData?.getQueryParameter(ACTION)
 
                             // Handle import redirect link
-                            val code = appLinkData?.getQueryParameter(CODE)
-                            val scope = appLinkData?.getQueryParameter(SCOPE)
+                            val easySwitchCode = appLinkData?.getQueryParameter(EASY_SWITCH_CODE)
+                            val easySwitchScope = appLinkData?.getQueryParameter(EASY_SWITCH_SCOPE)
 
                             if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
                                 handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
-                            } else if (code != null && scope != null) {
-                                val importerId = appLinkData.getQueryParameter(STATE) // Contains importerId when doing resume import process
+                            } else if (easySwitchCode != null && easySwitchScope != null) {
+                                val importerId = appLinkData.getQueryParameter(EASY_SWITCH_STATE) // Contains importerId when doing resume import process
                                 if (importerId != null) {
                                     lifecycleScope.launch {
                                         // Update importer with the new token id and resume importer
@@ -526,7 +518,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         if (userId != null) {
                                             if (!importAssistantViewModel.handleGoogleSignInRedirect(
                                                 userId,
-                                                code,
+                                                easySwitchCode,
                                                 resources.getIntArray(R.array.accent_colors_base),
                                                 importerId
                                             )) {
@@ -535,7 +527,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         } else this@MainActivity.displaySnackBar(getString(R.string.snack_network_error))
                                     }
                                 } else {
-                                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(code)
+                                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(easySwitchCode)
                                     safeNavigateToDialogFragment(importAssistantDeepLink)
                                 }
                             } else {
@@ -1016,7 +1008,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 lifecycleScope.launch {
                     val userId = accountViewModel.getPrimaryUserId()
                     if (userId != null) {
-                        val googleAuthenticationUrl = mainViewModel.getGoogleAuthenticationUrl(userId)
+                        val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId)
                         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
                         startActivity(browserIntent)
                     } else {
