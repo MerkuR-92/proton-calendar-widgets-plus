@@ -147,40 +147,13 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCalendarsFlags(userId: UserId) {
-        val dbMembers = database.membersDao().selectMembers()
-        val remoteCalendars = fetchCalendars(userId)
-        remoteCalendars?.forEach { remoteCalendar ->
-            val remoteMembers = fetchMembers(userId, remoteCalendar.id)
-            remoteMembers?.forEach { remoteMember ->
-                dbMembers.find { it.id == remoteMember.id }?.let { dbMember ->
-                    if (dbMember.flags != remoteMember.flags) {
-                        database.membersDao().updateFlags(remoteMember.id, remoteMember.calendarId, remoteMember.flags)
-                    }
-                }
-            }
-        }
-    }
+        val remoteMembers = calendarsApi.getAllMembers(userId).valueOrNullAndLogErrors(logger)
 
-    // TODO we should probably get rid of this and re-query Member from API to get the flags
-    override suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String) {
-        // Members objects are used to link an Address and the Calendars that are part of it
-        val members = database.membersDao().selectByAddress(address)
-        members.map { it.calendarId }.forEach {
-            selectCalendar(it)?.let { dbCalendar ->
-
-                val dbMember = selectMembers(dbCalendar.id).firstOrNull()
-
-                if (dbMember == null) {
-                    logger.e("could not find member in refreshCalendarsFlagsForAddress")
-                } else {
-                    var flags = dbMember.flags
-                    if (!enabled && !dbCalendar.isDisabled) {
-                        flags = addDisabledFlag(flags, dbCalendar)
-                    } else if (enabled && dbCalendar.isDisabled) {
-                        flags = removeDisabledFlag(flags, dbCalendar)
-                    }
-                    database.membersDao().updateFlags(dbMember.id, dbMember.calendarId, flags)
-                }
+        remoteMembers?.members?.forEach {
+            if (hasCalendar(it.calendarId)) {
+                persistMember(it)
+            } else {
+                logger.i("refreshCalendarsFlags: Member's Calendar doesn't exist locally")
             }
         }
     }

@@ -139,8 +139,6 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendarsFlags(userId: UserId)
 
-    suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String)
-
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself
      * if there is only one event with this UID.

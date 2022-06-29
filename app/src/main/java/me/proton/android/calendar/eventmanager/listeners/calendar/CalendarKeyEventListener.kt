@@ -47,8 +47,6 @@ class CalendarKeyEventListener @Inject constructor(
         val updatedItems = getActionMap(config)[Action.Create].orEmpty() + getActionMap(config)[Action.Update].orEmpty()
         if (updatedItems.isEmpty()) return
 
-        // TODO If new key, fetch all calendars to get flags (flags are not yet returned in fetch by id)
-        //  Replace this with select calendar by id once BE implements updated flags there
         calendarsRepository.refreshCalendarsFlags(config.userId)
     }
 }

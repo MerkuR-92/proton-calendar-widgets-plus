@@ -73,6 +73,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @POST("calendar/$API_VERSION_CALENDAR")
     suspend fun createCalendar(@Body body: CreateCalendarApiRequest) : CalendarApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/members")
+    suspend fun getAllMembers() : MemberListApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/members")
     suspend fun getMemberList(@Path("calendarId") calendarId: String) : MemberListApiResponse
 
@@ -214,6 +217,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     override suspend fun createCalendar(userId: UserId, body: CreateCalendarApiRequest): ApiResponse<CalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             createCalendar(body)
+        }.toApiResponse()
+
+    override suspend fun getAllMembers(userId: UserId): ApiResponse<MemberListApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getAllMembers()
         }.toApiResponse()
 
     override suspend fun getMemberList(userId: UserId, calendarId: String): ApiResponse<MemberListApiResponse> =
