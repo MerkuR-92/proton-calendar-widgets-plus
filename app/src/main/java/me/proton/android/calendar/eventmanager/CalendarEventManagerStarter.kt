@@ -1,6 +1,5 @@
 package me.proton.android.calendar.eventmanager
 
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -17,21 +16,21 @@ import me.proton.core.accountmanager.presentation.observe
 import me.proton.core.accountmanager.presentation.onAccountDisabled
 import me.proton.core.accountmanager.presentation.onAccountReady
 import me.proton.core.domain.entity.UserId
-import me.proton.core.eventmanager.data.EventManagerCoroutineScope
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.EventManagerConfig.Core
 import me.proton.core.eventmanager.domain.EventManagerProvider
 import me.proton.core.presentation.app.AppLifecycleProvider
+import me.proton.core.util.kotlin.CoroutineScopeProvider
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CalendarEventManagerStarter @Inject constructor(
-    @EventManagerCoroutineScope private val coroutineScope: CoroutineScope,
     private val appLifecycleProvider: AppLifecycleProvider,
     private val eventManagerProvider: EventManagerProvider,
     private val accountManager: AccountManager,
     private val calendarsRepository: CalendarsRepository,
+    private val scopeProvider: CoroutineScopeProvider
 ) {
     fun start() {
         accountManager.observe(appLifecycleProvider.lifecycle)
@@ -50,7 +49,7 @@ class CalendarEventManagerStarter @Inject constructor(
                         eventManagerProvider.get(EventManagerConfig.Calendar(userId, it.id)).start()
                     }
                 }
-            }.launchIn(coroutineScope)
+            }.launchIn(scopeProvider.GlobalDefaultSupervisedScope)
     }
 
     private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<Calendar>>> =
