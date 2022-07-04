@@ -14,4 +14,6 @@ data class ImportCalendarMapping(
     var destinationName: String,
     var destinationEmail: String,
     var destinationColor: Int
-)
+) {
+    val mergeCalendar: Boolean get() = !createDestinationCalendar
+}

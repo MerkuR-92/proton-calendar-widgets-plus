@@ -52,8 +52,7 @@ class MainViewModel @Inject constructor(
     private val userSettingsRepository: UserSettingsRepository,
     private val feedbackApi: FeedbackApi,
     private val importerApi: ImporterApi,
-    private val logger: Logger,
-    private val importFromGoogleUseCase: ImportFromGoogleUseCase
+    private val logger: Logger
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()

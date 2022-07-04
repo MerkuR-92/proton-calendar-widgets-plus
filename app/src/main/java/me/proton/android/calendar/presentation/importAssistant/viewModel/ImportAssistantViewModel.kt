@@ -26,6 +26,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -73,28 +74,9 @@ class ImportAssistantViewModel @Inject constructor(
 
     private lateinit var importerId: String
 
-    private var viewModelJob = Job()
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
-
     private suspend fun getGoogleClientId(userId: UserId): String? {
         importerApi.getGoogleClientId(userId)
-        return when (val googleClientIdApiResponse = importerApi.getGoogleClientId(userId)) {
-            is ApiResponse.Success -> {
-                googleClientIdApiResponse.data.config.googleClientId
-            }
-            is ApiResponse.Error -> {
-                logger.e(googleClientIdApiResponse.error)
-                null
-            }
-            is ApiResponse.Exception -> {
-                logger.e(googleClientIdApiResponse.exception.message ?: "(no exception message)")
-                null
-            }
-        }
+        return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId
     }
 
     /**
@@ -143,82 +125,49 @@ class ImportAssistantViewModel @Inject constructor(
 
     suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, calendarColors: IntArray, importerId: String? = null): Boolean {
         // Create Access token resource
-        return when (val createAccessTokenApiResponse = importerApi.createAccessToken(userId, code)) {
-            is ApiResponse.Success -> {
-                val tokenId = createAccessTokenApiResponse.data.token.id
-                _sourceEmail.value = createAccessTokenApiResponse.data.token.account
+        val token = importerApi.createAccessToken(userId, code).valueOrNullAndLogErrors(logger)?.token ?: return false
+        val tokenId = token.id
+        _sourceEmail.value = token.account
 
-                if (importerId != null) {
-                    updateImporter(userId, tokenId, importerId, createAccessTokenApiResponse.data.token.account)
-                } else {
-                    createImporter(userId, tokenId, createAccessTokenApiResponse.data.token.account, calendarColors)
-                }
-            }
-            is ApiResponse.Error -> {
-                logger.e(createAccessTokenApiResponse.error)
-                return false
-            }
-            is ApiResponse.Exception -> {
-                logger.e(createAccessTokenApiResponse.exception.message ?: "(no exception message)")
-                return false
-            }
+        return if (importerId != null) {
+            updateImporter(userId, tokenId, importerId, token.account)
+        } else {
+            createImporter(userId, tokenId, token.account, calendarColors)
         }
     }
 
     private suspend fun createImporter(userId: UserId, tokenId: String, account: String, calendarColors: IntArray): Boolean {
         // Create the importer for the required products
-        return when (val createCalendarImporterApiResponse = importerApi.createCalendarImporter(userId, tokenId)) {
-            is ApiResponse.Success -> {
-                importerId = createCalendarImporterApiResponse.data.importerID
+        val importerId = importerApi.createCalendarImporter(userId, tokenId).valueOrNullAndLogErrors(logger)?.importerID ?: return false
 
-                // Get all the importer mapping info
-                when (val getCalendarImportMappingInfoApiResponse = importerApi.getCalendarImportMappingInfo(userId, importerId)) {
-                    is ApiResponse.Success -> {
-                        val externalCalendarList = getCalendarImportMappingInfoApiResponse.data.calendars
+        // Get all the importer mapping info
+        val externalCalendarList = importerApi.getCalendarImportMappingInfo(userId, importerId).valueOrNullAndLogErrors(logger)?.calendars ?: return false
 
-                        defaultUserEmail.value = getDefaultUserEmail() ?: run {
-                            logger.e("ImportAssistantViewModel createImporter failed to get default user email")
-                            return false
-                        }
-                        val importCalendarMappingList = arrayListOf<ImportCalendarMapping>()
-                        externalCalendarList.forEach {
-                            importCalendarMappingList.add(
-                                ImportCalendarMapping(
-                                    importCalendar = true, // Set to true by default
-                                    sourceId = it.id,
-                                    sourceName = it.source.ellipsize(100),
-                                    sourceEmail = account,
-                                    createDestinationCalendar = true,
-                                    destinationId = null,
-                                    destinationName = it.source.ellipsize(100),
-                                    destinationEmail = defaultUserEmail.value!!,
-                                    destinationColor = calendarColors.random()
-                                )
-                            )
-                        }
-                        _importCalendarMappingList.value = importCalendarMappingList
-
-                        true
-                    }
-                    is ApiResponse.Error -> {
-                        logger.e(getCalendarImportMappingInfoApiResponse.error)
-                        return false
-                    }
-                    is ApiResponse.Exception -> {
-                        logger.e(getCalendarImportMappingInfoApiResponse.exception.message ?: "(no exception message)")
-                        return false
-                    }
-                }
-            }
-            is ApiResponse.Error -> {
-                logger.e(createCalendarImporterApiResponse.error)
-                return false
-            }
-            is ApiResponse.Exception -> {
-                logger.e(createCalendarImporterApiResponse.exception.message ?: "(no exception message)")
-                return false
-            }
+        defaultUserEmail.value = getDefaultUserEmail() ?: run {
+            logger.e("ImportAssistantViewModel createImporter failed to get default user email")
+            return false
         }
+
+        // Map external calendars to ImportCalendarMapping list
+        val importCalendarMappingList = arrayListOf<ImportCalendarMapping>()
+        externalCalendarList.forEach {
+            importCalendarMappingList.add(
+                ImportCalendarMapping(
+                    importCalendar = true, // Set to true by default
+                    sourceId = it.id,
+                    sourceName = it.source.ellipsize(100),
+                    sourceEmail = account,
+                    createDestinationCalendar = true, // Set to true by default
+                    destinationId = null, // Set to null by default (calendar has yet to be created)
+                    destinationName = it.source.ellipsize(100),
+                    destinationEmail = defaultUserEmail.value!!,
+                    destinationColor = calendarColors.random()
+                )
+            )
+        }
+        _importCalendarMappingList.value = importCalendarMappingList
+
+        return true
     }
 
     private suspend fun updateImporter(userId: UserId, tokenId: String, importerId: String, sourceEmail: String): Boolean {
@@ -234,23 +183,16 @@ class ImportAssistantViewModel @Inject constructor(
         }
 
         // Update the importer with the new token id
-        return when (val updateCalendarImporterApiResponse = importerApi.updateCalendarImporter(userId, importerId, tokenId)) {
-            is ApiResponse.Success -> {
-                // Resume import
-                if (resumeImport(importerId)) {
-                    if (_importerList.value?.any { it.id == importerId } == true) getImporters() // Refresh importers list if it has the importer
-                    true
-                } else false
+        importerApi.updateCalendarImporter(userId, importerId, tokenId).valueOrNullAndLogErrors(logger) ?: return false
+
+        // Resume import
+        return if (resumeImport(importerId)) {
+            if (_importerList.value?.any { it.id == importerId } == true) {
+                // Refresh importers list if it has the importer
+                getImporters()
             }
-            is ApiResponse.Error -> {
-                logger.e(updateCalendarImporterApiResponse.error)
-                return false
-            }
-            is ApiResponse.Exception -> {
-                logger.e(updateCalendarImporterApiResponse.exception.message ?: "(no exception message)")
-                return false
-            }
-        }
+            true
+        } else false
     }
 
     suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): Boolean {
@@ -260,6 +202,7 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
+        // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
             if (it.destinationId != null) {
                 CalendarMappingEntity(
@@ -268,19 +211,10 @@ class ImportAssistantViewModel @Inject constructor(
                 )
             } else null
         }
-        return when (val startImporterApiResponse = importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping)) {
-            is ApiResponse.Success -> {
-                true
-            }
-            is ApiResponse.Error -> {
-                logger.e(startImporterApiResponse.error)
-                false
-            }
-            is ApiResponse.Exception -> {
-                logger.e(startImporterApiResponse.exception.message ?: "(no exception message)")
-                false
-            }
-        }
+
+        // Start importer
+        importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping).valueOrNullAndLogErrors(logger) ?: return false
+        return true
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
@@ -393,39 +327,18 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
-        when (val getImportersApiResponse = importerApi.getImporters(userId)) {
-            is ApiResponse.Success -> {
-                _importerList.value = getImportersApiResponse.data.importers
-            }
-            is ApiResponse.Error -> {
-                logger.e(getImportersApiResponse.error)
-            }
-            is ApiResponse.Exception -> {
-                logger.e(getImportersApiResponse.exception.message ?: "(no exception message)")
-            }
-        }
+        val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return
+        _importerList.value = importers
     }
 
-    suspend fun getImporter(importerId: String): ImporterEntity? {
+    private suspend fun getImporter(importerId: String): ImporterEntity? {
         var userId = userId.value
         if (userId == null) {
             userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
             _userId.value = userId
         }
 
-       return when (val getImporterApiResponse = importerApi.getImporter(userId, importerId)) {
-            is ApiResponse.Success -> {
-                return getImporterApiResponse.data.importer
-            }
-            is ApiResponse.Error -> {
-                logger.e(getImporterApiResponse.error)
-                null
-            }
-            is ApiResponse.Exception -> {
-                logger.e(getImporterApiResponse.exception.message ?: "(no exception message)")
-                null
-            }
-        }
+        return importerApi.getImporter(userId, importerId).valueOrNullAndLogErrors(logger)?.importer
     }
 
     suspend fun getReports() {
@@ -435,17 +348,8 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
-        when (val getReportsApiResponse = importerApi.getReports(userId)) {
-            is ApiResponse.Success -> {
-                _reportList.value = getReportsApiResponse.data.reports
-            }
-            is ApiResponse.Error -> {
-                logger.e(getReportsApiResponse.error)
-            }
-            is ApiResponse.Exception -> {
-                logger.e(getReportsApiResponse.exception.message ?: "(no exception message)")
-            }
-        }
+        val reports = importerApi.getReports(userId).valueOrNullAndLogErrors(logger)?.reports ?: return
+        _reportList.value = reports
     }
 
     suspend fun cancelImport(importId: String): Boolean {
@@ -455,19 +359,8 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
-        return when (val cancelImportApiResponse = importerApi.cancelImport(userId, importId)) {
-            is ApiResponse.Success -> {
-                false
-            }
-            is ApiResponse.Error -> {
-                logger.e(cancelImportApiResponse.error)
-                true
-            }
-            is ApiResponse.Exception -> {
-                logger.e(cancelImportApiResponse.exception.message ?: "(no exception message)")
-                true
-            }
-        }
+        importerApi.cancelImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
+        return true
     }
 
     suspend fun resumeImport(importId: String): Boolean {
@@ -477,19 +370,8 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
-        return when (val resumeImportApiResponse = importerApi.resumeImport(userId, importId)) {
-            is ApiResponse.Success -> {
-                true
-            }
-            is ApiResponse.Error -> {
-                logger.e(resumeImportApiResponse.error)
-                false
-            }
-            is ApiResponse.Exception -> {
-                logger.e(resumeImportApiResponse.exception.message ?: "(no exception message)")
-                false
-            }
-        }
+        importerApi.resumeImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
+        return true
     }
 
     suspend fun deleteReport(reportId: String) {
@@ -499,18 +381,11 @@ class ImportAssistantViewModel @Inject constructor(
             _userId.value = userId
         }
 
-        when (val deleteReportApiResponse = importerApi.deleteReport(userId, reportId)) {
-            is ApiResponse.Success -> {
-                val currentList = _reportList.value?.let { ArrayList(it) }
-                currentList?.removeIf { it.id == reportId }
-                _reportList.value = currentList
-            }
-            is ApiResponse.Error -> {
-                logger.e(deleteReportApiResponse.error)
-            }
-            is ApiResponse.Exception -> {
-                logger.e(deleteReportApiResponse.exception.message ?: "(no exception message)")
-            }
-        }
+        importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return
+
+        // Update report list
+        val currentList = _reportList.value?.let { ArrayList(it) }
+        currentList?.removeIf { it.id == reportId }
+        _reportList.value = currentList
     }
 }

@@ -123,48 +123,52 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
             }
         }
         importListMediator.observe(viewLifecycleOwner) {
+            it ?: return@observe
+
             fragment_import_assistant_status_refresh.isRefreshing = false
 
             val importerList = it.first
             val reportList = it.second
             val zoneId = it.third
-            it?.let {
-                val importList = arrayListOf<Import>()
-                importerList.filter { it.product.contains(CalendarImport.PRODUCT_CALENDAR) && it.active?.calendar != null }.forEach { importerEntity ->
-                    // Importers
-                    importList.add(
-                        Import(
-                            importerEntity.id,
-                            importerEntity.account,
-                            null,
-                            importerEntity.active?.calendar?.createTime?.let { createTime ->
-                                LocalDateTime.ofInstant(Instant.ofEpochSecond(createTime.toLong()), zoneId)
-                            },
-                            importerEntity.active?.calendar?.state?.let { state ->
-                                Import.ImportState.values()[state]
-                            },
-                            importerEntity.active?.calendar?.errorCode
-                        )
+            val importList = arrayListOf<Import>()
+            importerList.filter { importerEntity ->
+                importerEntity.product.contains(CalendarImport.PRODUCT_CALENDAR) && importerEntity.active?.calendar != null
+            }.forEach { importerEntity ->
+                // Importers
+                importList.add(
+                    Import(
+                        importerEntity.id,
+                        importerEntity.account,
+                        null,
+                        importerEntity.active?.calendar?.createTime?.let { createTime ->
+                            LocalDateTime.ofInstant(Instant.ofEpochSecond(createTime.toLong()), zoneId)
+                        },
+                        importerEntity.active?.calendar?.state?.let { state ->
+                            Import.ImportState.values()[state]
+                        },
+                        importerEntity.active?.calendar?.errorCode
                     )
-                }
-                reportList.filter { it.summary.calendar != null }.forEach { reporterEntity ->
-                    // Reports
-                    importList.add(
-                        Import(
-                            reporterEntity.id,
-                            reporterEntity.account,
-                            reporterEntity.summary.calendar?.totalSize,
-                            LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.createTime.toLong()), zoneId),
-                            reporterEntity.summary.calendar?.state?.let { state ->
-                                Import.ImportState.values()[state]
-                            }
-                        )
-                    )
-                }
-                importStatusListAdapter.submitList(
-                    importList.sortedByDescending { it.dateTime }
                 )
             }
+            reportList.filter { reporterEntity ->
+                reporterEntity.summary.calendar != null
+            }.forEach { reporterEntity ->
+                // Reports
+                importList.add(
+                    Import(
+                        reporterEntity.id,
+                        reporterEntity.account,
+                        reporterEntity.summary.calendar?.totalSize,
+                        LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.createTime.toLong()), zoneId),
+                        reporterEntity.summary.calendar?.state?.let { state ->
+                            Import.ImportState.values()[state]
+                        }
+                    )
+                )
+            }
+            importStatusListAdapter.submitList(
+                importList.sortedByDescending { it.dateTime }
+            )
         }
     }
 
@@ -190,7 +194,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                 ImportStatusListAdapter.Action.RESUME -> {
                     lifecycleScope.launch {
                         // No confirmation dialog for resume
-                        if (import.errorCode == 1) {
+                        if (import.errorCode == Import.ErrorCode.LOST_CONNECTION.value) {
                             // Lost connection, we need to sign in to Google and create a new token to update importer
                             val userId = accountViewModel.getPrimaryUserId()
                             if (userId != null) {

@@ -297,7 +297,7 @@ data class ImporterEntity(
     @SerialName("Product")
     val product: List<String>, // "Mail", "Contacts", "Calendar"
     @SerialName("TokenID")
-    val tokenID: String,
+    val tokenID: String?,
     @SerialName("Active")
     val active: ActiveImporterEntity? = null // The Active field is present if there is an ongoing import.
 )

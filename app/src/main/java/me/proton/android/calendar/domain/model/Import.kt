@@ -18,4 +18,9 @@ data class Import(
         PAUSED(4),
         CANCELED(5)
     }
+
+    enum class ErrorCode(val value: Int) {
+        LOST_CONNECTION(1),
+        STORAGE_LIMIT_REACHED(2)
+    }
 }

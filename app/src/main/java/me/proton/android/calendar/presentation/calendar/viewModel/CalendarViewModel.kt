@@ -46,6 +46,7 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
@@ -797,7 +798,7 @@ class CalendarViewModel @Inject constructor(
         }
         val user = userManager.getUserOrNull(userId, logger)
         val delinquent = user?.delinquent?.value
-        return delinquent != null && delinquent >= 3 // We consider a user delinquent on the calendar side when the state is at least 3
+        return delinquent != null && delinquent >= Delinquent.InvoiceDelinquent.value // We consider a user delinquent on the calendar side when the state is at least 3 (InvoiceDelinquent)
     }
 
     enum class UserCalendarLimit {

@@ -69,7 +69,7 @@ class ImportStatusListAdapter(
                         R.string.import_assistant_report_details,
                         importSize,
                         import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
-                            ?: "" // TODO handle null
+                            ?: ""
                     )
                 } else {
                     import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))

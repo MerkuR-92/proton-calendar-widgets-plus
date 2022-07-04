@@ -276,7 +276,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
             // Start the import
             val startImportResult = importAssistantViewModel.startImport(
-                customCalendarMapping = calendarsToImport.any { !it.createDestinationCalendar }, // If we're merging a calendar then user has custom mapping
+                customCalendarMapping = calendarsToImport.any { it.mergeCalendar }, // If we're merging a calendar then user has custom mapping
                 importCalendarMappingList = calendarsToImport
             )
 
@@ -399,7 +399,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
 
         // Display calendars to merge count
-        val calendarsToMerge = importCalendarMappingList.filter { !it.createDestinationCalendar && it.importCalendar }.size
+        val calendarsToMerge = importCalendarMappingList.filter { it.mergeCalendar && it.importCalendar }.size
         fragment_import_assistant_summary_merge_details.visibleOrGone(calendarsToMerge > 0)
         fragment_import_assistant_summary_merge_details.text = getString(
             R.string.fragment_import_assistant_summary_merge_details,
