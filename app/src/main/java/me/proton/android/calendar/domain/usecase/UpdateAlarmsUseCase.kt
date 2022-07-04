@@ -60,7 +60,10 @@ class UpdateAlarmsUseCase @Inject constructor(
                 transformEventUseCase.execute(it)
             } }
 
-            val transformedChainWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedEvents(transformedChain, database.calendarSettingsDao().select(), json)
+            val transformedChainWithInjectedAlarms = if (FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) {
+                ICalUtilsImpl.injectVAlarmsIntoSubscribedEvents(transformedChain, database.calendarSettingsDao().select(), json)
+            } else transformedChain
+
             val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChainWithInjectedAlarms, fromZonedDateTime, "TODO")
 
             if (transformedChain.isEmpty()) {

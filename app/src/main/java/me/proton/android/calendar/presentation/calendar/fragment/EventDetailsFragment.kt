@@ -70,6 +70,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.ATTENDEE_AUTO_EXPAND_LIMIT
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
@@ -522,7 +523,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             lifecycleScope.launch {
-                val alarmLabels = if (event.calendar.isSubscribed) {
+                val alarmLabels = if (event.calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) {
                     calendarViewModel.getDefaultAlarms(event.calendar.id, event.isAllDay())
                         ?: emptyList<VAlarm>().also {
                             logger.e("could not get DefaultAlarms in EventDetailsFragment for subscribed event")

@@ -30,6 +30,7 @@ import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_defau
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_press
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_press
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_value
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_layout
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_press
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_value
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications
@@ -180,6 +181,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             calendarId?.let {
                 // Init form for existing calendar
                 calendarFormViewModel.initUpdateCalendarForm(it)
+
+                // hide "default event duration" for Subscribed Calendars, no need to use LiveData for this
+                calendar_form_default_event_duration_layout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed)
             } ?: run {
                 // Init character limit text
                 calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)

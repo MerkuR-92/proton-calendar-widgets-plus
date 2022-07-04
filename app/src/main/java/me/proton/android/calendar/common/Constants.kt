@@ -95,6 +95,7 @@ object FeatureFlag {
     const val SUBSCRIPTION = false
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = false
+    const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
 }
 
 object HttpResponseCode {

@@ -83,6 +83,9 @@ class CalendarFormViewModel @Inject constructor(
 
     val calendarFormState: MutableStateFlow<CalendarFormState> = MutableStateFlow(CalendarFormState.Idle)
 
+    var calendarIsSubscribed: Boolean = false
+        private set
+
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
@@ -165,6 +168,8 @@ class CalendarFormViewModel @Inject constructor(
             )
             return
         }
+
+        calendarIsSubscribed = calendarEntity.isSubscribed
 
         val calendarEmail = calendarsRepository.selectMembers(calendarId).firstOrNull {
             it.hasPermission(MemberEntity.Permission.SUPEROWNER)

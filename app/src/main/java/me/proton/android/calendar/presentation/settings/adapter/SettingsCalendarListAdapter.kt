@@ -12,8 +12,15 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_settings_calendar.view.*
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_badge_layout
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_helper
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_icon
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_menu_icon
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_press
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_subtitle
+import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_title
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -162,12 +169,12 @@ class SettingsCalendarListAdapter(
             }
 
             // Only show menu icon when calendar can be edited
-            calendarEntityItemMenuIcon.visibleOrGone(calendarEntity.isSubscribed.not())
+            calendarEntityItemMenuIcon.visibleOrGone(calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
             // Only allow item click when calendar can be edited
-            calendarEntityItemPress.visibleOrGone(calendarEntity.isSubscribed.not())
+            calendarEntityItemPress.visibleOrGone(calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
-            if (calendarEntity.isSubscribed.not()) {
+            if (calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
                 // On item click
                 calendarEntityItemPress.setOnSingleClickListener {
                     listener(calendarEntity)
