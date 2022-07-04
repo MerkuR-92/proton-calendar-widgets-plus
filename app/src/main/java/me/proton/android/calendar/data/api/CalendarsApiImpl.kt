@@ -64,11 +64,17 @@ interface CalendarsApiService : BaseRetrofitApi {
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
     suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : CalendarApiResponse
 
-    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarDisplayApiRequest) : CalendarApiResponse
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
+    suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Path("memberId") memberId: String, @Body body: UpdateCalendarDisplayApiRequest) : MemberApiResponse
+
+    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
+    suspend fun updateMember(@Path("calendarId") calendarId: String, @Path("memberId") memberId: String, @Body body: UpdateMemberApiRequest) : MemberApiResponse
 
     @POST("calendar/$API_VERSION_CALENDAR")
     suspend fun createCalendar(@Body body: CreateCalendarApiRequest) : CalendarApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/members")
+    suspend fun getAllMembers() : MemberListApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/members")
     suspend fun getMemberList(@Path("calendarId") calendarId: String) : MemberListApiResponse
@@ -203,14 +209,19 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             updateCalendar(calendarId, body)
         }.toApiResponse()
 
-    override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<CalendarApiResponse> =
+    override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, memberId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<MemberApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
-            updateCalendarDisplay(calendarId, body)
+            updateCalendarDisplay(calendarId, memberId, body)
         }.toApiResponse()
 
     override suspend fun createCalendar(userId: UserId, body: CreateCalendarApiRequest): ApiResponse<CalendarApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             createCalendar(body)
+        }.toApiResponse()
+
+    override suspend fun getAllMembers(userId: UserId): ApiResponse<MemberListApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getAllMembers()
         }.toApiResponse()
 
     override suspend fun getMemberList(userId: UserId, calendarId: String): ApiResponse<MemberListApiResponse> =
@@ -221,6 +232,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     override suspend fun setupKey(userId: UserId, calendarId: String, body: SetupKeyApiRequest): ApiResponse<SetupKeyApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             setupKey(calendarId, body)
+        }.toApiResponse()
+
+    override suspend fun updateMember(userId: UserId, calendarId: String, memberId: String, body: UpdateMemberApiRequest): ApiResponse<MemberApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            updateMember(calendarId, memberId, body)
         }.toApiResponse()
 
     override suspend fun getKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse> =
@@ -326,7 +342,11 @@ data class UpdateCalendarApiRequest(
     @SerialName("Name")
     val name: String? = null,
     @SerialName("Description")
-    val description: String? = null,
+    val description: String? = null
+)
+
+@Serializable
+data class UpdateMemberApiRequest(
     @SerialName("Color")
     val color: String? = null,
     @SerialName("Display")
@@ -357,6 +377,12 @@ data class CreateCalendarApiRequest(
 data class CalendarApiResponse(
     @SerialName("Calendar")
     val calendar: CalendarEntity
+)
+
+@Serializable
+data class MemberApiResponse(
+    @SerialName("Member")
+    val member: MemberEntity
 )
 
 @Serializable

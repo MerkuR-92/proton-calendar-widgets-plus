@@ -62,7 +62,7 @@ class CalendarUserAddressListenerTest {
             listener.onUpdate(config, listOf(addressResponse))
 
             coVerify { userAddressRepository.updateAddresses(any()) }
-            coVerify { calendarsRepository.refreshCalendarsFlagsForAddress(any(), any(), any()) }
+            coVerify { calendarsRepository.refreshCalendarsFlags(any()) }
         }
     }
 

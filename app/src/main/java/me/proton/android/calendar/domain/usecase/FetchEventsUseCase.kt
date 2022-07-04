@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
@@ -66,8 +67,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                                     UseCase.Result.Success<Unit>()
                                 } else if (eventsResponse is ApiResponse.Error) {
-                                    if (eventsResponse.httpCode == 404) {
-                                        logger.e("404 requesting events in FetchEventsUseCase")
+                                    if (eventsResponse.isNotFound()) {
+                                        logger.e("NOT_FOUND requesting events in FetchEventsUseCase")
                                         UseCase.Result.Success<Unit>()
                                     } else if (eventsResponse.isTimeout()) {
 

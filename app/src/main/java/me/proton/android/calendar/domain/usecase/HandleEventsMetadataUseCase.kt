@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.EventAlarmEntity
@@ -78,8 +79,8 @@ class HandleEventsMetadataUseCase @Inject constructor(
                     var errorOccurred = false
 
                     responses.mapNotNull { if (it is ApiResponse.Error) it else null }.forEach {
-                        if (it.httpCode == 404) {
-                            logger.e("404 fetching event in HandleEventsMetadataUseCase: $it")
+                        if (it.isNotFound()) {
+                            logger.e("NOT_FOUND fetching event in HandleEventsMetadataUseCase: $it")
                         } else {
                             errorOccurred = true
                             logger.e("error fetching event in HandleEventsMetadataUseCase: $it")

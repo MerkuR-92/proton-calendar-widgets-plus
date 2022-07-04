@@ -17,24 +17,24 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionStatus
+import me.proton.android.calendar.domain.model.Calendar
 
 class SettingsCalendarListAdapter(
-    val listener: (CalendarEntity) -> Unit
-) : ListAdapter<CalendarEntity, SettingsCalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
+    val listener: (Calendar) -> Unit
+) : ListAdapter<Calendar, SettingsCalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private var calendarEmails: Map<String, String>? = null
     private var defaultCalendarId: String? = null
 
-    class CalendarEntityDiffCallback : DiffUtil.ItemCallback<CalendarEntity>() {
-        override fun areItemsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+    class CalendarDiffCallback : DiffUtil.ItemCallback<Calendar>() {
+        override fun areItemsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+        override fun areContentsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem == newItem
         }
     }
@@ -76,7 +76,7 @@ class SettingsCalendarListAdapter(
         private val calendarEntityItemIcon: ImageView = view.item_settings_calendar_icon
         private val calendarEntityItemBadgeLayout: LinearLayout = view.item_settings_calendar_badge_layout
 
-        fun bind(calendarEntity : CalendarEntity) {
+        fun bind(calendarEntity : Calendar) {
             // Calendar name
             calendarEntityItemTitle.text = calendarEntity.name
 

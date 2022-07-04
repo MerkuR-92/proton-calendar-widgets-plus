@@ -17,6 +17,7 @@ import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.equalsNoCase
 
 class KeySetupUseCase @Inject constructor(
     private val logger: Logger,
@@ -70,26 +71,24 @@ class KeySetupUseCase @Inject constructor(
     }
 
     suspend fun execute(userId: UserId, calendarId: String, addresses: List<UserAddress>? = null) : UseCase.Result {
-
-        // We pass the user address list as a parameter because it has refresh flag set at true so we want to reduce
-        //  the amount of calls needed in case we're reactivating keys for a list of calendars.
-        val address = (addresses ?: userManager.getAddressesOrNull(userId, refresh = true))?.firstOrNull {
-            it.canSend && it.canReceive
-        } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
-
         // Get member for address
         return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
             is ApiResponse.Success -> {
 
-                val memberId = memberListApiResponse.data.members.firstOrNull()?.id
-                    ?: return UseCase.Result.Error("KeySetupUseCase: memberId was null")
+                val member = memberListApiResponse.data.members.firstOrNull()
+                    ?: return UseCase.Result.Error("KeySetupUseCase: could not fetch member")
+
+                // get Address for that Member
+                val address = (addresses ?: userManager.getAddressesOrNull(userId))?.firstOrNull {
+                    it.email.equalsNoCase(member.email) // TODO match by AddressID when we add it to Member
+                } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
 
                 val keySetupResult = execute(
                     userId,
                     address.addressId.id,
                     address.keys.primary() ?: return UseCase.Result.Error("KeySetupUseCase: No valid Primary Address Key found for Address"),
                     calendarId,
-                    memberId)
+                    member.id)
 
                 when (keySetupResult) {
                     is UseCase.Result.InvalidParams -> { logger.e("KeySetupUseCase: InvalidParams: ${keySetupResult.message}") }

@@ -69,7 +69,10 @@ internal class HandleDeleteUseCaseTest {
                 id = "id",
                 permissions = 64,
                 email = "email@pm.me",
-                calendarId = "calendarId"
+                calendarId = "calendarId",
+                color = calendarColor,
+                display = calendarDisplay,
+                flags = calendarFlags
             )
         )
 
@@ -119,7 +122,7 @@ internal class HandleDeleteUseCaseTest {
                 SyncResponseWrapper(
                     index = 0,
                     response = SyncResponse(
-                        code = ApiResponseCode.EVENT_DOES_NOT_EXIST,
+                        code = ApiResponseCode.DOES_NOT_EXIST,
                         event = provideEventEntity()
                     )
                 )

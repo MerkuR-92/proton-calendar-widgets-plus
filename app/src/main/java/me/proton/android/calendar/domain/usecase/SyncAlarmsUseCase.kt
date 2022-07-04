@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -146,8 +147,8 @@ class SyncAlarmsUseCase @Inject constructor(
                     logger.v("alarm window after adjusting => ${windowStart}-${windowEnd}, end = $end")
                 }
                 is ApiResponse.Error -> {
-                    return if (alarmsResponse.httpCode == 404) {
-                        logger.e("SyncAlarmsUseCase: 404 requesting alarms for calendar in handleCalendarAlarms")
+                    return if (alarmsResponse.isNotFound()) {
+                        logger.e("SyncAlarmsUseCase: NOT_FOUND requesting alarms for calendar in handleCalendarAlarms")
                         UseCase.Result.Success<Unit>()
                     } else {
                         alarmsResponse.logErrorIfNeeded("SyncAlarmsUseCase: api error getting server events", logger)

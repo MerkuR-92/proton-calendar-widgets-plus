@@ -258,7 +258,7 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.name ?: defaultCalendar.name,
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
-                if (existingCalendar != null) existingCalendar.display == 1 else defaultCalendar.display == 1,
+                if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,
                 existingCalendar?.type ?: defaultCalendar.type
             ), iCalendar, Instant.now().epochSecond) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
@@ -437,12 +437,7 @@ class HandleIcsUseCase @Inject constructor(
                         return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
                     }
 
-                    if (!existingEvent.calendar.display) {
-                        // 1. Update in DB
-                        calendarsRepository.updateCalendarDisplay(calendarId, true)
-                        // 2. Update on Server
-                        updateCalendarUseCase.executeUpdateFromDb(userId, calendarId)
-                    }
+                    makeCalendarVisible(existingEvent, userId)
 
                     return IcsSurgeryUtils.HandleIcsResult.Success(
                         eventId = existingEvent.id,

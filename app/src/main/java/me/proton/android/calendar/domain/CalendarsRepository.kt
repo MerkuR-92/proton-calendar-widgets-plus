@@ -7,6 +7,7 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
@@ -31,29 +32,31 @@ interface CalendarsRepository {
     suspend fun shutdown()
 
     // calendars
-    suspend fun selectCalendar(calendarId: String): CalendarEntity?
+    suspend fun selectCalendarEntity(calendarId: String): CalendarEntity?
+
+    suspend fun selectCalendar(calendarId: String): Calendar?
 
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
-    suspend fun selectUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectActiveUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectActiveUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectDisabledUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectDisabledUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectInactiveUserCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectInactiveUserCalendars(userId: String): List<Calendar>
 
     suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
 
-    fun flowActiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowDisabledUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowInactiveUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowUserCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowUserCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
+    fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>>
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
@@ -63,9 +66,20 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendars(userId: UserId): Boolean
 
-    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>?
+    suspend fun fetchCalendars(userId: UserId): List<Calendar>?
 
-    suspend fun fetchCalendar(userId: UserId, calendarId: String): CalendarEntity?
+    suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>?
+
+    /**
+     * Fetches and combines MemberEntity with supplied CalendarEntities
+     */
+    suspend fun fetchMembersToCalendarEntities(userId: UserId, calendars: List<CalendarEntity>): List<Calendar>?
+
+    suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>?
+
+    suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar?
+
+    suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity?
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
@@ -124,8 +138,6 @@ interface CalendarsRepository {
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
     suspend fun refreshCalendarsFlags(userId: UserId)
-
-    suspend fun refreshCalendarsFlagsForAddress(address: String, enabled: Boolean, userId: String)
 
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself

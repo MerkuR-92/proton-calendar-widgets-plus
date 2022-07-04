@@ -408,13 +408,13 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     private fun displayMonthViewEvents(events: List<Event>, fromDate:LocalDate, timeZoneId: String, isSkeletonEvent: Boolean) {
         val maxEventCount = monthView.getMaxEventCount()
 
+        // Clear keyboard to make sure it doesn't affect MonthView usable height
+        requireActivity().clearFocusAndHideKeyboard(view)
+
         lifecycleScope.launch {
 
             // Get the map of MonthViewEvent indexed by day
             val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(events, fromDate, maxEventCount, timeZoneId, isSkeletonEvent)
-
-            // Clear keyboard to make sure it doesn't affect MonthView usable height
-            requireActivity().clearFocusAndHideKeyboard(view)
 
             // Set the month view events so that they can be drawn
             monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false)

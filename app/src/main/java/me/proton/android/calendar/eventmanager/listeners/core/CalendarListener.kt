@@ -4,7 +4,6 @@ import androidx.annotation.VisibleForTesting
 import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.data.entity.CalendarFlags
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
@@ -24,7 +23,6 @@ class CalendarListener @Inject constructor(
     database: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
-    private val keySetupUseCase: KeySetupUseCase,
     private val logger: Logger,
 ): CalendarBaseEventListener<String, CalendarEntity>(database) {
     override val order: Int = 1
@@ -36,55 +34,6 @@ class CalendarListener @Inject constructor(
     ): List<Event<String, CalendarEntity>>? {
         return response.body.deserializeOrNull<ServerCoreEventsApiResponse>()?.calendars?.map {
             Event(requireNotNull(Action.Companion.map[it.action]), it.id, it.calendar)
-        }?.let { handleIncompleteKeys(config, it) }
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal suspend fun handleIncompleteKeys(
-        config: EventManagerConfig,
-        events: List<Event<String, CalendarEntity>>
-    ): List<Event<String, CalendarEntity>> {
-        // Try to complete key setup for calendar:
-        // - we use newly updated calendar fetched from API if it succeeds
-        // - we use calendar from server event if it fails
-        return events.map { event ->
-            val entity = event.entity ?: return@map event
-            val updatedCalendar = if (entity.hasIncompleteKeySetup) {
-                when (val result = keySetupUseCase.execute(config.userId, entity.id)) {
-                    is UseCase.Result.Success<*> -> {
-                        val fetchedCalendar = calendarsRepository.fetchCalendar(config.userId, entity.id)
-                        if (fetchedCalendar == null) {
-                            logger.e("error getting calendar from API in HandleServerEventsUseCase")
-
-                            var calendarFlags = entity.flags
-                            calendarFlags -= CalendarFlags.INCOMPLETE_SETUP.value
-                            // if calendar is inactive and no other error flags are set, make it active
-                            if (calendarFlags == 0) calendarFlags = CalendarFlags.ACTIVE.value
-
-                            entity.copy(flags = calendarFlags)
-                        } else {
-                            fetchedCalendar
-                        }
-                    }
-                    is UseCase.Result.InvalidParams -> {
-                        logger.e("keySetupResult invalid params: ${result.message}")
-                        entity
-                    }
-                    is UseCase.Result.Error -> {
-                        // Try and fetch the calendar to check that the key setup wasn't done by another client in the meantime
-                        val fetchedCalendar = calendarsRepository.fetchCalendar(config.userId, entity.id)
-                        if (fetchedCalendar == null || fetchedCalendar.hasIncompleteKeySetup) {
-                            logger.e("keySetupResult error: ${result.message}")
-                            entity
-                        } else {
-                            fetchedCalendar
-                        }
-                    }
-                }
-            } else {
-                entity
-            }
-            event.copy(entity = updatedCalendar)
         }
     }
 

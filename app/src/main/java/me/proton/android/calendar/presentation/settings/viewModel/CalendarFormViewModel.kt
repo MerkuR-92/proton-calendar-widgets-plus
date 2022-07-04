@@ -3,10 +3,7 @@ package me.proton.android.calendar.presentation.settings.viewModel
 import android.app.Application
 import android.graphics.Color
 import androidx.annotation.VisibleForTesting
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import biweekly.component.VAlarm
@@ -29,24 +26,21 @@ import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.presentation.*
 import me.proton.core.domain.entity.UserId
-import me.proton.core.network.domain.scopes.MissingScopeListener
-import me.proton.core.presentation.utils.showToast
 import me.proton.core.user.domain.UserManager
-import okhttp3.internal.toHexString
 import javax.inject.Inject
 
 @HiltViewModel
@@ -154,7 +148,7 @@ class CalendarFormViewModel @Inject constructor(
 
         _calendarId = calendarId
 
-        val calendarEntity = getCalendarEntity(calendarId) ?: run {
+        val calendarEntity = getCalendar(calendarId) ?: run {
             logger.e("CalendarEntity was null in initUpdateCalendarForm")
             // Use settings snack state here to display snack in calendar settings view
             calendarSettingsSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
@@ -354,7 +348,7 @@ class CalendarFormViewModel @Inject constructor(
                     userId,
                     calendarId,
                     name = _calendarName.value,
-                    color = _calendarColor.value
+                    color = _calendarColor.value?.toHexColor()
                 )
                 if (updateCalendarUseCaseResult !is UseCase.Result.Success<*>) {
                     calendarFormSnackState.value = CalendarFormSnackState.DisplaySnack(
@@ -482,10 +476,10 @@ class CalendarFormViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getCalendarEntity(calendarId: String): CalendarEntity? {
+    private suspend fun getCalendar(calendarId: String): Calendar? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarFormViewModel getCalendarEntity")
+            logger.e("User ID was null in CalendarFormViewModel getCalendar")
             return null
         }
         return calendarsRepository.selectCalendar(calendarId)

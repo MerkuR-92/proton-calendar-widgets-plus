@@ -73,6 +73,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.core.presentation.utils.normSnack
@@ -243,7 +244,7 @@ object AndroidUtils {
     fun displayCalendarPicker(
         context: Context,
         title: String?,
-        items: Array<CalendarEntity>,
+        items: Array<Calendar>,
         initiallySelectedIndex: Int,
         callback: (selectedIndex: Int) -> Unit
     ) {
@@ -299,7 +300,7 @@ object AndroidUtils {
         title: Int,
         message: Int,
         cancellable: Boolean,
-        items: List<CalendarEntity>,
+        items: List<Calendar>,
         callback: DialogInterface.OnClickListener
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
@@ -307,7 +308,7 @@ object AndroidUtils {
             .setCancelable(cancellable)
             .setPositiveButton(R.string.bootstrap_error_continue_button, callback)
 
-        val adapter = object : ArrayAdapter<CalendarEntity>(this, R.layout.item_calendar_dialog, items) {
+        val adapter = object : ArrayAdapter<Calendar>(this, R.layout.item_calendar_dialog, items) {
 
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 var view = convertView

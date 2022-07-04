@@ -36,6 +36,7 @@ import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
@@ -95,11 +96,11 @@ class CalendarViewModel @Inject constructor(
     val selectedDate: LiveData<LocalDate> = _selectedDate
 
     // userCalendars contains all non-subscribed calendars regardless of their flags
-    var userCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var activeUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var disabledUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var inactiveUserCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
-    var subscribedCalendars: LiveData<List<CalendarEntity>> = MutableLiveData()
+    var userCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var activeUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var disabledUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var inactiveUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var subscribedCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
@@ -619,7 +620,7 @@ class CalendarViewModel @Inject constructor(
         updatingCalendarPassphrase = false
     }
 
-    suspend fun fetchCalendars(userId: UserId): List<CalendarEntity>? {
+    suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
         return calendarsRepository.fetchCalendars(userId)
     }
 
@@ -789,7 +790,7 @@ class CalendarViewModel @Inject constructor(
         PAID_REACHED
     }
 
-    suspend fun isUserCalendarLimitReached(calendars: List<CalendarEntity>? = null): UserCalendarLimit {
+    suspend fun isUserCalendarLimitReached(calendars: List<Calendar>? = null): UserCalendarLimit {
         val userCalendarsCount = calendars?.size ?: getUserCalendars()?.size ?: return UserCalendarLimit.ERROR
         val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
 
@@ -802,7 +803,7 @@ class CalendarViewModel @Inject constructor(
      * Getters for LiveData
      */
 
-    suspend fun getUserCalendars(): List<CalendarEntity>? {
+    suspend fun getUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getUserCalendars")
@@ -811,7 +812,7 @@ class CalendarViewModel @Inject constructor(
         return userCalendars.value ?: calendarsRepository.selectUserCalendars(userId.id)
     }
 
-    suspend fun getActiveUserCalendars(): List<CalendarEntity>? {
+    suspend fun getActiveUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getActiveUserCalendars")
@@ -820,7 +821,7 @@ class CalendarViewModel @Inject constructor(
         return activeUserCalendars.value ?: calendarsRepository.selectActiveUserCalendars(userId.id)
     }
 
-    suspend fun getDisabledUserCalendars(): List<CalendarEntity>? {
+    suspend fun getDisabledUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getDisabledUserCalendars")
@@ -829,31 +830,13 @@ class CalendarViewModel @Inject constructor(
         return disabledUserCalendars.value ?: calendarsRepository.selectDisabledUserCalendars(userId.id)
     }
 
-    suspend fun getInactiveUserCalendars(): List<CalendarEntity>? {
+    suspend fun getInactiveUserCalendars(): List<Calendar>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getInactiveUserCalendars")
             return null
         }
         return inactiveUserCalendars.value ?: calendarsRepository.selectInactiveUserCalendars(userId.id)
-    }
-
-    suspend fun getSubscribedCalendars(): List<CalendarEntity>? {
-        val userId = userId.value
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getSubscribedCalendars")
-            return null
-        }
-        return subscribedCalendars.value ?: calendarsRepository.selectSubscribedCalendars(userId.id)
-    }
-
-    suspend fun getCalendarSubscriptions(): List<CalendarSubscriptionEntity>? {
-        val userId = userId.value
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getCalendarSubscriptions")
-            return null
-        }
-        return calendarSubscriptions.value ?: calendarsRepository.selectCalendarSubscriptions(userId.id)
     }
 
     suspend fun getUserAddresses(): List<UserAddress>? {

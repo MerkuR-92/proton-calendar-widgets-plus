@@ -73,7 +73,7 @@ interface CalendarsApi {
      */
     suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<CalendarApiResponse>
 
-    suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<CalendarApiResponse>
+    suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, memberId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<MemberApiResponse>
 
     /**
      * Create calendar.
@@ -81,9 +81,16 @@ interface CalendarsApi {
     suspend fun createCalendar(userId: UserId, body: CreateCalendarApiRequest): ApiResponse<CalendarApiResponse>
 
     /**
+     * Retrieve a list of all members associated with current user.
+     */
+    suspend fun getAllMembers(userId: UserId): ApiResponse<MemberListApiResponse>
+
+    /**
      * Retrieve a list of members associated with this calendar and current user.
      */
     suspend fun getMemberList(userId: UserId, calendarId: String): ApiResponse<MemberListApiResponse>
+
+    suspend fun updateMember(userId: UserId, calendarId: String, memberId: String, body: UpdateMemberApiRequest): ApiResponse<MemberApiResponse>
 
     /**
      * Sets a new calendar key and updates the encrypted passphrases for all existing members.

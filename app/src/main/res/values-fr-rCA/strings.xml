@@ -153,7 +153,7 @@
     <string name="event_alarm_partial_day_3">30 minutes</string>
     <string name="event_alarm_partial_day_4">1 heure</string>
     <string name="event_alarm_partial_day_5">1 semaine</string>
-    <string name="event_alarm_all_day_1">le même jour à $%1$s</string>
+    <string name="event_alarm_all_day_1">le même jour à %1$s</string>
     <string name="event_alarm_all_day_2">1 jour avant le %1$s</string>
     <string name="event_alarm_all_day_3">1 semaine avant le %1$s</string>
     <string name="event_alarm_all_day_4">3 semaines avant le %1$s</string>

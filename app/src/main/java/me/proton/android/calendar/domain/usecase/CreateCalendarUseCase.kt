@@ -113,18 +113,21 @@ class CreateCalendarUseCase @Inject constructor(
                                 keySetupResult
                             }
                             is UseCase.Result.Error -> {
-                                // Try and fetch the calendar to check that the key setup wasn't done by another client in the meantime
-                                val fetchedCalendar = calendarsRepository.fetchCalendar(userId, calendarId)
-                                if (fetchedCalendar == null || fetchedCalendar.hasIncompleteKeySetup) {
+                                // Try and fetch the Member to check that the key setup wasn't done by another client in the meantime
+                                val fetchedMember = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull()
+                                if (fetchedMember == null || fetchedMember.hasIncompleteKeySetup) {
                                     logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}")
                                     keySetupResult
-                                } else {
+                                } else { // key setup has been done on the server in the meantime
                                     val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
                                         ?: ZoneId.systemDefault().id
 
-                                    val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(fetchedCalendar, userId, timezone)
-                                    executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-                                    executeBootstrapResult
+                                    val fetchedCalendarEntity = calendarsRepository.fetchCalendarEntity(userId, calendarId)
+                                    if (fetchedCalendarEntity != null) {
+                                        val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(fetchedCalendarEntity, userId, timezone)
+                                        executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                                        executeBootstrapResult
+                                    } else UseCase.Result.Error("could not fetch CalendarEntity to execute bootstrap")
                                 }
                             }
                         }

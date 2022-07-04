@@ -6,17 +6,15 @@ import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.util.kotlin.toBoolean
+import me.proton.core.util.kotlin.toInt
 
 object CalendarMocks {
 
-    fun provideCalendarEntity(id: String = calendarId, isDisabled: Boolean = false, isHidden: Boolean = false): CalendarEntity {
+    fun provideCalendarEntity(id: String = calendarId): CalendarEntity {
         return CalendarEntity(
             id = id,
             name = calendarName,
             description = calendarDescription,
-            color = calendarColor,
-            display = if (isHidden) 0 else calendarDisplay,
-            flags = if (isDisabled) CalendarFlags.DISABLED.value else calendarFlags,
             type = calendarType,
             fkUserId = userId.id
         )
@@ -52,18 +50,21 @@ object CalendarMocks {
             calendarId,
             calendarName,
             calendarColor,
-            if (hasDisabledCalendar) CalendarFlags.DISABLED.value else calendarFlags,
+            if (hasDisabledCalendar) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType
         )
     }
 
-    fun provideMemberEntity(memberEmail: String = userEmail): MemberEntity {
+    fun provideMemberEntity(memberEmail: String = userEmail, flags: Int = calendarFlags): MemberEntity {
         return MemberEntity(
             id = memberId,
             permissions = MemberEntity.Permission.SUPEROWNER.value,
             email = memberEmail,
-            calendarId = calendarId
+            calendarId = calendarId,
+            color = calendarColor,
+            display = calendarDisplay,
+            flags = flags
         )
     }
 }

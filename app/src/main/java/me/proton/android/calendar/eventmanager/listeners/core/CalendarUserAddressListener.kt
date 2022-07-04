@@ -37,8 +37,6 @@ class CalendarUserAddressListener @Inject constructor(
     override suspend fun onUpdate(config: EventManagerConfig, entities: List<AddressResponse>) {
         super.onUpdate(config, entities)
 
-        entities.forEach {
-            calendarsRepository.refreshCalendarsFlagsForAddress(it.email, it.status.toBoolean(), config.userId.id)
-        }
+        calendarsRepository.refreshCalendarsFlags(config.userId)
     }
 }

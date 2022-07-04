@@ -1,5 +1,7 @@
 package me.proton.android.calendar.common.utils
 
+import me.proton.android.calendar.common.ApiResponseCode
+import me.proton.android.calendar.common.HttpResponseCode
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
@@ -9,6 +11,15 @@ import okhttp3.internal.toHexString
 fun ApiResponse.Error.isTimeout(): Boolean {
     // TODO hardcoded string because there is no dedicated code for timeout
     return this.httpCode == 0 && this.errorCode == 0 && this.error == "timeout"
+}
+
+/**
+ * We shouldn't treat 404 as "resource not found" anymore, instead use 422 + 2501, but this code makes sure we still
+ * maintain the old behavior until we do FU to new way.
+ */
+fun ApiResponse.Error.isNotFound(): Boolean {
+    return this.httpCode == HttpResponseCode.NOT_FOUND ||
+            (this.httpCode == HttpResponseCode.UNPROCESSABLE_ENTITY && this.errorCode == ApiResponseCode.DOES_NOT_EXIST)
 }
 
 suspend fun UserManager.getAddressesOrNull(userId: UserId, refresh: Boolean = false): List<UserAddress>? {

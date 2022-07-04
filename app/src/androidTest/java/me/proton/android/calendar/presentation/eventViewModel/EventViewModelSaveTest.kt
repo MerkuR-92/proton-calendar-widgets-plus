@@ -16,7 +16,6 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
 import org.junit.Test
@@ -41,7 +40,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
             // Mock hidden default calendar
-            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity(isHidden = true)
+            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
 
             // Schedule alarms if any
             coEvery { handleAlarmsUseCaseMock.execute(userId) } returns UseCase.Result.Success<Unit>()

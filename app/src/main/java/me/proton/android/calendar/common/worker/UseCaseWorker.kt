@@ -125,7 +125,7 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             }
             UseCaseId.UPDATE_CALENDAR_LIST -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
-                updateCalendarUseCase.executeUpdateList(userId)
+                updateCalendarUseCase.updateAllCalendarsDisplay(userId)
             }
             UseCaseId.SEND_BUG_REPORT -> {
                 val sendBugReportUseCase: SendBugReportUseCase = get()
