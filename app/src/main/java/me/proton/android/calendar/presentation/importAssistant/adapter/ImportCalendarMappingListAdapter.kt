@@ -34,10 +34,17 @@ class ImportCalendarMappingListAdapter(
 ) : ListAdapter<ImportCalendarMapping, ImportCalendarMappingListAdapter.ViewHolder>(ExternalCalendarEntityDiffCallback()) {
 
     private var limitReached = false
+    private var optionsEnabled = false
 
     fun setLimitReached(limitReached: Boolean) {
         val valueChanged = this.limitReached != limitReached
         this.limitReached = limitReached
+        if (valueChanged) notifyDataSetChanged()
+    }
+
+    fun isOptionsEnabled(optionsEnabled: Boolean) {
+        val valueChanged = this.optionsEnabled != optionsEnabled
+        this.optionsEnabled = optionsEnabled
         if (valueChanged) notifyDataSetChanged()
     }
 
@@ -107,12 +114,13 @@ class ImportCalendarMappingListAdapter(
                 importCheckBox.performClick()
             }
 
+            destinationOptionsButton.visibleOrGone(optionsEnabled)
             destinationPressOverlay.setOnSingleClickListener {
-                optionsListener(importCalendarMapping)
+                if (optionsEnabled) optionsListener(importCalendarMapping)
             }
 
             destinationOptionsButton.setOnSingleClickListener {
-                optionsListener(importCalendarMapping)
+                if (optionsEnabled) optionsListener(importCalendarMapping)
             }
 
             if (limitReached && importCalendarMapping.createDestinationCalendar) {

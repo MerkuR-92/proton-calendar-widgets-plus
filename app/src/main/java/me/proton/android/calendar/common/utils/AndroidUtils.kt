@@ -1338,4 +1338,9 @@ object AndroidUtils {
         value *= java.lang.Long.signum(bytes).toLong()
         return String.format("%.1f %ciB", value / 1024.0, ci.current())
     }
+
+    fun String.ellipsize(maxLength: Int): String {
+        if (this.length <= maxLength) return this
+        return this.substring(0, maxLength - 1).plus("…")
+    }
 }

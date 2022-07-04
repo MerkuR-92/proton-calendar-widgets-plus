@@ -119,6 +119,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
 
+            if (this::importCalendarMappingListAdapter.isInitialized) {
+                importCalendarMappingListAdapter.isOptionsEnabled(userCalendars.any { it.isActive })
+            }
+
             checkCalendarLimit()
         }
 
@@ -146,7 +150,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         importAssistantViewModel.importCalendarMappingList.observe(viewLifecycleOwner) { importCalendarMappingList ->
             importCalendarMappingList ?: return@observe
 
-            importCalendarMappingListAdapter.submitList(importCalendarMappingList)
+            if (this::importCalendarMappingListAdapter.isInitialized) {
+                importCalendarMappingListAdapter.submitList(importCalendarMappingList)
+            }
 
             showImportSummaryView(importCalendarMappingList)
 
@@ -158,12 +164,12 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             if (userId != null) {
                 // Create importer and fetch external calendars
                 if (!importAssistantViewModel.handleGoogleSignInRedirect(
-                    userId,
-                    navigationArguments.code,
-                    resources.getIntArray(R.array.accent_colors_base)
-                )) {
+                        userId,
+                        navigationArguments.code,
+                        resources.getIntArray(R.array.accent_colors_base)
+                    )) {
                     // Display error snack and navigate back
-                    requireActivity().displaySnackBar(getString(R.string.import_assistant_create_import_error))
+                    requireActivity().displaySnackBar(getString(R.string.import_assistant_data_gathering_error))
                     findNavController().navigateUp()
                 }
             } else {
@@ -189,7 +195,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             optionsListener = { importCalendarMapping ->
                 // On options click
                 lifecycleScope.launch {
-                    val userCalendars = calendarViewModel.getUserCalendars()
+                    val userCalendars = calendarViewModel.getActiveUserCalendars()
                     showBottomSheetDialog(importCalendarMapping, userCalendars)
                 }
             }
@@ -202,6 +208,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         val userCalendarsCount = userCalendars.size
         val importCalendarMappingList = importAssistantViewModel.importCalendarMappingList.value ?: return
         val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
+        val importCalendarsToImportCount = importCalendarMappingList.filter { it.importCalendar }.size
 
         lifecycleScope.launch {
             val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
@@ -223,25 +230,33 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     countCalendarsOverLimit,
                     calendarPluralString
                 )
-                fragment_import_assistant_import_button.isEnabled = false
-                // TODO Remove custom disabled style once core ProtonButton has been updated
-                fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
-                fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
-                    requireContext().getColorFromAttr(R.attr.proton_interaction_norm_disabled)
-                )
-                importCalendarMappingListAdapter.setLimitReached(true)
+                importButtonIsEnabled(false)
+                if (this@ImportAssistantFragment::importCalendarMappingListAdapter.isInitialized) {
+                    importCalendarMappingListAdapter.setLimitReached(true)
+                }
             } else {
                 fragment_import_assistant_summary_header_layout.visibleOrGone(true)
                 fragment_import_assistant_summary_error_layout.visibleOrGone(false)
-                fragment_import_assistant_import_button.isEnabled = true
-                // TODO Remove custom disabled style once core ProtonButton has been updated
-                fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
-                fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
-                    requireContext().getColorFromAttr(R.attr.proton_interaction_norm)
-                )
-                importCalendarMappingListAdapter.setLimitReached(false)
+                if (importCalendarsToImportCount > 0) importButtonIsEnabled(true)
+                if (this@ImportAssistantFragment::importCalendarMappingListAdapter.isInitialized) {
+                    importCalendarMappingListAdapter.setLimitReached(false)
+                }
             }
         }
+    }
+
+    // TODO Remove this method and only use isEnabled once core ProtonButton has been updated
+    private fun importButtonIsEnabled(isEnabled: Boolean) {
+        fragment_import_assistant_import_button.isEnabled = isEnabled
+
+        // TODO Remove custom disabled style once core ProtonButton has been updated
+        fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
+        fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
+            requireContext().getColorFromAttr(
+                if (isEnabled) R.attr.proton_interaction_norm
+                else R.attr.proton_interaction_norm_disabled
+            )
+        )
     }
 
     private fun onStartImportClick() {
@@ -370,6 +385,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             calendarsToImport.size,
             calendarsToImport.size
         )
+
+        // Disable button if list is empty
+        importButtonIsEnabled(importCalendarMappingList.any { it.importCalendar })
 
         // Display calendars to create count
         val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size

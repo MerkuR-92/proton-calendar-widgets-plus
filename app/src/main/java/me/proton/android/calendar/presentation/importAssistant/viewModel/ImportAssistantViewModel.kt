@@ -18,6 +18,7 @@ import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
 import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -185,11 +186,11 @@ class ImportAssistantViewModel @Inject constructor(
                                 ImportCalendarMapping(
                                     importCalendar = true, // Set to true by default
                                     sourceId = it.id,
-                                    sourceName = it.source,
+                                    sourceName = it.source.ellipsize(100),
                                     sourceEmail = account,
                                     createDestinationCalendar = true,
                                     destinationId = null,
-                                    destinationName = it.source,
+                                    destinationName = it.source.ellipsize(100),
                                     destinationEmail = defaultUserEmail.value!!,
                                     destinationColor = calendarColors.random()
                                 )
