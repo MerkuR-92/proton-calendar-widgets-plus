@@ -6,10 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
-import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.CalendarImport.ACCESS_TYPE
 import me.proton.android.calendar.common.CalendarImport.GOOGLE_AUTH_BASE_URL
 import me.proton.android.calendar.common.CalendarImport.GOOGLE_SCOPES
@@ -17,21 +15,19 @@ import me.proton.android.calendar.common.CalendarImport.PROMPT
 import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
 import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.ImporterApi
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
@@ -40,7 +36,6 @@ import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
-import me.proton.core.util.kotlin.replaceFirst
 import javax.inject.Inject
 
 @HiltViewModel
@@ -292,18 +287,18 @@ class ImportAssistantViewModel @Inject constructor(
         _importCalendarMappingList.value = currentList
     }
 
-    suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendarEntity: CalendarEntity) {
-        val calendarEmail = getCalendarEmail(calendarEntity.id) ?: return
+    suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
+        val calendarEmail = getCalendarEmail(calendar.id) ?: return
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
             sourceName = calendarToImport.sourceName,
             sourceEmail = calendarToImport.sourceEmail,
             createDestinationCalendar = false,
-            destinationId = calendarEntity.id,
-            destinationName = calendarEntity.name,
+            destinationId = calendar.id,
+            destinationName = calendar.name,
             destinationEmail = calendarEmail,
-            destinationColor = Color.parseColor(calendarEntity.color)
+            destinationColor = Color.parseColor(calendar.color)
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
         val indexOfItem = currentList.indexOf(calendarToImport)

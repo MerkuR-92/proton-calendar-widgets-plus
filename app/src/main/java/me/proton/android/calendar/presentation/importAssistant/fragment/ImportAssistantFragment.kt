@@ -49,7 +49,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -216,7 +216,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID) {
                 fragment_import_assistant_summary_header_layout.visibleOrGone(false)
                 fragment_import_assistant_summary_error_layout.visibleOrGone(true)
-                var countCalendarsOverLimit =
+                val countCalendarsOverLimit =
                     if (isFreeUser) {
                         if (userCalendarsCount >= MAX_CALENDAR_FREE) importCalendarsToCreateCount
                         else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
@@ -441,7 +441,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
     }
 
-    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, userCalendars: List<CalendarEntity>?) {
+    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, userCalendars: List<Calendar>?) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
         // Workaround to make sure we have the correct navigation bar color.

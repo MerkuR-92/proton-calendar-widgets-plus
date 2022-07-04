@@ -14,21 +14,20 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_calendar_import_mapping.view.item_calendar_import_mapping_icon
 import kotlinx.android.synthetic.main.item_calendar_import_mapping.view.item_calendar_import_mapping_layout
 import kotlinx.android.synthetic.main.item_calendar_import_mapping.view.item_calendar_import_mapping_name
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_source_title
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
-import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.domain.model.Calendar
 
 class MergeCalendarListAdapter(
-    val listener: (CalendarEntity) -> Unit
-): ListAdapter<CalendarEntity, MergeCalendarListAdapter.ViewHolder>(CalendarEntityDiffCallback()) {
+    val listener: (Calendar) -> Unit
+): ListAdapter<Calendar, MergeCalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 
-    class CalendarEntityDiffCallback : DiffUtil.ItemCallback<CalendarEntity>() {
-        override fun areItemsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+    class CalendarDiffCallback : DiffUtil.ItemCallback<Calendar>() {
+        override fun areItemsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: CalendarEntity, newItem: CalendarEntity): Boolean {
+        override fun areContentsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
             return oldItem == newItem
         }
     }
@@ -48,13 +47,13 @@ class MergeCalendarListAdapter(
         private val calendarName: TextView = view.item_calendar_import_mapping_name
         private val calendarLayout: LinearLayout = view.item_calendar_import_mapping_layout
 
-        fun bind(calendarEntity : CalendarEntity) {
+        fun bind(calendar : Calendar) {
 
-            calendarName.text = calendarEntity.name
-            calendarIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+            calendarName.text = calendar.name
+            calendarIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
 
             calendarLayout.setOnSingleClickListener {
-                listener(calendarEntity)
+                listener(calendar)
             }
         }
 

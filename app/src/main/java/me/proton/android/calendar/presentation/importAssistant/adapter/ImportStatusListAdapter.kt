@@ -15,7 +15,6 @@ import kotlinx.android.synthetic.main.item_import_status.view.item_import_status
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_details
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_icon
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountSI
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone

@@ -11,7 +11,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_badge.view.item_settings_calendar_badge
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_checkbox
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_badge
 import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_email
