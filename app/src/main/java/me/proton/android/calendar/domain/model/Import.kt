@@ -16,7 +16,8 @@ data class Import(
         DONE(2),
         FAILED(3),
         PAUSED(4),
-        CANCELED(5)
+        CANCELED(5),
+        CANCELING(6)
     }
 
     enum class ErrorCode(val value: Int) {

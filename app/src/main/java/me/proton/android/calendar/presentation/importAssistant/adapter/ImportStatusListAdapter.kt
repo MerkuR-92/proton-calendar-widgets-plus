@@ -86,6 +86,7 @@ class ImportStatusListAdapter(
                         Import.ImportState.FAILED -> R.string.import_assistant_status_failed
                         Import.ImportState.PAUSED -> R.string.import_assistant_status_paused
                         Import.ImportState.CANCELED -> R.string.import_assistant_status_canceled
+                        Import.ImportState.CANCELING -> R.string.import_assistant_status_canceling
                     }
                 )
                 badge.setTextColor(
@@ -97,7 +98,8 @@ class ImportStatusListAdapter(
                             Import.ImportState.PAUSED -> R.color.text_norm
                             Import.ImportState.DONE,
                             Import.ImportState.FAILED,
-                            Import.ImportState.CANCELED -> R.color.text_inverted
+                            Import.ImportState.CANCELED,
+                            Import.ImportState.CANCELING -> R.color.text_inverted
                         }
                     )
                 )
@@ -110,24 +112,32 @@ class ImportStatusListAdapter(
                             Import.ImportState.PAUSED -> R.color.background_secondary
                             Import.ImportState.DONE -> R.color.notification_success
                             Import.ImportState.FAILED,
-                            Import.ImportState.CANCELED -> R.color.notification_error
+                            Import.ImportState.CANCELED,
+                            Import.ImportState.CANCELING -> R.color.notification_error
                         }
                     )
                 )
 
-                icon.setImageDrawable(
-                    ContextCompat.getDrawable(
-                        itemView.context,
-                        when (import.state) {
-                            Import.ImportState.QUEUED,
-                            Import.ImportState.RUNNING -> R.drawable.ic_proton_cross
-                            Import.ImportState.PAUSED -> R.drawable.ic_proton_play
-                            Import.ImportState.DONE,
-                            Import.ImportState.FAILED,
-                            Import.ImportState.CANCELED -> R.drawable.ic_proton_trash
-                        }
+                if (import.state == Import.ImportState.CANCELING) {
+                    // When cancelling, we hide the icon
+                    icon.visibleOrGone(false)
+                } else {
+                    icon.visibleOrGone(true)
+                    icon.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            itemView.context,
+                            when (import.state) {
+                                Import.ImportState.QUEUED,
+                                Import.ImportState.RUNNING,
+                                Import.ImportState.CANCELING -> R.drawable.ic_proton_cross
+                                Import.ImportState.PAUSED -> R.drawable.ic_proton_play
+                                Import.ImportState.DONE,
+                                Import.ImportState.FAILED,
+                                Import.ImportState.CANCELED -> R.drawable.ic_proton_trash
+                            }
+                        )
                     )
-                )
+                }
 
                 icon.setOnSingleClickListener {
                     when (import.state) {
@@ -137,6 +147,7 @@ class ImportStatusListAdapter(
                         Import.ImportState.DONE,
                         Import.ImportState.FAILED,
                         Import.ImportState.CANCELED -> listener(import, Action.DELETE)
+                        Import.ImportState.CANCELING -> {} // Do nothing as icon should be hidden anyway
                     }
                 }
             }

@@ -44,6 +44,7 @@ import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
 import me.proton.android.calendar.common.MAX_CALENDAR_PAID
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -149,10 +150,6 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
         importAssistantViewModel.importCalendarMappingList.observe(viewLifecycleOwner) { importCalendarMappingList ->
             importCalendarMappingList ?: return@observe
-
-            if (this::importCalendarMappingListAdapter.isInitialized) {
-                importCalendarMappingListAdapter.submitList(importCalendarMappingList)
-            }
 
             showImportSummaryView(importCalendarMappingList)
 
@@ -271,7 +268,12 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
             if (calendarsToImport.any { it.createDestinationCalendar }) {
                 // Create new calendars
-                createCalendars(calendarsToImport)
+                if (!createCalendars(calendarsToImport)) {
+                    // If we fail to create one or more calendar, we display error to the user and display import summary view
+                    showImportSummaryView(calendarsToImport)
+                    view?.displaySnackBar(getString(R.string.import_assistant_create_calendar_error))
+                    return@launch
+                }
             }
 
             // Start the import
@@ -292,7 +294,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private suspend fun createCalendars(calendarsToImport: List<ImportCalendarMapping>) {
+    private suspend fun createCalendars(calendarsToImport: List<ImportCalendarMapping>): Boolean {
         // Create new calendars
         val calendarsToCreateCount = calendarsToImport.count { it.createDestinationCalendar }
         var calendarsCreatedCount = 0
@@ -304,6 +306,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             calendarsToImport.first { it.createDestinationCalendar }.destinationEmail
         )
 
+        var allCalendarCreated = true
         calendarsToImport.forEachIndexed { index, calendarToImport ->
             if (calendarToImport.createDestinationCalendar && calendarToImport.destinationId == null) {
                 // Create calendar
@@ -312,15 +315,26 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     calendarToImport.destinationEmail,
                     calendarToImport.destinationColor
                 )
-                // Set newly created calendar ID
-                calendarsToImport[index].destinationId = newCalendarId
 
-                calendarsCreatedCount++
+                if (newCalendarId == null) allCalendarCreated = false
+
+                // Set newly created calendar ID
+                if (newCalendarId != null) {
+                    calendarsToImport[index].destinationId = newCalendarId
+                    calendarsToImport[index].createDestinationCalendar = false // We set this to false so that in case of error we already preselect the newly created calendar
+                    calendarsCreatedCount++
+                }
+
                 // Update loader description text
                 updateCalendarCreatedView(calendarsToCreateCount, calendarsCreatedCount, calendarToImport.destinationEmail)
             }
         }
+
+        // Update list in VM
+        importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
+
         fragment_import_assistant_loader_description.text = getString(R.string.import_assistant_creating_calendars_finish)
+        return allCalendarCreated
     }
 
     private fun showImportInProgressView() {
@@ -369,6 +383,12 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun showImportSummaryView(importCalendarMappingList: List<ImportCalendarMapping>) {
+        // We set the list of ImportCalendarMapping to be displayed
+        if (this::importCalendarMappingListAdapter.isInitialized) {
+            importCalendarMappingListAdapter.submitList(importCalendarMappingList)
+            importCalendarMappingListAdapter.notifyDataSetChanged()
+        }
+
         // Display summary layout
         fragment_import_assistant_loader_layout.visibleOrGone(false)
         fragment_import_assistant_in_progress_layout.visibleOrGone(false)
@@ -406,6 +426,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             calendarsToMerge,
             resources.getQuantityString(R.plurals.calendar, calendarsToMerge)
         )
+
+        // Reset import button state
+        fragment_import_assistant_import_button.setIdle()
 
         // Show the import button
         fragment_import_assistant_import_button.visibleOrGone(true)

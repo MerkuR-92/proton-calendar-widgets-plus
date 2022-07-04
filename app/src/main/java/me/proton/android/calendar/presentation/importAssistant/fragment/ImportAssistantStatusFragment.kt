@@ -142,7 +142,9 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             LocalDateTime.ofInstant(Instant.ofEpochSecond(createTime.toLong()), zoneId)
                         },
                         importerEntity.active?.calendar?.state?.let { state ->
-                            Import.ImportState.values()[state]
+                            // Canceling is a special case because it has the same state value as canceled but only exists for active importers
+                            if (state == Import.ImportState.CANCELED.value) Import.ImportState.CANCELING
+                            else Import.ImportState.values()[state]
                         },
                         importerEntity.active?.calendar?.errorCode
                     )

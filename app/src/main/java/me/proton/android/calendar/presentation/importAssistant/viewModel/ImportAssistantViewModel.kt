@@ -133,7 +133,7 @@ class ImportAssistantViewModel @Inject constructor(
 
     private suspend fun createImporter(userId: UserId, tokenId: String, account: String, calendarColors: IntArray): Boolean {
         // Create the importer for the required products
-        val importerId = importerApi.createCalendarImporter(userId, tokenId).valueOrNullAndLogErrors(logger)?.importerID ?: return false
+        importerId = importerApi.createCalendarImporter(userId, tokenId).valueOrNullAndLogErrors(logger)?.importerID ?: return false
 
         // Get all the importer mapping info
         val externalCalendarList = importerApi.getCalendarImportMappingInfo(userId, importerId).valueOrNullAndLogErrors(logger)?.calendars ?: return false
@@ -256,6 +256,10 @@ class ImportAssistantViewModel @Inject constructor(
         }
 
         return null
+    }
+
+    fun setImportCalendarMappingList(calendarsToImport: List<ImportCalendarMapping>) {
+        _importCalendarMappingList.value = calendarsToImport
     }
 
     fun setImportCalendar(calendarToImport: ImportCalendarMapping, importCalendar: Boolean): Int? {

@@ -468,6 +468,7 @@
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
     <string name="import_assistant_update_import_error">Failed to update import, please try again later</string>
     <string name="import_assistant_start_import_error">Failed to start import, please try again later</string>
+    <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as">Import as</string>
     <string name="import_assistant_new_calendar_badge">New</string>
@@ -490,6 +491,7 @@
     <string name="import_assistant_status_in_progress">In progress</string>
     <string name="import_assistant_status_completed">Completed</string>
     <string name="import_assistant_status_canceled">Canceled</string>
+    <string name="import_assistant_status_canceling">Canceling</string>
     <string name="import_assistant_status_paused">Paused</string>
     <string name="import_assistant_status_failed">Failed</string>
     <string name="import_assistant_delete_report_title">Remove from the list?</string>

@@ -49,7 +49,7 @@ class ImportCalendarMappingListAdapter(
 
     class ExternalCalendarEntityDiffCallback : DiffUtil.ItemCallback<ImportCalendarMapping>() {
         override fun areItemsTheSame(oldItem: ImportCalendarMapping, newItem: ImportCalendarMapping): Boolean {
-            return oldItem.sourceId == newItem.sourceId
+            return oldItem.sourceId == newItem.sourceId && oldItem.destinationId == newItem.destinationId
         }
 
         override fun areContentsTheSame(oldItem: ImportCalendarMapping, newItem: ImportCalendarMapping): Boolean {
