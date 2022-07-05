@@ -354,7 +354,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-        deleteLayout?.visibleOrGone(DELETE_CALENDAR)
+        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not())
 
         val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
         markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not())

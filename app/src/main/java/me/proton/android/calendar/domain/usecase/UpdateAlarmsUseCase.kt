@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import android.content.Context
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
@@ -18,7 +19,8 @@ class UpdateAlarmsUseCase @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
-    private val transformEventUseCase: TransformEventUseCase
+    private val transformEventUseCase: TransformEventUseCase,
+    private val json: Json
 ) {
 
     suspend fun execute(userId: String, eventIds: List<String>) {
@@ -58,7 +60,11 @@ class UpdateAlarmsUseCase @Inject constructor(
                 transformEventUseCase.execute(it)
             } }
 
-            val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO")
+            val transformedChainWithInjectedAlarms = if (FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) {
+                ICalUtilsImpl.injectVAlarmsIntoSubscribedEvents(transformedChain, database.calendarSettingsDao().select(), json)
+            } else transformedChain
+
+            val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChainWithInjectedAlarms, fromZonedDateTime, "TODO")
 
             if (transformedChain.isEmpty()) {
                 logger.v("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")

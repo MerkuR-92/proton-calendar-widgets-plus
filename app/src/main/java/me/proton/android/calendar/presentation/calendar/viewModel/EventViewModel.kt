@@ -602,29 +602,9 @@ class EventViewModel @Inject constructor(
         return singleEditsInfo
     }
 
-    private fun getDefaultAlarms(calendarSettings: CalendarSettingsEntity, isAllDay: Boolean): List<VAlarm> {
-        val alarms = ArrayList<VAlarm>()
-        val defaultNotifications =
-            if (isAllDay) calendarSettings.defaultFullDayNotifications else calendarSettings.defaultPartDayNotifications
-        defaultNotifications.mapNotNull {
-            if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
-                it
-            ) else null
-        }.forEach { alarm ->
-            alarm.parseTrigger()?.let {
-                if (alarm.type == 0) {
-                    alarms.add(VAlarm.email(it, null, null))
-                } else {
-                    alarms.add(VAlarm.display(it, null))
-                }
-            }
-        }
-        return alarms
-    }
-
     private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
         event.iCalEvent.alarms.clear()
-        getDefaultAlarms(calendarSettings, event.isAllDay()).forEach {
+        calendarSettings.getDefaultAlarms(json, event.isAllDay()).forEach {
             if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) event.iCalEvent.addAlarm(it)
         }
     }

@@ -38,7 +38,9 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
@@ -670,6 +672,25 @@ object ICalUtilsImpl : ICalUtils {
                 }
             }
         }.filter { it.occurrence >= now.toEpochSecond() }
+    }
+
+    override fun injectVAlarmsIntoSubscribedEvents(
+        events: List<Event>,
+        calendarSettings: List<CalendarSettingsEntity>,
+        json: Json
+    ): List<Event> {
+        events.map { event ->
+            event.apply {
+                if (event.calendar.isSubscribed && event.iCalEvent.alarms.isEmpty()) {
+                    calendarSettings.find { it.calendarId == event.calendar.id }?.getDefaultAlarms(json, event.isAllDay())?.let { alarms ->
+                        alarms.forEach {
+                            event.iCalEvent.addAlarm(it)
+                        }
+                    }
+                }
+            }
+        }
+        return events
     }
 
     override fun isCalendarChangeAllowed(fromEvent: Event, toEvent: Event): Boolean {

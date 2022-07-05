@@ -4,12 +4,16 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import biweekly.component.VAlarm
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.data.db.AppDatabase
 
 // settings specific to Calendar, shared by all Calendar Members
@@ -54,4 +58,24 @@ data class CalendarSettingsEntity(
         }
     }
 
+}
+
+fun CalendarSettingsEntity.getDefaultAlarms(json: Json, isAllDay: Boolean): List<VAlarm> {
+    val alarms = ArrayList<VAlarm>()
+    val defaultNotifications =
+        if (isAllDay) this.defaultFullDayNotifications else this.defaultPartDayNotifications
+    defaultNotifications.mapNotNull {
+        if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
+            it
+        ) else null
+    }.forEach { alarm ->
+        alarm.parseTrigger()?.let {
+            if (alarm.type == 0) {
+                alarms.add(VAlarm.email(it, null, null))
+            } else {
+                alarms.add(VAlarm.display(it, null))
+            }
+        }
+    }
+    return alarms
 }

@@ -5,14 +5,14 @@ import me.proton.android.calendar.domain.model.Event
 
 internal abstract class BaseTest {
 
-    fun eventForICalString(iCalString: String, eventId: String? = null): Event {
+    fun eventForICalString(iCalString: String, eventId: String? = null, type: Int = 0): Event {
         return Event.from(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
             "calendar-id",
             "calendar",
             "",
             1,
             true,
-            0
+            type
         ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!
     }
 

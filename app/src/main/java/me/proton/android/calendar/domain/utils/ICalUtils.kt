@@ -14,7 +14,9 @@ import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.utils.CalendarSplit
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -166,6 +168,12 @@ interface ICalUtils {
      */
     fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
     ): List<EventAlarmEntity>
+
+    /**
+     * Events from Subscribed Calendars have no VAlarms inside ICS, so we take the default Alarms for that Calendar
+     * and inject it when needed, because all the other logic relies on having them inside [VEvent] object.
+     */
+    fun injectVAlarmsIntoSubscribedEvents(events: List<Event>, calendarSettings: List<CalendarSettingsEntity>, json: Json): List<Event>
 
     fun isCalendarChangeAllowed(from: Event, to: Event): Boolean
 
