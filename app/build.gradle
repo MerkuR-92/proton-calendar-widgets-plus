@@ -92,16 +92,16 @@ tasks.withType(Test) {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     buildToolsVersion "30.0.3"
     ndkVersion "21.3.6528147"
 
     defaultConfig {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 145
-        versionName "2.0.2"
+        targetSdkVersion 32
+        versionCode 146
+        versionName "2.1.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs "en", "ca", "es-rES", "es-rMX", "fr", "fr-rCA", "pl", "pt-rPT", "ro", "de"

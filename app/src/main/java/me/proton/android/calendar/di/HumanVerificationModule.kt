@@ -37,7 +37,7 @@ import javax.inject.Singleton
 object HumanVerificationModule {
 
     @Provides
-    fun provideHumanVerificationVersion() = HumanVerificationVersion.HV2
+    fun provideHumanVerificationVersion() = HumanVerificationVersion.HV3
 
     @Provides
     @HumanVerificationApiHost
@@ -94,7 +94,7 @@ object HumanVerificationModule {
     fun provideNetworkRequestOverrider(
         @ApplicationContext context: Context,
     ): NetworkRequestOverrider =
-        NetworkRequestOverriderImpl(OkHttpClient(), context)
+        NetworkRequestOverriderImpl(OkHttpClient())
 }
 
 @Module
