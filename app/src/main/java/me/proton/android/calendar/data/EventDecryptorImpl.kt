@@ -37,14 +37,15 @@ class EventDecryptorImpl @Inject constructor(
 
             val cachedValue = cacheValue.event
 
-            database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database)?.let { calendarEntity ->
+            database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database)?.let { calendar ->
                 val calendar = Calendar(
-                    calendarEntity.id,
-                    calendarEntity.name,
-                    calendarEntity.color,
-                    calendarEntity.flags,
-                    calendarEntity.display,
-                    calendarEntity.type
+                    calendar.id,
+                    calendar.name,
+                    calendar.email,
+                    calendar.color,
+                    calendar.flags,
+                    calendar.display,
+                    calendar.type
                 )
 
                 if (calendar != cacheValue.event.calendar) {

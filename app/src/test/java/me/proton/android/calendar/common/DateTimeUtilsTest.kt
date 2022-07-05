@@ -185,7 +185,7 @@ internal class DateTimeUtilsTest {
         val timeZoneId = "Europe/Berlin"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
+            Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -250,7 +250,7 @@ internal class DateTimeUtilsTest {
         val timeZoneId = "Europe/Berlin"
         val event = Event.from(
             "id",
-            Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
+            Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!

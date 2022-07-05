@@ -376,17 +376,6 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateCalendar(calendarEntity: CalendarEntity) {
-        val userId = userId.value?.id
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel updateCalendar")
-            return
-        }
-        withContext(Dispatchers.IO) {
-            calendarsRepository.updateCalendar(userId, calendarEntity)
-        }
-    }
-
     suspend fun prepareDeleteCalendar(calendarId: String): DeleteCalendarUseCase.DeleteCalendarOption {
         val userId = userId.value?.id
         if (userId == null) {
@@ -712,12 +701,6 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         return getCanonicalEmailsUseCase.invoke(userId, emails)
-    }
-
-    suspend fun getCalendarDefaultEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
     }
 
     suspend fun getUserEmails(): List<String>? {
@@ -1053,12 +1036,6 @@ class CalendarViewModel @Inject constructor(
         }
 
         return monthViewEventsMap
-    }
-
-    suspend fun getCalendarEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
     }
 
     suspend fun setJumpToCurrentTimeIfNeeded(date: LocalDate) {

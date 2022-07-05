@@ -7,6 +7,7 @@ import me.proton.core.util.kotlin.toBoolean
 data class Calendar(
         override val id: String,
         val name: String,
+        val email: String,
         val color: String,
         val flags: Int,
         val display: Boolean,
@@ -17,6 +18,7 @@ data class Calendar(
                 fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity) = Calendar(
                         id = calendarEntity.id,
                         name = calendarEntity.name,
+                        email = memberEntity.email,
                         color = memberEntity.color,
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),

@@ -137,9 +137,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val settingsCalendarListView = settings_calendars_list
         val settingsCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         settingsCalendarListView.layoutManager = settingsCalendarLayoutManager
-        settingsUserCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
+        settingsUserCalendarListAdapter = SettingsCalendarListAdapter() { calendar ->
             //On Calendar click event
-            showBottomSheetDialog(calendarEntity)
+            showBottomSheetDialog(calendar)
         }
         (settingsCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsCalendarListView.adapter = settingsUserCalendarListAdapter
@@ -158,9 +158,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val settingsSubscribedCalendarListView = settings_subscribed_calendars_list
         val settingsSubscribedCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         settingsSubscribedCalendarListView.layoutManager = settingsSubscribedCalendarLayoutManager
-        settingsSubscribedCalendarListAdapter = SettingsCalendarListAdapter() { calendarEntity ->
+        settingsSubscribedCalendarListAdapter = SettingsCalendarListAdapter() { calendar ->
             //On Calendar click event
-            showBottomSheetDialog(calendarEntity)
+            showBottomSheetDialog(calendar)
         }
         (settingsSubscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsSubscribedCalendarListView.adapter = settingsSubscribedCalendarListAdapter
@@ -187,15 +187,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
                     val dataSetChanged =
                         settingsSubscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
-
-                    val calendarEmails = hashMapOf<String, String>()
-                    subscribedCalendars.forEach { userCalendar ->
-                        val calendarEmail = calendarViewModel.getCalendarEmail(userCalendar.id)
-                        calendarEmail?.let {
-                            calendarEmails[userCalendar.id] = it
-                        }
-                    }
-                    settingsSubscribedCalendarListAdapter.setCalendarEmails(calendarEmails)
 
                     settingsSubscribedCalendarListAdapter.submitList(subscribedCalendars)
                     if (dataSetChanged) settingsSubscribedCalendarListAdapter.notifyDataSetChanged()
@@ -237,13 +228,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
      */
     private fun refreshUserCalendarList(userCalendars: List<Calendar>) {
         lifecycleScope.launch {
-            val calendarEmails = hashMapOf<String, String>()
-            userCalendars.forEach { userCalendar ->
-                val calendarEmail = calendarViewModel.getCalendarEmail(userCalendar.id)
-                calendarEmail?.let {
-                    calendarEmails[userCalendar.id] = it
-                }
-            }
             var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
             val defaultCalendar = userCalendars.firstOrNull { it.id == defaultCalendarId }
             if (defaultCalendar == null || !defaultCalendar.isActive) {
@@ -251,7 +235,6 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
             this@SettingsFragment.defaultCalendarId = defaultCalendarId
             val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-            settingsUserCalendarListAdapter.setCalendarEmails(calendarEmails)
             settingsUserCalendarListAdapter.submitList(
                 userCalendars.sortedBy {
                     it.isDisabled // Disabled will appear last

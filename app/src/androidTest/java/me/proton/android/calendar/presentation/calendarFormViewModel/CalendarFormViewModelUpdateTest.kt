@@ -32,9 +32,8 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     fun initViewModelUpdateTest() = runBlocking {
 
         // Mock calendar
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
         val calendarFormViewModel = getCalendarFormViewModel()
 
@@ -50,10 +49,6 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         coVerify(exactly = 1) {
             calendarsRepositoryMock.selectCalendarSettings(calendarId)
-        }
-
-        coVerify(exactly = 1) {
-            calendarsRepositoryMock.selectMembers(calendarId)
         }
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
@@ -147,7 +142,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun initViewModelUpdateFailedToGetCalendarSettingsTest() = runBlocking {
 
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns null
         coEvery { resourceProviderMock.provideString(R.string.snack_calendar_init_error) } returns
                 protonCalendarApplication.getString(R.string.snack_calendar_init_error)
@@ -183,7 +178,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarTest() = runBlocking {
 
-        val customCalendarColor = Color.parseColor("#ABCDEF")
+        val customCalendarColor = "#abcdef"
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -197,7 +192,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_update_calendar_success) } returns successSnackText
 
         // Mock calendar
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
         coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
@@ -210,7 +205,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(customCalendarColor)
+        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)
@@ -242,7 +237,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarErrorTest() = runBlocking {
 
-        val customCalendarColor = Color.parseColor("#ABCDEF")
+        val customCalendarColor = "#abcdef"
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -256,7 +251,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_update_calendar_error) } returns errorSnackText
 
         // Mock calendar
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
         coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
@@ -268,7 +263,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(customCalendarColor)
+        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)
@@ -300,7 +295,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
     @Test
     fun updateCalendarSettingsErrorTest() = runBlocking {
 
-        val customCalendarColor = Color.parseColor("#ABCDEF")
+        val customCalendarColor = "#abcdef"
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
         val customAllDayAlarm =
@@ -314,7 +309,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_update_calendar_settings_error) } returns errorSnackText
 
         // Mock calendar
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
         coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
@@ -327,7 +322,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(customCalendarColor)
+        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)
@@ -371,7 +366,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         coEvery { resourceProviderMock.provideString(R.string.snack_update_calendar_error) } returns errorSnackText
 
         // Mock calendar
-        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendarEntity()
+        coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
         coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
@@ -402,7 +397,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         assert(calendarFormViewModel.calendarSettingsSnackState.value == null)
 
         coVerify(exactly = 0) {
-            updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = calendarName, color = Color.parseColor(calendarColor))
+            updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = calendarName, color = calendarColor)
         }
         coVerify(exactly = 1) {
             updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm))

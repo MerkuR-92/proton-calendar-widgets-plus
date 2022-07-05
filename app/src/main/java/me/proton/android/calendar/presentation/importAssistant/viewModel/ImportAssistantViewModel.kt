@@ -292,7 +292,6 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
-        val calendarEmail = getCalendarEmail(calendar.id) ?: return
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -301,7 +300,7 @@ class ImportAssistantViewModel @Inject constructor(
             createDestinationCalendar = false,
             destinationId = calendar.id,
             destinationName = calendar.name,
-            destinationEmail = calendarEmail,
+            destinationEmail = calendar.email,
             destinationColor = Color.parseColor(calendar.color)
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
@@ -311,12 +310,6 @@ class ImportAssistantViewModel @Inject constructor(
         currentList.removeAt(indexOfItem)
         currentList.add(indexOfItem, updatedCalendarToImport)
         _importCalendarMappingList.value = currentList
-    }
-
-    private suspend fun getCalendarEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
     }
 
     suspend fun getImporters() {

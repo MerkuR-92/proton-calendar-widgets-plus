@@ -402,6 +402,7 @@ class EventViewModel @Inject constructor(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
                 defaultCalendar.id,
                 defaultCalendar.name,
+                defaultCalendar.email,
                 defaultCalendar.color,
                 defaultCalendar.flags,
                 defaultCalendar.display,
@@ -674,7 +675,7 @@ class EventViewModel @Inject constructor(
         return if (loadSettingsForCalendar(calendar.id)) {
             markEventAsEdited()
             if (event.iCalEvent.organizer != null) {
-                val organizerEmail = getCalendarEmail(calendar.id)
+                val organizerEmail = calendar.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
             event = Event.from(
@@ -682,6 +683,7 @@ class EventViewModel @Inject constructor(
                 calendar = Calendar(
                     calendar.id,
                     calendar.name,
+                    calendar.email,
                     calendar.color,
                     calendar.flags,
                     calendar.display,
@@ -1138,11 +1140,7 @@ class EventViewModel @Inject constructor(
                 logger.i("EventViewModel: User was null in allowSend")
                 return false
             }
-        val email = getCalendarEmail(event.calendar.id)
-        if (email == null) {
-            logger.i("EventViewModel: Email from selectMembers was null in allowSend")
-            return false
-        }
+        val email = event.calendar.email
         return user.hasSubscription() || !isShortDomainAddress(email)
     }
 
@@ -1166,7 +1164,7 @@ class EventViewModel @Inject constructor(
                 attendee
             )
             if (event.iCalEvent.organizer == null) {
-                val organizerEmail = getCalendarEmail(event.calendar.id)
+                val organizerEmail = event.calendar.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
         } else {
@@ -3041,11 +3039,5 @@ class EventViewModel @Inject constructor(
             if (occurrences.isNullOrEmpty()) EventLinkResult.OccurrenceDoesNotExist
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
-    }
-
-    suspend fun getCalendarEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
     }
 }

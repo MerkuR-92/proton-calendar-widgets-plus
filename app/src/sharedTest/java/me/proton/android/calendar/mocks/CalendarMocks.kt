@@ -45,12 +45,13 @@ object CalendarMocks {
         )
     }
 
-    fun provideCalendar(hasDisabledCalendar: Boolean = false, isHidden: Boolean = false): Calendar {
+    fun provideCalendar(isDisabled: Boolean = false, isHidden: Boolean = false, id: String = calendarId): Calendar {
         return Calendar(
-            calendarId,
+            id,
             calendarName,
+            userEmail,
             calendarColor,
-            if (hasDisabledCalendar) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
+            if (isDisabled) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType
         )

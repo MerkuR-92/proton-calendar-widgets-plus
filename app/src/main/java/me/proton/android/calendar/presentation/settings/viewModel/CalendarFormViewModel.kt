@@ -152,8 +152,8 @@ class CalendarFormViewModel @Inject constructor(
 
         _calendarId = calendarId
 
-        val calendarEntity = getCalendar(calendarId) ?: run {
-            logger.e("CalendarEntity was null in initUpdateCalendarForm")
+        val calendar = getCalendar(calendarId) ?: run {
+            logger.e("Calendar was null in initUpdateCalendarForm")
             // Use settings snack state here to display snack in calendar settings view
             calendarSettingsSnackState.value = CalendarFormSnackState.DisplaySnackNavigateUp(
                 resourceProvider.provideString(R.string.snack_calendar_init_error)
@@ -170,20 +170,16 @@ class CalendarFormViewModel @Inject constructor(
             return
         }
 
-        calendarIsSubscribed = calendarEntity.isSubscribed
-
-        val calendarEmail = calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
+        calendarIsSubscribed = calendar.isSubscribed
 
         // Calendar name
-        _calendarName.value = calendarEntity.name
+        _calendarName.value = calendar.name
 
         // Calendar default email (can't be updated for existing calendar)
-        _calendarEmail.value = calendarEmail ?: ""
+        _calendarEmail.value = calendar.email
 
         // Calendar color
-        _calendarColor.value = Color.parseColor(calendarEntity.color)
+        _calendarColor.value = Color.parseColor(calendar.color)
 
         // Default event duration
         _defaultEventDuration.value = calendarSettings.defaultEventDuration
