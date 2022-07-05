@@ -8,9 +8,12 @@
         <item>Español (México)</item>
         <item>Français</item>
         <item>Français (Canada)</item>
+        <item>Italiano</item>
+        <item>Nederlands</item>
         <item>Polski</item>
         <item>Português (Portugal)</item>
         <item>Română</item>
+        <item>Українська</item>
     </array>
     <array name="custom_language_values" translatable="false">
         <item>en</item>
@@ -20,8 +23,11 @@
         <item>es-MX</item>
         <item>fr</item>
         <item>fr-CA</item>
+        <item>it</item>
+        <item>nl</item>
         <item>pl</item>
         <item>pt</item>
         <item>ro</item>
+        <item>uk</item>
     </array>
 </resources>
