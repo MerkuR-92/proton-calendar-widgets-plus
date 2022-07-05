@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Proton Calendar</string>
+    <string name="default_event_summary" comment="Event has no title">(без назви)</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="default_user_email">(без адреси е-пошти)</string>
+    <string name="default_user_display_name">(без імені)</string>
+    <string name="toast_copied_to_clipboard">Скопійовано до буфера обміну</string>
+    <!-- DELETE EVENT DIALOG -->
+    <string name="dialog_title_delete_event">Видалити подію</string>
+    <string name="dialog_title_delete_recurring_event">Видалити повторювану подію</string>
+    <string name="dialog_description_delete_event">Бажаєте видалити цю подію?</string>
+    <string name="dialog_description_delete_recurring_event">Бажаєте видалити всі події в серії?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">Ця подія була оновлена організатором. Бажаєте видалити подію?</string>
+    <string name="dialog_button_delete">Видалити</string>
+    <string name="dialog_button_cancel">Скасувати</string>
+    <string name="dialog_button_close">Закрити</string>
+    <!-- Delete as an organizer -->
+    <string name="dialog_description_delete_event_as_organizer">Лист про скасування буде надіслано всім учасникам події. Бажаєте видалити цю подію?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Ваша адреса вимкнена. Неможливо надіслати лист про скасування учасникам події. Бажаєте все одно видалити цю подію?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">Лист про скасування буде надіслано всім учасникам події. Бажаєте видалити всі події в серії?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Ваша адреса вимкнена. Неможливо надіслати лист про скасування учасникам події. Бажаєте все одно видалити всі події в цій серії?</string>
+    <!-- Delete as an attendee -->
+    <string name="dialog_description_delete_single_event_as_attendee">Організатор цієї події отримає сповіщення про те, що ви відхиляєте запрошення. Бажаєте видалити цю подію?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">Організатор цієї події отримає сповіщення про те, що ви відхиляєте запрошення, оскільки ви не можете надсилати листи з адреси запрошення. Усе одно бажаєте видалити цю подію?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">Організатор цієї серії подій отримає сповіщення про те, що ви відхиляєте запрошення. Бажаєте видалити всі події в цій серії?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Організатор цієї серії подій отримає сповіщення про те, що ви відхиляєте запрошення, оскільки ви не можете надсилати листи з адреси запрошення. Усе одно бажаєте видалити всі події в цій серії?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Цю подію було оновлено. Організатор отримає сповіщення про те, що ви відхиляєте запрошення. Бажаєте видалити цю подію?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Ця подія була оновлена. Організатор не отримає сповіщення про те, що ви відхиляєте запрошення, оскільки ви не можете надсилати листи з адреси запрошення. Бажаєте видалити цю подію?</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Раніше оновлені організатором повторення будуть збережені, але ваші відповіді будуть втрачені</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Раніше оновлені організатором повторення будуть збережені</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Організатор не може бути повідомлений, що ви відхилили запрошення:\n\n• %1$s\n\nУсе одно бажаєте видалити подію?</string>
+    <string name="dialog_button_set">Встановити</string>
+    <string name="dialog_button_ok">Гаразд</string>
+    <string name="action_save">Зберегти</string>
+    <string name="action_done">Готово</string>
+    <string name="action_edit">Змінити</string>
+    <string name="action_delete">Видалити</string>
+    <string name="action_today">Сьогодні</string>
+    <string name="action_create_event">Створити подію</string>
+    <string name="action_mark_default">Позначити типовим</string>
+    <!-- MONTH VIEW -->
+    <string name="agenda_no_events">Немає подій</string>
+    <string name="agenda_loading_events">Завантаження подій…</string>
+    <string name="agenda_loading_events_error">Помилка завантаження подій</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
+    <string name="day_view_all_day_more">+ ще %d</string>
+    <!-- EVENT DETAILS   -->
+    <string name="event_all_day">Цілий день</string>
+    <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
+    <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
+    <string name="event_alarm_label_at_event_time">На час події</string>
+    <string name="event_alarm_label_at_event_time_by_email">На час події е-поштою</string>
+    <string name="event_alarm_label_on_the_same_day">Того ж дня</string>
+    <string name="event_alarm_label_before">%1$s до події</string>
+    <string name="event_alarm_label">%1$s</string>
+    <string name="event_alarm_label_before_by_email">%1$s до події електронним листом</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s, %2$s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s електронним листом</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s до події - %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s до події - %2$s електронним листом</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s у %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d числа</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s у %2$s</string>
+    <string name="event_recurrence_none">Не повторювати</string>
+    <string name="event_recurrence_daily">Щодня</string>
+    <string name="event_recurrence_weekly">Щотижня</string>
+    <string name="event_recurrence_monthly">Щомісяця</string>
+    <string name="event_recurrence_yearly">Щороку</string>
+    <string name="event_recurrence_weekly_on_all_days">всі дні</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">до %1$s</string>
+    <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">до %1$s (%2$s)</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
+    <string name="event_status_canceled">Скасовано</string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(вимкнено)</i>]]></string>
+    <string name="event_attendee_status_separator">%1$s, %2$s</string>
+    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d так</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d можливо</string>
+    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d ні</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d у черзі</string>
+    <string name="event_attendee_is_organizer">Ви є організатором</string>
+    <string name="event_attendee_organizer">Організатор</string>
+    <string name="event_attendee_optional">Необов\'язково</string>
+    <string name="event_attendee_is_current_user">Ви</string>
+    <string name="event_answer_attending">Будете присутні?</string>
+    <string name="event_answer_yes">Так</string>
+    <string name="event_answer_no">Ні</string>
+    <string name="event_answer_maybe">Можливо</string>
+    <string name="event_decryption_error_dialog_title">Не вдалося розшифрувати подію</string>
+    <string name="event_decryption_error_dialog_message">Не вдалося розшифрувати вміст цієї події.</string>
+    <string name="event_decryption_error_dialog_confirmation">Видалити подію</string>
+    <string name="event_decryption_error_dialog_confirmation_recurring">Видалити події</string>
+    <string name="event_decryption_error_dialog_close">Закрити</string>
+    <string name="event_signature_verification_warning">Не вдалося перевірити підпис події. <a href="https://proton.me/support/what-is-a-digital-signature">Докладніше</a></string>
+    <string name="event_change_answer_recurring_title">Оновити повторювану подію</string>
+    <string name="event_change_answer_recurring_description">Бажаєте змінити свою відповідь для всіх подій в серії?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Бажаєте змінити свою відповідь на всі події цієї серії?\nДеякі з ваших відповідей на події, раніше оновлені організатором, буде втрачено.</string>
+    <string name="event_change_answer_recurring_single_edit_description">Ця подія була оновлена організатором. Бажаєте змінити свою відповідь лише для цього повторення в серії?</string>
+    <string name="event_change_answer_recurring_cancel">Скасувати</string>
+    <string name="event_change_answer_recurring_confirm">Оновити</string>
+    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Відповідь: Запрошення на %s</string>
+    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s приймає ваше запрошення на %2$s</string>
+    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s відхиляє ваше запрошення на %2$s</string>
+    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s приймає із сумнівом ваше запрошення на %2$s</string>
+    <string name="event_organizer_send_prefs_error_title">Неможливо сповістити організатора</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">Неможливо повідомити організатора про те, що ви прийняли запрошення</string>
+    <string name="event_organizer_send_prefs_message_declined_title">Неможливо повідомити організатора про те, що ви відхилили запрошення</string>
+    <string name="event_organizer_send_prefs_message_tentative_title">Неможливо повідомити організатора про те, що ви із сумнівом прийняли запрошення</string>
+    <string name="event_organizer_send_prefs_message_default_title">Неможливо повідомити організатора про те, що ви відповіли на запрошення</string>
+    <string name="event_organizer_send_prefs_button_title">Гаразд</string>
+    <string name="event_attendees_send_prefs_error_title">Неможливо сповістити учасників</string>
+    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Неможливо сповістити нікого з учасників про ваші зміни:\n\n• %1$s\n\nВсе одно бажаєте продовжити?</string>
+    <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Неможливо сповістити про ваші зміни таких учасників:\n\n• %1$s\n\nВсе одно бажаєте продовжити?</string>
+    <string name="event_attendees_send_prefs_error_confirm">Продовжити</string>
+    <string name="event_attendees_send_prefs_error_cancel">Скасувати</string>
+    <string name="event_send_prefs_error_address_disabled">такої адреси не існує</string>
+    <string name="event_send_prefs_error_getting_contact">не вдалося отримати контактні дані</string>
+    <string name="event_send_prefs_error_network">помилка мережі</string>
+    <string name="event_send_prefs_trusted_keys_invalid">довірені ключі недійсні</string>
+    <string name="event_send_prefs_public_keys_invalid">відкриті ключі недійсні</string>
+    <string name="event_send_prefs_trusted_keys_signature_invalid">підпис контакту недійсний</string>
+    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <!-- CREATE / EDIT EVENT   -->
+    <string name="title_create_event">Нова подія</string>
+    <string name="event_text_edit_event">Змінити подію</string>
+    <string name="event_hint_title">Додати заголовок</string>
+    <string name="event_hint_location">Додати розташування</string>
+    <string name="event_text_add_participants">Додати учасників</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Учасники (%1$d/%2$d)</string>
+    <string name="event_current_user_organizer">Ви</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ ще %1$d</string>
+    <string name="event_text_switch_all_day">Цілий день</string>
+    <string name="event_text_date_start">Початок</string>
+    <string name="event_text_date_end">Завершення</string>
+    <string name="event_text_date_repeat">Повторення</string>
+    <string name="event_text_date_repeat_never">Не повторювати</string>
+    <string name="event_text_attendees">Учасники</string>
+    <string name="event_text_attendees_none">Ніхто</string>
+    <string name="event_text_calendar">Календар</string>
+    <string name="event_text_timezone_start">Часовий пояс</string>
+    <!-- TODO Start Timezone / End Timezone? -->
+    <string name="event_text_add_alarm">Додати сповіщення</string>
+    <string name="event_text_description">Опис</string>
+    <string name="event_hint_description">Додати опис</string>
+    <string name="event_text_custom">власний</string>
+    <string name="event_alert_invalid_start_end_date">Дата початку події не може бути після дати завершення</string>
+    <string name="event_alarms_title">Сповіщення</string>
+    <string name="event_custom_alarms_field">Сповіщати</string>
+    <string name="event_custom_alarms_title">Власні сповіщення</string>
+    <string name="event_alarm_partial_day_1">на час події</string>
+    <string name="event_alarm_partial_day_2">10 хвилин</string>
+    <string name="event_alarm_partial_day_3">30 хвилин</string>
+    <string name="event_alarm_partial_day_4">1 година</string>
+    <string name="event_alarm_partial_day_5">1 тиждень</string>
+    <string name="event_alarm_all_day_1">того ж дня $%1$s</string>
+    <string name="event_alarm_all_day_2">За 1 день до події - %1$s</string>
+    <string name="event_alarm_all_day_3">За 1 тиждень до події - %1$s</string>
+    <string name="event_alarm_all_day_4">За 3 тижні до події - %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00"> %1$s</string>
+    <string name="event_alarm_action">Надіслати через</string>
+    <string name="event_alarm_action_notification">сповіщення</string>
+    <string name="event_alarm_action_email">електронний лист</string>
+    <string name="event_alarm_same_day">того ж дня</string>
+    <string name="event_recurrence_1">не повторювати</string>
+    <string name="event_recurrence_2">щодня</string>
+    <string name="event_recurrence_3">щотижня</string>
+    <string name="event_recurrence_4">щомісяця</string>
+    <string name="event_recurrence_5">щороку</string>
+    <string name="event_recurrence_title">Частота</string>
+    <string name="event_recurrence_custom_title">Зазначена частота</string>
+    <string name="event_recurrence_occurs_every">Повторювати кожні</string>
+    <string name="event_recurrence_occurs_on">Повторити</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d числа</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">у %1$s</string>
+    <string name="event_recurrence_ends_on">Завершується</string>
+    <string name="event_recurrence_ends_never">ніколи</string>
+    <string name="event_recurrence_ends_on_date_empty">на день</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
+    <string name="event_recurrence_ends_after_count_prefix">після</string>
+    <string name="event_recurring_edit_this">Ця подія</string>
+    <string name="event_recurring_edit_this_and_future">Ця та майбутні події</string>
+    <string name="event_recurring_edit_all_events">Усі події</string>
+    <string name="event_discard_changes_title">Відхилити зміни?</string>
+    <string name="event_discard_changes_description">Ви втратите всі незбережені зміни.</string>
+    <string name="event_discard_changes_cancel">Продовжити редагування</string>
+    <string name="event_discard_changes_confirm">Відхилити</string>
+    <string name="event_recurring_update_this_title">Оновити повторювану подію</string>
+    <string name="event_recurring_update_this_description">Зміни частоти повторювань будуть втрачені</string>
+    <string name="event_recurring_update_all_description">Попередні зміни в цій серії будуть втрачені</string>
+    <string name="event_recurring_update_this_cancel">Скасувати</string>
+    <string name="event_recurring_update_this_confirm">Оновити</string>
+    <string name="event_allow_contacts_title">Дозволити Proton Calendar доступ до контактів?</string>
+    <string name="event_allow_contacts_description">Proton Calendar потребує доступу до ваших контактів для можливості автозавершення</string>
+    <string name="event_allow_contacts_cancel">Заборонити</string>
+    <string name="event_allow_contacts_confirm">Дозволити</string>
+    <string name="event_send_invite_mail_subject_prefix">Запрошення на %s</string>
+    <string name="event_send_invite_mail_subject_all_day">подія на %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day_multiple">подія починається %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">подія почнеться %1$s, %2$s %3$s</string>
+    <string name="event_send_invite_mail_body">Вас запрошено на %1$s\nКоли: %2$s</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
+    <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s - %4$s, %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nДе: %1$s</string>
+    <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nОпис: %1$s</string>
+    <string name="event_send_invite_dialog_title">Надіслати запрошення</string>
+    <string name="event_send_invite_dialog_description">Запрошення буде надіслано доданим учасникам.</string>
+    <string name="event_send_invite_dialog_confirm">Надіслати</string>
+    <string name="event_send_invite_dialog_cancel">Скасувати</string>
+    <string name="event_add_participants_dialog_title">Додати учасників</string>
+    <string name="event_add_participants_dialog_description">Запрошення буде надіслано вказаним учасникам на всі події цієї серії.</string>
+    <string name="event_add_participants_overwrite_dialog_description">Запрошення буде надіслано доданим учасникам на всі події цієї серії.\nПопередні зміни в цій серії будуть втрачені.</string>
+    <string name="event_add_participants_dialog_confirm">Надіслати</string>
+    <string name="event_add_participants_dialog_cancel">Скасувати</string>
+    <string name="event_send_cancel_mail_subject_prefix">Скасування %s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">подія почнеться %1$s, %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day_multiple">подія починається %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day">подія на %1$s</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s було скасовано.</string>
+    <!-- NAVIGATION VIEW   -->
+    <string name="nav_view_calendars">Мої календарі</string>
+    <string name="nav_view_subscribed_calendars">Підписні календарі</string>
+    <string name="nav_view_disabled_calendars">%s (Вимкнено)</string>
+    <string name="nav_view_not_synced_calendars">%s (Не синхронізовано)</string>
+    <string name="nav_view_syncing_calendars">%s (Синхронізація)</string>
+    <string name="nav_view_more">Докладніше</string>
+    <string name="nav_view_switcher">Вигляд</string>
+    <string name="nav_view_switcher_day">День</string>
+    <string name="nav_view_switcher_agenda">Розклад</string>
+    <string name="nav_view_switcher_month">Місяць</string>
+    <string name="nav_view_timezone">Часовий пояс</string>
+    <string name="nav_view_settings">Налаштування</string>
+    <string name="nav_view_feedback">Напишіть нам відгук</string>
+    <string name="nav_view_more_general_settings" comment="General Settings">Загальні</string>
+    <string name="nav_view_more_bug">Повідомити про ваду</string>
+    <string name="nav_view_more_subscription">Передплата</string>
+    <string name="nav_view_more_logout">Вийти</string>
+    <string name="nav_view_more_login">Увійти</string>
+    <string name="nav_view_version_name">Proton Calendar %1$s</string>
+    <!-- SnackBar messages -->
+    <string name="snack_feature_coming_soon">Ця функція незабаром буде доступна</string>
+    <string name="snack_event_deleted">Подію видалено</string>
+    <string name="snack_event_deleted_as_organizer">Лист про скасування надіслано, а подію видалено</string>
+    <string name="snack_event_deleted_as_attendee">Відповідь надіслано, а подію видалено</string>
+    <string name="snack_event_deleted_error">Помилка видалення події</string>
+    <string name="snack_event_deleted_as_organizer_error">Не вдалося надіслати електронний лист про скасування. Повторіть спробу</string>
+    <string name="snack_event_opening_error">Помилка відкриття події</string>
+    <string name="snack_event_saving">Збереження події</string>
+    <string name="snack_event_deleting">Видалення події</string>
+    <string name="snack_event_changing_answer">Оновлення відповіді</string>
+    <string name="snack_event_updated">Подію оновлено</string>
+    <string name="snack_event_updated_error_failed_mail">Не вдалося надіслати запрошення</string>
+    <string name="snack_event_updated_error">Помилка оновлення події</string>
+    <string name="snack_event_created">Подію створено</string>
+    <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>
+    <string name="snack_event_created_error">Помилка створення події</string>
+    <string name="snack_event_opening_edit_error">Помилка відкриття події для редагування</string>
+    <string name="snack_event_edit_with_attendees_error">Редагування подій з учасниками ще не підтримується</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">Не можна додавати учасників та змінювати календар одночасно</string>
+    <string name="snack_event_init_error">Помилка ініціалізації нової події</string>
+    <string name="snack_event_calendar_error">Помилка перемикання календаря</string>
+    <string name="snack_event_maximum_alarm_reached_error">Досягнуто максимальної кількості сповіщень</string>
+    <string name="snack_send_bug_report_success">Звіт надіслано, дякуємо за ваш відгук</string>
+    <string name="snack_send_bug_report_error">Помилка надсилання звіту, повторіть спробу пізніше</string>
+    <string name="snack_send_bug_report_description_empty">Опишіть свою проблему</string>
+    <string name="snack_create_event_no_active_personal_calendar">Вам потрібен власний активний календар для створення подій</string>
+    <string name="snack_add_self_as_participant">Запрошення самих себе заборонено</string>
+    <string name="snack_maximum_participants_reached">Досягнуто обмеження кількості учасників.</string>
+    <string name="snack_add_participant_error">Помилка під час додавання учасника</string>
+    <string name="snack_add_participant_invalid_email">Недійсна е-пошта</string>
+    <string name="snack_change_attendee_answer_error">Помилка надсилання відповіді, повторіть спробу пізніше</string>
+    <string name="snack_network_error">Помилка мережі. Повторіть спробу пізніше</string>
+    <string name="snack_import_event_signed_out">Ви повинні увійти для імпорту подій</string>
+    <string name="snack_app_link_signed_out">Ви повинні увійти, щоб переглянути подію</string>
+    <string name="snack_update_default_calendar">Типовий календар оновлено</string>
+    <string name="snack_update_default_calendar_error">Помилка оновлення типового календаря. Спробуйте знову пізніше</string>
+    <string name="snack_calendar_init_error">Помилка при завантаженні інформації календаря</string>
+    <string name="snack_update_calendar_error">Помилка при оновленні інформації календаря. Спробуйте знову пізніше</string>
+    <string name="snack_update_calendar_settings_error">Помилка при оновленні інформації календаря. Спробуйте знову пізніше</string>
+    <string name="snack_update_calendar_success">Календар оновлено</string>
+    <string name="snack_create_calendar_success">Календар створено</string>
+    <string name="snack_calendar_saving">Збереження календаря</string>
+    <string name="snack_create_calendar_error">Помилка створення календаря. Спробуйте знову пізніше</string>
+    <string name="snack_create_calendar_settings_error">Календар створено, але деяку інформацію не було оновлено. Спробуйте знову пізніше</string>
+    <string name="snack_ics_default_error">Помилка відкриття календаря</string>
+    <string name="snack_ics_event_not_found_error">Подію не знайдено</string>
+    <string name="snack_ics_create_error">Помилка створення події</string>
+    <string name="snack_ics_parsing_error">Помилка читання календаря</string>
+    <string name="snack_ics_unsupported_method_error">Цей тип події ще не підтримується</string>
+    <string name="snack_ics_unsupported_add_error">Додавання повторень для події наразі не підтримується</string>
+    <string name="snack_ics_unsupported_counter_error">Повторне планування події наразі не підтримується</string>
+    <string name="snack_ics_unsupported_refresh_error">Оновлення події наразі не підтримується</string>
+    <string name="snack_ics_unsupported_publish_error">Імпорт події наразі не підтримується</string>
+    <string name="snack_ics_unsupported_single_edit_reply_error">Ми підтримуємо лише відповіді на всі події серії на цей час</string>
+    <string name="snack_ics_party_crasher_error">Ваша адреса електронної пошти не входить до списку учасників</string>
+    <string name="snack_ics_reply_party_crasher_error">Неможливо додати учасників, які не були запрошені організатором</string>
+    <string name="snack_ics_missing_uid_error">В події відсутній UID</string>
+    <string name="snack_ics_no_active_calendar_error">Немає активного календаря, пов\'язаного з цим обліковим записом</string>
+    <string name="snack_ics_unsupported_duration_error">Властивість тривалості не підтримується</string>
+    <string name="snack_ics_too_many_events_error">Кілька подій поки не підтримується</string>
+    <string name="snack_ics_no_events_error">Цей календар не містить жодної події</string>
+    <string name="snack_ics_invalid_error">Це запрошення недійсне</string>
+    <string name="snack_ics_disabled_calendar_error">Повторно увімкнути адресу, пов\'язану з цим календарем, для оновлення цієї події</string>
+    <string name="snack_ics_event_deleted_error">Події більше не існує в календарі</string>
+    <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s приймає ваше запрошення</string>
+    <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s приймає ваше запрошення, але сумнівається, що відвідає</string>
+    <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s відхиляє ваше запрошення</string>
+    <string name="snack_app_link_invalid">Недійсне посилання на подію</string>
+    <string name="snack_app_link_error">Помилка відкриття події</string>
+    <string name="snack_notification_already_added">Сповіщення вже було додано</string>
+    <!-- Dialogs -->
+    <string name="error_event_does_not_exist">Події не існує</string>
+    <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
+    <string name="update_timezone_dialog_title">Часовий пояс змінено</string>
+    <string name="update_timezone_dialog_message">Схоже, часовий пояс системи змінено на %1$s. Хочете оновити налаштування часового поясу?</string>
+    <string name="update_timezone_dialog_confirmation">Оновити</string>
+    <string name="update_timezone_dialog_cancel">Скасувати</string>
+    <string name="contacts_permission_dialog_title">Дозволити Proton Calendar доступ до контактів?</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar потребує доступу до ваших контактів з телефону, щоб легко додати їх до ваших подій.</string>
+    <string name="contacts_permission_dialog_allow">Дозволити</string>
+    <string name="contacts_permission_dialog_open_settings">Відкрити налаштування</string>
+    <string name="contacts_permission_dialog_cancel">Заборонити</string>
+    <string name="dialog_title_calendar_picker">Календар</string>
+    <!-- NOTIFICATIONS -->
+    <string name="notification_channel_alarms">Сповіщення про події</string>
+    <string name="notification_channel_sync">Синхронізація календаря</string>
+    <string name="notification_sync">Синхронізація календарів…</string>
+    <string name="notification_text_today">Сьогодні</string>
+    <string name="notification_text_today_part_time">Сьогодні о %1$s</string>
+    <string name="notification_text_tomorrow">Завтра</string>
+    <string name="notification_text_tomorrow_part_time">Завтра о %1$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s, %2$s</string>
+    <!-- Bug report -->
+    <string name="bug_report_hint_title">Тема</string>
+    <string name="bug_report_hint_description">Опишіть проблему та додайте повідомлення про помилки.</string>
+    <string name="bug_report_discard_changes_title">Незбережені зміни</string>
+    <string name="bug_report_discard_changes_description">Виявлено незбереженні записи у формі. Ви дійсно хочете відхилити їх?</string>
+    <string name="bug_report_discard_changes_cancel">Продовжити писати</string>
+    <string name="bug_report_discard_changes_confirm">Відхилити</string>
+    <!-- Settings -->
+    <string name="settings_theme_title">Тема</string>
+    <string name="settings_theme_info">Цей параметр впливає лише на зовнішній вигляд застосунку Proton Calendar на цьому пристрої. Застосунок перезапуститься після зміни теми.</string>
+    <string name="settings_timezone_title">Часовий пояс</string>
+    <string name="settings_language_title">Мова програми</string>
+    <string name="settings_language_default">Автовизначення</string>
+    <string name="settings_update_timezone_title">Запит оновлення часового поясу</string>
+    <string name="settings_update_timezone_subtitle">Якщо часовий пояс системи відрізняється від налаштування поточного часового поясу, вам буде запропоновано його оновити.</string>
+    <string name="settings_update_timezone_checkbox">Надалі не запитувати</string>
+    <string name="settings_week_start_title">Початок тижня</string>
+    <string name="settings_time_format_title">Формат часу</string>
+    <string name="settings_week_numbers_title">Показати номери тижнів</string>
+    <string name="settings_auto_invites_title">Додати запрошення до календаря та додати його в чергу</string>
+    <string name="settings_alternative_routing_title">Дозволити альтернативну маршрутизацію</string>
+    <string name="settings_alternative_routing_subtitle">У випадку блокування сайтів Proton, цей параметр дозволяє програмі спробувати альтернативний мережевий маршрут для доступу до Proton, що може бути корисним для обходу мережевих екранів чи мережевих проблем. Рекомендовано увімкнути цей параметр для більшої надійності.</string>
+    <string name="settings_value_placeholder">Торкніться, щоб вибрати</string>
+    <string name="settings_general_title">Загальні</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s тощо.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">тема</string>
+    <string name="settings_general_info_language">мова</string>
+    <string name="settings_general_info_time_zone">часовий пояс</string>
+    <string name="settings_general_info_calendar_layout">вигляд календарів</string>
+    <string name="settings_calendars">Мої календарі</string>
+    <string name="settings_subscribed_calendars">Підписні календарі</string>
+    <string name="settings_calendar_default">Типовий</string>
+    <string name="settings_calendar_disabled">Вимкнено</string>
+    <string name="settings_calendar_not_synced">Не синхронізовано</string>
+    <string name="settings_calendar_syncing">Синхронізація</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Непідтримуваний формат календаря</string>
+    <string name="settings_calendar_subscribed_too_big">Календар завеликий</string>
+    <string name="settings_calendar_subscribed_not_accessible">Календар за посиланням недоступний</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Посилання календаря тимчасово недоступне</string>
+    <string name="settings_calendar_subscribed_last_sync_old">Понад 12 годин минуло після попередньої синхронізації</string>
+    <string name="settings_calendar_subscribed_not_decrypted">Не вдалося розшифрувати календар</string>
+    <!-- Calendar form -->
+    <string name="calendar_form_create_title">Створити календар</string>
+    <string name="calendar_form_update_title">Редагувати календар</string>
+    <string name="calendar_form_save">Зберегти</string>
+    <string name="calendar_form_name">Назва</string>
+    <string name="calendar_form_name_placeholder">Додати назву календаря</string>
+    <string name="calendar_form_name_character_limit">%d/%d символів</string>
+    <string name="calendar_form_color">Колір календаря</string>
+    <string name="calendar_form_default_event_duration">Тривалість події</string>
+    <string name="calendar_form_default_event_notifications">Сповіщення про події</string>
+    <string name="calendar_form_default_all_day_event_notifications">Сповіщення події на цілий день</string>
+    <string name="calendar_form_add_notification">Додати сповіщення</string>
+    <string name="calendar_form_default_email">Адреса е-пошти</string>
+    <string name="calendar_form_default_email_value_error">Не вдалося завантажити типову електронну пошту</string>
+    <string name="calendar_form_name_hint">Додати назву календаря</string>
+    <string name="calendar_form_name_required_error">Назва обов\'язкова</string>
+    <string name="add_calendar_text">Додати календар</string>
+    <string name="create_calendar_limit_reached">Ви досягли максимальної кількості календарів.</string>
+    <string name="create_calendar_limit_reached_paid_title">Досягнуто ліміту 20 календарів</string>
+    <string name="create_calendar_limit_reached_paid_message">Видалити календарі, які не використовуються, щоб створити новий календар.</string>
+    <string name="create_calendar_limit_reached_paid_manage">Керувати календарями</string>
+    <string name="create_calendar_limit_reached_close">Закрити</string>
+    <string name="create_calendar_limit_reached_free_title">Покращити Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Створюйте до 20 календарів та отримайте доступ до багатьох інших ексклюзивних функцій покращивши свій тарифний план.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Не зараз</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Покращити</string>
+    <string name="delete_calendar_dialog_title">Видалити календар</string>
+    <string name="delete_calendar_dialog_message">Ви дійсно хочете видалити цей календар?</string>
+    <string name="delete_default_calendar_dialog_message">Ви впевнені, що хочете видалити цей календар? \"%1$s\" буде встановлено типовим календарем.</string>
+    <string name="delete_calendar_snack_deleted">Календар видалено</string>
+    <string name="delete_calendar_snack_error">Помилка видалення календаря</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Не вдалося підтвердити пароль</string>
+    <!-- Bootstrap errors -->
+    <string name="bootstrap_error_default_confirm">Гаразд</string>
+    <string name="bootstrap_error_no_calendar_title">Немає календарів, пов’язаних із цим обліковим записом.</string>
+    <string name="bootstrap_error_no_calendar_message">Щоб налаштувати його, перейдіть до <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_some_calendars_failed_title">Помилка підготовки календарів</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Не вдається налаштувати зазначені календарі</string>
+    <string name="bootstrap_error_no_active_calendar_title">Немає активного календаря, пов\'язаного з цим обліковим записом.</string>
+    <string name="bootstrap_error_no_active_calendar_message">Щоб дізнатися, як активувати календар, відвідайте нашу <a href="https://proton.me/support">базу знань</a></string>
+    <string name="bootstrap_error_store_quota_reached_message">Немає вільного місця для зберігання.</string>
+    <string name="bootstrap_error_store_quota_reached_learn_more">Докладніше</string>
+    <string name="bootstrap_error_reset_needed_title">Скинути ключі календаря</string>
+    <string name="bootstrap_error_reset_needed_message">Ви скинули свій пароль, а події, пов\'язані з цими календарями, не можуть бути розшифровані. Будь-які активні календарі, на які ви підписані знову синхронізуються через кілька хвилин.</string>
+    <string name="bootstrap_error_update_passphrase_title">Повторно активувати ключі календаря</string>
+    <string name="bootstrap_error_update_passphrase_message">Ви повторно активували свої ключі, тому тепер можна зашифрувати події, пов\'язані з вказаними календарями.</string>
+    <string name="bootstrap_error_continue_button">Продовжити</string>
+    <string name="splash_after_login_init">Готування календарів</string>
+    <string name="splash_init">Розшифрування подій</string>
+    <string name="default_calendar_name">Мій календар</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Напишіть нам відгук</string>
+    <string name="dialog_feedback_text">Як би ви описали свої враження від Proton Calendar?</string>
+    <string name="dialog_feedback_rating_worst">Жахливо</string>
+    <string name="dialog_feedback_rating_best">Дивовижно</string>
+    <string name="dialog_feedback_hint">Розкажіть нам своє враження. (Необов\'язково)</string>
+    <string name="dialog_feedback_submit">Надіслати</string>
+    <string name="dialog_feedback_submit_thank_you">Дякуємо! Ваш відгук допоможе нам удосконалити Proton.</string>
+    <!-- Calendar Widget -->
+    <string name="calendar_widget_description">Віджет Proton Calendar</string>
+    <string name="calendar_widget_no_upcoming_events_today">На сьогодні подій немає</string>
+    <string name="calendar_widget_loading_events">Завантаження подій…</string>
+    <string name="calendar_widget_loading_events_error">Неможливо завантажити події</string>
+    <string name="calendar_widget_no_upcoming_events">Немає прийдешніх подій</string>
+    <string name="calendar_widget_please_log_in">Увійдіть, щоб переглянути свої події</string>
+    <string name="calendar_widget_part_day_event_starts_at">Початок %1$s</string>
+    <string name="calendar_widget_part_day_event_ends_at">Завершення %1$s</string>
+    <!-- Spotlight Dialogs -->
+    <string name="spotlight_dialog_header">Що нового</string>
+    <string name="spotlight_dialog_confirmation_button">Гаразд</string>
+    <string name="spotlight_dialog_month_view_title">Перегляд місяця</string>
+    <string name="spotlight_dialog_month_view_description">Оглядайте ваші події у нашому новому поданні на місяць. Перемикайте вигляд за допомогою меню.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Зрозуміло</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Докладніше</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Оновлений Proton, єдиний захист</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до інтернету, де приватність — це стандарт. <a href="http://proton.me/news/updated-proton">Докладніше</a></string>
+    <!--  STRING PLURALS  -->
+    <plurals name="plural_minute">
+        <item quantity="one">хвилина</item>
+        <item quantity="few">хвилини</item>
+        <item quantity="many">хвилин</item>
+        <item quantity="other">хвилини</item>
+    </plurals>
+    <plurals name="plural_hour">
+        <item quantity="one">година</item>
+        <item quantity="few">години</item>
+        <item quantity="many">годин</item>
+        <item quantity="other">години</item>
+    </plurals>
+    <plurals name="plural_day">
+        <item quantity="one">день</item>
+        <item quantity="few">дні</item>
+        <item quantity="many">днів</item>
+        <item quantity="other">дні</item>
+    </plurals>
+    <plurals name="plural_week">
+        <item quantity="one">тиждень</item>
+        <item quantity="few">тижні</item>
+        <item quantity="many">тижнів</item>
+        <item quantity="other">тижні</item>
+    </plurals>
+    <plurals name="plural_month">
+        <item quantity="one">місяць</item>
+        <item quantity="few">місяці</item>
+        <item quantity="many">місяців</item>
+        <item quantity="other">місяці</item>
+    </plurals>
+    <plurals name="plural_year">
+        <item quantity="one">рік</item>
+        <item quantity="few">роки</item>
+        <item quantity="many">років</item>
+        <item quantity="other">роки</item>
+    </plurals>
+    <plurals name="plural_recurrence_count">
+        <item quantity="one">одноразово</item>
+        <item quantity="few">рази</item>
+        <item quantity="many">разів</item>
+        <item quantity="other">рази</item>
+    </plurals>
+    <plurals name="plural_occurrence">
+        <item quantity="one">повторення</item>
+        <item quantity="few">повторення</item>
+        <item quantity="many">повторень</item>
+        <item quantity="other">повторення</item>
+    </plurals>
+    <plurals name="plural_participant_uppercase">
+        <item quantity="one">учасник</item>
+        <item quantity="few">учасники</item>
+        <item quantity="many">учасників</item>
+        <item quantity="other">учасники</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="few">Кожні %1$d %2$s</item>
+        <item quantity="many">Кожні %1$d %2$s</item>
+        <item quantity="other">Кожні %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="few">Кожні %1$d %2$s</item>
+        <item quantity="many">Кожні %1$d %2$s</item>
+        <item quantity="other">Кожні %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="few">Кожні %1$d %2$s</item>
+        <item quantity="many">Кожні %1$d %2$s</item>
+        <item quantity="other">Кожні %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Кожні %1$d %2$s</item>
+        <item quantity="few">Кожні %1$d %2$s</item>
+        <item quantity="many">Кожні %1$d %2$s</item>
+        <item quantity="other">Кожні %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s хвилина</item>
+        <item quantity="few">%s хвилини</item>
+        <item quantity="many">%s хвилин</item>
+        <item quantity="other">%s хвилини</item>
+    </plurals>
+    <!--  STRING ARRAYS  -->
+    <string-array name="ordinals_as_words">
+        <item/>
+        <item>перший</item>
+        <item>другий</item>
+        <item>третій</item>
+        <item>четвертий</item>
+        <item>пʼятий</item>
+    </string-array>
+    <string-array name="ordinals_as_words_backwards">
+        <item/>
+        <item>останній</item>
+        <item>від другого до останнього</item>
+        <item>від третього до останнього</item>
+        <item>від четвертого до останнього</item>
+        <item>від пʼятого до останнього</item>
+    </string-array>
+    <string-array name="app_themes">
+        <item>Світла</item>
+        <item>Темна</item>
+        <item>Системна</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>Системний</item>
+        <item>13:00</item>
+        <item>1:00пп</item>
+    </string-array>
+    <string-array name="week_start">
+        <item>Системи</item>
+        <item>Понеділок</item>
+        <item>Субота</item>
+        <item>Неділя</item>
+    </string-array>
+</resources>
