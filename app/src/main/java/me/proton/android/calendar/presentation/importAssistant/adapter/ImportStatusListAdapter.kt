@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
@@ -14,6 +15,10 @@ import kotlinx.android.synthetic.main.item_import_status.view.item_import_status
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_badge
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_details
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_icon
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_button
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_description
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_title
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountSI
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -57,6 +62,10 @@ class ImportStatusListAdapter(
         private val details: TextView = view.item_import_status_details
         private val badge: View = view.item_import_status_badge
         private val icon: ImageView = view.item_import_status_icon
+        private val warningLayout: LinearLayout = view.item_import_status_warning
+        private val warningTitle: TextView = view.item_import_status_warning_title
+        private val warningDescription: TextView = view.item_import_status_warning_description
+        private val warningButton: TextView = view.item_import_status_warning_button
 
         fun bind(import : Import) {
 
@@ -77,6 +86,7 @@ class ImportStatusListAdapter(
 
             icon.visibleOrGone(import.state != null)
             badge.visibleOrGone(import.state != null)
+            warningLayout.visibleOrGone(import.state != null)
             if (import.state != null) {
                 (badge as TextView).text = itemView.context.getString(
                     when (import.state) {
@@ -94,9 +104,9 @@ class ImportStatusListAdapter(
                         itemView.context,
                         when (import.state) {
                             Import.ImportState.QUEUED,
-                            Import.ImportState.RUNNING,
-                            Import.ImportState.PAUSED -> R.color.text_norm
+                            Import.ImportState.RUNNING -> R.color.text_norm
                             Import.ImportState.DONE,
+                            Import.ImportState.PAUSED,
                             Import.ImportState.FAILED,
                             Import.ImportState.CANCELED,
                             Import.ImportState.CANCELING -> R.color.text_inverted
@@ -108,12 +118,12 @@ class ImportStatusListAdapter(
                         itemView.context,
                         when (import.state) {
                             Import.ImportState.QUEUED,
-                            Import.ImportState.RUNNING,
-                            Import.ImportState.PAUSED -> R.color.background_secondary
+                            Import.ImportState.RUNNING -> R.color.background_secondary
                             Import.ImportState.DONE -> R.color.notification_success
                             Import.ImportState.FAILED,
                             Import.ImportState.CANCELED,
                             Import.ImportState.CANCELING -> R.color.notification_error
+                            Import.ImportState.PAUSED -> R.color.notification_warning
                         }
                     )
                 )
@@ -130,7 +140,12 @@ class ImportStatusListAdapter(
                                 Import.ImportState.QUEUED,
                                 Import.ImportState.RUNNING,
                                 Import.ImportState.CANCELING -> R.drawable.ic_proton_cross
-                                Import.ImportState.PAUSED -> R.drawable.ic_proton_play
+                                Import.ImportState.PAUSED -> {
+                                    if (import.lostConnection || import.storageFull) {
+                                        // Icon displayed is the cross and action is cancel for those two cases, as the resume button is in the view below
+                                        R.drawable.ic_proton_cross
+                                    } else R.drawable.ic_proton_play
+                                }
                                 Import.ImportState.DONE,
                                 Import.ImportState.FAILED,
                                 Import.ImportState.CANCELED -> R.drawable.ic_proton_trash
@@ -143,15 +158,45 @@ class ImportStatusListAdapter(
                     when (import.state) {
                         Import.ImportState.QUEUED,
                         Import.ImportState.RUNNING -> listener(import, Action.CANCEL)
-                        Import.ImportState.PAUSED -> listener(import, Action.RESUME)
+                        Import.ImportState.PAUSED -> {
+                            if (import.lostConnection || import.storageFull) {
+                                // Icon displayed is the cross and action is cancel for those two cases, as the resume button is in the view below
+                                listener(import, Action.CANCEL)
+                            } else listener(import, Action.RESUME)
+                        }
                         Import.ImportState.DONE,
                         Import.ImportState.FAILED,
                         Import.ImportState.CANCELED -> listener(import, Action.DELETE)
                         Import.ImportState.CANCELING -> {} // Do nothing as icon should be hidden anyway
                     }
                 }
+
+                if (import.lostConnection) {
+                    warningLayout.visibleOrGone(true)
+                    warningTitle.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_title)
+                    warningDescription.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_description)
+                    warningButton.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_button)
+                    warningButton.setOnSingleClickListener {
+                        listener(import, Action.RESUME)
+                    }
+                } else if (import.storageFull) {
+                    warningLayout.visibleOrGone(true)
+                    warningTitle.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_title)
+                    warningDescription.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_description)
+                    warningButton.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_button)
+                    warningButton.setOnSingleClickListener {
+                        listener(import, Action.RESUME)
+                    }
+                } else {
+                    warningLayout.visibleOrGone(false)
+                }
             }
         }
-
     }
 }
