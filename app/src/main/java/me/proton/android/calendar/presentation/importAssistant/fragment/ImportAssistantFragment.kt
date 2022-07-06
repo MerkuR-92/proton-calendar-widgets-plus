@@ -269,6 +269,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             if (calendarsToImport.any { it.createDestinationCalendar }) {
                 // Create new calendars
                 if (!createCalendars(calendarsToImport)) {
+                    // Update list in VM
+                    importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
+
                     // If we fail to create one or more calendar, we display error to the user and display import summary view
                     showImportSummaryView(calendarsToImport)
                     view?.displaySnackBar(getString(R.string.import_assistant_create_calendar_error))
@@ -288,6 +291,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             if (startImportResult) {
                 showImportInProgressView()
             } else {
+                // Update list in VM
+                importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
+
+                // We display error to the user and display import summary view
                 showImportSummaryView(calendarsToImport)
                 view?.displaySnackBar(getString(R.string.import_assistant_start_import_error))
             }
@@ -329,9 +336,6 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 updateCalendarCreatedView(calendarsToCreateCount, calendarsCreatedCount, calendarToImport.destinationEmail)
             }
         }
-
-        // Update list in VM
-        importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
 
         fragment_import_assistant_loader_description.text = getString(R.string.import_assistant_creating_calendars_finish)
         return allCalendarCreated
