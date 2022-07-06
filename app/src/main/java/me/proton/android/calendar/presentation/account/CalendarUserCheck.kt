@@ -11,7 +11,6 @@ import me.proton.core.auth.presentation.DefaultUserCheck
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.User
-import me.proton.core.user.domain.extension.hasSubscription
 
 /**
  * Check [User] succeed if:
