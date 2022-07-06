@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Proton Calendar</string>
+    <string name="default_event_summary" comment="Event has no title">(geen titel)</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="default_user_email">(geen e-mailadres)</string>
+    <string name="default_user_display_name">(geen naam)</string>
+    <string name="toast_copied_to_clipboard">Gekopieerd naar het klembord</string>
+    <!-- DELETE EVENT DIALOG -->
+    <string name="dialog_title_delete_event">Afspraak verwijderen</string>
+    <string name="dialog_title_delete_recurring_event">Terugkerende afspraak verwijderen</string>
+    <string name="dialog_description_delete_event">Wilt u deze afspraak verwijderen?</string>
+    <string name="dialog_description_delete_recurring_event">Wilt u alle afspraken uit de reeks verwijderen?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">Deze afspraak is bijgewerkt door de organisator. Wilt u deze afspraak verwijderen?</string>
+    <string name="dialog_button_delete">Verwijderen</string>
+    <string name="dialog_button_cancel">Annuleer</string>
+    <string name="dialog_button_close">Sluiten</string>
+    <!-- Delete as an organizer -->
+    <string name="dialog_description_delete_event_as_organizer">Een annuleringsmail wordt verstuurd naar de deelnemers aan de afspraak. Wilt u deze afspraak verwijderen?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Uw adres is uitgeschakeld. Een annuleringsmail kan niet worden verzonden naar de deelnemers aan de afspraak. Wilt u deze afspraak toch verwijderen?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">Een annuleringsmail wordt verzonden naar de deelnemers aan de afspraak. Wilt u alle afspraken in deze serie verwijderen?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Uw adres is uitgeschakeld. Een annuleringsmail kan niet worden verzonden naar de deelnemers aan de afspraak. Wilt u alle afspraken in deze serie toch verwijderen?</string>
+    <!-- Delete as an attendee -->
+    <string name="dialog_description_delete_single_event_as_attendee">De organisator van deze afspraak wordt op de hoogte gebracht dat u de uitnodiging afwijst. Wilt u deze afspraak verwijderen?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">De organisator van deze afspraak zal geen melding krijgen dat u de uitnodiging afwijst, omdat u geen e-mails kunt verzenden vanaf het uitgenodigde adres. Wilt u deze afspraak toch verwijderen?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">De organisator van deze serie afspraken wordt op de hoogte gebracht dat u de uitnodiging afwijst. Wilt u alle afspraken in deze reeks verwijderen?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">De organisator van deze serie afspraken zal niet worden geïnformeerd dat u de uitnodiging afwijst, omdat u geen e-mails kunt verzenden vanaf het uitgenodigde adres. Wilt u alle afspraken in deze serie toch verwijderen?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Deze afspraak is bijgewerkt. De organisator wordt op de hoogte gebracht dat u de uitnodiging afwijst. Wilt u deze afspraak verwijderen?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Deze afspraak is bijgewerkt. De organisator zal niet op de hoogte worden gebracht dat u de uitnodiging afwijst, omdat u geen e-mails van het uitgenodigde adres kunt verzenden. Wilt u deze afspraak toch verwijderen?</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Voorvallen die eerder door de organisator zijn bijgewerkt, zullen worden bewaard, maar uw antwoorden zullen verloren gaan</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Voorvallen die eerder zijn bijgewerkt door de organisator, zullen worden bewaard</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">De organisator kan niet op de hoogte worden gebracht dat u de uitnodiging afwijst:\n\n• %1$s\n\nWilt u de afspraak toch verwijderen?</string>
+    <string name="dialog_button_set">Instellen</string>
+    <string name="dialog_button_ok">OK</string>
+    <string name="action_save">Opslaan</string>
+    <string name="action_done">Klaar</string>
+    <string name="action_edit">Bewerk</string>
+    <string name="action_delete">Verwijder</string>
+    <string name="action_today">Vandaag</string>
+    <string name="action_create_event">Creëer afspraak</string>
+    <string name="action_mark_default">Markeren als standaard</string>
+    <!-- MONTH VIEW -->
+    <string name="agenda_no_events">Geen afspraken</string>
+    <string name="agenda_loading_events">Afspraken laden…</string>
+    <string name="agenda_loading_events_error">Fout bij het laden van afspraken</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
+    <string name="day_view_all_day_more">+ %d meer</string>
+    <!-- EVENT DETAILS   -->
+    <string name="event_all_day">De hele dag</string>
+    <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
+    <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
+    <string name="event_alarm_label_at_event_time">Op moment van afspraak</string>
+    <string name="event_alarm_label_at_event_time_by_email">Op het moment van de afspraak per e-mail</string>
+    <string name="event_alarm_label_on_the_same_day">Op dezelfde dag</string>
+    <string name="event_alarm_label_before">%1$s voor</string>
+    <string name="event_alarm_label">%1$s</string>
+    <string name="event_alarm_label_before_by_email">%1$s voorheen per e-mail</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s om %2$s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s op %2$s per e-mail</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s eerder om %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s eerder om %2$s via e-mail</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s op %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s op dag %2$d</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s op %2$s</string>
+    <string name="event_recurrence_none">Wordt niet herhaald</string>
+    <string name="event_recurrence_daily">Dagelijks</string>
+    <string name="event_recurrence_weekly">Wekelijks</string>
+    <string name="event_recurrence_monthly">Maandelijks</string>
+    <string name="event_recurrence_yearly">Jaarlijks</string>
+    <string name="event_recurrence_weekly_on_all_days">alle dagen</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">tot %1$s</string>
+    <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">tot %1$s (%2$s)</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
+    <string name="event_status_canceled">Geannuleerd</string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Uitgeschakeld)</i>]]></string>
+    <string name="event_attendee_status_separator">%1$s, %2$s</string>
+    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d ja</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d misschien</string>
+    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nee</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d in afwachting</string>
+    <string name="event_attendee_is_organizer">U bent de organisator</string>
+    <string name="event_attendee_organizer">Organisator</string>
+    <string name="event_attendee_optional">Optioneel</string>
+    <string name="event_attendee_is_current_user">U</string>
+    <string name="event_answer_attending">Aanwezig?</string>
+    <string name="event_answer_yes">Ja</string>
+    <string name="event_answer_no">Nee</string>
+    <string name="event_answer_maybe">Misschien</string>
+    <string name="event_decryption_error_dialog_title">Evenement kan niet worden ontcijferd</string>
+    <string name="event_decryption_error_dialog_message">Ontsleutelen van de inhoud van deze gebeurtenis is mislukt.</string>
+    <string name="event_decryption_error_dialog_confirmation">Afspraak verwijderen</string>
+    <string name="event_decryption_error_dialog_confirmation_recurring">Afspraken verwijderen</string>
+    <string name="event_decryption_error_dialog_close">Sluiten</string>
+    <string name="event_signature_verification_warning">De verificatie van de afspraakhandtekening is mislukt. <a href="https://proton.me/support/what-is-a-digital-signature">Meer informatie</a></string>
+    <string name="event_change_answer_recurring_title">Terugkerende afspraak updaten</string>
+    <string name="event_change_answer_recurring_description">Wilt u uw antwoord wijzigen voor alle afspraken in de serie?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Wilt u uw antwoord wijzigen voor alle afspraken in deze serie?\nSommige antwoorden op voorvallen die eerder zijn bijgewerkt door de organisator zullen verloren gaan.</string>
+    <string name="event_change_answer_recurring_single_edit_description">Deze afspraak is bijgewerkt door de organisator. Wilt u uw antwoord wijzigen alleen voor deze herhaling in deze serie?</string>
+    <string name="event_change_answer_recurring_cancel">Annuleren</string>
+    <string name="event_change_answer_recurring_confirm">Updaten</string>
+    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Uitnodiging voor %s</string>
+    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s geaccepteerd</string>
+    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s heeft uw uitnodiging aan %2$s geweigerd</string>
+    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s onder voorbehoud geaccepteerd</string>
+    <string name="event_organizer_send_prefs_error_title">Organisator kan niet worden geïnformeerd</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">De organisator kan niet worden geïnformeerd dat je de uitnodiging hebt geaccepteerd</string>
+    <string name="event_organizer_send_prefs_message_declined_title">De organisator kan niet worden geïnformeerd dat u de uitnodiging hebt geweigerd</string>
+    <string name="event_organizer_send_prefs_message_tentative_title">De organisator kan niet worden geïnformeerd dat u de uitnodiging voorlopig geaccepteerd hebt</string>
+    <string name="event_organizer_send_prefs_message_default_title">De organisator kan niet worden geïnformeerd dat u op de uitnodiging hebt gereageerd</string>
+    <string name="event_organizer_send_prefs_button_title">OK</string>
+    <string name="event_attendees_send_prefs_error_title">Deelnemers kunnen niet op de hoogte worden gebracht</string>
+    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Geen van de deelnemers kan op de hoogte worden gesteld van uw wijzigingen:\n\n• %1$s\n\nWilt u toch doorgaan?</string>
+    <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">De volgende deelnemers kunnen geen meldingen ontvangen over uw wijzigingen:\n\n• %1$s\n\nWilt u toch doorgaan?</string>
+    <string name="event_attendees_send_prefs_error_confirm">Doorgaan</string>
+    <string name="event_attendees_send_prefs_error_cancel">Annuleren</string>
+    <string name="event_send_prefs_error_address_disabled">dit adres bestaat niet</string>
+    <string name="event_send_prefs_error_getting_contact">kon geen contactgegevens ophalen</string>
+    <string name="event_send_prefs_error_network">netwerk fout</string>
+    <string name="event_send_prefs_trusted_keys_invalid">vertrouwde sleutels zijn ongeldig</string>
+    <string name="event_send_prefs_public_keys_invalid">publieke sleutels zijn ongeldig</string>
+    <string name="event_send_prefs_trusted_keys_signature_invalid">ongeldig contact handtekening</string>
+    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <!-- CREATE / EDIT EVENT   -->
+    <string name="title_create_event">Nieuwe afspraak</string>
+    <string name="event_text_edit_event">Afspraak bewerken</string>
+    <string name="event_hint_title">Titel toevoegen</string>
+    <string name="event_hint_location">Locatie toevoegen</string>
+    <string name="event_text_add_participants">Deelnemers toevoegen</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Deelnemers (%1$d/%2$d)</string>
+    <string name="event_current_user_organizer">U</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d meer</string>
+    <string name="event_text_switch_all_day">De hele dag</string>
+    <string name="event_text_date_start">Begin</string>
+    <string name="event_text_date_end">Einde</string>
+    <string name="event_text_date_repeat">Herhaal</string>
+    <string name="event_text_date_repeat_never">Wordt niet herhaald</string>
+    <string name="event_text_attendees">Aanwezigen</string>
+    <string name="event_text_attendees_none">Geen</string>
+    <string name="event_text_calendar">Kalender</string>
+    <string name="event_text_timezone_start">Tijdzone</string>
+    <!-- TODO Start Timezone / End Timezone? -->
+    <string name="event_text_add_alarm">Melding toevoegen</string>
+    <string name="event_text_description">Beschrijving</string>
+    <string name="event_hint_description">Voeg een beschrijving toe</string>
+    <string name="event_text_custom">eigen</string>
+    <string name="event_alert_invalid_start_end_date">Afspraakstartdatum kan niet na einddatum zijn</string>
+    <string name="event_alarms_title">Meldingen</string>
+    <string name="event_custom_alarms_field">Meld</string>
+    <string name="event_custom_alarms_title">Aangepaste meldingen</string>
+    <string name="event_alarm_partial_day_1">op tijdstip van gebeurtenis</string>
+    <string name="event_alarm_partial_day_2">10 minuten</string>
+    <string name="event_alarm_partial_day_3">30 minuten</string>
+    <string name="event_alarm_partial_day_4">1 uur</string>
+    <string name="event_alarm_partial_day_5">1 week</string>
+    <string name="event_alarm_all_day_1">op dezelfde dag om %1$s</string>
+    <string name="event_alarm_all_day_2">1 dag ervoor om %1$s</string>
+    <string name="event_alarm_all_day_3">1 week ervoor om %1$s</string>
+    <string name="event_alarm_all_day_4">3 weken ervoor om %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">om %1$s</string>
+    <string name="event_alarm_action">Verzenden via</string>
+    <string name="event_alarm_action_notification">melding</string>
+    <string name="event_alarm_action_email">e-mail</string>
+    <string name="event_alarm_same_day">op de dag</string>
+    <string name="event_recurrence_1">niet herhalen</string>
+    <string name="event_recurrence_2">elke dag</string>
+    <string name="event_recurrence_3">wekelijks</string>
+    <string name="event_recurrence_4">maandelijks</string>
+    <string name="event_recurrence_5">jaarlijks</string>
+    <string name="event_recurrence_title">Frequentie</string>
+    <string name="event_recurrence_custom_title">Aangepaste frequentie</string>
+    <string name="event_recurrence_occurs_every">Herhaalt elke</string>
+    <string name="event_recurrence_occurs_on">Herhaalt op</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">op de dag %1$d</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">op %1$s</string>
+    <string name="event_recurrence_ends_on">Eindigt</string>
+    <string name="event_recurrence_ends_never">nooit</string>
+    <string name="event_recurrence_ends_on_date_empty">op de dag</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">van %1$s</string>
+    <string name="event_recurrence_ends_after_count_prefix">na</string>
+    <string name="event_recurring_edit_this">Deze afspraak</string>
+    <string name="event_recurring_edit_this_and_future">Deze en toekomstige afspraken</string>
+    <string name="event_recurring_edit_all_events">Alle afspraken</string>
+    <string name="event_discard_changes_title">Wijzigingen annuleren?</string>
+    <string name="event_discard_changes_description">U zal alle wijzigingen kwijtraken.</string>
+    <string name="event_discard_changes_cancel">Blijven bewerken</string>
+    <string name="event_discard_changes_confirm">Weggooien</string>
+    <string name="event_recurring_update_this_title">Terugkerende afspraak updaten</string>
+    <string name="event_recurring_update_this_description">Frequentie wijzigingen zullen verloren gaan</string>
+    <string name="event_recurring_update_all_description">Eerdere wijzigingen in deze serie zullen verloren gaan</string>
+    <string name="event_recurring_update_this_cancel">Annuleer</string>
+    <string name="event_recurring_update_this_confirm">Bijwerken</string>
+    <string name="event_allow_contacts_title">Proton Calendar toegang geven tot uw contactpersonen?</string>
+    <string name="event_allow_contacts_description">Proton Calendar heeft toegang nodig tot uw contactpersonen om u te voorzien van automatische voltooiing</string>
+    <string name="event_allow_contacts_cancel">Weigeren</string>
+    <string name="event_allow_contacts_confirm">Toestaan</string>
+    <string name="event_send_invite_mail_subject_prefix">Uitnodiging voor %s</string>
+    <string name="event_send_invite_mail_subject_all_day">een afspraak op %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day_multiple">een afspraak die begint op %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">een afspraak die begint op %1$s om %2$s %3$s</string>
+    <string name="event_send_invite_mail_body">U bent uitgenodigd voor %1$s\nWanneer: %2$s</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hele dag)</string>
+    <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s om %2$s %3$s - %4$s om %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nWaar: %1$s</string>
+    <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nOmschrijving: %1$s</string>
+    <string name="event_send_invite_dialog_title">Stuur uitnodiging</string>
+    <string name="event_send_invite_dialog_description">Een uitnodiging zal worden verzonden aan toegevoegde deelnemers.</string>
+    <string name="event_send_invite_dialog_confirm">Verzenden</string>
+    <string name="event_send_invite_dialog_cancel">Annuleren</string>
+    <string name="event_add_participants_dialog_title">Personen toevoegen</string>
+    <string name="event_add_participants_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers van alle afspraken in deze serie.</string>
+    <string name="event_add_participants_overwrite_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers voor alle afspraken in deze serie.\nVorige wijzigingen in deze serie gaan verloren.</string>
+    <string name="event_add_participants_dialog_confirm">Verzenden</string>
+    <string name="event_add_participants_dialog_cancel">Annuleren</string>
+    <string name="event_send_cancel_mail_subject_prefix">Annulering van %s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">een afspraak die begint op %1$s om %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day_multiple">een afspraak die begint op %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day">een afspraak op %1$s</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s is geannuleerd.</string>
+    <!-- NAVIGATION VIEW   -->
+    <string name="nav_view_calendars">Mijn agenda</string>
+    <string name="nav_view_subscribed_calendars">Geabonneerde agenda\'s</string>
+    <string name="nav_view_disabled_calendars">%s (Uitgeschakeld)</string>
+    <string name="nav_view_not_synced_calendars">%s (Niet gesynchroniseerd)</string>
+    <string name="nav_view_syncing_calendars">%s (Synchroniseren)</string>
+    <string name="nav_view_more">Meer</string>
+    <string name="nav_view_switcher">Bekijken</string>
+    <string name="nav_view_switcher_day">Dag</string>
+    <string name="nav_view_switcher_agenda">Agenda</string>
+    <string name="nav_view_switcher_month">Maand</string>
+    <string name="nav_view_timezone">Tijdzone</string>
+    <string name="nav_view_settings">Instellingen</string>
+    <string name="nav_view_feedback">Geef ons feedback</string>
+    <string name="nav_view_more_general_settings" comment="General Settings">Algemeen</string>
+    <string name="nav_view_more_bug">Bug melden</string>
+    <string name="nav_view_more_subscription">Abonnement</string>
+    <string name="nav_view_more_logout">Uitloggen</string>
+    <string name="nav_view_more_login">Inloggen</string>
+    <string name="nav_view_version_name">Proton Calendar %1$s</string>
+    <!-- SnackBar messages -->
+    <string name="snack_feature_coming_soon">Deze functie komt binnenkort</string>
+    <string name="snack_event_deleted">Afspraak verwijderd</string>
+    <string name="snack_event_deleted_as_organizer">Annulering verstuurd en afspraak is verwijderd</string>
+    <string name="snack_event_deleted_as_attendee">Reactie verzonden en afspraak verwijderd</string>
+    <string name="snack_event_deleted_error">Fout bij verwijderen afspraak</string>
+    <string name="snack_event_deleted_as_organizer_error">Annulering e-mail kan niet worden verzonden, probeer het opnieuw</string>
+    <string name="snack_event_opening_error">Fout bij openen afspraak</string>
+    <string name="snack_event_saving">Afspraak opslaan</string>
+    <string name="snack_event_deleting">Afspraak verwijderen</string>
+    <string name="snack_event_changing_answer">Antwoord bijwerken</string>
+    <string name="snack_event_updated">Afspraak bijgewerkt</string>
+    <string name="snack_event_updated_error_failed_mail">Uitnodiging kon niet verzonden worden</string>
+    <string name="snack_event_updated_error">Fout bij bijwerken afspraak</string>
+    <string name="snack_event_created">Afspraak aangemaakt</string>
+    <string name="snack_event_created_failed_mail">Afspraak aangemaakt, maar uitnodiging kon niet verzonden worden</string>
+    <string name="snack_event_created_error">Fout bij maken evenement</string>
+    <string name="snack_event_opening_edit_error">Fout bij openen afspraak voor bewerken</string>
+    <string name="snack_event_edit_with_attendees_error">Het bewerken van evenementen met deelnemers is nog niet ondersteund</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">U kunt niet tegelijkertijd deelnemers toevoegen en de agenda wijzigen</string>
+    <string name="snack_event_init_error">Fout bij initialiseren van nieuwe afspraak</string>
+    <string name="snack_event_calendar_error">Fout bij wisselen kalender</string>
+    <string name="snack_event_maximum_alarm_reached_error">Het maximum aantal meldingen is bereikt</string>
+    <string name="snack_send_bug_report_success">Melding verzonden, bedankt voor uw feedback</string>
+    <string name="snack_send_bug_report_error">Fout bij verzenden rapport, probeer het later opnieuw</string>
+    <string name="snack_send_bug_report_description_empty">Geef een beschrijving van uw rapport</string>
+    <string name="snack_create_event_no_active_personal_calendar">U hebt een persoonlijke actieve agenda nodig om afspraken te maken</string>
+    <string name="snack_add_self_as_participant">Zelf uitnodiging niet toegestaan</string>
+    <string name="snack_maximum_participants_reached">Het maximale aantal deelnemers is bereikt.</string>
+    <string name="snack_add_participant_error">Fout bij het toevoegen van de deelnemer</string>
+    <string name="snack_add_participant_invalid_email">Ongeldig e-mailadres</string>
+    <string name="snack_change_attendee_answer_error">Fout bij verzenden van antwoord, probeer het later opnieuw</string>
+    <string name="snack_network_error">Netwerkfout, probeer het later opnieuw</string>
+    <string name="snack_import_event_signed_out">U moet inloggen om events te importeren</string>
+    <string name="snack_app_link_signed_out">U moet inloggen om uw afspraak te zien</string>
+    <string name="snack_update_default_calendar">Standaardagenda bijgewerkt</string>
+    <string name="snack_update_default_calendar_error">Fout bij het bijwerken van de standaard agenda, probeer het later nog eens</string>
+    <string name="snack_calendar_init_error">Fout bij laden agenda-informatie</string>
+    <string name="snack_update_calendar_error">Fout bij bijwerken agenda-informatie, probeer later nog eens</string>
+    <string name="snack_update_calendar_settings_error">Fout bij het bijwerken van sommige agendagegevens, probeer het later nog eens</string>
+    <string name="snack_update_calendar_success">Agenda bijgewerkt</string>
+    <string name="snack_create_calendar_success">Agenda aangemaakt</string>
+    <string name="snack_calendar_saving">Agenda opslaan</string>
+    <string name="snack_create_calendar_error">Fout bij het aanmaken van de agenda, probeer het later opnieuw</string>
+    <string name="snack_create_calendar_settings_error">De agenda is aangemaakt maar sommige informatie is niet bijgewerkt, probeer het later nog eens</string>
+    <string name="snack_ics_default_error">Fout bij openen agenda</string>
+    <string name="snack_ics_event_not_found_error">Afspraak niet gevonden</string>
+    <string name="snack_ics_create_error">Fout bij maken afspraak</string>
+    <string name="snack_ics_parsing_error">Fout bij lezen agenda</string>
+    <string name="snack_ics_unsupported_method_error">Dit afspraaktype wordt nog niet ondersteund</string>
+    <string name="snack_ics_unsupported_add_error">Herhalingen toevoegen aan een afspraak wordt momenteel niet ondersteund</string>
+    <string name="snack_ics_unsupported_counter_error">Afspraakherplanning wordt momenteel niet ondersteund</string>
+    <string name="snack_ics_unsupported_refresh_error">Afspraak verversen wordt momenteel niet ondersteund</string>
+    <string name="snack_ics_unsupported_publish_error">Afspraak import wordt momenteel niet ondersteund</string>
+    <string name="snack_ics_unsupported_single_edit_reply_error">Wij steunen alleen antwoorden op alle afspraken van een serie op dit moment</string>
+    <string name="snack_ics_party_crasher_error">Uw e-mail staat niet op de lijst van gebruikers</string>
+    <string name="snack_ics_reply_party_crasher_error">Deelnemers die niet zijn uitgenodigd door de organisator kunnen niet worden toegevoegd</string>
+    <string name="snack_ics_missing_uid_error">De afspraak mist UID</string>
+    <string name="snack_ics_no_active_calendar_error">Er is geen actieve agenda gekoppeld aan dit account</string>
+    <string name="snack_ics_unsupported_duration_error">Tijdsduur wordt niet ondersteund</string>
+    <string name="snack_ics_too_many_events_error">Meerdere afspraken worden nog niet ondersteund</string>
+    <string name="snack_ics_no_events_error">Deze agenda bevat geen enkele afspraak</string>
+    <string name="snack_ics_invalid_error">Deze uitnodiging is ongeldig</string>
+    <string name="snack_ics_disabled_calendar_error">Opnieuw inschakelen van het adres gekoppeld aan deze agenda om deze afspraak bij te werken</string>
+    <string name="snack_ics_event_deleted_error">De afspraak bestaat niet meer in uw agenda</string>
+    <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s heeft uw uitnodiging geaccepteerd</string>
+    <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s heeft voorzichtig een uitnodiging geaccepteerd</string>
+    <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s heeft uw uitnodiging geweigerd</string>
+    <string name="snack_app_link_invalid">Ongeldige link naar de afspraak</string>
+    <string name="snack_app_link_error">Fout bij openen afspraak</string>
+    <string name="snack_notification_already_added">De melding is al toegevoegd</string>
+    <!-- Dialogs -->
+    <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
+    <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
+    <string name="update_timezone_dialog_title">Tijdzone gewijzigd</string>
+    <string name="update_timezone_dialog_message">Uw systeemtijdzone lijkt te zijn veranderd naar %1$s. Wilt u uw voorkeur voor de tijdzone bijwerken?</string>
+    <string name="update_timezone_dialog_confirmation">Updaten</string>
+    <string name="update_timezone_dialog_cancel">Annuleer</string>
+    <string name="contacts_permission_dialog_title">Proton Calendar toegang geven tot uw contactpersonen?</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar heeft toegang nodig tot uw telefooncontacten om u te helpen deze gemakkelijk toe te voegen aan uw afspraken.</string>
+    <string name="contacts_permission_dialog_allow">Toestaan</string>
+    <string name="contacts_permission_dialog_open_settings">Instellingen openen</string>
+    <string name="contacts_permission_dialog_cancel">Weigeren</string>
+    <string name="dialog_title_calendar_picker">Agenda</string>
+    <!-- NOTIFICATIONS -->
+    <string name="notification_channel_alarms">Afspraakmelding</string>
+    <string name="notification_channel_sync">Agenda Synchronisatie</string>
+    <string name="notification_sync">Agenda\'s synchroniseren…</string>
+    <string name="notification_text_today">Vandaag</string>
+    <string name="notification_text_today_part_time">Vandaag om %1$s</string>
+    <string name="notification_text_tomorrow">Morgen</string>
+    <string name="notification_text_tomorrow_part_time">Morgen om %1$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s om %2$s</string>
+    <!-- Bug report -->
+    <string name="bug_report_hint_title">Onderwerp</string>
+    <string name="bug_report_hint_description">Beschrijf het probleem en voeg alle foutmeldingen toe.</string>
+    <string name="bug_report_discard_changes_title">Niet-opgeslagen wijzigingen</string>
+    <string name="bug_report_discard_changes_description">Er zijn niet-opgeslagen gegevens aanwezig in het formulier. Weet u zeker dat u deze gegevens wil weggooien?</string>
+    <string name="bug_report_discard_changes_cancel">Blijf schrijven</string>
+    <string name="bug_report_discard_changes_confirm">Weggooien</string>
+    <!-- Settings -->
+    <string name="settings_theme_title">Thema</string>
+    <string name="settings_theme_info">Deze instelling is alleen van invloed op het uiterlijk van de Proton Agenda app op dit apparaat. De app wordt opnieuw opgestart na het wijzigen van het thema.</string>
+    <string name="settings_timezone_title">Tijdzone</string>
+    <string name="settings_language_title">App-taal</string>
+    <string name="settings_language_default">Automatisch detecteren</string>
+    <string name="settings_update_timezone_title">Vraag om instelling voor tijdzone bij te werken</string>
+    <string name="settings_update_timezone_subtitle">Als de tijdzone van het systeem niet overeenkomt met de huidige tijdzone, wordt u gevraagd om deze bij te werken.</string>
+    <string name="settings_update_timezone_checkbox">Niet opnieuw vragen</string>
+    <string name="settings_week_start_title">Start van de Week</string>
+    <string name="settings_time_format_title">Tijdnotatie</string>
+    <string name="settings_week_numbers_title">Weeknummers weergeven</string>
+    <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als wachtend</string>
+    <string name="settings_alternative_routing_title">Alternatieve routing toestaan</string>
+    <string name="settings_alternative_routing_subtitle">In het geval dat Proton-sites worden geblokkeerd, stelt deze instelling de app in staat om alternatieve netwerkroutering te proberen om Proton te bereiken, wat nuttig kan zijn voor het omzeilen van firewalls of netwerkproblemen. We raden aan deze instelling aan te houden voor een grotere betrouwbaarheid.</string>
+    <string name="settings_value_placeholder">Tik om te selecteren</string>
+    <string name="settings_general_title">Algemeen</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
+    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info_theme">thema</string>
+    <string name="settings_general_info_language">taal</string>
+    <string name="settings_general_info_time_zone">tijdzone</string>
+    <string name="settings_general_info_calendar_layout">layout agenda</string>
+    <string name="settings_calendars">Mijn agenda\'s</string>
+    <string name="settings_subscribed_calendars">Abonneer op agenda\'s</string>
+    <string name="settings_calendar_default">Standaard</string>
+    <string name="settings_calendar_disabled">Uitgeschakeld</string>
+    <string name="settings_calendar_not_synced">Niet gesynchroniseerd</string>
+    <string name="settings_calendar_syncing">Synchroniseren</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Niet-ondersteunde agenda-indeling</string>
+    <string name="settings_calendar_subscribed_too_big">De agenda is te groot</string>
+    <string name="settings_calendar_subscribed_not_accessible">Agendalink is niet toegankelijk</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Agendalink is tijdelijk ontoegankelijk</string>
+    <string name="settings_calendar_subscribed_last_sync_old">Er is meer dan 12 uur verstreken sinds de laatste update</string>
+    <string name="settings_calendar_subscribed_not_decrypted">Agenda kon niet ontcijferd worden</string>
+    <!-- Calendar form -->
+    <string name="calendar_form_create_title">Agenda aanmaken</string>
+    <string name="calendar_form_update_title">Agenda bijwerken</string>
+    <string name="calendar_form_save">Opslaan</string>
+    <string name="calendar_form_name">Naam</string>
+    <string name="calendar_form_name_placeholder">Voeg een agendanaam toe</string>
+    <string name="calendar_form_name_character_limit">%d/%d tekens</string>
+    <string name="calendar_form_color">Agendakleur</string>
+    <string name="calendar_form_default_event_duration">Duur van de afspraak</string>
+    <string name="calendar_form_default_event_notifications">Afspraakmeldingen</string>
+    <string name="calendar_form_default_all_day_event_notifications">De hele dag meldingen van afspraken</string>
+    <string name="calendar_form_add_notification">Melding toevoegen</string>
+    <string name="calendar_form_default_email">E-mailadres</string>
+    <string name="calendar_form_default_email_value_error">Kan standaard e-mail niet laden</string>
+    <string name="calendar_form_name_hint">Voeg een agendanaam toe</string>
+    <string name="calendar_form_name_required_error">Naam vereist</string>
+    <string name="add_calendar_text">Agenda toevoegen</string>
+    <string name="create_calendar_limit_reached">U hebt het maximum aantal agenda\'s bereikt.</string>
+    <string name="create_calendar_limit_reached_paid_title">Het maximumaantal agenda\'s (20) is bereikt</string>
+    <string name="create_calendar_limit_reached_paid_message">Verwijder ongebruikte agenda\'s om nieuwe agenda\'s te maken.</string>
+    <string name="create_calendar_limit_reached_paid_manage">Agenda\'s beheren</string>
+    <string name="create_calendar_limit_reached_close">Sluiten</string>
+    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_description">Maak tot 20 agenda\'s aan en krijg toegang tot veel meer exclusieve functies wanneer u uw abonnement upgrade.</string>
+    <string name="create_calendar_limit_reached_free_not_now">Niet nu</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Upgraden</string>
+    <string name="delete_calendar_dialog_title">Agenda verwijderen</string>
+    <string name="delete_calendar_dialog_message">Weet u zeker dat u deze agenda wilt verwijderen?</string>
+    <string name="delete_default_calendar_dialog_message">Weet u zeker dat u deze agenda wilt verwijderen? \"%1$s\" zal ingesteld worden als standaardagenda.</string>
+    <string name="delete_calendar_snack_deleted">Agenda verwijderd</string>
+    <string name="delete_calendar_snack_error">Fout bij verwijderen agenda</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Wachtwoordbevestiging mislukt</string>
+    <!-- Bootstrap errors -->
+    <string name="bootstrap_error_default_confirm">OK</string>
+    <string name="bootstrap_error_no_calendar_title">Er zijn geen agenda\'s gekoppeld aan dit account.</string>
+    <string name="bootstrap_error_no_calendar_message">Ga naar <a href="https://calendar.proton.me">calendar.proton.me</a> om er één in te stellen</string>
+    <string name="bootstrap_error_some_calendars_failed_title">Fout bij het opstellen van agenda\'s</string>
+    <string name="bootstrap_error_some_calendars_failed_message">De volgende agenda\'s konden niet worden ingesteld</string>
+    <string name="bootstrap_error_no_active_calendar_title">Er is geen actieve agenda gekoppeld aan dit account.</string>
+    <string name="bootstrap_error_no_active_calendar_message">Om te leren hoe u een agenda kunt activeren, bezoek onze <a href="https://proton.me/support">kennisdatabank</a></string>
+    <string name="bootstrap_error_store_quota_reached_message">Geen opslagruimte meer beschikbaar.</string>
+    <string name="bootstrap_error_store_quota_reached_learn_more">Meer informatie</string>
+    <string name="bootstrap_error_reset_needed_title">Agendasleutels resetten</string>
+    <string name="bootstrap_error_reset_needed_message">U hebt uw wachtwoord opnieuw ingesteld en afspraken gekoppeld aan de volgende agenda\'s konden niet worden ontsleuteld. Alle actieve geabonneerde agenda\'s zullen na een paar minuten weer synchroniseren.</string>
+    <string name="bootstrap_error_update_passphrase_title">Heractiveer agendasleutels</string>
+    <string name="bootstrap_error_update_passphrase_message">U heeft uw sleutels opnieuw geactiveerd en afspraken gekoppeld aan de volgende agenda\'s kunnen nu worden ontsleuteld.</string>
+    <string name="bootstrap_error_continue_button">Doorgaan</string>
+    <string name="splash_after_login_init">Agenda\'s voorbereiden</string>
+    <string name="splash_init">Ontsleutelen van afspraken</string>
+    <string name="default_calendar_name">Mijn agenda</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Geef ons feedback</string>
+    <string name="dialog_feedback_text">Hoe zou u uw ervaring met Proton Calendar omschrijven?</string>
+    <string name="dialog_feedback_rating_worst">Vreselijk</string>
+    <string name="dialog_feedback_rating_best">Uitstekend</string>
+    <string name="dialog_feedback_hint">Vertel ons over uw ervaring. (Optioneel)</string>
+    <string name="dialog_feedback_submit">Versturen</string>
+    <string name="dialog_feedback_submit_thank_you">Bedankt! Uw feedback helpt ons Proton te verbeteren.</string>
+    <!-- Calendar Widget -->
+    <string name="calendar_widget_description">Proton Calendar widget</string>
+    <string name="calendar_widget_no_upcoming_events_today">Geen aankomende afspraken vandaag</string>
+    <string name="calendar_widget_loading_events">Afspraken laden…</string>
+    <string name="calendar_widget_loading_events_error">Afspraken konden niet geladen worden</string>
+    <string name="calendar_widget_no_upcoming_events">Geen aankomende afspraken</string>
+    <string name="calendar_widget_please_log_in">Log in om uw afspraken te zien</string>
+    <string name="calendar_widget_part_day_event_starts_at">Start op %1$s</string>
+    <string name="calendar_widget_part_day_event_ends_at">Eindigt op %1$s</string>
+    <!-- Spotlight Dialogs -->
+    <string name="spotlight_dialog_header">Wat is er nieuw</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
+    <string name="spotlight_dialog_month_view_title">Maandweergave</string>
+    <string name="spotlight_dialog_month_view_description">Krijg een overzicht van uw afspraken met onze nieuwe maandweergave. Wissel tussen weergaves met het menu.</string>
+    <string name="spotlight_v5_dialog_got_it_button">Begrepen</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Meer informatie</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Geüpdatete Proton, verenigde bescherming</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="http://proton.me/news/updated-proton">Meer informatie</a></string>
+    <!--  STRING PLURALS  -->
+    <plurals name="plural_minute">
+        <item quantity="one">minuut</item>
+        <item quantity="other">minuten</item>
+    </plurals>
+    <plurals name="plural_hour">
+        <item quantity="one">uur</item>
+        <item quantity="other">uren</item>
+    </plurals>
+    <plurals name="plural_day">
+        <item quantity="one">dag</item>
+        <item quantity="other">dagen</item>
+    </plurals>
+    <plurals name="plural_week">
+        <item quantity="one">week</item>
+        <item quantity="other">weken</item>
+    </plurals>
+    <plurals name="plural_month">
+        <item quantity="one">maand</item>
+        <item quantity="other">maanden</item>
+    </plurals>
+    <plurals name="plural_year">
+        <item quantity="one">jaar</item>
+        <item quantity="other">jaren</item>
+    </plurals>
+    <plurals name="plural_recurrence_count">
+        <item quantity="one">één keer</item>
+        <item quantity="other">keer</item>
+    </plurals>
+    <plurals name="plural_occurrence">
+        <item quantity="one">voorkomen</item>
+        <item quantity="other">voorkomens</item>
+    </plurals>
+    <plurals name="plural_participant_uppercase">
+        <item quantity="one">deelnemer</item>
+        <item quantity="other">deelnemers</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Elke %1$d %2$s</item>
+        <item quantity="other">Elke %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Elke %1$d %2$s</item>
+        <item quantity="other">Elke %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Elke %1$d %2$s</item>
+        <item quantity="other">Elke %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Elke %1$d %2$s</item>
+        <item quantity="other">Elke %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%s minuut</item>
+        <item quantity="other">%s minuten</item>
+    </plurals>
+    <!--  STRING ARRAYS  -->
+    <string-array name="ordinals_as_words">
+        <item/>
+        <item>eerste</item>
+        <item>tweede</item>
+        <item>derde</item>
+        <item>vierde</item>
+        <item>vijfde</item>
+    </string-array>
+    <string-array name="ordinals_as_words_backwards">
+        <item/>
+        <item>laatste</item>
+        <item>op een na laatste</item>
+        <item>op twee na laatste</item>
+        <item>op drie na laatste</item>
+        <item>op vier na laatste</item>
+    </string-array>
+    <string-array name="app_themes">
+        <item>Licht</item>
+        <item>Donker</item>
+        <item>Systeemstandaard</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>Systeemstandaard</item>
+        <item>13:00</item>
+        <item>1:00pm</item>
+    </string-array>
+    <string-array name="week_start">
+        <item>Systeemstandaard</item>
+        <item>Maandag</item>
+        <item>Zaterdag</item>
+        <item>Zondag</item>
+    </string-array>
+</resources>

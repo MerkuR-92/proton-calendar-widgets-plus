@@ -10,7 +10,7 @@
     <string name="dialog_title_delete_event">Supprimer l\'événement</string>
     <string name="dialog_title_delete_recurring_event">Supprimer l\'événement récurrent</string>
     <string name="dialog_description_delete_event">Souhaitez-vous supprimer cet événement ?</string>
-    <string name="dialog_description_delete_recurring_event">Souhaitez-vous supprimer tous les événements de la série ?</string>
+    <string name="dialog_description_delete_recurring_event">Voulez-vous supprimer tous les événements de la série ?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event">Cet événement a été mis à jour par l’organisateur. Voulez-vous supprimer cet événement ?</string>
     <string name="dialog_button_delete">Supprimer</string>
     <string name="dialog_button_cancel">Annuler</string>

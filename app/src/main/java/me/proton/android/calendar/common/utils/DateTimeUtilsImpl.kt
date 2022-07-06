@@ -396,6 +396,9 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "ro",
                     "pt",
                     "de",
+                    "it",
+                    "nl",
+                    "uk",
                     "en" -> locale
                     else -> {
                         null
