@@ -467,6 +467,7 @@
     <string name="import_assistant_error">Error fetching data</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
     <string name="import_assistant_update_import_error">Failed to update import, please try again later</string>
+    <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
     <string name="import_assistant_start_import_error">Failed to start import, please try again later</string>
     <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
@@ -494,11 +495,11 @@
     <string name="import_assistant_status_canceling">Canceling</string>
     <string name="import_assistant_status_paused">Paused</string>
     <string name="import_assistant_status_failed">Failed</string>
-    <string name="import_assistant_status_paused_lost_connection_title">Account is disconnected</string>
-    <string name="import_assistant_status_paused_lost_connection_description">Please reconnect to your Google account to resume this import.</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
+    <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
-    <string name="import_assistant_status_paused_storage_full_title">Your Proton storage is full</string>
-    <string name="import_assistant_status_paused_storage_full_description">Please free some space before resuming the import.</string>
+    <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
+    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
     <string name="import_assistant_status_paused_storage_full_button">Resume</string>
     <string name="import_assistant_delete_report_title">Remove from the list?</string>
     <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
