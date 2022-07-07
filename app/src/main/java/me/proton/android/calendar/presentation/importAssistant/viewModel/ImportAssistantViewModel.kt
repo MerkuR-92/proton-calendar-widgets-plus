@@ -89,11 +89,11 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     private suspend fun getDefaultUserEmail(): String? {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return null
+
         val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
 
         val defaultUserEmail = userManager.getUser(userId).email
@@ -191,11 +191,10 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): Boolean {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return false
 
         // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
@@ -213,11 +212,10 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return null
 
         // Create calendar
         val createCalendarResult = createCalendarUseCase.execute(
@@ -263,8 +261,9 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     fun setImportCalendar(calendarToImport: ImportCalendarMapping, importCalendar: Boolean): Int? {
-        val currentList = _importCalendarMappingList.value
-        val indexOfItem = currentList?.indexOf(calendarToImport) ?: return null
+        val currentList = _importCalendarMappingList.value ?: return null
+        val indexOfItem = currentList.indexOf(calendarToImport)
+        if (indexOfItem < 0 || indexOfItem > currentList.lastIndex) return null
         currentList[indexOfItem].importCalendar = importCalendar
         _importCalendarMappingList.value = currentList
         return indexOfItem
@@ -313,71 +312,65 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun getImporters() {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return
         _importerList.value = importers
     }
 
     private suspend fun getImporter(importerId: String): ImporterEntity? {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return null
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return null
 
         return importerApi.getImporter(userId, importerId).valueOrNullAndLogErrors(logger)?.importer
     }
 
     suspend fun getReports() {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return
 
         val reports = importerApi.getReports(userId).valueOrNullAndLogErrors(logger)?.reports ?: return
         _reportList.value = reports
     }
 
     suspend fun cancelImport(importId: String): Boolean {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return false
 
         importerApi.cancelImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
         return true
     }
 
     suspend fun resumeImport(importId: String): Boolean {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return false
 
         importerApi.resumeImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
         return true
     }
 
     suspend fun deleteReport(reportId: String) {
-        var userId = userId.value
-        if (userId == null) {
-            userId = accountManager.getPrimaryUserId().firstOrNull() ?: return
-            _userId.value = userId
-        }
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return
 
         importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return
 
         // Update report list
-        val currentList = _reportList.value?.let { ArrayList(it) }
-        currentList?.removeIf { it.id == reportId }
+        val currentList = _reportList.value?.let { ArrayList(it) } ?: return
+        currentList.removeIf { it.id == reportId }
         _reportList.value = currentList
     }
 }
