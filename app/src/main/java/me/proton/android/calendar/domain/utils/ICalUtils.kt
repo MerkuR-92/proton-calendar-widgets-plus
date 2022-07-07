@@ -269,4 +269,8 @@ interface ICalUtils {
     fun VAlarm.isTheSameAs(
         alarm: VAlarm
     ): Boolean
+
+    fun List<VAlarm>.isTheSameAs(
+        alarms: List<VAlarm>
+    ): Boolean
 }

@@ -13,7 +13,8 @@ import javax.inject.Inject
 class UpdateCalendarSettingsUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val calendarsRepository: CalendarsRepository
+    private val calendarsRepository: CalendarsRepository,
+    private val calendarSettingsChangedUseCase: CalendarSettingsChangedUseCase
 ): UseCase {
 
     companion object {
@@ -46,6 +47,8 @@ class UpdateCalendarSettingsUseCase @Inject constructor(
             calendarsApi.updateCalendarSettings(userId, calendarId, updateCalendarSettingsApiRequest)
         ) {
             is ApiResponse.Success -> {
+                // we have to call this before persisting settings in DB, because otherwise new and old settings will be the same
+                calendarSettingsChangedUseCase.execute(userId, updateCalendarSettingsResponse.data.calendarSettings)
                 calendarsRepository.updateCalendarSettings(updateCalendarSettingsResponse.data.calendarSettings)
                 return UseCase.Result.Success<Unit>()
             }

@@ -1106,6 +1106,19 @@ object ICalUtilsImpl : ICalUtils {
         return this.action == alarm.action && this.trigger?.duration?.toMillis() == alarm.trigger?.duration?.toMillis()
     }
 
+    override fun List<VAlarm>.isTheSameAs(alarms: List<VAlarm>): Boolean {
+
+        fun rightContainsLeft(left: List<VAlarm>, right: List<VAlarm>): Boolean {
+            left.forEach { alarm ->
+                if (right.find { it.isTheSameAs(alarm) } == null) return false
+            }
+
+            return true
+        }
+
+        return rightContainsLeft(this, alarms) && rightContainsLeft(alarms, this)
+    }
+
 }
 
 data class CalendarSplit(

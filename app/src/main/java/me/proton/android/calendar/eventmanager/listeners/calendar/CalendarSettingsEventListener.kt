@@ -5,6 +5,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.CalendarSettingsChangedUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
@@ -18,6 +19,7 @@ class CalendarSettingsEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val logger: Logger,
+    private val calendarSettingsChangedUseCase: CalendarSettingsChangedUseCase
 ): CalendarBaseEventListener<String, CalendarSettingsEntity>(db) {
     override val order: Int = 4
     override val type: Type = Type.Calendar
@@ -36,10 +38,10 @@ class CalendarSettingsEventListener @Inject constructor(
             logger.i("action CREATE/UPDATE for calendarKey in deleted calendar")
             return
         }
-        entities.forEach { calendarsRepository.persistCalendarSettings(it) }
+        entities.forEach {
+            calendarsRepository.persistCalendarSettings(it)
+            calendarSettingsChangedUseCase.execute(config.userId, it)
+        }
     }
 
-    override suspend fun onUpdate(config: EventManagerConfig, entities: List<CalendarSettingsEntity>) {
-        onCreate(config, entities)
-    }
 }
