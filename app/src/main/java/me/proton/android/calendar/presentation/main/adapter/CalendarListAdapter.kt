@@ -52,34 +52,34 @@ class CalendarListAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val calendarEntityItemOverlay: View = view.item_drawer_calendar_press
-        private val calendarEntityItemTitle: TextView = view.item_drawer_calendar_title
+        private val calendarItemOverlay: View = view.item_drawer_calendar_press
+        private val calendarItemTitle: TextView = view.item_drawer_calendar_title
         private val calendarItemCheckBox: CheckBox = view.item_drawer_calendar_checkbox
 
         fun bind(calendar : Calendar) {
             if (calendar.isDisabled) {
                 // For subscribed calendars we prioritize displaying disabled label over not synced
-                calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendar.name)
-                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
+                calendarItemTitle.text = itemView.context.getString(R.string.nav_view_disabled_calendars, calendar.name)
+                calendarItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
             } else if (calendar.isSubscribed) {
                 val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendar.id }
 
                 if (calendarSubscription?.lastUpdateTime == 0 || calendarSubscription?.isSyncing == true) {
                     // Calendar is syncing
-                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_syncing_calendars, calendar.name)
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
+                    calendarItemTitle.text = itemView.context.getString(R.string.nav_view_syncing_calendars, calendar.name)
+                    calendarItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 } else if (calendarSubscription?.isSynced == true) {
                     // Synced
-                    calendarEntityItemTitle.text = calendar.name
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
+                    calendarItemTitle.text = calendar.name
+                    calendarItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
                 } else {
                     // Not synced
-                    calendarEntityItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendar.name)
-                    calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
+                    calendarItemTitle.text = itemView.context.getString(R.string.nav_view_not_synced_calendars, calendar.name)
+                    calendarItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_weak))
                 }
             } else {
-                calendarEntityItemTitle.text = calendar.name
-                calendarEntityItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
+                calendarItemTitle.text = calendar.name
+                calendarItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.sidebar_text_norm))
             }
             calendarItemCheckBox.isChecked = calendar.display
             calendarItemCheckBox.buttonTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
@@ -94,7 +94,7 @@ class CalendarListAdapter(
                 )
             }
 
-            calendarEntityItemOverlay.setOnSingleClickListener {
+            calendarItemOverlay.setOnSingleClickListener {
                 calendarItemCheckBox.performClick()
             }
         }

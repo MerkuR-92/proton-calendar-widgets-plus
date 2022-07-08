@@ -46,6 +46,7 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscription
@@ -372,17 +373,6 @@ class CalendarViewModel @Inject constructor(
     suspend fun updateCalendarVisibility(calendarId: String, display: Boolean) {
         withContext(Dispatchers.IO) {
             calendarsRepository.updateCalendarDisplay(calendarId, display)
-        }
-    }
-
-    suspend fun updateCalendar(calendarEntity: CalendarEntity) {
-        val userId = userId.value?.id
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel updateCalendar")
-            return
-        }
-        withContext(Dispatchers.IO) {
-            calendarsRepository.updateCalendar(userId, calendarEntity)
         }
     }
 
@@ -713,12 +703,6 @@ class CalendarViewModel @Inject constructor(
         return getCanonicalEmailsUseCase.invoke(userId, emails)
     }
 
-    suspend fun getCalendarDefaultEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
-    }
-
     suspend fun getUserEmails(): List<String>? {
         return getUserAddresses()?.map { it.email }
     }
@@ -787,6 +771,17 @@ class CalendarViewModel @Inject constructor(
         }
         val user = userManager.getUserOrNull(userId, logger)
         return user?.hasSubscription() == false
+    }
+
+    suspend fun isDelinquentUser(): Boolean? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            return null
+        }
+        val user = userManager.getUserOrNull(userId, logger)
+        val delinquent = user?.delinquent?.value
+        return delinquent != null && delinquent >= Delinquent.InvoiceDelinquent.value // We consider a user delinquent on the calendar side when the state is at least 3 (InvoiceDelinquent)
     }
 
     enum class UserCalendarLimit {
@@ -1041,12 +1036,6 @@ class CalendarViewModel @Inject constructor(
         }
 
         return monthViewEventsMap
-    }
-
-    suspend fun getCalendarEmail(calendarId: String): String? {
-        return calendarsRepository.selectMembers(calendarId).firstOrNull {
-            it.hasPermission(MemberEntity.Permission.SUPEROWNER)
-        }?.email
     }
 
     suspend fun setJumpToCurrentTimeIfNeeded(date: LocalDate) {

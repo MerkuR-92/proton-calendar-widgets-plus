@@ -48,7 +48,7 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var position: Int? = null
     private var date: LocalDate? = null
 
-    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", 1, true, 0), ICalendar(), 0)
+    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", "", 1, true, 0), ICalendar(), 0)
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null

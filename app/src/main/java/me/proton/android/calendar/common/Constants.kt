@@ -75,7 +75,8 @@ const val MAX_CALENDAR_FREE = 1
 
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
-    145 // Rebranding (2.0.2)
+    145, // Rebranding (2.0.2)
+    146 // Easy switch (2.0.3) // TODO UPDATE
 )
 
 object FeatureFlag {
@@ -96,6 +97,7 @@ object FeatureFlag {
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = false
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
+    const val IMPORT_FROM_GOOGLE = true
 }
 
 object HttpResponseCode {
@@ -191,6 +193,24 @@ object AppLinksQueryParameters {
     const val CALENDAR_ID = "CalendarID"
     const val RECURRENCE_ID = "RecurrenceID"
     const val ACTION = "Action"
+
+    const val EASY_SWITCH_CODE = "code"
+    const val EASY_SWITCH_SCOPE = "scope"
+    const val EASY_SWITCH_STATE = "state"
+}
+
+object CalendarImport {
+    const val GOOGLE_AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth?"
+    const val GOOGLE_SCOPES = "email openid https://www.googleapis.com/auth/calendar.readonly"
+    const val ACCESS_TYPE = "offline"
+    const val REDIRECT_URI = "https://calendar.proton.me/easy_switch"
+    const val RESPONSE_TYPE = "code"
+    const val PRODUCT_CALENDAR = "Calendar"
+    const val PROMPT = "consent"
+    const val SOURCE = "calendar-android-settings"
+
+    const val ERROR = "error"
+    const val ERROR_ACCESS_DENIED = "access_denied"
 }
 
 object AppLinksAction {

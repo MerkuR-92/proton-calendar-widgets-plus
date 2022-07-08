@@ -256,6 +256,7 @@ class HandleIcsUseCase @Inject constructor(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
                 existingCalendar?.id ?: defaultCalendar.id,
                 existingCalendar?.name ?: defaultCalendar.name,
+                existingCalendar?.email ?: defaultCalendar.email,
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,

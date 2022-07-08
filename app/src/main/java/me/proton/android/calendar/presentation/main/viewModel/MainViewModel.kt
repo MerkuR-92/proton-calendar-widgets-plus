@@ -15,13 +15,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CalendarImport.ACCESS_TYPE
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_AUTH_BASE_URL
+import me.proton.android.calendar.common.CalendarImport.GOOGLE_SCOPES
+import me.proton.android.calendar.common.CalendarImport.PROMPT
+import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
+import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.ExternalCalendarEntity
 import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.FeedbackApi
+import me.proton.android.calendar.domain.api.ImporterApi
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
@@ -41,7 +50,9 @@ class MainViewModel @Inject constructor(
     private val networkManager: NetworkManager,
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     private val userSettingsRepository: UserSettingsRepository,
-    private val feedbackApi: FeedbackApi
+    private val feedbackApi: FeedbackApi,
+    private val importerApi: ImporterApi,
+    private val logger: Logger
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()

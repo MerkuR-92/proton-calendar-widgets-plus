@@ -375,6 +375,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -425,6 +426,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -492,6 +494,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -529,6 +532,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -568,6 +572,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -690,6 +695,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -749,6 +755,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -814,6 +821,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -873,6 +881,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -932,6 +941,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1008,6 +1018,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1051,6 +1062,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1099,6 +1111,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1159,6 +1172,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1209,6 +1223,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1256,6 +1271,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1305,6 +1321,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1356,6 +1373,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1402,6 +1420,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1452,6 +1471,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1507,6 +1527,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1558,6 +1579,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1602,6 +1624,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1656,6 +1679,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1694,6 +1718,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1742,6 +1767,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1786,6 +1812,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1835,6 +1862,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1885,6 +1913,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -1970,6 +1999,7 @@ internal class ICalUtilsTest {
             Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
                 "calendar",
+                "email",
                 "",
                 1,
                 true,
@@ -2106,6 +2136,7 @@ internal class ICalUtilsTest {
             Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
                 "calendar",
+                "email",
                 "",
                 1,
                 true,
@@ -2215,6 +2246,7 @@ internal class ICalUtilsTest {
             Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
                 "calendar",
+                "email",
                 "",
                 1,
                 true,
@@ -2257,6 +2289,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2296,6 +2329,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2347,6 +2381,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2391,6 +2426,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2426,6 +2462,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2466,6 +2503,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2501,6 +2539,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2540,6 +2579,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2583,6 +2623,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2629,6 +2670,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2667,6 +2709,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2713,6 +2756,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2760,6 +2804,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2798,6 +2843,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2840,6 +2886,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2881,6 +2928,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2922,6 +2970,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -2962,6 +3011,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3003,6 +3053,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3057,6 +3108,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3122,6 +3174,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3171,6 +3224,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3224,6 +3278,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3271,6 +3326,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3317,6 +3373,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3367,6 +3424,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3483,7 +3541,7 @@ internal class ICalUtilsTest {
         newICalendar.setEndTimeZone(eventTimeZoneId)
         newICalendar.setDefaultTimeZone(eventTimeZoneId)
 
-        val event = Event.from("id", Calendar("", "", "", 1, true, 0), newICalendar, 0)!!
+        val event = Event.from("id", Calendar("", "", "", "", 1, true, 0), newICalendar, 0)!!
         val eventCopy = Event.from(event)
 
         event.iCalEvent.setStart(LocalDate.of(2021, 1, 1), LocalTime.of(18, 0), "Europe/Vilnius")
@@ -3524,6 +3582,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3580,6 +3639,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3613,6 +3673,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3647,6 +3708,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3680,6 +3742,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3713,6 +3776,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3746,6 +3810,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3779,6 +3844,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3813,6 +3879,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3850,6 +3917,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3887,6 +3955,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -3936,6 +4005,7 @@ internal class ICalUtilsTest {
             Event.from("eventId-${index}", me.proton.android.calendar.domain.model.Calendar(
                 "id",
                 "calendar",
+                "email",
                 "",
                 1,
                 true,
@@ -3976,6 +4046,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4093,6 +4164,7 @@ internal class ICalUtilsTest {
         val originalEvent = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4103,6 +4175,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4159,6 +4232,7 @@ internal class ICalUtilsTest {
         val originalEvent = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4169,6 +4243,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4362,7 +4437,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getInviteIcs(
             event,
@@ -4423,7 +4498,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getCancelIcs(
             event,
@@ -4518,9 +4593,9 @@ internal class ICalUtilsTest {
         val displayTimeZoneId = "Europe/Zurich"
 
         val events = listOf(
-            Event.from("event-all-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
-            Event.from("event-part-day", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
-            Event.from("event-1-hour", Calendar("id", "name", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
+            Event.from("event-all-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
+            Event.from("event-part-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
+            Event.from("event-1-hour", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
         )
 
         val explodedEvents = events.explodeDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)
@@ -4583,8 +4658,8 @@ internal class ICalUtilsTest {
 
         val ics4DifferentUid = "BEGIN:VCALENDAR\r\nPRODID:-//Proton AG//ProtonCalendar 1.0.0//EN\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nDTSTAMP:20220404T104736Z\r\nUID:bobeventDifferentUid@hibob.com\r\nDTSTART;VALUE=DATE:20220411\r\nDTEND;VALUE=DATE:20220415\r\nEND:VEVENT\r\nEND:VCALENDAR"
 
-        val calendarSubscribed = Calendar("calendar 1", "calendar 1", "", 1, true, 1)
-        val calendarRegular = Calendar("calendar 2", "calendar 2", "", 1, true, 0)
+        val calendarSubscribed = Calendar("calendar 1", "calendar 1", "email 1", "", 1, true, 1)
+        val calendarRegular = Calendar("calendar 2", "calendar 2", "email 2", "", 1, true, 0)
 
         val skeletonEntities = listOf<SkeletonEvent>(
             // original event
@@ -4636,6 +4711,7 @@ internal class ICalUtilsTest {
         val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
             "id",
             "calendar",
+            "email",
             "",
             1,
             true,
@@ -4780,6 +4856,6 @@ internal class ICalUtilsTest {
         iCalendar.setStartTimeZone(timeZoneId)
         iCalendar.setEndTimeZone(timeZoneId)
 
-        return Event.from("", Calendar("", "", "", 1, true, 0), iCalendar, 0)!!
+        return Event.from("", Calendar("", "", "", "", 1, true, 0), iCalendar, 0)!!
     }
 }

@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.util.Linkify
-import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton

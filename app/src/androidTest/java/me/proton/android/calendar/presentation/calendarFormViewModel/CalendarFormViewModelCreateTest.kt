@@ -14,6 +14,7 @@ import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.mocks.*
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
+import me.proton.core.domain.entity.UserId
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
@@ -97,7 +98,7 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
     @Test
     fun createCalendarTest() = runBlocking {
 
-        val customCalendarColor = Color.parseColor("#ABCDEF")
+        val customCalendarColor = Color.parseColor("#abcdef")
         val customCalendarEmail = "custom@calendar.email.com"
         val customCalendarName = "custom calendar name"
         val customDefaultEventDuration = CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.last()
@@ -116,6 +117,9 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
 
         coEvery { createCalendarsUseCaseMock.execute(userId, customCalendarName, "", customCalendarColor, 1, customCalendarEmail) } returns UseCase.Result.Success(calendarId)
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM, customPartDayAlarm), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM, customAllDayAlarm)) } returns UseCase.Result.Success<Unit>()
+
+        coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar())
+
         val calendarFormViewModel = getCalendarFormViewModel()
 
         calendarFormViewModel.initCreateCalendarForm(Color.parseColor(calendarColor))
@@ -184,6 +188,8 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
         coEvery { createCalendarsUseCaseMock.execute(userId, calendarName, "", Color.parseColor(calendarColor), 1, userEmail) } returns UseCase.Result.Success(calendarId)
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM)) } returns UseCase.Result.Success<Unit>()
 
+        coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar())
+
         val calendarFormViewModel = getCalendarFormViewModel()
 
         calendarFormViewModel.initCreateCalendarForm(Color.parseColor(calendarColor))
@@ -223,6 +229,8 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
 
         coEvery { createCalendarsUseCaseMock.execute(userId, calendarName, "", Color.parseColor(calendarColor), 1, userEmail) } returns UseCase.Result.Error("Test")
 
+        coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar())
+
         val calendarFormViewModel = getCalendarFormViewModel()
 
         calendarFormViewModel.initCreateCalendarForm(Color.parseColor(calendarColor))
@@ -261,6 +269,8 @@ internal class CalendarFormViewModelCreateTest : KoinComponent, CalendarFormView
 
         coEvery { createCalendarsUseCaseMock.execute(userId, calendarName, "", Color.parseColor(calendarColor), 1, userEmail) } returns UseCase.Result.Success(calendarId)
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, CalendarForm.EVENT_DEFAULT_DURATION_MINUTES.first(), listOf(CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM), listOf(CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM)) } returns UseCase.Result.Error("Test")
+
+        coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar())
 
         val calendarFormViewModel = getCalendarFormViewModel()
 

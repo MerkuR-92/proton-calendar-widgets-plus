@@ -33,7 +33,6 @@ class SettingsCalendarListAdapter(
 ) : ListAdapter<Calendar, SettingsCalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
-    private var calendarEmails: Map<String, String>? = null
     private var defaultCalendarId: String? = null
 
     class CalendarDiffCallback : DiffUtil.ItemCallback<Calendar>() {
@@ -62,12 +61,6 @@ class SettingsCalendarListAdapter(
         return dataSetChanged
     }
 
-    fun setCalendarEmails(calendarEmails: Map<String, String>): Boolean {
-        val dataSetChanged = this.calendarEmails != calendarEmails
-        this.calendarEmails = calendarEmails
-        return dataSetChanged
-    }
-
     fun setDefaultCalendarId(defaultCalendarId: String?): Boolean {
         val dataSetChanged = this.defaultCalendarId != defaultCalendarId
         this.defaultCalendarId = defaultCalendarId
@@ -75,31 +68,30 @@ class SettingsCalendarListAdapter(
     }
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val calendarEntityItemPress: View = view.item_settings_calendar_press
-        private val calendarEntityItemTitle: TextView = view.item_settings_calendar_title
-        private val calendarEntityItemSubtitle: TextView = view.item_settings_calendar_subtitle
-        private val calendarEntityItemHelper: TextView = view.item_settings_calendar_helper
-        private val calendarEntityItemMenuIcon: ImageView = view.item_settings_calendar_menu_icon
-        private val calendarEntityItemIcon: ImageView = view.item_settings_calendar_icon
-        private val calendarEntityItemBadgeLayout: LinearLayout = view.item_settings_calendar_badge_layout
+        private val calendarItemPress: View = view.item_settings_calendar_press
+        private val calendarItemTitle: TextView = view.item_settings_calendar_title
+        private val calendarItemSubtitle: TextView = view.item_settings_calendar_subtitle
+        private val calendarItemHelper: TextView = view.item_settings_calendar_helper
+        private val calendarItemMenuIcon: ImageView = view.item_settings_calendar_menu_icon
+        private val calendarItemIcon: ImageView = view.item_settings_calendar_icon
+        private val calendarItemBadgeLayout: LinearLayout = view.item_settings_calendar_badge_layout
 
-        fun bind(calendarEntity : Calendar) {
+        fun bind(calendar : Calendar) {
             // Calendar name
-            calendarEntityItemTitle.text = calendarEntity.name
+            calendarItemTitle.text = calendar.name
 
             // Calendar email
-            val calendarEmail = calendarEmails?.get(calendarEntity.id)
-            calendarEntityItemSubtitle.visibleOrGone(calendarEmail?.isNotEmpty() == true)
-            calendarEntityItemSubtitle.text = calendarEmail
+            calendarItemSubtitle.visibleOrGone(calendar.email.isNotEmpty())
+            calendarItemSubtitle.text = calendar.email
 
             // Set colored calendar dot tint
-            calendarEntityItemIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendarEntity.color))
+            calendarItemIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
 
             // Clear badges
-            calendarEntityItemBadgeLayout.removeAllViews()
+            calendarItemBadgeLayout.removeAllViews()
 
             // Display default badge
-            if (calendarEntity.id == defaultCalendarId && calendarEntity.isDisabled.not()) {
+            if (calendar.id == defaultCalendarId && calendar.isDisabled.not()) {
                 addBadge(
                     itemView.context.getString(R.string.settings_calendar_default),
                     itemView.context.getColorFromAttr(R.attr.brand_norm)
@@ -107,11 +99,11 @@ class SettingsCalendarListAdapter(
             }
 
             // Display disabled badge
-            if (calendarEntity.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), itemView.context.getColor(R.color.background_secondary), R.color.text_norm)
+            if (calendar.isDisabled) addBadge(itemView.context.getString(R.string.settings_calendar_disabled), itemView.context.getColor(R.color.background_secondary), R.color.text_norm)
 
-            calendarEntityItemHelper.visibleOrGone(false)
-            if (calendarEntity.isSubscribed) {
-                val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendarEntity.id }
+            calendarItemHelper.visibleOrGone(false)
+            if (calendar.isSubscribed) {
+                val calendarSubscription = calendarSubscriptions?.firstOrNull { it.calendarId == calendar.id }
 
                 // Display not synced badge
                 if (calendarSubscription?.isSynced == false) {
@@ -163,38 +155,38 @@ class SettingsCalendarListAdapter(
                             }
                         }
 
-                    calendarEntityItemHelper.visibleOrGone(!helperMessage.isNullOrEmpty())
-                    calendarEntityItemHelper.text = helperMessage
+                    calendarItemHelper.visibleOrGone(!helperMessage.isNullOrEmpty())
+                    calendarItemHelper.text = helperMessage
                 }
             }
 
             // Only show menu icon when calendar can be edited
-            calendarEntityItemMenuIcon.visibleOrGone(calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemMenuIcon.visibleOrGone(calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
             // Only allow item click when calendar can be edited
-            calendarEntityItemPress.visibleOrGone(calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemPress.visibleOrGone(calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
-            if (calendarEntity.isSubscribed.not() || (calendarEntity.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
+            if (calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
                 // On item click
-                calendarEntityItemPress.setOnSingleClickListener {
-                    listener(calendarEntity)
+                calendarItemPress.setOnSingleClickListener {
+                    listener(calendar)
                 }
 
                 // On menu icon click
-                calendarEntityItemMenuIcon.setOnSingleClickListener {
-                    listener(calendarEntity)
+                calendarItemMenuIcon.setOnSingleClickListener {
+                    listener(calendar)
                 }
             }
         }
 
         private fun addBadge(text: String, color: Int, textColor: Int? = null) {
-            val badgeView = LayoutInflater.from(itemView.context).inflate(R.layout.item_badge, calendarEntityItemBadgeLayout, false) as TextView
+            val badgeView = LayoutInflater.from(itemView.context).inflate(R.layout.item_badge, calendarItemBadgeLayout, false) as TextView
             badgeView.text = text
             textColor?.let {
                 badgeView.setTextColor(ContextCompat.getColor(itemView.context, it))
             }
             badgeView.backgroundTintList = ColorStateList.valueOf(color)
-            calendarEntityItemBadgeLayout.addView(badgeView)
+            calendarItemBadgeLayout.addView(badgeView)
         }
     }
 }

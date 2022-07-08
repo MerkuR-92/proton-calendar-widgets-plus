@@ -9,6 +9,7 @@ internal abstract class BaseTest {
         return Event.from(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
             "calendar-id",
             "calendar",
+            "email",
             "",
             1,
             true,

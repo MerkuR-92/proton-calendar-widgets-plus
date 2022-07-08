@@ -61,10 +61,52 @@
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_import"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/settings_general_separator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/settings_import_press"
+            layout="@layout/view_press_overlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <TextView
+            android:id="@+id/settings_import_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/import_from_google_title"
+            style="@style/Text.Default"
+            android:layout_marginTop="@dimen/default_margin_text_vertical"
+            android:layout_marginStart="@dimen/spacing_page"
+            android:layout_marginEnd="@dimen/spacing_page"
+            android:layout_marginBottom="@dimen/spacing_page"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:id="@+id/settings_import_separator"
+        style="@style/Separator"
+        app:layout_constraintTop_toBottomOf="@+id/settings_import"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/settings_calendars"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/settings_general_separator">
+        app:layout_constraintTop_toBottomOf="@+id/settings_import_separator">
 
         <TextView
             android:id="@+id/settings_calendars_title"

@@ -150,7 +150,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Fallback calendar
             val fallbackCalendarId = "fallbackCalendarId"
-            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
+            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar(id = fallbackCalendarId))
 
             // Fallback calendar settings
             coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)
@@ -184,12 +184,12 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             } } returns EventMocks.provideEvent()
 
             // No default calendar
-            val calendarEntity = CalendarMocks.provideCalendarEntity(isDisabled = true)
-            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns calendarEntity
+            val calendar = CalendarMocks.provideCalendar(isDisabled = true)
+            coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns calendar
 
             // Fallback calendar
             val fallbackCalendarId = "fallbackCalendarId"
-            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendarEntity(id = fallbackCalendarId))
+            coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar(id = fallbackCalendarId))
 
             // Fallback calendar settings
             coEvery { calendarsRepositoryMock.selectCalendarSettings(fallbackCalendarId) } returns CalendarMocks.provideCalendarSettingsEntity(id = fallbackCalendarId)

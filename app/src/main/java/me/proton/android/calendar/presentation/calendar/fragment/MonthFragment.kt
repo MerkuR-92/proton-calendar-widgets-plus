@@ -64,7 +64,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.customView.MonthLayoutGestureListener
 import me.proton.android.calendar.presentation.calendar.fragment.ItemMiniCalendarFragment.Companion.calculateAdapterHeight
@@ -535,7 +534,7 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        requireContext().showLastSpotlightDialog()
+        requireActivity().showLastSpotlightDialog()
     }
 
     private fun setupMonthLayoutGestures(weekStart: Int) {

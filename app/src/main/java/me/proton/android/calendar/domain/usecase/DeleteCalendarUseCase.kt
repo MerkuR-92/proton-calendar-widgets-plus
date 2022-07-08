@@ -35,11 +35,11 @@ class DeleteCalendarUseCase @Inject constructor(
      */
     suspend fun prepare(userId: UserId, calendarId: String): DeleteCalendarOption {
 
-        val calendarEntity = calendarsRepository.selectCalendar(calendarId)
+        val calendar = calendarsRepository.selectCalendar(calendarId)
             ?: return DeleteCalendarOption.Error("could not select Calendar from DB")
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
         val isCalendarDefault =
-            calendarEntity.id == defaultCalendarId && calendarEntity.isActive && calendarEntity.isSubscribed.not()
+            calendar.id == defaultCalendarId && calendar.isActive && calendar.isSubscribed.not()
         val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
 
         return if (isCalendarDefault) {

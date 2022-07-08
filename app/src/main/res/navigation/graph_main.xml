@@ -25,6 +25,12 @@
         <action
             android:id="@+id/action_nav_calendar_to_nav_calendar_form"
             app:destination="@id/nav_calendar_form" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_import_assistant"
+            app:destination="@id/nav_import_assistant" />
+        <action
+            android:id="@+id/action_nav_calendar_to_nav_import_assistant_guide"
+            app:destination="@id/nav_import_assistant_guide" />
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="proton-calendar://protonmail.com/month" />
@@ -49,6 +55,51 @@
         <action
             android:id="@+id/action_nav_settings_to_nav_calendar_form"
             app:destination="@id/nav_calendar_form" />
+        <action
+            android:id="@+id/action_nav_settings_to_nav_import_assistant_guide"
+            app:destination="@id/nav_import_assistant_guide" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_import_assistant"
+        android:name="me.proton.android.calendar.presentation.importAssistant.fragment.ImportAssistantFragment"
+        android:label=""
+        tools:layout="@layout/fragment_import_assistant">
+        <deepLink
+            android:id="@+id/deepLinkImportAssistant"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/import?code={code}" />
+        <argument
+            android:name="code"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_nav_import_assistant_to_nav_import_assistant_status"
+            app:destination="@id/nav_import_assistant_status" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_import_assistant_guide"
+        android:name="me.proton.android.calendar.presentation.importAssistant.fragment.ImportAssistantGuideFragment"
+        android:label=""
+        tools:layout="@layout/fragment_import_assistant_guide">
+        <deepLink
+            android:id="@+id/deepLinkImportAssistantGuide"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/importGuide" />
+        <action
+            android:id="@+id/action_nav_import_assistant_guide_to_nav_import_assistant_status"
+            app:destination="@id/nav_import_assistant_status" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_import_assistant_status"
+        android:name="me.proton.android.calendar.presentation.importAssistant.fragment.ImportAssistantStatusFragment"
+        android:label=""
+        tools:layout="@layout/fragment_import_assistant_status">
+        <deepLink
+            android:id="@+id/deepLinkImportAssistantStatus"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/importStatus" />
     </dialog>
 
     <dialog
@@ -81,9 +132,6 @@
         android:name="me.proton.android.calendar.presentation.bugReport.BugReportFragment"
         android:label=""
         tools:layout="@layout/fragment_bug_report">
-        <action
-            android:id="@+id/action_nav_bug_report_to_nav_event_form"
-            app:destination="@id/nav_event_form" />
     </dialog>
 
     <dialog

@@ -1,0 +1,202 @@
+package me.proton.android.calendar.presentation.importAssistant.adapter
+
+import android.content.res.ColorStateList
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_account
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_badge
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_details
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_icon
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_button
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_description
+import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_title
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountSI
+import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.domain.model.Import
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
+class ImportStatusListAdapter(
+    val listener: (Import, Action) -> Unit
+): ListAdapter<Import, ImportStatusListAdapter.ViewHolder>(ImportDiffCallback()) {
+
+    enum class Action {
+        CANCEL,
+        RESUME,
+        DELETE
+    }
+
+    class ImportDiffCallback : DiffUtil.ItemCallback<Import>() {
+        override fun areItemsTheSame(oldItem: Import, newItem: Import): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Import, newItem: Import): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_import_status, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.bind(item)
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val account: TextView = view.item_import_status_account
+        private val details: TextView = view.item_import_status_details
+        private val badge: View = view.item_import_status_badge
+        private val icon: ImageView = view.item_import_status_icon
+        private val warningLayout: LinearLayout = view.item_import_status_warning
+        private val warningTitle: TextView = view.item_import_status_warning_title
+        private val warningDescription: TextView = view.item_import_status_warning_description
+        private val warningButton: TextView = view.item_import_status_warning_button
+
+        fun bind(import : Import) {
+
+            account.text = import.account
+            val importSize = humanReadableByteCountSI(import.size?.toLong() ?: 0L)
+            details.text =
+                if (import.size != null) {
+                    itemView.context.getString(
+                        R.string.import_assistant_report_details,
+                        importSize,
+                        import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                            ?: ""
+                    )
+                } else {
+                    import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
+                        ?: ""
+                }
+
+            icon.visibleOrGone(import.state != null)
+            badge.visibleOrGone(import.state != null)
+            warningLayout.visibleOrGone(import.state != null)
+            if (import.state != null) {
+                (badge as TextView).text = itemView.context.getString(
+                    when (import.state) {
+                        Import.ImportState.QUEUED,
+                        Import.ImportState.RUNNING -> R.string.import_assistant_status_in_progress
+                        Import.ImportState.DONE -> R.string.import_assistant_status_completed
+                        Import.ImportState.FAILED -> R.string.import_assistant_status_failed
+                        Import.ImportState.PAUSED -> R.string.import_assistant_status_paused
+                        Import.ImportState.CANCELED -> R.string.import_assistant_status_canceled
+                        Import.ImportState.CANCELING -> R.string.import_assistant_status_canceling
+                    }
+                )
+                badge.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        when (import.state) {
+                            Import.ImportState.QUEUED,
+                            Import.ImportState.RUNNING -> R.color.text_norm
+                            Import.ImportState.DONE,
+                            Import.ImportState.PAUSED,
+                            Import.ImportState.FAILED,
+                            Import.ImportState.CANCELED,
+                            Import.ImportState.CANCELING -> R.color.text_inverted
+                        }
+                    )
+                )
+                badge.backgroundTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        when (import.state) {
+                            Import.ImportState.QUEUED,
+                            Import.ImportState.RUNNING -> R.color.background_secondary
+                            Import.ImportState.DONE -> R.color.notification_success
+                            Import.ImportState.FAILED,
+                            Import.ImportState.CANCELED,
+                            Import.ImportState.CANCELING -> R.color.notification_error
+                            Import.ImportState.PAUSED -> R.color.notification_warning
+                        }
+                    )
+                )
+
+                if (import.state == Import.ImportState.CANCELING) {
+                    // When cancelling, we hide the icon
+                    icon.visibleOrGone(false)
+                } else {
+                    icon.visibleOrGone(true)
+                    icon.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            itemView.context,
+                            when (import.state) {
+                                Import.ImportState.QUEUED,
+                                Import.ImportState.RUNNING,
+                                Import.ImportState.CANCELING -> R.drawable.ic_proton_cross
+                                Import.ImportState.PAUSED -> {
+                                    if (import.lostConnection || import.storageFull) {
+                                        // Icon displayed is the cross and action is cancel for those two cases, as the resume button is in the view below
+                                        R.drawable.ic_proton_cross
+                                    } else R.drawable.ic_proton_play
+                                }
+                                Import.ImportState.DONE,
+                                Import.ImportState.FAILED,
+                                Import.ImportState.CANCELED -> R.drawable.ic_proton_trash
+                            }
+                        )
+                    )
+                }
+
+                icon.setOnSingleClickListener {
+                    when (import.state) {
+                        Import.ImportState.QUEUED,
+                        Import.ImportState.RUNNING -> listener(import, Action.CANCEL)
+                        Import.ImportState.PAUSED -> {
+                            if (import.lostConnection || import.storageFull) {
+                                // Icon displayed is the cross and action is cancel for those two cases, as the resume button is in the view below
+                                listener(import, Action.CANCEL)
+                            } else listener(import, Action.RESUME)
+                        }
+                        Import.ImportState.DONE,
+                        Import.ImportState.FAILED,
+                        Import.ImportState.CANCELED -> listener(import, Action.DELETE)
+                        Import.ImportState.CANCELING -> {} // Do nothing as icon should be hidden anyway
+                    }
+                }
+
+                if (import.lostConnection) {
+                    warningLayout.visibleOrGone(true)
+                    warningTitle.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_title)
+                    warningDescription.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_description)
+                    warningButton.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_button)
+                    warningButton.setOnSingleClickListener {
+                        listener(import, Action.RESUME)
+                    }
+                } else if (import.storageFull) {
+                    warningLayout.visibleOrGone(true)
+                    warningTitle.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_title)
+                    warningDescription.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_description)
+                    warningButton.text =
+                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_button)
+                    warningButton.setOnSingleClickListener {
+                        listener(import, Action.RESUME)
+                    }
+                } else {
+                    warningLayout.visibleOrGone(false)
+                }
+            }
+        }
+    }
+}
