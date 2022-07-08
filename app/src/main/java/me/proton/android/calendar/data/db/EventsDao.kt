@@ -45,7 +45,7 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events WHERE sharedEvents LIKE '%DTSTART;VALUE=DATE:%' AND calendarId = :calendarId")
     abstract suspend fun selectAllDayOnly(calendarId: String): List<EventEntity>
 
-    @Query("SELECT * FROM events WHERE sharedEvents LIKE '%DTSTART;TZID=%' AND calendarId = :calendarId")
+    @Query("SELECT * FROM events WHERE sharedEvents NOT LIKE '%DTSTART;VALUE=DATE:%' AND calendarId = :calendarId")
     abstract suspend fun selectPartDayOnly(calendarId: String): List<EventEntity>
 
     @Deprecated("Format UID with formatUidForICal")
