@@ -70,7 +70,7 @@ import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
@@ -1141,7 +1141,7 @@ class EventViewModel @Inject constructor(
                 return false
             }
         val email = event.calendar.email
-        return user.hasSubscription() || !isShortDomainAddress(email)
+        return user.hasSubscriptionForMail() || !isShortDomainAddress(email)
     }
 
     private suspend fun updateCalendarDisplay(calendar: Calendar, display: Boolean) {

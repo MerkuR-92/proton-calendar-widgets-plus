@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.CalendarSettingsChangedUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarSettingsEventListener
 import me.proton.android.calendar.mocks.calendarId
 import me.proton.android.calendar.mocks.calendarSettingsId
@@ -22,6 +23,7 @@ class CalendarSettingsEventListenerTest {
 
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
+    private val calendarSettingsChangedUseCase: CalendarSettingsChangedUseCase = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
     private lateinit var listener: CalendarSettingsEventListener
     private val config = EventManagerConfig.Calendar(UserId("user_id"), calendarId)
@@ -29,7 +31,7 @@ class CalendarSettingsEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarSettingsEventListener(db, calendarsRepository, logger)
+        listener = CalendarSettingsEventListener(db, calendarsRepository, logger, calendarSettingsChangedUseCase)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 

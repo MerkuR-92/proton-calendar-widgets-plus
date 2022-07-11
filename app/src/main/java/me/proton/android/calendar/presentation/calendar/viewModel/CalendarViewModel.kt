@@ -49,7 +49,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
@@ -770,7 +770,7 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         val user = userManager.getUserOrNull(userId, logger)
-        return user?.hasSubscription() == false
+        return user?.hasSubscriptionForMail() == false
     }
 
     suspend fun isDelinquentUser(): Boolean? {

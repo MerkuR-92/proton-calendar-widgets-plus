@@ -102,7 +102,7 @@ import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.user.domain.extension.hasSubscription
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.core.KoinComponent
 import javax.inject.Inject
@@ -594,7 +594,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             return
         }
         lifecycleScope.launch {
-            val isFreeUser = eventViewModel.user.hasSubscription().not()
+            val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
             val event = eventViewModel.eventLiveData.value
             val userEmails = userAddresses.map { it.email } // Emails are canonicalized in getParticipationStatus
             if (event != null && !event.calendar.isSubscribed) {

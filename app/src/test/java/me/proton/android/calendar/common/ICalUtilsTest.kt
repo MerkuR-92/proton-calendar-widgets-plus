@@ -3,7 +3,9 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.*
 import biweekly.ICalVersion
+import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
+import biweekly.parameter.Related
 import biweekly.property.*
 import biweekly.util.*
 import biweekly.util.DayOfWeek
@@ -56,9 +58,9 @@ import me.proton.android.calendar.common.utils.KotlinUtilsImpl.filterFromTheEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
@@ -67,8 +69,6 @@ import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.mocks.EventMocks
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import java.time.*
 import java.util.*
 
@@ -4844,6 +4844,43 @@ internal class ICalUtilsTest {
         assertThat(sortedList[3].summary).isEqualTo("Multi day part day 5 - 7 11h30 - 13h30")
         assertThat(sortedList[4].summary).isEqualTo("Part day 5 10h - 11h")
         assertThat(sortedList[5].summary).isEqualTo("Part day 5 10h30 - 11h30")
+
+    }
+
+    @Test
+    fun `VAlarm isTheSameAs comparison`() {
+
+        val same1 = listOf(
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(1).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(2).build(), Related.START), "not used")
+        )
+
+        val same2 = listOf(
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(1).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(2).build(), Related.START), "not used")
+        )
+
+        val sameButDuplicates = listOf(
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(1).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(1).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(2).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(2).build(), Related.START), "not used")
+        )
+
+        val different = listOf(
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(3).build(), Related.START), "not used"),
+            VAlarm.display(Trigger(biweekly.util.Duration.builder().prior(true).hours(4).build(), Related.START), "not used")
+        )
+
+        assertThat(same1.isTheSameAs(same2)).isTrue()
+        assertThat(same2.isTheSameAs(same1)).isTrue()
+        assertThat(same1.isTheSameAs(sameButDuplicates)).isTrue()
+        assertThat(sameButDuplicates.isTheSameAs(same1)).isTrue()
+
+        assertThat(same1.isTheSameAs(different)).isFalse()
+        assertThat(different.isTheSameAs(same1)).isFalse()
+
+        assertThat(different.isTheSameAs(sameButDuplicates)).isFalse()
 
     }
 

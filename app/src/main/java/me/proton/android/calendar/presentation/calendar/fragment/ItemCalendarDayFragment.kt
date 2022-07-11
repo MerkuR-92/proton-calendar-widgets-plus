@@ -526,7 +526,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                 if (this.isResumed) {
                     // We first load and display the events for the selected month
                     position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
-                    setupItemMiniCalendarContent(it.first, it.second)
+                    setupItemMiniCalendarContent(it.second)
                 } else {
                     loading = false
                     calendarViewModel.dayViewLoading.observe(viewLifecycleOwner) { dayViewLoading ->
@@ -540,7 +540,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         if (!loading && (dayViewLoading.first == position || !dayViewLoading.second)) {
                             loading = true
                             position?.let { pos -> calendarViewModel.dayViewLoading.value = Pair(pos, true) }
-                            setupItemMiniCalendarContent(it.first, it.second)
+                            setupItemMiniCalendarContent(it.second)
                         }
                     }
                 }
@@ -625,7 +625,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
     }
 
     private fun setupItemMiniCalendarContent(
-        timeZoneId: String,
         timeFormatIs24Hour: Boolean
     ) {
         val immutableDate = date ?: return
@@ -636,6 +635,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         allDayEventCroppedListAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
         allDayEventListAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
 
+        val timeZoneId = this.timeZoneId ?: calendarViewModel.timeZoneId.value?.id ?: return
         allDayEventCroppedListAdapter.setTimeZoneId(timeZoneId)
         allDayEventListAdapter.setTimeZoneId(timeZoneId)
 
@@ -644,7 +644,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
         // TODO remove UserID livedata
         calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
             userId?.let {
-                getEvents(immutableDate, timeZoneId)
+                getEvents(immutableDate, this.timeZoneId ?: calendarViewModel.timeZoneId.value?.id ?: return@observe)
             }
         }
 
@@ -670,7 +670,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         immutableDate == selectedDate.plusDays(1))
             ) {
                 logger.v("ItemCalendarDayFragment: events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId)
+                getEvents(immutableDate, this.timeZoneId ?: calendarViewModel.timeZoneId.value?.id ?: return@observe)
             }
         }
     }
