@@ -16,10 +16,8 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.model.Calendar
-import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 
 class CalendarListAdapter(
-    val calendarViewModel: CalendarViewModel,
     val listener: (Calendar) -> Unit
 ) : ListAdapter<Calendar, CalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 

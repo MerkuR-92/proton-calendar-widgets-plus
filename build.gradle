@@ -6,7 +6,7 @@ buildscript {
                 "coroutine": "1.5.2",
                 "retrofit": "2.7.1",
                 "room": "2.4.1",
-                "androidx": "2.4.0-alpha03",
+                "androidx": "2.5.0",
                 "navigation": "2.3.3",
                 "work": "2.6.0",
                 "security": "1.1.0-alpha03",

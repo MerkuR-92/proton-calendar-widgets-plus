@@ -6,13 +6,20 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.AppTheme
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.commonModule
+import me.proton.android.calendar.common.coreModule
 import me.proton.android.calendar.common.logger.LoggerImpl
 import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.logger.SentryTree
+import me.proton.android.calendar.common.networkModule
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.repositoryModule
+import me.proton.android.calendar.common.useCaseModule
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
+import me.proton.android.calendar.common.viewModelModule
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
@@ -198,7 +205,7 @@ class ProtonCalendarApplication : Application() {
     }
 
     override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(CustomLocale.apply(base))
+        super.attachBaseContext(CustomLocale.applyCurrent(base))
     }
 
     fun getAppTheme(): AppTheme {
