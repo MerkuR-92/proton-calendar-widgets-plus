@@ -1709,6 +1709,7 @@ class EventViewModel @Inject constructor(
         // Schedule alarms if any
         handleAlarmsUseCase.execute(userId)
 
+        var userErrorMessage: String? = null
         val saveResult =
             when (handleSaveResult) {
                 is UseCase.Result.Error -> {
@@ -1716,10 +1717,14 @@ class EventViewModel @Inject constructor(
                         UseCase.Error.HandleSave.EditSendEmail -> SaveResult.EDIT_ERROR_SEND_MAIL
                         UseCase.Error.HandleSave.CreateSendEmail -> SaveResult.CREATE_ERROR_SEND_MAIL
                         UseCase.Error.Crypto.UserAddressInvalidForEncryption -> SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
-                        else -> SaveResult.ERROR
+                        else -> {
+                            userErrorMessage = handleSaveResult.userErrorMessage
+                            SaveResult.ERROR
+                        }
                     }
                 }
                 is UseCase.Result.InvalidParams -> {
+                    userErrorMessage = handleSaveResult.userErrorMessage
                     SaveResult.ERROR
                 }
                 else -> {
@@ -1728,13 +1733,13 @@ class EventViewModel @Inject constructor(
             }
 
         // Handle save result
-        handleSaveResult(saveResult)
+        handleSaveResult(saveResult, userErrorMessage)
     }
 
     /**
      * Handle save event result
      */
-    private suspend fun handleSaveResult(saveResult: SaveResult) {
+    private suspend fun handleSaveResult(saveResult: SaveResult, userErrorMessage: String? = null) {
         if (eventLiveData.value?.isSyncedWithApi() == true) {
 
             // Save result for edit existing event
@@ -1780,9 +1785,13 @@ class EventViewModel @Inject constructor(
 
                     // Display error updating event snack
                     eventFormSnackState.value = EventSnackState.DisplaySnack(
-                        resourceProvider.provideString(
-                            R.string.snack_event_updated_error
-                        )
+                        if (userErrorMessage.isNullOrEmpty()) {
+                            resourceProvider.provideString(
+                                R.string.snack_event_updated_error
+                            )
+                        } else {
+                            userErrorMessage
+                        }
                     )
                 }
             }
@@ -1819,9 +1828,13 @@ class EventViewModel @Inject constructor(
 
                 // Display error creating event snack
                 eventFormSnackState.value = EventSnackState.DisplaySnack(
-                    resourceProvider.provideString(
-                        R.string.snack_event_created_error
-                    )
+                    if (userErrorMessage.isNullOrEmpty()) {
+                        resourceProvider.provideString(
+                            R.string.snack_event_created_error
+                        )
+                    } else {
+                        userErrorMessage
+                    }
                 )
             }
         }
@@ -2476,14 +2489,21 @@ class EventViewModel @Inject constructor(
             )
         } else {
 
+            var userErrorMessage: String? = null
             if (deleteResult is UseCase.Result.Error) {
                 logger.e("Error deleting event: ${deleteResult.message}")
+                userErrorMessage = deleteResult.userErrorMessage
             } else if (deleteResult is UseCase.Result.InvalidParams) {
                 logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                userErrorMessage = deleteResult.userErrorMessage
             }
 
             eventDetailsSnackState.value = EventSnackState.DisplaySnack(
-                resourceProvider.provideString(R.string.snack_event_deleted_error)
+                if (userErrorMessage.isNullOrEmpty()) {
+                    resourceProvider.provideString(R.string.snack_event_deleted_error)
+                } else {
+                    userErrorMessage
+                }
             )
         }
     }

@@ -626,12 +626,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 if (deleteResult is UseCase.Result.Success<*>) {
                                     this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
                                 } else {
+                                    var userErrorMessage: String? = null
                                     if (deleteResult is UseCase.Result.Error) {
                                         logger.e("Error deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
                                     } else if (deleteResult is UseCase.Result.InvalidParams) {
                                         logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
                                     }
-                                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
+                                    this@MainActivity.displaySnackBar(
+                                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                        else userErrorMessage
+                                    )
                                 }
                             }
                         }
@@ -744,12 +750,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     if (deleteResult is UseCase.Result.Success<*>) {
                         this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
                     } else {
+                        var userErrorMessage: String? = null
                         if (deleteResult is UseCase.Result.Error) {
                             logger.e("Error deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
                         } else if (deleteResult is UseCase.Result.InvalidParams) {
                             logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
                         }
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted_error))
+                        this@MainActivity.displaySnackBar(
+                            if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                            else userErrorMessage
+                        )
                     }
                 }
             }

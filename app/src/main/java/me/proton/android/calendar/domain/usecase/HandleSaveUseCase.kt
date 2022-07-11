@@ -187,13 +187,15 @@ class HandleSaveUseCase @Inject constructor(
                 if (editOriginalEventResult is UseCase.Result.Error) {
                     return HandleSaveOptionResult.Error(
                         UseCase.Result.Error(
-                            "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}"
+                            "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                            userErrorMessage = editOriginalEventResult.userErrorMessage
                         )
                     )
                 } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {
                     return HandleSaveOptionResult.Error(
                         UseCase.Result.InvalidParams(
-                            "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}"
+                            "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                            userErrorMessage = editOriginalEventResult.userErrorMessage
                         )
                     )
                 }
@@ -238,13 +240,15 @@ class HandleSaveUseCase @Inject constructor(
                     if (editOriginalEventResult is UseCase.Result.Error) {
                         return HandleSaveOptionResult.Error(
                             UseCase.Result.Error(
-                                "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}"
+                                "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                                userErrorMessage = editOriginalEventResult.userErrorMessage
                             )
                         )
                     } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {
                         return HandleSaveOptionResult.Error(
                             UseCase.Result.InvalidParams(
-                                "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}"
+                                "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                                userErrorMessage = editOriginalEventResult.userErrorMessage
                             )
                         )
                     }
@@ -358,9 +362,15 @@ class HandleSaveUseCase @Inject constructor(
         val editOriginalEventResult =
             editCreateEventUseCase.execute(userId, dbEventToUpdate)
         if (editOriginalEventResult is UseCase.Result.Error) {
-            return HandleSaveOptionResult.Error(UseCase.Result.Error("HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}"))
+            return HandleSaveOptionResult.Error(UseCase.Result.Error(
+                "HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}",
+                userErrorMessage = editOriginalEventResult.userErrorMessage
+            ))
         } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {
-            return HandleSaveOptionResult.Error(UseCase.Result.InvalidParams("HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}"))
+            return HandleSaveOptionResult.Error(UseCase.Result.InvalidParams(
+                "HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}",
+                userErrorMessage = editOriginalEventResult.userErrorMessage
+            ))
         }
 
         // TODO delete exdates after this occurrence?
@@ -722,8 +732,15 @@ class HandleSaveUseCase @Inject constructor(
         val createEventResult = editCreateEventUseCase.execute(userId, newEvent, oldCalendarId = oldCalendarId ?: newEvent.calendar.id)
 
         return when (createEventResult) {
-            is UseCase.Result.Error -> UseCase.Result.Error("HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}", createEventResult.error)
-            is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams("HandleSaveUseCase:invalid params in create event: ${createEventResult.message}")
+            is UseCase.Result.Error -> UseCase.Result.Error(
+                "HandleSaveUseCase: error in editCreateEvent event: ${createEventResult.message}",
+                createEventResult.error,
+                userErrorMessage = createEventResult.userErrorMessage
+            )
+            is UseCase.Result.InvalidParams -> UseCase.Result.InvalidParams(
+                "HandleSaveUseCase:invalid params in create event: ${createEventResult.message}",
+                userErrorMessage = createEventResult.userErrorMessage
+            )
             is UseCase.Result.Success<*> -> {
                 val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
                 if (isCalendarBeingChanged) {

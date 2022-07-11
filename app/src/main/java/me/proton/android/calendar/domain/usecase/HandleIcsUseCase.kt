@@ -271,7 +271,13 @@ class HandleIcsUseCase @Inject constructor(
             val deleteResult = handleDeleteUseCase.handleDelete(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
             if (deleteResult !is UseCase.Result.Success<*>) {
                 deleteResult.ifSuccessAndLogErrors(logger) {}
-                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(
+                    when (deleteResult) {
+                        is UseCase.Result.Error -> deleteResult.userErrorMessage
+                        is UseCase.Result.InvalidParams -> deleteResult.userErrorMessage
+                        else -> null
+                    }
+                )
             }
         }
 
@@ -394,8 +400,8 @@ class HandleIcsUseCase @Inject constructor(
 
         // Handle party crashers in replies
         val updatedAttendee = iCalendar.events.first().attendees.firstOrNull()
-        val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
-        val canonicalAttendeeEmail = canonicalEmailsUseCase.invoke(userId, listOf(updatedAttendeeEmail))[updatedAttendeeEmail] ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+        val updatedAttendeeEmail = updatedAttendee?.extractEmail() ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError()
+        val canonicalAttendeeEmail = canonicalEmailsUseCase.invoke(userId, listOf(updatedAttendeeEmail))[updatedAttendeeEmail] ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError()
         val existingEventCanonicalAttendeeEmails = canonicalEmailsUseCase.invoke(userId, existingEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() })
 
         if (existingEvent.iCalEvent.attendees?.none {
@@ -427,7 +433,7 @@ class HandleIcsUseCase @Inject constructor(
                         userId,
                         calendarId,
                         existingEvent.id,
-                        attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError,
+                        attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(),
                         updatedAttendee.participationStatus.toInt(),
                         null,
                         newUpdateTime
@@ -435,7 +441,7 @@ class HandleIcsUseCase @Inject constructor(
 
                     if (updateParticipationStatusUseCaseResult !is UseCase.Result.Success<*>) {
                         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
-                        return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                        return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError()
                     }
 
                     makeCalendarVisible(existingEvent, userId)
@@ -466,15 +472,15 @@ class HandleIcsUseCase @Inject constructor(
 
                 makeCalendarVisible(newEvent, userId)
 
-                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError, action, isRecurring = newEvent.isRecurring())
+                return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), action, isRecurring = newEvent.isRecurring())
             }
             is UseCase.Result.InvalidParams -> {
                 logger.i("HandleIcsUseCase: invalid params in create event: ${editCreateEventResult.message}")
-                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(editCreateEventResult.userErrorMessage)
             }
             is UseCase.Result.Error -> {
                 logger.i("HandleIcsUseCase: error in create event: ${editCreateEventResult.message}")
-                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError
+                return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(editCreateEventResult.userErrorMessage)
             }
         }
     }

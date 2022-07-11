@@ -161,7 +161,19 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 val deleteSingleEditsResult = deleteSingleEditsAfter(userId, rootEvent.id, occurrenceStart.minusNanos(1))
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("HandleDeleteUseCase: error deleting >this and future< events")
+                if ((editResult is UseCase.Result.Success<*>) && (deleteSingleEditsResult is UseCase.Result.Success<*>)) {
+                    UseCase.Result.Success<Unit>()
+                } else {
+                    val userErrorMessage =
+                        when {
+                            editResult is UseCase.Result.Error -> editResult.userErrorMessage
+                            editResult is UseCase.Result.InvalidParams -> editResult.userErrorMessage
+                            deleteSingleEditsResult is UseCase.Result.Error -> deleteSingleEditsResult.userErrorMessage
+                            deleteSingleEditsResult is UseCase.Result.InvalidParams -> deleteSingleEditsResult.userErrorMessage
+                            else -> null
+                        }
+                    UseCase.Result.Error("HandleDeleteUseCase: error deleting >this and future< events", userErrorMessage = userErrorMessage)
+                }
 
             }
             EventEditDeleteOption.ALL_EVENTS -> {
@@ -189,7 +201,19 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
-                if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) UseCase.Result.Success<Unit>() else UseCase.Result.Error("HandleDeleteUseCase: error deleting >all< events")
+                if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) {
+                    UseCase.Result.Success<Unit>()
+                } else {
+                    val userErrorMessage =
+                        when {
+                            deleteSingleEditsResult is UseCase.Result.Error -> deleteSingleEditsResult.userErrorMessage
+                            deleteSingleEditsResult is UseCase.Result.InvalidParams -> deleteSingleEditsResult.userErrorMessage
+                            deleteResult is UseCase.Result.Error -> deleteResult.userErrorMessage
+                            deleteResult is UseCase.Result.InvalidParams -> deleteResult.userErrorMessage
+                            else -> null
+                        }
+                    UseCase.Result.Error("HandleDeleteUseCase: error deleting >all< events", userErrorMessage = userErrorMessage)
+                }
             }
         }
 
@@ -220,16 +244,17 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     }
                 }
 
-                val succesEventIds = eventIds.filterNot { it in errorEventIds }
-                if (succesEventIds.isNotEmpty()) {
-                    calendarsRepository.deleteEventsById(succesEventIds)
+                val successEventIds = eventIds.filterNot { it in errorEventIds }
+                if (successEventIds.isNotEmpty()) {
+                    calendarsRepository.deleteEventsById(successEventIds)
                     handleAlarmsUseCase.execute(userId)
                 }
 
                 if (errorEventIds.isEmpty()) {
                     UseCase.Result.Success<Unit>()
                 } else {
-                    UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events")
+                    val syncError = syncResponse.data.responses.firstOrNull { !it.response.isSuccessful }
+                    UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events", userErrorMessage = syncError?.response?.error)
                 }
             }
             is ApiResponse.Error -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.error}")
