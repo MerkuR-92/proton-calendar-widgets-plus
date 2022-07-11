@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -43,45 +44,87 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.nav_view_main.*
-import kotlinx.android.synthetic.main.nav_view_main.view.*
-import kotlinx.coroutines.*
+import kotlinx.android.synthetic.main.activity_main.drawer_layout
+import kotlinx.android.synthetic.main.activity_main.nav_view_main_content
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_create
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_agenda_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_day_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_layout
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_timezone
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_user_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_calendars_list
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_bug_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_feedback_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_feedback_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_press
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_subscribed_calendars
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_subscribed_calendars_list
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_user_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_version
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_CODE
-import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
-import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_SCOPE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_STATE
+import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
+import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
+import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.CalendarImport.ERROR
 import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
+import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
+import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
+import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
+import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
+import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -99,7 +142,6 @@ import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
-import me.proton.core.util.kotlin.toBoolean
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -183,29 +225,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    fun getAppSettingsLanguage(): String {
-        return PreferenceManager.getDefaultSharedPreferences(this).getString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, null) ?: ""
-    }
-
-    fun changeAppLanguage(language: String) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-
-        val editor = sharedPreferences.edit()
-        editor.putString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, language)
-        // We restart the app next, so we can directly set the app current language to the new one
-        editor.putString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, language)
-        editor.commit()
-
-        restartApplication()
-    }
-
-    private fun setAppCurrentLanguage(currentLanguage: String) {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = sharedPreferences.edit()
-        editor.putString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, currentLanguage)
-        editor.commit()
-    }
-
     private fun restartActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -215,6 +234,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun restartApplication() {
         restartActivity()
         Runtime.getRuntime().exit(0)
+    }
+
+    fun changeAppLanguage(localeCode: String?) {
+        CustomLocale.apply(this, localeCode)
+        restartApplication()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -267,17 +291,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             //  at the top of the stack (ie: the last state of this task)
             finish()
             return
-        }
-
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val appCurrentLanguage = sharedPreferences.getString(SharedPreferencesKeys.APP_CURRENT_LANGUAGE, null)
-        val appSettingsLanguage = getAppSettingsLanguage()
-        // If we use System default as language settings for the app, check whether we need to restart Application to apply new language
-        if (appSettingsLanguage.isBlank() && appCurrentLanguage != getLocaleForFormatting().toLanguageTag()) {
-            setAppCurrentLanguage(getLocaleForFormatting().toLanguageTag())
-            if (CHANGE_LANGUAGE) {
-                restartApplication()
-            }
         }
 
         widgetRefresher.broadcastRefresh()
@@ -1152,7 +1165,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val userCalendarListView = nav_view_main_content.nav_view_calendars_list
         val userCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         userCalendarListView.layoutManager = userCalendarsLayoutManager
-        userCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendar ->
+        userCalendarListAdapter = CalendarListAdapter { calendar ->
             //On Calendar click event
             lifecycleScope.launch {
                 calendarViewModel.updateCalendarVisibility(calendar.id, calendar.display)
@@ -1165,7 +1178,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val subscribedCalendarListView = nav_view_main_content.nav_view_subscribed_calendars_list
         val subscribedCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         subscribedCalendarListView.layoutManager = subscribedCalendarLayoutManager
-        subscribedCalendarListAdapter = CalendarListAdapter(calendarViewModel) { calendar ->
+        subscribedCalendarListAdapter = CalendarListAdapter { calendar ->
             //On Calendar click event
             lifecycleScope.launch {
                 calendarViewModel.updateCalendarVisibility(calendar.id, calendar.display)
@@ -1309,10 +1322,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         } else {
             super.onBackPressed()
         }
-    }
-
-    override fun attachBaseContext(newBase: Context) {
-        super.attachBaseContext(CustomLocale.apply(newBase))
     }
 
     override fun onDestroy() {

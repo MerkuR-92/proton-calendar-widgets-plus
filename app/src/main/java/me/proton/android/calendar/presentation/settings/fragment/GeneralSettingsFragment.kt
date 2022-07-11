@@ -44,6 +44,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToI
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
@@ -173,7 +174,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
         val appLanguagesLabels = resources.getStringArray(R.array.custom_language_labels)
         val appLanguagesValues = resources.getStringArray(R.array.custom_language_values)
-        val selectedLanguageValue = (activity as MainActivity).getAppSettingsLanguage()
+        val selectedLanguageValue = CustomLocale.getSelectedLocale()?.language
         val selectedLanguageIndex = appLanguagesValues.indexOfFirst { it == selectedLanguageValue }
         val systemDefaultLabel = resources.getString(R.string.settings_language_default)
         settings_language_value.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
@@ -188,16 +189,17 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 getString(R.string.settings_language_title),
                 appLanguageDialogLabels.toTypedArray(),
                 run {
-                    val selectedLanguageDialogIndex = appLanguagesValues.indexOfFirst { it == (activity as MainActivity).getAppSettingsLanguage() }
+                    val selectedLanguage = CustomLocale.getSelectedLocale()?.language
+                    val selectedLanguageDialogIndex = appLanguagesValues.indexOf(selectedLanguage)
                     if (selectedLanguageDialogIndex == -1) 0 else selectedLanguageDialogIndex + 1
                 }
             ) { index ->
                 if (index == 0) {
                     settings_language_value.text = systemDefaultLabel
-                    (activity as MainActivity).changeAppLanguage("") // Use empty string for System default
+                    (activity as? MainActivity)?.changeAppLanguage(null) // Use empty string for System default
                 } else {
                     settings_language_value.text = appLanguagesLabels[index - 1]
-                    (activity as MainActivity).changeAppLanguage(appLanguagesValues[index - 1])
+                    (activity as? MainActivity)?.changeAppLanguage(appLanguagesValues[index - 1])
                 }
             }
         }
@@ -230,14 +232,12 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                     displayNetworkError()
                     return@displaySingleChoicePicker
                 }
-                lifecycleScope.launch {
                     val weekStart = when (index) {
                         2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
                         3 -> DayOfWeek.SUNDAY.value // 7 is value for Sunday and index 3 in available days string array
                         else -> index
                     }
                     calendarViewModel.updateWeekStart(weekStart)
-                }
             }
         }
 

@@ -192,12 +192,12 @@ class AccountViewModel @Inject constructor(
                 accounts.any { it.isReady() && it.isBootstrapped() } -> _state.tryEmit(State.Ready)
                 accounts.any { it.isStepNeeded() } -> _state.tryEmit(State.StepNeeded)
             }
-        }.launchIn(context.lifecycleScope)
+        }.launchIn(viewModelScope)
 
         // Observe primary user id.
         accountManager.getPrimaryUserId().onEach { userId ->
             _hasPrimary.postValue(userId != null)
-        }.launchIn(context.lifecycleScope)
+        }.launchIn(viewModelScope)
     }
 
     fun addAccount() {

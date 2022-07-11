@@ -1,53 +1,60 @@
 package me.proton.android.calendar.common.utils
 
 import android.content.Context
-import android.content.res.Configuration
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.preference.PreferenceManager
-import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
-import java.util.*
+import java.util.Locale
 
 object CustomLocale {
 
-    fun apply(context: Context): Context {
-        if (!CHANGE_LANGUAGE) return updateResources(context, "en-US")
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return updateResources(context, preferences.getString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, null) ?: "")
+    fun applyCurrent(context: Context): Context {
+        val currentSelectedLocaleCode = PreferenceManager.getDefaultSharedPreferences(context)
+            .getString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, null)
+        return currentSelectedLocaleCode?.let {
+            val locale = createLocaleFromCode(it)
+            if (getSelectedLocale() == null) {
+                AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+            }
+            // This is needed because of ResourceProvider's usage. It's advised to remove it ASAP.
+            val configuration = context.resources.configuration
+            configuration.setLocale(locale)
+            context.createConfigurationContext(configuration)
+        } ?: context
     }
 
-    private fun updateResources(context: Context, locale: String): Context {
-
-        var languageToSet = locale.substringBefore("-")
-        var countryToSet = locale.substringAfter("-", "")
-
-        if (locale == "") {
-            // If settings are in Auto Detect, use System language if supported, or fallback to en-US
-            val defaultSupportedLanguageTag = getLocaleForFormatting().toLanguageTag()
-            languageToSet = defaultSupportedLanguageTag.substringBefore("-")
-            countryToSet = defaultSupportedLanguageTag.substringAfter("-", "")
+    fun apply(context: Context, localeCode: String?) {
+        val localesToSet: LocaleListCompat = when {
+            !CHANGE_LANGUAGE -> LocaleListCompat.create(Locale("en", "US"))
+            localeCode.isNullOrBlank() -> {
+                // If settings are in Auto Detect, use System language if supported, or fallback to en-US
+                PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .remove(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE)
+                    .commit()
+                LocaleListCompat.getEmptyLocaleList()
+            }
+            else -> {
+                PreferenceManager.getDefaultSharedPreferences(context).edit()
+                    .putString(SharedPreferencesKeys.APP_SETTINGS_LANGUAGE, localeCode)
+                    .commit()
+                val locale = createLocaleFromCode(localeCode)
+                LocaleListCompat.create(locale)
+            }
         }
+        AppCompatDelegate.setApplicationLocales(localesToSet)
+    }
 
+    private fun createLocaleFromCode(localeCode: String): Locale {
+        val languageToSet = localeCode.substringBefore("-")
+        val countryToSet = localeCode.substringAfter("-", "")
         // Create custom Locale
-        val localeToSet = Locale(languageToSet, countryToSet)
-        Locale.setDefault(localeToSet)
-
-        val resources = context.resources
-        val configuration = Configuration(resources.configuration)
-
-        // Set the custom locale in Configuration
-        configuration.setLocale(localeToSet)
-
-        // Make sure we also set the app theme in Configuration
-        when (AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(context).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]) {
-            AppTheme.LIGHT -> configuration.uiMode = Configuration.UI_MODE_NIGHT_NO
-            AppTheme.DARK -> configuration.uiMode = Configuration.UI_MODE_NIGHT_YES
-            else -> configuration.uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED
-        }
-
-        val updatedContext = context.createConfigurationContext(configuration)
-        return updatedContext ?: context
+        return Locale(languageToSet, countryToSet)
     }
+
+    /** Gets either a custom selected Locale for the app or null. */
+    fun getSelectedLocale(): Locale? = AppCompatDelegate.getApplicationLocales().firstOrNull()
 }
 
+private fun LocaleListCompat.firstOrNull() = if (isEmpty) null else this[0]

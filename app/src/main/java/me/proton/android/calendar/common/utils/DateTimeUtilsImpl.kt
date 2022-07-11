@@ -21,7 +21,6 @@ import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.time.temporal.IsoFields
 import java.util.*
-import java.util.Locale.*
 import kotlin.math.abs
 
 object DateTimeUtilsImpl : DateTimeUtils {
@@ -279,8 +278,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                 val alternative = alternativeTimezones.firstOrNull { it.startsWith(timeZone.substringBefore("/")) } ?: alternativeTimezones.firstOrNull()
 
                 alternative ?: if (fallbackToDefault) TimeZone.getDefault().id else null
-            } else if (!windowsTimeZoneMap[timeZone.lowercase(getDefault()).replace(".", "")].isNullOrEmpty()) {
-                val windowsIdReplacement = windowsTimeZoneMap[timeZone.lowercase(getDefault()).replace(".", "")]
+            } else if (!windowsTimeZoneMap[timeZone.lowercase(Locale.getDefault()).replace(".", "")].isNullOrEmpty()) {
+                val windowsIdReplacement = windowsTimeZoneMap[timeZone.lowercase(Locale.getDefault()).replace(".", "")]
                     ?: return if (fallbackToDefault) TimeZone.getDefault().id
                     else null
                 fallbackTimeZone(windowsIdReplacement, fallbackToDefault)
@@ -362,20 +361,20 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     override fun getLocaleForFormatting(): Locale {
-        if (!CHANGE_LANGUAGE) return US
-        val appDefaultLocale = getDefault()
+        if (!CHANGE_LANGUAGE) return Locale.US
+        val appDefaultLocale = Locale.getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getSupportedLocaleOrNull(
                 appDefaultLocale
             ) ?: getSupportedLocaleOrNull(
                 Resources.getSystem().configuration.locales[0]
-            ) ?: US // Fallback to English (US)
+            ) ?: Locale.US // Fallback to English (US)
         } else {
             getSupportedLocaleOrNull(
                 appDefaultLocale
             ) ?: getSupportedLocaleOrNull(
                 Resources.getSystem().configuration.locale
-            ) ?: US // Fallback to English (US)
+            ) ?: Locale.US // Fallback to English (US)
         }
     }
 
