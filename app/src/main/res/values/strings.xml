@@ -176,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">on the %1$s</string>
     <string name="event_recurrence_ends_on">Ends</string>
     <string name="event_recurrence_ends_never">never</string>
-    <string name="event_recurrence_ends_on_date_empty">on day</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">on day</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">on %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">after</string>
     <string name="event_recurring_edit_this">This event</string>
@@ -460,9 +460,6 @@
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
     <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
     <string name="import_assistant_summary_title">Import summary</string>
-    <string name="import_assistant_summary_count">Import %d of %d calendars from</string>
-    <string name="fragment_import_assistant_summary_create_details">Create %d new %s in Proton Calendar.</string>
-    <string name="fragment_import_assistant_summary_merge_details">Merge %d %s in Proton Calendar.</string>
     <string name="import_assistant_summary_customize_import">Customize import</string>
     <string name="import_assistant_error">Error fetching data</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
@@ -471,23 +468,21 @@
     <string name="import_assistant_start_import_error">Failed to start import, please try again later</string>
     <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
-    <string name="import_assistant_import_as">Import as</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Import as</string>
     <string name="import_assistant_new_calendar_badge">New</string>
     <string name="import_assistant_merge_calendar_badge">Merged</string>
     <string name="import_assistant_creating_calendars">Creating new calendars</string>
-    <string name="import_assistant_creating_calendars_count">%d of %d created in %s</string>
-    <string name="import_assistant_creating_calendars_finish">Almost there…</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Almost there…</string>
     <string name="import_assistant_new_calendar_header">Create new</string>
     <string name="import_assistant_merge_calendar_header">Merge with existing</string>
     <string name="import_assistant_in_progress_title">Import in progress</string>
-    <string name="import_assistant_in_progress_description">Importing data from %s to %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %s to %s.</string>
     <string name="import_assistant_in_progress_redirect">Check the progress</string>
     <string name="import_assistant_in_progress_sub_description">Large imports can take several days. We will let you know when the import is done. You can close this screen.</string>
     <string name="import_assistant_guide_subtitle">Make the switch to privacy. Easily and securely.</string>
     <string name="import_assistant_guide_description">Move your events and other data from Google to Proton. The Easy Switch importer guides you each step of the way and encrypts your data as it\'s moved.</string>
     <string name="import_assistant_new_import">New import</string>
     <string name="import_assistant_previous_import">Previous imports</string>
-    <string name="import_assistant_ongoing_import">%d ongoing import</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_status_in_progress">In progress</string>
     <string name="import_assistant_status_completed">Completed</string>
@@ -509,11 +504,6 @@
     <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
     <string name="import_assistant_cancel_import_positive_button">Cancel import</string>
     <string name="import_assistant_cancel_import_negative_button">Resume import</string>
-    <string name="import_assistant_resume_import_title">Resume</string>
-    <string name="import_assistant_resume_import_message">Resume</string>
-    <string name="import_assistant_resume_import_positive_button">Resume</string>
-    <string name="import_assistant_resume_import_negative_button">Resume</string>
-    <string name="import_assistant_import_summary_error">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d %2$s or\n • Merge at least %1$d %2$s with existing Proton calendars.</string>
     <string name="import_assistant_in_progress_snack">Import in progress</string>
     <string name="import_assistant_discard_import_title">Cancel import?</string>
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
@@ -527,6 +517,30 @@
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %d calendar</item>
         <item quantity="other">Import %d calendars</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d ongoing import</item>
+        <item quantity="other">%d ongoing imports</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d of %d created in %s</item>
+        <item quantity="other">%d of %d created in %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Create %d new calendar in Proton Calendar.</item>
+        <item quantity="other">Create %d new calendars in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Import %d of %d calendar from</item>
+        <item quantity="other">Import %d of %d calendars from</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Merge %d calendar in Proton Calendar.</item>
+        <item quantity="other">Merge %d calendars in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

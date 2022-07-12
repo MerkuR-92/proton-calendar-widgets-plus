@@ -95,8 +95,9 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
         val ongoingImports = importerList.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
         import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports > 0)
         if (ongoingImports > 0) {
-            import_assistant_status_guide_imports_subtitle.text = getString(
-                R.string.import_assistant_ongoing_import,
+            import_assistant_status_guide_imports_subtitle.text = resources.getQuantityString(
+                R.plurals.import_assistant_ongoing_import,
+                ongoingImports,
                 ongoingImports
             )
         }

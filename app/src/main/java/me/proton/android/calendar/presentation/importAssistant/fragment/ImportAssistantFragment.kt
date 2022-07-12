@@ -221,11 +221,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         if (userCalendarsCount >= MAX_CALENDAR_PAID) importCalendarsToCreateCount
                         else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
-                val calendarPluralString = resources.getQuantityString(R.plurals.calendar, countCalendarsOverLimit)
-                fragment_import_assistant_summary_error.text = getString(
-                    R.string.import_assistant_import_summary_error,
+                fragment_import_assistant_summary_error.text = resources.getQuantityString(
+                    R.plurals.import_assistant_import_summary_error,
                     countCalendarsOverLimit,
-                    calendarPluralString
+                    countCalendarsOverLimit
                 )
                 importButtonIsEnabled(false)
                 if (this@ImportAssistantFragment::importCalendarMappingListAdapter.isInitialized) {
@@ -399,8 +398,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         fragment_import_assistant_summary_layout.visibleOrGone(true)
 
         val calendarsToImport = importCalendarMappingList.filter { it.importCalendar }
-        fragment_import_assistant_summary_count.text = getString(
-            R.string.import_assistant_summary_count,
+        fragment_import_assistant_summary_count.text = resources.getQuantityString(
+            R.plurals.import_assistant_summary_count,
+            importCalendarMappingList.size,
             calendarsToImport.size,
             importCalendarMappingList.size
         )
@@ -416,19 +416,19 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         // Display calendars to create count
         val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
         fragment_import_assistant_summary_create_details.visibleOrGone(calendarsToCreate > 0)
-        fragment_import_assistant_summary_create_details.text = getString(
-            R.string.fragment_import_assistant_summary_create_details,
+        fragment_import_assistant_summary_create_details.text = resources.getQuantityString(
+            R.plurals.fragment_import_assistant_summary_create_details,
             calendarsToCreate,
-            resources.getQuantityString(R.plurals.calendar, calendarsToCreate)
+            calendarsToCreate
         )
 
         // Display calendars to merge count
         val calendarsToMerge = importCalendarMappingList.filter { it.mergeCalendar && it.importCalendar }.size
         fragment_import_assistant_summary_merge_details.visibleOrGone(calendarsToMerge > 0)
-        fragment_import_assistant_summary_merge_details.text = getString(
-            R.string.fragment_import_assistant_summary_merge_details,
+        fragment_import_assistant_summary_merge_details.text = resources.getQuantityString(
+            R.plurals.fragment_import_assistant_summary_merge_details,
             calendarsToMerge,
-            resources.getQuantityString(R.plurals.calendar, calendarsToMerge)
+            calendarsToMerge
         )
 
         // Reset import button state
@@ -460,8 +460,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun updateCalendarCreatedView(calendarsToCreateCount: Int, calendarsCreatedCount: Int, destinationEmail: String) {
-        fragment_import_assistant_loader_description.text = getString(
-            R.string.import_assistant_creating_calendars_count,
+        fragment_import_assistant_loader_description.text = resources.getQuantityString(
+            R.plurals.import_assistant_creating_calendars_count,
+            calendarsCreatedCount,
             calendarsCreatedCount,
             calendarsToCreateCount,
             destinationEmail
