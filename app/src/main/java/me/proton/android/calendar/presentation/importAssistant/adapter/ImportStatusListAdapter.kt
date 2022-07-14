@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.item_import_status.view.item_import_status
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_description
 import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_title
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountSI
+import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountBin
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.domain.model.Import
@@ -70,7 +70,7 @@ class ImportStatusListAdapter(
         fun bind(import : Import) {
 
             account.text = import.account
-            val importSize = humanReadableByteCountSI(import.size?.toLong() ?: 0L)
+            val importSize = humanReadableByteCountBin(import.size?.toLong() ?: 0L)
             details.text =
                 if (import.size != null) {
                     itemView.context.getString(
