@@ -252,6 +252,11 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
 
     private fun refreshList() {
         lifecycleScope.launch {
+            if (!mainViewModel.isConnectedToNetwork) {
+                displayNetworkError()
+                fragment_import_assistant_status_refresh.isRefreshing = false
+                return@launch
+            }
             importAssistantViewModel.getReports()
             importAssistantViewModel.getImporters()
             // TODO Handle error and cancel loading animation
