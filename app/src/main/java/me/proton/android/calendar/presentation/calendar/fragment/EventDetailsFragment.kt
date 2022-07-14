@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +49,7 @@ import kotlinx.android.synthetic.main.fragment_event_details.section_calendar
 import kotlinx.android.synthetic.main.fragment_event_details.section_description
 import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
 import kotlinx.android.synthetic.main.fragment_event_details.section_location
+import kotlinx.android.synthetic.main.fragment_event_details.section_verification_warning
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_description
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_initials
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_status
@@ -562,10 +564,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             // TODO hide the warning until we verify Event signatures with pinned keys
-            /*with (section_verification_warning) {
+            with (section_verification_warning) {
                 visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
                 movementMethod = LinkMovementMethod.getInstance()
-            }*/
+            }
         })
     }
 

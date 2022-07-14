@@ -25,11 +25,13 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.decryptDataOrNull
 import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.entity.key.PublicKey
+import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.key.domain.useKeys
-import me.proton.core.key.domain.verifyText
+import me.proton.core.key.domain.verifyData
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import java.nio.charset.StandardCharsets
 import javax.inject.Inject
@@ -95,18 +97,23 @@ class TransformEventUseCase @Inject constructor(
                         if (userAddressForAddressKeyPacket != null) {
                             getPlainText(
                                 eventEntity.addressKeyPacket,
-                                userAddressForAddressKeyPacket,
-                                cryptoContext,
-                                sharedEvent
+                                sharedEvent,
+                                EncryptedWith.AddressKey(
+                                    userAddressForAddressKeyPacket,
+                                    cryptoContext,
+                                    getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                                )
                             )
                         } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
-                            calendarPrivateKeys,
-                            keyPassphrase,
                             sharedEvent,
-                            getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                            EncryptedWith.CalendarKey(
+                                calendarPrivateKeys,
+                                keyPassphrase,
+                                getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                            )
                         )
                     }
 
@@ -120,10 +127,12 @@ class TransformEventUseCase @Inject constructor(
                 }.map { calendarEvent ->
                     getPlainText(
                         eventEntity.calendarKeyPacket,
-                        calendarPrivateKeys,
-                        keyPassphrase,
                         calendarEvent,
-                        getPublicKeysForAuthor(UserId(userId), calendarEvent, userAddresses)
+                        EncryptedWith.CalendarKey(
+                            calendarPrivateKeys,
+                            keyPassphrase,
+                            getPublicKeysForAuthor(UserId(userId), calendarEvent, userAddresses)
+                        )
                     )
                 }
             }
@@ -135,10 +144,12 @@ class TransformEventUseCase @Inject constructor(
                 }.map { personalEvent ->
                     getPlainText(
                         null, // personal parts are only signed
-                        calendarPrivateKeys,
-                        keyPassphrase,
                         personalEvent,
-                        getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses)
+                        EncryptedWith.CalendarKey(
+                            calendarPrivateKeys,
+                            keyPassphrase,
+                            getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses)
+                        )
                     )
                 }
             }
@@ -153,18 +164,23 @@ class TransformEventUseCase @Inject constructor(
                         if (userAddressForAddressKeyPacket != null) {
                             getPlainText(
                                 eventEntity.addressKeyPacket,
-                                userAddressForAddressKeyPacket,
-                                cryptoContext,
-                                attendeeEvent
+                                attendeeEvent,
+                                EncryptedWith.AddressKey(
+                                    userAddressForAddressKeyPacket,
+                                    cryptoContext,
+                                    getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                                )
                             )
                         } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
-                            calendarPrivateKeys,
-                            keyPassphrase,
                             attendeeEvent,
-                            getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                            EncryptedWith.CalendarKey(
+                                calendarPrivateKeys,
+                                keyPassphrase,
+                                getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                            )
                         )
                     }
 
@@ -264,72 +280,98 @@ class TransformEventUseCase @Inject constructor(
 
     private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>): List<PublicKey> {
 
-        // TODO fix when we properly get public keys for authors
-        return emptyList()
+        return kotlin.runCatching {
 
-        /*return kotlin.runCatching {
+            val canonicalizedAuthorEmail = canonicalizeProtonEmail(eventPart.author, forceCanonicalization = true)
+
+            // try to match EventPart's Author with User emails
             userAddresses.firstOrNull {
-                canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(
-                    canonicalizeProtonEmail(eventPart.author, forceCanonicalization = true)
-                )
+                canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalizedAuthorEmail)
             }?.let {
                 // current User is the Author of this EventPart
-                it.publicKeyRing(cryptoContext).keys
+                return it.publicKeyRing(cryptoContext).keys
+            }
 
-                // Source.LocalIfAvailable, because we can't hit the network here -- if there are no keys available in local cache then it's too bad
-            } ?: publicAddressRepository.getPublicAddress(userId, eventPart.author, source = Source.LocalIfAvailable).keys.map { it.publicKey }
-        }.getOrNull() ?: emptyList()*/
+            // try to look for Author's pinned keys in Contacts
+
+            // TODO
+
+            return emptyList()
+        }.getOrNull() ?: emptyList()
+    }
+
+    private sealed class EncryptedWith(open val authorsPublicKeys: List<PublicKey>) {
+
+        data class CalendarKey(
+            val privateKeys: List<String>,
+            val privateKeysPassphrase: String,
+            override val authorsPublicKeys: List<PublicKey>
+        ): EncryptedWith(authorsPublicKeys)
+
+        data class AddressKey(
+            val userAddress: UserAddress,
+            val cryptoContext: CryptoContext,
+            override val authorsPublicKeys: List<PublicKey>
+        ): EncryptedWith(authorsPublicKeys)
+
     }
 
     /**
      * Get plaintext payload or decrypt & check signature if necessary.
      */
     private fun getPlainText(keyPacket: String?,
-                             privateKeys: List<String>,
-                             keyPassphrase: String,
                              eventPart: Event.EventPart,
-                             authorsPublicKeys: List<PublicKey>
+                             encryptedWith: EncryptedWith
     ): ProcessResult {
 
         // decrypt if necessary
         val plainText = if (eventPart.isEncrypted) {
+
             if (keyPacket != null) {
-                val cipherText = Ciphertext.from(keyPacket, eventPart.data)
-                crypto.decryptText(cipherText.asArmoredPGPMessage(), privateKeys, keyPassphrase.toByteArray())
+                when (encryptedWith) {
+                    is EncryptedWith.CalendarKey -> {
+                        val cipherText = Ciphertext.from(keyPacket, eventPart.data)
+                        crypto.decryptText(cipherText.asArmoredPGPMessage(), encryptedWith.privateKeys, encryptedWith.privateKeysPassphrase.toByteArray())
+                    }
+                    is EncryptedWith.AddressKey -> {
+                        encryptedWith.userAddress.useKeys(cryptoContext) {
+                            decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
+                                it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
+                            }?.toString(StandardCharsets.UTF_8)
+                        }
+                    }
+                }
             } else null
+
         } else {
             eventPart.data
         }
 
         return if (plainText != null) {
 
-            var signatureVerification: Event.SignatureVerification = Event.SignatureVerification.FAILURE
+            val signatureVerification: Event.SignatureVerification
 
             // verify signature if necessary
             if (eventPart.isSigned) {
 
                 if (eventPart.signature != null) {
-
-                    if (authorsPublicKeys.isEmpty()) {
-                        signatureVerification = Event.SignatureVerification.SIGNED_BUT_NO_KEYS
+                    signatureVerification = if (encryptedWith.authorsPublicKeys.isEmpty()) {
+                        Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                     } else {
-
                         val signatureOk = eventPart.signature?.let { signature ->
-                            authorsPublicKeys.any {
-                                it.verifyText(cryptoContext, plainText, signature)
+                            encryptedWith.authorsPublicKeys.any {
+                                it.verifyData(cryptoContext, plainText.toByteArray(), signature)
                             }
                         } ?: false
 
                         if (signatureOk) {
-                            signatureVerification = Event.SignatureVerification.SUCCESS
+                            Event.SignatureVerification.SUCCESS
                         } else {
-                            signatureVerification = Event.SignatureVerification.FAILURE
-                            logger.v("signature not okay for ${plainText}")
+                            Event.SignatureVerification.FAILURE
                         }
                     }
-
                 } else {
-                    logger.e("EventPart ${eventPart.javaClass} is signed but there is no signature")
+                    logger.v("EventPart ${eventPart.javaClass} is signed but there is no signature")
                     signatureVerification = Event.SignatureVerification.FAILURE
                 }
 
@@ -344,31 +386,4 @@ class TransformEventUseCase @Inject constructor(
 
     }
 
-    /**
-     * Get plaintext payload or decrypt using AddressKeys.
-     */
-    private fun getPlainText(keyPacket: String,
-                             userAddress: UserAddress,
-                             cryptoContext: CryptoContext,
-                             eventPart: Event.EventPart
-    ): ProcessResult {
-
-        // decrypt if necessary
-        val plainText = if (eventPart.isEncrypted) {
-            userAddress.useKeys(cryptoContext) {
-                kotlin.runCatching {
-                    decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
-                        it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
-                    }?.toString(StandardCharsets.UTF_8)
-                }.getOrNull()
-            }
-        } else {
-            eventPart.data
-        }
-
-        // TODO verify signature for author if (eventPart.isSigned) when we fix signatures, not refactoring it now because
-        //  we're not sure how it's going to look like
-
-        return ProcessResult(plainText, if (plainText != null) Event.DecryptionStatus.SUCCESS else Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
-    }
 }
