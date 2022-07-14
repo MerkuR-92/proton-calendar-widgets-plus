@@ -23,11 +23,13 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountBin
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.domain.model.Import
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 class ImportStatusListAdapter(
+    val is24Hour: Boolean,
     val listener: (Import, Action) -> Unit
 ): ListAdapter<Import, ImportStatusListAdapter.ViewHolder>(ImportDiffCallback()) {
 
@@ -71,18 +73,21 @@ class ImportStatusListAdapter(
 
             account.text = import.account
             val importSize = humanReadableByteCountBin(import.size?.toLong() ?: 0L)
+            val date = import.dateTime?.toLocalDate()?.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+            val time = import.dateTime?.toLocalTime()?.formatTime(is24Hour, short = false)
+            val dateTime = itemView.context.getString(
+                R.string.import_assistant_report_details_date_time,
+                date,
+                time
+            )
             details.text =
                 if (import.size != null) {
                     itemView.context.getString(
                         R.string.import_assistant_report_details,
                         importSize,
-                        import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
-                            ?: ""
+                        dateTime
                     )
-                } else {
-                    import.dateTime?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM))
-                        ?: ""
-                }
+                } else dateTime
 
             icon.visibleOrGone(import.state != null)
             badge.visibleOrGone(import.state != null)

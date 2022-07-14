@@ -176,7 +176,8 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         val importListView = fragment_import_assistant_status_list
         val importLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         importListView.layoutManager = importLayoutManager
-        importStatusListAdapter = ImportStatusListAdapter { import, action ->
+        val timeFormatIs24Hour = calendarViewModel.timeFormat.value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) } ?: true
+        importStatusListAdapter = ImportStatusListAdapter(timeFormatIs24Hour) { import, action ->
             when (action) {
                 ImportStatusListAdapter.Action.CANCEL -> {
                     showConfirmationDialog(
