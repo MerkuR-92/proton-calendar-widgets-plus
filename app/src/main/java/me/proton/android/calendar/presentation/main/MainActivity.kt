@@ -885,7 +885,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
-            onClickCreateCalendar()
+            lifecycleScope.launch {
+                if (IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false) showCalendarsCreateOrImportDialog()
+                else onClickCreateCalendar()
+            }
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
