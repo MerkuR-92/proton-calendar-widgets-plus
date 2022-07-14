@@ -69,6 +69,12 @@ class ImportAssistantViewModel @Inject constructor(
 
     private lateinit var importerId: String
 
+    fun resetViewModel() {
+        _userId.value = null
+        _importerList.value = null
+        _reportList.value = null
+    }
+
     private suspend fun getGoogleClientId(userId: UserId): String? {
         importerApi.getGoogleClientId(userId)
         return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId

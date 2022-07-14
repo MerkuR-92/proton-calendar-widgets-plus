@@ -94,6 +94,8 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        importAssistantViewModel.resetViewModel()
+
         initImportList()
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->

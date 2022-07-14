@@ -62,6 +62,8 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        importAssistantViewModel.resetViewModel()
+
         lifecycleScope.launch {
             importAssistantViewModel.getImporters()
             importAssistantViewModel.getReports()
@@ -106,7 +108,7 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
     private fun refreshOngoingImportText(importerList: List<ImporterEntity>?, reportList: List<ReportEntity>?) {
         val ongoingImports = importerList?.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
-        import_assistant_status_guide_imports_layout.visibleOrGone(ongoingImports != null || reportList.isNullOrEmpty().not())
+        import_assistant_status_guide_imports_layout.visibleOrGone((ongoingImports != null && ongoingImports > 0) || reportList.isNullOrEmpty().not())
         import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports != null && ongoingImports > 0)
         if (ongoingImports != null && ongoingImports > 0) {
             import_assistant_status_guide_imports_subtitle.text = resources.getQuantityString(
