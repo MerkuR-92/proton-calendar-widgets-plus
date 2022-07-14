@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_layout
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_press
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_subtitle
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_new_import_button
@@ -19,6 +20,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.api.ImporterEntity
+import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
@@ -62,6 +64,7 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             importAssistantViewModel.getImporters()
+            importAssistantViewModel.getReports()
         }
 
         // Hidden by default
@@ -69,7 +72,16 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
         importAssistantViewModel.importerList.observe(viewLifecycleOwner) { importerList ->
             importerList ?: return@observe
-            refreshOngoingImportText(importerList)
+
+            val reportList = importAssistantViewModel.reportList.value
+            refreshOngoingImportText(importerList, reportList)
+        }
+
+        importAssistantViewModel.reportList.observe(viewLifecycleOwner) { reportList ->
+            reportList ?: return@observe
+
+            val importerList = importAssistantViewModel.importerList.value
+            refreshOngoingImportText(importerList, reportList)
         }
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
@@ -86,15 +98,17 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onResume() {
         super.onResume()
-        importAssistantViewModel.importerList.value?.let { importerList ->
-            refreshOngoingImportText(importerList)
-        }
+
+        val importerList = importAssistantViewModel.importerList.value
+        val reportList = importAssistantViewModel.reportList.value
+        refreshOngoingImportText(importerList, reportList)
     }
 
-    private fun refreshOngoingImportText(importerList: List<ImporterEntity>) {
-        val ongoingImports = importerList.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
-        import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports > 0)
-        if (ongoingImports > 0) {
+    private fun refreshOngoingImportText(importerList: List<ImporterEntity>?, reportList: List<ReportEntity>?) {
+        val ongoingImports = importerList?.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
+        import_assistant_status_guide_imports_layout.visibleOrGone(ongoingImports != null || reportList.isNullOrEmpty().not())
+        import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports != null && ongoingImports > 0)
+        if (ongoingImports != null && ongoingImports > 0) {
             import_assistant_status_guide_imports_subtitle.text = resources.getQuantityString(
                 R.plurals.import_assistant_ongoing_import,
                 ongoingImports,
