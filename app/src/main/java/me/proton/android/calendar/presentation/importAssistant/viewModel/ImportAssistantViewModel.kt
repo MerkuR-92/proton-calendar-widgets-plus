@@ -360,17 +360,18 @@ class ImportAssistantViewModel @Inject constructor(
         return true
     }
 
-    suspend fun deleteReport(reportId: String) {
+    suspend fun deleteReport(reportId: String): Boolean {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
             return@let it
-        } ?: return
+        } ?: return false
 
-        importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return
+        importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return false
 
         // Update report list
-        val currentList = _reportList.value?.let { ArrayList(it) } ?: return
+        val currentList = _reportList.value?.let { ArrayList(it) } ?: return false
         currentList.removeIf { it.id == reportId }
         _reportList.value = currentList
+        return true
     }
 }

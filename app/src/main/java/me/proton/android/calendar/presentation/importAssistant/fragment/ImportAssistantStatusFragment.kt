@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_numbers_switch
 import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_list
 import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_refresh
 import kotlinx.coroutines.launch
@@ -188,12 +189,21 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                     ) { dialog, _ ->
                         dialog.dismiss()
                         lifecycleScope.launch {
+                            if (!mainViewModel.isConnectedToNetwork) {
+                                displayNetworkError()
+                                return@launch
+                            }
                             if (importAssistantViewModel.cancelImport(import.id)) refreshList()
+                            else view?.displaySnackBar(getString(R.string.import_assistant_cancel_import_error))
                         }
                     }
                 }
                 ImportStatusListAdapter.Action.RESUME -> {
                     lifecycleScope.launch {
+                        if (!mainViewModel.isConnectedToNetwork) {
+                            displayNetworkError()
+                            return@launch
+                        }
                         // No confirmation dialog for resume
                         if (import.errorCode == Import.ErrorCode.LOST_CONNECTION.value) {
                             // Lost connection, we need to sign in to Google and create a new token to update importer
@@ -207,6 +217,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             }
                         } else {
                             if (importAssistantViewModel.resumeImport(import.id)) refreshList()
+                            else view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
                         }
                     }
                 }
@@ -219,8 +230,14 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                     ) { dialog, _ ->
                         dialog.dismiss()
                         lifecycleScope.launch {
+                            if (!mainViewModel.isConnectedToNetwork) {
+                                displayNetworkError()
+                                return@launch
+                            }
                             // Import.id is the reportId since we mapped both reports and active importers to the Import object
-                            importAssistantViewModel.deleteReport(import.id)
+                            if (!importAssistantViewModel.deleteReport(import.id)) {
+                                view?.displaySnackBar(getString(R.string.import_assistant_delete_import_error))
+                            }
                         }
                     }
                 }
