@@ -113,6 +113,8 @@
                     android:layout_height="wrap_content"
                     style="@style/Proton.Text.DefaultSmall.Weak"
                     android:layout_marginTop="8dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
                     tools:text="Importing data from adam@gmail.com to eric@protonmail.com."/>
@@ -123,6 +125,8 @@
                     android:layout_height="wrap_content"
                     style="@style/Proton.Text.DefaultSmall.Weak"
                     android:layout_marginTop="8dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
                     android:layout_gravity="center_horizontal"
                     android:gravity="center_horizontal"
                     android:text="@string/import_assistant_in_progress_sub_description"/>
