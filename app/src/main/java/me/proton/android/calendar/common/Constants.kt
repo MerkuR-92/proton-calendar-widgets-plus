@@ -201,7 +201,7 @@ object AppLinksQueryParameters {
 
 object CalendarImport {
     const val GOOGLE_AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth?"
-    const val GOOGLE_SCOPES = "email openid https://www.googleapis.com/auth/calendar.readonly"
+    const val GOOGLE_SCOPES = "email+openid+https://www.googleapis.com/auth/calendar.readonly"
     const val ACCESS_TYPE = "offline"
     const val REDIRECT_URI = "https://calendar.proton.me/easy_switch"
     const val RESPONSE_TYPE = "code"
