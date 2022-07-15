@@ -19,11 +19,11 @@ import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
+import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
-import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.ImporterApi
@@ -68,6 +68,11 @@ class ImportAssistantViewModel @Inject constructor(
     val defaultUserEmail: MutableLiveData<String?> = MutableLiveData()
 
     private lateinit var importerId: String
+
+    sealed class ImportResult {
+        object Success : ImportResult()
+        class Error(val userErrorMessage: String? = null) : ImportResult()
+    }
 
     fun resetViewModel() {
         _userId.value = null
@@ -196,11 +201,11 @@ class ImportAssistantViewModel @Inject constructor(
         } else false
     }
 
-    suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): Boolean {
+    suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): ImportResult {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
             return@let it
-        } ?: return false
+        } ?: return ImportResult.Error()
 
         // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
@@ -213,8 +218,17 @@ class ImportAssistantViewModel @Inject constructor(
         }
 
         // Start importer
-        importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping).valueOrNullAndLogErrors(logger) ?: return false
-        return true
+        return when (val startImporterResponse = importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping)) {
+            is ApiResponse.Success -> {
+                ImportResult.Success
+            }
+            is ApiResponse.Error -> {
+                ImportResult.Error(userErrorMessage = startImporterResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                ImportResult.Error()
+            }
+        }
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
