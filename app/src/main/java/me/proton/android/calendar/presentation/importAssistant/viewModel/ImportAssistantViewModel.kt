@@ -78,6 +78,8 @@ class ImportAssistantViewModel @Inject constructor(
         _userId.value = null
         _importerList.value = null
         _reportList.value = null
+        _importCalendarMappingList.value = null
+        _sourceEmail.value = null
     }
 
     private suspend fun getGoogleClientId(userId: UserId): String? {
