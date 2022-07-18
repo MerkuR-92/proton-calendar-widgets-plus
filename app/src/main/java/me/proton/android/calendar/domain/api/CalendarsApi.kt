@@ -59,11 +59,6 @@ interface CalendarsApi {
      */
     suspend fun getEventAlarms(userId: UserId, calendarId: String, eventId: String) : ApiResponse<AlarmsApiResponse>
 
-    /**
-     * Delete an event.
-     */
-    suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<DeleteEventApiResponse>
-
     suspend fun syncEvents(userId: UserId, calendarId: String, body: SyncEventsUpdateApiRequest) : ApiResponse<SyncEventsApiResponse>
 
     suspend fun getEventsByUid(userId: UserId, eventUid: String, page: Int, pageSize: Int) : ApiResponse<EventsByUidApiResponse>

@@ -52,9 +52,6 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/alarms")
     suspend fun getEventAlarms(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : AlarmsApiResponse
 
-    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
-    suspend fun deleteEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : DeleteEventApiResponse
-
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/sync")
     suspend fun syncEvents(@Path("calendarId") calendarId: String, @Body body: SyncEventsUpdateApiRequest) : SyncEventsApiResponse
 
@@ -187,11 +184,6 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     ): ApiResponse<AlarmsApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             getEventAlarms(calendarId, eventId)
-        }.toApiResponse()
-
-    override suspend fun deleteEvent(userId: UserId, calendarId: String, eventId: String): ApiResponse<DeleteEventApiResponse> =
-        apiProvider.get<CalendarsApiService>(userId).invoke {
-            deleteEvent(calendarId, eventId)
         }.toApiResponse()
 
     override suspend fun syncEvents(userId: UserId, calendarId: String, body: SyncEventsUpdateApiRequest): ApiResponse<SyncEventsApiResponse> =
@@ -551,12 +543,6 @@ data class EventsByUidApiResponse(
 
 @Serializable
 data class ResetCalendarApiResponse(
-    @SerialName("Code")
-    override val code: Int
-) : BaseApiResponse()
-
-@Serializable
-data class DeleteEventApiResponse(
     @SerialName("Code")
     override val code: Int
 ) : BaseApiResponse()
