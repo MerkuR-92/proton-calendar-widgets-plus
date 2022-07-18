@@ -212,8 +212,10 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             val userId = accountViewModel.getPrimaryUserId()
                             if (userId != null) {
                                 val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId, import.id)
-                                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
-                                startActivity(browserIntent)
+                                if (googleAuthenticationUrl != null) {
+                                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
+                                    startActivity(browserIntent)
+                                } else view?.displaySnackBar(getString(R.string.snack_network_error))
                             } else {
                                 view?.displaySnackBar(getString(R.string.snack_network_error))
                             }

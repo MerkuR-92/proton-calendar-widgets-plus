@@ -83,20 +83,20 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     private suspend fun getGoogleClientId(userId: UserId): String? {
-        importerApi.getGoogleClientId(userId)
         return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId
     }
 
     /**
      * Use importerId parameter if we need to updated an existing importer
      */
-    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String {
+    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String? {
+        val googleClientId = getGoogleClientId(userId) ?: return null
         return GOOGLE_AUTH_BASE_URL +
                 "scope=${GOOGLE_SCOPES}" +
                 "&accessType=${ACCESS_TYPE}" +
                 "&redirect_uri=${REDIRECT_URI}" +
                 "&response_type=${RESPONSE_TYPE}"+
-                "&client_id=${getGoogleClientId(userId)}" +
+                "&client_id=$googleClientId" +
                 "&prompt=${PROMPT}" +
                 if (importerId.isNullOrBlank()) "" else "&state=$importerId" // Specifies any string value that your application uses to maintain state between your authorization request and the authorization server's response
     }

@@ -1037,8 +1037,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     val userId = accountViewModel.getPrimaryUserId()
                     if (userId != null) {
                         val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId)
-                        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
-                        startActivity(browserIntent)
+                        if (googleAuthenticationUrl != null) {
+                            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
+                            startActivity(browserIntent)
+                        } else displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
                     } else {
                         displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
                     }
