@@ -522,7 +522,6 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
         <item>prima</item>
         <item>a doua</item>
         <item>a treia</item>
@@ -530,7 +529,6 @@
         <item>a cincea</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
         <item>ultima</item>
         <item>a doua până la ultima</item>
         <item>a treia până la ultima</item>

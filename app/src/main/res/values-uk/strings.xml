@@ -536,7 +536,6 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
         <item>перший</item>
         <item>другий</item>
         <item>третій</item>
@@ -544,7 +543,6 @@
         <item>пʼятий</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
         <item>останній</item>
         <item>від другого до останнього</item>
         <item>від третього до останнього</item>

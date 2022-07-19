@@ -508,7 +508,6 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
         <item>eerste</item>
         <item>tweede</item>
         <item>derde</item>
@@ -516,7 +515,6 @@
         <item>vijfde</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
         <item>laatste</item>
         <item>op een na laatste</item>
         <item>op twee na laatste</item>
