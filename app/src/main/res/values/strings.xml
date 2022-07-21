@@ -488,6 +488,7 @@
     <string name="import_assistant_previous_import">Previous imports</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Started</string>
     <string name="import_assistant_status_in_progress">In progress</string>
     <string name="import_assistant_status_completed">Completed</string>
     <string name="import_assistant_status_canceled">Canceled</string>

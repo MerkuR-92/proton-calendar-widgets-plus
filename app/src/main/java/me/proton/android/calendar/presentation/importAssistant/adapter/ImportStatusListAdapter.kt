@@ -95,7 +95,7 @@ class ImportStatusListAdapter(
             if (import.state != null) {
                 (badge as TextView).text = itemView.context.getString(
                     when (import.state) {
-                        Import.ImportState.QUEUED,
+                        Import.ImportState.QUEUED -> R.string.import_assistant_status_queued
                         Import.ImportState.RUNNING -> R.string.import_assistant_status_in_progress
                         Import.ImportState.DONE -> R.string.import_assistant_status_completed
                         Import.ImportState.FAILED -> R.string.import_assistant_status_failed
