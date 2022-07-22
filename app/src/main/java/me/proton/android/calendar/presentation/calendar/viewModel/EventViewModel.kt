@@ -28,6 +28,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
@@ -100,7 +101,8 @@ class EventViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider,
     private val widgetRefresher: WidgetRefresher,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val upgradeEventUseCase: UpgradeEventUseCase
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -2906,16 +2908,20 @@ class EventViewModel @Inject constructor(
 
         val updateTime = Instant.now()
 
+        val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
+
         // For proton to proton we first update the participation status on BE
-        val updateParticipationStatusUseCaseResult = updateParticipationStatusUseCase.execute(
-            userId,
-            event.calendar.id,
-            event.id,
-            attendeeId,
-            status,
-            personalPartICalString,
-            updateTime.epochSecond.toInt()
-        )
+        val updateParticipationStatusUseCaseResult = if (upgradedEventEntity != null) {
+            updateParticipationStatusUseCase.execute(
+                userId,
+                event.calendar.id,
+                event.id,
+                attendeeId,
+                status,
+                personalPartICalString,
+                updateTime.epochSecond.toInt()
+            )
+        } else UseCase.Result.Error("handleChangeAnswerProtonToProton could not upgrade Event: ${upgradedEventEntity}")
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
         if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty()) {
