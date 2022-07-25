@@ -70,20 +70,21 @@ class UpdateCalendarUseCase @Inject constructor(
         val updateCalendarApiResponse = when (val updateCalendarResponse =
             calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
             is ApiResponse.Success -> {
-                calendarsRepository.updateCalendar(userId.id, updateCalendarResponse.data.calendar)
+                calendarsRepository.persistCalendar(userId.id, updateCalendarResponse.data.calendar)
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
         }
 
-        val updateMemberApiResponse = when (val updateCalendarResponse =
+        val updateMemberApiResponse = when (val updateMemberResponse =
             calendarsApi.updateMember(userId, calendarId, memberId, updateMemberApiRequest)) {
             is ApiResponse.Success -> {
+                calendarsRepository.persistMember(updateMemberResponse.data.member)
                 UseCase.Result.Success<Unit>()
             }
-            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateCalendarResponse.error}")
-            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
+            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.exception.message ?: "(no exception message)"}")
         }
 
         val responses = listOf(updateCalendarApiResponse, updateMemberApiResponse)
