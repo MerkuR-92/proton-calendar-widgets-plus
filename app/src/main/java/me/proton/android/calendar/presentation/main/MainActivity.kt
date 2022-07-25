@@ -36,6 +36,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.parameter.ParticipationStatus
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
@@ -433,6 +440,28 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
+
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId()
+            if (userId != null) {
+                val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId)
+                if (googleAuthenticationUrl != null) {
+                    // Configure sign-in to request the user's ID, email address, and basic
+                    // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+                    val clientId = importAssistantViewModel.getGoogleClientId(userId) ?: return@launch
+                    // AndroidClientId = 192543898962-jpqpevmumbfv93ulrb2alo5o9i0ogfus.apps.googleusercontent.com
+                    // WebClientId = 192543898962-v1mvc6s9jlfn71tms865ercsun7crnk4.apps.googleusercontent.com
+                    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestServerAuthCode(clientId)
+                        .requestScopes(Scope("https://www.googleapis.com/auth/calendar.readonly"))
+                        .requestEmail()
+                        .build()
+                    googleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
+                } else displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
+            } else {
+                displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
+            }
+        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -524,11 +553,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         val userId = accountViewModel.getPrimaryUserId()
                                         if (userId != null) {
                                             if (!importAssistantViewModel.handleGoogleSignInRedirect(
-                                                userId,
-                                                easySwitchCode,
-                                                resources.getIntArray(R.array.accent_colors_base),
-                                                importerId
-                                            )) {
+                                                    userId,
+                                                    easySwitchCode,
+                                                    resources.getIntArray(R.array.accent_colors_base),
+                                                    importerId
+                                                )) {
                                                 this@MainActivity.displaySnackBar(getString(R.string.import_assistant_update_import_error))
                                             }
                                         } else this@MainActivity.displaySnackBar(getString(R.string.snack_network_error))
@@ -862,12 +891,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
+            signOut()
             drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             mainViewModel.setViewMode(ViewMode.AGENDA)
+            revokeAccess()
             drawer_layout.close()
         }
 
@@ -1024,18 +1055,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
             .setPositiveButton(R.string.dialog_button_continue) { dialog, _ ->
-                lifecycleScope.launch {
-                    val userId = accountViewModel.getPrimaryUserId()
-                    if (userId != null) {
-                        val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId)
-                        if (googleAuthenticationUrl != null) {
-                            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
-                            startActivity(browserIntent)
-                        } else displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
-                    } else {
-                        displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
-                    }
-                }
+                val account = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
+                // TODO Handle last signed in account to save time
+                val signInIntent = googleSignInClient?.signInIntent
+                startActivityForResult(signInIntent, RC_SIGN_IN)
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
@@ -1049,6 +1072,49 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         materialDialogBuilder.setView(view)
         materialDialogBuilder.show()
+    }
+
+    override fun startActivityForResult(intent: Intent?, requestCode: Int) {
+        super.startActivityForResult(
+            intent ?: Intent(),
+            requestCode
+        )
+    }
+
+    private var googleSignInClient: GoogleSignInClient? = null
+    private val RC_SIGN_IN = 1
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+
+            try {
+                val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+
+                // Signed in successfully, show authenticated UI.
+                val authCode = account.serverAuthCode
+                authCode ?: return // TODO Handle null
+                val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
+                safeNavigateToDialogFragment(importAssistantDeepLink)
+            } catch (e: ApiException) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                logger.e("signInResult:failed code= ${e.statusCode}")
+            }
+
+        }
+    }
+
+    private fun signOut() {
+        googleSignInClient?.signOut()
+    }
+
+    private fun revokeAccess() {
+        googleSignInClient?.revokeAccess()
     }
 
     private fun showFeedbackDialog() {

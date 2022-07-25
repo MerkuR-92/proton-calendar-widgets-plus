@@ -82,7 +82,7 @@ class ImportAssistantViewModel @Inject constructor(
         _sourceEmail.value = null
     }
 
-    private suspend fun getGoogleClientId(userId: UserId): String? {
+    suspend fun getGoogleClientId(userId: UserId): String? {
         return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId
     }
 

@@ -331,4 +331,6 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:2.1.0"
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+
 }

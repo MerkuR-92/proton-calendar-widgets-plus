@@ -85,7 +85,7 @@
                 <data
                     android:scheme="https"
                     android:host="calendar.proton.me"
-                    android:pathPrefix="/easy_switch" />
+                    android:path="/easy_switch" />
             </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
