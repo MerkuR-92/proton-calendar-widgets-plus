@@ -335,9 +335,11 @@ class TransformEventUseCase @Inject constructor(
                     }
                     is EncryptedWith.AddressKey -> {
                         encryptedWith.userAddress.useKeys(cryptoContext) {
-                            decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
-                                it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
-                            }?.toString(StandardCharsets.UTF_8)
+                            kotlin.runCatching {
+                                decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
+                                    it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
+                                }?.toString(StandardCharsets.UTF_8)
+                            }.getOrNull()
                         }
                     }
                 }
