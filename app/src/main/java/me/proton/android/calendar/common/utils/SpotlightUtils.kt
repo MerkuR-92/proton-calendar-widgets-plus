@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
@@ -86,6 +87,7 @@ object SpotlightUtils {
                 )
             }
             146 -> {
+                if (!IMPORT_ASSISTANT) return
                 // Easy switch
                 val easySwitchContent = this.resources.getEasySwitchDialogContent()
                 val positiveButtonCallback = View.OnClickListener {

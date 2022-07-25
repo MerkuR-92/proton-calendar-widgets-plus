@@ -97,7 +97,7 @@ object FeatureFlag {
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = false
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
-    const val IMPORT_FROM_GOOGLE = true
+    const val IMPORT_ASSISTANT = false
 }
 
 object HttpResponseCode {

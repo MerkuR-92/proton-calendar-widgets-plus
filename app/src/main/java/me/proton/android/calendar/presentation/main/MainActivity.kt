@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.main
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
@@ -16,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -34,7 +32,6 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -80,7 +77,6 @@ import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_version
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -96,14 +92,13 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_SCO
 import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_STATE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
-import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.CalendarImport.ERROR
 import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
@@ -113,7 +108,6 @@ import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
-import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
@@ -501,7 +495,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
                     if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
                         handleIcsIntent(openIcsIntent)
-                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS || IMPORT_FROM_GOOGLE) {
+                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS || IMPORT_ASSISTANT) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                         if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && OPEN_ICS_FILES) {
                             // Handle ics file
@@ -886,14 +880,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
             lifecycleScope.launch {
-                if (IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false) showCalendarsCreateOrImportDialog()
+                if (calendarViewModel.displayImport()) showCalendarsCreateOrImportDialog()
                 else onClickCreateCalendar()
             }
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
             lifecycleScope.launch {
-                if (IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false) showCalendarsCreateOrImportDialog()
+                if (calendarViewModel.displayImport()) showCalendarsCreateOrImportDialog()
                 else onClickCreateCalendar()
             }
             drawer_layout.close()
@@ -1022,9 +1016,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             showImportGoogleAuthDialog()
             bottomSheetDialog.dismiss()
         }
-
-        val importFromGoogleLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendars_import)
-        importFromGoogleLayout?.visibleOrGone(IMPORT_FROM_GOOGLE)
 
         bottomSheetDialog.show()
     }

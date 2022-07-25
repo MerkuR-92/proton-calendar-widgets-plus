@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
@@ -771,6 +772,10 @@ class CalendarViewModel @Inject constructor(
         }
         val user = userManager.getUserOrNull(userId, logger)
         return user?.hasSubscriptionForMail() == false
+    }
+
+    suspend fun displayImport(): Boolean {
+        return IMPORT_ASSISTANT && isDelinquentUser() == false
     }
 
     suspend fun isDelinquentUser(): Boolean? {
