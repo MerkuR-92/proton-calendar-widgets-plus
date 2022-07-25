@@ -10,8 +10,6 @@
 
     <color name="textColorValidationError">@color/notification_error</color>
 
-    <color name="current_time_indicator">@color/pomegranate</color>
-
     <!-- constant colors, do not change in dark mode -->
     <color name="text_on_calendar_color">#FFFFFF</color>
 
