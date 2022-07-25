@@ -131,4 +131,9 @@ interface CalendarsApi {
      * Update calendar settings
      */
     suspend fun updateCalendarSettings(userId: UserId, calendarId: String, body: UpdateCalendarSettingsApiRequest): ApiResponse<UpdateCalendarSettingsApiResponse>
+
+    /**
+     * Get calendar settings
+     */
+    suspend fun getCalendarSettings(userId: UserId, calendarId: String): ApiResponse<GetCalendarSettingsApiResponse>
 }

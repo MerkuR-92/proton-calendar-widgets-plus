@@ -110,6 +110,11 @@ interface CalendarsApiService : BaseRetrofitApi {
         @Path("calendarId") calendarId: String,
         @Body body: UpdateCalendarSettingsApiRequest
     ) : UpdateCalendarSettingsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/settings")
+    suspend fun getCalendarSettings(
+        @Path("calendarId") calendarId: String
+    ) : GetCalendarSettingsApiResponse
 }
 
 class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -284,6 +289,13 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         body: UpdateCalendarSettingsApiRequest
     ): ApiResponse<UpdateCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         updateCalendarSettings(calendarId, body)
+    }.toApiResponse()
+
+    override suspend fun getCalendarSettings(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<GetCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getCalendarSettings(calendarId)
     }.toApiResponse()
 }
 
@@ -615,6 +627,12 @@ data class UpdateCalendarSettingsApiRequest(
 
 @Serializable
 data class UpdateCalendarSettingsApiResponse(
+    @SerialName("CalendarSettings")
+    val calendarSettings: CalendarSettingsEntity
+)
+
+@Serializable
+data class GetCalendarSettingsApiResponse(
     @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity
 )
