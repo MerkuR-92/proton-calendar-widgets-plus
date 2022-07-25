@@ -891,14 +891,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
-            signOut()
+            signOut() // TODO DELETE
             drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             mainViewModel.setViewMode(ViewMode.AGENDA)
-            revokeAccess()
+            revokeAccess() // TODO DELETE
             drawer_layout.close()
         }
 
@@ -1057,8 +1057,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             .setPositiveButton(R.string.dialog_button_continue) { dialog, _ ->
                 val account = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
                 // TODO Handle last signed in account to save time
-                val signInIntent = googleSignInClient?.signInIntent
-                startActivityForResult(signInIntent, RC_SIGN_IN)
+                googleSignInClient?.signInIntent?.let { signInIntent ->
+                    startActivityForResult(signInIntent, RC_SIGN_IN)
+                } ?: run {
+                    displaySnackBar("signInIntent was null") // TODO error message
+                }
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
@@ -1072,13 +1075,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         materialDialogBuilder.setView(view)
         materialDialogBuilder.show()
-    }
-
-    override fun startActivityForResult(intent: Intent?, requestCode: Int) {
-        super.startActivityForResult(
-            intent ?: Intent(),
-            requestCode
-        )
     }
 
     private var googleSignInClient: GoogleSignInClient? = null
@@ -1097,13 +1093,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 // Signed in successfully, show authenticated UI.
                 val authCode = account.serverAuthCode
-                authCode ?: return // TODO Handle null
-                val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
-                safeNavigateToDialogFragment(importAssistantDeepLink)
+                authCode?.let {
+                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
+                    safeNavigateToDialogFragment(importAssistantDeepLink)
+                } ?: run {
+                    displaySnackBar("authCode was null") // TODO error message
+                }
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 logger.e("signInResult:failed code= ${e.statusCode}")
+                displaySnackBar("signInResult:failed code= ${e.statusCode}")
             }
 
         }
