@@ -70,6 +70,23 @@ class EventDecryptorImpl @Inject constructor(
         }
     }
 
+    override suspend fun decryptAllowingApiCall(eventEntity: EventEntity): Event? {
+
+        // we don't care about cache value and force decrypting again
+        val decryptedEvent = transformEventUseCase.execute(eventEntity, allowApiCall = true)
+
+        mutex.withLock {
+            val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId)
+
+            if (decryptedEvent != null) {
+                cache[cacheKey] = CacheValue(eventEntity, decryptedEvent)
+            }
+
+            return cache[cacheKey]?.event
+        }
+
+    }
+
     override suspend fun clearCache() = mutex.withLock {
         cache.clear()
     }

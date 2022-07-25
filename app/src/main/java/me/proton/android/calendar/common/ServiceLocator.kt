@@ -178,6 +178,7 @@ fun coreModule(
     single<KeyStoreCrypto> { keyStoreCrypto }
     single<CryptoContext> { cryptoContext }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }
+    factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), contactEmailsRepository, get(), get(), getRecipientPublicAddresses) }
     factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
     single<PublicAddressRepository> { publicAddressRepository }
     single<NetworkManager> { networkManager }

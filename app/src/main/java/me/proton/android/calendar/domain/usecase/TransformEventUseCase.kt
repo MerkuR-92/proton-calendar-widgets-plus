@@ -29,6 +29,7 @@ import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
+import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
@@ -44,18 +45,21 @@ class TransformEventUseCase @Inject constructor(
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
     private val iCal: ICalUtilsImpl,
-    private val publicAddressRepository: PublicAddressRepository,
+    private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase,
     private val cryptoContext: CryptoContext
 ) : UseCase { // TODO ADD TEST
 
-    suspend fun execute(eventEntity: EventEntity) : Event? {
+    /**
+     * @param allowApiCall only set to [true] if you don't need "synchronous" result
+     */
+    suspend fun execute(eventEntity: EventEntity, allowApiCall: Boolean = false) : Event? {
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
         val calendar = calendarEntity.joinToCalendar(database) ?: return null
 
         val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
-        if (calendarPrivateKeys.isNullOrEmpty()) {
+        if (calendarPrivateKeys.isEmpty()) {
             logger.e("TransformEventUseCase, calendarKey is null")
             return null
         }
@@ -101,7 +105,7 @@ class TransformEventUseCase @Inject constructor(
                                 EncryptedWith.AddressKey(
                                     userAddressForAddressKeyPacket,
                                     cryptoContext,
-                                    getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                                    getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses, allowApiCall)
                                 )
                             )
                         } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
@@ -112,7 +116,7 @@ class TransformEventUseCase @Inject constructor(
                             EncryptedWith.CalendarKey(
                                 calendarPrivateKeys,
                                 keyPassphrase,
-                                getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses)
+                                getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses, allowApiCall)
                             )
                         )
                     }
@@ -131,7 +135,7 @@ class TransformEventUseCase @Inject constructor(
                         EncryptedWith.CalendarKey(
                             calendarPrivateKeys,
                             keyPassphrase,
-                            getPublicKeysForAuthor(UserId(userId), calendarEvent, userAddresses)
+                            getPublicKeysForAuthor(UserId(userId), calendarEvent, userAddresses, allowApiCall)
                         )
                     )
                 }
@@ -148,7 +152,7 @@ class TransformEventUseCase @Inject constructor(
                         EncryptedWith.CalendarKey(
                             calendarPrivateKeys,
                             keyPassphrase,
-                            getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses)
+                            getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses, allowApiCall)
                         )
                     )
                 }
@@ -168,7 +172,7 @@ class TransformEventUseCase @Inject constructor(
                                 EncryptedWith.AddressKey(
                                     userAddressForAddressKeyPacket,
                                     cryptoContext,
-                                    getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                                    getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
                                 )
                             )
                         } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
@@ -179,7 +183,7 @@ class TransformEventUseCase @Inject constructor(
                             EncryptedWith.CalendarKey(
                                 calendarPrivateKeys,
                                 keyPassphrase,
-                                getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses)
+                                getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
                             )
                         )
                     }
@@ -247,6 +251,9 @@ class TransformEventUseCase @Inject constructor(
                 verificationStatuses.any { it == Event.SignatureVerification.FAILURE } -> {
                     Event.SignatureVerification.FAILURE
                 }
+                verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS } -> {
+                    Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+                }
                 verificationStatuses.any { it == Event.SignatureVerification.SIGNED_BUT_NO_KEYS } -> {
                     Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                 }
@@ -278,7 +285,10 @@ class TransformEventUseCase @Inject constructor(
         val signatureVerification: Event.SignatureVerification
     )
 
-    private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>): List<PublicKey> {
+    /**
+     * @return null if couldn't obtain keys because of error, empty list if there are no keys available
+     */
+    private suspend fun getPublicKeysForAuthor(userId: UserId, eventPart: Event.EventPart, userAddresses: List<UserAddress>, allowApiCall: Boolean): List<PublicKey>? {
 
         return kotlin.runCatching {
 
@@ -292,26 +302,32 @@ class TransformEventUseCase @Inject constructor(
                 return it.publicKeyRing(cryptoContext).keys
             }
 
-            // try to look for Author's pinned keys in Contacts
+            if (allowApiCall) {
+                // try to look for Author's pinned keys in Contacts and Public Key repository
+                val pinnedKeyResult = obtainPinnedKeysUseCase.execute(userId, listOf(canonicalizedAuthorEmail))[eventPart.author]
+                if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Success) {
+                    listOf(pinnedKeyResult.pinnedPublicKey)
+                } else if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Error.EmailNotInContacts) {
+                    // case when we can't verify the signature and we don't treat it as error
+                    emptyList()
+                } else null // getting pinned keys failed for legitimate reason
+            } else null // we can't look for pinned keys in API so we return error straight away
 
-            // TODO
-
-            return emptyList()
-        }.getOrNull() ?: emptyList()
+        }.getOrNull()
     }
 
-    private sealed class EncryptedWith(open val authorsPublicKeys: List<PublicKey>) {
+    private sealed class EncryptedWith(open val authorsPublicKeys: List<PublicKey>?) {
 
         data class CalendarKey(
             val privateKeys: List<String>,
             val privateKeysPassphrase: String,
-            override val authorsPublicKeys: List<PublicKey>
+            override val authorsPublicKeys: List<PublicKey>?
         ): EncryptedWith(authorsPublicKeys)
 
         data class AddressKey(
             val userAddress: UserAddress,
             val cryptoContext: CryptoContext,
-            override val authorsPublicKeys: List<PublicKey>
+            override val authorsPublicKeys: List<PublicKey>?
         ): EncryptedWith(authorsPublicKeys)
 
     }
@@ -357,11 +373,13 @@ class TransformEventUseCase @Inject constructor(
             if (eventPart.isSigned) {
 
                 if (eventPart.signature != null) {
-                    signatureVerification = if (encryptedWith.authorsPublicKeys.isEmpty()) {
+                    signatureVerification = if (encryptedWith.authorsPublicKeys == null) {
+                        Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+                    } else if (encryptedWith.authorsPublicKeys?.isEmpty() == true) {
                         Event.SignatureVerification.SIGNED_BUT_NO_KEYS
                     } else {
                         val signatureOk = eventPart.signature?.let { signature ->
-                            encryptedWith.authorsPublicKeys.any {
+                            encryptedWith.authorsPublicKeys?.any {
                                 it.verifyData(cryptoContext, plainText.toByteArray(), signature)
                             }
                         } ?: false

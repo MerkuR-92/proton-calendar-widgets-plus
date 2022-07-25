@@ -746,6 +746,12 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
     }
 
+    suspend fun transformEventAllowingApiCall(eventId: String, calendarId: String): Event? {
+        return withTimeoutOrNull(SIGNATURE_VERIFICATION_API_TIMEOUT) {
+            calendarsRepository.transformAllowingApiCall(eventId, calendarId)
+        }
+    }
+
     /**
      * @param loading define the loading state
      * @param position fragment position in the view pager

@@ -7,6 +7,11 @@ interface EventDecryptor {
 
     suspend fun decrypt(eventEntity: EventEntity): Event?
 
+    /**
+     * Decrypts EventEntity and potentially connects to API, call only from appropriate coroutine contexts.
+     */
+    suspend fun decryptAllowingApiCall(eventEntity: EventEntity): Event?
+
     suspend fun clearCache()
 
 }

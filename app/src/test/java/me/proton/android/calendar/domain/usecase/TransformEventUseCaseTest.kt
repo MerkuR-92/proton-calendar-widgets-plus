@@ -44,7 +44,7 @@ internal class TransformEventUseCaseTest {
     private val valueStoreProviderMock: ValueStoreProvider = mockk()
     private val iCal = ICalUtilsImpl
     private val crypto: Crypto = mockk()
-    private val publicAddressRepositoryMock: PublicAddressRepository = mockk()
+    private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase = mockk()
     private val cryptoContextMock: CryptoContext = mockk()
     private val userManagerMock: UserManager = mockk()
     private lateinit var database: AppDatabase
@@ -154,7 +154,7 @@ internal class TransformEventUseCaseTest {
                 valueStoreProviderMock,
                 crypto,
                 iCal,
-                publicAddressRepositoryMock,
+                obtainPinnedKeysUseCase,
                 cryptoContextMock
             )
             val event = useCase.execute(eventEntity)
@@ -174,7 +174,7 @@ internal class TransformEventUseCaseTest {
             assertThat(event.iCalEvent.attendees[2].email).isEqualTo("adamtst@protonmail.com")
             assertThat(event.iCalEvent.attendees[2].participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
 
-            assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.SIGNED_BUT_NO_KEYS)
+            assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS)
 
             assertThat(event.calendar.color).isEqualTo(calendarColor)
             assertThat(event.calendar.display).isEqualTo(calendarDisplay.toBoolean())
