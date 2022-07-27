@@ -7,20 +7,20 @@ import me.proton.core.key.domain.entity.key.PublicKey
 
 interface CryptoUtils {
     /**
-     * Extracts pinned key from VCard and checks its validity against server-provided public keys.
+     * Extracts pinned keys from VCard and checks their validity against server-provided public keys.
      */
-    fun extractPinnedKey(
-        purpose: PinnedKeyPurpose,
+    fun extractPinnedKeys(
+        purpose: PinnedKeysPurpose,
         vCardEmail: String,
         vCard: VCard,
         publicAddress: PublicAddress,
         cryptoContext: CryptoContext
-    ): PinnedKeyOrError
+    ): PinnedKeysOrError
 
-    sealed class PinnedKeyOrError {
-        data class Success(val pinnedPublicKey: PublicKey) : PinnedKeyOrError()
+    sealed class PinnedKeysOrError {
+        data class Success(val pinnedPublicKeys: List<PublicKey>) : PinnedKeysOrError()
 
-        sealed class Error : PinnedKeyOrError() {
+        sealed class Error : PinnedKeysOrError() {
             object NoKeysAvailable : Error()
             object NoEmailInVCard : Error()
             object TrustedKeysInvalid : Error()
@@ -29,9 +29,9 @@ interface CryptoUtils {
         }
     }
 
-    sealed class PinnedKeyPurpose {
-        object VerifyingSignature : PinnedKeyPurpose()
-        object Encrypting : PinnedKeyPurpose()
+    sealed class PinnedKeysPurpose {
+        object VerifyingSignature : PinnedKeysPurpose()
+        object Encrypting : PinnedKeysPurpose()
     }
 
 

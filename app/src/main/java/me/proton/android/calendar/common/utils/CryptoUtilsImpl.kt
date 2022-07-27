@@ -14,45 +14,70 @@ import me.proton.core.key.domain.entity.key.Recipient
 
 object CryptoUtilsImpl : CryptoUtils {
 
-    override fun extractPinnedKey(
-        purpose: PinnedKeyPurpose,
+    override fun extractPinnedKeys(
+        purpose: PinnedKeysPurpose,
         vCardEmail: String,
         vCard: VCard,
         publicAddress: PublicAddress,
         cryptoContext: CryptoContext
-    ): PinnedKeyOrError {
+    ): PinnedKeysOrError {
 
         val isInternal = publicAddress.recipient == Recipient.Internal
         val publicAddressKey = publicAddress.keys.firstOrNull { it.publicKey.isPrimary }
 
-        val propertyGroup = vCard.getGroupForEmail(vCardEmail) ?: return PinnedKeyOrError.Error.NoEmailInVCard
+        val propertyGroup = vCard.getGroupForEmail(vCardEmail) ?: return PinnedKeysOrError.Error.NoEmailInVCard
 
         val vCardPublicKeys = vCard.getKeysForGroup(propertyGroup)
 
-        // TODO in theory we should only get keys that are valid for sending
-        val pinnedPublicKey = vCardPublicKeys.firstOrNull() ?: return PinnedKeyOrError.Error.NoKeysAvailable
+        val pinnedKeysOrErrors = vCardPublicKeys.map { pinnedPublicKey ->
+            extractPinnedKey(cryptoContext, pinnedPublicKey, publicAddress, isInternal, purpose, publicAddressKey) ?: PinnedKeysOrError.Success(listOf(PublicKey(pinnedPublicKey, true, true, true, true)))
+        }
 
-        val pinnedKeyFingerprint = cryptoContext.pgpCrypto.getFingerprintOrNull(pinnedPublicKey) ?: return PinnedKeyOrError.Error.TrustedKeysInvalid
-        val matchingPublicAddressKey = publicAddress.keys.find { cryptoContext.pgpCrypto.getFingerprintOrNull(it.publicKey.key) == pinnedKeyFingerprint }
+        if (pinnedKeysOrErrors.isEmpty()) return PinnedKeysOrError.Error.NoKeysAvailable
+
+        if (pinnedKeysOrErrors.none { it is PinnedKeysOrError.Success }) return pinnedKeysOrErrors.first()
+
+        val pinnedKeys = when (purpose) {
+            PinnedKeysPurpose.Encrypting -> pinnedKeysOrErrors.first { it is PinnedKeysOrError.Success }
+            PinnedKeysPurpose.VerifyingSignature -> PinnedKeysOrError.Success(pinnedKeysOrErrors.mapNotNull { it as? PinnedKeysOrError.Success }.flatMap { it.pinnedPublicKeys })
+        }
+
+        return pinnedKeys
+    }
+
+    private fun extractPinnedKey(
+        cryptoContext: CryptoContext,
+        pinnedPublicKey: String,
+        publicAddress: PublicAddress,
+        isInternal: Boolean,
+        purpose: PinnedKeysPurpose,
+        publicAddressKey: PublicAddressKey?
+    ): PinnedKeysOrError.Error? {
+
+        val pinnedKeyFingerprint = cryptoContext.pgpCrypto.getFingerprintOrNull(pinnedPublicKey)
+            ?: return PinnedKeysOrError.Error.TrustedKeysInvalid
+
+        val matchingPublicAddressKey =
+            publicAddress.keys.find { cryptoContext.pgpCrypto.getFingerprintOrNull(it.publicKey.key) == pinnedKeyFingerprint }
 
         // pinned key is not in the public key repository
-        if (isInternal && matchingPublicAddressKey == null) return PinnedKeyOrError.Error.TrustedKeysInvalid
+        if (isInternal && matchingPublicAddressKey == null) return PinnedKeysOrError.Error.TrustedKeysInvalid
 
         // pinned key is compromised
-        if (matchingPublicAddressKey?.isCompromised() == true) return PinnedKeyOrError.Error.TrustedKeysInvalid
+        if (matchingPublicAddressKey?.isCompromised() == true) return PinnedKeysOrError.Error.TrustedKeysInvalid
 
         // pinned key is obsolete (invalid for encrypting but we can still verify)
-        if (matchingPublicAddressKey?.isObsolete() == true && purpose == PinnedKeyPurpose.Encrypting) return PinnedKeyOrError.Error.TrustedKeysInvalid
+        if (matchingPublicAddressKey?.isObsolete() == true && purpose == PinnedKeysPurpose.Encrypting) return PinnedKeysOrError.Error.TrustedKeysInvalid
 
         // pinned key is expired
-        if (isKeyExpired(pinnedPublicKey) == true) return PinnedKeyOrError.Error.TrustedKeysInvalid
+        if (isKeyExpired(pinnedPublicKey) == true) return PinnedKeysOrError.Error.TrustedKeysInvalid
 
         // pinned key is revoked
-        if (isKeyRevoked(pinnedPublicKey) == true) return PinnedKeyOrError.Error.TrustedKeysInvalid
+        if (isKeyRevoked(pinnedPublicKey) == true) return PinnedKeysOrError.Error.TrustedKeysInvalid
 
-        if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return PinnedKeyOrError.Error.PublicKeysInvalid
+        if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return PinnedKeysOrError.Error.PublicKeysInvalid
 
-        return PinnedKeyOrError.Success(PublicKey(pinnedPublicKey, true, true, true, true))
+        return null
     }
 
     /**
@@ -72,7 +97,6 @@ object CryptoUtilsImpl : CryptoUtils {
     private fun isKeyRevoked(armoredKey: Armored): Boolean? {
         return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isRevoked }.getOrNull()
     }
-
 
 }
 

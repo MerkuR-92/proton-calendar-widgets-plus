@@ -26,10 +26,8 @@ import me.proton.core.key.domain.decryptDataOrNull
 import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.publicKeyRing
-import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
-import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
@@ -306,7 +304,7 @@ class TransformEventUseCase @Inject constructor(
                 // try to look for Author's pinned keys in Contacts and Public Key repository
                 val pinnedKeyResult = obtainPinnedKeysUseCase.execute(userId, listOf(canonicalizedAuthorEmail))[eventPart.author]
                 if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Success) {
-                    listOf(pinnedKeyResult.pinnedPublicKey)
+                    pinnedKeyResult.pinnedPublicKeys
                 } else if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Error.EmailNotInContacts) {
                     // case when we can't verify the signature and we don't treat it as error
                     emptyList()

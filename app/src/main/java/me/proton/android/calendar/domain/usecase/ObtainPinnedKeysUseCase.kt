@@ -1,7 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.CryptoUtilsImpl.extractPinnedKey
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.extractPinnedKeys
 import me.proton.android.calendar.common.utils.extractSignedVCard
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.utils.CryptoUtils
@@ -29,7 +29,7 @@ class ObtainPinnedKeysUseCase @Inject constructor(
 ) : UseCase {
 
     sealed class Result {
-        data class Success(val pinnedPublicKey: PublicKey) : Result()
+        data class Success(val pinnedPublicKeys: List<PublicKey>) : Result()
 
         sealed class Error : Result() {
             object AddressDisabled : Error()
@@ -117,14 +117,14 @@ class ObtainPinnedKeysUseCase @Inject constructor(
             val vCard = validVCards[email]
             val publicAddress = publicAddresses[email]
 
-            val pinnedKeyOrError = if (vCardEmail != null && vCard != null && publicAddress != null) {
-                extractPinnedKey(CryptoUtils.PinnedKeyPurpose.VerifyingSignature, vCardEmail, vCard, publicAddress, cryptoContext)
-            } else CryptoUtils.PinnedKeyOrError.Error.NotEnoughData
+            val pinnedKeysOrError = if (vCardEmail != null && vCard != null && publicAddress != null) {
+                extractPinnedKeys(CryptoUtils.PinnedKeysPurpose.VerifyingSignature, vCardEmail, vCard, publicAddress, cryptoContext)
+            } else CryptoUtils.PinnedKeysOrError.Error.NotEnoughData
 
-            result[email] = when (pinnedKeyOrError) {
-                is CryptoUtils.PinnedKeyOrError.Success -> Result.Success(pinnedKeyOrError.pinnedPublicKey)
-                is CryptoUtils.PinnedKeyOrError.Error.PublicKeysInvalid -> Result.Error.PublicKeysInvalid
-                is CryptoUtils.PinnedKeyOrError.Error.TrustedKeysInvalid -> Result.Error.TrustedKeysInvalid
+            result[email] = when (pinnedKeysOrError) {
+                is CryptoUtils.PinnedKeysOrError.Success -> Result.Success(pinnedKeysOrError.pinnedPublicKeys)
+                is CryptoUtils.PinnedKeysOrError.Error.PublicKeysInvalid -> Result.Error.PublicKeysInvalid
+                is CryptoUtils.PinnedKeysOrError.Error.TrustedKeysInvalid -> Result.Error.TrustedKeysInvalid
                 else -> Result.Error.GettingPinnedKeys
             }
 
