@@ -50,20 +50,20 @@ class ImportAssistantViewModel @Inject constructor(
     private val calendarsRepository: CalendarsRepository
 ) : AndroidViewModel(application) {
 
-    private val _userId: MutableLiveData<UserId> = MutableLiveData()
-    val userId: LiveData<UserId> = _userId
+    private val _userId: MutableLiveData<UserId?> = MutableLiveData()
+    val userId: LiveData<UserId?> = _userId
 
-    private val _importCalendarMappingList: MutableLiveData<List<ImportCalendarMapping>> = MutableLiveData()
-    val importCalendarMappingList: LiveData<List<ImportCalendarMapping>> = _importCalendarMappingList
+    private val _importCalendarMappingList: MutableLiveData<List<ImportCalendarMapping>?> = MutableLiveData()
+    val importCalendarMappingList: LiveData<List<ImportCalendarMapping>?> = _importCalendarMappingList
 
-    private val _sourceEmail: MutableLiveData<String> = MutableLiveData()
-    val sourceEmail: LiveData<String> = _sourceEmail
+    private val _sourceEmail: MutableLiveData<String?> = MutableLiveData()
+    val sourceEmail: LiveData<String?> = _sourceEmail
 
-    private val _importerList: MutableLiveData<List<ImporterEntity>> = MutableLiveData()
-    val importerList: LiveData<List<ImporterEntity>> = _importerList
+    private val _importerList: MutableLiveData<List<ImporterEntity>?> = MutableLiveData()
+    val importerList: LiveData<List<ImporterEntity>?> = _importerList
 
-    private val _reportList: MutableLiveData<List<ReportEntity>> = MutableLiveData()
-    val reportList: LiveData<List<ReportEntity>> = _reportList
+    private val _reportList: MutableLiveData<List<ReportEntity>?> = MutableLiveData()
+    val reportList: LiveData<List<ReportEntity>?> = _reportList
 
     val defaultUserEmail: MutableLiveData<String?> = MutableLiveData()
 
