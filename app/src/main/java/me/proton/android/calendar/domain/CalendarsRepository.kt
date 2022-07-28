@@ -108,6 +108,8 @@ interface CalendarsRepository {
         data class Exception(val throwable: Throwable): GetEventsResult<Nothing>()
     }
 
+    suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event?
+
     /**
      * @return Transformed Events.
      */

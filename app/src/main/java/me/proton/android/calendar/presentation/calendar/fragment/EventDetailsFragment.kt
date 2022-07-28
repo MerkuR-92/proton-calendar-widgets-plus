@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.text.format.DateFormat
+import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +49,7 @@ import kotlinx.android.synthetic.main.fragment_event_details.section_calendar
 import kotlinx.android.synthetic.main.fragment_event_details.section_description
 import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
 import kotlinx.android.synthetic.main.fragment_event_details.section_location
+import kotlinx.android.synthetic.main.fragment_event_details.section_verification_warning
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_description
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_initials
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_status
@@ -64,7 +66,6 @@ import kotlinx.android.synthetic.main.item_form_section.view.image_dot_icon
 import kotlinx.android.synthetic.main.item_form_section.view.image_icon
 import kotlinx.android.synthetic.main.item_form_section.view.text_header
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -90,7 +91,6 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -561,11 +561,43 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            // TODO hide the warning until we verify Event signatures with pinned keys
-            /*with (section_verification_warning) {
-                visibleOrGone(event.verificationStatus != Event.SignatureVerification.SUCCESS && event.verificationStatus != Event.SignatureVerification.NOT_SIGNED)
-                movementMethod = LinkMovementMethod.getInstance()
-            }*/
+            if (FeatureFlag.SHOW_SIGNATURE_VERIFICATION_BADGES) {
+                when (event.verificationStatus) {
+                    Event.SignatureVerification.SUCCESS, Event.SignatureVerification.NOT_SIGNED, Event.SignatureVerification.SIGNED_BUT_NO_KEYS -> {
+                        section_verification_warning.visibleOrGone(false)
+                        // TODO hide all the other badges
+                    }
+                    null, Event.SignatureVerification.FAILURE -> {
+                        with (section_verification_warning) {
+                            visibleOrGone(true)
+                            movementMethod = LinkMovementMethod.getInstance()
+                        }
+                    }
+                    Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS -> {
+                        // signature verification failed because we couldn't get the keys, try again allowing API call
+
+                        // TODO show badge that we are loading
+
+                        lifecycleScope.launch {
+                            val verificationWithApiCall = calendarViewModel.transformEventAllowingApiCall(event.id, event.calendar.id)?.verificationStatus
+
+                            // after verification with API call we should get SUCCESS or NO KEYS, anything else means something went wrong
+                            val showVerificationErrorBadge = verificationWithApiCall != Event.SignatureVerification.SUCCESS && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_NO_KEYS && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+                            val showNetworkErrorBadge = verificationWithApiCall == null || verificationWithApiCall == Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+
+                            withContext(Dispatchers.Main) {
+                                with(section_verification_warning) {
+                                    visibleOrGone(showVerificationErrorBadge)
+                                    movementMethod = LinkMovementMethod.getInstance()
+                                }
+                            }
+
+                            // TODO hide the loading badge
+                        }
+                    }
+                }
+            }
+
         })
     }
 

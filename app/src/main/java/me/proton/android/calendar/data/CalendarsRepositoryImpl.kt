@@ -531,6 +531,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event? {
+        return eventDecryptor.decryptAllowingApiCall(database.eventsDao().selectEvent(eventId, calendarId))
+    }
+
     private fun createEventsFlow(eventsWindow: CalendarsRepository.EventsWindow, allowCached: Boolean): Flow<CalendarsRepository.GetEventsResult<Event>> {
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->

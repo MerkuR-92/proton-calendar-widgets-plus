@@ -1,12 +1,11 @@
 package me.proton.android.calendar.domain.usecase
 
 import androidx.annotation.VisibleForTesting
-import com.proton.gopenpgp.crypto.Crypto
 import ezvcard.VCard
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl
 import me.proton.android.calendar.common.utils.extractSignedVCard
 import me.proton.android.calendar.common.utils.getGroupForEmail
-import me.proton.android.calendar.common.utils.getKeysForGroup
 import me.proton.android.calendar.common.utils.getProperty
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.Logger
@@ -14,10 +13,9 @@ import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.model.MailSettings
 import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
+import me.proton.android.calendar.domain.utils.CryptoUtils
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.Armored
-import me.proton.core.crypto.common.pgp.getFingerprintOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.entity.key.PublicAddress
 import me.proton.core.key.domain.entity.key.PublicAddressKey
@@ -169,44 +167,25 @@ class ObtainSendPreferencesUseCase @Inject constructor(
         val vCardSign = vCard.getProperty(propertyGroup, "x-pm-sign")
         val vCardMime = vCard.getProperty(propertyGroup, "x-pm-mimetype")
         val vCardScheme = vCard.getProperty(propertyGroup, "x-pm-scheme")
-        val vCardPublicKeys = vCard.getKeysForGroup(propertyGroup)
-
-        // TODO in theory we should only get keys that are valid for sending
-        val pinnedPublicKey = vCardPublicKeys.firstOrNull()
 
         val encrypt = if (vCardEncrypt != null) (vCardEncrypt.value?.equalsNoCase("true") == true) else false
         val sign = if (vCardSign != null) (vCardSign.value?.equalsNoCase("true") == true) else defaultMailSettings.sign
         val scheme = PackageType.fromScheme(vCardScheme?.value ?: "", encrypt, sign) ?: defaultMailSettings.pgpScheme
         val mime = if (vCardMime?.value != null) vCardMime.value else defaultMailSettings.draftMimeType
 
-        // we have to encrypt but there's no valid pinned public key
-        if (encrypt && pinnedPublicKey == null) return SendPreferencesOrError.Error.NoKeysAvailable
-
-        if (pinnedPublicKey != null) {
-            val pinnedKeyFingerprint = cryptoContext.pgpCrypto.getFingerprintOrNull(pinnedPublicKey) ?: return SendPreferencesOrError.Error.TrustedKeysInvalid
-            val matchingPublicAddressKey = publicAddress.keys.find { cryptoContext.pgpCrypto.getFingerprintOrNull(it.publicKey.key) == pinnedKeyFingerprint }
-
-            // pinned key is not in the public key repository
-            if (isInternal && matchingPublicAddressKey == null) return SendPreferencesOrError.Error.TrustedKeysInvalid
-
-            // pinned key is compromised
-            if (matchingPublicAddressKey?.isCompromised() == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
-
-            // pinned key is obsolete
-            if (matchingPublicAddressKey?.isObsolete() == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
-
-            // pinned key is expired
-            if (isKeyExpired(pinnedPublicKey) == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
-
-            // pinned key is revoked
-            if (isKeyRevoked(pinnedPublicKey) == true) return SendPreferencesOrError.Error.TrustedKeysInvalid
+        val pinnedPublicKeys = when (val pinnedKeysOrError = CryptoUtilsImpl.extractPinnedKeys(CryptoUtils.PinnedKeysPurpose.Encrypting, vCardEmail, vCard, publicAddress, cryptoContext)) {
+            is CryptoUtils.PinnedKeysOrError.Success -> pinnedKeysOrError.pinnedPublicKeys
+            is CryptoUtils.PinnedKeysOrError.Error.NoKeysAvailable, CryptoUtils.PinnedKeysOrError.Error.NoEmailInVCard -> null // no pinned key found
+            is CryptoUtils.PinnedKeysOrError.Error.PublicKeysInvalid -> return SendPreferencesOrError.Error.PublicKeysInvalid
+            is CryptoUtils.PinnedKeysOrError.Error.TrustedKeysInvalid -> return SendPreferencesOrError.Error.TrustedKeysInvalid
+            else -> return SendPreferencesOrError.Error.TrustedKeysInvalid
         }
 
         if (publicAddressKey != null && (publicAddressKey.isObsolete() || publicAddressKey.isCompromised())) return SendPreferencesOrError.Error.PublicKeysInvalid
 
         return if (isInternal) {
 
-            if (pinnedPublicKey == null && publicAddressKey == null) {
+            if (pinnedPublicKeys.isNullOrEmpty() && publicAddressKey == null) {
                 SendPreferencesOrError.Error.NoKeysAvailable
             } else {
                 SendPreferencesOrError.Success(
@@ -215,14 +194,14 @@ class ObtainSendPreferencesUseCase @Inject constructor(
                         sign = true,
                         pgpScheme = PackageType.ProtonMail,
                         mimeType = mime,
-                        publicKey = pinnedPublicKey ?: publicAddressKey?.publicKey?.key
+                        publicKey = pinnedPublicKeys?.firstOrNull()?.key ?: publicAddressKey?.publicKey?.key
                     )
                 )
             }
 
         } else {
 
-            if (encrypt && pinnedPublicKey == null && publicAddressKey == null) {
+            if (encrypt && pinnedPublicKeys == null && publicAddressKey == null) {
                 SendPreferencesOrError.Error.NoKeysAvailable
             } else {
                 SendPreferencesOrError.Success(
@@ -231,7 +210,7 @@ class ObtainSendPreferencesUseCase @Inject constructor(
                         sign = if (encrypt) true else sign,
                         pgpScheme = scheme,
                         mimeType = mime,
-                        publicKey = pinnedPublicKey ?: publicAddressKey?.publicKey?.key
+                        publicKey = pinnedPublicKeys?.firstOrNull()?.key ?: publicAddressKey?.publicKey?.key
                     )
                 )
             }
@@ -313,13 +292,5 @@ class ObtainSendPreferencesUseCase @Inject constructor(
      * If true, do not use the key to encrypt new messages, but can verify signatures.
      */
     private fun PublicAddressKey.isObsolete() = !(this.flags and 2 == 2)
-
-    private fun isKeyExpired(armoredKey: Armored): Boolean? {
-        return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isExpired }.getOrNull()
-    }
-
-    private fun isKeyRevoked(armoredKey: Armored): Boolean? {
-        return kotlin.runCatching { Crypto.newKeyFromArmored(armoredKey).isRevoked }.getOrNull()
-    }
 
 }

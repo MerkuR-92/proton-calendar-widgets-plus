@@ -26,6 +26,8 @@ const val ATTENDEE_AUTO_EXPAND_LIMIT = 5
 
 const val CLICK_INTERVAL_MS: Long = 500L
 
+const val SIGNATURE_VERIFICATION_API_TIMEOUT: Long = 10_000L
+
 const val WORKER_MAX_RETRY_COUNT = 5
 
 val PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD: Duration = Duration.ofHours(1)
@@ -98,6 +100,7 @@ object FeatureFlag {
     const val AUTO_INVITES_SETTING = false
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
     const val IMPORT_ASSISTANT = false
+    const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
 }
 
 object HttpResponseCode {

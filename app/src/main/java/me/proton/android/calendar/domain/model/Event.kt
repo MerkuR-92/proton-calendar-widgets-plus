@@ -433,7 +433,10 @@ data class Event private constructor(
     enum class SignatureVerification {
         SUCCESS,
         FAILURE,
+        // there are no verification keys so we don't actually verify
         SIGNED_BUT_NO_KEYS,
+        // couldn't get the verification keys so it's an error
+        SIGNED_BUT_CANT_GET_KEYS,
         NOT_SIGNED
     }
 
