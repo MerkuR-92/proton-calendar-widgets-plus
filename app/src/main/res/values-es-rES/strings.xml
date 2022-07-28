@@ -508,6 +508,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
+        <item/>
         <item>primero</item>
         <item>segundo</item>
         <item>tercero</item>
@@ -515,6 +516,7 @@
         <item>quinto</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
+        <item/>
         <item>último</item>
         <item>antepenúltimo</item>
         <item>tercero antes del último</item>
