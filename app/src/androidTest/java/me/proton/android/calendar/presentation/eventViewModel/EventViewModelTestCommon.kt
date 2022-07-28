@@ -33,6 +33,7 @@ import me.proton.android.calendar.domain.usecase.SendEmailUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.mocks.CalendarMocks
 import me.proton.android.calendar.mocks.EventMocks
 import me.proton.android.calendar.mocks.UserMocks
@@ -73,6 +74,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
     val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
+    val upgradeEventUseCaseMock: UpgradeEventUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -132,7 +134,8 @@ open class EventViewModelTestCommon: KoinComponent {
             widgetRefresher = calendarWidgetRefresherMock,
             handleAlarmsUseCase = handleAlarmsUseCaseMock,
             eventDecryptor = eventDecryptorMock,
-            database = appDatabaseMock
+            database = appDatabaseMock,
+            upgradeEventUseCase = upgradeEventUseCaseMock
         )
     }
 

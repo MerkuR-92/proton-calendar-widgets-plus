@@ -1,8 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
@@ -73,6 +75,15 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                 logger.e("BootstrapCalendarsUseCase: error unable to create default calendar for user")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
             }
+
+            // Fetch and persist calendar settings of the newly created calendar. Should not be blocking.
+            createDefaultCalendarResult.returnValue.tryCast<String> {
+                val calendarSettings = calendarsApi.getCalendarSettings(userId, this).valueOrNullAndLogErrors(logger)?.calendarSettings
+                calendarSettings?.let {
+                    calendarsRepository.persistCalendarSettings(it)
+                }
+            }
+
             redoGetCalendars = true
         }
 

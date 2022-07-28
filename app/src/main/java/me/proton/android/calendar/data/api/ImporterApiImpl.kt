@@ -70,7 +70,6 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
                 CreateAccessTokenApiRequest(
                     code = code,
                     redirectUri = REDIRECT_URI,
-                    source = SOURCE,
                     provider = 1,
                     products = listOf(PRODUCT_CALENDAR)
                 )
@@ -82,7 +81,8 @@ class ImporterApiImpl @Inject constructor(private val apiProvider: ApiProvider) 
             createImporter(
                 CreateImporterApiRequest(
                     tokenId = tokenId,
-                    calendar = 1
+                    calendar = 1,
+                    source = SOURCE
                 )
             )
         }.toApiResponse()
@@ -180,8 +180,6 @@ data class CreateAccessTokenApiRequest(
     val code: String,
     @SerialName("RedirectUri")
     val redirectUri: String,
-    @SerialName("Source")
-    val source: String,
     @SerialName("Provider")
     val provider: Int,
     @SerialName("Products")
@@ -213,7 +211,9 @@ data class CreateImporterApiRequest(
     @SerialName("TokenID")
     val tokenId: String,
     @SerialName("Calendar")
-    val calendar: Int
+    val calendar: Int,
+    @SerialName("Source")
+    val source: String
 )
 
 @Serializable

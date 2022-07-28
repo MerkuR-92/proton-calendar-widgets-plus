@@ -26,21 +26,21 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_add_layout_press
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_info
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_press
+import kotlinx.android.synthetic.main.fragment_settings.settings_import
 import kotlinx.android.synthetic.main.fragment_settings.settings_import_press
+import kotlinx.android.synthetic.main.fragment_settings.settings_import_separator
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars_list
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_FROM_GOOGLE
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
@@ -100,7 +100,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         lifecycleScope.launch {
-            settings_import_press.visibleOrGone(IMPORT_FROM_GOOGLE && calendarViewModel.isDelinquentUser() == false)
+            val displayImport = calendarViewModel.displayImport()
+            settings_import.visibleOrGone(displayImport)
+            settings_import_separator.visibleOrGone(displayImport)
         }
         settings_import_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_import_assistant_guide)

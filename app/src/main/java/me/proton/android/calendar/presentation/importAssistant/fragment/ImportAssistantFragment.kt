@@ -44,7 +44,6 @@ import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
 import me.proton.android.calendar.common.MAX_CALENDAR_PAID
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -116,6 +115,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        importAssistantViewModel.resetViewModel()
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
             userCalendars ?: return@observe
@@ -269,7 +270,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 // Create new calendars
                 if (!createCalendars(calendarsToImport)) {
                     // Update list in VM
-                    importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
+                    val updatedCalendarsList = ArrayList<ImportCalendarMapping>()
+                    updatedCalendarsList.addAll(calendarsToImport)
+                    updatedCalendarsList.addAll(importAssistantViewModel.importCalendarMappingList.value?.filter { it.importCalendar.not() } ?: arrayListOf())
+                    importAssistantViewModel.setImportCalendarMappingList(updatedCalendarsList)
 
                     // If we fail to create one or more calendar, we display error to the user and display import summary view
                     showImportSummaryView(calendarsToImport)
@@ -287,15 +291,22 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             // Reset import button state
             fragment_import_assistant_import_button.setIdle()
 
-            if (startImportResult) {
-                showImportInProgressView()
-            } else {
-                // Update list in VM
-                importAssistantViewModel.setImportCalendarMappingList(calendarsToImport)
-
-                // We display error to the user and display import summary view
-                showImportSummaryView(calendarsToImport)
-                view?.displaySnackBar(getString(R.string.import_assistant_start_import_error))
+            when (startImportResult) {
+                is ImportAssistantViewModel.ImportResult.Error -> {
+                    // Update list in VM
+                    val updatedCalendarsList = ArrayList<ImportCalendarMapping>()
+                    updatedCalendarsList.addAll(calendarsToImport)
+                    updatedCalendarsList.addAll(importAssistantViewModel.importCalendarMappingList.value?.filter { it.importCalendar.not() } ?: arrayListOf())
+                    importAssistantViewModel.setImportCalendarMappingList(updatedCalendarsList)
+                    // We display error to the user and display import summary view
+                    showImportSummaryView(updatedCalendarsList)
+                    view?.displaySnackBar(
+                        startImportResult.userErrorMessage ?: getString(R.string.import_assistant_start_import_error)
+                    )
+                }
+                is ImportAssistantViewModel.ImportResult.Success -> {
+                    showImportInProgressView()
+                }
             }
         }
     }

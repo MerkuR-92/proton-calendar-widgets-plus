@@ -10,14 +10,14 @@
         android:layout_width="7dp"
         android:layout_height="7dp"
         android:background="@drawable/shape_circle_large"
-        android:backgroundTint="@color/current_time_indicator"
+        android:backgroundTint="?attr/colorAccent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <View
         android:layout_width="0dp"
         android:layout_height="@dimen/divider_height"
-        android:background="@color/current_time_indicator"
+        android:background="?attr/colorAccent"
         app:layout_constraintTop_toTopOf="@+id/current_time_indicator_dot"
         app:layout_constraintBottom_toBottomOf="@+id/current_time_indicator_dot"
         app:layout_constraintStart_toEndOf="@+id/current_time_indicator_dot"

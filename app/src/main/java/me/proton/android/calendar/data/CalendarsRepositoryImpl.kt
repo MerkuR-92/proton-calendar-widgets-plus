@@ -359,10 +359,6 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))
     }
 
-    override suspend fun updateCalendar(userId: String, calendar: CalendarEntity) {
-        database.calendarsDao().update(calendar.copy(fkUserId = userId))
-    }
-
     override suspend fun deleteCalendarById(id: String) {
         database.calendarsDao().deleteById(id)
     }
@@ -1009,7 +1005,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun persistMember(member: MemberEntity) {
-        database.membersDao().insert(member)
+        database.membersDao().updateOrInsert(member)
     }
 
     override suspend fun deleteMemberById(id: String) {

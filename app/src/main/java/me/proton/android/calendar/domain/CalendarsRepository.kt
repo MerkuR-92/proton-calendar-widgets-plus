@@ -60,8 +60,6 @@ interface CalendarsRepository {
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
-    suspend fun updateCalendar(userId: String, calendar: CalendarEntity)
-
     suspend fun deleteCalendarById(id: String)
 
     suspend fun refreshCalendars(userId: UserId): Boolean

@@ -19,11 +19,11 @@ import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
+import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarMappingEntity
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
-import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.ImporterApi
@@ -69,21 +69,34 @@ class ImportAssistantViewModel @Inject constructor(
 
     private lateinit var importerId: String
 
+    sealed class ImportResult {
+        object Success : ImportResult()
+        class Error(val userErrorMessage: String? = null) : ImportResult()
+    }
+
+    fun resetViewModel() {
+        _userId.value = null
+        _importerList.value = null
+        _reportList.value = null
+        _importCalendarMappingList.value = null
+        _sourceEmail.value = null
+    }
+
     private suspend fun getGoogleClientId(userId: UserId): String? {
-        importerApi.getGoogleClientId(userId)
         return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId
     }
 
     /**
      * Use importerId parameter if we need to updated an existing importer
      */
-    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String {
+    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String? {
+        val googleClientId = getGoogleClientId(userId) ?: return null
         return GOOGLE_AUTH_BASE_URL +
                 "scope=${GOOGLE_SCOPES}" +
                 "&accessType=${ACCESS_TYPE}" +
                 "&redirect_uri=${REDIRECT_URI}" +
                 "&response_type=${RESPONSE_TYPE}"+
-                "&client_id=${getGoogleClientId(userId)}" +
+                "&client_id=$googleClientId" +
                 "&prompt=${PROMPT}" +
                 if (importerId.isNullOrBlank()) "" else "&state=$importerId" // Specifies any string value that your application uses to maintain state between your authorization request and the authorization server's response
     }
@@ -190,11 +203,11 @@ class ImportAssistantViewModel @Inject constructor(
         } else false
     }
 
-    suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): Boolean {
+    suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): ImportResult {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
             return@let it
-        } ?: return false
+        } ?: return ImportResult.Error()
 
         // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
@@ -207,8 +220,17 @@ class ImportAssistantViewModel @Inject constructor(
         }
 
         // Start importer
-        importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping).valueOrNullAndLogErrors(logger) ?: return false
-        return true
+        return when (val startImporterResponse = importerApi.startImporter(userId, importerId, customCalendarMapping, calendarMapping)) {
+            is ApiResponse.Success -> {
+                ImportResult.Success
+            }
+            is ApiResponse.Error -> {
+                ImportResult.Error(userErrorMessage = startImporterResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                ImportResult.Error()
+            }
+        }
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
@@ -360,17 +382,18 @@ class ImportAssistantViewModel @Inject constructor(
         return true
     }
 
-    suspend fun deleteReport(reportId: String) {
+    suspend fun deleteReport(reportId: String): Boolean {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
             return@let it
-        } ?: return
+        } ?: return false
 
-        importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return
+        importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return false
 
         // Update report list
-        val currentList = _reportList.value?.let { ArrayList(it) } ?: return
+        val currentList = _reportList.value?.let { ArrayList(it) } ?: return false
         currentList.removeIf { it.id == reportId }
         _reportList.value = currentList
+        return true
     }
 }

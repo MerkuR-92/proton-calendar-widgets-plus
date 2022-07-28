@@ -712,14 +712,6 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                                     } else null
                                 // Save time of the first event of the day
                                 calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
-                                if (immutableDate != LocalDate.now(ZoneId.of(timeZoneId)) && calendarViewModel.selectedDate.value == immutableDate && firstEventOfTheDayTime != null) {
-                                    val yPos = dayView.getHourTop(
-                                        if (firstEventOfTheDayTime.hour > 0) firstEventOfTheDayTime.hour - 1
-                                        else firstEventOfTheDayTime.hour
-                                    )
-                                    day_scroll_view.scrollY = yPos
-                                    calendarViewModel.dayViewScrollYPosition.value = yPos
-                                }
                             }
 
                             val userEmails = calendarViewModel.getUserEmails() ?: arrayListOf()
