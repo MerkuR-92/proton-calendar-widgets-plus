@@ -1,11 +1,19 @@
 package me.proton.android.calendar.domain.utils
 
 import ezvcard.VCard
+import me.proton.android.calendar.domain.Logger
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.key.domain.entity.key.PublicAddress
 import me.proton.core.key.domain.entity.key.PublicKey
+import me.proton.core.user.domain.entity.UserAddress
 
 interface CryptoUtils {
+
+    /**
+     * Temporary workaround for checking if [UserAddress] is valid for encryption or we should log out the User.
+     */
+    fun UserAddress.isValidForEncryption(cryptoContext: CryptoContext, logger: Logger): Boolean
+
     /**
      * Extracts pinned keys from VCard and checks their validity against server-provided public keys.
      */

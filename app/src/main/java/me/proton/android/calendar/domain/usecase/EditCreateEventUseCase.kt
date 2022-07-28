@@ -14,7 +14,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.utils.isValidForEncryption
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.SyncEvent
 import me.proton.android.calendar.data.api.SyncEventCreateContainer

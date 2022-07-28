@@ -19,7 +19,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.utils.isValidForEncryption
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase

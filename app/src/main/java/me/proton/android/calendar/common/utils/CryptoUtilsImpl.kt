@@ -2,17 +2,47 @@ package me.proton.android.calendar.common.utils
 
 import com.proton.gopenpgp.crypto.Crypto
 import ezvcard.VCard
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.utils.CryptoUtils
 import me.proton.android.calendar.domain.utils.CryptoUtils.*
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.pgp.Armored
 import me.proton.core.crypto.common.pgp.getFingerprintOrNull
+import me.proton.core.crypto.common.pgp.split
+import me.proton.core.key.domain.encryptData
 import me.proton.core.key.domain.entity.key.PublicAddress
 import me.proton.core.key.domain.entity.key.PublicAddressKey
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.entity.key.Recipient
+import me.proton.core.key.domain.signData
+import me.proton.core.key.domain.useKeys
+import me.proton.core.user.domain.entity.UserAddress
 
 object CryptoUtilsImpl : CryptoUtils {
+
+    override fun UserAddress.isValidForEncryption(cryptoContext: CryptoContext, logger: Logger): Boolean {
+
+        return this.useKeys(cryptoContext) {
+
+            val testData = "Test".encodeToByteArray()
+
+            val encryptException = kotlin.runCatching { encryptData(testData).split(cryptoContext.pgpCrypto) }.exceptionOrNull()
+
+            encryptException?.let {
+                logger.e("can't encrypt data in isValidForEncryption", it)
+            }
+
+            val signException = kotlin.runCatching { signData(testData) }.exceptionOrNull()
+
+            signException?.let {
+                logger.e("can't sign data in isValidForEncryption", it)
+            }
+
+            encryptException == null && signException == null
+
+        }
+
+    }
 
     override fun extractPinnedKeys(
         purpose: PinnedKeysPurpose,
