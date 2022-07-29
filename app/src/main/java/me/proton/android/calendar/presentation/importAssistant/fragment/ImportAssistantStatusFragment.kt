@@ -1,11 +1,12 @@
 package me.proton.android.calendar.presentation.importAssistant.fragment
 
+import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
@@ -13,9 +14,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_numbers_switch
 import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_list
 import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_refresh
 import kotlinx.coroutines.launch
@@ -23,20 +28,24 @@ import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Import
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.adapter.ImportStatusListAdapter
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
+import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import org.koin.core.KoinComponent
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
@@ -48,6 +57,9 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
 
     override val navigateUp = true
     override val isScrollable = false
+
+    @Inject
+    lateinit var logger: Logger
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
@@ -62,6 +74,10 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
     private var importerList: List<ImporterEntity>? = null
     private var reportList: List<ReportEntity>? = null
     private var zoneId: ZoneId? = null
+
+    private var resumeImportId: String? = null
+    private var resumeImportAccount: String? = null
+    private var googleSignInClient: GoogleSignInClient? = null
 
     override fun onBackPressedCustom() {
         if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
@@ -209,15 +225,20 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                         // No confirmation dialog for resume
                         if (import.errorCode == Import.ErrorCode.LOST_CONNECTION.value) {
                             // Lost connection, we need to sign in to Google and create a new token to update importer
-                            val userId = accountViewModel.getPrimaryUserId()
-                            if (userId != null) {
-                                val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId, import.id)
-                                if (googleAuthenticationUrl != null) {
-                                    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(googleAuthenticationUrl))
-                                    startActivity(browserIntent)
-                                } else view?.displaySnackBar(getString(R.string.snack_network_error))
-                            } else {
-                                view?.displaySnackBar(getString(R.string.snack_network_error))
+                            // Get Google Sign In Options with Calendar scope
+                            importAssistantViewModel.getGoogleSignInOptions()?.let { googleSignInOptions ->
+                                // Get Google Sign In Client and store the value so we can disconnect user
+                                googleSignInClient = GoogleSignIn.getClient(activity as MainActivity, googleSignInOptions)
+                                googleSignInClient?.let { googleSignInClient ->
+                                    // Start Google Sign In
+                                    resumeImportId = import.id
+                                    resumeImportAccount = import.account
+                                    resumeImportResultLauncher.launch(googleSignInClient.signInIntent)
+                                } ?: run {
+                                    view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
+                                }
+                            } ?: run {
+                                view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
                             }
                         } else {
                             if (importAssistantViewModel.resumeImport(import.id)) refreshList()
@@ -251,6 +272,65 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
 
         fragment_import_assistant_status_refresh.setOnRefreshListener {
             refreshList()
+        }
+    }
+
+    private var resumeImportResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data: Intent? = result.data
+
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+
+            try {
+                val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+
+                // Signed in successfully, show authenticated UI.
+                val authCode = account.serverAuthCode
+                val accountEmail = account.email
+                googleSignInClient?.signOut()
+                if (authCode != null && accountEmail != null) {
+                    // Resume import
+                    resumeImport(authCode, accountEmail)
+                } else {
+                    view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
+                }
+            } catch (e: ApiException) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                logger.i("Resume Import signInResult:failed code= ${e.statusCode}") // TODO This might flood Sentry ?
+                view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
+                googleSignInClient?.signOut()
+            }
+        }
+    }
+
+    private fun resumeImport(authCode: String, accountEmail: String) {
+        if (accountEmail != this.resumeImportAccount) {
+            view?.displaySnackBar(getString(R.string.import_assistant_update_import_wrong_account_error))
+            return
+        }
+
+        lifecycleScope.launch {
+            val userId = accountViewModel.getPrimaryUserId()
+            val importerId = this@ImportAssistantStatusFragment.resumeImportId
+            val calendarColors = resources.getIntArray(R.array.accent_colors_base)
+            if (userId == null || importerId == null) {
+                view?.displaySnackBar(getString(R.string.import_assistant_update_import_error))
+                return@launch
+            }
+
+            // Update Importer to resume
+            if (!importAssistantViewModel.handleGoogleSignInRedirect(
+                    userId,
+                    authCode,
+                    calendarColors,
+                    importerId
+                )
+            ) {
+                view?.displaySnackBar(getString(R.string.import_assistant_update_import_error))
+            }
         }
     }
 

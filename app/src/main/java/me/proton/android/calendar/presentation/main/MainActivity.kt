@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -39,9 +38,7 @@ import biweekly.parameter.ParticipationStatus
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -94,13 +91,8 @@ import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.AppLinksAction.VIEW
 import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
-import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_CODE
-import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_SCOPE
-import me.proton.android.calendar.common.AppLinksQueryParameters.EASY_SWITCH_STATE
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
-import me.proton.android.calendar.common.CalendarImport.ERROR
-import me.proton.android.calendar.common.CalendarImport.ERROR_ACCESS_DENIED
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
@@ -114,6 +106,7 @@ import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
 import me.proton.android.calendar.common.ViewMode
@@ -183,6 +176,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private var currentViewMode: ViewMode? = null
     // Lets us know whether we need to navigate back to month when triggering back action
     private var returnToMonthView: Boolean = false
+
+    private var googleSignInClient: GoogleSignInClient? = null
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -440,28 +435,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // Set timezone visibility to gone by default
         nav_view_timezone.visibleOrGone(false)
-
-        lifecycleScope.launch {
-            val userId = accountViewModel.getPrimaryUserId()
-            if (userId != null) {
-                val googleAuthenticationUrl = importAssistantViewModel.getGoogleAuthenticationUrl(userId)
-                if (googleAuthenticationUrl != null) {
-                    // Configure sign-in to request the user's ID, email address, and basic
-                    // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-                    val clientId = importAssistantViewModel.getGoogleClientId(userId) ?: return@launch
-                    // AndroidClientId = 192543898962-jpqpevmumbfv93ulrb2alo5o9i0ogfus.apps.googleusercontent.com
-                    // WebClientId = 192543898962-v1mvc6s9jlfn71tms865ercsun7crnk4.apps.googleusercontent.com
-                    val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestServerAuthCode(clientId)
-                        .requestScopes(Scope("https://www.googleapis.com/auth/calendar.readonly"))
-                        .requestEmail()
-                        .build()
-                    googleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
-                } else displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
-            } else {
-                displaySnackBar(this@MainActivity.getString(R.string.snack_network_error))
-            }
-        }
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -539,37 +512,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
                             val action = appLinkData?.getQueryParameter(ACTION)
 
-                            // Handle import redirect link
-                            val easySwitchCode = appLinkData?.getQueryParameter(EASY_SWITCH_CODE)
-                            val easySwitchScope = appLinkData?.getQueryParameter(EASY_SWITCH_SCOPE)
-
                             if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
                                 handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
-                            } else if (easySwitchCode != null && easySwitchScope != null) {
-                                val importerId = appLinkData.getQueryParameter(EASY_SWITCH_STATE) // Contains importerId when doing resume import process
-                                if (importerId != null) {
-                                    lifecycleScope.launch {
-                                        // Update importer with the new token id and resume importer
-                                        val userId = accountViewModel.getPrimaryUserId()
-                                        if (userId != null) {
-                                            if (!importAssistantViewModel.handleGoogleSignInRedirect(
-                                                    userId,
-                                                    easySwitchCode,
-                                                    resources.getIntArray(R.array.accent_colors_base),
-                                                    importerId
-                                                )) {
-                                                this@MainActivity.displaySnackBar(getString(R.string.import_assistant_update_import_error))
-                                            }
-                                        } else this@MainActivity.displaySnackBar(getString(R.string.snack_network_error))
-                                    }
-                                } else {
-                                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(easySwitchCode)
-                                    safeNavigateToDialogFragment(importAssistantDeepLink)
-                                }
                             } else {
-                                val error = appLinkData?.getQueryParameter(ERROR)
-                                if (error == ERROR_ACCESS_DENIED) this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_import_error))
-                                else this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                                this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
                                 safeNavigateToMonth()
                             }
                         } else safeNavigateToMonth()
@@ -891,14 +837,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
-            signOut() // TODO DELETE
             drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             mainViewModel.setViewMode(ViewMode.AGENDA)
-            revokeAccess() // TODO DELETE
             drawer_layout.close()
         }
 
@@ -1055,12 +999,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
             .setPositiveButton(R.string.dialog_button_continue) { dialog, _ ->
-                val account = GoogleSignIn.getLastSignedInAccount(this@MainActivity)
-                // TODO Handle last signed in account to save time
-                googleSignInClient?.signInIntent?.let { signInIntent ->
-                    startActivityForResult(signInIntent, RC_SIGN_IN)
-                } ?: run {
-                    displaySnackBar("signInIntent was null") // TODO error message
+                lifecycleScope.launch {
+                    // Start the google sign in process
+                    displayGoogleSignIn()
                 }
                 dialog.dismiss()
             }
@@ -1077,13 +1018,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         materialDialogBuilder.show()
     }
 
-    private var googleSignInClient: GoogleSignInClient? = null
-    private val RC_SIGN_IN = 1
+    private suspend fun displayGoogleSignIn(): Boolean {
+        // Get Google Sign In Options with Calendar scope
+        importAssistantViewModel.getGoogleSignInOptions()?.let { googleSignInOptions ->
+
+            // Get Google Sign In Client and store the value so we can disconnect user
+            googleSignInClient = GoogleSignIn.getClient(this@MainActivity, googleSignInOptions)
+            googleSignInClient?.let { googleSignInClient ->
+                // Start Google Sign In
+                startActivityForResult(googleSignInClient.signInIntent, RC_CREATE_IMPORT_SIGN_IN)
+            } ?: run {
+                displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                return false
+            }
+        } ?: run {
+            displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+            return false
+        }
+        return true
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == RC_CREATE_IMPORT_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
             val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -1093,28 +1052,22 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 // Signed in successfully, show authenticated UI.
                 val authCode = account.serverAuthCode
+                googleSignInClient?.signOut()
                 authCode?.let {
+                    // Create import
                     val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
                     safeNavigateToDialogFragment(importAssistantDeepLink)
                 } ?: run {
-                    displaySnackBar("authCode was null") // TODO error message
+                    displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
                 }
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
-                logger.e("signInResult:failed code= ${e.statusCode}")
-                displaySnackBar("signInResult:failed code= ${e.statusCode}")
+                logger.i("Create Import signInResult:failed code= ${e.statusCode}") // TODO This might flood Sentry ?
+                displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                googleSignInClient?.signOut()
             }
-
         }
-    }
-
-    private fun signOut() {
-        googleSignInClient?.signOut()
-    }
-
-    private fun revokeAccess() {
-        googleSignInClient?.revokeAccess()
     }
 
     private fun showFeedbackDialog() {

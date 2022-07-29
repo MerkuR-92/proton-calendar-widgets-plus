@@ -458,6 +458,7 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
+    <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
     <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
     <string name="import_assistant_summary_title">Import summary</string>
     <string name="import_assistant_summary_customize_import">Customize import</string>

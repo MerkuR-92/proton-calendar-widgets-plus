@@ -75,6 +75,8 @@ const val DAY_VIEW_ALL_DAY_MAX = 3
 const val MAX_CALENDAR_PAID = 20
 const val MAX_CALENDAR_FREE = 1
 
+const val RC_CREATE_IMPORT_SIGN_IN = 11
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
     145, // Rebranding (2.0.2)
@@ -99,7 +101,7 @@ object FeatureFlag {
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = false
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
-    const val IMPORT_ASSISTANT = false
+    const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
 }
 
@@ -203,17 +205,10 @@ object AppLinksQueryParameters {
 }
 
 object CalendarImport {
-    const val GOOGLE_AUTH_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth?"
-    const val GOOGLE_SCOPES = "email+openid+https://www.googleapis.com/auth/calendar.readonly"
-    const val ACCESS_TYPE = "offline"
+    const val GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.readonly"
     const val REDIRECT_URI = "https://calendar.proton.me/easy_switch"
-    const val RESPONSE_TYPE = "code"
     const val PRODUCT_CALENDAR = "Calendar"
-    const val PROMPT = "consent"
     const val SOURCE = "calendar-android-settings"
-
-    const val ERROR = "error"
-    const val ERROR_ACCESS_DENIED = "access_denied"
 }
 
 object AppLinksAction {
