@@ -166,13 +166,23 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         navigationArguments.code,
                         resources.getIntArray(R.array.accent_colors_base)
                     )) {
-                    // Display error snack and navigate back
-                    requireActivity().displaySnackBar(getString(R.string.import_assistant_data_gathering_error))
+                    if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                        importAssistantViewModel.importGuideSnackState.value =
+                            ImportAssistantViewModel.ImportSnackState.DisplaySnack(getString(R.string.import_assistant_data_gathering_error))
+                    } else {
+                        // Display error snack and navigate back
+                        requireActivity().displaySnackBar(getString(R.string.import_assistant_data_gathering_error))
+                    }
                     findNavController().navigateUp()
                 }
             } else {
-                // Display error snack and navigate back
-                requireActivity().displaySnackBar(getString(R.string.snack_network_error))
+                if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                    importAssistantViewModel.importGuideSnackState.value =
+                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(getString(R.string.snack_network_error))
+                } else {
+                    // Display error snack and navigate back
+                    requireActivity().displaySnackBar(getString(R.string.snack_network_error))
+                }
                 findNavController().navigateUp()
             }
         }

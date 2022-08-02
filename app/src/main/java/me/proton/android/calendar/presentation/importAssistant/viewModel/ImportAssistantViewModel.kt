@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarImport
@@ -65,6 +66,17 @@ class ImportAssistantViewModel @Inject constructor(
     val defaultUserEmail: MutableLiveData<String?> = MutableLiveData()
 
     private lateinit var importerId: String
+
+    val importSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+    val importGuideSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+    val importStatusSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+
+    sealed class ImportSnackState {
+
+        data class DisplaySnack(
+            val message: String
+        ): ImportSnackState()
+    }
 
     sealed class ImportResult {
         object Success : ImportResult()
