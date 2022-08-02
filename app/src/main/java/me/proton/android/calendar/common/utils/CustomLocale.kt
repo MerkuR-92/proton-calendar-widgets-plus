@@ -1,11 +1,15 @@
 package me.proton.android.calendar.common.utils
 
 import android.content.Context
+import android.content.res.Configuration
+import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.preference.PreferenceManager
+import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.logger.TimberLogger
 import java.util.Locale
 
 object CustomLocale {
@@ -17,12 +21,30 @@ object CustomLocale {
             val locale = createLocaleFromCode(it)
             if (getSelectedLocale() == null) {
                 AppCompatDelegate.setApplicationLocales(LocaleListCompat.create(locale))
+                setAppDefaultNightMode(context)
             }
             // This is needed because of ResourceProvider's usage. It's advised to remove it ASAP.
             val configuration = context.resources.configuration
             configuration.setLocale(locale)
-            context.createConfigurationContext(configuration)
-        } ?: context
+
+            setConfigurationUiMode(context, configuration)
+        } ?: run {
+            setAppDefaultNightMode(context)
+            // This is needed because of ResourceProvider's usage. It's advised to remove it ASAP.
+            val configuration = context.resources.configuration
+
+            setConfigurationUiMode(context, configuration)
+        }
+    }
+
+    private fun setConfigurationUiMode(context: Context, configuration: Configuration): Context {
+        // Make sure we also set the app theme in Configuration
+        when (AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(context).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]) {
+            AppTheme.LIGHT -> configuration.uiMode = Configuration.UI_MODE_NIGHT_NO
+            AppTheme.DARK -> configuration.uiMode = Configuration.UI_MODE_NIGHT_YES
+            else -> configuration.uiMode = Configuration.UI_MODE_NIGHT_UNDEFINED
+        }
+        return context.createConfigurationContext(configuration)
     }
 
     fun apply(context: Context, localeCode: String?) {
@@ -43,7 +65,19 @@ object CustomLocale {
                 LocaleListCompat.create(locale)
             }
         }
+
+        setAppDefaultNightMode(context)
         AppCompatDelegate.setApplicationLocales(localesToSet)
+    }
+
+    private fun setAppDefaultNightMode(context: Context) {
+        // Make sure we also set the app theme in Configuration
+        val appTheme = when (AppTheme.values()[PreferenceManager.getDefaultSharedPreferences(context).getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)]) {
+            AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+            AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        }
+        AppCompatDelegate.setDefaultNightMode(appTheme)
     }
 
     private fun createLocaleFromCode(localeCode: String): Locale {
