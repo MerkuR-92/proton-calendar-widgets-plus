@@ -998,14 +998,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     fun showImportGoogleAuthDialog() {
+        if (!mainViewModel.isConnectedToNetwork) {
+            val snackMessage = getString(R.string.snack_network_error)
+            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                importAssistantViewModel.importGuideSnackState.value =
+                    ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+            } else {
+                displaySnackBar(snackMessage)
+            }
+            return
+        }
+
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
             .setPositiveButton(R.string.dialog_button_continue) { dialog, _ ->
-                lifecycleScope.launch {
-                    // Start the google sign in process
-                    displayGoogleSignIn()
-                }
-                dialog.dismiss()
+                showPreparingImportDialog()
             }
             .setNegativeButton(R.string.dialog_button_cancel) { dialog, _ ->
                 dialog.dismiss()
@@ -1020,6 +1027,37 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         materialDialogBuilder.show()
     }
 
+    private fun showPreparingImportDialog() {
+        // Display preparing import loader dialog
+        val materialDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setCancelable(false)
+            .setOnDismissListener {
+            }
+
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.dialog_preparing_import, null, false)
+
+        materialDialogBuilder.setView(view)
+        val dialog = materialDialogBuilder.show()
+
+        lifecycleScope.launch {
+            if (importAssistantViewModel.isImportInProgress()) {
+                val snackMessage = getString(R.string.import_assistant_in_progress_error_snack)
+                if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                    importAssistantViewModel.importGuideSnackState.value =
+                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+                } else {
+                    displaySnackBar(snackMessage)
+                }
+                dialog.dismiss()
+            } else {
+                // Start the google sign in process
+                displayGoogleSignIn()
+                dialog.dismiss()
+            }
+        }
+    }
+
     private suspend fun displayGoogleSignIn(): Boolean {
         // Get Google Sign In Options with Calendar scope
         importAssistantViewModel.getGoogleSignInOptions()?.let { googleSignInOptions ->
@@ -1030,11 +1068,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 // Start Google Sign In
                 startActivityForResult(googleSignInClient.signInIntent, RC_CREATE_IMPORT_SIGN_IN)
             } ?: run {
-                displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                val snackMessage = getString(R.string.import_assistant_prepare_import_error)
+                if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                    importAssistantViewModel.importGuideSnackState.value =
+                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+                } else {
+                    displaySnackBar(snackMessage)
+                }
                 return false
             }
         } ?: run {
-            displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+            val snackMessage = getString(R.string.import_assistant_prepare_import_error)
+            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                importAssistantViewModel.importGuideSnackState.value =
+                    ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+            } else {
+                displaySnackBar(snackMessage)
+            }
             return false
         }
         return true

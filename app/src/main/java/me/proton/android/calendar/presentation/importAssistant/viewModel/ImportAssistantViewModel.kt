@@ -351,6 +351,16 @@ class ImportAssistantViewModel @Inject constructor(
         _importerList.value = importers
     }
 
+    suspend fun isImportInProgress(): Boolean {
+        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
+            _userId.value = it
+            return@let it
+        } ?: return false
+
+        val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return false
+        return importers.any { it.active != null }
+    }
+
     private suspend fun getImporter(importerId: String): ImporterEntity? {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
