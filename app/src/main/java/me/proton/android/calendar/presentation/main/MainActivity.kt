@@ -39,6 +39,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -101,6 +102,7 @@ import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
@@ -1064,7 +1066,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 // The ApiException status code indicates the detailed failure reason.
                 // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 logger.i("Create Import signInResult:failed code= ${e.statusCode}") // TODO This might flood Sentry ?
-                displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                val snackMessage = when (e.statusCode) {
+                    GoogleSignInCodes.SIGN_IN_CANCELED -> getString(R.string.import_assistant_authentication_canceled)
+                    GoogleSignInCodes.SIGN_IN_CURRENTLY_IN_PROGRESS -> getString(R.string.import_assistant_sign_in_in_progress)
+                    CommonStatusCodes.NETWORK_ERROR -> getString(R.string.snack_network_error)
+                    else -> getString(R.string.import_assistant_prepare_import_error)
+                }
+                if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                    importAssistantViewModel.importGuideSnackState.value =
+                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+                } else {
+                    displaySnackBar(snackMessage)
+                }
                 googleSignInClient?.signOut()
             }
         }

@@ -211,6 +211,12 @@ object CalendarImport {
     const val SOURCE = "calendar-android-settings"
 }
 
+object GoogleSignInCodes {
+    const val SIGN_IN_CANCELED = 12501
+    const val SIGN_IN_CURRENTLY_IN_PROGRESS = 12502
+    const val SIGN_IN_FAILED = 12500
+}
+
 object AppLinksAction {
     const val VIEW = "VIEW"
 }
