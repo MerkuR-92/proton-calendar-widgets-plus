@@ -80,7 +80,7 @@ const val RC_CREATE_IMPORT_SIGN_IN = 11
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
     145, // Rebranding (2.0.2)
-    147 // Easy switch (2.1.1)
+    150 // Easy switch (2.2.0)
 )
 
 object FeatureFlag {
