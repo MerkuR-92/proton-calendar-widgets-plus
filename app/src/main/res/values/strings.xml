@@ -93,7 +93,9 @@
     <string name="event_decryption_error_dialog_confirmation">Delete event</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Delete events</string>
     <string name="event_decryption_error_dialog_close">Close</string>
-    <string name="event_signature_verification_warning">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a></string>
+    <string name="event_signature_verification_failure">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a></string>
+    <string name="event_signature_verification_in_progress">Verification of the event signature is in progress.</string>
+    <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
     <string name="event_change_answer_recurring_title">Update recurring event</string>
     <string name="event_change_answer_recurring_description">Would you like to change your answer for all the events in this series?</string>
     <string name="event_change_answer_recurring_overwrite_description">Would you like to change your answer for all the events in this series?\nSome of your answers to occurrences previously updated by the organizer will be lost.</string>
