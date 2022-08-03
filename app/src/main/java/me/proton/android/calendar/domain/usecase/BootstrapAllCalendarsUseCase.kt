@@ -1,14 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
@@ -26,7 +27,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val keySetupUseCase: KeySetupUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val userManager: UserManager,
-    private val userSettingsRepository: UserSettingsRepository
+    private val userSettingsRepository: UserSettingsRepository,
+    private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase
 ): UseCase {
 
     suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
@@ -142,16 +144,15 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             }
         }
 
-        val calendarUserSettingsResponse =
-            settingsApi.getCalendarUserSettings(userId) // TODO this will have a value if we have at least 1 calendar
-        if (calendarUserSettingsResponse !is ApiResponse.Success) {
-            logger.e("BootstrapCalendarsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
+        val refreshedCalendarUserSettingsResult = refreshCalendarUserSettingsUseCase(userId)
+        val refreshedCalendarUserSettings = if (refreshedCalendarUserSettingsResult is UseCase.Result.Success<*>) {
+            refreshedCalendarUserSettingsResult.returnValue.tryCastOrNull<CalendarUserSettingsEntity>()
+        } else null
+
+        if (refreshedCalendarUserSettings == null) {
+            refreshedCalendarUserSettingsResult.ifSuccessAndLogErrors(logger) {}
+            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendar user settings from API")
         }
-        calendarsRepository.persistCalendarUserSettings(
-            userId.id,
-            calendarUserSettingsResponse.data.calendarUserSettings
-        )
 
         val userSettingsResponseException =
             kotlin.runCatching { userSettingsRepository.getUserSettings(userId, refresh = true) }.exceptionOrNull()
@@ -172,7 +173,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                 boostrapCalendarUseCase.executeBootstrap(
                     calendarEntity,
                     userId,
-                    calendarUserSettingsResponse.data.calendarUserSettings.primaryTimezone
+                    refreshedCalendarUserSettings.primaryTimezone
                 )
             } else UseCase.Result.InvalidParams("could not select CalendarEntity for executeBootstrapResult")
 

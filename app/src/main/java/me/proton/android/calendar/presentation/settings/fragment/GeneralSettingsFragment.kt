@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.work.Operation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_switch
@@ -31,13 +32,16 @@ import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_nu
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_numbers_switch
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_value
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.allowedTimezoneIds
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToId
@@ -46,6 +50,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZon
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -66,6 +71,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
@@ -85,6 +91,15 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // refresh CalendarUserSettings, for users who were logged in before auto-added invites switch,
+        //  the toggle value might be out of sync
+        lifecycleScope.launchWhenStarted {
+            val userId = accountViewModel.getPrimaryUserId()
+            if (userId != null) {
+                mainViewModel.refreshCalendarUserSettings(userId = userId)
+            }
+        }
 
         settings_week_numbers_press.setOnClickListener {
             settings_week_numbers_switch.performClick()

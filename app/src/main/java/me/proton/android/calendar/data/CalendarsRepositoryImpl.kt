@@ -115,7 +115,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private val visibleSkeletonEventsFlow =
         database.eventsDao().selectSkeletonEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
-            .combineTransform(visibleCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
+            .combineTransform<List<SkeletonEventEntity>, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
@@ -1081,7 +1081,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override fun flowCalendarUserSettingsAutoImportInvite(userId: String): Flow<Int?> {
-        return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsAutoImportInvite(userId).distinctUntilChanged()
     }
 
     override suspend fun updateCalendarUserDefaultCalendarId(userId: String, defaultCalendarId: String) {
