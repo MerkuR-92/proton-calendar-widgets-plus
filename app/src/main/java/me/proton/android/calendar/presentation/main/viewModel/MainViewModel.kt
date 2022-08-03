@@ -51,7 +51,7 @@ class MainViewModel @Inject constructor(
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     private val userSettingsRepository: UserSettingsRepository,
     private val feedbackApi: FeedbackApi,
-    private val importerApi: ImporterApi,
+    private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
     private val logger: Logger
 ) : AndroidViewModel(application) {
 
@@ -141,6 +141,14 @@ class MainViewModel @Inject constructor(
             withTimeoutOrNull(Duration.ofSeconds(30).toMillis()) {
                 // we don't need the most up-to-date value, just need to make sure we have anything in Store
                 val downloaded = kotlin.runCatching { userSettingsRepository.getUserSettings(userId, refresh = false) }.getOrNull()
+            }
+        }
+    }
+
+    fun refreshCalendarUserSettings(userId: UserId) {
+        ioScope.launch {
+            withTimeoutOrNull(Duration.ofSeconds(10).toMillis()) {
+                refreshCalendarUserSettingsUseCase(userId)
             }
         }
     }
