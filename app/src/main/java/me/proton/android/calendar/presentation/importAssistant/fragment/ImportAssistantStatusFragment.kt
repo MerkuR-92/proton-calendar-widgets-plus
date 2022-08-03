@@ -34,6 +34,7 @@ import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Import
+import me.proton.android.calendar.domain.model.ImportCalendarMapping
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.adapter.ImportStatusListAdapter
@@ -241,8 +242,16 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                                 view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
                             }
                         } else {
-                            if (importAssistantViewModel.resumeImport(import.id)) refreshList()
-                            else view?.displaySnackBar(getString(R.string.import_assistant_resume_import_error))
+                            when (val resumeImportResult = importAssistantViewModel.resumeImport(import.id)) {
+                                is ImportAssistantViewModel.ImportResult.Error -> {
+                                    view?.displaySnackBar(
+                                        resumeImportResult.userErrorMessage ?: getString(R.string.import_assistant_resume_import_error)
+                                    )
+                                }
+                                is ImportAssistantViewModel.ImportResult.Success -> {
+                                    refreshList()
+                                }
+                            }
                         }
                     }
                 }

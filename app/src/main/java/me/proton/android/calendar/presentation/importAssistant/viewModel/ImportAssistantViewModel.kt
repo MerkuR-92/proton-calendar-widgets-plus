@@ -202,7 +202,7 @@ class ImportAssistantViewModel @Inject constructor(
         importerApi.updateCalendarImporter(userId, importerId, tokenId).valueOrNullAndLogErrors(logger) ?: return false
 
         // Resume import
-        return if (resumeImport(importerId)) {
+        return if (resumeImport(importerId) is ImportResult.Success) {
             if (_importerList.value?.any { it.id == importerId } == true) {
                 // Refresh importers list if it has the importer
                 getImporters()
@@ -390,14 +390,24 @@ class ImportAssistantViewModel @Inject constructor(
         return true
     }
 
-    suspend fun resumeImport(importId: String): Boolean {
+    suspend fun resumeImport(importId: String): ImportResult {
         val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
             _userId.value = it
             return@let it
-        } ?: return false
+        } ?: return ImportResult.Error()
 
-        importerApi.resumeImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
-        return true
+        // Start importer
+        return when (val resumeImportResponse = importerApi.resumeImport(userId, importId)) {
+            is ApiResponse.Success -> {
+                ImportResult.Success
+            }
+            is ApiResponse.Error -> {
+                ImportResult.Error(userErrorMessage = resumeImportResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                ImportResult.Error()
+            }
+        }
     }
 
     suspend fun deleteReport(reportId: String): Boolean {
