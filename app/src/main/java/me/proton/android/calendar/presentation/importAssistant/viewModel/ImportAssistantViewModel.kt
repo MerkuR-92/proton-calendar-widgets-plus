@@ -48,9 +48,6 @@ class ImportAssistantViewModel @Inject constructor(
     private val calendarsRepository: CalendarsRepository
 ) : AndroidViewModel(application) {
 
-    private val _userId: MutableLiveData<UserId?> = MutableLiveData()
-    val userId: LiveData<UserId?> = _userId
-
     private val _importCalendarMappingList: MutableLiveData<List<ImportCalendarMapping>?> = MutableLiveData()
     val importCalendarMappingList: LiveData<List<ImportCalendarMapping>?> = _importCalendarMappingList
 
@@ -83,8 +80,9 @@ class ImportAssistantViewModel @Inject constructor(
         class Error(val userErrorMessage: String? = null) : ImportResult()
     }
 
+    private suspend fun getPrimaryUserIdOrNull() = accountManager.getPrimaryUserId().firstOrNull()
+
     fun resetViewModel() {
-        _userId.value = null
         _importerList.value = null
         _reportList.value = null
         _importCalendarMappingList.value = null
@@ -92,10 +90,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun getGoogleSignInOptions(): GoogleSignInOptions? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         // Fetch google client Id from config
         val clientId = importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId ?: return null
@@ -110,10 +105,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     private suspend fun getDefaultUserEmail(): String? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
 
@@ -212,10 +204,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): ImportResult {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return ImportResult.Error()
+        val userId = getPrimaryUserIdOrNull() ?: return ImportResult.Error()
 
         // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
@@ -242,10 +231,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         // Create calendar
         val createCalendarResult = createCalendarUseCase.execute(
@@ -320,7 +306,7 @@ class ImportAssistantViewModel @Inject constructor(
         _importCalendarMappingList.value = currentList
     }
 
-    suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
+    fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -342,59 +328,41 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun getImporters() {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return
+        val userId = getPrimaryUserIdOrNull() ?: return
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return
         _importerList.value = importers
     }
 
     suspend fun isImportInProgress(): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+        val userId = getPrimaryUserIdOrNull() ?: return false
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return false
         return importers.any { it.active != null }
     }
 
     private suspend fun getImporter(importerId: String): ImporterEntity? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         return importerApi.getImporter(userId, importerId).valueOrNullAndLogErrors(logger)?.importer
     }
 
     suspend fun getReports() {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return
+        val userId = getPrimaryUserIdOrNull() ?: return
 
         val reports = importerApi.getReports(userId).valueOrNullAndLogErrors(logger)?.reports ?: return
         _reportList.value = reports
     }
 
     suspend fun cancelImport(importId: String): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+        val userId = getPrimaryUserIdOrNull() ?: return false
 
         importerApi.cancelImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
         return true
     }
 
     suspend fun resumeImport(importId: String): ImportResult {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return ImportResult.Error()
+        val userId = getPrimaryUserIdOrNull() ?: return ImportResult.Error()
 
         // Start importer
         return when (val resumeImportResponse = importerApi.resumeImport(userId, importId)) {
@@ -411,10 +379,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun deleteReport(reportId: String): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+        val userId = getPrimaryUserIdOrNull() ?: return false
 
         importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return false
 

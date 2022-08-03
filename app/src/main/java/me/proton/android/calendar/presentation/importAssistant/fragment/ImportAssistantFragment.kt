@@ -547,14 +547,16 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         mergeCalendarLayout?.visibleOrGone(!userCalendars.isNullOrEmpty())
         if (!userCalendars.isNullOrEmpty()) {
             val mergeCalendarListView = bottomSheetDialog.findViewById<RecyclerView>(R.id.dialog_calendar_import_mapping_merge_list)
+            if (userCalendars.size > 10) {
+                // Workaround with padding bottom because of bottom sheet dialog expanding but hiding a few items from the bottom of the list
+                mergeCalendarListView?.setPadding(0, 0, 0, requireContext().dpToPixel(184))
+            }
             val mergeCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             mergeCalendarListView?.layoutManager = mergeCalendarLayoutManager
             val mergeCalendarListAdapter = MergeCalendarListAdapter {
                 // On calendar click
-                lifecycleScope.launch {
-                    importAssistantViewModel.setMergeExistingCalendar(calendarToImport, it)
-                    bottomSheetDialog.dismiss()
-                }
+                importAssistantViewModel.setMergeExistingCalendar(calendarToImport, it)
+                bottomSheetDialog.dismiss()
             }
             mergeCalendarListView?.adapter = mergeCalendarListAdapter
             mergeCalendarListAdapter.submitList(userCalendars)
