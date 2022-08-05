@@ -354,6 +354,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun handleDeleteEvent(eventId: String,
+                                  calendarId: String,
                                   deleteOption: EventEditDeleteOption,
                                   occurrenceNumber: Int? = null): UseCase.Result {
 
@@ -366,7 +367,7 @@ class CalendarViewModel @Inject constructor(
 
         return viewModelScope.async {
             withContext(Dispatchers.IO) {
-                handleDeleteUseCase.handleDelete(userId, eventId, deleteOption, occurrenceNumber) // TODO UserId
+                handleDeleteUseCase.handleDelete(userId, eventId, calendarId, deleteOption, occurrenceNumber) // TODO UserId
             }
         }.await()
     }

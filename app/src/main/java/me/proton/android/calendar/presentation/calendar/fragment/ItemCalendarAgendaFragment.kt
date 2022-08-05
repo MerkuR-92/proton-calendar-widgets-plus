@@ -112,6 +112,7 @@ class ItemCalendarAgendaFragment: Fragment() {
                                 val deleteResult = withContext(Dispatchers.Default) {
                                     calendarViewModel.handleDeleteEvent(
                                         it.id,
+                                        it.calendar.id,
                                         EventEditDeleteOption.ALL_EVENTS
                                     )
                                 }

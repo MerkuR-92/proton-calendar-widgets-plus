@@ -2391,6 +2391,7 @@ class EventViewModel @Inject constructor(
         val deleteResult = handleDeleteUseCase.handleDelete(
             userId,
             event.id,
+            event.calendar.id,
             deleteOption,
             if (deleteOption == EventEditDeleteOption.ALL_EVENTS) null else occurrenceNumber
         )
@@ -2415,7 +2416,7 @@ class EventViewModel @Inject constructor(
                     override fun onPositive(selectedItem: Int) {
                         coroutineScope.launch {
                             // Delete all events from chain
-                            val deleteResult = handleDeleteUseCase.handleDelete(userId, event.id,
+                            val deleteResult = handleDeleteUseCase.handleDelete(userId, event.id, event.calendar.id,
                                 EventEditDeleteOption.ALL_EVENTS, null)
 
                             handleDeleteResult(deleteResult, DeleteType.NO_PARTICIPANTS)
@@ -2451,10 +2452,10 @@ class EventViewModel @Inject constructor(
 
                             val deleteResult =
                                 if (dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == true) {
-                                    handleDeleteUseCase.handleDelete(userId, event.id,
+                                    handleDeleteUseCase.handleDelete(userId, event.id, event.calendar.id,
                                         EventEditDeleteOption.ALL_EVENTS, null)
                                 } else {
-                                    handleDeleteUseCase.handleDelete(userId, event.id,
+                                    handleDeleteUseCase.handleDelete(userId, event.id, event.calendar.id,
                                         EventEditDeleteOption.THIS_EVENT, occurrenceNumber)
                                 }
 

@@ -744,7 +744,7 @@ class HandleSaveUseCase @Inject constructor(
             is UseCase.Result.Success<*> -> {
                 val isCalendarBeingChanged = oldCalendarId != null && oldCalendarId != newEvent.calendar.id
                 if (isCalendarBeingChanged) {
-                    val deleteOldEventResult = handleDeleteUseCase.handleDelete(userId, newEvent.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber = null, deletionReason = EventDeletionReason.CalendarChange)
+                    val deleteOldEventResult = handleDeleteUseCase.handleDelete(userId, newEvent.id, newEvent.calendar.id, EventEditDeleteOption.THIS_EVENT, occurrenceNumber = null, deletionReason = EventDeletionReason.CalendarChange)
                     if (deleteOldEventResult is UseCase.Result.Success<*>) createEventResult else deleteOldEventResult
                 } else {
                     createEventResult
