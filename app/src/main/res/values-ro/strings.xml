@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">Acest eveniment a fost actualizat de către organizator. Doriți să ştergeți acest eveniment?</string>
     <string name="dialog_button_delete">Ștergere</string>
     <string name="dialog_button_cancel">Anulare</string>
+    <string name="dialog_button_continue">Continuare</string>
     <string name="dialog_button_close">Închidere</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Un e-mail de anulare va fi trimis participanților la eveniment. Doriți să ștergeți acest eveniment?</string>
@@ -175,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
     <string name="event_recurrence_ends_on">Se încheie</string>
     <string name="event_recurrence_ends_never">niciodată</string>
-    <string name="event_recurrence_ends_on_date_empty">în ziua</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">în ziua</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">la %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">după</string>
     <string name="event_recurring_edit_this">Acest eveniment</string>
@@ -308,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s v-a refuzat invitația</string>
     <string name="snack_app_link_invalid">Legătură nevalidă la eveniment.</string>
     <string name="snack_app_link_error">Eroare deschidere eveniment.</string>
+    <string name="snack_app_link_import_error">Autentificare anulată</string>
     <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Deschidere setări</string>
     <string name="contacts_permission_dialog_cancel">Refuzare</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
+    <string name="import_from_google_title">Importare din Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificări eveniment</string>
     <string name="notification_channel_sync">Sincronizare calendar</string>
@@ -445,11 +448,113 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vedere lunară</string>
     <string name="spotlight_dialog_month_view_description">Obțineți o imagine de ansamblu a evenimentelor cu noua vizualizare lunară. Comutați între vizualizări folosind meniul.</string>
+    <string name="spotlight_dialog_easy_switch_description">Importarea de evenimente și alte date din Google Calendar în Proton Calendar este mai ușoară ca niciodată. Importatorul nostru Easy Switch vă va ghida la fiecare pas.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Pornire importare</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Nu acum</string>
     <string name="spotlight_v5_dialog_got_it_button">Am înțeles</string>
     <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizat, protecție unificată</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un internet unde intimitatea este implicită. <a href="http://proton.me/news/updated-proton">Detalii</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="https://proton.me/news/updated-proton">Detalii</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Permitere acces</string>
+    <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
+    <string name="import_assistant_gathering_data_loader_title">Vi se preiau datele</string>
+    <string name="import_assistant_summary_title">Sumar importare</string>
+    <string name="import_assistant_summary_customize_import">Personalizare importare</string>
+    <string name="import_assistant_error">Eroare la preluarea datelor.</string>
+    <string name="import_assistant_data_gathering_error">Colectarea datelor a eșuat.</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Cont greșit. Conectați-vă cu contul pe care l-ați utilizat pentru importarea calendarului.</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_create_calendar_error">Nu s-au putut crea unul sau mai multe calendare.</string>
+    <string name="import_assistant_start_import_empty_error">Pornirea importării a eșuat. Nu sunt calendare de importat.</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importare ca</string>
+    <string name="import_assistant_new_calendar_badge">Nou</string>
+    <string name="import_assistant_merge_calendar_badge">Îmbinat</string>
+    <string name="import_assistant_creating_calendars">Creare calendare</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Aproape terminat…</string>
+    <string name="import_assistant_new_calendar_header">Creare</string>
+    <string name="import_assistant_merge_calendar_header">Îmbinare cu unul existent</string>
+    <string name="import_assistant_in_progress_title">Importare în derulare</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Se importă date din %s în %s.</string>
+    <string name="import_assistant_in_progress_redirect">Verificare progres</string>
+    <string name="import_assistant_in_progress_sub_description">Importările mari pot dura câteva zile. Vă vom anunța când s-a finalizat importarea. Puteți închide acest ecran.</string>
+    <string name="import_assistant_guide_subtitle">Faceți trecerea la confidențialitate. Ușor și sigur.</string>
+    <string name="import_assistant_guide_description">Mutați evenimentele și alte date de la Google la Proton. Importatorul Easy Switch vă ghidează la fiecare pas și vă criptează datele pe măsură ce sunt mutate.</string>
+    <string name="import_assistant_new_import">Importare nouă</string>
+    <string name="import_assistant_previous_import">Importări anterioare</string>
+    <string name="import_assistant_report_details">%s • %s</string>
+    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Începută</string>
+    <string name="import_assistant_status_in_progress">În desfășurare</string>
+    <string name="import_assistant_status_completed">Finalizat</string>
+    <string name="import_assistant_status_canceled">Anulat</string>
+    <string name="import_assistant_status_canceling">Se anulează</string>
+    <string name="import_assistant_status_paused">Suspendat</string>
+    <string name="import_assistant_status_failed">Eșuat</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Conexiune la Google căzută</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Pentru a continua importarea, apăsați pe «Reconectare», conectați-vă la Google și acordați din nou acces lui Proton la datele din Google.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Reconectare</string>
+    <string name="import_assistant_status_paused_storage_full_title">Spațiu de stocare plin</string>
+    <string name="import_assistant_status_paused_storage_full_description">Contul Proton nu are suficient spațiu de stocare pentru a termina această importare de calendare. Eliberați spațiu sau adăugați mai mult spațiu de stocare, apoi reveniți aici pentru a relua.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Reluare</string>
+    <string name="import_assistant_delete_report_title">Eliminare din listă?</string>
+    <string name="import_assistant_delete_report_message">Nu veți mai vedea această înregistrare importată în listă.</string>
+    <string name="import_assistant_delete_report_positive_button">Eliminare</string>
+    <string name="import_assistant_delete_report_negative_button">Păstrare</string>
+    <string name="import_assistant_cancel_import_title">Importarea nu este completă!</string>
+    <string name="import_assistant_cancel_import_message">Dacă anulați această importare, nu o veți putea relua. Proton a salvat tot progresul din cont. Anulați acum?</string>
+    <string name="import_assistant_cancel_import_positive_button">Anulare importare</string>
+    <string name="import_assistant_cancel_import_negative_button">Reluare importare</string>
+    <string name="import_assistant_in_progress_snack">Importare în derulare</string>
+    <string name="import_assistant_discard_import_title">Anulare importare?</string>
+    <string name="import_assistant_discard_import_message">Importarea nu este completă și nu se poate relua dacă o anulați.</string>
+    <string name="import_assistant_discard_import_positive">Anulare importare</string>
+    <string name="import_assistant_discard_import_negative">Reluare importare</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">calendar</item>
+        <item quantity="few">calendare</item>
+        <item quantity="other">de calendare</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Importare un calendar</item>
+        <item quantity="few">Importare %d calendare</item>
+        <item quantity="other">Importare %d de calendare</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d importare în desfășurare</item>
+        <item quantity="few">%d importare în desfășurare</item>
+        <item quantity="other">%d importare în desfășurare</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d din %d creat în %s</item>
+        <item quantity="few">%d din %d creat în %s</item>
+        <item quantity="other">%d din %d creat în %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Creare un calendar în Proton Calendar.</item>
+        <item quantity="few">Creare %d calendare în Proton Calendar.</item>
+        <item quantity="other">Creare %d de calendare în Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Importare un calendar din</item>
+        <item quantity="few">Importare %d din %d calendare din</item>
+        <item quantity="other">Importare %d din %d calendare din</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Îmbinare un calendar în Proton Calendar.</item>
+        <item quantity="few">Îmbinare %d calendare în Proton Calendar.</item>
+        <item quantity="other">Îmbinare %d de calendare în Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin un calendar sau\n • Îmbinați cel puțin un calendar cu calendarele existente din Proton.</item>
+        <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d calendare sau\n • Îmbinați cel puțin %1$d calendare cu calendarele existente din Proton.</item>
+        <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele existente din Proton.</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
         <item quantity="few">minute</item>
@@ -522,7 +627,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
+        <item translatable="false"/>
         <item>prima</item>
         <item>a doua</item>
         <item>a treia</item>
@@ -530,7 +635,7 @@
         <item>a cincea</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
+        <item translatable="false"/>
         <item>ultima</item>
         <item>a doua până la ultima</item>
         <item>a treia până la ultima</item>

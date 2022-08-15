@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">Deze afspraak is bijgewerkt door de organisator. Wilt u deze afspraak verwijderen?</string>
     <string name="dialog_button_delete">Verwijderen</string>
     <string name="dialog_button_cancel">Annuleer</string>
+    <string name="dialog_button_continue">Doorgaan</string>
     <string name="dialog_button_close">Sluiten</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Een annuleringsmail wordt verstuurd naar de deelnemers aan de afspraak. Wilt u deze afspraak verwijderen?</string>
@@ -175,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">op %1$s</string>
     <string name="event_recurrence_ends_on">Eindigt</string>
     <string name="event_recurrence_ends_never">nooit</string>
-    <string name="event_recurrence_ends_on_date_empty">op de dag</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">op de dag</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">van %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">na</string>
     <string name="event_recurring_edit_this">Deze afspraak</string>
@@ -308,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s heeft uw uitnodiging geweigerd</string>
     <string name="snack_app_link_invalid">Ongeldige link naar de afspraak</string>
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
+    <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Instellingen openen</string>
     <string name="contacts_permission_dialog_cancel">Weigeren</string>
     <string name="dialog_title_calendar_picker">Agenda</string>
+    <string name="import_from_google_title">Importeren uit Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Afspraakmelding</string>
     <string name="notification_channel_sync">Agenda Synchronisatie</string>
@@ -445,11 +448,105 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Maandweergave</string>
     <string name="spotlight_dialog_month_view_description">Krijg een overzicht van uw afspraken met onze nieuwe maandweergave. Wissel tussen weergaves met het menu.</string>
+    <string name="spotlight_dialog_easy_switch_description">Gebeurtenissen en andere data van Google Agenda importeren naar Proton Calendar is makkelijker dan ooit. Ons Easy Switch importprogramma zal u stap voor stap de weg wijzen.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Begin met importeren</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Niet nu</string>
     <string name="spotlight_v5_dialog_got_it_button">Begrepen</string>
     <string name="spotlight_v5_dialog_learn_more_button">Meer informatie</string>
     <string name="spotlight_v5_dialog_rebranding_title">Geüpdatete Proton, verenigde bescherming</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="http://proton.me/news/updated-proton">Meer informatie</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="https://proton.me/news/updated-proton">Meer leren</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Toegang verlenen</string>
+    <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
+    <string name="import_assistant_gathering_data_loader_title">Verzamelen van uw gegevens</string>
+    <string name="import_assistant_summary_title">Samenvatting importeren</string>
+    <string name="import_assistant_summary_customize_import">Importeren aanpassen</string>
+    <string name="import_assistant_error">Fout bij het ophalen van gegevens</string>
+    <string name="import_assistant_data_gathering_error">Verzameling van gegevens mislukt</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Verkeerde account. Log in met het account die u heeft gebruikt voor het importeren van de agenda.</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_create_calendar_error">Het is niet gelukt om één of meerdere agenda\'s te maken</string>
+    <string name="import_assistant_start_import_empty_error">Het starten van importeren is mislukt, er zijn geen andere agena\'s om te importeren</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importeren als</string>
+    <string name="import_assistant_new_calendar_badge">Nieuw</string>
+    <string name="import_assistant_merge_calendar_badge">Samengevoegd</string>
+    <string name="import_assistant_creating_calendars">Nieuwe agenda\'s maken</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Bijna daar…</string>
+    <string name="import_assistant_new_calendar_header">Create new</string>
+    <string name="import_assistant_merge_calendar_header">Samenvoegen met bestaande</string>
+    <string name="import_assistant_in_progress_title">Bezig met importeren</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Gegevens importeren van %s naar %s.</string>
+    <string name="import_assistant_in_progress_redirect">Voortgang controleren</string>
+    <string name="import_assistant_in_progress_sub_description">Grote imports kunnen enkele dagen duren. We zullen u laten weten wanneer het importeren is voltooid. U kan het venster sluiten.</string>
+    <string name="import_assistant_guide_subtitle">Maak de overstap naar privacy. Moeiteloos en veilig.</string>
+    <string name="import_assistant_guide_description">Verplaats uw afspraken en andere gegevens van Google naar Proton. Het Easy Switch importprogramma helpt u stapsgewijs op weg en versleuteld uw gegevens terwijl het verplaatst wordt.</string>
+    <string name="import_assistant_new_import">Nieuwe import</string>
+    <string name="import_assistant_previous_import">Vorige imports</string>
+    <string name="import_assistant_report_details">%s • %s</string>
+    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Gestart</string>
+    <string name="import_assistant_status_in_progress">In progress</string>
+    <string name="import_assistant_status_completed">Completed</string>
+    <string name="import_assistant_status_canceled">Canceled</string>
+    <string name="import_assistant_status_canceling">Canceling</string>
+    <string name="import_assistant_status_paused">Paused</string>
+    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
+    <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
+    <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
+    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Resume</string>
+    <string name="import_assistant_delete_report_title">Remove from the list?</string>
+    <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
+    <string name="import_assistant_delete_report_positive_button">Remove</string>
+    <string name="import_assistant_delete_report_negative_button">Keep</string>
+    <string name="import_assistant_cancel_import_title">Import is incomplete!</string>
+    <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
+    <string name="import_assistant_cancel_import_positive_button">Cancel import</string>
+    <string name="import_assistant_cancel_import_negative_button">Resume import</string>
+    <string name="import_assistant_in_progress_snack">Import in progress</string>
+    <string name="import_assistant_discard_import_title">Cancel import?</string>
+    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_positive">Cancel import</string>
+    <string name="import_assistant_discard_import_negative">Resume import</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">calendar</item>
+        <item quantity="other">calendars</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Import %d calendar</item>
+        <item quantity="other">Import %d calendars</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d import aan de gang</item>
+        <item quantity="other">%d imports aan de gang</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d van %d aangemaakt in %s</item>
+        <item quantity="other">%d van %d aangemaakt in %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Maak %d nieuwe agenda aan in Proton Calendar.</item>
+        <item quantity="other">Maak %d nieuwe agenda‘s aan in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Importeer %d van %d agenda van</item>
+        <item quantity="other">Importeer %d van %d agenda‘s van</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Voeg %d agenda samen in Proton Calendar.</item>
+        <item quantity="other">Voeg %d agenda‘s samen in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Kan geen nieuwe agenda aanmaken voor elke geïmporteerde agenda omdat er een limiet is voor persoonlijke agenda‘s.\n • Selecteer tenminste %1$d agenda minder, of\n • Voeg tenminste %1$d agenda samen met bestaande Proton agenda‘s.</item>
+        <item quantity="other">Kan geen nieuwe agenda\'s aanmaken voor elke geïmporteerde agenda omdat er een limiet is voor persoonlijke agenda‘s.\n • Selecteer tenminste %1$d agenda\'s minder, of\n • Voeg tenminste %1$d agenda\'s samen met bestaande Proton agenda‘s.</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>
         <item quantity="other">minuten</item>
@@ -508,7 +605,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
+        <item translatable="false"/>
         <item>eerste</item>
         <item>tweede</item>
         <item>derde</item>
@@ -516,7 +613,7 @@
         <item>vijfde</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
+        <item translatable="false"/>
         <item>laatste</item>
         <item>op een na laatste</item>
         <item>op twee na laatste</item>

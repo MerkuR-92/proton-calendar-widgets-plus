@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">Ця подія була оновлена організатором. Бажаєте видалити подію?</string>
     <string name="dialog_button_delete">Видалити</string>
     <string name="dialog_button_cancel">Скасувати</string>
+    <string name="dialog_button_continue">Продовжити</string>
     <string name="dialog_button_close">Закрити</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Лист про скасування буде надіслано всім учасникам події. Бажаєте видалити цю подію?</string>
@@ -58,8 +59,8 @@
     <string name="event_alarm_label_before_by_email">%1$s до події електронним листом</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s, %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s електронним листом</string>
-    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s до події - %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s до події - %2$s електронним листом</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s до події – %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s до події – %2$s електронним листом</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s у %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d числа</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s у %2$s</string>
@@ -154,9 +155,9 @@
     <string name="event_alarm_partial_day_4">1 година</string>
     <string name="event_alarm_partial_day_5">1 тиждень</string>
     <string name="event_alarm_all_day_1">того ж дня $%1$s</string>
-    <string name="event_alarm_all_day_2">За 1 день до події - %1$s</string>
-    <string name="event_alarm_all_day_3">За 1 тиждень до події - %1$s</string>
-    <string name="event_alarm_all_day_4">За 3 тижні до події - %1$s</string>
+    <string name="event_alarm_all_day_2">За 1 день до події – %1$s</string>
+    <string name="event_alarm_all_day_3">За 1 тиждень до події – %1$s</string>
+    <string name="event_alarm_all_day_4">За 3 тижні до події – %1$s</string>
     <string name="event_alarm_at_time" comment="Example: at 15:00"> %1$s</string>
     <string name="event_alarm_action">Надіслати через</string>
     <string name="event_alarm_action_notification">сповіщення</string>
@@ -175,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">у %1$s</string>
     <string name="event_recurrence_ends_on">Завершується</string>
     <string name="event_recurrence_ends_never">ніколи</string>
-    <string name="event_recurrence_ends_on_date_empty">на день</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">на день</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">після</string>
     <string name="event_recurring_edit_this">Ця подія</string>
@@ -201,7 +202,7 @@
     <string name="event_send_invite_mail_body">Вас запрошено на %1$s\nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
-    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s - %4$s, %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s – %4$s, %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nДе: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nОпис: %1$s</string>
     <string name="event_send_invite_dialog_title">Надіслати запрошення</string>
@@ -308,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s відхиляє ваше запрошення</string>
     <string name="snack_app_link_invalid">Недійсне посилання на подію</string>
     <string name="snack_app_link_error">Помилка відкриття події</string>
+    <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Відкрити налаштування</string>
     <string name="contacts_permission_dialog_cancel">Заборонити</string>
     <string name="dialog_title_calendar_picker">Календар</string>
+    <string name="import_from_google_title">Імпортувати з Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Сповіщення про події</string>
     <string name="notification_channel_sync">Синхронізація календаря</string>
@@ -445,11 +448,121 @@
     <string name="spotlight_dialog_confirmation_button">Гаразд</string>
     <string name="spotlight_dialog_month_view_title">Перегляд місяця</string>
     <string name="spotlight_dialog_month_view_description">Оглядайте ваші події у нашому новому поданні на місяць. Перемикайте вигляд за допомогою меню.</string>
+    <string name="spotlight_dialog_easy_switch_description">Імпортувати події та інші дані з календаря Google у календар Proton Calendar стало легше, ніж будь-коли. Наш імпортер Easy Switch допоможе вам на всіх етапах.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Розпочати імпорт</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Не зараз</string>
     <string name="spotlight_v5_dialog_got_it_button">Зрозуміло</string>
     <string name="spotlight_v5_dialog_learn_more_button">Докладніше</string>
     <string name="spotlight_v5_dialog_rebranding_title">Оновлений Proton, єдиний захист</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до інтернету, де приватність — це стандарт. <a href="http://proton.me/news/updated-proton">Докладніше</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до Інтернету, де приватність — це стандарт. <a href="https://proton.me/news/updated-proton">Докладніше</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Дозволити доступ</string>
+    <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
+    <string name="import_assistant_gathering_data_loader_title">Отримання ваших даних</string>
+    <string name="import_assistant_summary_title">Підсумки імпорту</string>
+    <string name="import_assistant_summary_customize_import">Налаштувати імпорт</string>
+    <string name="import_assistant_error">Помилка отримання даних</string>
+    <string name="import_assistant_data_gathering_error">Не вдалося отримати дані</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Неправильний обліковий запис. Увійдіть, використовуючи обліковий запис, який використовувався для імпорту календаря.</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_create_calendar_error">Не вдалося створити один або кілька календарів</string>
+    <string name="import_assistant_start_import_empty_error">Не вдалося почати імпорт, немає календарів для імпорту</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Імпортувати як</string>
+    <string name="import_assistant_new_calendar_badge">Новий</string>
+    <string name="import_assistant_merge_calendar_badge">Об\'єднаний</string>
+    <string name="import_assistant_creating_calendars">Створення нового календаря</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Майже готово…</string>
+    <string name="import_assistant_new_calendar_header">Створити новий</string>
+    <string name="import_assistant_merge_calendar_header">Об\'єднати з наявним</string>
+    <string name="import_assistant_in_progress_title">Виконується імпортування</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Імпортування даних з %s до %s.</string>
+    <string name="import_assistant_in_progress_redirect">Переглянути поступ</string>
+    <string name="import_assistant_in_progress_sub_description">Імпорт значної кількості даних може тривати кілька днів. Ми повідомимо вас, коли імпорт буде завершено. Ви можете закрити цей екран.</string>
+    <string name="import_assistant_guide_subtitle">Перейдіть на бік приватності. Без зусиль і безпечно.</string>
+    <string name="import_assistant_guide_description">Перенесіть свої події та інші дані з Google до Proton. Імпортер Easy Switch супроводжуватиме вас на всіх етапах і шифруватиме ваші дані під час їх переміщення.</string>
+    <string name="import_assistant_new_import">Новий імпорт</string>
+    <string name="import_assistant_previous_import">Попередні імпорти</string>
+    <string name="import_assistant_report_details">%s • %s</string>
+    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Запущено</string>
+    <string name="import_assistant_status_in_progress">Виконується</string>
+    <string name="import_assistant_status_completed">Завершено</string>
+    <string name="import_assistant_status_canceled">Скасовано</string>
+    <string name="import_assistant_status_canceling">Скасування</string>
+    <string name="import_assistant_status_paused">Зупинено</string>
+    <string name="import_assistant_status_failed">Невдалі</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Втрачено з’єднання з Google</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Щоб продовжити імпорт, торкніться Повторно з\'єднатись, увійдіть в Google і знову надайте Proton доступ до ваших даних Google.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Повторно з\'єднатись</string>
+    <string name="import_assistant_status_paused_storage_full_title">Ваше сховище заповнене</string>
+    <string name="import_assistant_status_paused_storage_full_description">У вашому обліковому записі Proton недостатньо сховища, щоб завершити цей імпорт календаря. Звільніть місце або додайте більше сховища, а потім поверніться сюди, щоб відновити.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Продовжити</string>
+    <string name="import_assistant_delete_report_title">Вилучити з цього списку?</string>
+    <string name="import_assistant_delete_report_message">Ви більше не побачите цей запис імпорту в списку.</string>
+    <string name="import_assistant_delete_report_positive_button">Вилучити</string>
+    <string name="import_assistant_delete_report_negative_button">Залишити</string>
+    <string name="import_assistant_cancel_import_title">Імпорт не завершений!</string>
+    <string name="import_assistant_cancel_import_message">Якщо ви скасуєте це імпортування, ви не зможете його продовжити. Proton зберіг перебіг процесу до вашого облікового запису. Усе одно скасувати?</string>
+    <string name="import_assistant_cancel_import_positive_button">Скасувати імпорт</string>
+    <string name="import_assistant_cancel_import_negative_button">Продовжити імпорт</string>
+    <string name="import_assistant_in_progress_snack">Виконується імпортування</string>
+    <string name="import_assistant_discard_import_title">Скасувати імпорт?</string>
+    <string name="import_assistant_discard_import_message">Імпорт незавершений і не зможе відновитися, якщо ви його скасуєте.</string>
+    <string name="import_assistant_discard_import_positive">Скасувати імпорт</string>
+    <string name="import_assistant_discard_import_negative">Продовжити імпорт</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">календар</item>
+        <item quantity="few">календарі</item>
+        <item quantity="many">календарів</item>
+        <item quantity="other">календарі</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Імпортувати %d календар</item>
+        <item quantity="few">Імпортувати %d календарі</item>
+        <item quantity="many">Імпортувати %d календарів</item>
+        <item quantity="other">Імпортувати %d календарі</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d поточний імпорт</item>
+        <item quantity="few">%d поточні імпорти</item>
+        <item quantity="many">%d поточних імпортів</item>
+        <item quantity="other">%d поточні імпорти</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d з %d створений у %s</item>
+        <item quantity="few">%d з %d створених у %s</item>
+        <item quantity="many">%d з %d створених у %s</item>
+        <item quantity="other">%d з %d створених у %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Створити %d новий календар у Proton Calendar.</item>
+        <item quantity="few">Створити %d нові календарі у Proton Calendar.</item>
+        <item quantity="many">Створити %d нових календарів у Proton Calendar.</item>
+        <item quantity="other">Створити %d нові календарі у Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Імпорт %d з %d календаря з</item>
+        <item quantity="few">Імпорт %d з %d календарів з</item>
+        <item quantity="many">Імпорт %d з %d календарів з</item>
+        <item quantity="other">Імпорт %d з %d календарів з</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Об\'єднати %d календар у Proton Calendar.</item>
+        <item quantity="few">Об\'єднати %d календарі у Proton Calendar.</item>
+        <item quantity="many">Об\'єднати %d календарів у Proton Calendar.</item>
+        <item quantity="other">Об\'єднати %d календарів у Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Неможливо створити нові календарі для всіх імпортованих календарів через обмеження особистого календаря.\n • Скасуйте вибір принаймні %1$d календаря або\n • Об’єднайте принаймні %1$d календар з наявними календарями Proton.</item>
+        <item quantity="few">Неможливо створити нові календарі для всіх імпортованих календарів через обмеження особистого календаря.\n • Скасуйте вибір принаймні %1$d календарів або\n • Об’єднайте принаймні %1$d календарі з наявними календарями Proton.</item>
+        <item quantity="many">Неможливо створити нові календарі для всіх імпортованих календарів через обмеження особистого календаря.\n • Скасуйте вибір принаймні %1$d календарів або\n • Об’єднайте принаймні %1$d календарів з наявними календарями Proton.</item>
+        <item quantity="other">Неможливо створити нові календарі для всіх імпортованих календарів через обмеження особистого календаря.\n • Скасуйте вибір принаймні %1$d календарів або\n • Об’єднайте принаймні %1$d календарів з наявними календарями Proton.</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">хвилина</item>
         <item quantity="few">хвилини</item>
@@ -536,7 +649,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
+        <item translatable="false"/>
         <item>перший</item>
         <item>другий</item>
         <item>третій</item>
@@ -544,7 +657,7 @@
         <item>пʼятий</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
+        <item translatable="false"/>
         <item>останній</item>
         <item>від другого до останнього</item>
         <item>від третього до останнього</item>

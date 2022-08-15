@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">Cet événement a été mis à jour par l’organisateur·rice. Voulez-vous supprimer cet événement?</string>
     <string name="dialog_button_delete">Supprimer</string>
     <string name="dialog_button_cancel">Annuler</string>
+    <string name="dialog_button_continue">Continuer</string>
     <string name="dialog_button_close">Fermer</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Un courriel d\'annulation sera envoyé aux participant·e·s de l\'événement. Voulez-vous supprimer cet événement?</string>
@@ -154,9 +155,9 @@
     <string name="event_alarm_partial_day_4">1 heure</string>
     <string name="event_alarm_partial_day_5">1 semaine</string>
     <string name="event_alarm_all_day_1">le même jour à %1$s</string>
-    <string name="event_alarm_all_day_2">1 jour avant le %1$s</string>
-    <string name="event_alarm_all_day_3">1 semaine avant le %1$s</string>
-    <string name="event_alarm_all_day_4">3 semaines avant le %1$s</string>
+    <string name="event_alarm_all_day_2">1 jour avant à %1$s</string>
+    <string name="event_alarm_all_day_3">1 semaine avant à %1$s</string>
+    <string name="event_alarm_all_day_4">3 semaines avant à %1$s</string>
     <string name="event_alarm_at_time" comment="Example: at 15:00">à %1$s</string>
     <string name="event_alarm_action">Envoyé par</string>
     <string name="event_alarm_action_notification">notification</string>
@@ -175,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">le %1$s</string>
     <string name="event_recurrence_ends_on">Se termine</string>
     <string name="event_recurrence_ends_never">jamais</string>
-    <string name="event_recurrence_ends_on_date_empty">le jour</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">le jour</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">le %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">après</string>
     <string name="event_recurring_edit_this">Cet événement</string>
@@ -308,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s a refusé votre invitation</string>
     <string name="snack_app_link_invalid">Lien invalide vers l\'événement</string>
     <string name="snack_app_link_error">Erreur lors de l\'ouverture de l\'événement</string>
+    <string name="snack_app_link_import_error">Authentification annulée</string>
     <string name="snack_notification_already_added">La notification a déjà été ajoutée</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Ouvrir les paramètres</string>
     <string name="contacts_permission_dialog_cancel">Refuser</string>
     <string name="dialog_title_calendar_picker">Calendrier</string>
+    <string name="import_from_google_title">Importer depuis Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notifications de l\'événement</string>
     <string name="notification_channel_sync">Synchronisation de Calendar</string>
@@ -350,7 +353,7 @@
     <string name="settings_week_start_title">Début de la semaine</string>
     <string name="settings_time_format_title">Format de l\'heure</string>
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
-    <string name="settings_auto_invites_title">Add invites to calendar and mark as pending</string>
+    <string name="settings_auto_invites_title">Ajouter les invitations au calendrier et marquer comme en attente</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un routage réseau alternatif pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de conserver ce paramètre activé pour une plus grande fiabilité.</string>
     <string name="settings_value_placeholder">Touchez pour sélectionner</string>
@@ -445,11 +448,105 @@
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vue mensuelle</string>
     <string name="spotlight_dialog_month_view_description">Obtenez un aperçu de vos événements avec notre nouvelle vue mensuelle. Basculez entre les vues à l\'aide du menu.</string>
+    <string name="spotlight_dialog_easy_switch_description">L\'importation d\'événements et d\'autres données de Google Calendar vers Proton Calendar est plus facile que jamais. Notre importateur Easy Switch vous guidera à chaque étape.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Commencer l\'importation</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Pas maintenant</string>
     <string name="spotlight_v5_dialog_got_it_button">J\'ai compris</string>
     <string name="spotlight_v5_dialog_learn_more_button">En savoir plus</string>
     <string name="spotlight_v5_dialog_rebranding_title">Nouvelle version, protection unifiée</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Présentation du nouveau design de Proton. Plusieurs services, une seule mission. Bienvenue sur un Internet où la confidentialité est la valeur par défaut. <a href="http://proton.me/news/updated-proton">En savoir plus</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Voici le nouveau Proton: plusieurs services, une seule mission. Bienvenue sur un internet où la vie privée est la règle absolue. <a href="https://proton.me/news/updated-proton">En savoir plus</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Autoriser l\'accès</string>
+    <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
+    <string name="import_assistant_gathering_data_loader_title">Rassemblement de vos données</string>
+    <string name="import_assistant_summary_title">Résumé de l\'importation</string>
+    <string name="import_assistant_summary_customize_import">Personnaliser l\'importation</string>
+    <string name="import_assistant_error">Erreur lors de la récupération des données</string>
+    <string name="import_assistant_data_gathering_error">La collecte des données a échoué</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Compte incorrect. Veuillez vous connecter avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_create_calendar_error">Un ou plusieurs calendriers n\'ont pas pu être créés</string>
+    <string name="import_assistant_start_import_empty_error">Échec du démarrage de l\'importation, il n\'y a aucun calendrier à importer</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importer comme</string>
+    <string name="import_assistant_new_calendar_badge">Nouveau</string>
+    <string name="import_assistant_merge_calendar_badge">Fusionné</string>
+    <string name="import_assistant_creating_calendars">Création de nouveaux calendriers</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Nous y sommes presque…</string>
+    <string name="import_assistant_new_calendar_header">Créer un nouveau</string>
+    <string name="import_assistant_merge_calendar_header">Fusionner avec l\'existant</string>
+    <string name="import_assistant_in_progress_title">Importation en cours</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importation des données de %s vers %s.</string>
+    <string name="import_assistant_in_progress_redirect">Vérifier la progression</string>
+    <string name="import_assistant_in_progress_sub_description">Les grandes importations peuvent prendre plusieurs jours. Nous vous informerons lorsque l\'importation sera terminée. Vous pouvez fermer cet écran.</string>
+    <string name="import_assistant_guide_subtitle">Passez à la confidentialité. Facilement et en toute sécurité.</string>
+    <string name="import_assistant_guide_description">Déplacez vos événements et autres données de Google vers Proton. L\'importateur Easy Switch vous guide à chaque étape du processus et chiffre vos données lors de leur déplacement.</string>
+    <string name="import_assistant_new_import">Nouvelle importation</string>
+    <string name="import_assistant_previous_import">Importations précédentes</string>
+    <string name="import_assistant_report_details">%s • %s</string>
+    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Démarré</string>
+    <string name="import_assistant_status_in_progress">En cours</string>
+    <string name="import_assistant_status_completed">Terminée</string>
+    <string name="import_assistant_status_canceled">Annulée</string>
+    <string name="import_assistant_status_canceling">Annulation en cours</string>
+    <string name="import_assistant_status_paused">En pause</string>
+    <string name="import_assistant_status_failed">Échec</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Connexion à Google perdue</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Pour continuer l\'importation, appuyez sur Reconnecter, connectez-vous à Google et accordez à nouveau à Proton l\'accès à vos données Google.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Reconnecter</string>
+    <string name="import_assistant_status_paused_storage_full_title">Votre stockage est plein</string>
+    <string name="import_assistant_status_paused_storage_full_description">Votre compte Proton ne dispose pas de suffisamment d\'espace de stockage pour terminer cette importation de calendrier. Libérez de l\'espace ou ajoutez plus de stockage, puis revenez ici pour reprendre.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Reprendre</string>
+    <string name="import_assistant_delete_report_title">Supprimer de la liste?</string>
+    <string name="import_assistant_delete_report_message">Vous ne verrez plus l’enregistrement de cette importation dans la liste.</string>
+    <string name="import_assistant_delete_report_positive_button">Retirer</string>
+    <string name="import_assistant_delete_report_negative_button">Conserver</string>
+    <string name="import_assistant_cancel_import_title">L\'importation est incomplète!</string>
+    <string name="import_assistant_cancel_import_message">Si vous annulez cette importation, vous ne pourrez pas la reprendre. Proton a sauvegardé toute la progression dans votre compte. Annuler quand même?</string>
+    <string name="import_assistant_cancel_import_positive_button">Annuler l\'importation</string>
+    <string name="import_assistant_cancel_import_negative_button">Reprendre l\'importation</string>
+    <string name="import_assistant_in_progress_snack">Importation en cours</string>
+    <string name="import_assistant_discard_import_title">Annuler l\'importation?</string>
+    <string name="import_assistant_discard_import_message">L\'importation est incomplète et ne pourra pas reprendre si vous l\'annulez.</string>
+    <string name="import_assistant_discard_import_positive">Annuler l\'importation</string>
+    <string name="import_assistant_discard_import_negative">Reprendre l\'importation</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">calendrier</item>
+        <item quantity="other">calendriers</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Importer %d calendrier</item>
+        <item quantity="other">Importer %d calendriers</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d importation en cours</item>
+        <item quantity="other">%d importations en cours</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d sur %d créé en %s</item>
+        <item quantity="other">%d sur %d créés en %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Créer %d nouveau calendrier dans Proton Calendar.</item>
+        <item quantity="other">Créer %d nouveaux calendriers dans Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Importer %d des %d calendrier depuis</item>
+        <item quantity="other">Importer %d des %d calendriers depuis</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Fusionner %d calendrier dans Proton Calendar.</item>
+        <item quantity="other">Fusionner %d calendriers dans Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendrier ou\n • fusionnez au moins %1$d calendrier avec les calendriers Proton existants.</item>
+        <item quantity="other">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers ou\n • fusionnez au moins %1$d calendriers avec les calendriers Proton existants.</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
         <item quantity="other">minutes</item>
@@ -508,7 +605,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
+        <item translatable="false"/>
         <item>premier</item>
         <item>deuxième</item>
         <item>troisième</item>
@@ -516,7 +613,7 @@
         <item>cinquième</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
+        <item translatable="false"/>
         <item>dernier</item>
         <item>deuxième au dernier</item>
         <item>troisième au dernier</item>
