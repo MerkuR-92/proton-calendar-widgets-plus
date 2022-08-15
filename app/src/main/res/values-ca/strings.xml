@@ -14,6 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">L\'organitzador ha actualitzat aquest esdeveniment. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_button_delete">Elimina</string>
     <string name="dialog_button_cancel">Cancel·la</string>
+    <string name="dialog_button_continue">Continua</string>
     <string name="dialog_button_close">Tanca</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">S\'enviarà un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir aquest esdeveniment?</string>
@@ -98,7 +99,7 @@
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador/a es perdran.</string>
     <string name="event_change_answer_recurring_single_edit_description">L\'organitzador ha actualitzat aquest esdeveniment. Voleu canviar la vostra resposta només per a aquest esdeveniment de la sèrie?</string>
     <string name="event_change_answer_recurring_cancel">Cancel·lar</string>
-    <string name="event_change_answer_recurring_confirm">Actualitzar</string>
+    <string name="event_change_answer_recurring_confirm">Actualitza</string>
     <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Invitació per a %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s ha acceptat la vostra invitació a %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s ha refusat la vostra invitació a %2$s</string>
@@ -175,7 +176,7 @@
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">el %1$s</string>
     <string name="event_recurrence_ends_on">Finalitza</string>
     <string name="event_recurrence_ends_never">mai</string>
-    <string name="event_recurrence_ends_on_date_empty">el dia</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">el dia</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">el %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">després</string>
     <string name="event_recurring_edit_this">Aquest esdeveniment</string>
@@ -189,7 +190,7 @@
     <string name="event_recurring_update_this_description">Es perdran les modificacions de freqüència</string>
     <string name="event_recurring_update_all_description">Es perdran les modificacions prèvies d\'aquesta sèrie</string>
     <string name="event_recurring_update_this_cancel">Cancel·lar</string>
-    <string name="event_recurring_update_this_confirm">Actualitzar</string>
+    <string name="event_recurring_update_this_confirm">Actualitza</string>
     <string name="event_allow_contacts_title">Permetre a Proton Calendar accedir als vostres contactes?</string>
     <string name="event_allow_contacts_description">Proton Calendar necessita l\'accés als vostres contactes per utilitzar l\'emplenament automàtic</string>
     <string name="event_allow_contacts_cancel">Denegar</string>
@@ -308,13 +309,14 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ha declinat la vostra invitació</string>
     <string name="snack_app_link_invalid">Enllaç invàlid a esdeveniment</string>
     <string name="snack_app_link_error">Error obrint l\'esdeveniment</string>
+    <string name="snack_app_link_import_error">S\'ha cancel·lat l\'autenticació</string>
     <string name="snack_notification_already_added">La notificació ja ha estat afegida</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix</string>
     <string name="update_timezone_dialog_title">Fus horari canviat</string>
     <string name="update_timezone_dialog_message">Sembla que el fus horari del vostre sistema ha canviat a $%1$s. Voleu actualitzar la vostra configuració de fus horari?</string>
-    <string name="update_timezone_dialog_confirmation">Actualitzar</string>
+    <string name="update_timezone_dialog_confirmation">Actualitza</string>
     <string name="update_timezone_dialog_cancel">Cancel·lar</string>
     <string name="contacts_permission_dialog_title">Permetre a Proton Calendar accedir als vostres contactes?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar necessita accés als contactes del vostre telèfon per ajudar-vos a incloure\'ls fàcilment als vostres esdeveniments.</string>
@@ -322,6 +324,7 @@
     <string name="contacts_permission_dialog_open_settings">Obrir la configuració</string>
     <string name="contacts_permission_dialog_cancel">Denegar</string>
     <string name="dialog_title_calendar_picker">Calendari</string>
+    <string name="import_from_google_title">Importa des de Google</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificacions d\'esdeveniment</string>
     <string name="notification_channel_sync">Sincronització del calendari</string>
@@ -396,7 +399,7 @@
     <string name="create_calendar_limit_reached_paid_manage">Gestionar els calendaris</string>
     <string name="create_calendar_limit_reached_close">Tancar</string>
     <string name="create_calendar_limit_reached_free_title">Millorar la subscripció a Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Crea fins a 20 calendaris i tingues accés a moltes més funcionalitats exclusives quan milloris la teva subscripció.</string>
+    <string name="create_calendar_limit_reached_free_description">Creeu fins a 20 calendaris i accediu a moltes més funcions exclusives en millorar la subscripció.</string>
     <string name="create_calendar_limit_reached_free_not_now">Ara no</string>
     <string name="create_calendar_limit_reached_free_upgrade">Millorar la subscripció</string>
     <string name="delete_calendar_dialog_title">Suprimir calendari</string>
@@ -445,11 +448,105 @@
     <string name="spotlight_dialog_confirmation_button">D\'acord</string>
     <string name="spotlight_dialog_month_view_title">Vista mensual</string>
     <string name="spotlight_dialog_month_view_description">Fagi un cop d\'ull als seus esdeveniments amb la nostra nova vista de mes. Canvii entre les diferents vistes fent servir el menu.</string>
+    <string name="spotlight_dialog_easy_switch_description">Importing events and other data from Google Calendar to Proton Calendar is easier than ever. Our Easy Switch importer will guide you each step of the way.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Start import</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Ara no</string>
     <string name="spotlight_v5_dialog_got_it_button">Entesos</string>
     <string name="spotlight_v5_dialog_learn_more_button">Saber-ne més</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentem el nou aspecte de Proton. Molts serveis, una missió. Benvingut/da a l\'Internet on tenim la privacitat per defecte. <a href="http://proton.me/news/updated-proton">Més informació</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Allow access</string>
+    <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
+    <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
+    <string name="import_assistant_summary_title">Import summary</string>
+    <string name="import_assistant_summary_customize_import">Customize import</string>
+    <string name="import_assistant_error">Error fetching data</string>
+    <string name="import_assistant_data_gathering_error">Data gathering failed</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
+    <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa como a</string>
+    <string name="import_assistant_new_calendar_badge">New</string>
+    <string name="import_assistant_merge_calendar_badge">Merged</string>
+    <string name="import_assistant_creating_calendars">Creating new calendars</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Almost there…</string>
+    <string name="import_assistant_new_calendar_header">Create new</string>
+    <string name="import_assistant_merge_calendar_header">Merge with existing</string>
+    <string name="import_assistant_in_progress_title">Import in progress</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %s to %s.</string>
+    <string name="import_assistant_in_progress_redirect">Check the progress</string>
+    <string name="import_assistant_in_progress_sub_description">Large imports can take several days. We will let you know when the import is done. You can close this screen.</string>
+    <string name="import_assistant_guide_subtitle">Make the switch to privacy. Easily and securely.</string>
+    <string name="import_assistant_guide_description">Move your events and other data from Google to Proton. The Easy Switch importer guides you each step of the way and encrypts your data as it\'s moved.</string>
+    <string name="import_assistant_new_import">New import</string>
+    <string name="import_assistant_previous_import">Previous imports</string>
+    <string name="import_assistant_report_details">%s • %s</string>
+    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_status_queued">Started</string>
+    <string name="import_assistant_status_in_progress">In progress</string>
+    <string name="import_assistant_status_completed">Completed</string>
+    <string name="import_assistant_status_canceled">Canceled</string>
+    <string name="import_assistant_status_canceling">Canceling</string>
+    <string name="import_assistant_status_paused">Paused</string>
+    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
+    <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
+    <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
+    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Resume</string>
+    <string name="import_assistant_delete_report_title">Remove from the list?</string>
+    <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
+    <string name="import_assistant_delete_report_positive_button">Remove</string>
+    <string name="import_assistant_delete_report_negative_button">Keep</string>
+    <string name="import_assistant_cancel_import_title">Import is incomplete!</string>
+    <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
+    <string name="import_assistant_cancel_import_positive_button">Cancel import</string>
+    <string name="import_assistant_cancel_import_negative_button">Resume import</string>
+    <string name="import_assistant_in_progress_snack">Import in progress</string>
+    <string name="import_assistant_discard_import_title">Cancel import?</string>
+    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_positive">Cancel·la la importació</string>
+    <string name="import_assistant_discard_import_negative">Reprèn la importació</string>
     <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">calendari</item>
+        <item quantity="other">calendars</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Importa %d calendari</item>
+        <item quantity="other">Importa %d calendaris</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%d ongoing import</item>
+        <item quantity="other">%d ongoing imports</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%d of %d created in %s</item>
+        <item quantity="other">%d of %d created in %s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Create %d new calendar in Proton Calendar.</item>
+        <item quantity="other">Create %d new calendars in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Import %d of %d calendar from</item>
+        <item quantity="other">Import %d of %d calendars from</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Merge %d calendar in Proton Calendar.</item>
+        <item quantity="other">Merge %d calendars in Proton Calendar.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
         <item quantity="other">minuts</item>
@@ -508,7 +605,7 @@
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
-        <item/>
+        <item translatable="false"/>
         <item>primer</item>
         <item>segon</item>
         <item>tercer</item>
@@ -516,7 +613,7 @@
         <item>cinquè</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
-        <item/>
+        <item translatable="false"/>
         <item>darrer</item>
         <item>penúltim</item>
         <item>antepenúltim</item>

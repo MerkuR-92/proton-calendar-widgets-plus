@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Customize import</string>
     <string name="import_assistant_error">Error fetching data</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later</string>
+    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
     <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later</string>
+    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
+    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
+    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
     <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Import as</string>
