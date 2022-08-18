@@ -18,7 +18,7 @@
         android:theme="@style/ProtonTheme.Calendar"
         android:maxLength="100"
         app:actionMode="clear_text"
-        app:help="@string/calendar_form_name_character_limit"
+        app:help="0/100 characters"
         app:label="@string/calendar_form_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

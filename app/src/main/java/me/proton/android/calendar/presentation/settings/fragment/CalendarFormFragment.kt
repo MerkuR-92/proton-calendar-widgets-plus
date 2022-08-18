@@ -186,7 +186,12 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 calendar_form_default_event_duration_layout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed)
             } ?: run {
                 // Init character limit text
-                calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, 0, CALENDAR_NAME_CHARACTER_LIMIT)
+                calendar_form_name_value.helpText = resources.getQuantityString(
+                    R.plurals.calendar_form_name_character_limit,
+                    CALENDAR_NAME_CHARACTER_LIMIT,
+                    0,
+                    CALENDAR_NAME_CHARACTER_LIMIT
+                )
 
                 calendar_form_name_value.requestFocus()
                 requireContext().showKeyboard()
@@ -202,7 +207,12 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         calendar_form_name_value.onTextChange {
             if (it.isNotEmpty()) calendar_form_name_value.clearInputError()
-            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, it.length, CALENDAR_NAME_CHARACTER_LIMIT)
+            calendar_form_name_value.helpText = resources.getQuantityString(
+                R.plurals.calendar_form_name_character_limit,
+                CALENDAR_NAME_CHARACTER_LIMIT,
+                it.length,
+                CALENDAR_NAME_CHARACTER_LIMIT
+            )
         }
 
         observeCalendarFormSnackState(lifecycleScope.coroutineContext)
@@ -213,7 +223,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
             calendar_form_name_value.text = calendarName
-            calendar_form_name_value.helpText = getString(R.string.calendar_form_name_character_limit, calendarName.length,
+            calendar_form_name_value.helpText = resources.getQuantityString(
+                R.plurals.calendar_form_name_character_limit,
+                CALENDAR_NAME_CHARACTER_LIMIT,
+                calendarName.length,
                 CALENDAR_NAME_CHARACTER_LIMIT
             )
         }
