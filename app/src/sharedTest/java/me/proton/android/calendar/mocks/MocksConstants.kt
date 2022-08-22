@@ -26,6 +26,7 @@ const val calendarDescription = "calendarDescription"
 const val calendarColor = "#657EE4"
 const val calendarDisplay = 1
 const val calendarFlags = 1
+const val calendarPermissions = 127
 const val calendarType = 0
 
 const val calendarSettingsId = "calendarSettingsId"
