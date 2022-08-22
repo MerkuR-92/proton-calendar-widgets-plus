@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Personalizare importare</string>
     <string name="import_assistant_error">Eroare la preluarea datelor.</string>
     <string name="import_assistant_data_gathering_error">Colectarea datelor a eșuat.</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Nu s-a reușit actualizarea importării. Mai încercați.</string>
     <string name="import_assistant_update_import_wrong_account_error">Cont greșit. Conectați-vă cu contul pe care l-ați utilizat pentru importarea calendarului.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Pornirea importării a eșuat. Mai încercați.</string>
+    <string name="import_assistant_delete_import_error">Nu s-a reușit ștergerea importării. Mai încercați.</string>
+    <string name="import_assistant_cancel_import_error">Nu s-a reușit anularea importării. Mai încercați.</string>
+    <string name="import_assistant_resume_import_error">Nu s-a reușit reluarea importării. Mai încercați.</string>
     <string name="import_assistant_create_calendar_error">Nu s-au putut crea unul sau mai multe calendare.</string>
     <string name="import_assistant_start_import_empty_error">Pornirea importării a eșuat. Nu sunt calendare de importat.</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importare ca</string>

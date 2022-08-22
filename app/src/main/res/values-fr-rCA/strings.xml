@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Personnaliser l\'importation</string>
     <string name="import_assistant_error">Erreur lors de la récupération des données</string>
     <string name="import_assistant_data_gathering_error">La collecte des données a échoué</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Échec de la mise à jour de l\'importation, veuillez réessayer plus tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">Compte incorrect. Veuillez vous connecter avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Échec du démarrage de l\'importation, veuillez réessayer plus tard.</string>
+    <string name="import_assistant_delete_import_error">Impossible de supprimer l\'importation, veuillez réessayer plus tard.</string>
+    <string name="import_assistant_cancel_import_error">Impossible d\'annuler l\'importation, veuillez réessayer plus tard.</string>
+    <string name="import_assistant_resume_import_error">Impossible de reprendre l\'importation, veuillez réessayer plus tard.</string>
     <string name="import_assistant_create_calendar_error">Un ou plusieurs calendriers n\'ont pas pu être créés</string>
     <string name="import_assistant_start_import_empty_error">Échec du démarrage de l\'importation, il n\'y a aucun calendrier à importer</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importer comme</string>

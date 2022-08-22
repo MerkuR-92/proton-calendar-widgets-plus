@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Dostosuj proces importowania</string>
     <string name="import_assistant_error">Pobieranie danych nie powiodło się</string>
     <string name="import_assistant_data_gathering_error">Pobieranie danych nie powiodło się</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Nie udało się zaktualizować importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_update_import_wrong_account_error">Złe konto. Zaloguj się na konto, z którego chcesz wyeksportować kalendarz.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Nie udało się rozpocząć importowania. Spróbuj ponownie później.</string>
+    <string name="import_assistant_delete_import_error">Nie udało się usunąć importowania. Spróbuj ponownie później.</string>
+    <string name="import_assistant_cancel_import_error">Nie udało się anulować importowania. Spróbuj ponownie później.</string>
+    <string name="import_assistant_resume_import_error">Nie udało się wznowić importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_create_calendar_error">Utworzenie co najmniej jednego kalendarza nie powiodło się</string>
     <string name="import_assistant_start_import_empty_error">Nie udało się rozpocząć importowania. Brak kalendarzy do zaimportowania</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importuj jako</string>

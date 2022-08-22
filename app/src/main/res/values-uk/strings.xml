@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Налаштувати імпорт</string>
     <string name="import_assistant_error">Помилка отримання даних</string>
     <string name="import_assistant_data_gathering_error">Не вдалося отримати дані</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Не вдалося оновити імпорт. Повторіть спробу пізніше.</string>
     <string name="import_assistant_update_import_wrong_account_error">Неправильний обліковий запис. Увійдіть, використовуючи обліковий запис, який використовувався для імпорту календаря.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Не вдалося розпочати імпорт. Повторіть спробу пізніше.</string>
+    <string name="import_assistant_delete_import_error">Не вдалося видалити імпорт. Повторіть спробу пізніше.</string>
+    <string name="import_assistant_cancel_import_error">Не вдалося скасувати імпорт. Повторіть спробу пізніше.</string>
+    <string name="import_assistant_resume_import_error">Не вдалося відновити імпорт. Повторіть спробу пізніше.</string>
     <string name="import_assistant_create_calendar_error">Не вдалося створити один або кілька календарів</string>
     <string name="import_assistant_start_import_empty_error">Не вдалося почати імпорт, немає календарів для імпорту</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Імпортувати як</string>
