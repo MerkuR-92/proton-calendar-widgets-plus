@@ -16,7 +16,6 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
-import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerDelegate
@@ -25,6 +24,7 @@ import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
+import me.proton.core.eventmanager.domain.extension.asCalendar
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -133,12 +133,12 @@ class CalendarEventListenerTest {
     fun `onDelete calls delegate's onDelete`() {
         runBlocking {
             val capturedIds = slot<List<String>>()
-            coEvery { delegate.onDelete(capture(capturedIds)) } returns Unit
+            coEvery { delegate.onDelete(any(), capture(capturedIds)) } returns Unit
             val ids = listOf("id_1")
 
             listener.onDelete(config, ids)
 
-            coVerify(exactly = 1) { delegate.onDelete(any()) }
+            coVerify(exactly = 1) { delegate.onDelete(any(), any()) }
             assertThat(capturedIds.captured).isEqualTo(ids)
         }
     }
@@ -182,7 +182,6 @@ class CalendarEventListenerDelegateTest {
     private val logger: Logger = mockk(relaxed = true)
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase = mockk(relaxed = true)
     private val widgetRefresher: WidgetRefresher = mockk(relaxed = true)
-    private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase = mockk(relaxed = true)
     private val updateAlarmsUseCase: UpdateAlarmsUseCase = mockk(relaxed = true)
 
     private lateinit var delegate: CalendarEventListenerDelegate
@@ -194,7 +193,6 @@ class CalendarEventListenerDelegateTest {
             calendarsRepository,
             fetchPublicKeysUseCase,
             widgetRefresher,
-            handleEventsMetadataUseCase,
             updateAlarmsUseCase,
         )
 
@@ -205,9 +203,6 @@ class CalendarEventListenerDelegateTest {
                 EventApiResponse(createEventEntity(id))
             )
         }
-
-        every { handleEventsMetadataUseCase.now } returns Instant.now()
-        every { handleEventsMetadataUseCase.shouldFetchEvent(any()) } answers { callOriginal() }
     }
 
     @Test
@@ -278,11 +273,11 @@ class CalendarEventListenerDelegateTest {
     @Test
     fun `onDelete deletes events`() {
         runBlocking {
-            coEvery { calendarsRepository.deleteEventsById(any()) } returns Unit
+            coEvery { calendarsRepository.deleteEventsById(any(), any()) } returns Unit
 
-            delegate.onDelete(listOf(eventId))
+            delegate.onDelete(config.asCalendar().calendarId, listOf(eventId))
 
-            coVerify(exactly = 1) { calendarsRepository.deleteEventsById(any()) }
+            coVerify(exactly = 1) { calendarsRepository.deleteEventsById(any(), any()) }
         }
     }
 

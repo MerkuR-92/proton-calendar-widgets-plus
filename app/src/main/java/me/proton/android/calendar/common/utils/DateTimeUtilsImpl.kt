@@ -18,6 +18,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.Month
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -140,6 +141,17 @@ object DateTimeUtilsImpl : DateTimeUtils {
             locale
         )
         return if (firstLetter) formatted.replaceFirstChar { it.titlecase(locale) } else formatted
+    }
+
+    override fun DayOfWeek.formatShort(): String {
+        return this.getDisplayName(
+            TextStyle.SHORT,
+            getLocaleForFormatting()
+        )
+    }
+
+    override fun Month.formatShort(): String {
+        return this.getDisplayName(TextStyle.SHORT, getLocaleForFormatting())
     }
 
     override fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek {

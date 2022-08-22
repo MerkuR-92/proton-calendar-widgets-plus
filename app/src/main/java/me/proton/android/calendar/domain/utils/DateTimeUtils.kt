@@ -26,6 +26,16 @@ interface DateTimeUtils {
     fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int
     fun LocalDate.toDate(timeZoneId: String? = null): Date
     fun DayOfWeek.format(firstLetter: Boolean = false): String
+
+    /**
+     * Returns "Sat", "Mon", etc.
+     */
+    fun DayOfWeek.formatShort(): String
+
+    /**
+     * Returns "Dec", "Jan", etc.
+     */
+    fun Month.formatShort(): String
     fun DayOfWeek.toBiweeklyDayOfWeek(): biweekly.util.DayOfWeek
     fun biweekly.util.DayOfWeek.toDayOfWeek(): DayOfWeek
 

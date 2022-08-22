@@ -34,6 +34,25 @@ interface CalendarsApiService : BaseRetrofitApi {
         @Query("PageSize") pageSize: Int
     ): EventsApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/ids")
+    suspend fun getEventIdsForExport(
+        @Path("calendarId") calendarId: String,
+        @Query("Limit") limit: Int,
+        @Query("AfterID") afterId: String?
+    ): EventsExportIdsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
+    suspend fun getEventsForExport(
+        @Path("calendarId") calendarId: String,
+        @Query("PageSize") pageSize: Int,
+        @Query("BeginID") beginId: String?
+    ): EventsExportApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/count")
+    suspend fun getEventsCount(
+        @Path("calendarId") calendarId: String
+    ): EventsCountApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : EventApiResponse
 
@@ -147,6 +166,33 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             type,
             page,
             pageSize
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventIdsForExport(
+        userId: UserId,
+        calendarId: String,
+        limit: Int,
+        afterId: String?
+    ): ApiResponse<EventsExportIdsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventIdsForExport(
+            calendarId,
+            limit,
+            afterId
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventsForExport(userId: UserId, calendarId: String, pageSize: Int, beginId: String?): ApiResponse<EventsExportApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventsForExport(
+            calendarId,
+            pageSize,
+            beginId
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventsCount(userId: UserId, calendarId: String): ApiResponse<EventsCountApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventsCount(
+            calendarId
         )
     }.toApiResponse()
 
@@ -311,6 +357,26 @@ data class EventsApiResponse(
     val events: List<EventEntity>,
     @SerialName("More")
     val more: Int
+)
+
+@Serializable
+data class EventsExportIdsApiResponse(
+    @SerialName("IDs")
+    val events: List<String>
+)
+
+@Serializable
+data class EventsExportApiResponse(
+    @SerialName("Events")
+    val events: List<EventEntity>,
+    @SerialName("Total")
+    val total: Int
+)
+
+@Serializable
+data class EventsCountApiResponse(
+    @SerialName("Total")
+    val total: Int
 )
 
 @Serializable

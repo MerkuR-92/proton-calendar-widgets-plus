@@ -58,6 +58,8 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZon
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -70,14 +72,8 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
-import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
-import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
-import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
-import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
-import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
+import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
@@ -362,6 +358,89 @@ class CalendarViewModel @Inject constructor(
         }
 
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
+    }
+
+    /**
+     * Creates a Flow with Events matching the search term.
+     */
+    fun getTimelineEvents(userId: String, searchTerm: String, userEmails: List<String>, is24Hour: Boolean, timeZoneId: String): Flow<List<TimelineEventAdapter.TimelineItem>?> {
+
+        val fromDate = LocalDate.now().minusYears(3)
+        val toDate = LocalDate.now().plusYears(3)
+
+        return calendarsRepository.getSearchEvents(userId, searchTerm).transform<CalendarsRepository.GetEventsResult<Event>, List<TimelineEventAdapter.TimelineItem>?> { eventResult ->
+
+            when (eventResult) {
+                is CalendarsRepository.GetEventsResult.Exception -> {
+                    logger.e("Exception in getTimelineEvents", eventResult.throwable)
+                    emit(null)
+                }
+                CalendarsRepository.GetEventsResult.InProgress -> { }
+                is CalendarsRepository.GetEventsResult.Success -> {
+
+                    // expand events until given date in the future
+                    val expandedEvents = eventResult.events.flatMap {
+
+                        // we need to get all Events sharing UID of this Event for recurrence expansion
+                        // we can't just pass search results, because Single Edit might not match the same search query
+                        val eventsSharingUid = if (it.isRecurring()) {
+                            calendarsRepository.selectEventsByUid(it.uid)
+                        } else emptyList()
+
+                        calendarsRepository.expandDbEvent(it, eventsSharingUid, toDate.atStartOfDay(ZoneId.of(timeZoneId))).filterOutEventsBySearchTerm(searchTerm)
+                    }
+
+                    // explode events for UI
+                    val timelineEvents = mutableListOf<TimelineEventAdapter.TimelineEvent>()
+                    expandedEvents.explodeDayByDay(fromDate, toDate, timeZoneId).toSortedMap().forEach { entry ->
+
+                        //logger.e("expanded after explode: ${entry.key} ->  ${entry.value.map { it.occurrence?.startDateTime }}")
+
+                        yield() // support coroutine cancellation
+
+                        val sortedEvents = entry.value.sortedBy {
+                            "${!it.isAllDay()}${
+                                it.getStart(timeZoneId).toEpochSecond()
+                            }${it.summary}"
+                        }
+
+                        sortedEvents.forEachIndexed { index, event ->
+                            // show date column only in the first Event on a given day
+                            val timelineEvent = event.toTimelineEvent(
+                                resourceProvider,
+                                entry.key,
+                                timeZoneId,
+                                index == 0,
+                                index == sortedEvents.size - 1,
+                                userEmails,
+                                is24Hour,
+                                searchTerm
+                            )
+                            timelineEvents.add(timelineEvent)
+                        }
+                    }
+
+                    val grouped = timelineEvents.groupBy {
+                        it.happensOn.year
+                    }.toSortedMap().flatMap {
+                        listOf(TimelineEventAdapter.TimelineItem.Header(it.key)) + it.value.map {
+                            TimelineEventAdapter.TimelineItem.Event(it)
+                        }
+                    }
+
+                    emit(grouped)
+
+                }
+            }
+
+        }.cancellable()
+
+    }
+
+    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<List<Event>?> {
+        return liveData<List<Event>?> {
+            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId).asLiveData(Dispatchers.Default))
+        }
     }
 
     fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {

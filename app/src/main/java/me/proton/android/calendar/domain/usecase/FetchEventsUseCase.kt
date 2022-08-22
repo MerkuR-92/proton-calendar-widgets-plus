@@ -1,9 +1,16 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package me.proton.android.calendar.domain.usecase
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
@@ -173,6 +180,111 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                 null
             )
         } // TODO which calendar?
+    }
+
+    /**
+     * @param lastKnownEventId in case we want to resume export starting after this Event ID
+     * @return EventEntities in batches, consume with one worker to maintain the order!
+     */
+    suspend fun execute(
+        userId: UserId,
+        calendarId: String,
+        lastKnownEventId: String?,
+        coroutineScope: CoroutineScope
+    ): ReceiveChannel<List<EventEntity>> {
+
+        // eventIdsRequestPageSize has to be evenly divisible by (workerCount * workerBatchSize)!
+        val workerCount = 5
+        val workerBatchSize = 5
+        val eventIdsRequestPageSize = 200
+
+        val eventIdsChannel = Channel<List<String>>(1)
+        val eventEntitiesChannel = Channel<List<EventEntity>>(5)
+
+        coroutineScope.launch {
+
+            var afterId = lastKnownEventId
+
+            // Event IDs downloaded in one call
+            var batchOfIds = emptyList<String>()
+
+            launch { // PRODUCE Event IDs
+
+                do {
+
+                    when (val response = calendarsApi.getEventIdsForExport(userId, calendarId, eventIdsRequestPageSize, afterId)) {
+                        is ApiResponse.Error -> {
+                            response.logErrorIfNeeded("[FetchEventsUseCase] error in getEventIdsForExport", logger)
+                            eventIdsChannel.close(Exception("Error in getEventIdsForExport"))
+                            break
+                        }
+                        is ApiResponse.Exception -> {
+                            response.logErrorIfNeeded("[FetchEventsUseCase] exception in getEventIdsForExport", logger)
+                            eventIdsChannel.close(Exception("Exception in getEventIdsForExport", response.exception))
+                            break
+                        }
+                        is ApiResponse.Success -> {
+
+                            batchOfIds = response.data.events
+                            afterId = batchOfIds.lastOrNull()
+
+                            eventIdsChannel.send(batchOfIds)
+                        }
+                    }
+
+                } while (batchOfIds.isNotEmpty())
+
+                eventIdsChannel.close()
+
+            }
+
+        }
+
+        coroutineScope.launch {
+            for (eventIds in eventIdsChannel) { // CONSUME Event IDs
+
+                // we have to fetch EventEntites somewhat synchronously, because we need to maintain order
+                // of Event IDs in downloaded Event batches we publish to consumer
+
+                eventIds.chunked(workerCount * workerBatchSize).map { chunkForAllWorkers ->
+
+                    val fetchedEntities = chunkForAllWorkers.chunked(workerBatchSize).map { eventIds ->
+                        async {
+                            eventIds.mapNotNull { eventId ->
+                                when (val eventResponse = calendarsApi.getEvent(userId, calendarId, eventId)) {
+                                    is ApiResponse.Error -> if (eventResponse.isNotFound()) {
+                                        null // legitimate situation if Event was deleted in the meantime
+                                    } else {
+                                        eventResponse.logErrorIfNeeded("[FetchEventsUseCase] error in fetching chunked entities", logger)
+                                        eventEntitiesChannel.close(Exception("Error in fetching chunked entities"))
+                                        null
+                                    }
+                                    is ApiResponse.Exception -> {
+                                        eventResponse.logErrorIfNeeded("[FetchEventsUseCase] exception in fetching chunked entities", logger)
+                                        eventEntitiesChannel.close(Exception("Exception in fetching chunked entities"))
+                                        null
+                                    }
+                                    is ApiResponse.Success -> {
+                                        eventResponse.data.event
+                                    }
+                                }
+                            }
+                        }
+                    }.awaitAll().flatten()
+
+                    if (!eventEntitiesChannel.isClosedForSend) {
+                        eventEntitiesChannel.send(fetchedEntities) // PRODUCE Event Entities
+                    }
+
+                }
+
+            }
+
+            eventEntitiesChannel.close()
+        }
+
+        return eventEntitiesChannel
+
     }
 
 }

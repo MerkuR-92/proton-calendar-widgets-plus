@@ -7,23 +7,32 @@ import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatShort
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
+import java.time.*
+import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
-import java.time.*
-import java.time.temporal.ChronoUnit
+import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
+import me.proton.core.util.kotlin.takeIfNotBlank
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(
@@ -530,6 +539,79 @@ data class Event private constructor(
     enum class DecryptionStatus {
         SUCCESS,
         FAILURE
+    }
+
+    /**
+     * Converts to helper object used in Timeline view.
+     */
+    fun toTimelineEvent(
+        resourceProvider: ResourceProvider,
+        happensOn: LocalDate,
+        timeZoneId: String,
+        showDateColumn: Boolean,
+        showBottomSpacing: Boolean,
+        userEmails: List<String>,
+        is24Hour: Boolean,
+        searchTerm: String
+    ): TimelineEventAdapter.TimelineEvent {
+
+        val fullDayCounter = this.calculateFullDayCounter(happensOn, timeZoneId)
+
+        val fullDayCounterString = if (fullDayCounter.second > 1) {
+            this.formatFullDayCounter(happensOn, timeZoneId)
+        } else null
+
+        val dateText = if (this.isAllDay()) {
+            resourceProvider.provideString(R.string.event_all_day)
+        } else {
+            if (fullDayCounter.second > 1) { // multi-day part-day
+                when (fullDayCounter.first) {
+                    1 -> { // first day
+                        resourceProvider.provideString(
+                            R.string.calendar_widget_part_day_event_starts_at,
+                            getOccurrenceStart(timeZoneId).formatTime(timeZoneId, is24Hour)
+                        )
+                    }
+                    fullDayCounter.second -> { // last day
+                        resourceProvider.provideString(
+                            R.string.calendar_widget_part_day_event_ends_at,
+                            getOccurrenceEnd(timeZoneId).formatTime(timeZoneId, is24Hour)
+                        )
+                    }
+                    else -> { // day in the middle
+                        resourceProvider.provideString(R.string.event_all_day)
+                    }
+                }
+            } else { // single-day part-day
+                "${
+                    (getOccurrenceStart(timeZoneId)).formatTime(
+                        timeZoneId,
+                        is24Hour
+                    )
+                } ‐ ${(getOccurrenceEnd(timeZoneId)).formatTime(timeZoneId, is24Hour)}"
+            }
+        }
+
+        val participationStatus = this.getParticipationStatus(userEmails)
+
+        val locationText = this.location?.takeIfNotBlank()
+
+        return TimelineEventAdapter.TimelineEvent(
+            id = this.id,
+            summary = this.summary?.takeIfNotBlank() ?: resourceProvider.provideString(R.string.default_event_summary),
+            dateContent = "${getOccurrenceStart(timeZoneId).dayOfWeek.formatShort()}, ${dateText}${if (locationText != null) " • " else ""}",
+            location = locationText ?: "",
+            happensOn = happensOn,
+            showDateColumn = showDateColumn,
+            showBottomSpacing = showBottomSpacing,
+            fullDayCounter = fullDayCounterString,
+            occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
+            calendarColor = this.calendar.color,
+            isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
+            needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
+            isEncrypted = this.decryptionStatus == DecryptionStatus.FAILURE,
+            searchTerm = searchTerm
+        )
     }
 }
 

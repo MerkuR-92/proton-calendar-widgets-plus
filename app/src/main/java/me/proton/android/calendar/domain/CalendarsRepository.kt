@@ -31,6 +31,8 @@ interface CalendarsRepository {
 
     suspend fun shutdown()
 
+    suspend fun clearSearchDatabase()
+
     // calendars
     suspend fun countCalendars(): Int
 
@@ -41,6 +43,8 @@ interface CalendarsRepository {
     suspend fun selectCalendars(userId: String): List<CalendarEntity>
 
     suspend fun selectUserCalendars(userId: String): List<Calendar>
+
+    suspend fun selectAllCalendars(userId: String): List<Calendar>
 
     suspend fun selectActiveUserCalendars(userId: String): List<Calendar>
 
@@ -122,6 +126,17 @@ interface CalendarsRepository {
         allowCached: Boolean
     ): Flow<GetEventsResult<Event>>
 
+    fun getSearchEvents(
+        userId: String,
+        searchTerm: String
+    ): Flow<GetEventsResult<Event>>
+
+    fun deleteSearchEvents(userId: String)
+
+    fun deleteSearchEvents(userId: String, calendarId: String)
+
+    fun deleteSearchEvents(userId: String, calendarId: String, eventIds: List<String>)
+
     /**
      * @return SkeletonEvents with correct Calendar Color.
      */
@@ -138,6 +153,8 @@ interface CalendarsRepository {
     suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean
 
     suspend fun hasCalendar(calendarId: String, ): Boolean
+
+    fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event>
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
@@ -159,11 +176,13 @@ interface CalendarsRepository {
 
     suspend fun persistEvents(vararg events: EventEntity)
 
-    suspend fun deleteEventsById(ids: List<String>)
+    suspend fun deleteEventsById(calendarId: String, ids: List<String>)
 
     suspend fun deleteAllEvents(calendarId: String)
 
     suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse>
+
+    suspend fun selectEventsByUid(eventUid: String): List<Event>
 
     suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse>
 

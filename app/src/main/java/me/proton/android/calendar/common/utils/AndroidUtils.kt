@@ -11,12 +11,17 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Shader
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.text.Editable
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.text.TextWatcher
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +42,7 @@ import android.widget.SimpleAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.AttrRes
+import androidx.annotation.CheckResult
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -61,11 +67,17 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
 import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.onStart
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Animation.HEIGHT_CHANGE_DURATION
 import me.proton.android.calendar.common.CLICK_INTERVAL_MS
 import me.proton.android.calendar.common.MAX_ANIM_DURATION
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
@@ -77,6 +89,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.core.presentation.utils.normSnack
+import me.proton.core.util.kotlin.takeIfNotBlank
 import okhttp3.internal.toHexString
 import java.text.CharacterIterator
 import java.text.Normalizer
@@ -855,6 +868,48 @@ object AndroidUtils {
     }
 
     /**
+     * Highlights all the strings passed in [tokens] in entire text of this TextView
+     */
+    fun TextView.highlightSearchTokens(tokens: List<String>) {
+
+        val spannableStringBuilder = SpannableStringBuilder(this.text)
+
+        tokens.filter { it.isNotBlank() }.forEach { token ->
+
+            var startIndex = 0
+
+            while (startIndex < this.text.length) {
+                val start = this.text.indexOf(token, ignoreCase = true, startIndex = startIndex)
+                val end = start + token.length
+
+                if (start > -1) {
+                    startIndex = end
+
+                    // Set text bold style
+                    spannableStringBuilder.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    // Set text highlight color
+                    spannableStringBuilder.setSpan(
+                        ForegroundColorSpan(this.context.getColorFromAttr(R.attr.proton_text_accent)),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                } else {
+                    break
+                }
+            }
+        }
+
+        this.text = spannableStringBuilder
+
+    }
+
+    /**
      * @param toHeightPx is the desired height for the view
      * @param maxHeight is the maximum expected height of the view, used when collapsing (maxHeight >= toHeightPx)
      */
@@ -1297,6 +1352,21 @@ object AndroidUtils {
         }
         addTextChangedListener(watcher)
         return watcher
+    }
+
+    @CheckResult
+    fun EditText.onTextChange(): Flow<CharSequence> {
+        return callbackFlow {
+            val listener = object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) = Unit
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    s?.let { trySend(s) }
+                }
+            }
+            addTextChangedListener(listener)
+            awaitClose { removeTextChangedListener(listener) }
+        }
     }
 
     @ColorInt

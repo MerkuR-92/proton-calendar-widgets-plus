@@ -2,6 +2,8 @@ package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
 import me.proton.core.domain.entity.UserId
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface CalendarsApi {
 
@@ -28,6 +30,25 @@ interface CalendarsApi {
         page: Int,
         pageSize: Int
     ): ApiResponse<EventsApiResponse>
+
+    suspend fun getEventIdsForExport(
+        userId: UserId,
+        calendarId: String,
+        limit: Int,
+        afterId: String?
+    ): ApiResponse<EventsExportIdsApiResponse>
+
+    suspend fun getEventsForExport(
+        userId: UserId,
+        calendarId: String,
+        pageSize: Int,
+        beginId: String?
+    ): ApiResponse<EventsExportApiResponse>
+
+    suspend fun getEventsCount(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<EventsCountApiResponse>
 
     /**
      * Get single event.

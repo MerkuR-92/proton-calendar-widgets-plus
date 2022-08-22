@@ -64,6 +64,13 @@ class ValueStoreProviderImpl @Inject constructor(
 
         @Synchronized
         override fun removeKey(key: String) = sharedPreferences.edit().remove(key).apply()
+
+        @Synchronized
+        override fun removeKeySet(setName: String) {
+            val editor = sharedPreferences.edit()
+            sharedPreferences.all.filter { it.key.startsWith("$setName~") }.forEach { editor.remove(it.key) }
+            editor.apply()
+        }
     }
 
     @Synchronized

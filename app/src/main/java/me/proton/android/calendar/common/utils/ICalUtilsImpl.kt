@@ -40,6 +40,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealO
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
@@ -607,6 +608,27 @@ object ICalUtilsImpl : ICalUtils {
         return this.distinctBy { "${it.eventId} ${it.occurrence} ${Duration.parse(it.trigger).toMillis()} ${it.action}" }
     }
 
+    override fun List<Event>.filterOutEventsBySearchTerm(searchTerm: String): List<Event> {
+
+        val filtered = this.map { SearchEventEntity.from("we don't have it in Event yet, should not matter here", it) }.filterOutBySearchTerm(searchTerm)
+
+        return this.filter { event -> filtered.any { it.calendarId == event.calendar.id && it.eventId == event.id } }
+    }
+
+    override fun List<SearchEventEntity>.filterOutBySearchTerm(searchTerm: String): List<SearchEventEntity> {
+        val searchTokens = searchTerm.lowercase().split(" ")
+
+        return this.filter { searchEventEntity ->
+            searchTokens.all {
+                searchEventEntity.summary.lowercase().contains(it, ignoreCase = true) ||
+                        searchEventEntity.description.lowercase().contains(it, ignoreCase = true) ||
+                        searchEventEntity.location.lowercase().contains(it, ignoreCase = true) ||
+                        searchEventEntity.organizer.lowercase().contains(it, ignoreCase = true) ||
+                        searchEventEntity.attendees.lowercase().contains(it, ignoreCase = true)
+            }
+        }
+    }
+
     override fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent> {
 
         val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.occurrence?.occurrenceNumber}, ${it.iCalEvent.dateStart?.value?.time}" }
@@ -633,6 +655,10 @@ object ICalUtilsImpl : ICalUtils {
         }
 
         return result
+    }
+
+    override fun List<Event>.filterOutEventDuplicatesInSubscribedCalendars(): List<Event> {
+        TODO("Not yet implemented")
     }
 
     /**
@@ -945,7 +971,7 @@ object ICalUtilsImpl : ICalUtils {
 
         this.forEach { event ->
 
-            val startDate = event.getStart(timeZoneId).toLocalDate()
+            val startDate = event.getOccurrenceStart(timeZoneId).toLocalDate()
 
             if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                 result[startDate] = (result[startDate] ?: mutableListOf()).apply { add(event) }

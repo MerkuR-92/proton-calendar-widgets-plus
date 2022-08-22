@@ -8,7 +8,6 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
@@ -48,15 +47,9 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onPrepare(config: EventManagerConfig, entities: List<EventAlarmEntity>) {
         val alarmsWithMissingEvent = entities.filter { !calendarsRepository.hasEvent(it.eventId, it.calendarId) }
-        val eventIdsToFetch = alarmsWithMissingEvent.mapNotNull {
-            if (HandleEventsMetadataUseCase.shouldFetchEvent(it)) {
-                logger.v("event ${it.eventId} for alarm doesn't exist in DB")
-                it
-            } else {
-                logger.v("event ${it.eventId} for alarm doesn't exist in DB but is outside of sync window")
-                invalidAlarmIds += it.id
-                null
-            }
+        val eventIdsToFetch = alarmsWithMissingEvent.map {
+            logger.v("event ${it.eventId} for alarm doesn't exist in DB")
+            it
         }
         if (eventIdsToFetch.isEmpty()) return
 

@@ -21,10 +21,12 @@ import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.viewModelModule
 import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
@@ -100,6 +102,12 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var eventDecryptor: EventDecryptor
 
+    @Inject
+    lateinit var searchDatabase: SearchDatabase
+
+    @Inject
+    lateinit var indexEventForSearchUseCase: IndexEventForSearchUseCase
+
     override fun onCreate() {
         super.onCreate()
         MainInitializer.init(this)
@@ -125,7 +133,9 @@ class ProtonCalendarApplication : Application() {
                     calendarsRepository,
                     contactEmailsRepository,
                     userSettingsRepository,
-                    getRecipientPublicAddresses
+                    getRecipientPublicAddresses,
+                    searchDatabase,
+                    indexEventForSearchUseCase
                 )
             )
         }

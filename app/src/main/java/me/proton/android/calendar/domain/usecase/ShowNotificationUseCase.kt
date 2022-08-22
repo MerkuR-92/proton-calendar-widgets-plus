@@ -213,9 +213,11 @@ class ShowNotificationUseCase @Inject constructor(
         val CHANNEL_ID_EVENT_ALARMS = "CHANNEL_ID_EVENT_ALARMS"
         // deprecated but don't remove it, might come in handy
         val CHANNEL_ID_SYNC_SERVICE = "CHANNEL_ID_SYNC_SERVICE"
+        val CHANNEL_ID_CALENDAR_FETCH = "CHANNEL_ID_CALENDAR_FETCH"
 
         // deprecated but don't remove it, might come in handy
         val NOTIFICATION_ID_SYNC_SERVICE: Int = 1
+        val NOTIFICATION_ID_FETCH_CALENDARS_WORKER: Int = 2
 
         fun createNotificationChannels(context: Context) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -234,6 +236,12 @@ class ShowNotificationUseCase @Inject constructor(
                 val importanceSync = NotificationManager.IMPORTANCE_MIN
                 val channelSync = NotificationChannel(CHANNEL_ID_SYNC_SERVICE, nameSync, importanceSync)
                 notificationManager.createNotificationChannel(channelSync)
+
+                // fetching all events for a Calendar channel
+                val nameCalendarFetch = context.getString(R.string.notification_channel_calendar_fetch)
+                val importanceCalendarFetch = NotificationManager.IMPORTANCE_DEFAULT
+                val channelCalendarFetch = NotificationChannel(CHANNEL_ID_CALENDAR_FETCH, nameCalendarFetch, importanceCalendarFetch)
+                notificationManager.createNotificationChannel(channelCalendarFetch)
 
             }
         }

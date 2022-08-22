@@ -17,7 +17,7 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Transaction
     @Query("SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId")
-    abstract suspend fun selectEvent(eventId: String, calendarId: String): EventEntity
+    abstract suspend fun selectEvent(eventId: String, calendarId: String): EventEntity?
 
     @Query("SELECT * FROM events")
     abstract fun selectEventsFlow(): Flow<List<EventEntity>>
@@ -72,9 +72,6 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Query("SELECT COUNT(id) FROM events WHERE calendarId = :calendarId")
     abstract suspend fun count(calendarId: String): Int
-
-    @Query("DELETE FROM events WHERE id = :id")
-    abstract suspend fun deleteById(id: String)
 
     @Query("DELETE FROM events WHERE id IN (:ids)")
     abstract suspend fun deleteByIds(ids: List<String>)

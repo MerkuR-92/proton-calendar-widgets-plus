@@ -255,7 +255,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
                 val successEventIds = eventIds.filterNot { it in errorEventIds }
                 if (successEventIds.isNotEmpty()) {
-                    calendarsRepository.deleteEventsById(successEventIds)
+                    calendarsRepository.deleteEventsById(calendarId, successEventIds)
                     handleAlarmsUseCase.execute(userId)
                 }
 

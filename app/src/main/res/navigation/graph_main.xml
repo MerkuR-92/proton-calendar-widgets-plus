@@ -42,6 +42,9 @@
         <deepLink
             android:id="@+id/deepLink7"
             app:uri="proton-calendar://protonmail.com/month/details?date={date}" />
+        <action
+            android:id="@+id/action_nav_calendar_to_searchFragment"
+            app:destination="@id/nav_search" />
     </fragment>
 
     <dialog
@@ -228,5 +231,16 @@
             android:id="@+id/action_rootFragment_to_nav_calendar"
             app:destination="@id/nav_calendar" />
     </fragment>
+    <dialog
+        android:id="@+id/nav_search"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.SearchFragment">
+        <action
+            android:id="@+id/action_searchFragment_to_nav_event_details"
+            app:destination="@id/nav_event_details" />
+        <deepLink
+            android:id="@+id/deepLink6"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/search" />
+    </dialog>
 
 </navigation>

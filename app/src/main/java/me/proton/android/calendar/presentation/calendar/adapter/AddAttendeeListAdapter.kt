@@ -21,6 +21,7 @@ import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
+import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
@@ -80,26 +81,8 @@ class AddAttendeeListAdapter(
                             attendee.commonName.equals(attendee.extractEmail(), ignoreCase = true))) ""
                 else attendee.extractEmail() ?: ""
 
-            if (query.isNotEmpty() && title.contains(query, true)) {
-                val spannableStringBuilder = SpannableStringBuilder(title)
-                val start = title.indexOf(query, ignoreCase = true)
-                val end = title.indexOf(query, ignoreCase = true) + query.length
-                // Set text bold style
-                spannableStringBuilder.setSpan(
-                    StyleSpan(Typeface.BOLD),
-                    start,
-                    end,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                // Set text highlight color
-                spannableStringBuilder.setSpan(
-                    ForegroundColorSpan(itemView.context.getColorFromAttr(R.attr.proton_text_accent)),
-                    start,
-                    end,
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                attendeeItemTitle.text = spannableStringBuilder
-            } else attendeeItemTitle.text = title
+            attendeeItemTitle.text = title
+            attendeeItemTitle.highlightSearchTokens(listOf(query))
 
             attendeeItemDescription.visibleOrGone(description.isNotEmpty())
             val textLayoutParams = attendeeItemTextLayout.layoutParams as ConstraintLayout.LayoutParams
