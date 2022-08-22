@@ -67,9 +67,7 @@ class EditCreateEventUseCase @Inject constructor(
      * @param [sendPreferences] needed for Auto-Added Invites to encrypt SharedKeyPacket with attendee's Public Address Key
      */
     suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false, sendPreferences: Map<Email, SendPreferences> = emptyMap()) : UseCase.Result {
-
-        logger.e("sendPreferences: $sendPreferences")
-
+        
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
             (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
         } else null
