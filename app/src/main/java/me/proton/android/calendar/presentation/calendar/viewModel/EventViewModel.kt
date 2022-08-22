@@ -408,7 +408,8 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.color,
                 defaultCalendar.flags,
                 defaultCalendar.display,
-                defaultCalendar.type
+                defaultCalendar.type,
+                defaultCalendar.permissions
             ), newICalendar, 0
         ) ?: return InitResult.Error("could not create Event using factory method")
 
@@ -689,7 +690,8 @@ class EventViewModel @Inject constructor(
                     calendar.color,
                     calendar.flags,
                     calendar.display,
-                    calendar.type
+                    calendar.type,
+                    calendar.permissions
                 )
             )
 

@@ -11,7 +11,8 @@ data class Calendar(
         val color: String,
         val flags: Int,
         val display: Boolean,
-        val type: Int
+        val type: Int,
+        val permissions: Int
 ) : BaseModel() {
 
         companion object {
@@ -22,7 +23,8 @@ data class Calendar(
                         color = memberEntity.color,
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),
-                        type = calendarEntity.type
+                        type = calendarEntity.type,
+                        permissions = memberEntity.permissions
                 )
         }
 
@@ -36,5 +38,7 @@ data class Calendar(
         val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 
         val isSubscribed: Boolean get() = type == 1
+
+        val allowEdit: Boolean get() = permissions and 16 == 16
 }
     // TODO fields need to be duplicated here, plus local metadata added

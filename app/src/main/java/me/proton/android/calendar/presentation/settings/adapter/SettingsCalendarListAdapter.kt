@@ -161,12 +161,12 @@ class SettingsCalendarListAdapter(
             }
 
             // Only show menu icon when calendar can be edited
-            calendarItemMenuIcon.visibleOrGone(calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemMenuIcon.visibleOrGone((calendar.isSubscribed.not() && calendar.allowEdit) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
             // Only allow item click when calendar can be edited
-            calendarItemPress.visibleOrGone(calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemPress.visibleOrGone((calendar.isSubscribed.not() && calendar.allowEdit) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
 
-            if (calendar.isSubscribed.not() || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
+            if ((calendar.isSubscribed.not() && calendar.allowEdit) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
                 // On item click
                 calendarItemPress.setOnSingleClickListener {
                     listener(calendar)

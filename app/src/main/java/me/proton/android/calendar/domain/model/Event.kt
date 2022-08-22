@@ -119,7 +119,7 @@ data class Event private constructor(
             return if (vEvent?.sanitise() == true) {
                 Event(
                     "",
-                    Calendar("", "", "", "", 1, true, 0),
+                    Calendar("", "", "", "", 1, true, 0, 0),
                     iCalendar,
                     0
                 )

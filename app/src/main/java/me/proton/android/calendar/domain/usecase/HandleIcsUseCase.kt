@@ -260,7 +260,8 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,
-                existingCalendar?.type ?: defaultCalendar.type
+                existingCalendar?.type ?: defaultCalendar.type,
+                existingCalendar?.permissions ?: defaultCalendar.permissions
             ), iCalendar, Instant.now().epochSecond) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
