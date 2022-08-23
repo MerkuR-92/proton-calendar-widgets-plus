@@ -238,7 +238,8 @@ class TransformEventUseCase @Inject constructor(
                 calendar.color,
                 calendar.flags,
                 calendar.display,
-                calendarEntity.type
+                calendarEntity.type,
+                calendar.permissions
             ),
             iCalendar = iCalendar,
             modifyTime = eventEntity.modifyTime,

@@ -45,7 +45,8 @@ class EventDecryptorImpl @Inject constructor(
                     calendar.color,
                     calendar.flags,
                     calendar.display,
-                    calendar.type
+                    calendar.type,
+                    calendar.permissions
                 )
 
                 if (calendar != cacheValue.event.calendar) {

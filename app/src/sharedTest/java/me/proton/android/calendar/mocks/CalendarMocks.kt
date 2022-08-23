@@ -53,7 +53,8 @@ object CalendarMocks {
             calendarColor,
             if (isDisabled) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
-            calendarType
+            calendarType,
+            calendarPermissions
         )
     }
 
