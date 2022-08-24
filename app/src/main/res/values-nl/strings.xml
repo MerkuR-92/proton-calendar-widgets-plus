@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Importeren aanpassen</string>
     <string name="import_assistant_error">Fout bij het ophalen van gegevens</string>
     <string name="import_assistant_data_gathering_error">Verzameling van gegevens mislukt</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Het updaten van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_update_import_wrong_account_error">Verkeerde account. Log in met het account die u heeft gebruikt voor het importeren van de agenda.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Het starten van importeren is mislukt. Probeer later nog eens.</string>
+    <string name="import_assistant_delete_import_error">Het verwijderen van de import is mislukt. Probeer later nog eens.</string>
+    <string name="import_assistant_cancel_import_error">Het annuleren van de import is mislukt. Probeer later nog eens.</string>
+    <string name="import_assistant_resume_import_error">Het hervatten van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_create_calendar_error">Het is niet gelukt om één of meerdere agenda\'s te maken</string>
     <string name="import_assistant_start_import_empty_error">Het starten van importeren is mislukt, er zijn geen andere agena\'s om te importeren</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importeren als</string>

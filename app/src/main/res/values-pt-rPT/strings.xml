@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Personalizar importação</string>
     <string name="import_assistant_error">Erro ao carregar dados</string>
     <string name="import_assistant_data_gathering_error">A recolha de dados falhou</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Falha ao atualizar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Conta errada. Por favor, inicie sessão na conta usada para a importação da agenda.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Falha ao iniciar importação, por favor, tente novamente mais tarde.</string>
+    <string name="import_assistant_delete_import_error">Falha ao eliminar importação, por favor, tente novamente mais tarde.</string>
+    <string name="import_assistant_cancel_import_error">Falha ao cancelar importação, por favor, tente novamente mais tarde.</string>
+    <string name="import_assistant_resume_import_error">Falha ao retomar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_create_calendar_error">A criação de uma ou mais agendas falhou</string>
     <string name="import_assistant_start_import_empty_error">Falha ao iniciar importação, não existem agendas para importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>

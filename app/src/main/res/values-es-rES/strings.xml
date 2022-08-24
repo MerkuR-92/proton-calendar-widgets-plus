@@ -353,7 +353,7 @@
     <string name="settings_week_start_title">Inicio de semana</string>
     <string name="settings_time_format_title">Formato de hora</string>
     <string name="settings_week_numbers_title">Mostrar los números de la semana</string>
-    <string name="settings_auto_invites_title">Add invites to calendar and mark as pending</string>
+    <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcar como pendiente</string>
     <string name="settings_alternative_routing_title">Permitir el enrutamiento alternativo</string>
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, esta configuración permite a la aplicación intentar un enrutamiento de red alternativo para llegar a Proton, lo que puede ser útil para evitar los cortafuegos o los problemas de red. Recomendamos mantener esta configuración activada para una mayor fiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
@@ -398,7 +398,7 @@
     <string name="create_calendar_limit_reached_paid_message">Elimine calendarios no usados para crear nuevos.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
-    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_title">Actualice Proton Calendar</string>
     <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
     <string name="create_calendar_limit_reached_free_not_now">Ahora no</string>
     <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Personalizar importación</string>
     <string name="import_assistant_error">Error fetching data</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">No se pudo actualizar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">No se pudo iniciar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_delete_import_error">No se pudo eliminar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_cancel_import_error">No se pudo cancelar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_resume_import_error">No se pudo reanudar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Import as</string>

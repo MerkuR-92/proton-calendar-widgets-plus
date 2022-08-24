@@ -463,12 +463,12 @@
     <string name="import_assistant_summary_customize_import">Personalizza importazione</string>
     <string name="import_assistant_error">Errore durante il recupero dei dati</string>
     <string name="import_assistant_data_gathering_error">Raccolta dati non riuscita</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">Impossibile aggiornare l\'importazione, riprova più tardi.</string>
     <string name="import_assistant_update_import_wrong_account_error">Conto sbagliato. Accedi con l\'account utilizzato per l\'importazione del calendario.</string>
-    <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
-    <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
-    <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
-    <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
+    <string name="import_assistant_start_import_error">Impossibile avviare l\'importazione, riprova più tardi.</string>
+    <string name="import_assistant_delete_import_error">Cancellazione dell\'importazione fallita, si prega di riprovare più tardi.</string>
+    <string name="import_assistant_cancel_import_error">Annullamento dell\'importazione fallito, si prega di riprovare più tardi.</string>
+    <string name="import_assistant_resume_import_error">Ripristino dell\'importazione fallito, si prega di riprovare più tardi.</string>
     <string name="import_assistant_create_calendar_error">Impossibile creare uno o più calendari</string>
     <string name="import_assistant_start_import_empty_error">Impossibile avviare l\'importazione, non ci sono calendari da importare</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa come</string>

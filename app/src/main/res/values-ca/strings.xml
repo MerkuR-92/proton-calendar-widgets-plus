@@ -471,7 +471,7 @@
     <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
     <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
-    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa como a</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa com a</string>
     <string name="import_assistant_new_calendar_badge">New</string>
     <string name="import_assistant_merge_calendar_badge">Merged</string>
     <string name="import_assistant_creating_calendars">Creating new calendars</string>
@@ -500,7 +500,7 @@
     <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
     <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
     <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
-    <string name="import_assistant_status_paused_storage_full_button">Resume</string>
+    <string name="import_assistant_status_paused_storage_full_button">Reprèn</string>
     <string name="import_assistant_delete_report_title">Remove from the list?</string>
     <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
     <string name="import_assistant_delete_report_positive_button">Remove</string>
@@ -508,7 +508,7 @@
     <string name="import_assistant_cancel_import_title">Import is incomplete!</string>
     <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
     <string name="import_assistant_cancel_import_positive_button">Cancel import</string>
-    <string name="import_assistant_cancel_import_negative_button">Resume import</string>
+    <string name="import_assistant_cancel_import_negative_button">Reprèn la importació</string>
     <string name="import_assistant_in_progress_snack">Import in progress</string>
     <string name="import_assistant_discard_import_title">Cancel import?</string>
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
