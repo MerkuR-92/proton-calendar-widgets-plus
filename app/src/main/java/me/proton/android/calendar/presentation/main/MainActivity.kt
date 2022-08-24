@@ -55,6 +55,8 @@ import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_agenda_pre
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_day_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_layout
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_three_day_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_week_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_timezone
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_user_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_calendars_list
@@ -77,6 +79,10 @@ import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_i
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_icon
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_user_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_version
 import kotlinx.coroutines.Dispatchers
@@ -844,6 +850,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_switcher_three_day_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
+            mainViewModel.setViewMode(ViewMode.THREE_DAY)
+            drawer_layout.close()
+        }
+
+        nav_view_switcher_week_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.WEEK)
+            mainViewModel.setViewMode(ViewMode.WEEK)
+            drawer_layout.close()
+        }
+
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             mainViewModel.setViewMode(ViewMode.AGENDA)
@@ -879,33 +897,75 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     // Set selected background
                     nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                     nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_three_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_week_layout.background = null
                     nav_view_main_content.nav_view_switcher_month_layout.background = null
 
                     // Set icon tint
                     nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                     nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_week_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                 }
                 ViewMode.DAY -> {
                     // Set selected background
                     nav_view_main_content.nav_view_switcher_agenda_layout.background = null
                     nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_three_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_week_layout.background = null
                     nav_view_main_content.nav_view_switcher_month_layout.background = null
 
                     // Set icon tint
                     nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_week_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.THREE_DAY -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_three_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_week_layout.background = null
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
+
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                    nav_view_main_content.nav_view_switcher_week_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                }
+                ViewMode.WEEK -> {
+                    // Set selected background
+                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
+                    nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_three_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_week_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                    nav_view_main_content.nav_view_switcher_month_layout.background = null
+
+                    // Set icon tint
+                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_week_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                     nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                 }
                 ViewMode.MONTH -> {
                     // Set selected background
                     nav_view_main_content.nav_view_switcher_agenda_layout.background = null
                     nav_view_main_content.nav_view_switcher_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_three_day_layout.background = null
+                    nav_view_main_content.nav_view_switcher_week_layout.background = null
                     nav_view_main_content.nav_view_switcher_month_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
 
                     // Set icon tint
                     nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+                    nav_view_main_content.nav_view_switcher_week_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
                     nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 }
             }

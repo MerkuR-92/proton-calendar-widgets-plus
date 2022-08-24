@@ -156,7 +156,9 @@ enum class AlarmAction(val value: Int) {
 enum class ViewMode(val value: Int) {
     AGENDA(0),
     DAY(1),
-    MONTH(2)
+    MONTH(2),
+    THREE_DAY(3),
+    WEEK(4)
 }
 
 enum class EventEditDeleteOption {

@@ -230,6 +230,8 @@
     <string name="nav_view_more">More</string>
     <string name="nav_view_switcher">View</string>
     <string name="nav_view_switcher_day">Day</string>
+    <string name="nav_view_switcher_three_day">3 Days</string>
+    <string name="nav_view_switcher_week">Week</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_switcher_month">Month</string>
     <string name="nav_view_timezone">Time zone</string>

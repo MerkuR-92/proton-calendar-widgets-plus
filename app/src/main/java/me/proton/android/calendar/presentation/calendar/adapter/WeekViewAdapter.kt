@@ -1,0 +1,76 @@
+package me.proton.android.calendar.presentation.calendar.adapter
+
+import android.graphics.RectF
+import android.util.Log
+import com.alamkanak.weekview.WeekViewEntity
+import com.alamkanak.weekview.jsr310.WeekViewPagingAdapterJsr310
+import me.proton.android.calendar.common.utils.AndroidUtils.showToast
+import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
+import me.proton.android.calendar.domain.model.toWeekViewEntity
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+
+class WeekViewAdapter(
+    private val dragHandler: (Long, LocalDateTime, LocalDateTime) -> Unit,
+    private val loadMoreHandler: (List<YearMonth>) -> Unit
+) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
+
+    private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
+        FormatStyle.MEDIUM,
+        FormatStyle.SHORT
+    )
+
+    override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity()
+
+    override fun onEventClick(data: WeekViewCalendarEntity, bounds: RectF) {
+        if (data is WeekViewCalendarEntity.Event) {
+            context.showToast("Clicked ${data.title}")
+        }
+    }
+
+    override fun onEmptyViewClick(time: LocalDateTime) {
+        context.showToast("Empty view clicked at ${defaultDateTimeFormatter.format(time)}")
+    }
+
+    override fun onDragAndDropFinished(data: WeekViewCalendarEntity, newStartTime: LocalDateTime, newEndTime: LocalDateTime) {
+        if (data is WeekViewCalendarEntity.Event) {
+            dragHandler(data.id, newStartTime, newEndTime)
+        }
+    }
+
+    override fun onEmptyViewLongClick(time: LocalDateTime) {
+        context.showToast("Empty view long-clicked at ${defaultDateTimeFormatter.format(time)}")
+    }
+
+    override fun onLoadMore(startDate: LocalDate, endDate: LocalDate) {
+        loadMoreHandler(yearMonthsBetween(startDate, endDate))
+    }
+
+    override fun onVerticalScrollPositionChanged(currentOffset: Float, distance: Float) {
+        Log.d("BasicActivity", "Scrolling vertically (distance: ${distance.toInt()}, current offset ${currentOffset.toInt()})")
+    }
+
+    override fun onVerticalScrollFinished(currentOffset: Float) {
+        Log.d("BasicActivity", "Vertical scroll finished (current offset ${currentOffset.toInt()})")
+    }
+
+    private fun yearMonthsBetween(startDate: LocalDate, endDate: LocalDate): List<YearMonth> {
+        val yearMonths = mutableListOf<YearMonth>()
+        val maxYearMonth = endDate.yearMonth
+        var currentYearMonth = startDate.yearMonth
+
+        while (currentYearMonth <= maxYearMonth) {
+            yearMonths += currentYearMonth
+            currentYearMonth = currentYearMonth.plusMonths(1)
+        }
+
+        return yearMonths
+    }
+
+    private val LocalDate.yearMonth: YearMonth
+        get() = YearMonth.of(year, month)
+}
+

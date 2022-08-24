@@ -91,14 +91,51 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/agendaPager"
+<!--    <androidx.viewpager2.widget.ViewPager2-->
+<!--        android:id="@+id/agendaPager"-->
+<!--        android:visibility="gone"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:overScrollMode="never"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/miniCalendarLayout" />-->
+
+    <com.alamkanak.weekview.WeekView
+        android:id="@+id/weekView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:overScrollMode="never"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/miniCalendarLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/miniCalendarLayout"
+        app:adaptiveEventTextSize="true"
+        app:allDayEventTextSize="13sp"
+        app:columnGap="6dp"
+        app:eventCornerRadius="4dp"
+        app:eventMarginVertical="2dp"
+        app:eventPaddingHorizontal="4dp"
+        app:eventPaddingVertical="5dp"
+        app:eventTextSize="13sp"
+        app:headerBottomShadowRadius="4dp"
+        app:headerPadding="8dp"
+        app:headerTextColor="@color/text_norm"
+        app:hourHeight="60dp"
+        app:nowLineDotRadius="5dp"
+        app:nowLineStrokeWidth="2dp"
+        app:numberOfVisibleDays="3"
+        app:overlappingEventGap="1dp"
+        app:showCurrentTimeFirst="true"
+        app:showHeaderBottomShadow="true"
+        app:showNowLine="true"
+        app:showNowLineDot="true"
+        app:showTimeColumnSeparator="true"
+        app:showWeekNumber="true"
+        app:timeColumnPadding="16dp"
+        app:timeColumnSeparatorStrokeWidth="1dp"
+        app:timeColumnTextColor="@color/text_norm"
+        app:timeColumnTextSize="12sp"
+        app:weekNumberBackgroundCornerRadius="8dp" />
 
 </me.proton.android.calendar.presentation.calendar.customView.InterceptTouchConstraintLayout>

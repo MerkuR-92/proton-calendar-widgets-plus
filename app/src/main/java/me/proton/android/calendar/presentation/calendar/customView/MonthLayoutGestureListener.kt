@@ -16,7 +16,7 @@ class MonthLayoutGestureListener(
     private val calendarViewModel: CalendarViewModel,
     private val viewPagerTopGuideline: View,
     private val viewPagerSliderGuideline: View,
-    private val agendaPager: ViewPager2,
+    private val weekView: View,
     private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
 ) : View.OnTouchListener {
     private var oldScrollY: Float? = null
@@ -130,7 +130,7 @@ class MonthLayoutGestureListener(
 
                 val pressDuration = System.currentTimeMillis() - pressStartTime
                 val delegateArea = Rect()
-                agendaPager.getHitRect(delegateArea)
+                weekView.getHitRect(delegateArea)
                 val isWithinPager =
                     delegateArea.contains(pressedX.toInt(), pressedY.toInt()) // Check if click is within agenda view
 

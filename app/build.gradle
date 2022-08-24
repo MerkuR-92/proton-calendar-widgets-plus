@@ -195,6 +195,10 @@ tasks.withType(Test) {
 
 dependencies {
 
+    implementation project(path: ':week-view-jsr310')
+    implementation project(path: ':week-view-core')
+    implementation project(path: ':week-view-emoji')
+    implementation project(path: ':week-view-base')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
@@ -333,5 +337,4 @@ dependencies {
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
-
 }
