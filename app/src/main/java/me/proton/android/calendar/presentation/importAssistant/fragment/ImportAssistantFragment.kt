@@ -167,12 +167,22 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         resources.getIntArray(R.array.accent_colors_base)
                     )) {
                     // Display error snack and navigate back
-                    requireActivity().displaySnackBar(getString(R.string.import_assistant_data_gathering_error))
+                    if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                        importAssistantViewModel.importGuideSnackState.value =
+                            ImportAssistantViewModel.ImportSnackState.DisplaySnack(getString(R.string.import_assistant_data_gathering_error))
+                    } else {
+                        requireActivity().displaySnackBar(getString(R.string.import_assistant_data_gathering_error))
+                    }
                     findNavController().navigateUp()
                 }
             } else {
                 // Display error snack and navigate back
-                requireActivity().displaySnackBar(getString(R.string.snack_network_error))
+                if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                    importAssistantViewModel.importGuideSnackState.value =
+                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(getString(R.string.snack_network_error))
+                } else {
+                    requireActivity().displaySnackBar(getString(R.string.snack_network_error))
+                }
                 findNavController().navigateUp()
             }
         }
@@ -222,11 +232,22 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         if (userCalendarsCount >= MAX_CALENDAR_PAID) importCalendarsToCreateCount
                         else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
+
+                val activeUserCalendarsCount = userCalendars.filter { it.isActive }.size
+                // Only show merge calendars disclaimer if we can merge
+                val mergeCalendarsMessage = if (activeUserCalendarsCount > 0) {
+                    resources.getQuantityString(
+                        R.plurals.import_assistant_import_summary_error_merge,
+                        countCalendarsOverLimit,
+                        countCalendarsOverLimit
+                    )
+                } else ""
                 fragment_import_assistant_summary_error.text = resources.getQuantityString(
                     R.plurals.import_assistant_import_summary_error,
                     countCalendarsOverLimit,
                     countCalendarsOverLimit
-                )
+                ) + mergeCalendarsMessage
+
                 importButtonIsEnabled(false)
                 if (this@ImportAssistantFragment::importCalendarMappingListAdapter.isInitialized) {
                     importCalendarMappingListAdapter.setLimitReached(true)
@@ -526,14 +547,16 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         mergeCalendarLayout?.visibleOrGone(!userCalendars.isNullOrEmpty())
         if (!userCalendars.isNullOrEmpty()) {
             val mergeCalendarListView = bottomSheetDialog.findViewById<RecyclerView>(R.id.dialog_calendar_import_mapping_merge_list)
+            if (userCalendars.size > 10) {
+                // Workaround with padding bottom because of bottom sheet dialog expanding but hiding a few items from the bottom of the list
+                mergeCalendarListView?.setPadding(0, 0, 0, requireContext().dpToPixel(184))
+            }
             val mergeCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             mergeCalendarListView?.layoutManager = mergeCalendarLayoutManager
             val mergeCalendarListAdapter = MergeCalendarListAdapter {
                 // On calendar click
-                lifecycleScope.launch {
-                    importAssistantViewModel.setMergeExistingCalendar(calendarToImport, it)
-                    bottomSheetDialog.dismiss()
-                }
+                importAssistantViewModel.setMergeExistingCalendar(calendarToImport, it)
+                bottomSheetDialog.dismiss()
             }
             mergeCalendarListView?.adapter = mergeCalendarListAdapter
             mergeCalendarListAdapter.submitList(userCalendars)

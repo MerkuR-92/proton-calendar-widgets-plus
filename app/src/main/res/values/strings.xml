@@ -309,7 +309,6 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">The notification has already been added</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
@@ -458,6 +457,8 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
+    <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
+    <string name="import_assistant_prepare_import">Preparing import</string>
     <string name="import_assistant_gathering_data_loader_title">Gathering your data</string>
     <string name="import_assistant_summary_title">Import summary</string>
     <string name="import_assistant_summary_customize_import">Customize import</string>
@@ -514,6 +515,9 @@
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
     <string name="import_assistant_discard_import_positive">Cancel import</string>
     <string name="import_assistant_discard_import_negative">Resume import</string>
+    <string name="import_assistant_authentication_canceled">Authentication canceled</string>
+    <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
+    <string name="import_assistant_in_progress_error_snack">There is still an import in progress</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
@@ -544,8 +548,12 @@
         <item quantity="other">Merge %d calendars in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
-        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
+        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+        <item quantity="one"> or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="other">or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

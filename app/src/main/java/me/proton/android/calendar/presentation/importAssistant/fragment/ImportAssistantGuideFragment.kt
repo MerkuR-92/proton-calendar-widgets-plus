@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -12,6 +13,7 @@ import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_ass
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_press
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_subtitle
 import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_new_import_button
+import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
@@ -27,6 +29,7 @@ import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportA
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.core.KoinComponent
+import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
 class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
@@ -89,6 +92,8 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
         }
 
+        observeImportGuideSnackState(coroutineContext)
+
         import_assistant_status_guide_new_import_button.setOnSingleClickListener {
             (requireActivity() as MainActivity).showImportGoogleAuthDialog()
         }
@@ -121,6 +126,19 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
     private fun displayNetworkError() {
         view?.displaySnackBar(getString(R.string.snack_network_error))
+    }
+
+    private fun observeImportGuideSnackState(coroutineContext: CoroutineContext) {
+        importAssistantViewModel.importGuideSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { importGuideSnackState ->
+            importGuideSnackState?.let {
+                when (it) {
+                    is ImportAssistantViewModel.ImportSnackState.DisplaySnack -> {
+                        view?.displaySnackBar(it.message)
+                    }
+                }
+                importAssistantViewModel.importGuideSnackState.value = null
+            }
+        }
     }
 }
 

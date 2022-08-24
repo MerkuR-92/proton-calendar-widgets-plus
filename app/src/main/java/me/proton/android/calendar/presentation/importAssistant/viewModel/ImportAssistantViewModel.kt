@@ -5,15 +5,13 @@ import android.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
-import me.proton.android.calendar.common.CalendarImport.ACCESS_TYPE
-import me.proton.android.calendar.common.CalendarImport.GOOGLE_AUTH_BASE_URL
-import me.proton.android.calendar.common.CalendarImport.GOOGLE_SCOPES
-import me.proton.android.calendar.common.CalendarImport.PROMPT
-import me.proton.android.calendar.common.CalendarImport.REDIRECT_URI
-import me.proton.android.calendar.common.CalendarImport.RESPONSE_TYPE
+import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
@@ -50,9 +48,6 @@ class ImportAssistantViewModel @Inject constructor(
     private val calendarsRepository: CalendarsRepository
 ) : AndroidViewModel(application) {
 
-    private val _userId: MutableLiveData<UserId?> = MutableLiveData()
-    val userId: LiveData<UserId?> = _userId
-
     private val _importCalendarMappingList: MutableLiveData<List<ImportCalendarMapping>?> = MutableLiveData()
     val importCalendarMappingList: LiveData<List<ImportCalendarMapping>?> = _importCalendarMappingList
 
@@ -69,43 +64,48 @@ class ImportAssistantViewModel @Inject constructor(
 
     private lateinit var importerId: String
 
+    val importSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+    val importGuideSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+    val importStatusSnackState: MutableStateFlow<ImportSnackState?> = MutableStateFlow(null)
+
+    sealed class ImportSnackState {
+
+        data class DisplaySnack(
+            val message: String
+        ): ImportSnackState()
+    }
+
     sealed class ImportResult {
         object Success : ImportResult()
         class Error(val userErrorMessage: String? = null) : ImportResult()
     }
 
+    private suspend fun getPrimaryUserIdOrNull() = accountManager.getPrimaryUserId().firstOrNull()
+
     fun resetViewModel() {
-        _userId.value = null
         _importerList.value = null
         _reportList.value = null
         _importCalendarMappingList.value = null
         _sourceEmail.value = null
     }
 
-    private suspend fun getGoogleClientId(userId: UserId): String? {
-        return importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId
-    }
+    suspend fun getGoogleSignInOptions(): GoogleSignInOptions? {
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
-    /**
-     * Use importerId parameter if we need to updated an existing importer
-     */
-    suspend fun getGoogleAuthenticationUrl(userId: UserId, importerId: String? = null): String? {
-        val googleClientId = getGoogleClientId(userId) ?: return null
-        return GOOGLE_AUTH_BASE_URL +
-                "scope=${GOOGLE_SCOPES}" +
-                "&accessType=${ACCESS_TYPE}" +
-                "&redirect_uri=${REDIRECT_URI}" +
-                "&response_type=${RESPONSE_TYPE}"+
-                "&client_id=$googleClientId" +
-                "&prompt=${PROMPT}" +
-                if (importerId.isNullOrBlank()) "" else "&state=$importerId" // Specifies any string value that your application uses to maintain state between your authorization request and the authorization server's response
+        // Fetch google client Id from config
+        val clientId = importerApi.getGoogleClientId(userId).valueOrNullAndLogErrors(logger)?.config?.googleClientId ?: return null
+
+        // Configure sign-in to request the user's ID, email address, and basic
+        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+        return GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestServerAuthCode(clientId)
+            .requestScopes(Scope(CalendarImport.GOOGLE_CALENDAR_SCOPE))
+            .requestEmail()
+            .build()
     }
 
     private suspend fun getDefaultUserEmail(): String? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
 
@@ -194,7 +194,7 @@ class ImportAssistantViewModel @Inject constructor(
         importerApi.updateCalendarImporter(userId, importerId, tokenId).valueOrNullAndLogErrors(logger) ?: return false
 
         // Resume import
-        return if (resumeImport(importerId)) {
+        return if (resumeImport(importerId) is ImportResult.Success) {
             if (_importerList.value?.any { it.id == importerId } == true) {
                 // Refresh importers list if it has the importer
                 getImporters()
@@ -204,10 +204,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun startImport(customCalendarMapping: Boolean, importCalendarMappingList: List<ImportCalendarMapping>): ImportResult {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return ImportResult.Error()
+        val userId = getPrimaryUserIdOrNull() ?: return ImportResult.Error()
 
         // Map ImportCalendarMapping list to CalendarMappingEntity list
         val calendarMapping = importCalendarMappingList.mapNotNull {
@@ -234,10 +231,7 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         // Create calendar
         val createCalendarResult = createCalendarUseCase.execute(
@@ -312,7 +306,7 @@ class ImportAssistantViewModel @Inject constructor(
         _importCalendarMappingList.value = currentList
     }
 
-    suspend fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
+    fun setMergeExistingCalendar(calendarToImport: ImportCalendarMapping, calendar: Calendar) {
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
             sourceId = calendarToImport.sourceId,
@@ -334,59 +328,58 @@ class ImportAssistantViewModel @Inject constructor(
     }
 
     suspend fun getImporters() {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return
+        val userId = getPrimaryUserIdOrNull() ?: return
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return
         _importerList.value = importers
     }
 
+    suspend fun isImportInProgress(): Boolean {
+        val userId = getPrimaryUserIdOrNull() ?: return false
+
+        val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return false
+        return importers.any { it.active != null }
+    }
+
     private suspend fun getImporter(importerId: String): ImporterEntity? {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return null
+        val userId = getPrimaryUserIdOrNull() ?: return null
 
         return importerApi.getImporter(userId, importerId).valueOrNullAndLogErrors(logger)?.importer
     }
 
     suspend fun getReports() {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return
+        val userId = getPrimaryUserIdOrNull() ?: return
 
         val reports = importerApi.getReports(userId).valueOrNullAndLogErrors(logger)?.reports ?: return
         _reportList.value = reports
     }
 
     suspend fun cancelImport(importId: String): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+        val userId = getPrimaryUserIdOrNull() ?: return false
 
         importerApi.cancelImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
         return true
     }
 
-    suspend fun resumeImport(importId: String): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+    suspend fun resumeImport(importId: String): ImportResult {
+        val userId = getPrimaryUserIdOrNull() ?: return ImportResult.Error()
 
-        importerApi.resumeImport(userId, importId).valueOrNullAndLogErrors(logger) ?: return false
-        return true
+        // Start importer
+        return when (val resumeImportResponse = importerApi.resumeImport(userId, importId)) {
+            is ApiResponse.Success -> {
+                ImportResult.Success
+            }
+            is ApiResponse.Error -> {
+                ImportResult.Error(userErrorMessage = resumeImportResponse.error)
+            }
+            is ApiResponse.Exception -> {
+                ImportResult.Error()
+            }
+        }
     }
 
     suspend fun deleteReport(reportId: String): Boolean {
-        val userId = _userId.value ?: accountManager.getPrimaryUserId().firstOrNull()?.let {
-            _userId.value = it
-            return@let it
-        } ?: return false
+        val userId = getPrimaryUserIdOrNull() ?: return false
 
         importerApi.deleteReport(userId, reportId).valueOrNullAndLogErrors(logger) ?: return false
 

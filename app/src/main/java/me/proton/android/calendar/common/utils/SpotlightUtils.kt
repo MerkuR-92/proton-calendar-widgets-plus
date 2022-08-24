@@ -86,7 +86,7 @@ object SpotlightUtils {
                     rebrandingContent.second
                 )
             }
-            146 -> {
+            150 -> {
                 if (!IMPORT_ASSISTANT) return
                 // Easy switch
                 val easySwitchContent = this.resources.getEasySwitchDialogContent()
