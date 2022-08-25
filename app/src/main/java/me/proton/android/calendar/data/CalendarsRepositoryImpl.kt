@@ -23,10 +23,12 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
+import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.*
@@ -719,6 +721,17 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean =
         database.eventsDao().hasEvent(eventId, calendarId)
+
+    override suspend fun eventExistsOnServer(userId: UserId, eventId: String, calendarId: String): Boolean? {
+        return when (val result = calendarsApi.getEvent(userId, calendarId, eventId)) {
+            is ApiResponse.Success-> true
+            is ApiResponse.Error -> {
+                if (result.isNotFound()) return false
+                else null
+            }
+            is ApiResponse.Exception -> null
+        }
+    }
 
     override suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean {
 

@@ -89,6 +89,11 @@ class CreateCalendarUseCase @Inject constructor(
                                 // save Passphrase in DB
                                 calendarsRepository.persistPassphrase(passphraseEntity)
 
+                                val fetchedMember = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull()
+                                if (fetchedMember != null) {
+                                    calendarsRepository.persistMember(fetchedMember)
+                                }
+
                                 // cache Passphrase
                                 val cachePassphraseResult =
                                     cacheCalendarPassphraseUseCase.execute(userId, passphraseEntity.calendarId)

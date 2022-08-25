@@ -382,7 +382,6 @@
     <string name="calendar_form_save">Salva</string>
     <string name="calendar_form_name">Nome</string>
     <string name="calendar_form_name_placeholder">Aggiungi un nome al calendario</string>
-    <string name="calendar_form_name_character_limit">%d/%d caratteri</string>
     <string name="calendar_form_color">Colore calendario</string>
     <string name="calendar_form_default_event_duration">Durata evento</string>
     <string name="calendar_form_default_event_notifications">Notifiche dell\'evento</string>

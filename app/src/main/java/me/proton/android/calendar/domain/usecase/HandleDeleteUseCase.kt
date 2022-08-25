@@ -45,6 +45,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
     suspend fun handleDelete(
         userId: UserId,
         eventId: String,
+        calendarId: String,
         deleteOption: EventEditDeleteOption,
         occurrenceNumber: Int?,
         deleteSingleEdits: Boolean = true,
@@ -56,7 +57,15 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
         logger.v("executing HandleDeleteUseCase $userId, $eventId, $deleteOption, $occurrenceNumber $deleteSingleEdits $isOrphanSingleEdit")
 
-        val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
+        val eventEntity = calendarsRepository.selectEventEntity(eventId)
+
+        // maybe Event was deleted on server first
+        if (eventEntity == null) {
+            if (calendarsRepository.eventExistsOnServer(userId, eventId, calendarId) == false) {
+                return UseCase.Result.Success<Unit>()
+            } else return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
+        }
+
         val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
             eventDecryptor.decrypt(eventEntity)
         } else {
@@ -339,6 +348,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         val handleDeleteResult = handleDelete(
             userId,
             event.id,
+            event.calendar.id,
             if (isPartOfChain) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
             if (isPartOfChain) null else 0
         )
@@ -442,6 +452,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         val handleDeleteResult = handleDelete(
             userId,
             event.id,
+            event.calendar.id,
             if (event.isRecurring() || (event.isSingleEdit() && !isOrphanSingleEdit && event.calendar.isDisabled)) EventEditDeleteOption.ALL_EVENTS else EventEditDeleteOption.THIS_EVENT,
             if (event.isRecurring() || (event.isSingleEdit() && !isOrphanSingleEdit && event.calendar.isDisabled)) null else if (event.isSingleEdit()) occurrenceNumber else 0,
             !(event.isRecurring() && hasNonCancelledSingleEdit) || event.calendar.isDisabled,

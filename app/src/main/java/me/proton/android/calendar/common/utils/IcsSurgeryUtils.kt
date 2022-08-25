@@ -92,7 +92,7 @@ object IcsSurgeryUtils {
 
             data class EditCreateEventError(val userErrorMessage: String? = null): Error()
             data class ReplyPartyCrasher(val eventId: String? = null): Error()
-            data class DecryptionFailed(val eventId: String? = null, val isRecurring: Boolean? = null): Error()
+            data class DecryptionFailed(val eventId: String? = null, val calendarId: String? = null, val isRecurring: Boolean? = null): Error()
             data class DisabledCalendar(val eventId: String? = null): Error()
             data class Method(val eventId: String? = null): Error()
 

@@ -226,7 +226,7 @@ class HandleIcsUseCase @Inject constructor(
         if (iCalendar.method.isReply && !isOrganizerMode) {
             return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
         }
-        if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.isRecurring())
+        if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
         if (isCurrentUserSender && existingEvent != null) {
@@ -269,7 +269,7 @@ class HandleIcsUseCase @Inject constructor(
 
         val isReInvitation = newEvent.iCalendar.method.isRequest && !newEvent.isCancelled() && existingEvent != null && existingEvent?.isCancelled() == true
         if (isReInvitation && immutableExistingEvent != null) {
-            val deleteResult = handleDeleteUseCase.handleDelete(userId, immutableExistingEvent.id, EventEditDeleteOption.ALL_EVENTS, null)
+            val deleteResult = handleDeleteUseCase.handleDelete(userId, immutableExistingEvent.id, immutableExistingEvent.calendar.id, EventEditDeleteOption.ALL_EVENTS, null)
             if (deleteResult !is UseCase.Result.Success<*>) {
                 deleteResult.ifSuccessAndLogErrors(logger) {}
                 return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(

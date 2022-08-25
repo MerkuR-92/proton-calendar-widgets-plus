@@ -434,6 +434,7 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
                         val deleteResult = withContext(Dispatchers.Default) {
                             calendarViewModel.handleDeleteEvent(
                                 event.id,
+                                event.calendar.id,
                                 EventEditDeleteOption.ALL_EVENTS
                             )
                         }

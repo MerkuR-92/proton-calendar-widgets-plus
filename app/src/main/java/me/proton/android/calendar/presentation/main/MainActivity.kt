@@ -604,6 +604,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 val deleteResult = withContext(Dispatchers.Default) {
                                     calendarViewModel.handleDeleteEvent(
                                         eventId,
+                                        calendarId,
                                         EventEditDeleteOption.ALL_EVENTS
                                     )
                                 }
@@ -704,8 +705,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
                     is Error.Method -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_invalid_error))
                     is Error.DecryptionFailed -> {
-                        if (handleIcsImportResult.eventId != null) {
-                            deleteFailedToDecryptEvent(handleIcsImportResult.eventId, handleIcsImportResult.isRecurring)
+                        if (handleIcsImportResult.eventId != null && handleIcsImportResult.calendarId != null) {
+                            deleteFailedToDecryptEvent(handleIcsImportResult.eventId, handleIcsImportResult.calendarId, handleIcsImportResult.isRecurring)
                         } else this@MainActivity.displaySnackBar(getString(R.string.event_decryption_error_dialog_title), Snackbar.LENGTH_LONG)
                     }
                     else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
@@ -716,7 +717,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun deleteFailedToDecryptEvent(eventId: String, isRecurring: Boolean?) {
+    private fun deleteFailedToDecryptEvent(eventId: String, calendarId: String, isRecurring: Boolean?) {
         val confirmationMessage =
             if (isRecurring == true) R.string.event_decryption_error_dialog_confirmation_recurring
             else R.string.event_decryption_error_dialog_confirmation
@@ -728,6 +729,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     val deleteResult = withContext(Dispatchers.Default) {
                         calendarViewModel.handleDeleteEvent(
                             eventId,
+                            calendarId,
                             EventEditDeleteOption.ALL_EVENTS
                         )
                     }

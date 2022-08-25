@@ -171,6 +171,7 @@ internal class HandleDeleteUseCaseTest {
                 getHandleDeleteUseCase().handleDelete(
                     userId,
                     event.id,
+                    event.calendar.id,
                     EventEditDeleteOption.THIS_EVENT,
                     0
                 ) is UseCase.Result.Success<*>
@@ -206,6 +207,7 @@ internal class HandleDeleteUseCaseTest {
                 getHandleDeleteUseCase().handleDelete(
                     userId,
                     event.id,
+                    event.calendar.id,
                     EventEditDeleteOption.THIS_EVENT,
                     0
                 ) is UseCase.Result.Success<*>
@@ -241,6 +243,7 @@ internal class HandleDeleteUseCaseTest {
                 getHandleDeleteUseCase().handleDelete(
                     userId,
                     event.id,
+                    event.calendar.id,
                     EventEditDeleteOption.THIS_EVENT,
                     0
                 ) is UseCase.Result.Error

@@ -382,7 +382,6 @@
     <string name="calendar_form_save">Desar</string>
     <string name="calendar_form_name">Nom</string>
     <string name="calendar_form_name_placeholder">Afegir un nom de calendari</string>
-    <string name="calendar_form_name_character_limit">%d/%d caràcters</string>
     <string name="calendar_form_color">Color del calendari</string>
     <string name="calendar_form_default_event_duration">Durada de l\'esdeveniment</string>
     <string name="calendar_form_default_event_notifications">Notificacions d\'esdeveniment</string>

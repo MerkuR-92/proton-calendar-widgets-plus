@@ -381,7 +381,6 @@
     <string name="calendar_form_save">Save</string>
     <string name="calendar_form_name">Name</string>
     <string name="calendar_form_name_placeholder">Add a calendar name</string>
-    <string name="calendar_form_name_character_limit">%d/%d characters</string>
     <string name="calendar_form_color">Calendar color</string>
     <string name="calendar_form_default_event_duration">Event duration</string>
     <string name="calendar_form_default_event_notifications">Event notifications</string>
@@ -610,6 +609,10 @@
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minute</item>
         <item quantity="other">%s minutes</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d character</item>
+        <item quantity="other">%d/%d characters</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
