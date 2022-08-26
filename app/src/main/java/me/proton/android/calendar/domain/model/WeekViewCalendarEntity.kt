@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 sealed class WeekViewCalendarEntity {
 
     data class Event(
-        val id: Long,
+        val id: String,
         val title: CharSequence,
         val startTime: LocalDateTime,
         val endTime: LocalDateTime,
@@ -25,7 +25,7 @@ sealed class WeekViewCalendarEntity {
     ) : WeekViewCalendarEntity()
 
     data class BlockedTimeSlot(
-        val id: Long,
+        val id: String,
         val startTime: LocalDateTime,
         val endTime: LocalDateTime
     ) : WeekViewCalendarEntity()

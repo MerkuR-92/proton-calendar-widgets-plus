@@ -6,7 +6,7 @@ import kotlin.math.roundToInt
 
 internal sealed class ResolvedWeekViewEntity {
 
-    internal abstract val id: Long
+    internal abstract val id: String
     internal abstract val title: CharSequence
     internal abstract val subtitle: CharSequence?
     internal abstract val startTime: Calendar
@@ -19,7 +19,7 @@ internal sealed class ResolvedWeekViewEntity {
     }
 
     data class Event<T>(
-        override val id: Long,
+        override val id: String,
         override val title: CharSequence,
         override val startTime: Calendar,
         override val endTime: Calendar,
@@ -30,7 +30,7 @@ internal sealed class ResolvedWeekViewEntity {
     ) : ResolvedWeekViewEntity()
 
     data class BlockedTime(
-        override val id: Long,
+        override val id: String,
         override val title: CharSequence,
         override val subtitle: CharSequence?,
         override val startTime: Calendar,

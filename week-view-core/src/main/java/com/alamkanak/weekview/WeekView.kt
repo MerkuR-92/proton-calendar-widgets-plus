@@ -1437,18 +1437,18 @@ class WeekView @JvmOverloads constructor(
             weekView?.invalidate()
         }
 
-        internal fun onEventClick(id: Long, bounds: RectF) {
+        internal fun onEventClick(id: String, bounds: RectF) {
             val data = findEventData(id) ?: return
             onEventClick(data, bounds)
         }
 
-        internal fun handleLongClick(id: Long, bounds: RectF) {
+        internal fun handleLongClick(id: String, bounds: RectF) {
             val data = findEventData(id) ?: return
             onEventLongClick(data, bounds)
         }
 
         @Suppress("UNCHECKED_CAST")
-        private fun findEventData(id: Long): T? {
+        private fun findEventData(id: String): T? {
             val match = eventsCache[id]
             return (match as? ResolvedWeekViewEntity.Event<T>)?.data
         }
@@ -1497,7 +1497,7 @@ class WeekView @JvmOverloads constructor(
          */
         open fun onEventLongClick(data: T, bounds: RectF): Boolean = false
 
-        internal fun handleDragAndDrop(id: Long) {
+        internal fun handleDragAndDrop(id: String) {
             val data = findEventData(id) ?: return
             val match = eventsCache[id] ?: return
 

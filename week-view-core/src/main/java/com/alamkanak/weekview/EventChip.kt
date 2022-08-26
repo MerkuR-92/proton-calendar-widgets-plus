@@ -23,7 +23,7 @@ internal data class EventChip(
     /**
      * The ID of this [EventChip]'s [ResolvedWeekViewEntity].
      */
-    val eventId: Long = event.id
+    val eventId: String = event.id
 
     /**
      * The bounds in which [EventChip] will be drawn.

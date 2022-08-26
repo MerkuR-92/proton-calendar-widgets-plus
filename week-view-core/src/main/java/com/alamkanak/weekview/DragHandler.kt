@@ -12,7 +12,7 @@ internal class DragHandler(
     private val touchHandler: WeekViewTouchHandler,
     private val eventsCacheProvider: EventsCacheProvider,
     private val navigator: Navigator,
-    private val dragListener: (Long) -> Unit,
+    private val dragListener: (String) -> Unit,
     private val eventsProcessorProvider: () -> EventsProcessor?,
 ) {
 

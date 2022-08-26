@@ -15,7 +15,7 @@ internal abstract class EventsCache {
     abstract fun update(event: ResolvedWeekViewEntity)
     abstract fun clear()
 
-    operator fun get(id: Long): ResolvedWeekViewEntity? = allEvents.firstOrNull { it.id == id }
+    operator fun get(id: String): ResolvedWeekViewEntity? = allEvents.firstOrNull { it.id == id }
 
     operator fun get(
         dateRange: List<Calendar>

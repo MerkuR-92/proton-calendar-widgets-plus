@@ -78,7 +78,7 @@ internal class EventChipsCache {
         }
     }
 
-    fun remove(eventId: Long) {
+    fun remove(eventId: String) {
         val eventChip = allEventChips.firstOrNull { it.eventId == eventId } ?: return
         remove(eventChip)
     }

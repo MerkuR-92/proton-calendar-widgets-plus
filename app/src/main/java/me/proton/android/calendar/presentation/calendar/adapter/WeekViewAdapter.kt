@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 class WeekViewAdapter(
-    private val dragHandler: (Long, LocalDateTime, LocalDateTime) -> Unit,
+    private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
     private val loadMoreHandler: (List<YearMonth>) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
@@ -22,6 +22,8 @@ class WeekViewAdapter(
         FormatStyle.MEDIUM,
         FormatStyle.SHORT
     )
+
+
 
     override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity()
 

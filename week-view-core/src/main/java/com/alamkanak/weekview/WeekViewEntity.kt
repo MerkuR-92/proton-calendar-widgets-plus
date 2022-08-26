@@ -13,7 +13,7 @@ import java.util.Calendar
 sealed class WeekViewEntity {
 
     data class Event<T> internal constructor(
-        internal val id: Long = 0L,
+        internal val id: String = "0",
         internal val titleResource: TextResource,
         internal val startTime: Calendar = now(),
         internal val endTime: Calendar = now(),
@@ -25,7 +25,7 @@ sealed class WeekViewEntity {
 
         class Builder<T>(private val data: T) {
 
-            private var id: Long? = null
+            private var id: String? = null
             private var title: TextResource? = null
             private var subtitle: TextResource? = null
             private var startTime: Calendar? = null
@@ -34,7 +34,7 @@ sealed class WeekViewEntity {
             private var isAllDay: Boolean = false
 
             @PublicApi
-            fun setId(id: Long): Builder<T> {
+            fun setId(id: String): Builder<T> {
                 this.id = id
                 return this
             }
@@ -101,7 +101,7 @@ sealed class WeekViewEntity {
     }
 
     data class BlockedTime internal constructor(
-        internal val id: Long = 0L,
+        internal val id: String = "0",
         internal val titleResource: TextResource,
         internal val subtitleResource: TextResource? = null,
         internal val startTime: Calendar = now(),
@@ -111,7 +111,7 @@ sealed class WeekViewEntity {
 
         class Builder {
 
-            private var id: Long? = null
+            private var id: String? = null
             private var title: TextResource? = null
             private var subtitle: TextResource? = null
             private var startTime: Calendar? = null
@@ -119,7 +119,7 @@ sealed class WeekViewEntity {
             private var style: Style? = null
 
             @PublicApi
-            fun setId(id: Long): Builder {
+            fun setId(id: String): Builder {
                 this.id = id
                 return this
             }
