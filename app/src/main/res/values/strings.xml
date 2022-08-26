@@ -309,6 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s declined your invitation</string>
     <string name="snack_app_link_invalid">Invalid link to the event</string>
     <string name="snack_app_link_error">Error opening event</string>
+    <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">The notification has already been added</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
