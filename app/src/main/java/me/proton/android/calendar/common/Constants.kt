@@ -99,7 +99,7 @@ object FeatureFlag {
     const val SPOTLIGHT = true
     const val SUBSCRIPTION = false
     const val FEEDBACK = true
-    const val AUTO_INVITES_SETTING = false
+    const val AUTO_INVITES_SETTING = true
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false

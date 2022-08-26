@@ -39,21 +39,28 @@ object SpotlightUtils {
         editor.apply()
     }
 
-    private fun Resources.getMonthViewDialogContent(): Pair<Int, Int> {
+    private fun getMonthViewDialogContent(): Pair<Int, Int> {
         return Pair(
             R.string.spotlight_dialog_month_view_title,
             R.string.spotlight_dialog_month_view_description
         )
     }
 
-    private fun Resources.getRebrandingDialogContent(): Pair<Int, Int> {
+    private fun getRebrandingDialogContent(): Pair<Int, Int> {
         return Pair(
             R.string.spotlight_v5_dialog_rebranding_title,
             R.string.spotlight_v5_dialog_rebranding_description
         )
     }
 
-    private fun Resources.getEasySwitchDialogContent(): Pair<Int, Int> {
+    private fun getAutoAddedInvitesDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_auto_invites_title,
+            R.string.spotlight_dialog_auto_invites_description
+        )
+    }
+
+    private fun getEasySwitchDialogContent(): Pair<Int, Int> {
         return Pair(
             R.string.import_from_google_title,
             R.string.spotlight_dialog_easy_switch_description
@@ -72,7 +79,7 @@ object SpotlightUtils {
         when (lastSpotlightVersionCode) {
             112 -> {
                 // Month view
-                val monthViewContent = this.resources.getMonthViewDialogContent()
+                val monthViewContent = getMonthViewDialogContent()
                 this.displaySpotlightDialog(
                     monthViewContent.first,
                     monthViewContent.second
@@ -80,26 +87,34 @@ object SpotlightUtils {
             }
             145 -> {
                 // Rebranding
-                val rebrandingContent = this.resources.getRebrandingDialogContent()
+                val rebrandingContent = getRebrandingDialogContent()
                 this.displayV5SpotlightDialog(
                     rebrandingContent.first,
                     rebrandingContent.second
                 )
             }
             150 -> {
-                if (!IMPORT_ASSISTANT) return
-                // Easy switch
-                val easySwitchContent = this.resources.getEasySwitchDialogContent()
-                val positiveButtonCallback = View.OnClickListener {
-                    // Open import from google view
-                    (this as MainActivity).showImportGoogleAuthDialog()
-                }
+                // Display auto added invites dialog, followed by easy switch dialog
+                val autoAddedInvitesContent = getAutoAddedInvitesDialogContent()
                 this.displaySpotlightDialog(
-                    easySwitchContent.first,
-                    easySwitchContent.second,
-                    R.string.spotlight_dialog_easy_switch_positive_button,
-                    R.string.spotlight_dialog_easy_switch_negative_button,
-                    positiveButtonCallback
+                    autoAddedInvitesContent.first,
+                    autoAddedInvitesContent.second,
+                    materialPositiveButtonText = R.string.spotlight_dialog_auto_invites_positive_button,
+                    customOnDismissCallback = {
+                        // Easy switch
+                        val easySwitchContent = getEasySwitchDialogContent()
+                        val positiveButtonCallback = View.OnClickListener {
+                            // Open import from google view
+                            (this as MainActivity).showImportGoogleAuthDialog()
+                        }
+                        this.displaySpotlightDialog(
+                            easySwitchContent.first,
+                            easySwitchContent.second,
+                            customPositiveButtonText = R.string.spotlight_dialog_easy_switch_positive_button,
+                            customNegativeButtonText = R.string.spotlight_dialog_easy_switch_negative_button,
+                            customPositiveButtonCallback = positiveButtonCallback
+                        )
+                    }
                 )
             }
             else -> {
@@ -111,19 +126,23 @@ object SpotlightUtils {
     private fun Context.displaySpotlightDialog(
         title: Int,
         description: Int,
+        materialPositiveButtonText: Int? = null,
         customPositiveButtonText: Int? = null,
         customNegativeButtonText: Int? = null,
-        customPositiveButtonCallback: View.OnClickListener? = null
+        customPositiveButtonCallback: View.OnClickListener? = null,
+        customOnDismissCallback: View.OnClickListener? = null
     ) {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
-            .setOnDismissListener {
-                // Set current version name as last spotlight shown
-                this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
-            }
 
         val view = LayoutInflater.from(this)
             .inflate(R.layout.dialog_spotlight, null, false)
+
+        materialDialogBuilder.setOnDismissListener {
+            customOnDismissCallback?.onClick(view)
+            // Set current version name as last spotlight shown
+            this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
+        }
 
         // Support link in text with getText
         view.dialog_spotlight_title.text = getText(title)
@@ -142,8 +161,9 @@ object SpotlightUtils {
                 customPositiveButtonCallback?.onClick(it)
             }
         } else {
-            materialDialogBuilder.setPositiveButton(R.string.spotlight_dialog_confirmation_button) { _, _ ->
+            materialDialogBuilder.setPositiveButton(materialPositiveButtonText ?: R.string.spotlight_dialog_confirmation_button) { _, _ ->
                 // Nothing to do here
+                customPositiveButtonCallback?.onClick(view)
             }
         }
 
