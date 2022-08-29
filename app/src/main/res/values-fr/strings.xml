@@ -245,7 +245,7 @@
     <string name="snack_event_deleted_as_organizer">Annulation envoyée et événement supprimé</string>
     <string name="snack_event_deleted_as_attendee">Réponse envoyée et événement supprimé</string>
     <string name="snack_event_deleted_error">Erreur lors de la suppression de l\'événement</string>
-    <string name="snack_event_deleted_as_organizer_error">L\'email d\'annulation ne peut être envoyé, veuillez réessayer</string>
+    <string name="snack_event_deleted_as_organizer_error">L\'email d\'annulation ne peut être envoyé, veuillez réessayer.</string>
     <string name="snack_event_opening_error">Erreur lors de l\'ouverture de l\'événement</string>
     <string name="snack_event_saving">Enregistrement de l\'événement</string>
     <string name="snack_event_deleting">Suppression de l\'événement</string>
@@ -263,27 +263,27 @@
     <string name="snack_event_calendar_error">Erreur lors du changement de calendrier</string>
     <string name="snack_event_maximum_alarm_reached_error">Le nombre maximum de notifications a été atteint</string>
     <string name="snack_send_bug_report_success">Rapport envoyé, merci pour vos commentaires</string>
-    <string name="snack_send_bug_report_error">Erreur lors de l\'envoi du rapport, veuillez réessayer ultérieurement</string>
-    <string name="snack_send_bug_report_description_empty">Veuillez fournir une description de votre rapport</string>
+    <string name="snack_send_bug_report_error">Erreur lors de l\'envoi du rapport, réessayez plus tard.</string>
+    <string name="snack_send_bug_report_description_empty">Fournissez une description de votre rapport.</string>
     <string name="snack_create_event_no_active_personal_calendar">Vous avez besoin d\'un calendrier personnel actif pour créer des événements</string>
     <string name="snack_add_self_as_participant">L\'auto-invitation n\'est pas autorisée</string>
     <string name="snack_maximum_participants_reached">Le nombre maximum de participants est atteint.</string>
     <string name="snack_add_participant_error">Erreur lors de l\'ajout du participant</string>
     <string name="snack_add_participant_invalid_email">Adresse électronique invalide</string>
-    <string name="snack_change_attendee_answer_error">Erreur lors de l\'envoi de la réponse, veuillez réessayer ultérieurement</string>
-    <string name="snack_network_error">Erreur de réseau, veuillez réessayer ultérieurement</string>
+    <string name="snack_change_attendee_answer_error">Erreur lors de l\'envoi de la réponse, réessayez plus tard.</string>
+    <string name="snack_network_error">Erreur de réseau, réessayez plus tard.</string>
     <string name="snack_import_event_signed_out">Vous devez vous connecter pour importer les événements</string>
     <string name="snack_app_link_signed_out">Vous devez vous connecter pour voir votre événement</string>
     <string name="snack_update_default_calendar">Calendrier par défaut mis à jour</string>
-    <string name="snack_update_default_calendar_error">Erreur lors de la mise à jour du calendrier, veuillez réessayer ultérieurement</string>
+    <string name="snack_update_default_calendar_error">Erreur lors de la mise à jour du calendrier, réessayez plus tard.</string>
     <string name="snack_calendar_init_error">Erreur lors du chargement des informations du calendrier</string>
-    <string name="snack_update_calendar_error">Erreur lors de la mise à jour des informations du calendrier, veuillez réessayer plus tard</string>
-    <string name="snack_update_calendar_settings_error">Erreur lors de la mise à jour de certaines informations du calendrier, veuillez réessayer plus tard</string>
+    <string name="snack_update_calendar_error">Erreur lors de la mise à jour des informations du calendrier, réessayez plus tard.</string>
+    <string name="snack_update_calendar_settings_error">Erreur lors de la mise à jour de certaines informations du calendrier, réessayez plus tard.</string>
     <string name="snack_update_calendar_success">Calendrier mis à jour</string>
     <string name="snack_create_calendar_success">Calendrier créé</string>
     <string name="snack_calendar_saving">Enregistrement du calendrier</string>
-    <string name="snack_create_calendar_error">Erreur lors de la création du calendrier, veuillez réessayer ultérieurement</string>
-    <string name="snack_create_calendar_settings_error">Le calendrier a été créé, mais plusieurs informations n\'ont pas été mises à jour. Veuillez réessayer ultérieurement</string>
+    <string name="snack_create_calendar_error">Erreur lors de la création du calendrier, réessayez plus tard.</string>
+    <string name="snack_create_calendar_settings_error">Le calendrier a été créé, mais plusieurs informations n\'ont pas été mises à jour. Réessayez plus tard.</string>
     <string name="snack_ics_default_error">Erreur lors de l\'ouverture du calendrier</string>
     <string name="snack_ics_event_not_found_error">Événement non trouvé</string>
     <string name="snack_ics_create_error">Erreur lors de la création de l\'événement</string>
@@ -336,7 +336,7 @@
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s à %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Objet</string>
-    <string name="bug_report_hint_description">Veuillez décrire le problème et inclure tous les messages d\'erreur.</string>
+    <string name="bug_report_hint_description">Décrivez le problème et incluez les éventuels messages d\'erreur.</string>
     <string name="bug_report_discard_changes_title">Modifications non enregistrées</string>
     <string name="bug_report_discard_changes_description">Le formulaire contient des modifications non enregistrées. Êtes-vous sûr de ne pas vouloir les conserver ?</string>
     <string name="bug_report_discard_changes_cancel">Continuer à écrire</string>
@@ -450,6 +450,9 @@
     <string name="spotlight_dialog_easy_switch_description">L\'importation d\'événements et d\'autres données de Google Calendar vers Proton Calendar est plus facile que jamais. Notre importateur Easy Switch vous guidera à chaque étape.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Commencer l\'importation</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Pas maintenant</string>
+    <string name="spotlight_dialog_auto_invites_title">Acceptez facilement les invitations</string>
+    <string name="spotlight_dialog_auto_invites_description">Les invitations sont maintenant affichées dans votre calendrier comme des événements en attente. Pour répondre, il suffit d\'ouvrir un événement.\n\nRendez-vous dans les paramètres pour gérer cela.</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">J\'ai compris</string>
     <string name="spotlight_v5_dialog_got_it_button">J\'ai compris</string>
     <string name="spotlight_v5_dialog_learn_more_button">En savoir plus</string>
     <string name="spotlight_v5_dialog_rebranding_title">Nouvelle version, protection unifiée</string>
@@ -457,17 +460,19 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
+    <string name="import_assistant_prepare_import_error">Erreur lors de la préparation de l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_prepare_import">Préparation de l\'importation</string>
     <string name="import_assistant_gathering_data_loader_title">Rassemblement de vos données</string>
     <string name="import_assistant_summary_title">Résumé de l\'importation</string>
     <string name="import_assistant_summary_customize_import">Personnaliser l\'importation</string>
     <string name="import_assistant_error">Erreur lors de la récupération des données</string>
     <string name="import_assistant_data_gathering_error">La collecte des données a échoué</string>
-    <string name="import_assistant_update_import_error">Échec de la mise à jour de l\'importation, veuillez réessayer plus tard.</string>
-    <string name="import_assistant_update_import_wrong_account_error">Compte incorrect. Veuillez vous connecter avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
-    <string name="import_assistant_start_import_error">Échec du démarrage de l\'importation, veuillez réessayer plus tard.</string>
-    <string name="import_assistant_delete_import_error">Impossible de supprimer l\'importation, veuillez réessayer plus tard.</string>
-    <string name="import_assistant_cancel_import_error">Impossible d\'annuler l\'importation, veuillez réessayer plus tard.</string>
-    <string name="import_assistant_resume_import_error">Impossible de reprendre l\'importation, veuillez réessayer plus tard.</string>
+    <string name="import_assistant_update_import_error">Échec de la mise à jour de l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Compte incorrect. Connectez-vous avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
+    <string name="import_assistant_start_import_error">Échec du démarrage de l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_delete_import_error">Impossible de supprimer l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_cancel_import_error">Impossible d\'annuler l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_resume_import_error">Impossible de reprendre l\'importation, réessayez plus tard.</string>
     <string name="import_assistant_create_calendar_error">Un ou plusieurs calendriers n\'ont pas pu être créés.</string>
     <string name="import_assistant_start_import_empty_error">Échec du démarrage de l\'importation, il n\'y a aucun calendrier à importer.</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importer comme</string>
@@ -513,6 +518,9 @@
     <string name="import_assistant_discard_import_message">L\'importation n\'est pas complète et ne peut pas reprendre si vous l\'annulez.</string>
     <string name="import_assistant_discard_import_positive">Annuler l\'importation</string>
     <string name="import_assistant_discard_import_negative">Reprendre l\'importation</string>
+    <string name="import_assistant_authentication_canceled">Authentification annulée</string>
+    <string name="import_assistant_sign_in_in_progress">Un processus de connexion est déjà en cours.</string>
+    <string name="import_assistant_in_progress_error_snack">Il y a encore une importation en cours.</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendrier</item>
@@ -543,8 +551,12 @@
         <item quantity="other">Fusionner %d calendriers dans Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Impossible de créer autant de nouveaux calendriers que de calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendrier ou\n • Fusionnez au moins %1$d calendrier avec les calendriers Proton existants.</item>
-        <item quantity="other">Impossible de créer autant de nouveaux calendriers que de calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers ou\n • Fusionnez au moins %1$d calendriers avec les calendriers Proton existants.</item>
+        <item quantity="one">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendrier</item>
+        <item quantity="other">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+        <item quantity="one"> ou\n • Fusionnez au moins %1$d calendrier avec des calendriers Proton existants.</item>
+        <item quantity="other">ou\n • Fusionnez au moins %1$d calendriers avec des calendriers Proton existants.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
@@ -601,6 +613,10 @@
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minute</item>
         <item quantity="other">%s minutes</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d caractère</item>
+        <item quantity="other">%d/%d caractères</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

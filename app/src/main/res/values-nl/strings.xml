@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s heeft uw uitnodiging geweigerd</string>
     <string name="snack_app_link_invalid">Ongeldige link naar de afspraak</string>
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
-    <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
+    <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
@@ -450,6 +450,9 @@
     <string name="spotlight_dialog_easy_switch_description">Gebeurtenissen en andere data van Google Agenda importeren naar Proton Calendar is makkelijker dan ooit. Ons Easy Switch importprogramma zal u stap voor stap de weg wijzen.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Begin met importeren</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Niet nu</string>
+    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
+    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Got it</string>
     <string name="spotlight_v5_dialog_got_it_button">Begrepen</string>
     <string name="spotlight_v5_dialog_learn_more_button">Meer informatie</string>
     <string name="spotlight_v5_dialog_rebranding_title">Geüpdatete Proton, verenigde bescherming</string>
@@ -457,6 +460,8 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
+    <string name="import_assistant_prepare_import_error">Fout bij het voorbereiden van de import, probeer het later opnieuw</string>
+    <string name="import_assistant_prepare_import">Import aan het voorbereiden</string>
     <string name="import_assistant_gathering_data_loader_title">Verzamelen van uw gegevens</string>
     <string name="import_assistant_summary_title">Samenvatting importeren</string>
     <string name="import_assistant_summary_customize_import">Importeren aanpassen</string>
@@ -513,6 +518,9 @@
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
     <string name="import_assistant_discard_import_positive">Cancel import</string>
     <string name="import_assistant_discard_import_negative">Resume import</string>
+    <string name="import_assistant_authentication_canceled">Authenticatie geannuleerd</string>
+    <string name="import_assistant_sign_in_in_progress">Er is reeds een loginproces bezig</string>
+    <string name="import_assistant_in_progress_error_snack">Er is nog steeds een import in uitvoering</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
@@ -543,8 +551,14 @@
         <item quantity="other">Voeg %d agenda‘s samen in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Kan geen nieuwe agenda aanmaken voor elke geïmporteerde agenda omdat er een limiet is voor persoonlijke agenda‘s.\n • Selecteer tenminste %1$d agenda minder, of\n • Voeg tenminste %1$d agenda samen met bestaande Proton agenda‘s.</item>
-        <item quantity="other">Kan geen nieuwe agenda\'s aanmaken voor elke geïmporteerde agenda omdat er een limiet is voor persoonlijke agenda‘s.\n • Selecteer tenminste %1$d agenda\'s minder, of\n • Voeg tenminste %1$d agenda\'s samen met bestaande Proton agenda‘s.</item>
+        <item quantity="one">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor persoonlijke agenda.\n • 
+Vink minstens %1$d agenda af</item>
+        <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor persoonlijke agenda.\n • 
+Vink minstens %1$d agenda\'s af</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">of\n • Voeg minstens %1$d agenda samen met bestaande Proton-agenda\'s.</item>
+        <item quantity="other">of\n • Voeg minstens %1$d agenda\'s samen met bestaande Proton-agenda\'s.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>
@@ -601,6 +615,10 @@
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minuut</item>
         <item quantity="other">%s minuten</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d teken</item>
+        <item quantity="other">%d/%d tekens</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
