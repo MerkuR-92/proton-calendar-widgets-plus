@@ -450,6 +450,9 @@
     <string name="spotlight_dialog_easy_switch_description">L\'importazione di eventi e altri dati da Google Calendar a Proton Calendar è più facile che mai. Il nostro importatore Easy Switch ti guiderà in ogni fase del processo.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Avvia importazione</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Non ora</string>
+    <string name="spotlight_dialog_auto_invites_title">Accetta gli inviti facilmente</string>
+    <string name="spotlight_dialog_auto_invites_description">Ora gli inviti appaiono sul tuo calendario come eventi in attesa. Apri un evento per rispondere.\n\nPer gestirlo, vai alle impostazioni.</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Ho capito</string>
     <string name="spotlight_v5_dialog_got_it_button">Ho capito</string>
     <string name="spotlight_v5_dialog_learn_more_button">Per saperne di più</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton Aggiornato, protezione unificata</string>
@@ -457,6 +460,8 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
+    <string name="import_assistant_prepare_import_error">Errore durante la preparazione dell\'importazione, si prega di riprovare più tardi</string>
+    <string name="import_assistant_prepare_import">Preparazione dell\'importazione</string>
     <string name="import_assistant_gathering_data_loader_title">Raccolta dei tuoi dati</string>
     <string name="import_assistant_summary_title">Riepilogo dell\'importazione</string>
     <string name="import_assistant_summary_customize_import">Personalizza importazione</string>
@@ -513,6 +518,9 @@
     <string name="import_assistant_discard_import_message">L\'importazione è incompleta e non può riprendere se la annulli.</string>
     <string name="import_assistant_discard_import_positive">Annulla importazione</string>
     <string name="import_assistant_discard_import_negative">Riprendi importazione</string>
+    <string name="import_assistant_authentication_canceled">Autenticazione cancellata</string>
+    <string name="import_assistant_sign_in_in_progress">È già in corso una procedura di accesso</string>
+    <string name="import_assistant_in_progress_error_snack">C\'è ancora un\'importazione in corso</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendario</item>
@@ -543,8 +551,12 @@
         <item quantity="other">Unisci %d calendari in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Impossibile creare nuovi calendari per tutti i calendari importati a causa del limite del calendario personale.\n • Deseleziona almeno %1$d calendario o\n • Unisci almeno %1$d calendario con i calendari Proton esistenti.</item>
-        <item quantity="other">Impossibile creare nuovi calendari per tutti i calendari importati a causa del limite del calendario personale.\n • Deseleziona almeno %1$d calendari o\n • Unisci almeno %1$d calendari con i calendari Proton esistenti.</item>
+        <item quantity="one">Impossibile creare nuovi calendari per tutti i calendari importati a causa del limite del calendario personale.\n • Deseleziona almeno %1$d calendario</item>
+        <item quantity="other">Impossibile creare nuovi calendari per tutti i calendari importati a causa del limite del calendario personale.\n • Deseleziona almeno %1$d calendari</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+        <item quantity="one"> or\n • Unisci almeno %1$d calendario con calendari Proton esistenti.</item>
+        <item quantity="other">or\n • Unisci almeno %1$d calendari con calendari Proton esistenti.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>
@@ -601,6 +613,10 @@
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minuto</item>
         <item quantity="other">%s minuti</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d carattere</item>
+        <item quantity="other">%d/%d caratteri</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

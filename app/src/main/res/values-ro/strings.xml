@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s v-a refuzat invitația</string>
     <string name="snack_app_link_invalid">Legătură nevalidă la eveniment.</string>
     <string name="snack_app_link_error">Eroare deschidere eveniment.</string>
-    <string name="snack_app_link_import_error">Autentificare anulată</string>
+    <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
@@ -450,6 +450,9 @@
     <string name="spotlight_dialog_easy_switch_description">Importarea de evenimente și alte date din Google Calendar în Proton Calendar este mai ușoară ca niciodată. Importatorul nostru Easy Switch vă va ghida la fiecare pas.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Pornire importare</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Nu acum</string>
+    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
+    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Got it</string>
     <string name="spotlight_v5_dialog_got_it_button">Am înțeles</string>
     <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizat, protecție unificată</string>
@@ -457,6 +460,8 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
+    <string name="import_assistant_prepare_import_error">Eroare la pregătirea importării. Reîncercați mai târziu.</string>
+    <string name="import_assistant_prepare_import">Se pregătește importarea.</string>
     <string name="import_assistant_gathering_data_loader_title">Vi se preiau datele</string>
     <string name="import_assistant_summary_title">Sumar importare</string>
     <string name="import_assistant_summary_customize_import">Personalizare importare</string>
@@ -513,6 +518,9 @@
     <string name="import_assistant_discard_import_message">Importarea nu este completă și nu se poate relua dacă o anulați.</string>
     <string name="import_assistant_discard_import_positive">Anulare importare</string>
     <string name="import_assistant_discard_import_negative">Reluare importare</string>
+    <string name="import_assistant_authentication_canceled">Autentificare anulată.</string>
+    <string name="import_assistant_sign_in_in_progress">Un proces de autentificare este deja în derulare.</string>
+    <string name="import_assistant_in_progress_error_snack">Încă mai există o importare în derulare.</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
@@ -550,9 +558,14 @@
         <item quantity="other">Îmbinare %d de calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin un calendar sau\n • Îmbinați cel puțin un calendar cu calendarele existente din Proton.</item>
-        <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d calendare sau\n • Îmbinați cel puțin %1$d calendare cu calendarele existente din Proton.</item>
-        <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele existente din Proton.</item>
+        <item quantity="one">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin un calendar</item>
+        <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d calendare</item>
+        <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
+        <item quantity="few">sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
+        <item quantity="other">sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
@@ -623,6 +636,11 @@
         <item quantity="one">%s minut</item>
         <item quantity="few">%s minute</item>
         <item quantity="other">%s de minute</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d caracter</item>
+        <item quantity="few">%d/%d caractere</item>
+        <item quantity="other">%d/%d de caractere</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
