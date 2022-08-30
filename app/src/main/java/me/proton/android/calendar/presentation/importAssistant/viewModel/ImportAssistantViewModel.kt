@@ -334,11 +334,11 @@ class ImportAssistantViewModel @Inject constructor(
         _importerList.value = importers
     }
 
-    suspend fun isImportInProgress(): Boolean {
+    suspend fun isImportInProgress(accountEmail: String): Boolean {
         val userId = getPrimaryUserIdOrNull() ?: return false
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return false
-        return importers.any { it.active != null }
+        return importers.any { it.account == accountEmail && it.active != null }
     }
 
     private suspend fun getImporter(importerId: String): ImporterEntity? {
