@@ -122,7 +122,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             userCalendars ?: return@observe
 
             if (this::importCalendarMappingListAdapter.isInitialized) {
-                importCalendarMappingListAdapter.isOptionsEnabled(userCalendars.any { it.isActive })
+                importCalendarMappingListAdapter.isOptionsEnabled(userCalendars.any { it.isActive && it.allowEditEvents })
             }
 
             checkCalendarLimit()
@@ -203,7 +203,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             optionsListener = { importCalendarMapping ->
                 // On options click
                 lifecycleScope.launch {
-                    val userCalendars = calendarViewModel.getActiveUserCalendars()
+                    val userCalendars = calendarViewModel.getActiveUserCalendars()?.filter { it.allowEditEvents }
                     showBottomSheetDialog(importCalendarMapping, userCalendars)
                 }
             }
@@ -233,7 +233,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
 
-                val activeUserCalendarsCount = userCalendars.filter { it.isActive }.size
+                val activeUserCalendarsCount = userCalendars.filter { it.isActive && it.allowEditEvents }.size
                 // Only show merge calendars disclaimer if we can merge
                 val mergeCalendarsMessage = if (activeUserCalendarsCount > 0) {
                     resources.getQuantityString(
@@ -260,6 +260,19 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     importCalendarMappingListAdapter.setLimitReached(false)
                 }
             }
+            fragment_import_assistant_summary_header_layout.visibleOrGone(false)
+            fragment_import_assistant_summary_error_layout.visibleOrGone(true)
+            val mergeCalendarsMessage =
+                resources.getQuantityString(
+                    R.plurals.import_assistant_import_summary_error_merge,
+                    4,
+                    4
+                )
+            fragment_import_assistant_summary_error.text = resources.getQuantityString(
+                R.plurals.import_assistant_import_summary_error,
+                4,
+                4
+            ) + mergeCalendarsMessage
         }
     }
 
@@ -501,7 +514,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
     }
 
-    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, userCalendars: List<Calendar>?) {
+    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, activeUserCalendars: List<Calendar>?) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
         // Workaround to make sure we have the correct navigation bar color.
@@ -544,10 +557,10 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val mergeCalendarLayout = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_import_mapping_merge_layout)
-        mergeCalendarLayout?.visibleOrGone(!userCalendars.isNullOrEmpty())
-        if (!userCalendars.isNullOrEmpty()) {
+        mergeCalendarLayout?.visibleOrGone(!activeUserCalendars.isNullOrEmpty())
+        if (!activeUserCalendars.isNullOrEmpty()) {
             val mergeCalendarListView = bottomSheetDialog.findViewById<RecyclerView>(R.id.dialog_calendar_import_mapping_merge_list)
-            if (userCalendars.size > 10) {
+            if (activeUserCalendars.size > 10) {
                 // Workaround with padding bottom because of bottom sheet dialog expanding but hiding a few items from the bottom of the list
                 mergeCalendarListView?.setPadding(0, 0, 0, requireContext().dpToPixel(184))
             }
@@ -559,7 +572,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 bottomSheetDialog.dismiss()
             }
             mergeCalendarListView?.adapter = mergeCalendarListAdapter
-            mergeCalendarListAdapter.submitList(userCalendars)
+            mergeCalendarListAdapter.submitList(activeUserCalendars)
         }
 
         bottomSheetDialog.show()
