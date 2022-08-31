@@ -452,7 +452,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Nicht jetzt</string>
     <string name="spotlight_dialog_auto_invites_title">Einladungen ganz einfach annehmen</string>
     <string name="spotlight_dialog_auto_invites_description">Jetzt werden Einladungen in deinem Kalender als ausstehende Termine angezeigt. Öffne einfach einen Termin, um zu antworten.\n\nBegib dich zu den Einstellungen, um dies zu verwalten.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Verstanden</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Weiter</string>
     <string name="spotlight_v5_dialog_got_it_button">Verstanden</string>
     <string name="spotlight_v5_dialog_learn_more_button">Mehr erfahren</string>
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>

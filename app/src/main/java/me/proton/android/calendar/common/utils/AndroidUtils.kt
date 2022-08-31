@@ -1309,19 +1309,6 @@ object AndroidUtils {
         return typedValue.data
     }
 
-    fun humanReadableByteCountSI(bytesRaw: Long): String {
-        var bytes = bytesRaw
-        if (-1000 < bytes && bytes < 1000) {
-            return "$bytes B"
-        }
-        val ci: CharacterIterator = StringCharacterIterator("kMGTPE")
-        while (bytes <= -999950 || bytes >= 999950) {
-            bytes /= 1000
-            ci.next()
-        }
-        return String.format("%.1f %cB", bytes / 1000.0, ci.current())
-    }
-
     fun humanReadableByteCountBin(bytes: Long): String {
         val absB = if (bytes == Long.MIN_VALUE) Long.MAX_VALUE else Math.abs(bytes)
         if (absB < 1024) {
@@ -1336,7 +1323,7 @@ object AndroidUtils {
             i -= 10
         }
         value *= java.lang.Long.signum(bytes).toLong()
-        return String.format("%.1f %ciB", value / 1024.0, ci.current())
+        return String.format("%.1f %cB", value / 1024.0, ci.current())
     }
 
     fun String.ellipsize(maxLength: Int): String {

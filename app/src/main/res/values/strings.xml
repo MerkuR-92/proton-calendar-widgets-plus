@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Settings</string>
     <string name="nav_view_feedback">Give us feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
-    <string name="nav_view_more_bug">Report bug</string>
+    <string name="nav_view_more_bug">Report a problem</string>
     <string name="nav_view_more_subscription">Subscription</string>
     <string name="nav_view_more_logout">Sign out</string>
     <string name="nav_view_more_login">Sign in</string>
@@ -452,7 +452,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Not now</string>
     <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
     <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Got it</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Next</string>
     <string name="spotlight_v5_dialog_got_it_button">Got it</string>
     <string name="spotlight_v5_dialog_learn_more_button">Learn more</string>
     <string name="spotlight_v5_dialog_rebranding_title">Updated Proton, unified protection</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
     <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
     <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_success">Import record deleted</string>
     <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
     <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
     <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>
@@ -555,8 +556,8 @@
         <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one"> or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
-        <item quantity="other">or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

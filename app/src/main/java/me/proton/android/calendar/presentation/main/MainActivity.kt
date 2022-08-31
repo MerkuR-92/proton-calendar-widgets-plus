@@ -1043,20 +1043,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val dialog = materialDialogBuilder.show()
 
         lifecycleScope.launch {
-            if (importAssistantViewModel.isImportInProgress()) {
-                val snackMessage = getString(R.string.import_assistant_in_progress_error_snack)
-                if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
-                    importAssistantViewModel.importGuideSnackState.value =
-                        ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
-                } else {
-                    displaySnackBar(snackMessage)
-                }
-                dialog.dismiss()
-            } else {
-                // Start the google sign in process
-                displayGoogleSignIn()
-                dialog.dismiss()
-            }
+            // Start the google sign in process
+            displayGoogleSignIn()
+            dialog.dismiss()
         }
     }
 
@@ -1105,14 +1094,28 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
 
                 // Signed in successfully, show authenticated UI.
-                val authCode = account.serverAuthCode
                 googleSignInClient?.signOut()
-                authCode?.let {
-                    // Create import
-                    val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
-                    safeNavigateToDialogFragment(importAssistantDeepLink)
-                } ?: run {
-                    displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                lifecycleScope.launch {
+                    account.email?.let { accountEmail ->
+                        if (importAssistantViewModel.isImportInProgress(accountEmail)) {
+                            val snackMessage = getString(R.string.import_assistant_in_progress_error_snack)
+                            if (safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
+                                importAssistantViewModel.importGuideSnackState.value =
+                                    ImportAssistantViewModel.ImportSnackState.DisplaySnack(snackMessage)
+                            } else {
+                                displaySnackBar(snackMessage)
+                            }
+                            return@launch
+                        }
+                    }
+
+                    account.serverAuthCode?.let { authCode ->
+                        // Create import
+                        val importAssistantDeepLink = Navigation.Deeplink.toImportAssistant(authCode)
+                        safeNavigateToDialogFragment(importAssistantDeepLink)
+                    } ?: run {
+                        displaySnackBar(getString(R.string.import_assistant_prepare_import_error))
+                    }
                 }
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.

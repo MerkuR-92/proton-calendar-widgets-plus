@@ -179,7 +179,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                         reporterEntity.id,
                         reporterEntity.account,
                         reporterEntity.summary.calendar?.totalSize,
-                        LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.createTime.toLong()), zoneId),
+                        LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.endTime.toLong()), zoneId),
                         reporterEntity.summary.calendar?.state?.let { state ->
                             Import.ImportState.values()[state]
                         }
@@ -271,6 +271,8 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                             // Import.id is the reportId since we mapped both reports and active importers to the Import object
                             if (!importAssistantViewModel.deleteReport(import.id)) {
                                 view?.displaySnackBar(getString(R.string.import_assistant_delete_import_error))
+                            } else {
+                                view?.displaySnackBar(getString(R.string.import_assistant_delete_import_success))
                             }
                         }
                     }
