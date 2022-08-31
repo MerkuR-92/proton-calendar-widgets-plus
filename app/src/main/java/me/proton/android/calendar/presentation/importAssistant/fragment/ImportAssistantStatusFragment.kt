@@ -179,7 +179,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
                         reporterEntity.id,
                         reporterEntity.account,
                         reporterEntity.summary.calendar?.totalSize,
-                        LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.createTime.toLong()), zoneId),
+                        LocalDateTime.ofInstant(Instant.ofEpochSecond(reporterEntity.endTime.toLong()), zoneId),
                         reporterEntity.summary.calendar?.state?.let { state ->
                             Import.ImportState.values()[state]
                         }
