@@ -452,7 +452,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Pas maintenant</string>
     <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
     <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Got it</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Suivant</string>
     <string name="spotlight_v5_dialog_got_it_button">J\'ai compris</string>
     <string name="spotlight_v5_dialog_learn_more_button">En savoir plus</string>
     <string name="spotlight_v5_dialog_rebranding_title">Nouvelle version, protection unifiée</string>
