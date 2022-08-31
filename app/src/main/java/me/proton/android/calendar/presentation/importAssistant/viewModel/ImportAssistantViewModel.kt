@@ -338,7 +338,7 @@ class ImportAssistantViewModel @Inject constructor(
         val userId = getPrimaryUserIdOrNull() ?: return false
 
         val importers = importerApi.getImporters(userId).valueOrNullAndLogErrors(logger)?.importers ?: return false
-        return importers.any { it.account == accountEmail && it.active != null }
+        return importers.any { it.account == accountEmail && it.active?.calendar != null }
     }
 
     private suspend fun getImporter(importerId: String): ImporterEntity? {
