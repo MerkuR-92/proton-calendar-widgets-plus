@@ -260,19 +260,6 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     importCalendarMappingListAdapter.setLimitReached(false)
                 }
             }
-            fragment_import_assistant_summary_header_layout.visibleOrGone(false)
-            fragment_import_assistant_summary_error_layout.visibleOrGone(true)
-            val mergeCalendarsMessage =
-                resources.getQuantityString(
-                    R.plurals.import_assistant_import_summary_error_merge,
-                    4,
-                    4
-                )
-            fragment_import_assistant_summary_error.text = resources.getQuantityString(
-                R.plurals.import_assistant_import_summary_error,
-                4,
-                4
-            ) + mergeCalendarsMessage
         }
     }
 
