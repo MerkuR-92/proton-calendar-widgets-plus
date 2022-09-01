@@ -563,9 +563,9 @@
         <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
-        <item quantity="few">sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
-        <item quantity="other">sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>
+        <item quantity="one">\u0020sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
+        <item quantity="few">\u0020sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
+        <item quantity="other">\u0020sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>

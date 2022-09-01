@@ -571,10 +571,10 @@
         <item quantity="other">Неможливо створити нові календарі для всіх імпортованих календарів через ліміт особистого календаря.\n • Зніміть вибір принаймні %1$d календарів</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one"> або\n • Обʼєднайте принаймні %1$d календар із наявними календарями Proton.</item>
-        <item quantity="few">або\n • Обʼєднайте принаймні %1$d календарі з наявними календарями Proton.</item>
-        <item quantity="many">або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
-        <item quantity="other">або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
+        <item quantity="one">\u0020або\n • Обʼєднайте принаймні %1$d календар із наявними календарями Proton.</item>
+        <item quantity="few">\u0020або\n • Обʼєднайте принаймні %1$d календарі з наявними календарями Proton.</item>
+        <item quantity="many">\u0020або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
+        <item quantity="other">\u0020або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">хвилина</item>

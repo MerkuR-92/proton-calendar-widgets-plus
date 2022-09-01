@@ -571,10 +571,10 @@
         <item quantity="other">Z powodu limitu maksymalnej liczby osobistych kalendarzy, nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarzy</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">lub\n • Scal co najmniej %1$d kalendarz z obecnymi kalendarzami Proton.</item>
-        <item quantity="few">lub\n • Scal co najmniej %1$d kalendarze z obecnymi kalendarzami Proton.</item>
-        <item quantity="many">lub\n • Scal co najmniej %1$d kalendarzy z obecnymi kalendarzami Proton.</item>
-        <item quantity="other">lub\n • Scal co najmniej %1$d kalendarzy z obecnymi kalendarzami Proton.</item>
+        <item quantity="one">\u0020lub\n • Scal co najmniej %1$d kalendarz z obecnymi kalendarzami Proton.</item>
+        <item quantity="few">\u0020lub\n • Scal co najmniej %1$d kalendarze z obecnymi kalendarzami Proton.</item>
+        <item quantity="many">\u0020lub\n • Scal co najmniej %1$d kalendarzy z obecnymi kalendarzami Proton.</item>
+        <item quantity="other">\u0020lub\n • Scal co najmniej %1$d kalendarzy z obecnymi kalendarzami Proton.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuta</item>

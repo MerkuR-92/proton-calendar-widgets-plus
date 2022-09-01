@@ -220,8 +220,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
-            if (isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
-                !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID) {
+            if (importCalendarsToCreateCount > 0 &&
+                (isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
+                !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID)) {
                 fragment_import_assistant_summary_header_layout.visibleOrGone(false)
                 fragment_import_assistant_summary_error_layout.visibleOrGone(true)
                 val countCalendarsOverLimit =

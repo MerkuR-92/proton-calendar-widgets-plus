@@ -557,8 +557,8 @@ Vink minstens %1$d agenda af</item>
 Vink minstens %1$d agenda\'s af</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">of\n • Voeg minstens %1$d agenda samen met bestaande Proton-agenda\'s.</item>
-        <item quantity="other">of\n • Voeg minstens %1$d agenda\'s samen met bestaande Proton-agenda\'s.</item>
+        <item quantity="one">\u0020of\n • Voeg minstens %1$d agenda samen met bestaande Proton-agenda\'s.</item>
+        <item quantity="other">\u0020of\n • Voeg minstens %1$d agenda\'s samen met bestaande Proton-agenda\'s.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>

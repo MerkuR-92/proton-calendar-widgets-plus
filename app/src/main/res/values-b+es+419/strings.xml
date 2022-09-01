@@ -555,8 +555,8 @@
         <item quantity="other">No se pueden crear calendarios nuevos para todos los calendarios importados debido al límite de calendarios personales.\n • Deseleccione al menos %1$d calendarios</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one"> o\n • fusione al menos %1$d calendario con calendarios de Proton existentes.</item>
-        <item quantity="other">o\n • fusione al menos %1$d calendarios con calendarios de Proton existentes.</item>
+        <item quantity="one">\u0020o\n • fusione al menos %1$d calendario con calendarios de Proton existentes.</item>
+        <item quantity="other">\u0020o\n • fusione al menos %1$d calendarios con calendarios de Proton existentes.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>
