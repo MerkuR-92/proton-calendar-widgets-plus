@@ -15,7 +15,8 @@ import java.time.format.FormatStyle
 
 class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
-    private val loadMoreHandler: (List<YearMonth>) -> Unit
+    private val loadMoreHandler: (List<YearMonth>) -> Unit,
+    private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -31,6 +32,11 @@ class WeekViewAdapter(
         if (data is WeekViewCalendarEntity.Event) {
             context.showToast("Clicked ${data.title}")
         }
+    }
+
+    override fun onRangeChanged(firstVisibleDate: LocalDate, lastVisibleDate: LocalDate) {
+        super.onRangeChanged(firstVisibleDate, lastVisibleDate)
+        rangeChangedHandler(firstVisibleDate, lastVisibleDate)
     }
 
     override fun onEmptyViewClick(time: LocalDateTime) {

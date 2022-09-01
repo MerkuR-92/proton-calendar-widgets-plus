@@ -572,6 +572,9 @@ class MonthFragment : BaseFragment() {
                 if (yearMonth.isAfter(currentToDate)) currentToDate = yearMonth
                 TimberLogger.e("Test test week view load more $yearMonthList currentFromDate $currentFromDate currentToDate $currentToDate")
                 getEvents(currentFromDate.atDay(1), currentToDate.atEndOfMonth(), timeZoneId ?: ZoneId.systemDefault().id)
+            },
+            rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
+                calendarViewModel.handleDaySelected(firstVisibleDate)
             }
         )
         weekView.adapter = weekViewAdapter
