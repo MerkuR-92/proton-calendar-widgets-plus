@@ -963,7 +963,8 @@ class CalendarsRepositoryImpl @Inject constructor(
                 if (database.calendarsDao().hasCalendar(it.key)) {
                     try {
                         it.value.forEach {
-                            if (!database.eventsDao().hasEvent(it.id, it.calendarId, it.modifyTime)) {
+                            // don't overwrite Event it we already have newer one in DB
+                            if (!database.eventsDao().hasEventWithHigherModifyTime(it.id, it.calendarId, it.modifyTime)) {
                                 database.eventsDao().updateOrInsert(it)
                             }
                         }
