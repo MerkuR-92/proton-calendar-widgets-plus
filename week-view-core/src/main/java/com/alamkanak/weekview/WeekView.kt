@@ -14,6 +14,7 @@ import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
 import java.util.Calendar
+import java.util.TimeZone
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -1052,6 +1053,26 @@ class WeekView @JvmOverloads constructor(
         get() = viewState.daySeparatorPaint.strokeWidth.roundToInt()
         set(value) {
             viewState.daySeparatorPaint.strokeWidth = value.toFloat()
+            invalidate()
+        }
+
+    /*
+     ***********************************************************************************************
+     *
+     *   Time zone
+     *
+     ***********************************************************************************************
+     */
+
+    /**
+     * Returns the time zone that [WeekView] will be displayed in
+     */
+    @PublicApi
+    var customTimeZone: TimeZone
+        get() = viewState.customTimeZone
+        set(value) {
+            viewState.customTimeZone = value
+            viewState.renderCurrentTime()
             invalidate()
         }
 

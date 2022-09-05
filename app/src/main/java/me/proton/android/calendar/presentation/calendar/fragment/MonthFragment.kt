@@ -24,6 +24,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
+import com.alamkanak.weekview.jsr310.firstVisibleDateAsLocalDate
+import com.alamkanak.weekview.jsr310.scrollToDate
 import com.alamkanak.weekview.jsr310.scrollToDateTime
 import com.alamkanak.weekview.jsr310.setDateFormatter
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,6 +91,7 @@ import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import java.util.Collections
 import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -197,8 +200,7 @@ class MonthFragment : BaseFragment() {
             // Align day view to current time
             calendarViewModel.jumpToCurrentTime.value = true
 
-            // TODO
-            weekView.scrollToDateTime(dateTime = LocalDateTime.now())
+            weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
         }
     }
 
@@ -410,6 +412,20 @@ class MonthFragment : BaseFragment() {
             setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
 
             lifecycleScope.launch {
+                if (currentFromDate?.month != selectedDate.month) {
+                    val fromDate = selectedDate.minusMonths(1).withDayOfMonth(1)
+                    val toDate = selectedDate.plusMonths(1).withDayOfMonth(selectedDate.plusMonths(1).lengthOfMonth())
+                    val timeZoneId = calendarViewModel.getTimeZoneId()?.id
+                    getEvents(fromDate, toDate, timeZoneId ?: return@launch)
+                    currentFromDate = selectedDate
+                }
+            }
+
+            if (weekView.firstVisibleDateAsLocalDate != selectedDate) {
+                weekView.scrollToDate(selectedDate)
+            }
+
+            lifecycleScope.launch {
                 val firstDayOfMonth = selectedDate.withDayOfMonth(1)
                 val weekStart = calendarViewModel.getWeekStart() ?: return@launch
                 val startWeekOn = getWeekStartDayOfWeek(weekStart)
@@ -502,6 +518,8 @@ class MonthFragment : BaseFragment() {
 
             setToolbarListeners(zoneId)
 
+            weekView.customTimeZone = TimeZone.getTimeZone(zoneId)
+
             if (timeZoneId != null && startWeekOn != null) {
                 headerDaysMediator.value = Pair(startWeekOn!!, timeZoneId!!)
             }
@@ -566,12 +584,7 @@ class MonthFragment : BaseFragment() {
                 // TODO DRAG
             },
             loadMoreHandler = { yearMonthList ->
-                // TODO LOAD
-                val yearMonth = yearMonthList.first()
-                if (yearMonth.isBefore(currentFromDate)) currentFromDate = yearMonth
-                if (yearMonth.isAfter(currentToDate)) currentToDate = yearMonth
-                TimberLogger.e("Test test week view load more $yearMonthList currentFromDate $currentFromDate currentToDate $currentToDate")
-                getEvents(currentFromDate.atDay(1), currentToDate.atEndOfMonth(), timeZoneId ?: ZoneId.systemDefault().id)
+                // TODO Needed ? Or use selectedDate only ?
             },
             rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
                 calendarViewModel.handleDaySelected(firstVisibleDate)
@@ -605,8 +618,7 @@ class MonthFragment : BaseFragment() {
         )
     }
 
-    private var currentFromDate: YearMonth = YearMonth.now()
-    private var currentToDate: YearMonth = YearMonth.now()
+    private var currentFromDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
@@ -624,11 +636,10 @@ class MonthFragment : BaseFragment() {
 
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
-                        TimberLogger.e("Test test getEvents fromDate $fromDate toDate $toDate ${it.events.size}")
                         val weekViewCalendarEntities = it.events.map { event ->
                             WeekViewCalendarEntity.Event(
                                 id = event.id,
-                                title = event.summary ?: "(no title)",
+                                title = event.summary ?: getString(R.string.default_event_summary),
                                 location = event.location ?: "",
                                 startTime = event.getStart(timeZoneId).toLocalDateTime(),
                                 endTime = event.getEnd(timeZoneId).toLocalDateTime(),

@@ -185,6 +185,8 @@ internal fun today() = now().atStartOfDay
 
 internal fun now() = Calendar.getInstance()
 
+internal fun nowAtTimezone(timeZone: TimeZone) = Calendar.getInstance(timeZone)
+
 internal fun Calendar.isSameDate(other: Calendar): Boolean = toEpochDays() == other.toEpochDays()
 
 internal fun firstDayOfYear(): Calendar {
@@ -260,6 +262,12 @@ internal fun Calendar.withHour(hour: Int): Calendar {
 
 internal fun Calendar.withMinutes(minute: Int): Calendar {
     return copy().apply { set(Calendar.MINUTE, minute) }
+}
+
+internal fun Calendar.withTimeZone(timeZone: TimeZone): Calendar {
+    val localCalendar = Calendar.getInstance(timeZone)
+    localCalendar.timeInMillis = timeInMillis
+    return localCalendar
 }
 
 internal fun Calendar.withLocalTimeZone(): Calendar {

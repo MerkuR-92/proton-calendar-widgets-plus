@@ -9,6 +9,7 @@ import android.os.Build
 import android.text.TextPaint
 import android.view.View
 import java.util.Calendar
+import java.util.TimeZone
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
@@ -89,6 +90,8 @@ internal class ViewState {
     var showHeaderBottomShadow: Boolean = false
 
     var horizontalScrollingEnabled: Boolean = false
+
+    var customTimeZone: TimeZone = TimeZone.getDefault()
 
     var minHour: Int = 0
     var maxHour: Int = 24
@@ -335,8 +338,8 @@ internal class ViewState {
         navigationListener.onHorizontalScrollingFinished()
     }
 
-    private fun renderCurrentTime() {
-        val desired = now()
+    fun renderCurrentTime() {
+        val desired = nowAtTimezone(customTimeZone)
         if (desired.hour > minHour) {
             // Add some padding above the current time (and thus: the now line)
             desired.subtractHours(1)

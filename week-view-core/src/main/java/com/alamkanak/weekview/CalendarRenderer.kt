@@ -275,7 +275,7 @@ private class NowLineDrawer(
 
     private fun Canvas.drawLine(startPixel: Float) {
         val top = viewState.headerHeight + viewState.currentOrigin.y
-        val now = now()
+        val now = nowAtTimezone(viewState.customTimeZone)
 
         val portionOfDay = (now.hour - viewState.minHour) + now.minute / 60f
         val portionOfDayInPixels = portionOfDay * viewState.hourHeight
