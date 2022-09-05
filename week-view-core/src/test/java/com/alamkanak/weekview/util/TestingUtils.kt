@@ -8,7 +8,7 @@ internal fun createResolvedWeekViewEvent(
     startTime: Calendar,
     endTime: Calendar
 ): ResolvedWeekViewEntity = ResolvedWeekViewEntity.Event(
-    id = 0,
+    id = "0",
     title = "Title",
     startTime = startTime,
     endTime = endTime,
@@ -18,4 +18,4 @@ internal fun createResolvedWeekViewEvent(
     data = Unit
 )
 
-internal fun ResolvedWeekViewEntity.Event<*>.withDifferentId() = copy(id = Random.nextLong())
+internal fun ResolvedWeekViewEntity.Event<*>.withDifferentId() = copy(id = Random.nextLong().toString())

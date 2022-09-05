@@ -16,7 +16,7 @@ internal object MockFactory {
         endTime: Calendar = Calendar.getInstance().plusHours(1),
         isAllDay: Boolean = false,
     ): ResolvedWeekViewEntity.Event<Event> {
-        val id = Random.nextLong()
+        val id = Random.nextLong().toString()
         return ResolvedWeekViewEntity.Event(
             id = id,
             title = "Title $id",

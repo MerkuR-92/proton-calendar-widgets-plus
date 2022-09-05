@@ -51,7 +51,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.ViewMode
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.animateGuidelineHeightChange
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -84,7 +83,6 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
