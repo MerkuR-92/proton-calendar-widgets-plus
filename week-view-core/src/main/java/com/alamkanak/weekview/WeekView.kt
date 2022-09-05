@@ -427,13 +427,35 @@ class WeekView @JvmOverloads constructor(
         }
 
     /**
-     * Returns whether a horizontal line is displayed for each hour in the time column.
+     * Returns whether a horizontal line is displayed between each hour in the time column.
      */
     @PublicApi
     var showTimeColumnHourSeparators: Boolean
         get() = viewState.showTimeColumnHourSeparators
         set(value) {
             viewState.showTimeColumnHourSeparators = value
+            invalidate()
+        }
+
+    /**
+     * Returns whether a horizontal line is displayed on each hour in the time column.
+     */
+    @PublicApi
+    var showCustomTimeColumnHourSeparators: Boolean
+        get() = viewState.showCustomTimeColumnHourSeparators
+        set(value) {
+            viewState.showCustomTimeColumnHourSeparators = value
+            invalidate()
+        }
+
+    /**
+     * Returns the hour separator width
+     */
+    @PublicApi
+    var customTimeColumnHourSeparatorWidth: Float
+        get() = viewState.customTimeColumnHourSeparatorWidth
+        set(value) {
+            viewState.customTimeColumnHourSeparatorWidth = value
             invalidate()
         }
 

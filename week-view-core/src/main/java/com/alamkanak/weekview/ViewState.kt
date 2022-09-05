@@ -86,8 +86,11 @@ internal class ViewState {
     var showDaySeparators: Boolean = false
     var showTimeColumnSeparator: Boolean = false
     var showTimeColumnHourSeparators: Boolean = false
+    var showCustomTimeColumnHourSeparators: Boolean = false
     var showHeaderBottomLine: Boolean = false
     var showHeaderBottomShadow: Boolean = false
+
+    var customTimeColumnHourSeparatorWidth: Float = 0f
 
     var horizontalScrollingEnabled: Boolean = false
 

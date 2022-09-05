@@ -30,6 +30,8 @@
         <attr name="timeColumnTextSize" format="dimension" />
         <attr name="showMidnightHour" format="boolean" />
         <attr name="showTimeColumnHourSeparator" format="boolean" />
+        <attr name="showCustomTimeColumnHourSeparator" format="boolean" />
+        <attr name="customTimeColumnHourSeparatorWidth" format="dimension" />
         <attr name="timeColumnHoursInterval" format="integer" />
 
         <!-- Time column separator -->

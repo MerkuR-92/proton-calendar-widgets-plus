@@ -149,6 +149,8 @@ internal object ViewStateFactory {
         viewState.apply {
             timeColumnPadding = a.getDimensionPixelSize(R.styleable.WeekView_timeColumnPadding, 10)
             showTimeColumnHourSeparators = a.getBoolean(R.styleable.WeekView_showTimeColumnHourSeparator, false)
+            showCustomTimeColumnHourSeparators = a.getBoolean(R.styleable.WeekView_showCustomTimeColumnHourSeparator, false)
+            customTimeColumnHourSeparatorWidth = a.getDimension(R.styleable.WeekView_customTimeColumnHourSeparatorWidth, context.dp(10))
             timeColumnHoursInterval = a.getInteger(R.styleable.WeekView_timeColumnHoursInterval, 1)
         }
 

@@ -58,12 +58,21 @@ internal class TimeColumnRenderer(
                 label.draw(this)
             }
 
+            val verticalOffset = viewState.headerHeight + viewState.currentOrigin.y + heightOfHour
+            val horizontalOffset = if (viewState.isLtr) viewState.timeColumnWidth else 0f
+
             if (showTimeColumnHourSeparators && hour > 0) {
                 val j = hour - 1
                 hourLines[j * 4] = x
                 hourLines[j * 4 + 1] = topMargin
                 hourLines[j * 4 + 2] = x + timeColumnWidth
                 hourLines[j * 4 + 3] = topMargin
+            } else if (showCustomTimeColumnHourSeparators && hour > 0) {
+                val j = hour - 1
+                hourLines[j * 4] = horizontalOffset - customTimeColumnHourSeparatorWidth
+                hourLines[j * 4 + 1] = verticalOffset
+                hourLines[j * 4 + 2] = horizontalOffset
+                hourLines[j * 4 + 3] = verticalOffset
             }
         }
 
@@ -78,7 +87,7 @@ internal class TimeColumnRenderer(
         }
 
         // Draw the hour separator inside the time column
-        if (showTimeColumnHourSeparators) {
+        if (showTimeColumnHourSeparators || showCustomTimeColumnHourSeparators) {
             canvas.drawLines(hourLines, hourSeparatorPaint)
         }
     }

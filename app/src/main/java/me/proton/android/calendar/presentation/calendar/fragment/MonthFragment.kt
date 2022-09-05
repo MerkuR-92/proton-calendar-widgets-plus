@@ -556,6 +556,8 @@ class MonthFragment : BaseFragment() {
                                 requireContext().resources.getDimensionPixelSize(R.dimen.calendar_week_number_spacing_start)
                     } else 0
             miniCalendarDaysHeaderLayout.layoutParams = layoutParams
+
+            weekView.showWeekNumber = displayWeekNumber
         }
 
         calendarViewModel.monthView.observe(viewLifecycleOwner) { monthView ->
