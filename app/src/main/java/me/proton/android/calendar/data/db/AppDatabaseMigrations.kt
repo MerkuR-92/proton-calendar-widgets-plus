@@ -306,4 +306,13 @@ object AppDatabaseMigrations {
             UserSettingsDatabase.MIGRATION_1.migrate(database)
         }
     }
+
+    val MIGRATION_42_43 = object : Migration(42, 43) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            FeatureFlagDatabase.MIGRATION_2.migrate(database)
+            FeatureFlagDatabase.MIGRATION_3.migrate(database)
+            HumanVerificationDatabase.MIGRATION_1.migrate(database)
+            HumanVerificationDatabase.MIGRATION_2.migrate(database)
+        }
+    }
 }

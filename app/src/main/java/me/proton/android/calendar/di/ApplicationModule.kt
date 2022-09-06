@@ -13,6 +13,7 @@ import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.core.account.domain.entity.AccountType
+import me.proton.core.domain.entity.AppStore
 import me.proton.core.domain.entity.Product
 import javax.inject.Singleton
 
@@ -23,6 +24,10 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideProduct(): Product = Product.Calendar
+
+    @Provides
+    @Singleton
+    fun provideAppStore() = AppStore.GooglePlay
 
     @Provides
     @Singleton

@@ -155,7 +155,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 42
+        const val version = 43
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -179,7 +179,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_38_39,
             AppDatabaseMigrations.MIGRATION_39_40,
             AppDatabaseMigrations.MIGRATION_40_41,
-            AppDatabaseMigrations.MIGRATION_41_42
+            AppDatabaseMigrations.MIGRATION_41_42,
+            AppDatabaseMigrations.MIGRATION_42_43
         )
 
         fun buildDatabase(context: Context): AppDatabase =
