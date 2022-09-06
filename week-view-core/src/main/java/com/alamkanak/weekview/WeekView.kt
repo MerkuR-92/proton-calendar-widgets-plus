@@ -587,6 +587,17 @@ class WeekView @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether we show arrow down in header.
+     */
+    @PublicApi
+    var showHeaderDownArrow: Boolean
+        get() = viewState.showHeaderDownArrow
+        set(value) {
+            viewState.showHeaderDownArrow = value
+            invalidate()
+        }
+
     /*
      ***********************************************************************************************
      *

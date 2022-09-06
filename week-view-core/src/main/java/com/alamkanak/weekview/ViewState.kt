@@ -89,6 +89,7 @@ internal class ViewState {
     var showCustomTimeColumnHourSeparators: Boolean = false
     var showHeaderBottomLine: Boolean = false
     var showHeaderBottomShadow: Boolean = false
+    var showHeaderDownArrow: Boolean = false
 
     var customTimeColumnHourSeparatorWidth: Float = 0f
 
@@ -143,6 +144,8 @@ internal class ViewState {
     var currentOrigin = PointF(0f, 0f)
 
     val headerBackgroundPaint = Paint()
+
+    val expandInfoBackgroundPaint = Paint()
 
     val headerBackgroundWithShadowPaint = Paint()
 

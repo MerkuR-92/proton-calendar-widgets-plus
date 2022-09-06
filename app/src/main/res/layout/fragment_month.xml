@@ -120,7 +120,7 @@
         app:eventPaddingVertical="5dp"
         app:eventTextSize="13sp"
         app:headerBottomShadowRadius="4dp"
-        app:headerPadding="16dp"
+        app:headerPadding="6dp"
         app:headerTextColor="@color/text_norm"
         app:showHeaderBottomShadow="false"
         app:showHeaderBottomLine="true"
@@ -141,6 +141,8 @@
         app:timeColumnSeparatorStrokeWidth="1dp"
         app:timeColumnTextColor="@color/text_norm"
         app:timeColumnTextSize="12sp"
+        app:showHeaderDownArrow="false"
+        app:expandInfoBackgroundColor="@color/interaction_weak"
         app:weekNumberBackgroundCornerRadius="8dp" />
 
 </me.proton.android.calendar.presentation.calendar.customView.InterceptTouchConstraintLayout>

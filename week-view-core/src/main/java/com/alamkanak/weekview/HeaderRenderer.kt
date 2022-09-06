@@ -8,6 +8,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.text.StaticLayout
 import android.text.TextPaint
+import android.util.Log
 import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
@@ -316,8 +317,11 @@ internal class AllDayEventsDrawer(
     }
 
     private fun Canvas.drawExpandInfo(eventsCount: Int, priorEventChip: EventChip) {
-        // Draw +X text
-        val text = "+$eventsCount"
+        // Draw + X more text
+        val text =
+            if (viewState.numberOfVisibleDays > 3) "+ $eventsCount"
+            else "+ $eventsCount more"
+
         val textPaint = expandInfoTextPaint.apply {
             textAlign = if (viewState.isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
             textSize = viewState.allDayEventTextPaint.textSize
@@ -331,9 +335,16 @@ internal class AllDayEventsDrawer(
         }
 
         val y = priorEventChip.bounds.bottom +
-            viewState.eventMarginVertical +
-            viewState.eventPaddingVertical +
-            textPaint.textSize
+                viewState.eventPaddingVertical +
+                textPaint.textSize
+
+        // Draw text background
+        val radius = viewState.eventCornerRadius.toFloat()
+        val left = priorEventChip.bounds.left
+        val top = priorEventChip.bounds.bottom + viewState.eventMarginVertical
+        val right = priorEventChip.bounds.right
+        val bottom = y + (textPaint.textHeight / 2)
+        drawRoundRect(left, top, right, bottom, radius, radius, viewState.expandInfoBackgroundPaint)
 
         drawText(text, x, y, textPaint)
     }
@@ -435,7 +446,7 @@ private class HeaderDrawer(
         if (allDayEventsExpanded) {
             upArrow.setBounds(left, top, right, bottom)
             upArrow.draw(this@drawAllDayEventsToggleArrow)
-        } else {
+        } else if (showHeaderDownArrow) {
             downArrow.setBounds(left, top, right, bottom)
             downArrow.draw(this@drawAllDayEventsToggleArrow)
         }

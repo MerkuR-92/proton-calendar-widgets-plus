@@ -59,6 +59,10 @@ internal object ViewStateFactory {
             typeface = headerTextTypeface
         }
 
+        viewState.expandInfoBackgroundPaint.apply {
+            color = a.getColor(R.styleable.WeekView_expandInfoBackgroundColor, context.colorBackground)
+        }
+
         viewState.headerBackgroundPaint.apply {
             color = a.getColor(R.styleable.WeekView_headerBackgroundColor, context.colorBackground)
         }
@@ -144,6 +148,7 @@ internal object ViewStateFactory {
         viewState.apply {
             showHeaderBottomLine = a.getBoolean(R.styleable.WeekView_showHeaderBottomLine, false)
             showHeaderBottomShadow = a.getBoolean(R.styleable.WeekView_showHeaderBottomShadow, false)
+            showHeaderDownArrow = a.getBoolean(R.styleable.WeekView_showHeaderDownArrow, false)
         }
 
         viewState.apply {

@@ -50,6 +50,8 @@
         <attr name="headerTextColor" format="color" />
         <attr name="todayHeaderTextColor" format="color" />
         <attr name="weekendHeaderTextColor" format="color" />
+        <attr name="showHeaderDownArrow" format="boolean" />
+        <attr name="expandInfoBackgroundColor" format="color" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />
