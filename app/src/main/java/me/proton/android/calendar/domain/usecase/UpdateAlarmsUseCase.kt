@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -64,7 +65,7 @@ class UpdateAlarmsUseCase @Inject constructor(
                 ICalUtilsImpl.injectVAlarmsIntoSubscribedEvents(transformedChain, database.calendarSettingsDao().select(), json)
             } else transformedChain
 
-            val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChainWithInjectedAlarms, fromZonedDateTime, "TODO")
+            val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChainWithInjectedAlarms, fromZonedDateTime, "TODO").onlyDisplayType()
 
             if (transformedChain.isEmpty()) {
                 logger.v("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")
@@ -78,7 +79,7 @@ class UpdateAlarmsUseCase @Inject constructor(
             database.eventAlarmsDao().updateOrInsert(*upcomingAlarms.toTypedArray())
 
             upcomingAlarms.forEach {
-                logger.v("${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
+                logger.v("upcoming alarm: ${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
             }
 
         }

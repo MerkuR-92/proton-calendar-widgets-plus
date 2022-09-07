@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.getTimeFormat
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartForNotification
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.EventDecryptor
@@ -174,8 +175,8 @@ class ShowNotificationUseCase @Inject constructor(
         val now = ZonedDateTime.now(zoneId)
 
         val lastAlarmForCurrentEvent =
-            ICalUtilsImpl.calculateAlarmEntities(currentEvent, zoneId.id, "doesn't matter TODO").sortedBy { it.occurrence }
-                .lastOrNull()
+            ICalUtilsImpl.calculateAlarmEntities(currentEvent, zoneId.id, "doesn't matter TODO").onlyDisplayType()
+                .sortedBy { it.occurrence }.lastOrNull()
 
         logger.v("lastAlarmForCurrentEvent: $lastAlarmForCurrentEvent")
 
@@ -185,7 +186,7 @@ class ShowNotificationUseCase @Inject constructor(
             val nextEvent = Event.withOccurrence(originalEvent, nextOccurrenceNumber, zoneId.id)
 
             if (nextEvent != null) { // maybe [currentOccurrence] was the last valid occurrence of this event
-                val alarmsForNextOccurrence = ICalUtilsImpl.calculateAlarmEntities(nextEvent, zoneId.id, "TODO")
+                val alarmsForNextOccurrence = ICalUtilsImpl.calculateAlarmEntities(nextEvent, zoneId.id, "TODO").onlyDisplayType()
 
                 database.eventAlarmsDao().deleteAllByEventId(nextEvent.id)
 

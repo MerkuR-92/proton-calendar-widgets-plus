@@ -674,6 +674,10 @@ object ICalUtilsImpl : ICalUtils {
         }.filter { it.occurrence >= now.toEpochSecond() }
     }
 
+    override fun List<EventAlarmEntity>.onlyDisplayType(): List<EventAlarmEntity> {
+        return this.filter { it.action == 2 }
+    }
+
     override fun injectVAlarmsIntoSubscribedEvents(
         events: List<Event>,
         calendarSettings: List<CalendarSettingsEntity>,

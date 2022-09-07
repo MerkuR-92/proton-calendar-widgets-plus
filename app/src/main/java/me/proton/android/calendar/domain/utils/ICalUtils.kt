@@ -170,6 +170,11 @@ interface ICalUtils {
     ): List<EventAlarmEntity>
 
     /**
+     * Filters out all Alarm Entities that are not of type DISPLAY.
+     */
+    fun List<EventAlarmEntity>.onlyDisplayType(): List<EventAlarmEntity>
+
+    /**
      * Events from Subscribed Calendars have no VAlarms inside ICS, so we take the default Alarms for that Calendar
      * and inject it when needed, because all the other logic relies on having them inside [VEvent] object.
      */

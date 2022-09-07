@@ -25,6 +25,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENT_ALARMS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.account.data.entity.AccountEntity
@@ -313,6 +314,13 @@ object AppDatabaseMigrations {
             FeatureFlagDatabase.MIGRATION_3.migrate(database)
             HumanVerificationDatabase.MIGRATION_1.migrate(database)
             HumanVerificationDatabase.MIGRATION_2.migrate(database)
+        }
+    }
+
+    val MIGRATION_43_44 = object : Migration(43, 44) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            // delete all existing EMAIL notifications because we don't
+            database.execSQL("DELETE FROM `${TABLE_EVENT_ALARMS}` WHERE `action` = 1")
         }
     }
 }
