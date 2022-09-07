@@ -6,7 +6,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,18 +44,9 @@ import me.proton.core.accountmanager.presentation.onAccountTwoPassModeFailed
 import me.proton.core.accountmanager.presentation.onAccountTwoPassModeNeeded
 import me.proton.core.accountmanager.presentation.onSessionSecondFactorNeeded
 import me.proton.core.auth.presentation.AuthOrchestrator
-import me.proton.core.auth.presentation.observe
 import me.proton.core.auth.presentation.onAddAccountResult
-import me.proton.core.auth.presentation.onConfirmPasswordNeeded
-import me.proton.core.auth.presentation.onMissingScopeFailed
-import me.proton.core.auth.presentation.onMissingScopeSuccess
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
-import me.proton.core.humanverification.domain.HumanVerificationManager
-import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
-import me.proton.core.humanverification.presentation.observe
-import me.proton.core.humanverification.presentation.onHumanVerificationNeeded
-import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
@@ -65,8 +55,6 @@ import javax.inject.Inject
 class AccountViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val authOrchestrator: AuthOrchestrator,
-    private val humanVerificationManager: HumanVerificationManager,
-    private val humanVerificationOrchestrator: HumanVerificationOrchestrator,
     private val bootstrapAllCalendarsUseCase: BootstrapAllCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
     private val userSettingsRepository: UserSettingsRepository,
@@ -78,7 +66,6 @@ class AccountViewModel @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
     private val userSettingsDatabase: UserSettingsDatabase,
-    private val missingScopeListener: MissingScopeListener
 ) : ViewModel() {
 
     sealed class State {
@@ -170,19 +157,6 @@ class AccountViewModel @Inject constructor(
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }
                 .onAccountRemoved { cleanUser(context) }
-
-            missingScopeListener.observe(context.lifecycle, minActiveState = Lifecycle.State.CREATED)
-                .onConfirmPasswordNeeded { startConfirmPasswordWorkflow(it) }
-                .onMissingScopeSuccess { logger.d("onMissingScopeSuccess") }
-                .onMissingScopeFailed { logger.d("onMissingScopeFailed") }
-
-        }
-
-        // HumanVerification State handling.
-        with(humanVerificationOrchestrator) {
-            register(context)
-            humanVerificationManager.observe(context.lifecycle, minActiveState = Lifecycle.State.RESUMED)
-                .onHumanVerificationNeeded { startHumanVerificationWorkflow(it) }
         }
 
         // Check if we already have Ready account.
