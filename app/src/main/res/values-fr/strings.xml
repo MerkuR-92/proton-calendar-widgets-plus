@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">jusqu\'au %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annulé</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(désactivé)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(désactivé)&lt;/i&gt;</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d oui</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d peut-être</string>
@@ -145,7 +145,7 @@
     <string name="event_text_description">Description</string>
     <string name="event_hint_description">Ajouter une description</string>
     <string name="event_text_custom">personnalisé</string>
-    <string name="event_alert_invalid_start_end_date">La date de début de l’événement ne peut pas être postérieure à la date de fin</string>
+    <string name="event_alert_invalid_start_end_date">La date de début de l\'événement ne peut pas être après celle de fin.</string>
     <string name="event_alarms_title">Notifications</string>
     <string name="event_custom_alarms_field">Notifier</string>
     <string name="event_custom_alarms_title">Notifications personnalisées</string>
@@ -297,7 +297,7 @@
     <string name="snack_ics_party_crasher_error">Votre adresse électronique n\'est pas dans la liste des participants</string>
     <string name="snack_ics_reply_party_crasher_error">Les participants qui n\'ont pas été invités par l\'organisateur ne peuvent pas être ajoutés</string>
     <string name="snack_ics_missing_uid_error">L\'UID de l\'événement est manquant</string>
-    <string name="snack_ics_no_active_calendar_error">Il n\'y a pas de calendrier actif associé à ce compte</string>
+    <string name="snack_ics_no_active_calendar_error">Il n\'y a pas de calendrier actif associé à ce compte.</string>
     <string name="snack_ics_unsupported_duration_error">La propriété de durée n\'est pas prise en charge</string>
     <string name="snack_ics_too_many_events_error">Plusieurs événements ne sont pas encore pris en charge</string>
     <string name="snack_ics_no_events_error">Ce calendrier ne contient aucun événement</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Échec de la mise à jour de l\'importation, réessayez plus tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">Compte incorrect. Connectez-vous avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
     <string name="import_assistant_start_import_error">Échec du démarrage de l\'importation, réessayez plus tard.</string>
+    <string name="import_assistant_delete_import_success">Enregistrement supprimé</string>
     <string name="import_assistant_delete_import_error">Impossible de supprimer l\'importation, réessayez plus tard.</string>
     <string name="import_assistant_cancel_import_error">Impossible d\'annuler l\'importation, réessayez plus tard.</string>
     <string name="import_assistant_resume_import_error">Impossible de reprendre l\'importation, réessayez plus tard.</string>
@@ -555,8 +556,8 @@
         <item quantity="other">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020ou\n • Fusionnez au moins %1$d calendrier avec des calendriers Proton existants.</item>
-        <item quantity="other">\u0020ou\n • Fusionnez au moins %1$d calendriers avec des calendriers Proton existants.</item>
+        <item quantity="one">\u0020or\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>
+        <item quantity="other">\u0020or\n • Fusionner au moins %1$d calendriers avec les calendriers Proton existants.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

@@ -34,7 +34,7 @@
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar a l\'organitzador que refuseu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment de totes maneres?</string>
     <string name="dialog_button_set">Aplicar</string>
     <string name="dialog_button_ok">D\'acord</string>
-    <string name="action_save">Desar</string>
+    <string name="action_save">Desa</string>
     <string name="action_done">Fet</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">fins el %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancel·lat</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitat)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(Deshabilitat)&lt;/i&gt;</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sí</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d potser</string>
@@ -92,7 +92,7 @@
     <string name="event_decryption_error_dialog_message">Ha fallat el desxifratge del contingut d\'aquest esdeveniment.</string>
     <string name="event_decryption_error_dialog_confirmation">Suprimir esdeveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Suprimir esdeveniments</string>
-    <string name="event_decryption_error_dialog_close">Tancar</string>
+    <string name="event_decryption_error_dialog_close">Tanca</string>
     <string name="event_signature_verification_warning">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
     <string name="event_change_answer_recurring_title">Actualitzar esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
@@ -234,9 +234,9 @@
     <string name="nav_view_settings">Preferències</string>
     <string name="nav_view_feedback">Doneu-nos la vostra opinió</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
-    <string name="nav_view_more_bug">Informeu d\'un error</string>
+    <string name="nav_view_more_bug">Report a problem</string>
     <string name="nav_view_more_subscription">Subscripció</string>
-    <string name="nav_view_more_logout">Tancar la sessió</string>
+    <string name="nav_view_more_logout">Tanca la sessió</string>
     <string name="nav_view_more_login">Iniciar la sessió</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
@@ -379,7 +379,7 @@
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Crear calendari</string>
     <string name="calendar_form_update_title">Editar Calendari</string>
-    <string name="calendar_form_save">Desar</string>
+    <string name="calendar_form_save">Desa</string>
     <string name="calendar_form_name">Nom</string>
     <string name="calendar_form_name_placeholder">Afegir un nom de calendari</string>
     <string name="calendar_form_color">Color del calendari</string>
@@ -396,7 +396,7 @@
     <string name="create_calendar_limit_reached_paid_title">Màxim de 20 calendaris assolit</string>
     <string name="create_calendar_limit_reached_paid_message">Elimineu calendaris sense ús per crear-ne de nous.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionar els calendaris</string>
-    <string name="create_calendar_limit_reached_close">Tancar</string>
+    <string name="create_calendar_limit_reached_close">Tanca</string>
     <string name="create_calendar_limit_reached_free_title">Millorar la subscripció a Proton Calendar</string>
     <string name="create_calendar_limit_reached_free_description">Creeu fins a 20 calendaris i accediu a moltes més funcions exclusives en millorar la subscripció.</string>
     <string name="create_calendar_limit_reached_free_not_now">Ara no</string>
@@ -452,7 +452,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Ara no</string>
     <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
     <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Següent</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Next</string>
     <string name="spotlight_v5_dialog_got_it_button">Entesos</string>
     <string name="spotlight_v5_dialog_learn_more_button">Saber-ne més</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
     <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
     <string name="import_assistant_start_import_error">Failed to start import, please try again later.</string>
+    <string name="import_assistant_delete_import_success">Import record deleted</string>
     <string name="import_assistant_delete_import_error">Failed to delete import, please try again later.</string>
     <string name="import_assistant_cancel_import_error">Failed to cancel import, please try again later.</string>
     <string name="import_assistant_resume_import_error">Failed to resume import, please try again later.</string>

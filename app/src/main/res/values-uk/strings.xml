@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">до %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Скасовано</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(вимкнено)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(вимкнено)&lt;/i&gt;</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d так</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d можливо</string>
@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Налаштування</string>
     <string name="nav_view_feedback">Напишіть нам відгук</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Загальні</string>
-    <string name="nav_view_more_bug">Повідомити про ваду</string>
+    <string name="nav_view_more_bug">Повідомити про проблему</string>
     <string name="nav_view_more_subscription">Передплата</string>
     <string name="nav_view_more_logout">Вийти</string>
     <string name="nav_view_more_login">Увійти</string>
@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s відхиляє ваше запрошення</string>
     <string name="snack_app_link_invalid">Недійсне посилання на подію</string>
     <string name="snack_app_link_error">Помилка відкриття події</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
+    <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
@@ -450,8 +450,8 @@
     <string name="spotlight_dialog_easy_switch_description">Імпортувати події та інші дані з календаря Google у календар Proton Calendar стало легше, ніж будь-коли. Наш імпортер Easy Switch допоможе вам на всіх етапах.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Розпочати імпорт</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Не зараз</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
-    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_title">Легко погоджуйтеся на запрошення</string>
+    <string name="spotlight_dialog_auto_invites_description">Відтепер запрошення показуються у вашому календарі подіями, що очікують на розгляд. Просто відкрийте подію, щоб відповісти.\n\nКерувати цією функцією можна в налаштуваннях.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Далі</string>
     <string name="spotlight_v5_dialog_got_it_button">Зрозуміло</string>
     <string name="spotlight_v5_dialog_learn_more_button">Докладніше</string>
@@ -460,7 +460,7 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
-    <string name="import_assistant_prepare_import_error">Помилка під час підготовки імпортування, спробуйте пізніше</string>
+    <string name="import_assistant_prepare_import_error">Помилка під час підготовки імпортування. Спробуйте знову пізніше</string>
     <string name="import_assistant_prepare_import">Підготовка до імпортування</string>
     <string name="import_assistant_gathering_data_loader_title">Отримання ваших даних</string>
     <string name="import_assistant_summary_title">Підсумки імпорту</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Не вдалося оновити імпорт. Повторіть спробу пізніше.</string>
     <string name="import_assistant_update_import_wrong_account_error">Неправильний обліковий запис. Увійдіть, використовуючи обліковий запис, який використовувався для імпорту календаря.</string>
     <string name="import_assistant_start_import_error">Не вдалося розпочати імпорт. Повторіть спробу пізніше.</string>
+    <string name="import_assistant_delete_import_success">Запис імпорту видалено</string>
     <string name="import_assistant_delete_import_error">Не вдалося видалити імпорт. Повторіть спробу пізніше.</string>
     <string name="import_assistant_cancel_import_error">Не вдалося скасувати імпорт. Повторіть спробу пізніше.</string>
     <string name="import_assistant_resume_import_error">Не вдалося відновити імпорт. Повторіть спробу пізніше.</string>
@@ -519,7 +520,7 @@
     <string name="import_assistant_discard_import_positive">Скасувати імпорт</string>
     <string name="import_assistant_discard_import_negative">Продовжити імпорт</string>
     <string name="import_assistant_authentication_canceled">Автентифікацію скасовано</string>
-    <string name="import_assistant_sign_in_in_progress">Процес входу вже триває</string>
+    <string name="import_assistant_sign_in_in_progress">Наразі триває процес входу в систему</string>
     <string name="import_assistant_in_progress_error_snack">Усе ще триває імпортування</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -565,15 +566,15 @@
         <item quantity="other">Об\'єднати %d календарів у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Неможливо створити нові календарі для всіх імпортованих календарів через ліміт особистого календаря.\n • Зніміть вибір принаймні %1$d календаря</item>
-        <item quantity="few">Неможливо створити нові календарі для всіх імпортованих календарів через ліміт особистого календаря.\n • Зніміть вибір принаймні %1$d календарів</item>
-        <item quantity="many">Неможливо створити нові календарі для всіх імпортованих календарів через ліміт особистого календаря.\n • Зніміть вибір принаймні %1$d календарів</item>
-        <item quantity="other">Неможливо створити нові календарі для всіх імпортованих календарів через ліміт особистого календаря.\n • Зніміть вибір принаймні %1$d календарів</item>
+        <item quantity="one">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календаря</item>
+        <item quantity="few">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
+        <item quantity="many">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
+        <item quantity="other">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
         <item quantity="one">\u0020або\n • Обʼєднайте принаймні %1$d календар із наявними календарями Proton.</item>
         <item quantity="few">\u0020або\n • Обʼєднайте принаймні %1$d календарі з наявними календарями Proton.</item>
-        <item quantity="many">\u0020або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
+        <item quantity="many">\u0020або\n • Обʼєднайте принаймні %1$d календарів з наявними календарями Proton.</item>
         <item quantity="other">\u0020або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
     </plurals>
     <plurals name="plural_minute">
@@ -661,10 +662,10 @@
         <item quantity="other">%s хвилини</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d знака</item>
-        <item quantity="few">%d/%d знаків</item>
-        <item quantity="many">%d/%d знаків</item>
-        <item quantity="other">%d/%d знаків</item>
+        <item quantity="one">%d/%d символ</item>
+        <item quantity="few">%d/%d символи</item>
+        <item quantity="many">%d/%d символів</item>
+        <item quantity="other">%d/%d символів</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

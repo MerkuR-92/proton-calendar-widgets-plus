@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">bis %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Abgesagt</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deaktiviert)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(Deaktiviert)&lt;/i&gt;</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d Ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d Vielleicht</string>
@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Einstellungen</string>
     <string name="nav_view_feedback">Gib uns Feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Allgemein</string>
-    <string name="nav_view_more_bug">Fehler melden</string>
+    <string name="nav_view_more_bug">Ein Problem melden</string>
     <string name="nav_view_more_subscription">Abonnement</string>
     <string name="nav_view_more_logout">Abmelden</string>
     <string name="nav_view_more_login">Anmelden</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Der Import konnte nicht aktualisiert werden, bitte versuche es später noch einmal.</string>
     <string name="import_assistant_update_import_wrong_account_error">Falsches Konto. Bitte melde dich mit dem Konto an, das du für den Kalenderimport verwendet hast.</string>
     <string name="import_assistant_start_import_error">Der Import konnte nicht gestartet werden, bitte versuche es später noch einmal.</string>
+    <string name="import_assistant_delete_import_success">Import-Eintrag gelöscht</string>
     <string name="import_assistant_delete_import_error">Der Import konnte nicht gelöscht werden, bitte versuche es später noch einmal.</string>
     <string name="import_assistant_cancel_import_error">Der Import konnte nicht abgebrochen werden, bitte versuche es später noch einmal.</string>
     <string name="import_assistant_resume_import_error">Der Import konnte nicht fortgesetzt werden, bitte versuche es später noch einmal.</string>
@@ -555,8 +556,8 @@
         <item quantity="other">Aufgrund des Limits für persönliche Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020oder\n • führe mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammen.</item>
-        <item quantity="other">\u0020oder\n • führe mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammen.</item>
+        <item quantity="one">\u0020oder\n • Mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammenführen.</item>
+        <item quantity="other">\u0020oder\n • Mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammenführen.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">Minute</item>

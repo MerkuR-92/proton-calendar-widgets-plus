@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">tot %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Geannuleerd</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Uitgeschakeld)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(Uitgeschakeld)&lt;/i&gt;</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d misschien</string>
@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Instellingen</string>
     <string name="nav_view_feedback">Geef ons feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Algemeen</string>
-    <string name="nav_view_more_bug">Bug melden</string>
+    <string name="nav_view_more_bug">Meld een probleem</string>
     <string name="nav_view_more_subscription">Abonnement</string>
     <string name="nav_view_more_logout">Uitloggen</string>
     <string name="nav_view_more_login">Inloggen</string>
@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s heeft uw uitnodiging geweigerd</string>
     <string name="snack_app_link_invalid">Ongeldige link naar de afspraak</string>
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
+    <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
@@ -450,8 +450,8 @@
     <string name="spotlight_dialog_easy_switch_description">Gebeurtenissen en andere data van Google Agenda importeren naar Proton Calendar is makkelijker dan ooit. Ons Easy Switch importprogramma zal u stap voor stap de weg wijzen.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Begin met importeren</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Niet nu</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
-    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_title">Accepteer eenvoudig uitnodigingen</string>
+    <string name="spotlight_dialog_auto_invites_description">Uitnodigingen verschijnen nu in uw agenda als afspraken in afwachting. Open gewoon de afspraak om te antwoorden.\n\nGa naar instellingen om dit te beheren.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Volgende</string>
     <string name="spotlight_v5_dialog_got_it_button">Begrepen</string>
     <string name="spotlight_v5_dialog_learn_more_button">Meer informatie</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Het updaten van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_update_import_wrong_account_error">Verkeerde account. Log in met het account die u heeft gebruikt voor het importeren van de agenda.</string>
     <string name="import_assistant_start_import_error">Het starten van importeren is mislukt. Probeer later nog eens.</string>
+    <string name="import_assistant_delete_import_success">Import record verwijderd</string>
     <string name="import_assistant_delete_import_error">Het verwijderen van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_cancel_import_error">Het annuleren van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_resume_import_error">Het hervatten van de import is mislukt. Probeer later nog eens.</string>
@@ -493,30 +494,30 @@
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
     <string name="import_assistant_status_queued">Gestart</string>
-    <string name="import_assistant_status_in_progress">In progress</string>
-    <string name="import_assistant_status_completed">Completed</string>
-    <string name="import_assistant_status_canceled">Canceled</string>
-    <string name="import_assistant_status_canceling">Canceling</string>
-    <string name="import_assistant_status_paused">Paused</string>
-    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_in_progress">Bezig</string>
+    <string name="import_assistant_status_completed">Voltooid</string>
+    <string name="import_assistant_status_canceled">Geannuleerd</string>
+    <string name="import_assistant_status_canceling">Annuleren</string>
+    <string name="import_assistant_status_paused">Gepauzeerd</string>
+    <string name="import_assistant_status_failed">Mislukt</string>
     <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
     <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
-    <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Opnieuw verbinden</string>
     <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
     <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
-    <string name="import_assistant_status_paused_storage_full_button">Resume</string>
+    <string name="import_assistant_status_paused_storage_full_button">Hervatten</string>
     <string name="import_assistant_delete_report_title">Remove from the list?</string>
     <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
     <string name="import_assistant_delete_report_positive_button">Remove</string>
     <string name="import_assistant_delete_report_negative_button">Keep</string>
-    <string name="import_assistant_cancel_import_title">Import is incomplete!</string>
-    <string name="import_assistant_cancel_import_message">If you cancel this import, you won\'t be able to resume it. Proton saved all progress in your account. Cancel anyway?</string>
-    <string name="import_assistant_cancel_import_positive_button">Cancel import</string>
+    <string name="import_assistant_cancel_import_title">Importen is onvolledig!</string>
+    <string name="import_assistant_cancel_import_message">Als u deze import annuleert, zult u niet in staat zijn om deze te hervatten. Proton heeft alle voortgang in uw account opgeslagen. Toch annuleren?</string>
+    <string name="import_assistant_cancel_import_positive_button">Importeren annuleren</string>
     <string name="import_assistant_cancel_import_negative_button">Resume import</string>
-    <string name="import_assistant_in_progress_snack">Import in progress</string>
-    <string name="import_assistant_discard_import_title">Cancel import?</string>
+    <string name="import_assistant_in_progress_snack">Bezig met importeren</string>
+    <string name="import_assistant_discard_import_title">Importeren annuleren?</string>
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
-    <string name="import_assistant_discard_import_positive">Cancel import</string>
+    <string name="import_assistant_discard_import_positive">Importeren annuleren</string>
     <string name="import_assistant_discard_import_negative">Resume import</string>
     <string name="import_assistant_authentication_canceled">Authenticatie geannuleerd</string>
     <string name="import_assistant_sign_in_in_progress">Er is reeds een loginproces bezig</string>
@@ -557,8 +558,8 @@ Vink minstens %1$d agenda af</item>
 Vink minstens %1$d agenda\'s af</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020of\n • Voeg minstens %1$d agenda samen met bestaande Proton-agenda\'s.</item>
-        <item quantity="other">\u0020of\n • Voeg minstens %1$d agenda\'s samen met bestaande Proton-agenda\'s.</item>
+        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>
