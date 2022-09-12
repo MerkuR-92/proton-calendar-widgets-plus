@@ -344,7 +344,9 @@ internal class AllDayEventsDrawer(
         val top = priorEventChip.bounds.bottom + viewState.eventMarginVertical
         val right = priorEventChip.bounds.right
         val bottom = y + (textPaint.textHeight / 2)
-        drawRoundRect(left, top, right, bottom, radius, radius, viewState.expandInfoBackgroundPaint)
+        val backgroundRectF = RectF(left, top, right, bottom)
+        viewState.allDayMoreMap[priorEventChip.startTime] = backgroundRectF
+        drawRoundRect(backgroundRectF, radius, radius, viewState.expandInfoBackgroundPaint)
 
         drawText(text, x, y, textPaint)
     }

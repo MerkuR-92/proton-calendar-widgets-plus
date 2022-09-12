@@ -276,6 +276,8 @@ internal class ViewState {
             bottom = headerHeight
         }
 
+    val allDayMoreMap: HashMap<Calendar, RectF> = hashMapOf()
+
     val weekNumberTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
     }
@@ -566,6 +568,7 @@ internal class ViewState {
         val visibleDays = if (isNotScrolling) numberOfVisibleDays else numberOfVisibleDays + 1
 
         dateRange.clear()
+        allDayMoreMap.clear()
 
         val startDate = if (isLtr) {
             today().plusDays(daysFromOrigin)
@@ -610,5 +613,13 @@ internal class ViewState {
     fun minutesFromStart(eventStartTime: Calendar): Int {
         val hoursFromStart = eventStartTime.hour - minHour
         return hoursFromStart * 60 + eventStartTime.minute
+    }
+
+    fun isInAllDayMoreBounds(x: Float, y: Float): Boolean {
+        for (i in 0 until numberOfVisibleDays) {
+            val expandRectF = allDayMoreMap[dateRange[i]]
+            if (expandRectF != null && expandRectF.contains(x, y)) return true
+        }
+        return false
     }
 }
