@@ -1,7 +1,6 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableString
 import android.view.LayoutInflater
@@ -20,6 +19,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -29,6 +29,7 @@ import com.alamkanak.weekview.jsr310.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.jsr310.scrollToDate
 import com.alamkanak.weekview.jsr310.scrollToDateTime
 import com.alamkanak.weekview.jsr310.setDateFormatter
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_base.fragment_progress_bar
 import kotlinx.android.synthetic.main.fragment_base.fragment_toolbar_content
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
+import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -67,9 +69,13 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
+import me.proton.android.calendar.domain.model.getActualEventId
+import me.proton.android.calendar.domain.model.toWeekViewCalendarEntityEvent
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.WeekViewAdapter
 import me.proton.android.calendar.presentation.calendar.customView.MonthLayoutGestureListener
@@ -100,6 +106,8 @@ class MonthFragment : BaseFragment() {
     private val accountViewModel: AccountViewModel by activityViewModels()
     @Inject
     lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
+    @Inject
+    lateinit var logger: Logger
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
@@ -590,6 +598,9 @@ class MonthFragment : BaseFragment() {
             },
             viewClickHandler = { startTime ->
                 openCreateEventForm(isAllDay = false, startTime)
+            },
+            eventClickHandler = { weekViewEventClicked ->
+                onWeekViewEventClick(weekViewEventClicked)
             }
         )
         weekView.adapter = weekViewAdapter
@@ -601,23 +612,6 @@ class MonthFragment : BaseFragment() {
             val dateLabel = dateFormatter.format(date)
             weekdayLabel + "\n" + dateLabel
         }
-
-        val entities: ArrayList<WeekViewCalendarEntity> = arrayListOf()
-        entities.add(
-            WeekViewCalendarEntity.Event(
-                id = "testId",
-                title = "Test",
-                location = "Location",
-                startTime = LocalDateTime.of(2022, 8, 24, 13, 0),
-                endTime = LocalDateTime.of(2022, 8, 24, 13, 30),
-                color = Color.parseColor("#59DBE0"),
-                isAllDay = false,
-                isCanceled = false
-            )
-        )
-        weekViewAdapter.submitList(
-            entities
-        )
     }
 
     private var currentFromDate: LocalDate? = null
@@ -639,16 +633,7 @@ class MonthFragment : BaseFragment() {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         val weekViewCalendarEntities = it.events.map { event ->
-                            WeekViewCalendarEntity.Event(
-                                id = event.id,
-                                title = event.summary ?: getString(R.string.default_event_summary),
-                                location = event.location ?: "",
-                                startTime = event.getStart(timeZoneId).toLocalDateTime(),
-                                endTime = event.getEnd(timeZoneId).toLocalDateTime(),
-                                color = Color.parseColor(event.calendar.color),
-                                isAllDay = event.isAllDay(),
-                                isCanceled = event.isCancelled()
-                            )
+                            event.toWeekViewCalendarEntityEvent(timeZoneId, getString(R.string.default_event_summary))
                         }
                         weekViewAdapter.submitList(
                             weekViewCalendarEntities
@@ -679,6 +664,53 @@ class MonthFragment : BaseFragment() {
             } else {
                 requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
             }
+        }
+    }
+
+    private fun onWeekViewEventClick(weekViewEvent: WeekViewCalendarEntity.Event) {
+        if (weekViewEvent.decrypted) {
+            findNavController().navigate(
+                Navigation.Deeplink.toEventDetails(
+                    weekViewEvent.getActualEventId(),
+                    weekViewEvent.occurrenceNumber ?: 0
+                )
+            )
+        } else {
+            val confirmationMessage =
+                if (weekViewEvent.isRecurring) R.string.event_decryption_error_dialog_confirmation_recurring
+                else R.string.event_decryption_error_dialog_confirmation
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.event_decryption_error_dialog_title)
+                .setMessage(R.string.event_decryption_error_dialog_message)
+                .setPositiveButton(confirmationMessage) { _, _ ->
+                    lifecycleScope.launch { // TODO
+                        val deleteResult = withContext(Dispatchers.Default) {
+                            calendarViewModel.handleDeleteEvent(
+                                weekViewEvent.getActualEventId(),
+                                weekViewEvent.calendarId,
+                                EventEditDeleteOption.ALL_EVENTS
+                            )
+                        }
+                        if (deleteResult is UseCase.Result.Success<*>) {
+                            requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+                        } else {
+                            var userErrorMessage: String? = null
+                            if (deleteResult is UseCase.Result.Error) {
+                                logger.e("Error deleting event: ${deleteResult.message}")
+                                userErrorMessage = deleteResult.userErrorMessage
+                            } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                userErrorMessage = deleteResult.userErrorMessage
+                            }
+                            requireActivity().displaySnackBar(
+                                if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                else userErrorMessage
+                            )
+                        }
+                    }
+                }
+                .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+                .show()
         }
     }
 

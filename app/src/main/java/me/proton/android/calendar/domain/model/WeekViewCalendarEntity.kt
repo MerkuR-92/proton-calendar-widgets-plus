@@ -9,6 +9,7 @@ import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.jsr310.setEndTime
 import com.alamkanak.weekview.jsr310.setStartTime
 import me.proton.android.calendar.R
+import me.proton.core.util.kotlin.substring
 import java.time.LocalDateTime
 
 sealed class WeekViewCalendarEntity {
@@ -21,7 +22,11 @@ sealed class WeekViewCalendarEntity {
         val location: CharSequence,
         val color: Int,
         val isAllDay: Boolean,
-        val isCanceled: Boolean
+        val isCanceled: Boolean,
+        val calendarId: String,
+        val decrypted: Boolean,
+        val isRecurring: Boolean,
+        val occurrenceNumber: Int? = null
     ) : WeekViewCalendarEntity()
 
     data class BlockedTimeSlot(
@@ -29,6 +34,32 @@ sealed class WeekViewCalendarEntity {
         val startTime: LocalDateTime,
         val endTime: LocalDateTime
     ) : WeekViewCalendarEntity()
+}
+
+fun WeekViewCalendarEntity.Event.getActualEventId(): String {
+    val occurrenceNumberIndex = id.indexOf("&occurrenceNumber=")
+    return id.substring(0, if (occurrenceNumberIndex >= 0) occurrenceNumberIndex else id.length)
+}
+
+fun Event.toWeekViewCalendarEntityEvent(timeZoneId: String, defaultEventTitle: String): WeekViewCalendarEntity.Event {
+    val occurrenceNumberSuffix = this.occurrence?.occurrenceNumber?.let {
+        "&occurrenceNumber=" + this.occurrence?.occurrenceNumber
+    } ?: ""
+    val weekViewEventId = this.id + occurrenceNumberSuffix
+    return WeekViewCalendarEntity.Event(
+        id = weekViewEventId,
+        title = this.summary ?: defaultEventTitle,
+        location = this.location ?: "",
+        startTime = this.getStart(timeZoneId).toLocalDateTime(),
+        endTime = this.getEnd(timeZoneId).toLocalDateTime(),
+        color = Color.parseColor(this.calendar.color),
+        isAllDay = this.isAllDay(),
+        isCanceled = this.isCancelled(),
+        calendarId = this.calendar.id,
+        decrypted = this.decryptionStatus == Event.DecryptionStatus.SUCCESS,
+        isRecurring = this.isRecurring(),
+        occurrenceNumber = this.occurrence?.occurrenceNumber
+    )
 }
 
 fun WeekViewCalendarEntity.toWeekViewEntity(): WeekViewEntity {

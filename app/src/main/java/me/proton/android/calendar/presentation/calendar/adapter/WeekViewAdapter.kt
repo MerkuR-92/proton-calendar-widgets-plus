@@ -17,7 +17,8 @@ class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
     private val loadMoreHandler: (List<YearMonth>) -> Unit,
     private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit,
-    private val viewClickHandler: (LocalDateTime) -> Unit
+    private val viewClickHandler: (LocalDateTime) -> Unit,
+    private val eventClickHandler: (WeekViewCalendarEntity.Event) -> Unit,
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -25,13 +26,11 @@ class WeekViewAdapter(
         FormatStyle.SHORT
     )
 
-
-
     override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity()
 
     override fun onEventClick(data: WeekViewCalendarEntity, bounds: RectF) {
         if (data is WeekViewCalendarEntity.Event) {
-            context.showToast("Clicked ${data.title}")
+            eventClickHandler(data)
         }
     }
 
