@@ -104,6 +104,8 @@ object FeatureFlag {
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
+    const val THREE_DAYS_VIEW = true
+    const val WEEK_VIEW = false
 }
 
 object HttpResponseCode {
@@ -155,8 +157,8 @@ enum class AlarmAction(val value: Int) {
 
 enum class ViewMode(val value: Int) {
     AGENDA(0),
-    DAY(1),
-    MONTH(2),
+    MONTH(1),
+    DAY(2),
     THREE_DAY(3),
     WEEK(4)
 }

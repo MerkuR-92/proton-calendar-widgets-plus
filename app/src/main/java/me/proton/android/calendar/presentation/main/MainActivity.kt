@@ -850,12 +850,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(FeatureFlag.THREE_DAYS_VIEW)
         nav_view_switcher_three_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setViewMode(ViewMode.THREE_DAY)
             drawer_layout.close()
         }
 
+        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(FeatureFlag.WEEK_VIEW)
         nav_view_switcher_week_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setViewMode(ViewMode.WEEK)

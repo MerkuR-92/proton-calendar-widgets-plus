@@ -16,7 +16,8 @@ import java.time.format.FormatStyle
 class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
     private val loadMoreHandler: (List<YearMonth>) -> Unit,
-    private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit
+    private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit,
+    private val viewClickHandler: (LocalDateTime) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -40,7 +41,7 @@ class WeekViewAdapter(
     }
 
     override fun onEmptyViewClick(time: LocalDateTime) {
-        context.showToast("Empty view clicked at ${defaultDateTimeFormatter.format(time)}")
+        viewClickHandler(time)
     }
 
     override fun onDragAndDropFinished(data: WeekViewCalendarEntity, newStartTime: LocalDateTime, newEndTime: LocalDateTime) {

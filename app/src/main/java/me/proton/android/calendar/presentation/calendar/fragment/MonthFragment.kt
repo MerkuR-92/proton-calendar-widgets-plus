@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
@@ -74,7 +75,6 @@ import me.proton.android.calendar.presentation.calendar.adapter.WeekViewAdapter
 import me.proton.android.calendar.presentation.calendar.customView.MonthLayoutGestureListener
 import me.proton.android.calendar.presentation.calendar.fragment.ItemMiniCalendarFragment.Companion.calculateAdapterHeight
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPagerAdapter
-import me.proton.android.calendar.presentation.calendar.pagerAdapter.DayPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -83,6 +83,7 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -102,7 +103,6 @@ class MonthFragment : BaseFragment() {
 
     private lateinit var miniCalendarPagerAdapter: MiniCalendarPagerAdapter
     private lateinit var agendaPagerAdapter: AgendaPagerAdapter
-    private lateinit var dayPagerAdapter: DayPagerAdapter
     private lateinit var monthPagerAdapter: MonthPagerAdapter
 
     private val navigationArguments: MonthFragmentArgs by navArgs()
@@ -359,7 +359,6 @@ class MonthFragment : BaseFragment() {
         }
 
         agendaPagerAdapter = AgendaPagerAdapter(requireActivity(), calendarViewModel.initialToday)
-        dayPagerAdapter = DayPagerAdapter(requireActivity(), calendarViewModel.initialToday)
 
         calendarViewModel.viewMode.value?.let { viewMode ->
             when (viewMode) {
@@ -457,8 +456,8 @@ class MonthFragment : BaseFragment() {
 
             // Handle selected day change in agendaPager (agenda / day views)
             if (agendaPager.adapter != null) {
-                val startingDate = dayPagerAdapter.startingDate
-                val startingPosition = dayPagerAdapter.startingPosition
+                val startingDate = agendaPagerAdapter.startingDate
+                val startingPosition = agendaPagerAdapter.startingPosition
                 val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
                 val agendaIndex = startingPosition + selectedDayOffset
                 if (agendaPager.currentItem != agendaIndex) {
@@ -588,6 +587,9 @@ class MonthFragment : BaseFragment() {
             },
             rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
                 calendarViewModel.handleDaySelected(firstVisibleDate)
+            },
+            viewClickHandler = { startTime ->
+                openCreateEventForm(isAllDay = false, startTime)
             }
         )
         weekView.adapter = weekViewAdapter
@@ -656,6 +658,26 @@ class MonthFragment : BaseFragment() {
 
                     }
                 }
+            }
+        }
+    }
+
+    private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalDateTime) {
+        lifecycleScope.launch {
+            val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
+            if (hasActiveCalendars) {
+                val truncatedStartTime =
+                    if (!isAllDay) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
+                    else null
+                requireActivity().findNavController(R.id.nav_host_fragment_container_view)
+                    .navigate(
+                        Navigation.Deeplink.toEventCreate(
+                            startTime.toLocalDate(),
+                            truncatedStartTime
+                        )
+                    )
+            } else {
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
             }
         }
     }
@@ -769,120 +791,100 @@ class MonthFragment : BaseFragment() {
     private fun initAgendaPager(viewMode: ViewMode) {
         // Skip initAgendaPager if it was already done for specified viewMode
         if (viewMode == currentViewMode) return
+        val previousViewMode = currentViewMode
         currentViewMode = viewMode
+
+        if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)) return
 
         fragmentMonthLayout?.allowScrolling = viewMode == ViewMode.AGENDA
 
         if (viewMode == ViewMode.MONTH) {
-            // Update the pager to use month adapter
-            miniCalendarPager?.apply {
-                val currentItem =
-                    calendarViewModel.selectedDate.value?.let { selectedDate ->
-                        val startingDate = monthPagerAdapter.firstDayOfMonth
-                        val startingPosition = monthPagerAdapter.startingPosition
-                        val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
-                        startingPosition + selectedDayOffset
-                    } ?: monthPagerAdapter.startingPosition
-
-                adapter = monthPagerAdapter
-                offscreenPageLimit = 2
-
-                val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
-                setCurrentItem(item, false)
-            }
-            // TODO Try and see if this is still needed
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = true
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(5)
-        } else {
-            // Update the pager to use mini calendar adapter
-            miniCalendarPager?.apply {
-                val currentItem =
-                    calendarViewModel.selectedDate.value?.let { selectedDate ->
-                        val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
-                        val startingPosition = miniCalendarPagerAdapter.startingPosition
-                        val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
-                        startingPosition + selectedDayOffset
-                    } ?: miniCalendarPagerAdapter.startingPosition
-
-                adapter = miniCalendarPagerAdapter
-                offscreenPageLimit = 1
-
-                val item = if (currentItem > 0) currentItem else miniCalendarPagerAdapter.startingPosition
-                setCurrentItem(item, false)
-            }
-            // TODO Try and see if this is still needed
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-            (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+            displayMonthCalendarPager()
+        } else if (previousViewMode == null || previousViewMode == ViewMode.MONTH) {
+            displayMiniCalendarPager()
         }
 
-        if (viewMode == ViewMode.AGENDA) {
-            // Update the pager to use agenda adapter
-            lifecycleScope.launch {
-                val weekStart = calendarViewModel.getWeekStart()
-                if (weekStart != null) {
-                    calendarViewModel.monthView.value = true
-                    simulateExpandWithScroll(getWeekStartDayOfWeek(weekStart))
+        when (viewMode) {
+            ViewMode.MONTH -> {
+                // Hide the agenda
+                agendaPager?.visibleOrGone(false)
+                weekView?.visibleOrGone(false)
+                miniCalendarDaysHeaderLayout?.visibleOrGone(false)
+                mini_calendar_slider?.visibleOrGone(false)
+                mini_calendar_chevron.clearAnimation()
+                mini_calendar_chevron.visibleOrGone(false)
+
+                // Update constraints so that month view can occupy entire space
+                updateMiniCalendarConstraints(viewMode)
+            }
+            ViewMode.AGENDA -> {
+                // Update the pager to use agenda adapter
+                lifecycleScope.launch {
+                    val weekStart = calendarViewModel.getWeekStart()
+                    if (weekStart != null) {
+                        calendarViewModel.monthView.value = true
+                        simulateExpandWithScroll(getWeekStartDayOfWeek(weekStart))
+                    }
                 }
-            }
-            agendaPager?.apply {
-                val currentItem =
-                    calendarViewModel.selectedDate.value?.let { selectedDate ->
-                        val startingDate = agendaPagerAdapter.startingDate
-                        val startingPosition = agendaPagerAdapter.startingPosition
-                        val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
-                        startingPosition + selectedDayOffset
-                    } ?: agendaPagerAdapter.startingPosition
+                agendaPager?.apply {
+                    val currentItem =
+                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                            val startingDate = agendaPagerAdapter.startingDate
+                            val startingPosition = agendaPagerAdapter.startingPosition
+                            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                            startingPosition + selectedDayOffset
+                        } ?: agendaPagerAdapter.startingPosition
 
-                adapter = agendaPagerAdapter
-                val item = if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition
-                setCurrentItem(item, false)
-                offscreenPageLimit = 1
+                    adapter = agendaPagerAdapter
+                    val item = if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition
+                    setCurrentItem(item, false)
+                    offscreenPageLimit = 1
+                }
+                // TODO Try and see if this is still needed
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+                // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+
+                // Display the agenda
+                agendaPager?.visibleOrGone(true)
+                weekView?.visibleOrGone(false)
+                miniCalendarDaysHeaderLayout?.visibleOrGone(true)
+                mini_calendar_slider?.visibleOrGone(true)
+                mini_calendar_chevron.clearAnimation()
+                mini_calendar_chevron.visibleOrGone(true)
+
+                // Update constraints so that the view is split between mini calendar and agenda view
+                updateMiniCalendarConstraints(viewMode)
             }
-            // TODO Try and see if this is still needed
-            // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-            // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
+            else -> {
+                lifecycleScope.launch {
+                    val weekStart = calendarViewModel.getWeekStart()
+                    if (weekStart != null) {
+                        calendarViewModel.monthView.value = false
+                        simulateCollapseWithScroll(getWeekStartDayOfWeek(weekStart))
+                    }
+
+                    val timeZoneId = calendarViewModel.getTimeZoneId()
+                    if (timeZoneId != null && calendarViewModel.selectedDate.value == LocalDate.now()) {
+                        weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
+                        calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
+                    }
+                }
+
+                agendaPager?.visibleOrGone(false)
+                weekView?.visibleOrGone(true)
+                miniCalendarDaysHeaderLayout?.visibleOrGone(true)
+                mini_calendar_slider?.visibleOrGone(true)
+                mini_calendar_chevron.clearAnimation()
+                mini_calendar_chevron.visibleOrGone(true)
+
+                // Update constraints so that the view is split between mini calendar and agenda / day views
+                updateMiniCalendarConstraints(viewMode)
+            }
         }
-//        else {
-//            // Update the pager to use day adapter
-//            lifecycleScope.launch {
-//                val weekStart = calendarViewModel.getWeekStart()
-//                if (weekStart != null) {
-//                    calendarViewModel.monthView.value = false
-//                    simulateCollapseWithScroll(getWeekStartDayOfWeek(weekStart))
-//                }
-//            }
-//            if (calendarViewModel.selectedDate.value == LocalDate.now()) {
-//                calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
-//            }
-//            agendaPager?.apply {
-//                val currentItem =
-//                    calendarViewModel.selectedDate.value?.let { selectedDate ->
-//                        val startingDate = dayPagerAdapter.startingDate
-//                        val startingPosition = dayPagerAdapter.startingPosition
-//                        val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
-//                        startingPosition + selectedDayOffset
-//                    } ?: dayPagerAdapter.startingPosition
-//
-//                adapter = dayPagerAdapter
-//                val item = if (currentItem > 0) currentItem else dayPagerAdapter.startingPosition
-//                setCurrentItem(item, false)
-//                offscreenPageLimit = 1
-//            }
-//            // TODO Try and see if this is still needed
-//            // (agendaPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
-//            // (agendaPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
-//        }
+    }
 
+    private fun updateMiniCalendarConstraints(viewMode: ViewMode) {
         if (viewMode == ViewMode.MONTH) {
-            // Hide the agenda
-            agendaPager?.visibleOrGone(false)
-            weekView?.visibleOrGone(false)
-            miniCalendarDaysHeaderLayout?.visibleOrGone(false)
-            mini_calendar_slider?.visibleOrGone(false)
-            mini_calendar_chevron.clearAnimation()
-            mini_calendar_chevron.visibleOrGone(false)
-
-            // Update constraints so that month view can occupy entire space
             (miniCalendarLayout?.layoutParams as? ConstraintLayout.LayoutParams)?.let { miniCalendarLayoutLayoutParams ->
                 miniCalendarLayoutLayoutParams.height = ViewPager.LayoutParams.MATCH_PARENT
                 miniCalendarLayout.layoutParams = miniCalendarLayoutLayoutParams
@@ -895,38 +897,7 @@ class MonthFragment : BaseFragment() {
                 miniCalendarPagerLayoutParams.height = ViewPager.LayoutParams.MATCH_PARENT
                 miniCalendarPager.layoutParams = miniCalendarPagerLayoutParams
             }
-
-        } else if (viewMode == ViewMode.AGENDA) {
-            // Display the agenda
-            agendaPager?.visibleOrGone(true)
-            weekView?.visibleOrGone(false)
-            miniCalendarDaysHeaderLayout?.visibleOrGone(true)
-            mini_calendar_slider?.visibleOrGone(true)
-            mini_calendar_chevron.clearAnimation()
-            mini_calendar_chevron.visibleOrGone(true)
-
-            // Update constraints so that the view is split between mini calendar and agenda view
-            (miniCalendarLayout?.layoutParams as? ConstraintLayout.LayoutParams)?.let { miniCalendarLayoutLayoutParams ->
-                miniCalendarLayoutLayoutParams.height = ViewPager.LayoutParams.WRAP_CONTENT
-                miniCalendarLayout.layoutParams = miniCalendarLayoutLayoutParams
-            }
-            (miniCalendarPagerLayout?.layoutParams as? ConstraintLayout.LayoutParams)?.let { miniCalendarPagerLayoutLayoutParams ->
-                miniCalendarPagerLayoutLayoutParams.height = 0
-                miniCalendarPagerLayout.layoutParams = miniCalendarPagerLayoutLayoutParams
-            }
-            (miniCalendarPager?.layoutParams as? ConstraintLayout.LayoutParams)?.let { miniCalendarPagerLayoutParams ->
-                miniCalendarPagerLayoutParams.height = 0
-                miniCalendarPager.layoutParams = miniCalendarPagerLayoutParams
-            }
         } else {
-            agendaPager?.visibleOrGone(false)
-            weekView?.visibleOrGone(true)
-            miniCalendarDaysHeaderLayout?.visibleOrGone(true)
-            mini_calendar_slider?.visibleOrGone(true)
-            mini_calendar_chevron.clearAnimation()
-            mini_calendar_chevron.visibleOrGone(true)
-
-            // Update constraints so that the view is split between mini calendar and agenda / day views
             (miniCalendarLayout?.layoutParams as? ConstraintLayout.LayoutParams)?.let { miniCalendarLayoutLayoutParams ->
                 miniCalendarLayoutLayoutParams.height = ViewPager.LayoutParams.WRAP_CONTENT
                 miniCalendarLayout.layoutParams = miniCalendarLayoutLayoutParams
@@ -940,6 +911,50 @@ class MonthFragment : BaseFragment() {
                 miniCalendarPager.layoutParams = miniCalendarPagerLayoutParams
             }
         }
+    }
+
+    private fun displayMonthCalendarPager() {
+        // Update the pager to use month adapter
+        miniCalendarPager?.apply {
+            val currentItem =
+                calendarViewModel.selectedDate.value?.let { selectedDate ->
+                    val startingDate = monthPagerAdapter.firstDayOfMonth
+                    val startingPosition = monthPagerAdapter.startingPosition
+                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                    startingPosition + selectedDayOffset
+                } ?: monthPagerAdapter.startingPosition
+
+            adapter = monthPagerAdapter
+            offscreenPageLimit = 2
+
+            val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
+            setCurrentItem(item, false)
+        }
+        // TODO Try and see if this is still needed
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = true
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(5)
+    }
+
+    private fun displayMiniCalendarPager() {
+        // Update the pager to use mini calendar adapter
+        miniCalendarPager?.apply {
+            val currentItem =
+                calendarViewModel.selectedDate.value?.let { selectedDate ->
+                    val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
+                    val startingPosition = miniCalendarPagerAdapter.startingPosition
+                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                    startingPosition + selectedDayOffset
+                } ?: miniCalendarPagerAdapter.startingPosition
+
+            adapter = miniCalendarPagerAdapter
+            offscreenPageLimit = 1
+
+            val item = if (currentItem > 0) currentItem else miniCalendarPagerAdapter.startingPosition
+            setCurrentItem(item, false)
+        }
+        // TODO Try and see if this is still needed
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(0) // Make sure we only keep 3 childs in cache
     }
 
     private fun setHeaderDaysContent(startWeekOn: DayOfWeek, timeZoneId: String) {
