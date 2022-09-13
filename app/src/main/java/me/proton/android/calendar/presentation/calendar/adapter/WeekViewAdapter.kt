@@ -4,6 +4,7 @@ import android.graphics.RectF
 import android.util.Log
 import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.jsr310.WeekViewPagingAdapterJsr310
+import me.proton.android.calendar.common.FeatureFlag.DRAG_AND_DROP
 import me.proton.android.calendar.common.utils.AndroidUtils.showToast
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
 import me.proton.android.calendar.domain.model.toWeekViewEntity
@@ -63,6 +64,10 @@ class WeekViewAdapter(
 
     override fun onVerticalScrollFinished(currentOffset: Float) {
         Log.d("BasicActivity", "Vertical scroll finished (current offset ${currentOffset.toInt()})")
+    }
+
+    override fun onEventLongClick(data: WeekViewCalendarEntity, bounds: RectF): Boolean {
+        return !DRAG_AND_DROP // Return true to disable drag and drop
     }
 
     private fun yearMonthsBetween(startDate: LocalDate, endDate: LocalDate): List<YearMonth> {

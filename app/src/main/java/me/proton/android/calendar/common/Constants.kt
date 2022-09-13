@@ -106,6 +106,7 @@ object FeatureFlag {
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
     const val THREE_DAYS_VIEW = true
     const val WEEK_VIEW = false
+    const val DRAG_AND_DROP = false
 }
 
 object HttpResponseCode {

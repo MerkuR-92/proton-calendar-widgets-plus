@@ -49,7 +49,7 @@ fun Event.toWeekViewCalendarEntityEvent(timeZoneId: String, defaultEventTitle: S
     return WeekViewCalendarEntity.Event(
         id = weekViewEventId,
         title = this.summary ?: defaultEventTitle,
-        location = this.location ?: "",
+        location = "", // TODO Do we want to display event location as subtitle ?
         startTime = this.getStart(timeZoneId).toLocalDateTime(),
         endTime = this.getEnd(timeZoneId).toLocalDateTime(),
         color = Color.parseColor(this.calendar.color),
