@@ -88,6 +88,7 @@ private class SingleEventsUpdater(
 
             if (availableHeight <= 0 || availableWidth <= 0) {
                 // We can't fit any text into this
+                eventLabels[eventChip.id] = null // Clear any existing textLayout
                 continue
             }
 

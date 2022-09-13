@@ -53,7 +53,7 @@ internal class EventChipDrawer(
             drawCornersForMultiDayEvents(eventChip, cornerRadius)
         }
 
-        if (textLayout != null) {
+        if (textLayout != null) { // textLayout will be null if event chip is too small to display title
             drawEventTitle(eventChip, textLayout)
         }
     }
@@ -146,7 +146,10 @@ internal class EventChipDrawer(
         val verticalOffset = if (eventChip.event.isAllDay) {
             (bounds.height() - textLayout.height) / 2f
         } else {
-            viewState.eventPaddingVertical.toFloat()
+            if (eventChip.eventTextDoesNotFit) {
+                // If title doesn't fit, reduce vertical padding
+                viewState.eventPaddingVertical.toFloat() - eventChip.verticalPaddingReduction / 2
+            } else viewState.eventPaddingVertical.toFloat()
         }
 
         withTranslation(x = horizontalOffset, y = bounds.top + verticalOffset) {

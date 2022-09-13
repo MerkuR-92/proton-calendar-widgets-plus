@@ -67,6 +67,9 @@ internal data class EventChip(
     val endsOnLaterDay: Boolean
         get() = event.endTime > endTime
 
+    var eventTextDoesNotFit: Boolean = false
+    var verticalPaddingReduction: Int = 0
+
     fun setEmpty() {
         bounds.setEmpty()
         widthCache = 0

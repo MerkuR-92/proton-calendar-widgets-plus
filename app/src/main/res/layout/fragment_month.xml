@@ -112,13 +112,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/miniCalendarLayout"
         app:adaptiveEventTextSize="true"
-        app:allDayEventTextSize="13sp"
+        app:allDayEventTextSize="12sp"
         app:columnGap="6dp"
         app:eventCornerRadius="4dp"
         app:eventMarginVertical="2dp"
         app:eventPaddingHorizontal="4dp"
         app:eventPaddingVertical="5dp"
-        app:eventTextSize="13sp"
+        app:eventTextSize="12sp"
         app:headerBottomShadowRadius="4dp"
         app:headerPadding="6dp"
         app:headerTextColor="@color/text_norm"
@@ -143,6 +143,7 @@
         app:timeColumnTextSize="12sp"
         app:showHeaderDownArrow="false"
         app:expandInfoBackgroundColor="@color/interaction_weak"
+        app:arrangeAllDayEventsVertically="true"
         app:weekNumberBackgroundCornerRadius="8dp" />
 
 </me.proton.android.calendar.presentation.calendar.customView.InterceptTouchConstraintLayout>

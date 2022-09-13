@@ -37,7 +37,19 @@ internal class TextFitter(
             textLayout = text.toTextLayout(textPaint, width = availableWidth)
         }
 
-        while (textLayout.height > availableHeight && viewState.adaptiveEventTextSize) {
+        val eventMaxVerticalPadding = viewState.eventPaddingVertical * 2
+        eventTextDoesNotFit = true
+        while (textLayout.height > (availableHeight + verticalPaddingReduction) && verticalPaddingReduction < eventMaxVerticalPadding) {
+            // Even a single line doesn't fit. We need to reduce the padding.
+            verticalPaddingReduction++
+        }
+
+        // Adjust if over max
+        if (verticalPaddingReduction > eventMaxVerticalPadding) {
+            verticalPaddingReduction = eventMaxVerticalPadding
+        }
+
+        while (textLayout.height > (availableHeight + verticalPaddingReduction) && viewState.adaptiveEventTextSize) {
             // Even a single line doesn't fit. We need to reduce the text size.
             textPaint.textSize -= 1
             textLayout = text.toTextLayout(textPaint, width = Int.MAX_VALUE)
