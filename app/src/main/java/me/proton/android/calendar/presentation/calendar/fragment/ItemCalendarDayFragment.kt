@@ -852,8 +852,10 @@ class ItemCalendarDayFragment() : Fragment(), KoinComponent {
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalTime? = null) {
         lifecycleScope.launch {
-            val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
-            if (hasActiveCalendars) {
+            val hasWritableActiveCalendars = calendarViewModel.getActiveUserCalendars()?.let { activeUserCalendars ->
+                activeUserCalendars.any { it.allowEditEvents }
+            } ?: false
+            if (hasWritableActiveCalendars) {
                 val immutableDate = date ?: return@launch
                 val truncatedStartTime =
                     if (!isAllDay && startTime != null) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)

@@ -297,7 +297,7 @@
     <string name="snack_ics_party_crasher_error">Your email is not on the participant list</string>
     <string name="snack_ics_reply_party_crasher_error">Participants who were not invited by the organizer cannot be added</string>
     <string name="snack_ics_missing_uid_error">The event is missing UID</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active calendar associated with this account</string>
+    <string name="snack_ics_no_active_calendar_error">There is no active personal calendar associated with this account</string>
     <string name="snack_ics_unsupported_duration_error">Duration property is not supported</string>
     <string name="snack_ics_too_many_events_error">Multiple events are not yet supported</string>
     <string name="snack_ics_no_events_error">This calendar does not contain any event</string>
@@ -413,7 +413,7 @@
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
     <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
-    <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
+    <string name="bootstrap_error_no_active_calendar_title">There is no active personal calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://proton.me/support">knowledge base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Learn more</string>

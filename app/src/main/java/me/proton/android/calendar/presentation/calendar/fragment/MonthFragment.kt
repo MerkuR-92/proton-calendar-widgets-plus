@@ -151,8 +151,10 @@ class MonthFragment : BaseFragment() {
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonCreate.setOnSingleClickListener {
             lifecycleScope.launch {
-                val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
-                if (hasActiveCalendars) {
+                val hasWritableActiveCalendars = calendarViewModel.getActiveUserCalendars()?.let { activeUserCalendars ->
+                    activeUserCalendars.any { it.allowEditEvents }
+                } ?: false
+                if (hasWritableActiveCalendars) {
                     // Each item in the adapter is one day
                     calendarViewModel.selectedDate.value?.let { currentDate ->
 

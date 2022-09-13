@@ -39,6 +39,7 @@ data class Calendar(
 
         val isSubscribed: Boolean get() = type == 1
         val isShared: Boolean get() = !allowEditCalendar
+        val isPersonal: Boolean get() = allowEditCalendar && !isSubscribed
 
         val allowEditCalendar: Boolean get() = permissions and 2 == 2
         val allowEditEvents: Boolean get() = permissions and 16 == 16
