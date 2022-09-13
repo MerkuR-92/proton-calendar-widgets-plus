@@ -57,8 +57,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         var redoGetCalendars = false
 
         // We need to create a default calendar if user has none or has only subscribed or shared calendars
-        var personalUserCalendars = userCalendars.filterNot { it.isShared }
-        if (personalUserCalendars.isEmpty()) {
+        var ownedUserCalendars = userCalendars.filter { it.isOwner }
+        if (ownedUserCalendars.isEmpty()) {
 
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
@@ -129,14 +129,14 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Members for allCalendars in redoGetCalendars")
 
             // Subscribed calendars do not count for those checks
-            personalUserCalendars = allCalendars.filterNot { it.isSubscribed && it.isShared }
-            if (personalUserCalendars.isEmpty()) {
+            ownedUserCalendars = allCalendars.filterNot { it.isSubscribed && it.isOwner.not() }
+            if (ownedUserCalendars.isEmpty()) {
                 logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
                 return UseCase.Result.Error(
                     "BootstrapCalendarsUseCase: error user has no calendar",
                     UseCase.Error.Bootstrap.NoCalendar
                 )
-            } else if (personalUserCalendars.any { it.isActive || it.isDisabled }.not()) { // If has no active or disabled cals
+            } else if (ownedUserCalendars.none { it.isActive || it.isDisabled }) { // If has no active or disabled cals
                 logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
                 return UseCase.Result.Error(
                     "BootstrapCalendarsUseCase: error user has no active calendar",

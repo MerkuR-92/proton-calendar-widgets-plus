@@ -203,8 +203,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             optionsListener = { importCalendarMapping ->
                 // On options click
                 lifecycleScope.launch {
-                    val userCalendars = calendarViewModel.getActiveUserCalendars()?.filter { it.allowEditEvents }
-                    showBottomSheetDialog(importCalendarMapping, userCalendars)
+                    val writableUserCalendars = calendarViewModel.getActiveUserCalendars()?.filter { it.allowEditEvents }
+                    showBottomSheetDialog(importCalendarMapping, writableUserCalendars)
                 }
             }
         )
@@ -234,9 +234,9 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
 
-                val activeUserCalendarsCount = userCalendars.filter { it.isActive && it.allowEditEvents }.size
+                val activeWritableUserCalendarsCount = userCalendars.filter { it.isActive && it.allowEditEvents }.size
                 // Only show merge calendars disclaimer if we can merge
-                val mergeCalendarsMessage = if (activeUserCalendarsCount > 0) {
+                val mergeCalendarsMessage = if (activeWritableUserCalendarsCount > 0) {
                     resources.getQuantityString(
                         R.plurals.import_assistant_import_summary_error_merge,
                         countCalendarsOverLimit,
