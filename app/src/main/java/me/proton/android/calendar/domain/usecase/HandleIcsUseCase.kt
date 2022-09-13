@@ -159,7 +159,7 @@ class HandleIcsUseCase @Inject constructor(
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull()
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.allowEditEvents }.firstOrNull()
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
