@@ -74,7 +74,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">jusqu\'au %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annulé</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s &lt;i&gt;(désactivé)&lt;/i&gt;</string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(désactivé)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d oui</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d peut-être</string>
@@ -556,8 +556,8 @@
         <item quantity="other">Impossible de créer de nouveaux calendriers pour tous les calendriers importés en raison de la limite du nombre de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020or\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>
-        <item quantity="other">\u0020or\n • Fusionner au moins %1$d calendriers avec les calendriers Proton existants.</item>
+        <item quantity="one">\u0020ou\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>
+        <item quantity="other">\u0020ou\n • Fusionner au moins %1$d calendriers avec les calendriers Proton existants.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
