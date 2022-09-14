@@ -37,7 +37,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
         var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Member for allCalendars")
-        var userCalendars = allCalendars.filterNot { it.isSubscribed }
+        val userCalendars = allCalendars.filterNot { it.isSubscribed }
 
         if (allCalendars.isNotEmpty() && allCalendars.any { it.isResetNeeded }) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
@@ -56,8 +56,9 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         var redoGetCalendars = false
 
-        // We need to create a default calendar if user has none or has only subscribed calendars
-        if (userCalendars.isEmpty()) {
+        // We need to create a default calendar if user has none or has only subscribed or shared calendars
+        var ownedUserCalendars = userCalendars.filter { it.isOwner }
+        if (ownedUserCalendars.isEmpty()) {
 
             val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
 
@@ -124,18 +125,18 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         if (redoGetCalendars) {
             // GET the calendar(entities) list again after creating default one or fixing incomplete setup
-            var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
-            var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Members for allCalendars in redoGetCalendars")
+            allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
+            allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Members for allCalendars in redoGetCalendars")
 
             // Subscribed calendars do not count for those checks
-            userCalendars = allCalendars.filterNot { it.isSubscribed }
-            if (userCalendars.isNullOrEmpty()) {
+            ownedUserCalendars = allCalendars.filterNot { it.isSubscribed && it.isOwner.not() }
+            if (ownedUserCalendars.isEmpty()) {
                 logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
                 return UseCase.Result.Error(
                     "BootstrapCalendarsUseCase: error user has no calendar",
                     UseCase.Error.Bootstrap.NoCalendar
                 )
-            } else if (userCalendars.firstOrNull { it.isActive || it.isDisabled } == null) {
+            } else if (ownedUserCalendars.none { it.isActive || it.isDisabled }) { // If has no active or disabled cals
                 logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
                 return UseCase.Result.Error(
                     "BootstrapCalendarsUseCase: error user has no active calendar",

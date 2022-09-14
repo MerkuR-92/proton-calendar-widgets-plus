@@ -297,7 +297,7 @@
     <string name="snack_ics_party_crasher_error">Your email is not on the participant list</string>
     <string name="snack_ics_reply_party_crasher_error">Participants who were not invited by the organizer cannot be added</string>
     <string name="snack_ics_missing_uid_error">The event is missing UID</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active calendar associated with this account</string>
+    <string name="snack_ics_no_active_calendar_error">There is no active personal calendar associated with this account</string>
     <string name="snack_ics_unsupported_duration_error">Duration property is not supported</string>
     <string name="snack_ics_too_many_events_error">Multiple events are not yet supported</string>
     <string name="snack_ics_no_events_error">This calendar does not contain any event</string>
@@ -366,10 +366,10 @@
     <string name="settings_general_info_calendar_layout">calendar layout</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
-    <string name="settings_calendar_default">Default</string>
-    <string name="settings_calendar_disabled">Disabled</string>
-    <string name="settings_calendar_not_synced">Not synced</string>
-    <string name="settings_calendar_syncing">Syncing</string>
+    <string name="settings_calendar_default" comment="Default calendar">Default</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Disabled</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Not synced</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Syncing</string>
     <string name="settings_calendar_subscribed_invalid_ics">Unsupported calendar format</string>
     <string name="settings_calendar_subscribed_too_big">Calendar is too big</string>
     <string name="settings_calendar_subscribed_not_accessible">Calendar link is not accessible</string>
@@ -413,7 +413,7 @@
     <string name="bootstrap_error_no_calendar_message">To set up one now visit <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparing calendars</string>
     <string name="bootstrap_error_some_calendars_failed_message">Following calendars could not be set up</string>
-    <string name="bootstrap_error_no_active_calendar_title">There is no active calendar associated with this account.</string>
+    <string name="bootstrap_error_no_active_calendar_title">There is no active personal calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">To learn how to activate a calendar visit our <a href="https://proton.me/support">knowledge base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No more storage space available.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Learn more</string>
@@ -493,13 +493,13 @@
     <string name="import_assistant_previous_import">Previous imports</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Started</string>
-    <string name="import_assistant_status_in_progress">In progress</string>
-    <string name="import_assistant_status_completed">Completed</string>
-    <string name="import_assistant_status_canceled">Canceled</string>
-    <string name="import_assistant_status_canceling">Canceling</string>
-    <string name="import_assistant_status_paused">Paused</string>
-    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Started</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">In progress</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Completed</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Canceled</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Canceling</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Paused</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Failed</string>
     <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
     <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>

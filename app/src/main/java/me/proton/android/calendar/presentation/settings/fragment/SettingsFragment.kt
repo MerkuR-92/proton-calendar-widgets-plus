@@ -232,8 +232,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
             val defaultCalendar = userCalendars.firstOrNull { it.id == defaultCalendarId }
-            if (defaultCalendar == null || !defaultCalendar.isActive) {
-                defaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
+            if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
+                defaultCalendarId = userCalendars.firstOrNull { it.isActive && it.isOwner }?.id
             }
             this@SettingsFragment.defaultCalendarId = defaultCalendarId
             val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)

@@ -40,11 +40,11 @@ class DeleteCalendarUseCase @Inject constructor(
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
         val isCalendarDefault =
             calendar.id == defaultCalendarId && calendar.isActive && calendar.isSubscribed.not()
-        val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
+        val activeOwnedUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }
 
         return if (isCalendarDefault) {
 
-            val nextDefaultCalendar = activeUserCalendars.firstOrNull { it.id != calendarId }
+            val nextDefaultCalendar = activeOwnedUserCalendars.firstOrNull { it.id != calendarId }
             if (nextDefaultCalendar != null) {
                 DeleteCalendarOption.Delete.DefaultNextActive(
                     calendarId,
