@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Impostazioni</string>
     <string name="nav_view_feedback">Dateci il vostro feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
-    <string name="nav_view_more_bug">Segnala un bug</string>
+    <string name="nav_view_more_bug">Segnala un problema</string>
     <string name="nav_view_more_subscription">Abbonamento</string>
     <string name="nav_view_more_logout">Esci</string>
     <string name="nav_view_more_login">Accedi</string>
@@ -452,7 +452,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Non ora</string>
     <string name="spotlight_dialog_auto_invites_title">Accetta gli inviti facilmente</string>
     <string name="spotlight_dialog_auto_invites_description">Ora gli inviti appaiono sul tuo calendario come eventi in attesa. Apri un evento per rispondere.\n\nPer gestirlo, vai alle impostazioni.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Successiva</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Prossimo</string>
     <string name="spotlight_v5_dialog_got_it_button">Ho capito</string>
     <string name="spotlight_v5_dialog_learn_more_button">Per saperne di più</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton Aggiornato, protezione unificata</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Impossibile aggiornare l\'importazione, riprova più tardi.</string>
     <string name="import_assistant_update_import_wrong_account_error">Conto sbagliato. Accedi con l\'account utilizzato per l\'importazione del calendario.</string>
     <string name="import_assistant_start_import_error">Impossibile avviare l\'importazione, riprova più tardi.</string>
+    <string name="import_assistant_delete_import_success">Record dell\'importazione eliminato</string>
     <string name="import_assistant_delete_import_error">Cancellazione dell\'importazione fallita, si prega di riprovare più tardi.</string>
     <string name="import_assistant_cancel_import_error">Annullamento dell\'importazione fallito, si prega di riprovare più tardi.</string>
     <string name="import_assistant_resume_import_error">Ripristino dell\'importazione fallito, si prega di riprovare più tardi.</string>
@@ -555,8 +556,8 @@
         <item quantity="other">Impossibile creare nuovi calendari per tutti i calendari importati a causa del limite del calendario personale.\n • Deseleziona almeno %1$d calendari</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020or\n • Unisci almeno %1$d calendario con calendari Proton esistenti.</item>
-        <item quantity="other">\u0020or\n • Unisci almeno %1$d calendari con calendari Proton esistenti.</item>
+        <item quantity="one">\u0020o\n • Unisci almeno %1$d calendario con i calendari Proton esistenti.</item>
+        <item quantity="other">\u0020o\n • Unisci almeno %1$d calendari con i calendari Proton esistenti.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>

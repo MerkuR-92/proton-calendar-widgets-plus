@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Setări</string>
     <string name="nav_view_feedback">Oferiți-ne feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
-    <string name="nav_view_more_bug">Raportare eroare</string>
+    <string name="nav_view_more_bug">Raportare problemă</string>
     <string name="nav_view_more_subscription">Abonament</string>
     <string name="nav_view_more_logout">Deconectare</string>
     <string name="nav_view_more_login">Autentificare</string>
@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s v-a refuzat invitația</string>
     <string name="snack_app_link_invalid">Legătură nevalidă la eveniment.</string>
     <string name="snack_app_link_error">Eroare deschidere eveniment.</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
+    <string name="snack_app_link_import_error">Autentificare anulată</string>
     <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
@@ -450,8 +450,8 @@
     <string name="spotlight_dialog_easy_switch_description">Importarea de evenimente și alte date din Google Calendar în Proton Calendar este mai ușoară ca niciodată. Importatorul nostru Easy Switch vă va ghida la fiecare pas.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Pornire importare</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Nu acum</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
-    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_title">Acceptați ușor invitații</string>
+    <string name="spotlight_dialog_auto_invites_description">Acum invitațiile apar în calendar ca evenimente în așteptare. Doar deschideți un eveniment pentru a răspunde.\n\nPentru a gestiona asta accesați setările.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Înainte</string>
     <string name="spotlight_v5_dialog_got_it_button">Am înțeles</string>
     <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Nu s-a reușit actualizarea importării. Mai încercați.</string>
     <string name="import_assistant_update_import_wrong_account_error">Cont greșit. Conectați-vă cu contul pe care l-ați utilizat pentru importarea calendarului.</string>
     <string name="import_assistant_start_import_error">Pornirea importării a eșuat. Mai încercați.</string>
+    <string name="import_assistant_delete_import_success">Articol importat șters.</string>
     <string name="import_assistant_delete_import_error">Nu s-a reușit ștergerea importării. Mai încercați.</string>
     <string name="import_assistant_cancel_import_error">Nu s-a reușit anularea importării. Mai încercați.</string>
     <string name="import_assistant_resume_import_error">Nu s-a reușit reluarea importării. Mai încercați.</string>

@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Ajustes</string>
     <string name="nav_view_feedback">Deja un comentario</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
-    <string name="nav_view_more_bug">Notificar un error</string>
+    <string name="nav_view_more_bug">Notificar un problema</string>
     <string name="nav_view_more_subscription">Suscripción</string>
     <string name="nav_view_more_logout">Cerrar sesión</string>
     <string name="nav_view_more_login">Iniciar sesión</string>
@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ha rechazado tu invitación</string>
     <string name="snack_app_link_invalid">Enlace al evento no válido</string>
     <string name="snack_app_link_error">Error al abrir evento</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
+    <string name="snack_app_link_import_error">Autenticación cancelada</string>
     <string name="snack_notification_already_added">La notificación ya ha sido añadida</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe</string>
@@ -400,7 +400,7 @@
     <string name="create_calendar_limit_reached_free_title">Actualice Proton Calendar</string>
     <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
     <string name="create_calendar_limit_reached_free_not_now">Ahora no</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Actualizar</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">No se pudo actualizar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Wrong account. Please sign in with the account you used for the calendar import.</string>
     <string name="import_assistant_start_import_error">No se pudo iniciar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_delete_import_success">Se ha eliminado el registro importación</string>
     <string name="import_assistant_delete_import_error">No se pudo eliminar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_cancel_import_error">No se pudo cancelar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_resume_import_error">No se pudo reanudar la importación. Por favor, inténtalo más tarde.</string>
@@ -478,8 +479,8 @@
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Import as</string>
     <string name="import_assistant_new_calendar_badge">Nuevo</string>
     <string name="import_assistant_merge_calendar_badge">Merged</string>
-    <string name="import_assistant_creating_calendars">Creating new calendars</string>
-    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Almost there…</string>
+    <string name="import_assistant_creating_calendars">Creando calendarios nuevos</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Ya casi está…</string>
     <string name="import_assistant_new_calendar_header">Crear nuevo</string>
     <string name="import_assistant_merge_calendar_header">Merge with existing</string>
     <string name="import_assistant_in_progress_title">Importación en progreso</string>
@@ -494,14 +495,14 @@
     <string name="import_assistant_report_details_date_time">%s %s</string>
     <string name="import_assistant_status_queued">Iniciada</string>
     <string name="import_assistant_status_in_progress">En progreso</string>
-    <string name="import_assistant_status_completed">Completed</string>
-    <string name="import_assistant_status_canceled">Canceled</string>
+    <string name="import_assistant_status_completed">Completado</string>
+    <string name="import_assistant_status_canceled">Cancelado</string>
     <string name="import_assistant_status_canceling">Cancelando</string>
-    <string name="import_assistant_status_paused">Paused</string>
-    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_paused">Pausado</string>
+    <string name="import_assistant_status_failed">Fallido</string>
     <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
     <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
-    <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
     <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
     <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reanudar</string>
@@ -518,7 +519,7 @@
     <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
     <string name="import_assistant_discard_import_positive">Cancelar la importación</string>
     <string name="import_assistant_discard_import_negative">Reanudar la importación</string>
-    <string name="import_assistant_authentication_canceled">Authentication canceled</string>
+    <string name="import_assistant_authentication_canceled">Autenticación cancelada</string>
     <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
     <string name="import_assistant_in_progress_error_snack">There is still an import in progress</string>
     <!--  STRING PLURALS  -->
@@ -555,8 +556,8 @@
         <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
-        <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+        <item quantity="one">\u0020or\n • Unir al menos %1$d calendario con calendarios Proton existentes.</item>
+        <item quantity="other">\u0020or\n • Unir al menos %1$d calendarios con calendarios Proton existentes.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>

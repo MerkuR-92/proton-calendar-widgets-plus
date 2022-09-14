@@ -234,7 +234,7 @@
     <string name="nav_view_settings">Ustawienia</string>
     <string name="nav_view_feedback">Wyślij opinię</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Ogólne</string>
-    <string name="nav_view_more_bug">Zgłoś błąd</string>
+    <string name="nav_view_more_bug">Zgłoś problem</string>
     <string name="nav_view_more_subscription">Subskrypcja</string>
     <string name="nav_view_more_logout">Wyloguj</string>
     <string name="nav_view_more_login">Zaloguj się</string>
@@ -309,7 +309,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">Uczestnik %1$s odrzucił zaproszenie</string>
     <string name="snack_app_link_invalid">Link do wydarzenia jest nieprawidłowy</string>
     <string name="snack_app_link_error">Wystąpił błąd podczas odczytywania wydarzenia</string>
-    <string name="snack_app_link_import_error">Authentication canceled</string>
+    <string name="snack_app_link_import_error">Uwierzytelnianie zostało anulowane</string>
     <string name="snack_notification_already_added">Powiadomienia zostały już dodane</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Wydarzenie nie istnieje</string>
@@ -450,8 +450,8 @@
     <string name="spotlight_dialog_easy_switch_description">Importowanie wydarzeń i innych danych z Kalendarza Google do Proton Calendar jest łatwiejsze niż kiedykolwiek. Asystent importu Easy Switch poprowadzi Cię na każdym kroku.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Rozpocznij importowanie</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Nie teraz</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
-    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_title">Akceptuj zaproszenia</string>
+    <string name="spotlight_dialog_auto_invites_description">Zaproszenia pojawią się w Twoim kalendarzu jako wydarzenia oczekujące. Otwórz wydarzenie, aby odpowiedzieć.\n\nAby zarządzać tym, przejdź do ustawień.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Dalej</string>
     <string name="spotlight_v5_dialog_got_it_button">Ok</string>
     <string name="spotlight_v5_dialog_learn_more_button">Dowiedz się więcej</string>
@@ -470,6 +470,7 @@
     <string name="import_assistant_update_import_error">Nie udało się zaktualizować importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_update_import_wrong_account_error">Złe konto. Zaloguj się na konto, z którego chcesz wyeksportować kalendarz.</string>
     <string name="import_assistant_start_import_error">Nie udało się rozpocząć importowania. Spróbuj ponownie później.</string>
+    <string name="import_assistant_delete_import_success">Rekord importu został usunięty</string>
     <string name="import_assistant_delete_import_error">Nie udało się usunąć importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_cancel_import_error">Nie udało się anulować importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_resume_import_error">Nie udało się wznowić importowania. Spróbuj ponownie później.</string>
