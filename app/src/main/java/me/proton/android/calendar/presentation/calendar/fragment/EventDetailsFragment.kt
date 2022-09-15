@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
@@ -49,7 +50,7 @@ import kotlinx.android.synthetic.main.fragment_event_details.section_calendar
 import kotlinx.android.synthetic.main.fragment_event_details.section_description
 import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
 import kotlinx.android.synthetic.main.fragment_event_details.section_location
-import kotlinx.android.synthetic.main.fragment_event_details.section_verification_warning
+import kotlinx.android.synthetic.main.fragment_event_details.section_verification_badge
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_description
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_initials
 import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_status
@@ -564,41 +565,69 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             if (FeatureFlag.SHOW_SIGNATURE_VERIFICATION_BADGES) {
                 when (event.verificationStatus) {
                     Event.SignatureVerification.SUCCESS, Event.SignatureVerification.NOT_SIGNED, Event.SignatureVerification.SIGNED_BUT_NO_KEYS -> {
-                        section_verification_warning.visibleOrGone(false)
-                        // TODO hide all the other badges
+                        section_verification_badge.visibleOrGone(false)
                     }
                     null, Event.SignatureVerification.FAILURE -> {
-                        with (section_verification_warning) {
+                        with (section_verification_badge) {
+                            setBackgroundResource(R.drawable.shape_background_error)
+                            setText(R.string.event_signature_verification_failure)
                             visibleOrGone(true)
                             movementMethod = LinkMovementMethod.getInstance()
                         }
                     }
                     Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS -> {
                         // signature verification failed because we couldn't get the keys, try again allowing API call
-
-                        // TODO show badge that we are loading
-
-                        lifecycleScope.launch {
-                            val verificationWithApiCall = calendarViewModel.transformEventAllowingApiCall(event.id, event.calendar.id)?.verificationStatus
-
-                            // after verification with API call we should get SUCCESS or NO KEYS, anything else means something went wrong
-                            val showVerificationErrorBadge = verificationWithApiCall != Event.SignatureVerification.SUCCESS && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_NO_KEYS && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
-                            val showNetworkErrorBadge = verificationWithApiCall == null || verificationWithApiCall == Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
-
-                            withContext(Dispatchers.Main) {
-                                with(section_verification_warning) {
-                                    visibleOrGone(showVerificationErrorBadge)
-                                    movementMethod = LinkMovementMethod.getInstance()
-                                }
-                            }
-
-                            // TODO hide the loading badge
-                        }
+                        onVerificationBadgeClicked(event)
                     }
                 }
             }
 
         })
+    }
+
+    private fun onVerificationBadgeClicked(event: Event) {
+        lifecycleScope.launch {
+
+            with (section_verification_badge) {
+                setBackgroundResource(R.drawable.shape_background_norm)
+                setText(R.string.event_signature_verification_in_progress)
+                visibleOrGone(true)
+            }
+
+            val verificationWithApiCall =
+                calendarViewModel.transformEventAllowingApiCall(event.id, event.calendar.id)?.verificationStatus
+
+            // after verification with API call we should get SUCCESS or NO KEYS, anything else means something went wrong
+            val showVerificationErrorBadge =
+                verificationWithApiCall != null
+                        && verificationWithApiCall != Event.SignatureVerification.SUCCESS
+                        && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_NO_KEYS
+                        && verificationWithApiCall != Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+
+            val showNetworkErrorBadge = verificationWithApiCall == null || verificationWithApiCall == Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
+
+            withContext(Dispatchers.Main) {
+                with(section_verification_badge) {
+                    if (showVerificationErrorBadge) { // verifying with API keys failed
+                        setBackgroundResource(R.drawable.shape_background_error)
+                        setText(R.string.event_signature_verification_failure)
+                        visibleOrGone(showVerificationErrorBadge)
+                        movementMethod = LinkMovementMethod.getInstance()
+                    } else if (showNetworkErrorBadge) { // could not perform verification
+                        setBackgroundResource(R.drawable.shape_background_warning)
+                        setText(R.string.event_signature_verification_network_error)
+                        visibleOrGone(showNetworkErrorBadge)
+                        movementMethod = LinkMovementMethod.getInstance()
+                        setOnSingleClickListener {
+                            onVerificationBadgeClicked(event)
+                            it.setOnClickListener(null) // prevent multiple clicks while contacting API
+                        }
+                    } else { // all is good, verification succeeded
+                        visibleOrGone(false)
+                    }
+                }
+            }
+        }
     }
 
     private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {

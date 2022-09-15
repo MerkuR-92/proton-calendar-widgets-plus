@@ -24,10 +24,10 @@
 
             <TextView
                 style="@style/TextViewWarning"
-                android:id="@+id/section_verification_warning"
+                android:id="@+id/section_verification_badge"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:text="@string/event_signature_verification_warning"
+                android:text="@string/event_signature_verification_failure"
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:layout_marginHorizontal="16dp"
