@@ -1431,6 +1431,15 @@ class WeekView @JvmOverloads constructor(
     }
 
     @PublicApi
+    fun setWeekDayFormatter(formatter: DateFormatter) {
+        viewState.weekDayFormatter = formatter
+        renderers.filterIsInstance(DateFormatterDependent::class.java).forEach {
+            it.onDateFormatterChanged(formatter)
+        }
+        invalidate()
+    }
+
+    @PublicApi
     fun setTimeFormatter(formatter: TimeFormatter) {
         viewState.timeFormatter = formatter
         renderers.filterIsInstance(TimeFormatterDependent::class.java).forEach {

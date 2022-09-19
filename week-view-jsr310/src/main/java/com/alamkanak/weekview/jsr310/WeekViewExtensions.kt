@@ -101,3 +101,8 @@ fun WeekView.scrollToTime(time: LocalTime) {
 fun WeekView.setDateFormatter(formatter: (LocalDate) -> String) {
     setDateFormatter { formatter(it.toLocalDate()) }
 }
+
+@PublicApi
+fun WeekView.setWeekDayFormatter(formatter: (LocalDate) -> String) {
+    setWeekDayFormatter { formatter(it.toLocalDate()) }
+}

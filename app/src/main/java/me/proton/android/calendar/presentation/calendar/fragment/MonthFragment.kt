@@ -29,6 +29,7 @@ import com.alamkanak.weekview.jsr310.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.jsr310.scrollToDate
 import com.alamkanak.weekview.jsr310.scrollToDateTime
 import com.alamkanak.weekview.jsr310.setDateFormatter
+import com.alamkanak.weekview.jsr310.setWeekDayFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_base.fragment_progress_bar
@@ -86,7 +87,6 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerA
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -95,7 +95,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
 import java.util.Collections
 import java.util.Locale
 import java.util.TimeZone
@@ -612,11 +611,12 @@ class MonthFragment : BaseFragment() {
         weekView.adapter = weekViewAdapter
 
         val weekdayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
+        weekView.setWeekDayFormatter { date: LocalDate ->
+            weekdayFormatter.format(date)
+        }
         val dateFormatter = DateTimeFormatter.ofPattern("dd", Locale.getDefault())
         weekView.setDateFormatter { date: LocalDate ->
-            val weekdayLabel = weekdayFormatter.format(date)
-            val dateLabel = dateFormatter.format(date)
-            "$weekdayLabel $dateLabel"
+            dateFormatter.format(date)
         }
     }
 

@@ -8,7 +8,6 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.text.StaticLayout
 import android.text.TextPaint
-import android.util.Log
 import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
@@ -23,7 +22,7 @@ internal class HeaderRenderer(
 ) : Renderer, DateFormatterDependent {
 
     private val allDayEventLabels = ArrayMap<EventChip, StaticLayout>()
-    private val dateLabelLayouts = SparseArray<StaticLayout>()
+    private val dateLabelLayouts = SparseArray<Pair<StaticLayout, StaticLayout>>()
 
     private val headerUpdater = HeaderUpdater(
         viewState = viewState,
@@ -74,7 +73,7 @@ internal class HeaderRenderer(
 
 private class HeaderUpdater(
     private val viewState: ViewState,
-    private val labelLayouts: SparseArray<StaticLayout>,
+    private val labelLayouts: SparseArray<Pair<StaticLayout, StaticLayout>>,
     private val onHeaderHeightChanged: () -> Unit
 ) : Updater {
 
@@ -92,9 +91,15 @@ private class HeaderUpdater(
     }
 
     private fun updateHeaderHeight(
-        dateLabels: List<StaticLayout>
+        dateLabels: List<Pair<StaticLayout, StaticLayout>>
     ) {
-        val maximumLayoutHeight = dateLabels.map { it.height.toFloat() }.maxOrNull() ?: 0f
+        val maximumLayoutHeight = dateLabels.map {
+            if (viewState.numberOfVisibleDays == 1) {
+                it.first.height.toFloat() + it.second.height.toFloat()
+            } else {
+                it.first.height.toFloat()
+            }
+        }.maxOrNull() ?: 0f
         viewState.dateLabelHeight = maximumLayoutHeight
 
         val currentHeaderHeight = viewState.headerHeight
@@ -121,14 +126,31 @@ private class HeaderUpdater(
         )
     }
 
-    private fun calculateStaticLayoutForDate(date: Calendar): StaticLayout {
-        val dayLabel = viewState.dateFormatter(date)
+    private fun calculateStaticLayoutForDate(date: Calendar): Pair<StaticLayout, StaticLayout> {
+        val weekDayLabel = viewState.weekDayFormatter(date)
+        val dateLabel = viewState.dateFormatter(date)
+
         val textPaint = when {
             date.isToday -> viewState.todayHeaderTextPaint
             date.isWeekend -> viewState.weekendHeaderTextPaint
             else -> viewState.headerTextPaint
         }
-        return dayLabel.toTextLayout(textPaint = textPaint, width = viewState.dayWidth.toInt())
+        val weekDayPaint = TextPaint(textPaint).apply {
+            if (viewState.numberOfVisibleDays > 1) textAlign = Paint.Align.LEFT
+            else textAlign = Paint.Align.CENTER
+            if (!date.isToday) color = viewState.weakHeaderTextColor
+        }
+        val datePaint = TextPaint(textPaint).apply {
+            if (viewState.numberOfVisibleDays > 1) textAlign = Paint.Align.LEFT
+            else {
+                textAlign = Paint.Align.CENTER
+                textSize = viewState.singleDayNumberHeaderTextSize
+            }
+        }
+        return Pair(
+            weekDayLabel.toTextLayout(textPaint = weekDayPaint, width = viewState.dayWidth.toInt()),
+            dateLabel.toTextLayout(textPaint = datePaint, width = viewState.dayWidth.toInt()),
+        )
     }
 
     private fun <E> SparseArray<E>.hasKey(key: Int): Boolean = indexOfKey(key) >= 0
@@ -136,7 +158,7 @@ private class HeaderUpdater(
 
 private class DateLabelsDrawer(
     private val viewState: ViewState,
-    private val dateLabelLayouts: SparseArray<StaticLayout>
+    private val dateLabelLayouts: SparseArray<Pair<StaticLayout, StaticLayout>>
 ) : Drawer {
 
     override fun draw(canvas: Canvas) {
@@ -154,11 +176,19 @@ private class DateLabelsDrawer(
         val key = date.toEpochDays()
         val textLayout = dateLabelLayouts[key]
 
+        val weekDayTextLayout = textLayout.first
+        val dateTextLayout = textLayout.second
         withTranslation(
             x = bounds.centerX(),
             y = viewState.headerPadding,
         ) {
-            draw(textLayout)
+            draw(weekDayTextLayout)
+        }
+        withTranslation(
+            x = bounds.centerX(),
+            y = viewState.headerPadding + weekDayTextLayout.height,
+        ) {
+            draw(dateTextLayout)
         }
     }
 
@@ -174,11 +204,29 @@ private class DateLabelsDrawer(
         val key = date.toEpochDays()
         val textLayout = dateLabelLayouts[key]
 
+        val weekDayTextLayout = textLayout.first
+        val dateTextLayout = textLayout.second
+
+        val weekDayBounds = weekDayTextLayout.paint.getTextBounds(weekDayTextLayout.text.toString())
+        val dateBounds = dateTextLayout.paint.getTextBounds(dateTextLayout.text.toString())
+        val weekDayWidth = weekDayBounds.right - weekDayBounds.left
+        val spaceWidth = viewState.headerLabelsInnerMargin
+        val dateWidth = dateBounds.right - dateBounds.left
+        val sumLabelWidth = weekDayWidth + dateWidth + spaceWidth
+        val weekDayStartX = startPixel + (viewState.dayWidth - sumLabelWidth) / 2f
+        val dateStartX = weekDayStartX + weekDayWidth + spaceWidth
+
         withTranslation(
-            x = startPixel + viewState.dayWidth / 2f,
+            x = weekDayStartX,
             y = viewState.headerPadding,
         ) {
-            draw(textLayout)
+            draw(weekDayTextLayout)
+        }
+        withTranslation(
+            x = dateStartX,
+            y = viewState.headerPadding,
+        ) {
+            draw(dateTextLayout)
         }
     }
 }
@@ -268,8 +316,6 @@ internal class AllDayEventsDrawer(
 
     private val eventChipDrawer = EventChipDrawer(viewState)
 
-    private val expandInfoTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-
     override fun draw(canvas: Canvas) = canvas.drawInBounds(viewState.headerBounds) {
         for (date in viewState.dateRange) {
             val events = allDayEventLayouts
@@ -317,16 +363,16 @@ internal class AllDayEventsDrawer(
     }
 
     private fun Canvas.drawExpandInfo(eventsCount: Int, priorEventChip: EventChip) {
-        // Draw + X more text
+        // Draw "+ X more" blob
         val text =
             if (viewState.numberOfVisibleDays > 3) "+ $eventsCount"
             else "+ $eventsCount more"
 
-        val textPaint = expandInfoTextPaint.apply {
+        val textPaint = viewState.expandInfoTextPaint.apply {
             textAlign = if (viewState.isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
-            textSize = viewState.allDayEventTextPaint.textSize
-            color = viewState.headerTextPaint.color
         }
+
+        val textLayout = text.semibold().toTextLayout(textPaint, priorEventChip.bounds.width().toInt())
 
         val x = if (viewState.isLtr) {
             priorEventChip.bounds.left + viewState.eventPaddingHorizontal.toFloat()
@@ -334,21 +380,25 @@ internal class AllDayEventsDrawer(
             priorEventChip.bounds.right - viewState.eventPaddingHorizontal.toFloat()
         }
 
-        val y = priorEventChip.bounds.bottom +
-                viewState.eventPaddingVertical +
-                textPaint.textSize
-
         // Draw text background
         val radius = viewState.eventCornerRadius.toFloat()
         val left = priorEventChip.bounds.left
         val top = priorEventChip.bounds.bottom + viewState.eventMarginVertical
         val right = priorEventChip.bounds.right
-        val bottom = y + (textPaint.textHeight / 2)
+        val bottom = priorEventChip.bounds.bottom + viewState.eventPaddingVertical * 2 + textLayout.height
         val backgroundRectF = RectF(left, top, right, bottom)
         viewState.allDayMoreMap[priorEventChip.startTime] = backgroundRectF
         drawRoundRect(backgroundRectF, radius, radius, viewState.expandInfoBackgroundPaint)
 
-        drawText(text, x, y, textPaint)
+        // Draw text label
+        val verticalOffset = (backgroundRectF.height() - textLayout.height) / 2f
+        val y = top + verticalOffset
+        withTranslation(
+            x = x,
+            y = y
+        ) {
+            draw(textLayout)
+        }
     }
 }
 

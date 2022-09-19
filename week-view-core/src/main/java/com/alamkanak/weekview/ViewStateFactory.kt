@@ -36,6 +36,8 @@ internal object ViewStateFactory {
             Typeface.create(it, Typeface.NORMAL)
         } ?: Typeface.create("sans-serif-medium", Typeface.NORMAL)
 
+        viewState.weakHeaderTextColor = a.getColor(R.styleable.WeekView_weakHeaderTextColor, context.textColorPrimary)
+
         viewState.headerTextPaint.apply {
             color = a.getColor(R.styleable.WeekView_headerTextColor, context.textColorPrimary)
             textSize = a.getDimension(R.styleable.WeekView_headerTextSize, context.defaultTextSize)
@@ -116,6 +118,12 @@ internal object ViewStateFactory {
             typeface = customTypeface ?: Typeface.DEFAULT
         }
 
+        viewState.expandInfoTextPaint.apply {
+            color = a.getColor(R.styleable.WeekView_expandInfoTextColor, Color.BLACK)
+            textSize = a.getDimension(R.styleable.WeekView_allDayEventTextSize, context.defaultTextSize)
+            typeface = customTypeface ?: Typeface.DEFAULT
+        }
+
         viewState.allDayEventTextPaint.apply {
             color = a.getColor(R.styleable.WeekView_eventTextColor, Color.WHITE)
             textSize = a.getDimension(R.styleable.WeekView_allDayEventTextSize, viewState.eventTextPaint.textSize)
@@ -170,6 +178,8 @@ internal object ViewStateFactory {
 
         viewState.apply {
             headerPadding = a.getDimension(R.styleable.WeekView_headerPadding, context.dp(8))
+            singleDayNumberHeaderTextSize = a.getDimension(R.styleable.WeekView_singleDayNumberHeaderTextSize, context.sp(20))
+            headerLabelsInnerMargin = a.getDimension(R.styleable.WeekView_headerLabelsInnerMargin, context.dp(3))
         }
 
         viewState.apply {

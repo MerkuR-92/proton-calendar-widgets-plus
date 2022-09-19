@@ -61,6 +61,8 @@ internal class ViewState {
     var timeColumnHoursInterval: Int = 0
 
     var headerPadding: Float = 0f
+    var singleDayNumberHeaderTextSize: Float = 0f
+    var headerLabelsInnerMargin: Float = 0f
 
     var showWeekNumber: Boolean = false
     var weekNumberBackgroundCornerRadius: Float = 0f
@@ -117,6 +119,8 @@ internal class ViewState {
         get() = _timeColumnTextPaint.apply {
             textAlign = if (isLtr) Paint.Align.RIGHT else Paint.Align.LEFT
         }
+
+    var weakHeaderTextColor: Int = 0
 
     val headerTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
@@ -197,6 +201,10 @@ internal class ViewState {
         style = Paint.Style.FILL
     }
 
+    val expandInfoTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG or Paint.LINEAR_TEXT_FLAG).apply {
+        style = Paint.Style.FILL
+    }
+
     val timeColumnBackgroundPaint = Paint()
 
     var newHourHeight: Float = 0f
@@ -206,6 +214,10 @@ internal class ViewState {
 
     var dateFormatter: DateFormatter = { date ->
         defaultDateFormatter(numberOfDays = numberOfVisibleDays).format(date.time)
+    }
+
+    var weekDayFormatter: DateFormatter = { date ->
+        defaultWeekDayFormatter(numberOfDays = numberOfVisibleDays).format(date.time)
     }
 
     var timeFormatter: TimeFormatter = { hour ->

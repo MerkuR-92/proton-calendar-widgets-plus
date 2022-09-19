@@ -48,10 +48,14 @@
         <attr name="headerPadding" format="dimension" />
         <attr name="headerTextSize" format="dimension" />
         <attr name="headerTextColor" format="color" />
+        <attr name="weakHeaderTextColor" format="color" />
+        <attr name="headerLabelsInnerMargin" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
         <attr name="weekendHeaderTextColor" format="color" />
         <attr name="showHeaderDownArrow" format="boolean" />
         <attr name="expandInfoBackgroundColor" format="color" />
+        <attr name="expandInfoTextColor" format="color" />
+        <attr name="singleDayNumberHeaderTextSize" format="dimension" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />
