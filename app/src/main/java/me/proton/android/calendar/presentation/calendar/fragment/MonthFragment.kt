@@ -86,6 +86,7 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerA
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -94,6 +95,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
+import java.util.Calendar
 import java.util.Collections
 import java.util.Locale
 import java.util.TimeZone
@@ -413,6 +415,10 @@ class MonthFragment : BaseFragment() {
         }
         calendarViewModel.handleInitialDaySelection(navigationDate ?: calendarViewModel.initialToday)
 
+        calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
+            weekView.timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(timeFormat, requireContext())
+        }
+
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
             setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
 
@@ -606,11 +612,11 @@ class MonthFragment : BaseFragment() {
         weekView.adapter = weekViewAdapter
 
         val weekdayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault())
-        val dateFormatter = DateTimeFormatter.ofPattern("MM/dd", Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern("dd", Locale.getDefault())
         weekView.setDateFormatter { date: LocalDate ->
             val weekdayLabel = weekdayFormatter.format(date)
             val dateLabel = dateFormatter.format(date)
-            weekdayLabel + "\n" + dateLabel
+            "$weekdayLabel $dateLabel"
         }
     }
 
@@ -632,12 +638,15 @@ class MonthFragment : BaseFragment() {
 
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
-                        val weekViewCalendarEntities = it.events.map { event ->
-                            event.toWeekViewCalendarEntityEvent(timeZoneId, getString(R.string.default_event_summary))
+                        lifecycleScope.launch {
+                            val userEmails = calendarViewModel.getUserEmails()
+                            val weekViewCalendarEntities = it.events.map { event ->
+                                event.toWeekViewCalendarEntityEvent(userEmails, timeZoneId, getString(R.string.default_event_summary))
+                            }
+                            weekViewAdapter.submitList(
+                                weekViewCalendarEntities
+                            )
                         }
-                        weekViewAdapter.submitList(
-                            weekViewCalendarEntities
-                        )
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
 

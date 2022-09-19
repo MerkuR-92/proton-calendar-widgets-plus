@@ -5,6 +5,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.text.StaticLayout
+import android.text.TextUtils
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.roundToInt
 
 internal class EventChipDrawer(
     private val viewState: ViewState
@@ -32,6 +36,82 @@ internal class EventChipDrawer(
         updateBackgroundPaint(entity, isBeingDragged, backgroundPaint)
         drawRoundRect(bounds, cornerRadius, cornerRadius, backgroundPaint)
 
+        updateBorderPaint(entity, borderPaint)
+
+        // Draw the event side strip
+        val sideStripBounds = RectF(bounds.left, bounds.top, bounds.left + viewState.eventSideStripWidth * 2, bounds.bottom)
+        drawRoundRect(sideStripBounds, cornerRadius, cornerRadius, Paint().apply {
+            style = Paint.Style.FILL
+            color = borderPaint.color
+            isAntiAlias = true
+        })
+
+        // Draw a line to hide the right side of the event side strip rectangle
+        val eventStripSeparationPaint = Paint(backgroundPaint).apply {
+            strokeWidth = viewState.eventSideStripWidth + 1F // Adjustment to make sure the lines cover the whole right side of the event stripe
+            style = Paint.Style.FILL
+        }
+        val eventStripSeparationLine = floatArrayOf(
+            sideStripBounds.centerX() + (viewState.eventSideStripWidth / 2), sideStripBounds.top, sideStripBounds.centerX() + (viewState.eventSideStripWidth / 2), sideStripBounds.bottom
+        )
+        drawLines(
+            eventStripSeparationLine,
+            eventStripSeparationPaint
+        )
+
+        val unansweredStripesColor = entity.style.stripesColor
+        if (unansweredStripesColor != null) {
+            val lineWidth = viewState.unansweredStripesWidth
+
+            // Set the paint for the stripes
+            val unansweredStripesPaint = Paint().apply {
+                color = unansweredStripesColor
+                strokeWidth = lineWidth
+                isAntiAlias = true
+            }
+
+            // Define the gap between each stripe
+            val lineGap = viewState.unansweredStripesGap
+
+            val sideStripWidth = sideStripBounds.width() / 2
+            val eventWidth = bounds.width() - sideStripWidth
+            val totalDistance = eventWidth + bounds.height()
+
+            // Array list containing sets of 4 floats that represents the x and y coordinates for the start and stop points of the line
+            val stripesArrayList = arrayListOf<Float>()
+            var distance = 0.0
+            val rectStartX = bounds.left + sideStripWidth
+            while (distance < totalDistance) {
+
+                val startX =
+                    if (distance < eventWidth) rectStartX + distance.toFloat()
+                    else rectStartX + eventWidth
+                val startY =
+                    if (distance < eventWidth) bounds.top
+                    else bounds.top + (distance.toFloat() - eventWidth)
+                val stopX =
+                    if (distance < bounds.height()) rectStartX
+                    else rectStartX + (distance.toFloat() - bounds.height())
+                val stopY =
+                    if (distance < bounds.height()) bounds.top + distance.toFloat()
+                    else bounds.top + bounds.height()
+
+                stripesArrayList.add(startX) // The x-coordinate of the start point of the line
+                stripesArrayList.add(startY) // The y-coordinate of the start point of the line
+                stripesArrayList.add(stopX) // The x-coordinate of the end point of the line
+                stripesArrayList.add(stopY) // The y-coordinate of the end point of the line
+
+                distance += ((lineGap + lineWidth) / cos(PI / 4))
+
+            }
+            val unansweredStripes = stripesArrayList.toFloatArray()
+
+            drawLines(
+                unansweredStripes,
+                unansweredStripesPaint
+            )
+        }
+
         val pattern = entity.style.pattern
         if (pattern != null) {
             drawPattern(
@@ -44,7 +124,6 @@ internal class EventChipDrawer(
 
         val borderWidth = entity.style.borderWidth
         if (borderWidth != null && borderWidth > 0) {
-            updateBorderPaint(entity, borderPaint)
             val borderBounds = bounds.insetBy(borderWidth / 2f)
             drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
         }
@@ -138,7 +217,7 @@ internal class EventChipDrawer(
         val bounds = eventChip.bounds
 
         val horizontalOffset = if (viewState.isLtr) {
-            bounds.left + viewState.eventPaddingHorizontal
+            bounds.left + viewState.eventPaddingHorizontal + viewState.eventSideStripWidth / 2
         } else {
             bounds.right - viewState.eventPaddingHorizontal
         }
@@ -152,8 +231,25 @@ internal class EventChipDrawer(
             } else viewState.eventPaddingVertical.toFloat()
         }
 
+        val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2
+        // Use ellipsize to calculate the max length we can draw
+        val ellipsizedTitle = TextUtils.ellipsize(
+            textLayout.text,
+            textLayout.paint,
+            titleWidth,
+            TextUtils.TruncateAt.END
+        )
+
         withTranslation(x = horizontalOffset, y = bounds.top + verticalOffset) {
-            draw(textLayout)
+            draw(
+                ellipsizedTitle.toTextLayout(
+                    textPaint = textLayout.paint,
+                    width = bounds.width().roundToInt() - viewState.eventPaddingHorizontal,
+                    alignment = textLayout.alignment,
+                    spacingMultiplier = textLayout.spacingMultiplier,
+                    spacingExtra = textLayout.spacingAdd
+                )
+            )
         }
     }
 

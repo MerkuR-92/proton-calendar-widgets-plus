@@ -69,6 +69,9 @@
         <attr name="eventPaddingVertical" format="dimension" />
         <attr name="defaultEventColor" format="color" />
         <attr name="allDayEventTextSize" format="dimension" />
+        <attr name="eventSideStripWidth" format="dimension" />
+        <attr name="unansweredStripesWidth" format="dimension" />
+        <attr name="unansweredStripesGap" format="dimension" />
 
         <!-- Event margins -->
         <attr name="columnGap" format="dimension" />

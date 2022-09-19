@@ -1112,6 +1112,26 @@ class WeekView @JvmOverloads constructor(
     /*
      ***********************************************************************************************
      *
+     *   Time format
+     *
+     ***********************************************************************************************
+     */
+
+    /**
+     * Returns the time format that [WeekView] will be displayed in
+     */
+    @PublicApi
+    var timeFormatIs24Hour: Boolean
+        get() = viewState.timeFormatIs24Hour
+        set(value) {
+            viewState.timeFormatIs24Hour = value
+            viewState.renderCurrentTime()
+            invalidate()
+        }
+
+    /*
+     ***********************************************************************************************
+     *
      *   Date range
      *
      ***********************************************************************************************

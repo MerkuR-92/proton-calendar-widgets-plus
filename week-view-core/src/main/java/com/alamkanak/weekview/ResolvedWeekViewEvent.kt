@@ -46,7 +46,8 @@ internal sealed class ResolvedWeekViewEntity {
         val pattern: WeekViewEntity.Style.Pattern? = null,
         val borderColor: Int? = null,
         val borderWidth: Int? = null,
-        val cornerRadius: Int? = null
+        val cornerRadius: Int? = null,
+        val stripesColor: Int? = null
     )
 
     internal val isNotAllDay: Boolean
@@ -124,5 +125,6 @@ internal fun WeekViewEntity.Style.resolve(
     pattern = pattern,
     borderColor = borderColorResource?.resolve(context),
     borderWidth = borderWidthResource?.resolve(context),
-    cornerRadius = cornerRadiusResource?.resolve(context)
+    cornerRadius = cornerRadiusResource?.resolve(context),
+    stripesColor = stripesColorResource?.resolve(context)
 )

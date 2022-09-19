@@ -8,7 +8,9 @@ import android.graphics.Typeface
 import android.os.Build
 import android.text.TextPaint
 import android.view.View
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -68,6 +70,9 @@ internal class ViewState {
     var eventPaddingHorizontal: Int = 0
     var eventPaddingVertical: Int = 0
     var defaultEventColor: Int = 0
+    var eventSideStripWidth: Float = 0f
+    var unansweredStripesWidth: Float = 0f
+    var unansweredStripesGap: Float = 0f
 
     var columnGap: Int = 0
     var overlappingEventGap: Int = 0
@@ -96,6 +101,7 @@ internal class ViewState {
     var horizontalScrollingEnabled: Boolean = false
 
     var customTimeZone: TimeZone = TimeZone.getDefault()
+    var timeFormatIs24Hour: Boolean = true
 
     var minHour: Int = 0
     var maxHour: Int = 24
@@ -203,8 +209,11 @@ internal class ViewState {
     }
 
     var timeFormatter: TimeFormatter = { hour ->
-        val date = now().withTime(hour = hour, minutes = 0)
-        defaultTimeFormatter().format(date.time)
+        val date = nowAtTimezone(customTimeZone).withTime(hour = hour, minutes = 0)
+        val dateFormat =
+            if (timeFormatIs24Hour) SimpleDateFormat("HH:mm", Locale.getDefault())
+            else SimpleDateFormat("hh a", Locale.getDefault())
+        dateFormat.format(date.time)
     }
 
     val minX: Float

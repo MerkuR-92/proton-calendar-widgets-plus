@@ -27,7 +27,7 @@ class WeekViewAdapter(
         FormatStyle.SHORT
     )
 
-    override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity()
+    override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity(context)
 
     override fun onEventClick(data: WeekViewCalendarEntity, bounds: RectF) {
         if (data is WeekViewCalendarEntity.Event) {

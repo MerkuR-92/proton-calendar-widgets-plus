@@ -185,6 +185,7 @@ sealed class WeekViewEntity {
         internal var borderColorResource: ColorResource? = null
         internal var backgroundColorResource: ColorResource? = null
         internal var cornerRadiusResource: DimenResource? = null
+        internal var stripesColorResource: ColorResource? = null
         internal var pattern: Pattern? = null
 
         sealed class Pattern {
@@ -259,6 +260,12 @@ sealed class WeekViewEntity {
             @PublicApi
             fun setBackgroundColorResource(@ColorRes resId: Int): Builder {
                 style.backgroundColorResource = ColorResource.Id(resId)
+                return this
+            }
+
+            @PublicApi
+            fun setStripesColorResource(@ColorInt color: Int): Builder {
+                style.stripesColorResource = ColorResource.Value(color)
                 return this
             }
 

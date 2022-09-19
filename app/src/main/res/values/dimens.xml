@@ -138,7 +138,7 @@
     <dimen name="month_view_plus_icon_end_margin">5dp</dimen>
 
     <!--  Week view  -->
-    <dimen name="week_view_no_border_width">5dp</dimen>
-    <dimen name="week_view_border_width">5dp</dimen>
+    <dimen name="week_view_no_border_width">0dp</dimen>
+    <dimen name="week_view_border_width">1dp</dimen>
 
 </resources>
