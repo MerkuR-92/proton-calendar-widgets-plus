@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Termin löschen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
-    <string name="event_signature_verification_warning">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
+    <string name="event_signature_verification_failure">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
     <string name="event_change_answer_recurring_overwrite_description">Möchtest du deine Antwort für alle Termine in dieser Serie ändern?\nEinige deiner Antworten auf Wiederholungen, die zuvor vom Organisator aktualisiert wurden, gehen dabei verloren.</string>

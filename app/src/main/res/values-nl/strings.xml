@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Afspraak verwijderen</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Afspraken verwijderen</string>
     <string name="event_decryption_error_dialog_close">Sluiten</string>
-    <string name="event_signature_verification_warning">De verificatie van de afspraakhandtekening is mislukt. <a href="https://proton.me/support/what-is-a-digital-signature">Meer informatie</a></string>
+    <string name="event_signature_verification_failure">De verificatie van de afspraakhandtekening is mislukt. <a href="https://proton.me/support/what-is-a-digital-signature">Meer informatie</a></string>
     <string name="event_change_answer_recurring_title">Terugkerende afspraak updaten</string>
     <string name="event_change_answer_recurring_description">Wilt u uw antwoord wijzigen voor alle afspraken in de serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Wilt u uw antwoord wijzigen voor alle afspraken in deze serie?\nSommige antwoorden op voorvallen die eerder zijn bijgewerkt door de organisator zullen verloren gaan.</string>

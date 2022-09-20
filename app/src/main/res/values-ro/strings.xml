@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Ștergere eveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
-    <string name="event_signature_verification_warning">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/support/what-is-a-digital-signature">Detalii</a></string>
+    <string name="event_signature_verification_failure">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/support/what-is-a-digital-signature">Detalii</a></string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>

@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Elimina evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Elimina eventi</string>
     <string name="event_decryption_error_dialog_close">Chiudi</string>
-    <string name="event_signature_verification_warning">La verifica della firma dell\'evento non è riuscita. <a href="https://proton.me/support/what-is-a-digital-signature">Per saperne di più</a></string>
+    <string name="event_signature_verification_failure">La verifica della firma dell\'evento non è riuscita. <a href="https://proton.me/support/what-is-a-digital-signature">Per saperne di più</a></string>
     <string name="event_change_answer_recurring_title">Aggiorna l\'evento ricorrente</string>
     <string name="event_change_answer_recurring_description">Vuoi cambiare la tua risposta per tutti gli eventi di questa serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Vuoi cambiare la tua risposta per tutti gli eventi di questa serie?\nAlcune delle tue risposte alle occorrenze precedentemente aggiornate dall\'organizzatore andranno perse.</string>

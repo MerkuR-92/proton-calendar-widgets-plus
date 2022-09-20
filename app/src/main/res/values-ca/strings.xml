@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Suprimir esdeveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Suprimir esdeveniments</string>
     <string name="event_decryption_error_dialog_close">Tanca</string>
-    <string name="event_signature_verification_warning">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
+    <string name="event_signature_verification_failure">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
     <string name="event_change_answer_recurring_title">Actualitzar esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador/a es perdran.</string>

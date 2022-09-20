@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Видалити подію</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Видалити події</string>
     <string name="event_decryption_error_dialog_close">Закрити</string>
-    <string name="event_signature_verification_warning">Не вдалося перевірити підпис події. <a href="https://proton.me/support/what-is-a-digital-signature">Докладніше</a></string>
+    <string name="event_signature_verification_failure">Не вдалося перевірити підпис події. <a href="https://proton.me/support/what-is-a-digital-signature">Докладніше</a></string>
     <string name="event_change_answer_recurring_title">Оновити повторювану подію</string>
     <string name="event_change_answer_recurring_description">Бажаєте змінити свою відповідь для всіх подій в серії?</string>
     <string name="event_change_answer_recurring_overwrite_description">Бажаєте змінити свою відповідь на всі події цієї серії?\nДеякі з ваших відповідей на події, раніше оновлені організатором, буде втрачено.</string>
