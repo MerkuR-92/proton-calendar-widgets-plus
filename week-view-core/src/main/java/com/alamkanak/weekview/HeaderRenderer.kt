@@ -319,7 +319,7 @@ internal class AllDayEventsDrawer(
     override fun draw(canvas: Canvas) = canvas.drawInBounds(viewState.headerBounds) {
         for (date in viewState.dateRange) {
             val events = allDayEventLayouts
-                .filter { it.key.event.startTime.isSameDate(date) }
+                .filter { it.key.startTime.isSameDate(date) }
                 .toList()
 
             if (viewState.arrangeAllDayEventsVertically) {
@@ -363,10 +363,10 @@ internal class AllDayEventsDrawer(
     }
 
     private fun Canvas.drawExpandInfo(eventsCount: Int, priorEventChip: EventChip) {
-        // Draw "+ X more" blob
+        // Draw "+ X" blob
         val text =
             if (viewState.numberOfVisibleDays > 3) "+ $eventsCount"
-            else "+ $eventsCount more"
+            else "+ $eventsCount"
 
         val textPaint = viewState.expandInfoTextPaint.apply {
             textAlign = if (viewState.isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
