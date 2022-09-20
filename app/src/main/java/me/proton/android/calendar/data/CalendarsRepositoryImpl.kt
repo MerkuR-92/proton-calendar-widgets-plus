@@ -555,7 +555,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
                 // all we need to do is decrypt EventEntity and return full Events with correct occurrences
 
-                val eventIds = deduplicatedEventSkeletons.map { it.id }
+                val eventIds = deduplicatedEventSkeletons.map { it.id }.distinct()
                 val chunkedEventIds = eventIds.chunked(100)
                 val eventEntities = chunkedEventIds.flatMap {
                     database.eventsDao().selectAllById(it)
