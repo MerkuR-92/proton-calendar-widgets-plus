@@ -48,11 +48,12 @@ internal class EventChipDrawer(
 
         // Draw a line to hide the right side of the event side strip rectangle
         val eventStripSeparationPaint = Paint(backgroundPaint).apply {
-            strokeWidth = viewState.eventSideStripWidth + 1F // Adjustment to make sure the lines cover the whole right side of the event stripe
+            strokeWidth = viewState.eventSideStripWidth + 2f // Adjustment to make sure the lines cover the whole right side of the event stripe
             style = Paint.Style.FILL
         }
+        val xPos = sideStripBounds.centerX() + (viewState.eventSideStripWidth / 2) + 2f
         val eventStripSeparationLine = floatArrayOf(
-            sideStripBounds.centerX() + (viewState.eventSideStripWidth / 2), sideStripBounds.top, sideStripBounds.centerX() + (viewState.eventSideStripWidth / 2), sideStripBounds.bottom
+            xPos, sideStripBounds.top, xPos, sideStripBounds.bottom
         )
         drawLines(
             eventStripSeparationLine,
@@ -129,7 +130,8 @@ internal class EventChipDrawer(
         }
 
         if (entity.isMultiDay && entity.isNotAllDay) {
-            drawCornersForMultiDayEvents(eventChip, cornerRadius)
+            // TODO Draw event blob (w/ stripe) all the way to the top / bottom
+            // drawCornersForMultiDayEvents(eventChip, cornerRadius)
         }
 
         if (textLayout != null) { // textLayout will be null if event chip is too small to display title
