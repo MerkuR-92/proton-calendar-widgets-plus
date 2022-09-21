@@ -95,7 +95,7 @@ internal class WeekViewAccessibilityTouchHelper(
         action: Int
     ): Boolean = when (action) {
         AccessibilityNodeInfoCompat.ACTION_CLICK -> {
-            touchHandler.adapter?.onEmptyViewClick(date)
+            touchHandler.adapter?.onEmptyViewClick(date, false)
             sendEventForVirtualView(virtualViewId, AccessibilityEvent.TYPE_VIEW_CLICKED)
             true
         }

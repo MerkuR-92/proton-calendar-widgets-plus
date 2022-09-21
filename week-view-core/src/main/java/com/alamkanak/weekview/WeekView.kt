@@ -1602,11 +1602,19 @@ class WeekView @JvmOverloads constructor(
         open fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) = Unit
 
         /**
-         * Returns the date and time of the location that the user clicked on.
+         * Returns the date of the day header that the user clicked on.
          *
          * @param time A [Calendar] with the date and time
          */
-        open fun onEmptyViewClick(time: Calendar) = Unit
+        open fun onDateHeaderClick(time: Calendar) = Unit
+
+        /**
+         * Returns the date and time of the location that the user clicked on.
+         *
+         * @param time A [Calendar] with the date and time
+         * @param isAllDay A [Boolean] to define whether we clicked on all day header
+         */
+        open fun onEmptyViewClick(time: Calendar, isAllDay: Boolean) = Unit
 
         /**
          * Returns the date and time of the location that the user long-clicked on.

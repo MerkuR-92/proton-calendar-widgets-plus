@@ -25,14 +25,37 @@ internal class WeekViewTouchHandler(
             return
         }
 
+        val handled = adapter?.handleClick(x, y) ?: false
+        if (viewState.numberOfVisibleDays > 1 && viewState.headerBounds.contains(x, y) && !handled) {
+            // Handle click on date headers
+            val headerWidth = viewState.headerBounds.right - viewState.headerBounds.left
+                val dayWidth = headerWidth / viewState.numberOfVisibleDays
+                var dayClicked = -1
+                for (i in 0 until viewState.numberOfVisibleDays) {
+                    if (x >= viewState.headerBounds.left + i * dayWidth && x <= viewState.headerBounds.left + i * dayWidth + dayWidth) {
+                        dayClicked = i
+                        break
+                    }
+                }
+            if (y < viewState.headerDateLabelHeight) {
+                // Handle click to open day view
+                if (dayClicked >= 0) adapter?.onDateHeaderClick(viewState.dateRange[dayClicked])
+                return
+            } else {
+                // Handle click in empty header
+                adapter?.onEmptyViewClick(viewState.dateRange[dayClicked], true)
+                return
+            }
+
+        }
+
         if (!inCalendarArea) {
             return
         }
 
-        val handled = adapter?.handleClick(x, y) ?: false
         if (!handled && y > viewState.headerHeight) {
             val time = calculateTimeFromPoint(x, y) ?: return
-            adapter?.onEmptyViewClick(time)
+            adapter?.onEmptyViewClick(time, false)
         }
     }
 

@@ -216,6 +216,7 @@ private class DateLabelsDrawer(
         val weekDayStartX = startPixel + (viewState.dayWidth - sumLabelWidth) / 2f
         val dateStartX = weekDayStartX + weekDayWidth + spaceWidth
 
+        viewState.headerDateLabelHeight = viewState.headerPadding + weekDayTextLayout.height + viewState.headerPadding
         withTranslation(
             x = weekDayStartX,
             y = viewState.headerPadding,

@@ -63,6 +63,7 @@ internal class ViewState {
     var headerPadding: Float = 0f
     var singleDayNumberHeaderTextSize: Float = 0f
     var headerLabelsInnerMargin: Float = 0f
+    var headerDateLabelHeight: Float = 0f
 
     var showWeekNumber: Boolean = false
     var weekNumberBackgroundCornerRadius: Float = 0f

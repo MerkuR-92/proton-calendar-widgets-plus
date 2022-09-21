@@ -371,9 +371,9 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.viewMode.value?.let { viewMode ->
             when (viewMode) {
-                ViewMode.DAY -> weekView.numberOfVisibleDays =  1
-                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays =  3
-                ViewMode.WEEK -> weekView.numberOfVisibleDays =  7
+                ViewMode.DAY -> weekView.numberOfVisibleDays = 1
+                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = 3
+                ViewMode.WEEK -> weekView.numberOfVisibleDays = 7
                 else -> {}
             }
             fragmentMonthLayout.viewMode = viewMode
@@ -387,9 +387,9 @@ class MonthFragment : BaseFragment() {
         // Switch between Agenda and Day views
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
             when (viewMode) {
-                ViewMode.DAY -> weekView.numberOfVisibleDays =  1
-                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays =  3
-                ViewMode.WEEK -> weekView.numberOfVisibleDays =  7
+                ViewMode.DAY -> weekView.numberOfVisibleDays = 1
+                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = 3
+                ViewMode.WEEK -> weekView.numberOfVisibleDays = 7
                 else -> {}
             }
             fragmentMonthLayout.viewMode = viewMode
@@ -601,11 +601,15 @@ class MonthFragment : BaseFragment() {
             rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
                 calendarViewModel.handleDaySelected(firstVisibleDate)
             },
-            viewClickHandler = { startTime ->
-                openCreateEventForm(isAllDay = false, startTime)
+            viewClickHandler = { startTime, isAllDay ->
+                openCreateEventForm(isAllDay, startTime)
             },
             eventClickHandler = { weekViewEventClicked ->
                 onWeekViewEventClick(weekViewEventClicked)
+            },
+            dateHeaderClickHandler = { dateClicked ->
+                calendarViewModel.viewMode.value = ViewMode.DAY
+                weekView.scrollToDate(dateClicked)
             }
         )
         weekView.adapter = weekViewAdapter

@@ -13,13 +13,15 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import java.util.Calendar
 
 class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
     private val loadMoreHandler: (List<YearMonth>) -> Unit,
     private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit,
-    private val viewClickHandler: (LocalDateTime) -> Unit,
+    private val viewClickHandler: (LocalDateTime, Boolean) -> Unit,
     private val eventClickHandler: (WeekViewCalendarEntity.Event) -> Unit,
+    private val dateHeaderClickHandler: (Calendar) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -40,8 +42,12 @@ class WeekViewAdapter(
         rangeChangedHandler(firstVisibleDate, lastVisibleDate)
     }
 
-    override fun onEmptyViewClick(time: LocalDateTime) {
-        viewClickHandler(time)
+    override fun onEmptyViewClick(time: LocalDateTime, isAllDay: Boolean) {
+        viewClickHandler(time, isAllDay)
+    }
+
+    override fun onDateHeaderClick(time: Calendar) {
+        dateHeaderClickHandler(time)
     }
 
     override fun onDragAndDropFinished(data: WeekViewCalendarEntity, newStartTime: LocalDateTime, newEndTime: LocalDateTime) {

@@ -18,12 +18,16 @@ import java.util.Calendar
  */
 @PublicApi
 abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
-    final override fun onEmptyViewClick(time: Calendar) {
-        onEmptyViewClick(time.toLocalDateTime())
+    final override fun onEmptyViewClick(time: Calendar, isAllDay: Boolean) {
+        onEmptyViewClick(time.toLocalDateTime(), isAllDay)
     }
 
     final override fun onEmptyViewLongClick(time: Calendar) {
         onEmptyViewLongClick(time.toLocalDateTime())
+    }
+
+    override fun onDateHeaderClick(time: Calendar) {
+        onDateHeaderClick(time)
     }
 
     final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
@@ -38,8 +42,9 @@ abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
      * Returns the date and time of the location that the user clicked on.
      *
      * @param time A [LocalDateTime] with the date and time
+     * @param isAllDay A [Boolean] to define whether we clicked on all day header
      */
-    open fun onEmptyViewClick(time: LocalDateTime) = Unit
+    open fun onEmptyViewClick(time: LocalDateTime, isAllDay: Boolean) = Unit
 
     /**
      * Returns the date and time of the location that the user long-clicked on.
@@ -86,12 +91,16 @@ abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
 @PublicApi
 abstract class WeekViewPagingAdapterJsr310<T> : WeekView.PagingAdapter<T>() {
 
-    final override fun onEmptyViewClick(time: Calendar) {
-        onEmptyViewClick(time.toLocalDateTime())
+    final override fun onEmptyViewClick(time: Calendar, isAllDay: Boolean) {
+        onEmptyViewClick(time.toLocalDateTime(), isAllDay)
     }
 
     final override fun onEmptyViewLongClick(time: Calendar) {
         onEmptyViewLongClick(time.toLocalDateTime())
+    }
+
+    override fun onDateHeaderClick(time: Calendar) {
+        onDateHeaderClick(time)
     }
 
     final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
@@ -110,8 +119,9 @@ abstract class WeekViewPagingAdapterJsr310<T> : WeekView.PagingAdapter<T>() {
      * Returns the date and time of the location that the user clicked on.
      *
      * @param time A [LocalDateTime] with the date and time
+     * @param isAllDay A [Boolean] to define whether we clicked on all day header
      */
-    open fun onEmptyViewClick(time: LocalDateTime) = Unit
+    open fun onEmptyViewClick(time: LocalDateTime, isAllDay: Boolean) = Unit
 
     /**
      * Returns the date and time of the location that the user long-clicked on.
