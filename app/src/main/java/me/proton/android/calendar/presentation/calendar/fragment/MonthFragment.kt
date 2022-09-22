@@ -431,8 +431,9 @@ class MonthFragment : BaseFragment() {
                 }
             }
 
-            if (weekView.firstVisibleDateAsLocalDate != selectedDate) {
+            if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
                 weekView.scrollToDate(selectedDate)
+                currentSelectedDate = selectedDate
             }
 
             lifecycleScope.launch {
@@ -625,6 +626,7 @@ class MonthFragment : BaseFragment() {
     }
 
     private var currentFromDate: LocalDate? = null
+    private var currentSelectedDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 

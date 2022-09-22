@@ -1487,22 +1487,22 @@ class WeekView @JvmOverloads constructor(
         val context: Context
             get() = checkNotNull(weekView).context
 
-        internal fun handleClick(x: Float, y: Float): Boolean {
-            val eventChip = findHitEvent(x, y) ?: return false
+        internal fun handleClick(x: Float, y: Float, headerClicked: Boolean, dateClicked: Calendar): Boolean {
+            val eventChip = findHitEvent(x, y, headerClicked, dateClicked) ?: return false
             val data = findEventData(id = eventChip.eventId) ?: return false
             onEventClick(data, eventChip.bounds)
             return true
         }
 
-        internal fun handleLongClick(x: Float, y: Float): LongClickResult? {
-            val eventChip = findHitEvent(x, y) ?: return null
+        internal fun handleLongClick(x: Float, y: Float, headerClicked: Boolean, dateClicked: Calendar): LongClickResult? {
+            val eventChip = findHitEvent(x, y, headerClicked, dateClicked) ?: return null
             val data = findEventData(id = eventChip.eventId) ?: return null
             val handled = onEventLongClick(data, eventChip.bounds)
             return LongClickResult(eventChip = eventChip, handled = handled)
         }
 
-        private fun findHitEvent(x: Float, y: Float): EventChip? {
-            val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) }
+        private fun findHitEvent(x: Float, y: Float, headerClicked: Boolean, dateClicked: Calendar): EventChip? {
+            val candidates = eventChipsCache.allEventChips.filter { it.isHit(x, y) && dateClicked.isSameDate(it.startTime) && headerClicked == it.event.isAllDay }
             return when {
                 candidates.isEmpty() -> null
                 // Two events hit. This is most likely because an all-day event was clicked, but a
