@@ -152,6 +152,10 @@
         app:eventSideStripWidth="3dp"
         app:unansweredStripesWidth="0.5dp"
         app:unansweredStripesGap="4dp"
-        app:weekNumberBackgroundCornerRadius="8dp" />
+        app:weekNumberTextSize="10sp"
+        app:weekNumberTextColor="@color/text_weak"
+        app:weekNumberBackgroundColor="@color/background_secondary"
+        app:weekNumberBackgroundSize="24dp"
+        app:weekNumberBackgroundCornerRadius="3dp" />
 
 </me.proton.android.calendar.presentation.calendar.customView.InterceptTouchConstraintLayout>

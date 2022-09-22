@@ -63,6 +63,7 @@
         <attr name="weekNumberTextSize" format="dimension" />
         <attr name="weekNumberBackgroundColor" format="color" />
         <attr name="weekNumberBackgroundCornerRadius" format="dimension" />
+        <attr name="weekNumberBackgroundSize" format="dimension" />
 
         <!-- Event chips -->
         <attr name="eventCornerRadius" format="dimension" />

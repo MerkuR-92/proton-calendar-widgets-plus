@@ -454,14 +454,11 @@ private class HeaderDrawer(
         val textHeight = textPaint.textHeight
         val textOffset = (textHeight / 2f).roundToInt() - textPaint.descent().roundToInt()
 
-        val width = textPaint.getTextBounds("52").width() * 2.5f
-        val height = textHeight * 1.5f
-
         val backgroundRect = RectF(
-            bounds.centerX() - width / 2f,
-            bounds.centerY() - height / 2f,
-            bounds.centerX() + width / 2f,
-            bounds.centerY() + height / 2f
+            bounds.centerX() - viewState.weekNumberBackgroundSize / 2,
+            bounds.centerY() - viewState.weekNumberBackgroundSize / 2,
+            bounds.centerX() + viewState.weekNumberBackgroundSize / 2,
+            bounds.centerY() + viewState.weekNumberBackgroundSize / 2
         )
 
         drawRect(bounds, viewState.headerBackgroundPaint)
@@ -470,7 +467,13 @@ private class HeaderDrawer(
         val radius = viewState.weekNumberBackgroundCornerRadius
         drawRoundRect(backgroundRect, radius, radius, backgroundPaint)
 
-        drawText(weekNumber, bounds.centerX(), bounds.centerY() + textOffset, textPaint)
+        val textLayout = weekNumber.semibold().toTextLayout(textPaint, viewState.weekNumberBackgroundSize.toInt())
+        withTranslation(
+            x = bounds.centerX(),
+            y = bounds.centerY() - textHeight / 2,
+        ) {
+            draw(textLayout)
+        }
     }
 
     private fun Canvas.drawTimeColumnSeparatorExtension() {

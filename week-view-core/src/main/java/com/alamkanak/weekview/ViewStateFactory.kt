@@ -191,6 +191,7 @@ internal object ViewStateFactory {
         viewState.apply {
             showWeekNumber = a.getBoolean(R.styleable.WeekView_showWeekNumber, false)
             weekNumberBackgroundCornerRadius = a.getDimension(R.styleable.WeekView_weekNumberBackgroundCornerRadius, context.dp(8))
+            weekNumberBackgroundSize = a.getDimension(R.styleable.WeekView_weekNumberBackgroundSize, context.dp(24))
         }
 
         viewState.apply {

@@ -67,6 +67,7 @@ internal class ViewState {
 
     var showWeekNumber: Boolean = false
     var weekNumberBackgroundCornerRadius: Float = 0f
+    var weekNumberBackgroundSize: Float = 0f
 
     var eventCornerRadius: Int = 0
     var adaptiveEventTextSize: Boolean = false

@@ -661,6 +661,17 @@ class WeekView @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns the size the week number's background.
+     */
+    @PublicApi
+    var weekNumberBackgroundSize: Int
+        get() = viewState.weekNumberBackgroundSize.roundToInt()
+        set(value) {
+            viewState.weekNumberBackgroundSize = value.toFloat()
+            invalidate()
+        }
+
     /*
      ***********************************************************************************************
      *
