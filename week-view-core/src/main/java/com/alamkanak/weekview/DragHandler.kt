@@ -31,7 +31,7 @@ internal class DragHandler(
     fun startDragAndDrop(eventChip: EventChip, x: Float, y: Float) {
         viewState.dragState = DragState(
             eventId = eventChip.eventId,
-            draggedEventStartTime = eventChip.event.startTime,
+            draggedEventStartTime = eventChip.startTime,
             dragStartTime = requireNotNull(touchHandler.calculateTimeFromPoint(x, y)),
         )
 

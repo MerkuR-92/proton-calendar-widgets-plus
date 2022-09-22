@@ -285,7 +285,7 @@ private class AllDayEventsUpdater(
         viewState.currentAllDayEventHeight = maximumChipHeight
 
         val maximumChipsPerDay = eventsLabelLayouts.keys
-            .groupBy { it.event.startTime.toEpochDays() }
+            .groupBy { it.startTime.toEpochDays() }
             .values
             .maxByOrNull { it.size }?.size ?: 0
 
