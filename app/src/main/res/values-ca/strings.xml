@@ -93,7 +93,9 @@
     <string name="event_decryption_error_dialog_confirmation">Suprimir esdeveniment</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Suprimir esdeveniments</string>
     <string name="event_decryption_error_dialog_close">Tanca</string>
-    <string name="event_signature_verification_failure">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
+    <string name="event_signature_verification_failure">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a></string>
+    <string name="event_signature_verification_in_progress">Verification of the event signature is in progress.</string>
+    <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
     <string name="event_change_answer_recurring_title">Actualitzar esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador/a es perdran.</string>
@@ -297,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">El vostre correu electrònic no es troba a la llista de participants</string>
     <string name="snack_ics_reply_party_crasher_error">No es poden afegir participants que no han estat convidats per l\'organitzador</string>
     <string name="snack_ics_missing_uid_error">A l\'esdeveniment li manca UID</string>
-    <string name="snack_ics_no_active_calendar_error">No hi ha un calendari actiu associat amb aquest compte</string>
+    <string name="snack_ics_no_active_calendar_error">There is no active personal calendar associated with this account</string>
     <string name="snack_ics_unsupported_duration_error">No s\'admet la propietat de durada</string>
     <string name="snack_ics_too_many_events_error">Encara no s\'admeten esdeveniments múltiples</string>
     <string name="snack_ics_no_events_error">Aquest calendari no conté cap esdeveniment</string>
@@ -366,10 +368,10 @@
     <string name="settings_general_info_calendar_layout">disseny del calendari</string>
     <string name="settings_calendars">Els meus calendaris</string>
     <string name="settings_subscribed_calendars">Calendaris subscrits</string>
-    <string name="settings_calendar_default">Per defecte</string>
-    <string name="settings_calendar_disabled">Desactivat</string>
-    <string name="settings_calendar_not_synced">No sincronitzat</string>
-    <string name="settings_calendar_syncing">Sincronitzant</string>
+    <string name="settings_calendar_default" comment="Default calendar">Per defecte</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Desactivat</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">No sincronitzat</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Sincronitzant</string>
     <string name="settings_calendar_subscribed_invalid_ics">Format de calendari no suportat</string>
     <string name="settings_calendar_subscribed_too_big">El calendari és massa gran</string>
     <string name="settings_calendar_subscribed_not_accessible">L\'enllaç del calendari no és accessible</string>
@@ -413,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Per configurar-ne un ara, visiteu <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparant els calendaris</string>
     <string name="bootstrap_error_some_calendars_failed_message">Els calendaris següents no s\'han pogut configurar</string>
-    <string name="bootstrap_error_no_active_calendar_title">No hi ha un calendari actiu associat amb aquest compte.</string>
+    <string name="bootstrap_error_no_active_calendar_title">There is no active personal calendar associated with this account.</string>
     <string name="bootstrap_error_no_active_calendar_message">Per aprendre com activar un calendari, visiteu la nostra <a href="https://proton.me/support">base de coneixements</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hi ha més espai d\'emmagatzematge disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Saber-ne més</string>
@@ -493,13 +495,13 @@
     <string name="import_assistant_previous_import">Previous imports</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Started</string>
-    <string name="import_assistant_status_in_progress">In progress</string>
-    <string name="import_assistant_status_completed">Completed</string>
-    <string name="import_assistant_status_canceled">Canceled</string>
-    <string name="import_assistant_status_canceling">Canceling</string>
-    <string name="import_assistant_status_paused">Paused</string>
-    <string name="import_assistant_status_failed">Failed</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Started</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">In progress</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Completed</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Canceled</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Canceling</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Paused</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Failed</string>
     <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
     <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnect</string>
@@ -555,7 +557,7 @@
         <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
         <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
         <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
     </plurals>

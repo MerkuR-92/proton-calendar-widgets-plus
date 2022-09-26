@@ -94,6 +94,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Ștergere evenimente</string>
     <string name="event_decryption_error_dialog_close">Închidere</string>
     <string name="event_signature_verification_failure">Verificarea semnăturii evenimentului a eșuat. <a href="https://proton.me/support/what-is-a-digital-signature">Detalii</a></string>
+    <string name="event_signature_verification_in_progress">Verificarea semnăturii evenimentului este în desfășurare.</string>
+    <string name="event_signature_verification_network_error">Verificarea semnăturii evenimentului a fost întreruptă de o eroare. <a href="">Reîncercare</a></string>
     <string name="event_change_answer_recurring_title">Actualizare eveniment recurent</string>
     <string name="event_change_answer_recurring_description">Doriți să vă schimbați răspunsul pentru toate evenimentele din serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Doriți să schimbați răspunsul pentru toate evenimentele din această serie?\nUnele dintre răspunsurile dvs. la manifestările anterioare actualizate de către organizator vor fi pierdute.</string>
@@ -297,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">Adresa dvs. de e-mail nu se află în lista de participanți</string>
     <string name="snack_ics_reply_party_crasher_error">Participanții care nu au fost invitați de către organizator nu pot fi adăugați</string>
     <string name="snack_ics_missing_uid_error">Evenimentul nu are UID</string>
-    <string name="snack_ics_no_active_calendar_error">Nu există nici un calendar activ asociat cu acest cont</string>
+    <string name="snack_ics_no_active_calendar_error">Nu există nici un calendar personal activ asociat cu acest cont.</string>
     <string name="snack_ics_unsupported_duration_error">Durata proprietății nu este suportată</string>
     <string name="snack_ics_too_many_events_error">Multiple evenimente nu sunt încă acceptate</string>
     <string name="snack_ics_no_events_error">Calendarul nu conține nici un eveniment</string>
@@ -366,10 +368,10 @@
     <string name="settings_general_info_calendar_layout">aspect calendar</string>
     <string name="settings_calendars">Calendarele mele</string>
     <string name="settings_subscribed_calendars">Abonări la calendare</string>
-    <string name="settings_calendar_default">Implicit</string>
-    <string name="settings_calendar_disabled">Dezactivat</string>
-    <string name="settings_calendar_not_synced">Nesincronizat</string>
-    <string name="settings_calendar_syncing">Se sincronizează</string>
+    <string name="settings_calendar_default" comment="Default calendar">Implicit</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Dezactivat</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Nesincronizat</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Se sincronizează</string>
     <string name="settings_calendar_subscribed_invalid_ics">Format de calendar nesuportat.</string>
     <string name="settings_calendar_subscribed_too_big">Calendarul este prea mare.</string>
     <string name="settings_calendar_subscribed_not_accessible">Legătura calendarului nu este accesibilă.</string>
@@ -413,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Pentru a configura unul acum, vizitați <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Eroare pregătire calendar</string>
     <string name="bootstrap_error_some_calendars_failed_message">Următoarele calendare nu au putut fi setate</string>
-    <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar activ asociat cu acest cont.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Nu există nici un calendar personal activ asociat cu acest cont.</string>
     <string name="bootstrap_error_no_active_calendar_message">Pentru a învăța cum să activați un calendar, vizitați <a href="https://proton.me/support">baza de cunoștințe</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Nu mai există spațiu de stocare disponibil.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Detalii</string>
@@ -493,13 +495,13 @@
     <string name="import_assistant_previous_import">Importări anterioare</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Începută</string>
-    <string name="import_assistant_status_in_progress">În desfășurare</string>
-    <string name="import_assistant_status_completed">Finalizat</string>
-    <string name="import_assistant_status_canceled">Anulat</string>
-    <string name="import_assistant_status_canceling">Se anulează</string>
-    <string name="import_assistant_status_paused">Suspendat</string>
-    <string name="import_assistant_status_failed">Eșuat</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Începută</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">În desfășurare</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Finalizat</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Anulat</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Se anulează</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Suspendat</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Eșuat</string>
     <string name="import_assistant_status_paused_lost_connection_title">Conexiune la Google căzută</string>
     <string name="import_assistant_status_paused_lost_connection_description">Pentru a continua importarea, apăsați pe «Reconectare», conectați-vă la Google și acordați din nou acces lui Proton la datele din Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectare</string>
@@ -563,7 +565,7 @@
         <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d calendare</item>
         <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
         <item quantity="few">\u0020sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
         <item quantity="other">\u0020sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>

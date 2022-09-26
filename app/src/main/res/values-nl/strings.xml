@@ -94,6 +94,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Afspraken verwijderen</string>
     <string name="event_decryption_error_dialog_close">Sluiten</string>
     <string name="event_signature_verification_failure">De verificatie van de afspraakhandtekening is mislukt. <a href="https://proton.me/support/what-is-a-digital-signature">Meer informatie</a></string>
+    <string name="event_signature_verification_in_progress">De verificatie van de afspraakhandtekening is bezig.</string>
+    <string name="event_signature_verification_network_error">De verificatie van de afspraakhandtekening werd afgebroken door een fout. <a href="">Probeer opnieuw</a></string>
     <string name="event_change_answer_recurring_title">Terugkerende afspraak updaten</string>
     <string name="event_change_answer_recurring_description">Wilt u uw antwoord wijzigen voor alle afspraken in de serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Wilt u uw antwoord wijzigen voor alle afspraken in deze serie?\nSommige antwoorden op voorvallen die eerder zijn bijgewerkt door de organisator zullen verloren gaan.</string>
@@ -297,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">Uw e-mail staat niet op de lijst van gebruikers</string>
     <string name="snack_ics_reply_party_crasher_error">Deelnemers die niet zijn uitgenodigd door de organisator kunnen niet worden toegevoegd</string>
     <string name="snack_ics_missing_uid_error">De afspraak mist UID</string>
-    <string name="snack_ics_no_active_calendar_error">Er is geen actieve agenda gekoppeld aan dit account</string>
+    <string name="snack_ics_no_active_calendar_error">Er is geen actieve persoonlijke agenda gekoppeld aan dit account</string>
     <string name="snack_ics_unsupported_duration_error">Tijdsduur wordt niet ondersteund</string>
     <string name="snack_ics_too_many_events_error">Meerdere afspraken worden nog niet ondersteund</string>
     <string name="snack_ics_no_events_error">Deze agenda bevat geen enkele afspraak</string>
@@ -366,10 +368,10 @@
     <string name="settings_general_info_calendar_layout">layout agenda</string>
     <string name="settings_calendars">Mijn agenda\'s</string>
     <string name="settings_subscribed_calendars">Abonneer op agenda\'s</string>
-    <string name="settings_calendar_default">Standaard</string>
-    <string name="settings_calendar_disabled">Uitgeschakeld</string>
-    <string name="settings_calendar_not_synced">Niet gesynchroniseerd</string>
-    <string name="settings_calendar_syncing">Synchroniseren</string>
+    <string name="settings_calendar_default" comment="Default calendar">Standaard</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Uitgeschakeld</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Niet gesynchroniseerd</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Synchroniseren</string>
     <string name="settings_calendar_subscribed_invalid_ics">Niet-ondersteunde agenda-indeling</string>
     <string name="settings_calendar_subscribed_too_big">De agenda is te groot</string>
     <string name="settings_calendar_subscribed_not_accessible">Agendalink is niet toegankelijk</string>
@@ -413,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Ga naar <a href="https://calendar.proton.me">calendar.proton.me</a> om er één in te stellen</string>
     <string name="bootstrap_error_some_calendars_failed_title">Fout bij het opstellen van agenda\'s</string>
     <string name="bootstrap_error_some_calendars_failed_message">De volgende agenda\'s konden niet worden ingesteld</string>
-    <string name="bootstrap_error_no_active_calendar_title">Er is geen actieve agenda gekoppeld aan dit account.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Er is geen actieve persoonlijke agenda gekoppeld aan dit account.</string>
     <string name="bootstrap_error_no_active_calendar_message">Om te leren hoe u een agenda kunt activeren, bezoek onze <a href="https://proton.me/support">kennisdatabank</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Geen opslagruimte meer beschikbaar.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Meer informatie</string>
@@ -481,7 +483,7 @@
     <string name="import_assistant_merge_calendar_badge">Samengevoegd</string>
     <string name="import_assistant_creating_calendars">Nieuwe agenda\'s maken</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Bijna daar…</string>
-    <string name="import_assistant_new_calendar_header">Create new</string>
+    <string name="import_assistant_new_calendar_header">Maak nieuw aan</string>
     <string name="import_assistant_merge_calendar_header">Samenvoegen met bestaande</string>
     <string name="import_assistant_in_progress_title">Bezig met importeren</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Gegevens importeren van %s naar %s.</string>
@@ -493,43 +495,43 @@
     <string name="import_assistant_previous_import">Vorige imports</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Gestart</string>
-    <string name="import_assistant_status_in_progress">Bezig</string>
-    <string name="import_assistant_status_completed">Voltooid</string>
-    <string name="import_assistant_status_canceled">Geannuleerd</string>
-    <string name="import_assistant_status_canceling">Annuleren</string>
-    <string name="import_assistant_status_paused">Gepauzeerd</string>
-    <string name="import_assistant_status_failed">Mislukt</string>
-    <string name="import_assistant_status_paused_lost_connection_title">Connection to Google lost</string>
-    <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Gestart</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Bezig</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Voltooid</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Geannuleerd</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Annuleren</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Gepauzeerd</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Mislukt</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Verbinding met Google verloren</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Om de import voort te zetten, tikt u op Opnieuw verbinden, meldt u zich aan bij Google en geef uw Proton opnieuw toegang tot uw Google-gegevens.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Opnieuw verbinden</string>
-    <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
-    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
+    <string name="import_assistant_status_paused_storage_full_title">Uw opslagruimte is vol</string>
+    <string name="import_assistant_status_paused_storage_full_description">Uw Proton-account heeft niet genoeg opslagruimte om deze agenda-import te voltooien. Maak ruimte vrij of voeg meer opslagruimte toe en kom dan hier terug om verder te gaan.</string>
     <string name="import_assistant_status_paused_storage_full_button">Hervatten</string>
-    <string name="import_assistant_delete_report_title">Remove from the list?</string>
-    <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
-    <string name="import_assistant_delete_report_positive_button">Remove</string>
-    <string name="import_assistant_delete_report_negative_button">Keep</string>
+    <string name="import_assistant_delete_report_title">Dit bericht komt van een mailinglist?</string>
+    <string name="import_assistant_delete_report_message">U ziet dit importrecord niet meer in de lijst.</string>
+    <string name="import_assistant_delete_report_positive_button">Verwijderen</string>
+    <string name="import_assistant_delete_report_negative_button">Behouden</string>
     <string name="import_assistant_cancel_import_title">Importen is onvolledig!</string>
     <string name="import_assistant_cancel_import_message">Als u deze import annuleert, zult u niet in staat zijn om deze te hervatten. Proton heeft alle voortgang in uw account opgeslagen. Toch annuleren?</string>
     <string name="import_assistant_cancel_import_positive_button">Importeren annuleren</string>
-    <string name="import_assistant_cancel_import_negative_button">Resume import</string>
+    <string name="import_assistant_cancel_import_negative_button">Hervat import</string>
     <string name="import_assistant_in_progress_snack">Bezig met importeren</string>
     <string name="import_assistant_discard_import_title">Importeren annuleren?</string>
-    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_message">Import is onvolledig en kan niet worden hervat als u het annuleert.</string>
     <string name="import_assistant_discard_import_positive">Importeren annuleren</string>
-    <string name="import_assistant_discard_import_negative">Resume import</string>
+    <string name="import_assistant_discard_import_negative">Hervat import</string>
     <string name="import_assistant_authentication_canceled">Authenticatie geannuleerd</string>
     <string name="import_assistant_sign_in_in_progress">Er is reeds een loginproces bezig</string>
     <string name="import_assistant_in_progress_error_snack">Er is nog steeds een import in uitvoering</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
-        <item quantity="one">calendar</item>
-        <item quantity="other">calendars</item>
+        <item quantity="one">agenda</item>
+        <item quantity="other">agenda\'s</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Import %d calendar</item>
-        <item quantity="other">Import %d calendars</item>
+        <item quantity="one">Importeer een agenda</item>
+        <item quantity="other">Importeer %d agenda\'s</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
         <item quantity="one">%d import aan de gang</item>
@@ -557,9 +559,9 @@ Vink minstens %1$d agenda af</item>
         <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor persoonlijke agenda.\n • 
 Vink minstens %1$d agenda\'s af</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
-        <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
+        <item quantity="one">\u0020or\n • Tenminste %1$d agenda samenvoegen met bestaande Proton agenda\'s.</item>
+        <item quantity="other">\u0020or\n • Tenminste %1$d agenda\'s samenvoegen met bestaande Proton agenda\'s.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>

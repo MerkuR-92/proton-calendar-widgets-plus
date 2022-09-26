@@ -94,6 +94,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
     <string name="event_signature_verification_failure">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
+    <string name="event_signature_verification_in_progress">Überprüfung der Terminsignatur ist im Gange.</string>
+    <string name="event_signature_verification_network_error">Die Überprüfung der Terminsignatur wurde durch einen Fehler unterbrochen. <a href="">Erneut versuchen</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
     <string name="event_change_answer_recurring_overwrite_description">Möchtest du deine Antwort für alle Termine in dieser Serie ändern?\nEinige deiner Antworten auf Wiederholungen, die zuvor vom Organisator aktualisiert wurden, gehen dabei verloren.</string>
@@ -297,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">Deine E-Mail-Adresse ist nicht in der Teilnehmerliste</string>
     <string name="snack_ics_reply_party_crasher_error">Teilnehmer, die nicht vom Organisator eingeladen wurden, können nicht hinzugefügt werden</string>
     <string name="snack_ics_missing_uid_error">Dem Termin fehlt die UID</string>
-    <string name="snack_ics_no_active_calendar_error">Derzeit ist kein aktiver Kalender mit diesem Konto verknüpft</string>
+    <string name="snack_ics_no_active_calendar_error">Diesem Konto ist kein aktiver persönlicher Kalender zugeordnet</string>
     <string name="snack_ics_unsupported_duration_error">Die Eigenschaft „Dauer” wird nicht unterstützt</string>
     <string name="snack_ics_too_many_events_error">Mehrfachtermine werden noch nicht unterstützt</string>
     <string name="snack_ics_no_events_error">Dieser Kalender enthält keine Termine</string>
@@ -366,10 +368,10 @@
     <string name="settings_general_info_calendar_layout">Kalenderlayout</string>
     <string name="settings_calendars">Meine Kalender</string>
     <string name="settings_subscribed_calendars">Abonnierte Kalender</string>
-    <string name="settings_calendar_default">Standard</string>
-    <string name="settings_calendar_disabled">Deaktiviert</string>
-    <string name="settings_calendar_not_synced">Nicht synchronisiert</string>
-    <string name="settings_calendar_syncing">Wird synchronisiert</string>
+    <string name="settings_calendar_default" comment="Default calendar">Standard</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Deaktiviert</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Nicht synchronisiert</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Wird synchronisiert</string>
     <string name="settings_calendar_subscribed_invalid_ics">Nicht unterstütztes Kalender-Format</string>
     <string name="settings_calendar_subscribed_too_big">Dateigröße des Kalenders überschreitet Maximum</string>
     <string name="settings_calendar_subscribed_not_accessible">Kalender über diesen Link nicht erreichbar</string>
@@ -413,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Um jetzt einen einzurichten, besuche <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Fehler beim Einrichten der Kalender</string>
     <string name="bootstrap_error_some_calendars_failed_message">Die folgenden Kalender konnten nicht eingerichtet werden</string>
-    <string name="bootstrap_error_no_active_calendar_title">Derzeit ist kein aktiver Kalender mit diesem Konto verknüpft.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Diesem Konto ist kein aktiver persönlicher Kalender zugeordnet.</string>
     <string name="bootstrap_error_no_active_calendar_message">Um zu erfahren, wie du einen Kalender aktivieren kannst, besuche unsere <a href="https://proton.me/support">Wissensdatenbank</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Kein Speicherplatz mehr verfügbar.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Mehr erfahren</string>
@@ -493,13 +495,13 @@
     <string name="import_assistant_previous_import">Frühere Importe</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Gestartet</string>
-    <string name="import_assistant_status_in_progress">In Bearbeitung</string>
-    <string name="import_assistant_status_completed">Abgeschlossen</string>
-    <string name="import_assistant_status_canceled">Abgebrochen</string>
-    <string name="import_assistant_status_canceling">Wird abgebrochen</string>
-    <string name="import_assistant_status_paused">Angehalten</string>
-    <string name="import_assistant_status_failed">Fehlgeschlagen</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Gestartet</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">In Bearbeitung</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Abgeschlossen</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Abgebrochen</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Wird abgebrochen</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Angehalten</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Fehlgeschlagen</string>
     <string name="import_assistant_status_paused_lost_connection_title">Verbindung zu Google unterbrochen</string>
     <string name="import_assistant_status_paused_lost_connection_description">Um den Import fortzusetzen, tippe auf \"Erneut verbinden\", melde dich bei Google an und gewähre Proton erneut Zugriff auf deine Google-Daten.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Erneut verbinden</string>
@@ -555,7 +557,7 @@
         <item quantity="one">Aufgrund des Limits für persönliche Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
         <item quantity="other">Aufgrund des Limits für persönliche Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020oder\n • Mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammenführen.</item>
         <item quantity="other">\u0020oder\n • Mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammenführen.</item>
     </plurals>

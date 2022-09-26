@@ -94,6 +94,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Видалити події</string>
     <string name="event_decryption_error_dialog_close">Закрити</string>
     <string name="event_signature_verification_failure">Не вдалося перевірити підпис події. <a href="https://proton.me/support/what-is-a-digital-signature">Докладніше</a></string>
+    <string name="event_signature_verification_in_progress">Триває перевірка підпису події.</string>
+    <string name="event_signature_verification_network_error">Перевірку підпису події перервано через помилку. <a href="">Повторити спробу</a></string>
     <string name="event_change_answer_recurring_title">Оновити повторювану подію</string>
     <string name="event_change_answer_recurring_description">Бажаєте змінити свою відповідь для всіх подій в серії?</string>
     <string name="event_change_answer_recurring_overwrite_description">Бажаєте змінити свою відповідь на всі події цієї серії?\nДеякі з ваших відповідей на події, раніше оновлені організатором, буде втрачено.</string>
@@ -297,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">Ваша адреса електронної пошти не входить до списку учасників</string>
     <string name="snack_ics_reply_party_crasher_error">Неможливо додати учасників, які не були запрошені організатором</string>
     <string name="snack_ics_missing_uid_error">В події відсутній UID</string>
-    <string name="snack_ics_no_active_calendar_error">Немає активного календаря, пов\'язаного з цим обліковим записом</string>
+    <string name="snack_ics_no_active_calendar_error">Немає активного особистого календаря повʼязаного з обліковим записом</string>
     <string name="snack_ics_unsupported_duration_error">Властивість тривалості не підтримується</string>
     <string name="snack_ics_too_many_events_error">Кілька подій поки не підтримується</string>
     <string name="snack_ics_no_events_error">Цей календар не містить жодної події</string>
@@ -366,10 +368,10 @@
     <string name="settings_general_info_calendar_layout">вигляд календарів</string>
     <string name="settings_calendars">Мої календарі</string>
     <string name="settings_subscribed_calendars">Підписні календарі</string>
-    <string name="settings_calendar_default">Типовий</string>
-    <string name="settings_calendar_disabled">Вимкнено</string>
-    <string name="settings_calendar_not_synced">Не синхронізовано</string>
-    <string name="settings_calendar_syncing">Синхронізація</string>
+    <string name="settings_calendar_default" comment="Default calendar">Типовий</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Вимкнено</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Не синхронізовано</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Синхронізація</string>
     <string name="settings_calendar_subscribed_invalid_ics">Непідтримуваний формат календаря</string>
     <string name="settings_calendar_subscribed_too_big">Календар завеликий</string>
     <string name="settings_calendar_subscribed_not_accessible">Календар за посиланням недоступний</string>
@@ -413,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Щоб налаштувати його, перейдіть до <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Помилка підготовки календарів</string>
     <string name="bootstrap_error_some_calendars_failed_message">Не вдається налаштувати зазначені календарі</string>
-    <string name="bootstrap_error_no_active_calendar_title">Немає активного календаря, пов\'язаного з цим обліковим записом.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Немає активного особистого календаря повʼязаного з обліковим записом.</string>
     <string name="bootstrap_error_no_active_calendar_message">Щоб дізнатися, як активувати календар, відвідайте нашу <a href="https://proton.me/support">базу знань</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Немає вільного місця для зберігання.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Докладніше</string>
@@ -493,13 +495,13 @@
     <string name="import_assistant_previous_import">Попередні імпорти</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
-    <string name="import_assistant_status_queued">Запущено</string>
-    <string name="import_assistant_status_in_progress">Виконується</string>
-    <string name="import_assistant_status_completed">Завершено</string>
-    <string name="import_assistant_status_canceled">Скасовано</string>
-    <string name="import_assistant_status_canceling">Скасування</string>
-    <string name="import_assistant_status_paused">Зупинено</string>
-    <string name="import_assistant_status_failed">Невдалі</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Запущено</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Виконується</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Завершено</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Скасовано</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Скасування</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Зупинено</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Невдалі</string>
     <string name="import_assistant_status_paused_lost_connection_title">Втрачено з’єднання з Google</string>
     <string name="import_assistant_status_paused_lost_connection_description">Щоб продовжити імпорт, торкніться Повторно з\'єднатись, увійдіть в Google і знову надайте Proton доступ до ваших даних Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Повторно з\'єднатись</string>
@@ -571,7 +573,7 @@
         <item quantity="many">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
         <item quantity="other">У зв\'язку з обмеженням кількості особистих календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error_merge" comment="%1$d is replaced by number of calendars">
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020або\n • Обʼєднайте принаймні %1$d календар із наявними календарями Proton.</item>
         <item quantity="few">\u0020або\n • Обʼєднайте принаймні %1$d календарі з наявними календарями Proton.</item>
         <item quantity="many">\u0020або\n • Обʼєднайте принаймні %1$d календарів з наявними календарями Proton.</item>
