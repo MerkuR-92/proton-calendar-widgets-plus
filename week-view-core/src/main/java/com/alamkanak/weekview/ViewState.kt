@@ -123,6 +123,8 @@ internal class ViewState {
         }
 
     var weakHeaderTextColor: Int = 0
+    var hintHeaderTextColor: Int = 0
+    var noEventsLabel: String = ""
 
     val headerTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER

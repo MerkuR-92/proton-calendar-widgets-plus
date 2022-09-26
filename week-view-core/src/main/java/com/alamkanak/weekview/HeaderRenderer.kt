@@ -48,7 +48,8 @@ internal class HeaderRenderer(
 
     private val headerDrawer = HeaderDrawer(
         context = context,
-        viewState = viewState
+        viewState = viewState,
+        eventChipsCacheProvider = eventChipsCacheProvider
     )
 
     override fun onSizeChanged(width: Int, height: Int) {
@@ -405,7 +406,8 @@ internal class AllDayEventsDrawer(
 
 private class HeaderDrawer(
     context: Context,
-    private val viewState: ViewState
+    private val viewState: ViewState,
+    private val eventChipsCacheProvider: EventChipsCacheProvider
 ) : Drawer {
 
     private val upArrow: Drawable by lazy {
@@ -439,9 +441,31 @@ private class HeaderDrawer(
             canvas.drawAllDayEventsToggleArrow()
         }
 
+        if (viewState.numberOfVisibleDays == 1 && eventChipsCacheProvider()?.allEventChipsInDateRange(viewState.dateRange)?.isEmpty() == true) {
+            canvas.drawNoEventsLabel()
+        }
+
         if (viewState.showHeaderBottomLine) {
             val y = viewState.headerHeight - viewState.headerBottomLinePaint.strokeWidth
             canvas.drawLine(0f, y, width, y, viewState.headerBottomLinePaint)
+        }
+    }
+
+    private fun Canvas.drawNoEventsLabel() {
+
+        val text = viewState.noEventsLabel
+        val textPaint = TextPaint(viewState.headerTextPaint).apply {
+            textAlign = Paint.Align.LEFT
+            color = viewState.hintHeaderTextColor
+        }
+
+        withTranslation(
+            x = viewState.timeColumnWidth + viewState.eventPaddingHorizontal.toFloat(),
+            y = viewState.eventMarginVertical.toFloat() + viewState.eventPaddingVertical.toFloat()
+        ) {
+            draw(
+                text.toTextLayout(textPaint, textPaint.measureText(text).toInt())
+            )
         }
     }
 

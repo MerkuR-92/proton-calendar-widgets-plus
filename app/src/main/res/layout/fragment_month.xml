@@ -123,6 +123,8 @@
         app:headerBottomShadowRadius="4dp"
         app:headerPadding="6dp"
         app:weakHeaderTextColor="@color/text_weak"
+        app:hintHeaderTextColor="@color/text_hint"
+        app:noEventsLabel="@string/agenda_no_events"
         app:headerTextColor="@color/text_norm"
         app:headerTextSize="14sp"
         app:headerLabelsInnerMargin="4dp"

@@ -37,6 +37,9 @@ internal object ViewStateFactory {
         } ?: Typeface.create("sans-serif-medium", Typeface.NORMAL)
 
         viewState.weakHeaderTextColor = a.getColor(R.styleable.WeekView_weakHeaderTextColor, context.textColorPrimary)
+        viewState.hintHeaderTextColor = a.getColor(R.styleable.WeekView_hintHeaderTextColor, context.textColorPrimary)
+
+        viewState.noEventsLabel = a.getString(R.styleable.WeekView_noEventsLabel) ?: ""
 
         viewState.headerTextPaint.apply {
             color = a.getColor(R.styleable.WeekView_headerTextColor, context.textColorPrimary)

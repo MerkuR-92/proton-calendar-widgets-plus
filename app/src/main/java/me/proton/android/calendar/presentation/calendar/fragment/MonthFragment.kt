@@ -618,7 +618,7 @@ class MonthFragment : BaseFragment() {
         weekView.setWeekDayFormatter { date: LocalDate ->
             val weekdayFormatter =
                 when (weekView.numberOfVisibleDays) {
-                    in 2..6 -> DateTimeFormatter.ofPattern("EEE", Locale.getDefault()) // first three characters
+                    in 1..6 -> DateTimeFormatter.ofPattern("EEE", Locale.getDefault()) // first three characters
                     else -> DateTimeFormatter.ofPattern("EEEEE", Locale.getDefault()) // first character
                 }
             weekdayFormatter.format(date)
