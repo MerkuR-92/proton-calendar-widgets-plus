@@ -2,6 +2,7 @@ package me.proton.android.calendar.mocks
 
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.model.SendPreferences
+import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.usersettings.domain.entity.PasswordSetting
@@ -78,6 +79,23 @@ object UserMocks {
             type = addressType,
             order = order,
             keys = emptyList(), // TODO
+            signedKeyList = null // TODO
+        )
+    }
+
+    fun provideAddressEntity(canSendParam: Boolean? = null, canReceiveParam: Boolean? = null, enabledParam: Boolean? = null): AddressEntity {
+        return AddressEntity(
+            userId = userId,
+            addressId = addressId,
+            email = userEmail,
+            displayName = userDisplayName,
+            signature = null, // TODO
+            domainId = null, // TODO
+            canSend = canSendParam ?: canSend,
+            canReceive = canReceiveParam ?: canReceive,
+            enabled = enabledParam ?: enabled,
+            type = addressType.value,
+            order = order,
             signedKeyList = null // TODO
         )
     }

@@ -3,11 +3,32 @@ package me.proton.android.calendar.data
 import android.database.sqlite.SQLiteConstraintException
 import androidx.annotation.VisibleForTesting
 import biweekly.property.RecurrenceId
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.retry
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
@@ -15,23 +36,33 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
-import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
-import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.data.entity.SkeletonEventEntity
+import me.proton.android.calendar.data.entity.toSkeletonEvent
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -39,10 +70,18 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.toInt
-import java.time.*
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
@@ -1192,26 +1231,47 @@ class CalendarsRepositoryImpl @Inject constructor(
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
-fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List<Calendar>> =
-    this.combine(database.membersDao().selectMembersFlow()) { calendars, members ->
-        calendars.mapNotNull { calendarEntity ->
-            members.find { it.calendarId == calendarEntity.id }?.let {
-                Calendar.from(calendarEntity, it)
+fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List<Calendar>> {
+    return this.combine(database.membersDao().selectMembersFlow()) { calendars, members ->
+        if (calendars.isNotEmpty()) {
+            // Get user addresses so we can find the calendar member for current user
+            val userCanonicalEmails = database.addressDao().getByUserId(UserId(calendars.first().fkUserId)).map {
+                canonicalizeProtonEmail(it.email, forceCanonicalization = true)
             }
-        }
+            calendars.mapNotNull { calendarEntity ->
+                // Find the member that belongs to the current user
+                val userMember = members.firstOrNull {
+                    // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members
+                    val canonicalMemberEmail = canonicalizeProtonEmail(it.email, forceCanonicalization = true)
+                    it.calendarId == calendarEntity.id && userCanonicalEmails.any { it.equals(
+                        canonicalMemberEmail, ignoreCase = true
+                    ) }
+                }
+                // Map to Calendar
+                userMember?.let { Calendar.from(calendarEntity, it) }
+            }
+        } else emptyList()
     }
+}
 
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
-suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase): List<Calendar> =
-    database.membersDao().selectMembers().let { members ->
-        this.mapNotNull { calendarEntity ->
-            members.find { it.calendarId == calendarEntity.id }?.let {
-                Calendar.from(calendarEntity, it)
-            }
-        }
+suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase): List<Calendar> {
+    if (this.isEmpty()) return emptyList()
+    // Get user addresses so we can find the calendar member for current user
+    val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.first().fkUserId)).map {
+        canonicalizeProtonEmail(it.email, forceCanonicalization = true)
     }
+    return this.mapNotNull { calendarEntity ->
+        // Get all members for that calendar
+        val calendarMembers = database.membersDao().select(calendarEntity.id)
+        // Find the member that belongs to the current user
+        val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
+        // Map to Calendar
+        userMember?.let { Calendar.from(calendarEntity, it) }
+    }
+}
 
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
@@ -1220,6 +1280,30 @@ suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase): Calendar? {
     return if (this == null) {
         null
     } else {
-        database.membersDao().select(this.id).firstOrNull()?.let { Calendar.from(this, it) }
+        // Get user addresses so we can find the calendar member for current user
+        val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.fkUserId)).map {
+            canonicalizeProtonEmail(it.email, forceCanonicalization = true)
+        }
+        // Get all members for that calendar
+        val calendarMembers = database.membersDao().select(this.id)
+        // Find the member that belongs to the current user
+        val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
+        // Map to Calendar
+        userMember?.let { Calendar.from(this, it) }
+    }
+}
+
+/**
+ * Find member for the given canonical user emails
+ */
+private fun List<MemberEntity>.getMemberForEmails(userCanonicalEmails: List<String>): MemberEntity? {
+    return this.firstOrNull {
+        // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members
+        val canonicalMemberEmail = canonicalizeProtonEmail(it.email, forceCanonicalization = true)
+        userCanonicalEmails.any {
+            it.equals(
+                canonicalMemberEmail, ignoreCase = true
+            )
+        }
     }
 }

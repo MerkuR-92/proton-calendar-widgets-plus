@@ -6,28 +6,34 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import biweekly.parameter.ParticipationStatus
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.data.joinToCalendar
-import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
 import me.proton.android.calendar.mocks.CalendarMocks
+import me.proton.android.calendar.mocks.UserMocks
 import me.proton.android.calendar.mocks.calendarColor
 import me.proton.android.calendar.mocks.calendarDisplay
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
@@ -106,8 +112,12 @@ internal class TransformEventUseCaseTest {
             } returns listOf(calendarKeyEntity)
 
             coEvery {
+                database.addressDao().getByUserId(any())
+            } returns listOf(UserMocks.provideAddressEntity())
+
+            coEvery {
                 database.membersDao().select(any())
-            } returns listOf(CalendarMocks.provideMemberEntity("member email"))
+            } returns listOf(CalendarMocks.provideMemberEntity())
 
             // calendarPassphrase
             val memberPassphrase = MemberPassphrase(
