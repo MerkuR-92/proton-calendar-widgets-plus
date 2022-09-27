@@ -470,7 +470,7 @@ private class HeaderDrawer(
     }
 
     private fun Canvas.drawWeekNumber() {
-        val weekNumber = viewState.dateRange.first().weekOfYear.toString()
+        val weekNumber = viewState.weekNumber.toString()
 
         val bounds = viewState.weekNumberBounds
         val textPaint = viewState.weekNumberTextPaint

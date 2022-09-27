@@ -66,6 +66,7 @@ internal class ViewState {
     var headerDateLabelHeight: Float = 0f
 
     var showWeekNumber: Boolean = false
+    var weekNumber: Int = 0
     var weekNumberBackgroundCornerRadius: Float = 0f
     var weekNumberBackgroundSize: Float = 0f
 

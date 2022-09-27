@@ -437,6 +437,13 @@ class MonthFragment : BaseFragment() {
             }
 
             lifecycleScope.launch {
+                calendarViewModel.getWeekStart()?.let { weekStart ->
+                    val startWeekOn = getWeekStartDayOfWeek(weekStart)
+                    weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                }
+            }
+
+            lifecycleScope.launch {
                 val firstDayOfMonth = selectedDate.withDayOfMonth(1)
                 val weekStart = calendarViewModel.getWeekStart() ?: return@launch
                 val startWeekOn = getWeekStartDayOfWeek(weekStart)
@@ -552,6 +559,12 @@ class MonthFragment : BaseFragment() {
             }
 
             startWeekOn = weekStart?.let { getWeekStartDayOfWeek(it) }
+
+            startWeekOn?.let { startWeekOn ->
+                calendarViewModel.selectedDate.value?.weekNumber(startWeekOn)?.let { weekNumber ->
+                    weekView.weekNumber = weekNumber
+                }
+            }
 
             if (timeZoneId != null && startWeekOn != null) {
                 headerDaysMediator.value = Pair(startWeekOn!!, timeZoneId!!)

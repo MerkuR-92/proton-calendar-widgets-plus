@@ -610,6 +610,17 @@ class WeekView @JvmOverloads constructor(
      * Returns whether the current week number is displayed in the header.
      */
     @PublicApi
+    var weekNumber: Int
+        get() = viewState.weekNumber
+        set(value) {
+            viewState.weekNumber = value
+            invalidate()
+        }
+
+    /**
+     * Returns whether the current week number is displayed in the header.
+     */
+    @PublicApi
     var showWeekNumber: Boolean
         get() = viewState.showWeekNumber
         set(value) {
