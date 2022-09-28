@@ -82,6 +82,8 @@ internal class ViewState {
     var eventSideStripWidth: Float = 0f
     var unansweredStripesWidth: Float = 0f
     var unansweredStripesGap: Float = 0f
+    var decryptionFailedRectMargin: Float = 0f
+    var decryptionFailedRectHeight: Float = 0f
 
     var columnGap: Int = 0
     var overlappingEventGap: Int = 0

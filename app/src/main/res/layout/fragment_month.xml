@@ -158,6 +158,8 @@
         app:eventSideStripWidth="3dp"
         app:unansweredStripesWidth="0.5dp"
         app:unansweredStripesGap="4dp"
+        app:decryptionFailedRectMargin="6dp"
+        app:decryptionFailedRectHeight="6dp"
         app:weekNumberTextSize="10sp"
         app:weekNumberTextColor="@color/text_weak"
         app:weekNumberBackgroundColor="@color/background_secondary"

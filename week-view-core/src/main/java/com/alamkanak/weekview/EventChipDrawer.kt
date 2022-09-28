@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.text.StaticLayout
 import android.text.TextUtils
+import androidx.core.graphics.ColorUtils
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -132,6 +133,37 @@ internal class EventChipDrawer(
         if (entity.isMultiDay && entity.isNotAllDay) {
             // TODO Draw event blob (w/ stripe) all the way to the top / bottom
             // drawCornersForMultiDayEvents(eventChip, cornerRadius)
+        }
+
+        // Draw event decryption failed blur rectangle
+        if (textLayout?.text?.isEmpty() == true) {
+            val pastEvent = eventChip.event.endTime.withTimeZone(viewState.customTimeZone).isBefore(nowAtTimezone(viewState.customTimeZone))
+            val colorToBrighten = "#${Integer.toHexString(backgroundPaint.color and 0x00ffffff)}"
+
+            val outHSL = FloatArray(3)
+            ColorUtils.colorToHSL(Integer.valueOf(colorToBrighten.substringAfter("#"), 16), outHSL)
+
+            val increaseBy =
+                if (pastEvent) 0.04f
+                else 0.18f
+            val brightenedColor = ColorUtils.HSLToColor(
+                floatArrayOf(outHSL[0], outHSL[1], kotlin.math.max(0f, kotlin.math.min(outHSL[2] + increaseBy, 1.0f)))
+            )
+            val brightenedColorHex = "#${Integer.toHexString(brightenedColor)}"
+
+            val decryptionFailedPaint = Paint().apply {
+                color = Color.parseColor(brightenedColorHex)
+                isAntiAlias = true
+            }
+
+            val decryptionFailedRect = RectF(
+                eventChip.bounds.left + viewState.decryptionFailedRectMargin,
+                eventChip.bounds.top + viewState.decryptionFailedRectMargin,
+                eventChip.bounds.right - viewState.decryptionFailedRectMargin,
+                eventChip.bounds.top + viewState.decryptionFailedRectMargin + viewState.decryptionFailedRectHeight
+            )
+            val decryptionFailedRadius = viewState.eventCornerRadius.toFloat()
+            drawRoundRect(decryptionFailedRect, decryptionFailedRadius, decryptionFailedRadius, decryptionFailedPaint)
         }
 
         if (textLayout != null) { // textLayout will be null if event chip is too small to display title

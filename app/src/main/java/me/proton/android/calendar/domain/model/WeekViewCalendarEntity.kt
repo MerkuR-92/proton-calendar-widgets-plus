@@ -59,7 +59,8 @@ fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: S
         else null
     return WeekViewCalendarEntity.Event(
         id = weekViewEventId,
-        title = this.summary ?: defaultEventTitle,
+        // Use empty title for failed to decrypt event state
+        title = if (this.decryptionStatus == Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
         location = "", // TODO Do we want to display event location as subtitle ?
         startTime = this.getStart(timeZoneId).toLocalDateTime(),
         endTime = this.getEnd(timeZoneId).toLocalDateTime(),

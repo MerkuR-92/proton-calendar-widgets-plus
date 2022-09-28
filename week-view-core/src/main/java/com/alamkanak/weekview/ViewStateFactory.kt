@@ -193,6 +193,8 @@ internal object ViewStateFactory {
             eventSideStripWidth = a.getDimension(R.styleable.WeekView_eventSideStripWidth, context.dp(8))
             unansweredStripesWidth = a.getDimension(R.styleable.WeekView_unansweredStripesWidth, context.dp(1))
             unansweredStripesGap = a.getDimension(R.styleable.WeekView_unansweredStripesGap, context.dp(4))
+            decryptionFailedRectMargin = a.getDimension(R.styleable.WeekView_decryptionFailedRectMargin, context.dp(8))
+            decryptionFailedRectHeight = a.getDimension(R.styleable.WeekView_decryptionFailedRectHeight, context.dp(6))
         }
 
         viewState.apply {

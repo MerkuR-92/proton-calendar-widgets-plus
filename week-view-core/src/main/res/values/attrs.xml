@@ -83,6 +83,8 @@
         <attr name="eventSideStripWidth" format="dimension" />
         <attr name="unansweredStripesWidth" format="dimension" />
         <attr name="unansweredStripesGap" format="dimension" />
+        <attr name="decryptionFailedRectMargin" format="dimension" />
+        <attr name="decryptionFailedRectHeight" format="dimension" />
 
         <!-- Event margins -->
         <attr name="columnGap" format="dimension" />
