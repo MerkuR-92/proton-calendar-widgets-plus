@@ -22,7 +22,7 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events")
     abstract fun selectEventsFlow(): Flow<List<EventEntity>>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime FROM events")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events")
     abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")

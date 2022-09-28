@@ -75,6 +75,7 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
 import java.time.Instant
@@ -160,7 +161,11 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
-                    calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
+
+                    if ((skeletonEventEntity.addressId != null) && (database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) == null)) {
+                        // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
+                        null
+                    } else calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
                 }
 
                 emit(skeletonEvents)
@@ -970,7 +975,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         return if (eventsSharingUidResponse is ApiResponse.Success) {
 
             val skeletonEvents = eventsSharingUidResponse.data.events.mapNotNull { eventEntity ->
-                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents, eventEntity.modifyTime)
+                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents, eventEntity.modifyTime, eventEntity.addressId)
                 skeletonEventEntity.toSkeletonEvent(json)
             }
 
