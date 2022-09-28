@@ -19,7 +19,9 @@ data class SkeletonEventEntity(
     @SerialName("SharedEvents")
     val sharedEvents: List<JsonElement>,
     @SerialName("ModifyTime")
-    val modifyTime: Long
+    val modifyTime: Long,
+    @SerialName("AddressID")
+    val addressId: String?
 )
 
 /**
