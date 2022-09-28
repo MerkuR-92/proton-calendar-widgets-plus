@@ -58,6 +58,10 @@
         <attr name="expandInfoBackgroundColor" format="color" />
         <attr name="expandInfoTextColor" format="color" />
         <attr name="singleDayNumberHeaderTextSize" format="dimension" />
+        <attr name="headerTodaySquareSize" format="dimension" />
+        <attr name="headerTodaySquareStrokeWidth" format="dimension" />
+        <attr name="headerTodaySquareMarginTop" format="dimension" />
+        <attr name="headerTodaySquareRadius" format="dimension" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />

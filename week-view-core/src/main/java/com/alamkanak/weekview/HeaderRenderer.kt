@@ -142,11 +142,8 @@ private class HeaderUpdater(
             if (!date.isToday) color = viewState.weakHeaderTextColor
         }
         val datePaint = TextPaint(textPaint).apply {
-            if (viewState.numberOfVisibleDays > 1) textAlign = Paint.Align.LEFT
-            else {
-                textAlign = Paint.Align.CENTER
-                textSize = viewState.singleDayNumberHeaderTextSize
-            }
+            textAlign = Paint.Align.CENTER
+            if (viewState.numberOfVisibleDays == 1) textSize = viewState.singleDayNumberHeaderTextSize
         }
         return Pair(
             weekDayLabel.toTextLayout(textPaint = weekDayPaint, width = viewState.dayWidth.toInt()),
@@ -215,7 +212,27 @@ private class DateLabelsDrawer(
         val dateWidth = dateBounds.right - dateBounds.left
         val sumLabelWidth = weekDayWidth + dateWidth + spaceWidth
         val weekDayStartX = startPixel + (viewState.dayWidth - sumLabelWidth) / 2f
-        val dateStartX = weekDayStartX + weekDayWidth + spaceWidth
+
+        val squareStartX = weekDayStartX + weekDayWidth + spaceWidth
+        if (date.withTimeZone(viewState.customTimeZone).isSameDate(nowAtTimezone(viewState.customTimeZone))) {
+            val rect = RectF(
+                squareStartX,
+                viewState.headerTodaySquareMarginTop,
+                squareStartX + viewState.headerTodaySquareSize,
+                viewState.headerTodaySquareMarginTop + viewState.headerTodaySquareSize
+            )
+            drawRoundRect(
+                rect,
+                viewState.headerTodaySquareRadius,
+                viewState.headerTodaySquareRadius,
+                Paint().apply {
+                    color = weekDayTextLayout.paint.color
+                    isAntiAlias = true
+                    style = Paint.Style.STROKE
+                    strokeWidth = viewState.headerTodaySquareStrokeWidth
+                }
+            )
+        }
 
         viewState.headerDateLabelHeight = viewState.headerPadding + weekDayTextLayout.height + viewState.headerPadding
         withTranslation(
@@ -224,6 +241,8 @@ private class DateLabelsDrawer(
         ) {
             draw(weekDayTextLayout)
         }
+
+        val dateStartX = squareStartX + viewState.headerTodaySquareSize / 2
         withTranslation(
             x = dateStartX,
             y = viewState.headerPadding,

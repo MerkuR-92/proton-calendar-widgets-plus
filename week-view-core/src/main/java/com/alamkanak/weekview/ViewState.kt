@@ -64,6 +64,10 @@ internal class ViewState {
     var singleDayNumberHeaderTextSize: Float = 0f
     var headerLabelsInnerMargin: Float = 0f
     var headerDateLabelHeight: Float = 0f
+    var headerTodaySquareSize: Float = 0f
+    var headerTodaySquareStrokeWidth: Float = 0f
+    var headerTodaySquareMarginTop: Float = 0f
+    var headerTodaySquareRadius: Float = 0f
 
     var showWeekNumber: Boolean = false
     var weekNumber: Int = 0
