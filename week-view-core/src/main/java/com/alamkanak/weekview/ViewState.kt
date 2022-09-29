@@ -16,6 +16,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
 
 internal data class DragState(
     val eventId: String,
@@ -586,7 +587,7 @@ internal class ViewState {
 
     private fun updateDateRange() {
         val originX = currentOrigin.x
-        val daysFromOrigin = ceil(originX / dayWidth).toInt() * (-1)
+        val daysFromOrigin = round(originX / dayWidth).toInt() * (-1)
 
         startPixel = if (isLtr) {
             timeColumnWidth + originX + dayWidth * daysFromOrigin
