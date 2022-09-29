@@ -28,7 +28,9 @@ import androidx.work.Operation
 import com.alamkanak.weekview.jsr310.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.jsr310.scrollToDate
 import com.alamkanak.weekview.jsr310.scrollToDateTime
+import com.alamkanak.weekview.jsr310.setDate
 import com.alamkanak.weekview.jsr310.setDateFormatter
+import com.alamkanak.weekview.jsr310.setDateTime
 import com.alamkanak.weekview.jsr310.setWeekDayFormatter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -421,26 +423,11 @@ class MonthFragment : BaseFragment() {
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
             setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
 
-            lifecycleScope.launch {
-                if (currentFromDate?.month != selectedDate.month) {
-                    val fromDate = selectedDate.minusMonths(1).withDayOfMonth(1)
-                    val toDate = selectedDate.plusMonths(1).withDayOfMonth(selectedDate.plusMonths(1).lengthOfMonth())
-                    val timeZoneId = calendarViewModel.getTimeZoneId()?.id
-                    getEvents(fromDate, toDate, timeZoneId ?: return@launch)
-                    currentFromDate = selectedDate
-                }
-            }
-
-            if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
-                weekView.scrollToDate(selectedDate)
-                currentSelectedDate = selectedDate
-            }
-
-            lifecycleScope.launch {
-                calendarViewModel.getWeekStart()?.let { weekStart ->
-                    val startWeekOn = getWeekStartDayOfWeek(weekStart)
-                    weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
-                }
+            // Only update those when we are in week views
+            if (calendarViewModel.viewMode.value == ViewMode.WEEK ||
+                calendarViewModel.viewMode.value == ViewMode.THREE_DAY ||
+                calendarViewModel.viewMode.value == ViewMode.DAY) {
+                updateWeekView(selectedDate)
             }
 
             lifecycleScope.launch {
@@ -646,6 +633,34 @@ class MonthFragment : BaseFragment() {
     private var currentSelectedDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
+
+    private fun updateWeekView(selectedDate: LocalDate, selectedDateTime: LocalDateTime? = null, animate: Boolean = true) {
+        lifecycleScope.launch {
+            if (currentFromDate?.month != selectedDate.month) {
+                val fromDate = selectedDate.minusMonths(1).withDayOfMonth(1)
+                val toDate =
+                    selectedDate.plusMonths(1).withDayOfMonth(selectedDate.plusMonths(1).lengthOfMonth())
+                val timeZoneId = calendarViewModel.getTimeZoneId()?.id
+                getEvents(fromDate, toDate, timeZoneId ?: return@launch)
+                currentFromDate = selectedDate
+            }
+        }
+
+        if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
+            if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
+            else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
+            else if (animate) weekView.scrollToDate(selectedDate)
+            else weekView.setDate(selectedDate)
+            currentSelectedDate = selectedDate
+        }
+
+        lifecycleScope.launch {
+            calendarViewModel.getWeekStart()?.let { weekStart ->
+                val startWeekOn = getWeekStartDayOfWeek(weekStart)
+                weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+            }
+        }
+    }
 
     private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
@@ -928,9 +943,11 @@ class MonthFragment : BaseFragment() {
                     }
 
                     val timeZoneId = calendarViewModel.getTimeZoneId()
-                    if (timeZoneId != null && calendarViewModel.selectedDate.value == LocalDate.now()) {
-                        weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
-                        calendarViewModel.jumpToCurrentTime.value = true // Open Day view on current time
+                    val selectedDate = calendarViewModel.selectedDate.value
+                    if (timeZoneId != null && selectedDate == LocalDate.now()) {
+                        updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId), animate = false)
+                    } else if (selectedDate != null) {
+                        updateWeekView(selectedDate, animate = false)
                     }
                 }
 

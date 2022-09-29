@@ -13,6 +13,7 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.TimeZone
 import kotlin.math.abs
@@ -1277,6 +1278,31 @@ class WeekView @JvmOverloads constructor(
         get() = viewState.dateRange.last().copy()
 
     /**
+     * Set the specified date. Any provided [Calendar] that falls outside the range of
+     * [minDate] and [maxDate] will be adjusted to fit into this range.
+     *
+     * @param date A [Calendar] representing the date to scroll to.
+     */
+    @PublicApi
+    fun setDate(date: Calendar) {
+        internalScrollToDate(date.withLocalTimeZone(), animate = false)
+    }
+
+    /**
+     * Set the specified date time. Any provided [Calendar] that falls outside the range of
+     * [minDate] and [maxDate], or [minHour] and [maxHour], will be adjusted to fit into these
+     * ranges.
+     *
+     * @param dateTime A [Calendar] representing the date time to scroll to.
+     */
+    @PublicApi
+    fun setDateTime(dateTime: Calendar) {
+        internalScrollToDate(dateTime.withLocalTimeZone(), animate = false) {
+            scrollToTime(hour = it.hour, minute = it.minute)
+        }
+    }
+
+    /**
      * Scrolls to the specified date. Any provided [Calendar] that falls outside the range of
      * [minDate] and [maxDate] will be adjusted to fit into this range.
      *
@@ -1340,7 +1366,7 @@ class WeekView @JvmOverloads constructor(
         navigator.scrollVerticallyTo(offset = finalOffset)
     }
 
-    private fun internalScrollToDate(date: Calendar, onComplete: (Calendar) -> Unit = {}) {
+    private fun internalScrollToDate(date: Calendar, animate: Boolean = true, onComplete: (Calendar) -> Unit = {}) {
         val adjustedDate = viewState.getStartDateInAllowedRange(date)
         if (adjustedDate.toEpochDays() == viewState.firstVisibleDate.toEpochDays()) {
             onComplete(adjustedDate)
@@ -1356,7 +1382,7 @@ class WeekView @JvmOverloads constructor(
             return
         }
 
-        navigator.scrollHorizontallyTo(date = adjustedDate) {
+        navigator.scrollHorizontallyTo(date = adjustedDate, animate = animate) {
             onComplete(adjustedDate)
         }
     }

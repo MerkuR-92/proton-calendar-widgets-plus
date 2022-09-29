@@ -28,17 +28,18 @@ internal class Navigator(
         listener.onHorizontalScrollPositionChanged()
     }
 
-    fun scrollHorizontallyTo(date: Calendar, onFinished: () -> Unit = {}) {
+    fun scrollHorizontallyTo(date: Calendar, animate: Boolean = true, onFinished: () -> Unit = {}) {
         val destinationOffset = viewState.getXOriginForDate(date)
         val adjustedDestinationOffset = destinationOffset.coerceIn(
             minimumValue = if (viewState.isLtr) viewState.minX else viewState.maxX,
             maximumValue = if (viewState.isLtr) viewState.maxX else viewState.minX
         )
-        scrollHorizontallyTo(offset = adjustedDestinationOffset, onFinished = onFinished)
+        scrollHorizontallyTo(offset = adjustedDestinationOffset, onFinished = onFinished, animate = animate)
     }
 
-    fun scrollHorizontallyTo(offset: Float, onFinished: () -> Unit = {}) {
+    fun scrollHorizontallyTo(offset: Float, animate: Boolean = true, onFinished: () -> Unit = {}) {
         animator.animate(
+            duration = if (animate) 300 else 0,
             fromValue = viewState.currentOrigin.x,
             toValue = offset,
             onUpdate = {

@@ -64,6 +64,29 @@ val WeekView.lastVisibleDateAsLocalDate: LocalDate
     get() = lastVisibleDate.toLocalDate()
 
 /**
+ * Set the specified date. Any provided [LocalDate] that falls outside the range of
+ * [WeekView.minDate] and [WeekView.maxDate] will be adjusted to fit into this range.
+ *
+ * @param date The [LocalDate] to scroll to.
+ */
+@PublicApi
+fun WeekView.setDate(date: LocalDate) {
+    setDate(date.toCalendar())
+}
+
+/**
+ * Set the specified date time. Any provided [LocalDateTime] that falls outside the range of
+ * [WeekView.minDate] and [WeekView.maxDate], or [WeekView.minHour] and [WeekView.maxHour], will be
+ * adjusted to fit into this range.
+ *
+ * @param dateTime The [LocalDateTime] to scroll to.
+ */
+@PublicApi
+fun WeekView.setDateTime(dateTime: LocalDateTime) {
+    setDateTime(dateTime.toCalendar())
+}
+
+/**
  * Scrolls to the specified date. Any provided [LocalDate] that falls outside the range of
  * [WeekView.minDate] and [WeekView.maxDate] will be adjusted to fit into this range.
  *
