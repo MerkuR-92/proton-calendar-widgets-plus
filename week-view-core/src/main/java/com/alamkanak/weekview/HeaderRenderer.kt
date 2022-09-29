@@ -362,7 +362,7 @@ internal class AllDayEventsDrawer(
         // we set isHidden to true for all events that aren't shown in the collapsed state.
         events.forEach { it.first.isHidden = false }
 
-        if (viewState.allDayEventsExpanded || events.size <= 2) {
+        if (viewState.allDayEventsExpanded || events.size <= 3) {
             // Draw them all!
             for ((eventChip, textLayout) in events) {
                 eventChipDrawer.draw(eventChip, canvas = this, textLayout)
@@ -370,24 +370,24 @@ internal class AllDayEventsDrawer(
         } else {
             val (firstEventChip, firstTextLayout) = events[0]
             eventChipDrawer.draw(firstEventChip, canvas = this, firstTextLayout)
+            val (secondEventChip, secondTextLayout) = events[1]
+            eventChipDrawer.draw(secondEventChip, canvas = this, secondTextLayout)
 
-            val needsExpandInfo = events.size >= 2
+            val needsExpandInfo = events.size > 3
             if (needsExpandInfo) {
-                drawExpandInfo(eventsCount = events.size - 1, priorEventChip = firstEventChip)
-                events.drop(1).forEach { it.first.isHidden = true }
-            } else {
-                val (secondEventChip, secondTextLayout) = events[1]
-                eventChipDrawer.draw(secondEventChip, canvas = this, secondTextLayout)
+                drawExpandInfo(eventsCount = events.size - 2, priorEventChip = secondEventChip)
                 events.drop(2).forEach { it.first.isHidden = true }
+            } else {
+                val (thirdEventChip, thirdTextLayout) = events[2]
+                eventChipDrawer.draw(thirdEventChip, canvas = this, thirdTextLayout)
+                events.drop(3).forEach { it.first.isHidden = true }
             }
         }
     }
 
     private fun Canvas.drawExpandInfo(eventsCount: Int, priorEventChip: EventChip) {
         // Draw "+ X" blob
-        val text =
-            if (viewState.numberOfVisibleDays > 3) "+ $eventsCount"
-            else "+ $eventsCount"
+        val text = "+ $eventsCount"
 
         val textPaint = viewState.expandInfoTextPaint.apply {
             textAlign = if (viewState.isLtr) Paint.Align.LEFT else Paint.Align.RIGHT

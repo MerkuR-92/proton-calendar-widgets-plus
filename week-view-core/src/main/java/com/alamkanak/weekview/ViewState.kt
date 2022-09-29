@@ -493,7 +493,7 @@ internal class ViewState {
             val numberOfRows = if (arrangeAllDayEventsVertically && allDayEventsExpanded) {
                 maxNumberOfAllDayEvents
             } else if (arrangeAllDayEventsVertically) {
-                min(maxNumberOfAllDayEvents, 2)
+                min(maxNumberOfAllDayEvents, 3)
             } else {
                 1
             }
@@ -522,7 +522,7 @@ internal class ViewState {
             val numberOfRows = if (arrangeAllDayEventsVertically && allDayEventsExpanded) {
                 maxNumberOfAllDayEvents
             } else if (arrangeAllDayEventsVertically) {
-                min(maxNumberOfAllDayEvents, 2)
+                min(maxNumberOfAllDayEvents, 3)
             } else {
                 1
             }
