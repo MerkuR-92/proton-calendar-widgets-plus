@@ -57,7 +57,7 @@ internal class WeekViewTouchHandler(
         val handled = adapter?.handleClick(x, y, viewState.headerBounds.contains(x, y), dateClicked) ?: false
 
         // Check if user clicked on empty space in header to open all day event form
-        if (viewState.numberOfVisibleDays > 1 && viewState.headerBounds.contains(x, y) && !handled) {
+        if (viewState.headerBounds.contains(x, y) && !handled) {
             // Handle click in empty header
             adapter?.onEmptyViewClick(dateClicked, true)
             return
