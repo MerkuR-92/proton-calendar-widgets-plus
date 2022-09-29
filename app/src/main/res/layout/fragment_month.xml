@@ -162,6 +162,8 @@
         app:decryptionFailedRectHeight="6dp"
         app:weekNumberTextSize="10sp"
         app:weekNumberTextColor="@color/text_weak"
+        app:todayHeaderTextColor="?attr/proton_text_accent"
+        app:stickToWeekInWeekView="false"
         app:weekNumberBackgroundColor="@color/background_secondary"
         app:weekNumberBackgroundSize="24dp"
         app:weekNumberBackgroundCornerRadius="3dp" />

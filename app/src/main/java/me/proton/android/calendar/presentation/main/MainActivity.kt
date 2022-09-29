@@ -108,6 +108,8 @@ import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.FeatureFlag.THREE_DAYS_VIEW
+import me.proton.android.calendar.common.FeatureFlag.WEEK_VIEW
 import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
@@ -183,7 +185,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // Save the current view mode so that we know if we are navigating to day view from the month view
     private var currentViewMode: ViewMode? = null
     // Lets us know whether we need to navigate back to month when triggering back action
-    private var returnToMonthView: Boolean = false
+    private var returnToView: ViewMode? = null
 
     private var googleSignInClient: GoogleSignInClient? = null
 
@@ -840,7 +842,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
-            returnToMonthView = currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY
+            returnToView =
+                if (currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY) ViewMode.MONTH
+                else if (currentViewMode == ViewMode.WEEK && viewMode == ViewMode.DAY) ViewMode.WEEK
+                else if (currentViewMode == ViewMode.THREE_DAY && viewMode == ViewMode.DAY) ViewMode.THREE_DAY
+                else null
             currentViewMode = viewMode
         })
 
@@ -1455,13 +1461,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if (returnToMonthView && MONTH_VIEW) {
+        } else if (returnToView == ViewMode.MONTH && MONTH_VIEW) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)
             }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setViewMode(ViewMode.MONTH)
+        } else if (returnToView == ViewMode.WEEK && WEEK_VIEW) {
+            // Navigate back to week view
+            calendarViewModel.viewMode.postValue(ViewMode.WEEK)
+            mainViewModel.setViewMode(ViewMode.WEEK)
+        } else if (returnToView == ViewMode.THREE_DAY && THREE_DAYS_VIEW) {
+            // Navigate back to 3 days view
+            calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
+            mainViewModel.setViewMode(ViewMode.THREE_DAY)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {
