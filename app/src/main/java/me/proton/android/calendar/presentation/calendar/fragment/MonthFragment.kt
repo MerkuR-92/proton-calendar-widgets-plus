@@ -623,7 +623,7 @@ class MonthFragment : BaseFragment() {
                 }
             weekdayFormatter.format(date)
         }
-        val dateFormatter = DateTimeFormatter.ofPattern("dd", Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern("d", Locale.getDefault())
         weekView.setDateFormatter { date: LocalDate ->
             dateFormatter.format(date)
         }
