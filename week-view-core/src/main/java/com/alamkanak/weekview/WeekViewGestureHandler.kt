@@ -45,7 +45,10 @@ internal class WeekViewGestureHandler(
 
     private var preFlingFirstVisibleDate: Calendar = today()
 
+    private var dragStartMs: Long = 0L
+
     override fun onDown(e: MotionEvent): Boolean {
+        dragStartMs = System.currentTimeMillis()
         if (scrollDirection == None && flingDirection != None) {
             goToNearestOrigin()
         }
@@ -219,10 +222,11 @@ internal class WeekViewGestureHandler(
     }
 
     private fun onUp() {
-        if (flingDirection == None && scrollDirection != None) {
+        val dragDuration = System.currentTimeMillis() - dragStartMs
+        if (((viewState.numberOfVisibleDays == 3 && dragDuration > 500L) || flingDirection == None) && scrollDirection != None) {
             handleScrollingFinished()
         }
-
+        dragStartMs = 0L
         resetScrollAndFlingDirections()
     }
 
