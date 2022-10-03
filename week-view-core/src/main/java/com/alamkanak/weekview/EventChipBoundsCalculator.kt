@@ -86,10 +86,9 @@ internal class EventChipBoundsCalculator(
         val top = if (viewState.arrangeAllDayEventsVertically) {
             val previousChipsHeight = index * (eventChip.bounds.height() + viewState.eventMarginVertical)
             val fixedPreviousChipsHeight =
-                if (previousChipsHeight > 0 && previousChipsHeight < chipHeight) chipHeight + viewState.eventMarginVertical
+                if (previousChipsHeight > 0 && previousChipsHeight < chipHeight) index * (chipHeight + viewState.eventMarginVertical)
                 else previousChipsHeight
             dateLabelHeight + fixedPreviousChipsHeight
-
         } else {
             dateLabelHeight
         }
