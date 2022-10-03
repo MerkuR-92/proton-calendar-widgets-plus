@@ -66,6 +66,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
@@ -204,12 +205,21 @@ class MonthFragment : BaseFragment() {
             textField.visibility = View.VISIBLE
         }
         buttonToday.setOnSingleClickListener {
-            val todayDate = LocalDate.now(timeZoneId)
-            calendarViewModel.handleDaySelected(todayDate)
-            // Align day view to current time
-            calendarViewModel.jumpToCurrentTime.value = true
+            if (calendarViewModel.viewMode.value != ViewMode.WEEK) {
+                val todayDate = LocalDate.now(timeZoneId)
+                calendarViewModel.handleDaySelected(todayDate)
+                // Align day view to current time
+                calendarViewModel.jumpToCurrentTime.value = true
 
-            weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
+                weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
+            } else {
+                val todayDate = LocalDateTime.now(timeZoneId)
+                val weekStart = calendarViewModel.weekStart.value
+                val firstDayOfCurrentWeek = todayDate.firstDayOfWeek(weekStart)
+
+                calendarViewModel.handleDaySelected(firstDayOfCurrentWeek.toLocalDate())
+                weekView.scrollToDateTime(dateTime = firstDayOfCurrentWeek)
+            }
         }
     }
 
@@ -872,6 +882,15 @@ class MonthFragment : BaseFragment() {
         if (viewMode == currentViewMode) return
         val previousViewMode = currentViewMode
         currentViewMode = viewMode
+
+        if (viewMode == ViewMode.WEEK) {
+            val selectedDate = calendarViewModel.selectedDate.value
+            val weekStart = calendarViewModel.weekStart.value
+            selectedDate?.firstDayOfWeek(weekStart)?.let {
+                calendarViewModel.handleDaySelected(it)
+                weekView.scrollToDate(it)
+            }
+        }
 
         if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)) return
 

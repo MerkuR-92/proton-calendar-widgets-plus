@@ -26,8 +26,8 @@ abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
         onEmptyViewLongClick(time.toLocalDateTime())
     }
 
-    override fun onDateHeaderClick(time: Calendar) {
-        onDateHeaderClick(time)
+    final override fun onDateHeaderClick(time: Calendar) {
+        onDateHeaderClick(time.toLocalDate())
     }
 
     final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
@@ -52,6 +52,13 @@ abstract class WeekViewSimpleAdapterJsr310<T> : WeekView.SimpleAdapter<T>() {
      * @param time A [LocalDateTime] with the date and time
      */
     open fun onEmptyViewLongClick(time: LocalDateTime) = Unit
+
+    /**
+     * Returns the date of the day header that the user clicked on.
+     *
+     * @param time A [LocalDate] with the date
+     */
+    open fun onDateHeaderClick(time: LocalDate) = Unit
 
     /**
      * Called when a drag-&-drop gesture has finished to inform the caller of the dragged event's
@@ -99,8 +106,8 @@ abstract class WeekViewPagingAdapterJsr310<T> : WeekView.PagingAdapter<T>() {
         onEmptyViewLongClick(time.toLocalDateTime())
     }
 
-    override fun onDateHeaderClick(time: Calendar) {
-        onDateHeaderClick(time)
+    final override fun onDateHeaderClick(time: Calendar) {
+        onDateHeaderClick(time.toLocalDate())
     }
 
     final override fun onDragAndDropFinished(data: T, newStartTime: Calendar, newEndTime: Calendar) {
@@ -129,6 +136,13 @@ abstract class WeekViewPagingAdapterJsr310<T> : WeekView.PagingAdapter<T>() {
      * @param time A [LocalDateTime] with the date and time
      */
     open fun onEmptyViewLongClick(time: LocalDateTime) = Unit
+
+    /**
+     * Returns the date of the day header that the user clicked on.
+     *
+     * @param time A [LocalDate] with the date
+     */
+    open fun onDateHeaderClick(time: LocalDate) = Unit
 
     /**
      * Called when a drag-&-drop gesture has finished to inform the caller of the dragged event's

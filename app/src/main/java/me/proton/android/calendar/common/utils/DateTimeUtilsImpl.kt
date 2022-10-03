@@ -13,14 +13,25 @@ import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
 import java.text.SimpleDateFormat
-import java.time.*
+import java.time.DayOfWeek
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import java.time.temporal.IsoFields
-import java.util.*
+import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.abs
 
 object DateTimeUtilsImpl : DateTimeUtils {
@@ -413,5 +424,26 @@ object DateTimeUtilsImpl : DateTimeUtils {
         }
     }
 
+    override fun LocalDate.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDate {
+        return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
+    }
+
+    override fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate {
+        val weekStartDayOfWeek = weekStart?.let {
+            AndroidUtils.getWeekStartDayOfWeek(weekStart)
+        } ?: WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
+    }
+
+    override fun LocalDateTime.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDateTime {
+        return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
+    }
+
+    override fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime {
+        val weekStartDayOfWeek = weekStart?.let {
+            AndroidUtils.getWeekStartDayOfWeek(weekStart)
+        } ?: WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
+    }
 
 }

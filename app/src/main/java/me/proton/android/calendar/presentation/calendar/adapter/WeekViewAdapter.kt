@@ -21,7 +21,7 @@ class WeekViewAdapter(
     private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit,
     private val viewClickHandler: (LocalDateTime, Boolean) -> Unit,
     private val eventClickHandler: (WeekViewCalendarEntity.Event) -> Unit,
-    private val dateHeaderClickHandler: (Calendar) -> Unit
+    private val dateHeaderClickHandler: (LocalDate) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -46,7 +46,7 @@ class WeekViewAdapter(
         viewClickHandler(time, isAllDay)
     }
 
-    override fun onDateHeaderClick(time: Calendar) {
+    override fun onDateHeaderClick(time: LocalDate) {
         dateHeaderClickHandler(time)
     }
 
