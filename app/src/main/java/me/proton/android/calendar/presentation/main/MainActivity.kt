@@ -497,11 +497,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 } else if (showDayIntent != null && showDayIntent.data != null) {
 
                     val dayToShow = showDayIntent.data?.getQueryParameter("date")?.let { LocalDate.parse(it) }
-                    dayToShow?.let {
-                        lifecycleScope.launch {
-                            calendarViewModel.setJumpToCurrentTimeIfNeeded(it)
-                        }
-                    }
                     safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
@@ -1487,21 +1482,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onDestroy()
         if (this::updateCalendarsJob.isInitialized && updateCalendarsJob.isActive) {
             updateCalendarsJob.cancel()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        // Check if we the app is opened on Day view and selected date is today.
-        //  If it is, then make it scroll to current time.
-        if (calendarViewModel.initialised.value == true) {
-            val selectedDate = calendarViewModel.selectedDate.value
-            if (calendarViewModel.viewMode.value == ViewMode.DAY && selectedDate != null && selectedDate == LocalDate.now()) {
-                lifecycleScope.launch {
-                    calendarViewModel.setJumpToCurrentTimeIfNeeded(selectedDate)
-                }
-            }
         }
     }
 }

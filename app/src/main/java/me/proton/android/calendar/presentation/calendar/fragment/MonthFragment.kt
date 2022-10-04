@@ -208,8 +208,6 @@ class MonthFragment : BaseFragment() {
             if (calendarViewModel.viewMode.value != ViewMode.WEEK) {
                 val todayDate = LocalDate.now(timeZoneId)
                 calendarViewModel.handleDaySelected(todayDate)
-                // Align day view to current time
-                calendarViewModel.jumpToCurrentTime.value = true
 
                 weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
             } else {
