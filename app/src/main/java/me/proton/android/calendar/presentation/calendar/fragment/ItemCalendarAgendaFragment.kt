@@ -34,6 +34,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 import java.util.*
 
@@ -57,6 +58,8 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var selectedDate: LocalDate? = null
 
     private lateinit var eventsListLayoutAdapter: EventAdapter
+
+    private var firstEventOfTheDayTime: LocalTime? = null
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment {
@@ -190,6 +193,10 @@ class ItemCalendarAgendaFragment: Fragment() {
                 return@observe
             }
             this.selectedDate = selectedDate
+            if (selectedDate == immutableDate && firstEventOfTheDayTime != null) {
+                // Set the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
+            }
             if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers() &&
                 immutableDate != selectedDate &&
                 immutableDate != selectedDate.minusDays(1) &&
@@ -231,20 +238,18 @@ class ItemCalendarAgendaFragment: Fragment() {
                         // Sort the events
                         val sortedEvents = it.events.sortForAgendaView(timeZoneId)
 
-                        if (immutableDate == calendarViewModel.selectedDate.value) {
-                            val partDayEvents = it.events.filter {
-                                !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
-                            }
-                            // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
-                            calendarViewModel.firstEventOfTheDayTime =
-                                if (partDayEvents.isNotEmpty()) {
-                                    Collections.min(
-                                        partDayEvents.map {
-                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
-                                        }
-                                    )
-                                } else null
+                        val partDayEvents = it.events.filter {
+                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
                         }
+                        // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                        firstEventOfTheDayTime =
+                            if (partDayEvents.isNotEmpty()) {
+                                Collections.min(
+                                    partDayEvents.map {
+                                        it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                    }
+                                )
+                            } else null
 
                         if (sortedEvents.isEmpty()) {
                             list_view_status.visibleOrInvisible(true)

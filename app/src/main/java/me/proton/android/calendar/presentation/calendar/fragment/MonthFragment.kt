@@ -964,7 +964,12 @@ class MonthFragment : BaseFragment() {
                     if (timeZoneId != null && selectedDate == LocalDate.now()) {
                         updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId), animate = false)
                     } else if (selectedDate != null) {
-                        updateWeekView(selectedDate, animate = false)
+                        val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
+                        if (firstEventOfTheDayTime != null) {
+                            updateWeekView(selectedDate, selectedDate.atTime(firstEventOfTheDayTime), animate = false)
+                        } else {
+                            updateWeekView(selectedDate, animate = false)
+                        }
                     }
                 }
 

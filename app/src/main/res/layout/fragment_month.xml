@@ -127,7 +127,7 @@
         app:noEventsLabel="@string/agenda_no_events"
         app:headerTextColor="@color/text_norm"
         app:headerTextSize="14sp"
-        app:headerLabelsInnerMargin="6dp"
+        app:headerLabelsInnerMargin="4dp"
         app:singleDayNumberHeaderTextSize="20sp"
         app:headerTodaySquareSize="24dp"
         app:headerTodaySquareStrokeWidth="1.5dp"
