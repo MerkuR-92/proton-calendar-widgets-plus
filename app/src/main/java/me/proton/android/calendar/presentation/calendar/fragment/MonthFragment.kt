@@ -102,6 +102,7 @@ import java.util.Collections
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @AndroidEntryPoint
 class MonthFragment : BaseFragment() {
@@ -619,9 +620,14 @@ class MonthFragment : BaseFragment() {
             dateHeaderClickHandler = { dateClicked ->
                 calendarViewModel.viewMode.value = ViewMode.DAY
                 weekView.scrollToDate(dateClicked)
+            },
+            onHourHeightChangedHandler = { newHourHeight ->
+                mainViewModel.setWeekViewHourHeight(newHourHeight)
             }
         )
         weekView.adapter = weekViewAdapter
+
+        weekView.hourHeight = mainViewModel.getWeekViewHourHeight(resources.getDimensionPixelSize(R.dimen.default_week_view_hour_height).toFloat()).roundToInt()
 
         weekView.setWeekDayFormatter { date: LocalDate ->
             val weekdayFormatter =

@@ -138,7 +138,7 @@
         app:showCustomTimeColumnHourSeparator="true"
         app:customTimeColumnHourSeparatorWidth="10dp"
         app:showTimeColumnHourSeparator="false"
-        app:hourHeight="60dp"
+        app:hourHeight="@dimen/default_week_view_hour_height"
         app:nowLineDotRadius="5dp"
         app:nowLineStrokeWidth="2dp"
         app:numberOfVisibleDays="3"

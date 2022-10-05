@@ -419,7 +419,7 @@ internal class ViewState {
         }
     }
 
-    private fun refreshAfterZooming() {
+    private fun refreshAfterZooming(navigationListener: Navigator.NavigationListener) {
         if (showCompleteDay) {
             return
         }
@@ -442,6 +442,8 @@ internal class ViewState {
             currentOrigin.y = currentOrigin.y / hourHeight * newHourHeight
             hourHeight = newHourHeight
             newHourHeight = 0f
+
+            navigationListener.onZoomFinished()
         }
     }
 
@@ -559,12 +561,12 @@ internal class ViewState {
 
     fun update(navigationListener: Navigator.NavigationListener) {
         updateViewState(navigationListener)
-        updateScrollState()
+        updateScrollState(navigationListener)
         updateDateRange()
     }
 
-    private fun updateScrollState() {
-        refreshAfterZooming()
+    private fun updateScrollState(navigationListener: Navigator.NavigationListener) {
+        refreshAfterZooming(navigationListener)
         updateVerticalOrigin()
     }
 

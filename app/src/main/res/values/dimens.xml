@@ -140,5 +140,6 @@
     <!--  Week view  -->
     <dimen name="week_view_no_border_width">0dp</dimen>
     <dimen name="week_view_border_width">1dp</dimen>
+    <dimen name="default_week_view_hour_height">60dp</dimen>
 
 </resources>

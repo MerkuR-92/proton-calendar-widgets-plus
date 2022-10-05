@@ -13,7 +13,6 @@ import android.view.View
 import android.view.accessibility.AccessibilityManager
 import androidx.annotation.RequiresApi
 import androidx.core.view.ViewCompat
-import java.time.LocalDate
 import java.util.Calendar
 import java.util.TimeZone
 import kotlin.math.abs
@@ -55,6 +54,10 @@ class WeekView @JvmOverloads constructor(
 
         override fun requestInvalidation() {
             ViewCompat.postInvalidateOnAnimation(this@WeekView)
+        }
+
+        override fun onZoomFinished() {
+            notifyHourHeightChanged()
         }
     }
 
@@ -204,6 +207,10 @@ class WeekView @JvmOverloads constructor(
                 lastVisibleDate = newLastVisibleDate
             )
         }
+    }
+
+    private fun notifyHourHeightChanged() {
+        adapter?.onHourHeightChanged(viewState.hourHeight)
     }
 
     private fun notifyVerticalScrollChanged(distance: Float) {
@@ -1697,6 +1704,13 @@ class WeekView @JvmOverloads constructor(
          * @param currentOffset The current vertical offset.
          */
         open fun onVerticalScrollFinished(currentOffset: Float) = Unit
+
+        /**
+         * Called when the hour height changes after zooming in or out.
+         *
+         * @param newHourHeight The new hour height.
+         */
+        open fun onHourHeightChanged(newHourHeight: Float) = Unit
     }
 
     /**

@@ -141,5 +141,6 @@ internal class Navigator(
         fun onVerticalScrollPositionChanged(distance: Float)
         fun onVerticalScrollingFinished()
         fun requestInvalidation()
+        fun onZoomFinished()
     }
 }

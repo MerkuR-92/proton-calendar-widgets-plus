@@ -106,6 +106,16 @@ class MainViewModel @Inject constructor(
         return if (!MONTH_VIEW && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 
+    fun setWeekViewHourHeight(newHourHeight: Float) {
+        val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
+        editor.putFloat(SharedPreferencesKeys.WEEK_VIEW_HOUR_HEIGHT, newHourHeight)
+        editor.apply()
+    }
+
+    fun getWeekViewHourHeight(defaultHourHeight: Float): Float {
+        return defaultSharedPreferencesProvider.sharedPreferences.getFloat(SharedPreferencesKeys.WEEK_VIEW_HOUR_HEIGHT, defaultHourHeight)
+    }
+
     // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
 

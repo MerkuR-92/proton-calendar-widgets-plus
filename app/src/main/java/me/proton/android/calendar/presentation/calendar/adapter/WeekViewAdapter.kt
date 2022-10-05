@@ -21,7 +21,8 @@ class WeekViewAdapter(
     private val rangeChangedHandler: (LocalDate, LocalDate) -> Unit,
     private val viewClickHandler: (LocalDateTime, Boolean) -> Unit,
     private val eventClickHandler: (WeekViewCalendarEntity.Event) -> Unit,
-    private val dateHeaderClickHandler: (LocalDate) -> Unit
+    private val dateHeaderClickHandler: (LocalDate) -> Unit,
+    private val onHourHeightChangedHandler: (Float) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
     private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
@@ -70,6 +71,10 @@ class WeekViewAdapter(
 
     override fun onVerticalScrollFinished(currentOffset: Float) {
         Log.d("BasicActivity", "Vertical scroll finished (current offset ${currentOffset.toInt()})")
+    }
+
+    override fun onHourHeightChanged(newHourHeight: Float) {
+        onHourHeightChangedHandler(newHourHeight)
     }
 
     override fun onEventLongClick(data: WeekViewCalendarEntity, bounds: RectF): Boolean {
