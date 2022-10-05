@@ -30,8 +30,16 @@ internal data class EventChip(
      */
     var bounds: RectF = RectF()
 
+    /**
+     * We display events with a minimum height of 10min
+     */
+    val minimumHeightMinutes = 10
+
     val durationInMinutes: Int by lazy {
-        endTime minutesUntil startTime
+        val duration = endTime minutesUntil startTime
+        if (duration < minimumHeightMinutes) {
+            minimumHeightMinutes
+        } else duration
     }
 
     /**

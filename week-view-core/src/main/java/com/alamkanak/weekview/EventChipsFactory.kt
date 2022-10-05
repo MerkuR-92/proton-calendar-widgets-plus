@@ -1,6 +1,7 @@
 package com.alamkanak.weekview
 
 import java.util.Calendar
+import kotlin.math.max
 
 internal class EventChipsFactory {
 
@@ -47,6 +48,105 @@ internal class EventChipsFactory {
         }.flatten()
     }
 
+    internal class EventTimeRange(
+        val startMinute: Int,
+        val endMinute: Int
+    ) {
+        fun conflicts(range: EventTimeRange): Boolean {
+            return startMinute >= range.startMinute && startMinute < range.endMinute
+                    || endMinute > range.startMinute && endMinute <= range.endMinute
+                    || range.startMinute >= startMinute && range.startMinute < endMinute
+                    || range.endMinute > startMinute && range.endMinute <= endMinute
+        }
+    }
+
+    internal class EventColumnSpan {
+        var startColumn = -1
+        var endColumn = -1
+    }
+
+    private var timeRanges: ArrayList<EventTimeRange> = arrayListOf()
+    private var columnSpans: ArrayList<EventColumnSpan> = arrayListOf()
+    private var columnCount = 0
+
+    private fun computeSingleEvents(eventChips: List<EventChip>, viewState: ViewState) {
+        timeRanges = ArrayList(
+            eventChips.map {
+                val startTimeMinutes = 60 * it.startTime.hour + it.startTime.minute
+                val endTimeMinutes = 60 * it.endTime.hour + it.endTime.minute
+                val lengthenEvent = endTimeMinutes - startTimeMinutes < it.minimumHeightMinutes
+                EventTimeRange(
+                    startTimeMinutes,
+                    if (lengthenEvent) startTimeMinutes + it.minimumHeightMinutes
+                    else endTimeMinutes
+                )
+            }
+        )
+
+        columnSpans = ArrayList(timeRanges.size)
+
+        for (i in timeRanges.indices) {
+            findStartColumn(i)
+        }
+
+        for (i in timeRanges.indices) {
+            findEndColumn(i)
+        }
+
+        val eventColumnWidth =
+            if (columnCount > 0) 1f / columnCount
+            else 0f
+
+        for (i in eventChips.indices) {
+            val columnSpan: EventColumnSpan = columnSpans[i]
+            val start = columnSpan.startColumn * eventColumnWidth
+            val end = start + (columnSpan.endColumn - columnSpan.startColumn) * eventColumnWidth
+
+            eventChips[i].relativeStart = start
+            eventChips[i].relativeWidth = end - start
+
+            calculateMinutesFromStart(eventChips[i], viewState)
+        }
+    }
+
+    private fun findStartColumn(position: Int) {
+        for (i in timeRanges.indices) {
+            if (isColumnEmpty(i, position)) {
+                val columnSpan = EventColumnSpan()
+                columnSpan.startColumn = i
+                columnSpan.endColumn = i + 1
+                columnSpans.add(columnSpan)
+                columnCount = max(columnCount, i + 1)
+                break
+            }
+        }
+    }
+
+    private fun findEndColumn(position: Int) {
+        val columnSpan: EventColumnSpan = columnSpans[position]
+        for (i in columnSpan.endColumn until columnCount) {
+            if (!isColumnEmpty(i, position)) {
+                break
+            }
+            columnSpan.endColumn++
+        }
+    }
+
+    private fun isColumnEmpty(column: Int, position: Int): Boolean {
+        val timeRange: EventTimeRange = timeRanges[position]
+        for (i in columnSpans.indices) {
+            if (position == i) {
+                continue
+            }
+            val compareTimeRange: EventTimeRange = timeRanges[i]
+            val compareColumnSpan: EventColumnSpan = columnSpans[i]
+            if (compareColumnSpan.startColumn == column && compareTimeRange.conflicts(timeRange)) {
+                return false
+            }
+        }
+        return true
+    }
+
     /**
      * Forms [CollisionGroup]s for all event chips and uses them to expand the [EventChip]s to their
      * maximum width.
@@ -57,16 +157,13 @@ internal class EventChipsFactory {
         val singleEventChips = eventChips.filter { it.event.isNotAllDay }
         val allDayEventChips = eventChips.filter { it.event.isAllDay }
 
-        val singleEventGroups = singleEventChips.toMultiColumnCollisionGroups()
         val allDayGroups = if (viewState.arrangeAllDayEventsVertically) {
             allDayEventChips.toSingleColumnCollisionGroups()
         } else {
             allDayEventChips.toMultiColumnCollisionGroups()
         }
 
-        for (collisionGroup in singleEventGroups) {
-            expandEventsToMaxWidth(collisionGroup, viewState)
-        }
+        computeSingleEvents(singleEventChips, viewState)
 
         for (collisionGroup in allDayGroups) {
             expandEventsToMaxWidth(collisionGroup, viewState)
@@ -101,7 +198,9 @@ internal class EventChipsFactory {
         columns += Column(index = 0)
 
         for (eventChip in collisionGroup.eventChips) {
-            val fittingColumns = columns.filter { it.fits(eventChip) }
+            val fittingColumns = columns.filter {
+                it.fits(eventChip)
+            }
             when (fittingColumns.size) {
                 0 -> {
                     val index = columns.size
@@ -169,7 +268,8 @@ internal class EventChipsFactory {
         } else {
             // Every column gets the same width. For instance, if there are four columns,
             // then each column's width is 0.25.
-            eventChip.relativeWidth = columnWidth
+            if (eventChip.relativeWidth >= columnWidth) eventChip.relativeWidth += columnWidth
+            else eventChip.relativeWidth = columnWidth
 
             // The start position is calculated based on the index of the column. For
             // instance, if there are four columns, the start positions will be 0.0, 0.25, 0.5
