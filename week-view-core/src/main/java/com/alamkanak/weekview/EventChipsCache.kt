@@ -59,7 +59,7 @@ internal class EventChipsCache {
         for (eventChip in eventChips) {
             val key = eventChip.startTime.atStartOfDay.timeInMillis
 
-            if (eventChip.event.isAllDay) {
+            if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
                 allDayEventChipsByDate.addOrReplace(key, eventChip)
             } else {
                 normalEventChipsByDate.addOrReplace(key, eventChip)
@@ -73,7 +73,7 @@ internal class EventChipsCache {
             candidates.isEmpty() -> null
             // Two events hit. This is most likely because an all-day event was clicked, but a
             // single event is rendered underneath it. We return the all-day event.
-            candidates.size == 2 -> candidates.first { it.event.isAllDay }
+            candidates.size == 2 -> candidates.first { it.event.isAllDay || it.event.isMultiDay }
             else -> candidates.first()
         }
     }
@@ -93,7 +93,7 @@ internal class EventChipsCache {
         val key = eventChip.startTime.atStartOfDay.timeInMillis
         val eventId = eventChip.eventId
 
-        if (eventChip.event.isAllDay) {
+        if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
             allDayEventChipsByDate[key]?.removeAll { it.event.id == eventId }
         } else {
             normalEventChipsByDate[key]?.removeAll { it.event.id == eventId }
@@ -101,7 +101,7 @@ internal class EventChipsCache {
     }
 
     fun clearSingleEventsCache() {
-        allEventChips.filter { it.event.isNotAllDay }.forEach(EventChip::setEmpty)
+        allEventChips.filter { it.event.isNotAllDay && it.event.isSingleDay }.forEach(EventChip::setEmpty)
     }
 
     fun clear() {

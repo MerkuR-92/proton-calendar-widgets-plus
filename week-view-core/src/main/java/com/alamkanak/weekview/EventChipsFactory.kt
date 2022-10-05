@@ -154,8 +154,8 @@ internal class EventChipsFactory {
      * @param eventChips A list of [EventChip]s
      */
     private fun computePositionOfEvents(eventChips: List<EventChip>, viewState: ViewState) {
-        val singleEventChips = eventChips.filter { it.event.isNotAllDay }
-        val allDayEventChips = eventChips.filter { it.event.isAllDay }
+        val singleEventChips = eventChips.filter { it.event.isNotAllDay && it.event.isSingleDay }
+        val allDayEventChips = eventChips.filter { it.event.isAllDay || it.event.isMultiDay }
 
         val allDayGroups = if (viewState.arrangeAllDayEventsVertically) {
             allDayEventChips.toSingleColumnCollisionGroups()
@@ -244,7 +244,7 @@ internal class EventChipsFactory {
     }
 
     private fun calculateMinutesFromStart(eventChip: EventChip, viewState: ViewState) {
-        if (eventChip.event.isAllDay) {
+        if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
             return
         }
 

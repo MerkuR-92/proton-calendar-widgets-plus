@@ -59,11 +59,11 @@ internal class TextFitter(
     }
 
     private fun EventChip.getText(includeSubtitle: Boolean): CharSequence {
-        val subtitle = event.subtitle?.takeIf { event.isNotAllDay && includeSubtitle }
+        val subtitle = event.subtitle?.takeIf { event.isNotAllDay && event.isSingleDay && includeSubtitle }
         return combineTitleAndSubtitle(
             title = event.title,
             subtitle = subtitle,
-            isMultiLine = event.isNotAllDay
+            isMultiLine = event.isNotAllDay && event.isSingleDay
         )
     }
 

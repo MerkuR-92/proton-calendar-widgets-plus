@@ -232,10 +232,11 @@ internal class ViewState {
         defaultWeekDayFormatter(numberOfDays = numberOfVisibleDays).format(date.time)
     }
 
-    var timeFormatter: TimeFormatter = { hour ->
-        val date = nowAtTimezone(customTimeZone).withTime(hour = hour, minutes = 0)
+    var timeFormatter: TimeFormatter = { hour, minutes ->
+        val date = nowAtTimezone(customTimeZone).withTime(hour = hour, minutes = minutes ?: 0)
         val dateFormat =
             if (timeFormatIs24Hour) SimpleDateFormat("HH:mm", Locale.getDefault())
+            else if (minutes != null) SimpleDateFormat("hh:mm a", Locale.getDefault())
             else SimpleDateFormat("hh a", Locale.getDefault())
         dateFormat.format(date.time)
     }

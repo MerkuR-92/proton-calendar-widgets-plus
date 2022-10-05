@@ -42,7 +42,7 @@ internal fun CharSequence.semibold() = SpannableString(this).apply {
 }
 
 internal fun ViewState.getTextPaint(event: ResolvedWeekViewEntity): TextPaint {
-    val textPaint = TextPaint(if (event.isAllDay) allDayEventTextPaint else eventTextPaint)
+    val textPaint = TextPaint(if (event.isAllDay || event.isMultiDay) allDayEventTextPaint else eventTextPaint)
     textPaint.textAlign = if (isLtr) Paint.Align.LEFT else Paint.Align.RIGHT
 
     val textColor = event.style.textColor

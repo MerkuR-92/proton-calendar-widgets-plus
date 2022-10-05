@@ -59,13 +59,16 @@ internal sealed class ResolvedWeekViewEntity {
     internal val isMultiDay: Boolean
         get() = startTime.isSameDate(endTime).not()
 
+    internal val isSingleDay: Boolean
+        get() = startTime.isSameDate(endTime)
+
     internal fun isWithin(
         minHour: Int,
         maxHour: Int
     ): Boolean = startTime.hour >= minHour && endTime.hour <= maxHour
 
     internal fun collidesWith(other: ResolvedWeekViewEntity): Boolean {
-        if (isAllDay != other.isAllDay) {
+        if (isAllDay != other.isAllDay && isMultiDay != other.isMultiDay) {
             return false
         }
 

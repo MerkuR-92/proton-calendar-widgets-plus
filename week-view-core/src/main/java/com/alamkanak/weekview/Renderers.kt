@@ -17,7 +17,7 @@ internal interface DateFormatterDependent {
     fun onDateFormatterChanged(formatter: DateFormatter)
 }
 
-typealias TimeFormatter = (Int) -> String
+typealias TimeFormatter = (Int, Int?) -> String
 
 internal interface TimeFormatterDependent {
     fun onTimeFormatterChanged(formatter: TimeFormatter)

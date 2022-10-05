@@ -130,11 +130,6 @@ internal class EventChipDrawer(
             drawRoundRect(borderBounds, cornerRadius, cornerRadius, borderPaint)
         }
 
-        if (entity.isMultiDay && entity.isNotAllDay) {
-            // TODO Draw event blob (w/ stripe) all the way to the top / bottom
-            // drawCornersForMultiDayEvents(eventChip, cornerRadius)
-        }
-
         // Draw event decryption failed blur rectangle
         if (textLayout?.text?.isEmpty() == true) {
             val pastEvent = eventChip.event.endTime.withTimeZone(viewState.customTimeZone).isBefore(nowAtTimezone(viewState.customTimeZone))
@@ -250,13 +245,21 @@ internal class EventChipDrawer(
     ) {
         val bounds = eventChip.bounds
 
+        val isMultiDayFirstDay = eventChip.event.isMultiDay && eventChip.index == 0
+        val multiDayTimeText =
+            if (isMultiDayFirstDay && eventChip.event.isNotAllDay) {
+                val hour = eventChip.event.startTime.hour
+                val minutes = eventChip.event.startTime.minute
+                viewState.timeFormatter(hour, minutes)
+            } else ""
+
         val horizontalOffset = if (viewState.isLtr) {
             bounds.left + viewState.eventPaddingHorizontal + viewState.eventSideStripWidth / 2
         } else {
             bounds.right - viewState.eventPaddingHorizontal
         }
 
-        val verticalOffset = if (eventChip.event.isAllDay) {
+        val verticalOffset = if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
             (bounds.height() - textLayout.height) / 2f
         } else {
             if (eventChip.eventTextDoesNotFit) {
@@ -268,15 +271,19 @@ internal class EventChipDrawer(
         val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2
         // Use ellipsize to calculate the max length we can draw
         val ellipsizedTitle = TextUtils.ellipsize(
-            textLayout.text,
+            if (multiDayTimeText.isEmpty()) textLayout.text
+            else "$multiDayTimeText ${textLayout.text}",
             textLayout.paint,
             titleWidth,
             TextUtils.TruncateAt.END
         )
 
-        withTranslation(x = horizontalOffset, y = bounds.top + verticalOffset) {
+        withTranslation(
+            x = horizontalOffset,
+            y = bounds.top + verticalOffset
+        ) {
             draw(
-                ellipsizedTitle.toTextLayout(
+                ellipsizedTitle.semibold().toTextLayout(
                     textPaint = textLayout.paint,
                     width = bounds.width().roundToInt() - viewState.eventPaddingHorizontal,
                     alignment = textLayout.alignment,
