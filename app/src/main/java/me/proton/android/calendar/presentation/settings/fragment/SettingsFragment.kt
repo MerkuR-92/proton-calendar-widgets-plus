@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_cale
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars_list
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
@@ -348,10 +349,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not())
+        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not() && calendar.isSharedWithMe.not())
 
         val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
-        markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not())
+        markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not() && calendar.isSharedWithMe.not())
 
         bottomSheetDialog.show()
     }

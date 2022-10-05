@@ -87,6 +87,9 @@ class CalendarFormViewModel @Inject constructor(
     var calendarIsSubscribed: Boolean = false
         private set
 
+    var calendarIsSharedWithMe: Boolean = false
+        private set
+
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
@@ -171,6 +174,8 @@ class CalendarFormViewModel @Inject constructor(
         }
 
         calendarIsSubscribed = calendar.isSubscribed
+
+        calendarIsSharedWithMe = calendar.isSharedWithMe
 
         // Calendar name
         _calendarName.value = calendar.name

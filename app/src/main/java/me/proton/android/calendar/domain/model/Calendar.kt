@@ -38,6 +38,7 @@ data class Calendar(
         val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 
         val isSubscribed: Boolean get() = type == 1
+        val isSharedWithMe: Boolean get() = !allowEditEvents
 
         val isOwner: Boolean get() = permissions and 2 == 2
         val allowEditEvents: Boolean get() = permissions and 2 == 2 // TODO Change to 16 so that we check actual write permissions

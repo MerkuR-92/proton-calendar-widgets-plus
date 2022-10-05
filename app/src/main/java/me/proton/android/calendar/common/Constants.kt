@@ -118,6 +118,7 @@ object FeatureFlag {
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = true
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
+    const val ALARMS_IN_SHARED_CALENDARS = false
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
     const val THREE_DAYS_VIEW = true

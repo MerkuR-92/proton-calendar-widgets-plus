@@ -160,13 +160,17 @@ class SettingsCalendarListAdapter(
                 }
             }
 
+            val calendarSettingsCanBeEdited = (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
+                    (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) || // subscribed calendar
+                    (calendar.isSharedWithMe && FeatureFlag.ALARMS_IN_SHARED_CALENDARS) // shared calendar
+
             // Only show menu icon when calendar can be edited
-            calendarItemMenuIcon.visibleOrGone((calendar.isSubscribed.not() && calendar.isOwner) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemMenuIcon.visibleOrGone(calendarSettingsCanBeEdited)
 
             // Only allow item click when calendar can be edited
-            calendarItemPress.visibleOrGone((calendar.isSubscribed.not() && calendar.isOwner) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS))
+            calendarItemPress.visibleOrGone(calendarSettingsCanBeEdited)
 
-            if ((calendar.isSubscribed.not() && calendar.isOwner) || (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS)) {
+            if (calendarSettingsCanBeEdited) {
                 // On item click
                 calendarItemPress.setOnSingleClickListener {
                     listener(calendar)

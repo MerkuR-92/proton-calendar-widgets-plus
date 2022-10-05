@@ -182,8 +182,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 // Init form for existing calendar
                 calendarFormViewModel.initUpdateCalendarForm(it)
 
-                // hide "default event duration" for Subscribed Calendars, no need to use LiveData for this
-                calendar_form_default_event_duration_layout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed)
+                // hide "default event duration" for Subscribed and Shared Calendars
+                calendar_form_default_event_duration_layout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed && !calendarFormViewModel.calendarIsSharedWithMe)
             } ?: run {
                 // Init character limit text
                 calendar_form_name_value.helpText = resources.getQuantityString(
