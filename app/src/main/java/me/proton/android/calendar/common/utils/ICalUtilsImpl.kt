@@ -679,14 +679,14 @@ object ICalUtilsImpl : ICalUtils {
         return this.filter { it.action == 2 }
     }
 
-    override fun injectVAlarmsIntoSubscribedEvents(
+    override fun injectVAlarmsIntoSubscribedOrSharedEvents(
         events: List<Event>,
         calendarSettings: List<CalendarSettingsEntity>,
         json: Json
     ): List<Event> {
         events.map { event ->
             event.apply {
-                if (event.calendar.isSubscribed && event.iCalEvent.alarms.isEmpty()) {
+                if ((event.calendar.isSubscribed || event.calendar.isSharedWithMe) && event.iCalEvent.alarms.isEmpty()) {
                     calendarSettings.find { it.calendarId == event.calendar.id }?.getDefaultAlarms(json, event.isAllDay())?.let { alarms ->
                         alarms.forEach {
                             event.iCalEvent.addAlarm(it)

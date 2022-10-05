@@ -178,7 +178,7 @@ interface ICalUtils {
      * Events from Subscribed Calendars have no VAlarms inside ICS, so we take the default Alarms for that Calendar
      * and inject it when needed, because all the other logic relies on having them inside [VEvent] object.
      */
-    fun injectVAlarmsIntoSubscribedEvents(events: List<Event>, calendarSettings: List<CalendarSettingsEntity>, json: Json): List<Event>
+    fun injectVAlarmsIntoSubscribedOrSharedEvents(events: List<Event>, calendarSettings: List<CalendarSettingsEntity>, json: Json): List<Event>
 
     fun isCalendarChangeAllowed(from: Event, to: Event): Boolean
 

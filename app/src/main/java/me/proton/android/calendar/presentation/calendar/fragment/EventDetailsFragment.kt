@@ -524,7 +524,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             lifecycleScope.launch {
-                val alarmLabels = if (event.calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) {
+                val alarmLabels = if ((event.calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) || (event.calendar.isSharedWithMe && FeatureFlag.ALARMS_IN_SHARED_CALENDARS)) {
                     calendarViewModel.getDefaultAlarms(event.calendar.id, event.isAllDay())
                         ?: emptyList<VAlarm>().also {
                             logger.e("could not get DefaultAlarms in EventDetailsFragment for subscribed event")

@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.content.Context
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -61,8 +60,8 @@ class UpdateAlarmsUseCase @Inject constructor(
                 transformEventUseCase.execute(it)
             } }
 
-            val transformedChainWithInjectedAlarms = if (FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) {
-                ICalUtilsImpl.injectVAlarmsIntoSubscribedEvents(transformedChain, database.calendarSettingsDao().select(), json)
+            val transformedChainWithInjectedAlarms = if (FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS || FeatureFlag.ALARMS_IN_SHARED_CALENDARS) {
+                ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(transformedChain, database.calendarSettingsDao().select(), json)
             } else transformedChain
 
             val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChainWithInjectedAlarms, fromZonedDateTime, "TODO").onlyDisplayType()

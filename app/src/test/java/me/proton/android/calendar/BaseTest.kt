@@ -5,7 +5,7 @@ import me.proton.android.calendar.domain.model.Event
 
 internal abstract class BaseTest {
 
-    fun eventForICalString(iCalString: String, eventId: String? = null, type: Int = 0): Event {
+    fun eventForICalString(iCalString: String, eventId: String? = null, type: Int = 0, calendarIsSharedWithMe: Boolean = false): Event {
         return Event.from(eventId ?: "event-id", me.proton.android.calendar.domain.model.Calendar(
             "calendar-id",
             "calendar",
@@ -14,7 +14,7 @@ internal abstract class BaseTest {
             1,
             true,
             type,
-            127
+            if (calendarIsSharedWithMe) (127 and 16.inv() /* remove bit with write permissions */) else 127
         ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!
     }
 
