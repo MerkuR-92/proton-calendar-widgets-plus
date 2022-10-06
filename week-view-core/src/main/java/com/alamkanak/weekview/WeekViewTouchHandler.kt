@@ -25,7 +25,8 @@ internal class WeekViewTouchHandler(
                     break
                 }
             }
-            viewState.dateRange[dayClicked]
+            val dateRange = viewState.createDateRange(viewState.firstVisibleDate).validate(viewState).toMutableList()
+            dateRange[dayClicked]
         }
     }
 

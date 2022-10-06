@@ -58,7 +58,6 @@ class WeekViewAdapter(
     }
 
     override fun onEmptyViewLongClick(time: LocalDateTime) {
-        context.showToast("Empty view long-clicked at ${defaultDateTimeFormatter.format(time)}")
     }
 
     override fun onLoadMore(startDate: LocalDate, endDate: LocalDate) {
