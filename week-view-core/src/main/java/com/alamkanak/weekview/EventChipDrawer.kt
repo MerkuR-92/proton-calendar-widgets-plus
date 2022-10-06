@@ -268,7 +268,14 @@ internal class EventChipDrawer(
             } else viewState.eventPaddingVertical.toFloat()
         }
 
-        val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2
+        val eventCountText = if (viewState.numberOfVisibleDays == 1 && eventChip.event.isMultiDay) {
+            val dayCount = daysDiff(eventChip.event.startTime.atStartOfDay, eventChip.event.endTime.atEndOfDay)
+            val eventCountText = "${eventChip.index + 1}/$dayCount"
+            eventCountText
+        } else ""
+        val eventCountTextWidth = textLayout.paint.measureText(eventCountText)
+        val eventCountMargin = if (eventCountTextWidth > 0) viewState.eventPaddingHorizontal * 2 else 0
+        val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2 - eventCountTextWidth - eventCountMargin
         // Use ellipsize to calculate the max length we can draw
         val ellipsizedTitle = TextUtils.ellipsize(
             if (multiDayTimeText.isEmpty()) textLayout.text
@@ -277,6 +284,23 @@ internal class EventChipDrawer(
             titleWidth,
             TextUtils.TruncateAt.END
         )
+
+        if (eventCountText.isNotBlank()) {
+            withTranslation(
+                x = bounds.right - eventCountTextWidth - viewState.eventPaddingHorizontal,
+                y = bounds.top + verticalOffset
+            ) {
+                draw(
+                    eventCountText.semibold().toTextLayout(
+                        textPaint = textLayout.paint,
+                        width = eventCountTextWidth.toInt(),
+                        alignment = textLayout.alignment,
+                        spacingMultiplier = textLayout.spacingMultiplier,
+                        spacingExtra = textLayout.spacingAdd
+                    )
+                )
+            }
+        }
 
         withTranslation(
             x = horizontalOffset,

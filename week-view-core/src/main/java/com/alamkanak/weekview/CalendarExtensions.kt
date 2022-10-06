@@ -181,6 +181,13 @@ internal val Calendar.daysFromToday: Int
         return (diff / DAY_IN_MILLIS).roundToInt()
     }
 
+internal fun daysDiff(firstDate: Calendar, secondDate: Calendar): Int {
+    val diff =
+        if (firstDate.isBefore(secondDate)) (secondDate.timeInMillis - firstDate.timeInMillis).toFloat()
+        else (firstDate.timeInMillis - secondDate.timeInMillis).toFloat()
+    return (diff / DAY_IN_MILLIS).roundToInt()
+}
+
 internal fun today() = now().atStartOfDay
 
 internal fun now() = Calendar.getInstance()
