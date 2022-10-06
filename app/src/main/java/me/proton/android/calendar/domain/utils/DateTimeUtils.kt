@@ -85,9 +85,9 @@ interface DateTimeUtils {
 
     fun LocalDate.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDate
 
-    fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate
+    fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate?
 
     fun LocalDateTime.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDateTime
 
-    fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime
+    fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime?
 }

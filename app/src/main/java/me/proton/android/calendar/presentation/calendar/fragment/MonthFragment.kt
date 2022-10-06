@@ -206,19 +206,7 @@ class MonthFragment : BaseFragment() {
             textField.visibility = View.VISIBLE
         }
         buttonToday.setOnSingleClickListener {
-            if (calendarViewModel.viewMode.value != ViewMode.WEEK) {
-                val todayDate = LocalDate.now(timeZoneId)
-                calendarViewModel.handleDaySelected(todayDate)
-
-                weekView.scrollToDateTime(dateTime = LocalDateTime.now(timeZoneId))
-            } else {
-                val todayDate = LocalDateTime.now(timeZoneId)
-                val weekStart = calendarViewModel.weekStart.value
-                val firstDayOfCurrentWeek = todayDate.firstDayOfWeek(weekStart)
-
-                calendarViewModel.handleDaySelected(firstDayOfCurrentWeek.toLocalDate())
-                weekView.scrollToDateTime(dateTime = firstDayOfCurrentWeek)
-            }
+            calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId))
         }
     }
 
@@ -609,7 +597,19 @@ class MonthFragment : BaseFragment() {
                 // TODO Needed ? Or use selectedDate only ?
             },
             rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
-                calendarViewModel.handleDaySelected(firstVisibleDate)
+                if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
+                    // For week view we need to use set date as first day of the week so that we stick to user week start choice
+                    lifecycleScope.launch {
+                        val selectedDate = calendarViewModel.selectedDate.value
+                        calendarViewModel.getWeekStart()?.let { weekStart ->
+                            if (selectedDate?.firstDayOfWeek(weekStart) != firstVisibleDate) {
+                                calendarViewModel.handleDaySelected(firstVisibleDate)
+                            }
+                        }
+                    }
+                } else {
+                    calendarViewModel.handleDaySelected(firstVisibleDate)
+                }
             },
             viewClickHandler = { startTime, isAllDay ->
                 openCreateEventForm(isAllDay, startTime)
@@ -660,7 +660,19 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
+        if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
+            // For week view we need to use set date as first day of the week so that we stick to user week start choice
+            lifecycleScope.launch {
+                calendarViewModel.getWeekStart()?.let { weekStart ->
+                    selectedDate.firstDayOfWeek(weekStart)?.let {
+                        if (selectedDateTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedDateTime.toLocalTime()))
+                        else if (selectedDateTime != null) weekView.setDateTime(it.atTime(selectedDateTime.toLocalTime()))
+                        else if (animate) weekView.scrollToDate(it)
+                        else weekView.setDate(it)
+                    }
+                }
+            }
+        } else if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
             if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
             else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
             else if (animate) weekView.scrollToDate(selectedDate)

@@ -428,10 +428,10 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
-    override fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate {
+    override fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate? {
         val weekStartDayOfWeek = weekStart?.let {
             AndroidUtils.getWeekStartDayOfWeek(weekStart)
-        } ?: WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        } ?: return null
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
@@ -439,10 +439,10 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
-    override fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime {
+    override fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime? {
         val weekStartDayOfWeek = weekStart?.let {
             AndroidUtils.getWeekStartDayOfWeek(weekStart)
-        } ?: WeekFields.of(Locale.getDefault()).firstDayOfWeek
+        } ?: return null
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
