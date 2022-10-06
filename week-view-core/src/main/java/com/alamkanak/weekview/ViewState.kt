@@ -590,7 +590,7 @@ internal class ViewState {
 
     private fun updateDateRange() {
         val originX = currentOrigin.x
-        val daysFromOrigin = round(originX / dayWidth).toInt() * (-1)
+        val daysFromOrigin = ceil(originX / dayWidth).toInt() * (-1)
 
         startPixel = if (isLtr) {
             timeColumnWidth + originX + dayWidth * daysFromOrigin

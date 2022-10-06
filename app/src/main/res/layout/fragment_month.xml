@@ -148,7 +148,7 @@
         app:showNowLineDot="true"
         app:showTimeColumnSeparator="true"
         app:showWeekNumber="true"
-        app:timeColumnPadding="16dp"
+        app:timeColumnPadding="10dp"
         app:timeColumnSeparatorStrokeWidth="1dp"
         app:timeColumnTextColor="@color/text_norm"
         app:timeColumnTextSize="12sp"
