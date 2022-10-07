@@ -326,10 +326,11 @@ class EventViewModel @Inject constructor(
         // Try to get default calendar if it exists
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
 
-        if (defaultCalendar == null || !defaultCalendar.isActive) {
+        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
             // Fallback to first active user calendar
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull()
-                ?: return InitResult.Error("EventViewModel: no active calendars for user")
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull {
+                it.allowEditEvents
+            } ?: return InitResult.Error("EventViewModel: no active calendars for user")
             defaultCalendarId = defaultCalendar.id
         }
 
