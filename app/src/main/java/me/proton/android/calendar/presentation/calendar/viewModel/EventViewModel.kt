@@ -111,7 +111,10 @@ class EventViewModel @Inject constructor(
         object EventDoesNotExist : InitResult()
         class InitEventSuccess(val event: Event) : InitResult()
         class InitDefaultCalendarSuccess(val calendar: Calendar?) : InitResult()
-        class Error(val message: String) : InitResult()
+        sealed class Error(val message: String): InitResult() {
+            class Default(val errorMessage: String) : Error(errorMessage)
+            class InitDefaultCalendarError(val errorMessage: String) : Error(errorMessage)
+        }
     }
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -273,14 +276,14 @@ class EventViewModel @Inject constructor(
             } else null
 
         // Default calendar is mandatory on event creation
-        if (eventId == null && defaultCalendar == null) return InitResult.Error("EventViewModel: could not get default calendar")
+        if (eventId == null && defaultCalendar == null) return InitResult.Error.InitDefaultCalendarError("EventViewModel: could not get default calendar")
 
         calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
-            ?: return InitResult.Error("EventViewModel: could not get Calendar User Settings")
+            ?: return InitResult.Error.Default("EventViewModel: could not get Calendar User Settings")
 
         userSettings = userSettingsRepository.getUserSettingsEntity(userId, database)
 
-        user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error("EventViewModel: could not get User")
+        user = userManager.getUserOrNull(userId, logger) ?: return InitResult.Error.Default("EventViewModel: could not get User")
 
         displayTimeZoneId = calendarUserSettings.primaryTimezone
 
@@ -321,7 +324,7 @@ class EventViewModel @Inject constructor(
     private suspend fun initializeDefaultCalendar(): InitResult {
         // Try to get default calendar id if it exists
         var defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return InitResult.Error("EventViewModel: could not get default calendar ID")
+            ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: could not get default calendar ID")
 
         // Try to get default calendar if it exists
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
@@ -330,12 +333,12 @@ class EventViewModel @Inject constructor(
             // Fallback to first active user calendar
             defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull {
                 it.allowEditEvents
-            } ?: return InitResult.Error("EventViewModel: no active calendars for user")
+            } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
             defaultCalendarId = defaultCalendar.id
         }
 
         // Load settings for given calendar id and stores them in calendarSettings
-        if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error("EventViewModel: could not get CalendarSettings")
+        if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error.Default("EventViewModel: could not get CalendarSettings")
 
         return InitResult.InitDefaultCalendarSuccess(defaultCalendar)
     }
@@ -412,7 +415,7 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.type,
                 defaultCalendar.permissions
             ), newICalendar, 0
-        ) ?: return InitResult.Error("could not create Event using factory method")
+        ) ?: return InitResult.Error.Default("could not create Event using factory method")
 
         setDefaultAlarms(newEvent, this.calendarSettings)
         return InitResult.InitEventSuccess(newEvent)
@@ -463,7 +466,7 @@ class EventViewModel @Inject constructor(
 
         if (editMode) {
             // Load the settings for the event's calendar
-            val event = dbEventWithOccurrence ?: dbEvent ?: return InitResult.Error("EventViewModel: event was null when loading settings for calendar in EventViewModel")
+            val event = dbEventWithOccurrence ?: dbEvent ?: return InitResult.Error.Default("EventViewModel: event was null when loading settings for calendar in EventViewModel")
             loadSettingsForCalendar(event.calendar.id)
         }
 
@@ -515,7 +518,7 @@ class EventViewModel @Inject constructor(
 
             InitResult.InitEventSuccess(adjustedEvent)
 
-        } else InitResult.Error("EventViewModel: could not generate event with occurrence in EventViewModel")
+        } else InitResult.Error.Default("EventViewModel: could not generate event with occurrence in EventViewModel")
     }
 
     /**
