@@ -128,7 +128,9 @@ private class HeaderUpdater(
     }
 
     private fun calculateStaticLayoutForDate(date: Calendar): Pair<StaticLayout, StaticLayout> {
-        val weekDayLabel = viewState.weekDayFormatter(date)
+        val weekDayLabel =
+            if (viewState.numberOfVisibleDays > 6) viewState.weekDayFormatter(date).replaceFirstChar { it.titlecase() }
+            else viewState.weekDayFormatter(date)
         val dateLabel = viewState.dateFormatter(date)
 
         val textPaint = when {
