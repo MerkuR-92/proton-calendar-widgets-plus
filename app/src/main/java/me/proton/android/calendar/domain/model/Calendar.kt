@@ -40,6 +40,6 @@ data class Calendar(
         val isSubscribed: Boolean get() = type == 1
 
         val isOwner: Boolean get() = permissions and 2 == 2
-        val allowEditEvents: Boolean get() = permissions and 16 == 16
+        val allowEditEvents: Boolean get() = permissions and 2 == 2 // TODO Change to 16 so that we check actual write permissions
 }
     // TODO fields need to be duplicated here, plus local metadata added
