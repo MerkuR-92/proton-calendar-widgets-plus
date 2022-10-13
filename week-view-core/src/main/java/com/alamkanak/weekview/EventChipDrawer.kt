@@ -278,13 +278,18 @@ internal class EventChipDrawer(
         val eventCountMargin = if (eventCountTextWidth > 0) viewState.eventPaddingHorizontal * 2 else 0
         val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2 - eventCountTextWidth - eventCountMargin
         // Use ellipsize to calculate the max length we can draw
-        val ellipsizedTitle = TextUtils.ellipsize(
-            if (multiDayTimeText.isEmpty()) textLayout.text
-            else "$multiDayTimeText ${textLayout.text}",
-            textLayout.paint,
-            titleWidth,
-            TextUtils.TruncateAt.END
-        )
+        val ellipsizedTitle =
+            if (eventChip.event.isAllDay) {
+                TextUtils.ellipsize(
+                    if (multiDayTimeText.isEmpty()) textLayout.text
+                    else "$multiDayTimeText ${textLayout.text}",
+                    textLayout.paint,
+                    titleWidth,
+                    TextUtils.TruncateAt.END
+                )
+            } else {
+                textLayout.text
+            }
 
         if (eventCountText.isNotBlank()) {
             withTranslation(
