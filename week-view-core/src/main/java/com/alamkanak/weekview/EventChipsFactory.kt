@@ -14,6 +14,7 @@ internal class EventChipsFactory {
 
         for (group in groups) {
             computePositionOfEvents(group, viewState)
+            columnCount = 0
         }
 
         return eventChips
