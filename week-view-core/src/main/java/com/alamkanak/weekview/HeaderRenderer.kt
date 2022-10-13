@@ -12,6 +12,7 @@ import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
 import java.util.Calendar
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 internal class HeaderRenderer(
@@ -95,7 +96,7 @@ private class HeaderUpdater(
         dateLabels: List<Pair<StaticLayout, StaticLayout>>
     ) {
         val maximumLayoutHeight = dateLabels.map {
-            if (viewState.numberOfVisibleDays == 1) {
+            if (viewState.isSingleDay) {
                 it.first.height.toFloat() + it.second.height.toFloat()
             } else {
                 it.first.height.toFloat()
@@ -145,7 +146,7 @@ private class HeaderUpdater(
         }
         val datePaint = TextPaint(textPaint).apply {
             textAlign = Paint.Align.CENTER
-            if (viewState.numberOfVisibleDays == 1) textSize = viewState.singleDayNumberHeaderTextSize
+            if (viewState.isSingleDay) textSize = viewState.singleDayNumberHeaderTextSize
         }
         return Pair(
             weekDayLabel.toTextLayout(textPaint = weekDayPaint, width = viewState.dayWidth.toInt()),
@@ -212,10 +213,18 @@ private class DateLabelsDrawer(
         val weekDayWidth = weekDayBounds.right - weekDayBounds.left
         val spaceWidth = viewState.headerLabelsInnerMargin
         val dateWidth = dateBounds.right - dateBounds.left
-        val sumLabelWidth = weekDayWidth + dateWidth + spaceWidth
-        val weekDayStartX = startPixel + (viewState.dayWidth - sumLabelWidth) / 2f
 
-        val squareStartX = weekDayStartX + weekDayWidth + spaceWidth
+        val squareStartX: Float
+        val weekDayStartX: Float
+        if (viewState.numberOfVisibleDays > 6) {
+            squareStartX = startPixel + viewState.dayWidth - viewState.headerLabelsInnerMargin - viewState.headerTodaySquareSize
+            weekDayStartX = squareStartX - spaceWidth - weekDayWidth
+        } else {
+            val sumLabelWidth = weekDayWidth + dateWidth + spaceWidth
+            weekDayStartX = startPixel + (viewState.dayWidth - sumLabelWidth) / 2f
+            squareStartX = weekDayStartX + weekDayWidth + spaceWidth
+        }
+
         if (date.withTimeZone(viewState.customTimeZone).isSameDate(nowAtTimezone(viewState.customTimeZone))) {
             val rect = RectF(
                 squareStartX,
@@ -237,6 +246,7 @@ private class DateLabelsDrawer(
         }
 
         viewState.headerDateLabelHeight = viewState.headerPadding + weekDayTextLayout.height + viewState.headerPadding
+        // Draw weekday
         withTranslation(
             x = weekDayStartX,
             y = viewState.headerPadding,
@@ -245,12 +255,22 @@ private class DateLabelsDrawer(
         }
 
         val dateStartX = squareStartX + viewState.headerTodaySquareSize / 2
+        // Draw date
         withTranslation(
             x = dateStartX,
             y = viewState.headerPadding,
         ) {
             draw(dateTextLayout)
         }
+
+        // Draw labels separator line
+        drawLine(
+            startPixel + viewState.dayWidth,
+            viewState.headerPadding,
+            startPixel + viewState.dayWidth,
+            viewState.headerHeight,
+            viewState.headerBottomLinePaint
+        )
     }
 }
 
@@ -282,6 +302,8 @@ private class AllDayEventsUpdater(
         eventsLabelLayouts.clear()
 
         val datesWithStartPixels = viewState.dateRangeWithStartPixels
+        // Keep previous date vertical index that are taken
+        val previousIndexTaken = arrayListOf<Int>()
         for ((date, startPixel) in datesWithStartPixels) {
             // If we use a horizontal margin in the day view, we need to offset the start pixel.
             val modifiedStartPixel = when {
@@ -289,15 +311,53 @@ private class AllDayEventsUpdater(
                 else -> startPixel
             }
 
-            val eventChips = eventChipsCacheProvider()?.allDayEventChipsByDate(date).orEmpty()
+            // Sort events by days count and then alphabetically
+            val eventChips = eventChipsCacheProvider()?.allDayEventChipsByDate(date).orEmpty().sortedWith(
+                compareByDescending<EventChip> { it.event.daysCount }.thenBy { it.event.title.toString() })
+            // Keep current date vertical index that are taken
+            val currentIndexTaken = arrayListOf<Int>()
             eventChips.forEachIndexed { index, eventChip ->
-                eventChip.updateBounds(index = index, startPixel = modifiedStartPixel)
+                if (viewState.isSingleDay) {
+                    eventChip.verticalIndex = index
+                    eventChip.updateBounds(startPixel = modifiedStartPixel)
+                } else {
+
+                    var modifiedIndex: Int = index
+                    var topPixel: Float? = null
+                    for (i in eventChips.indices) {
+                        // Jump to next vertical index if space is already taken
+                        if (previousIndexTaken.any { it == modifiedIndex }) modifiedIndex++
+                        else break
+                    }
+
+                    eventsLabelLayouts.forEach {
+                        if (it.key.eventId == eventChip.eventId) {
+                            topPixel = it.key.bounds.top
+                            modifiedIndex = it.key.verticalIndex
+                        }
+                    }
+                    eventChip.verticalIndex = modifiedIndex
+                    if (eventChip.isNotLastIndex) currentIndexTaken.add(modifiedIndex)
+                    if (eventChip.event.isMultiDay) {
+                        // Get start index of last date of multi day
+                        val firstPixelForStartDate = getClosestDatePixelStart(datesWithStartPixels, eventChip.event.startTime.atStartOfDay.timeInMillis)
+                        val firstPixelForEndDate = getClosestDatePixelStart(datesWithStartPixels, eventChip.event.endTime.atStartOfDay.timeInMillis)
+                        val lastPixelForEndDate = firstPixelForEndDate?.let {
+                            firstPixelForEndDate + viewState.dayWidth
+                        }
+                        eventChip.updateBounds(modifiedStartPixel, firstPixelForStartDate, lastPixelForEndDate, topPixel)
+                    } else {
+                        eventChip.updateBounds(startPixel = modifiedStartPixel, topPixel = topPixel)
+                    }
+                }
                 if (eventChip.bounds.isNotEmpty) {
                     eventsLabelLayouts[eventChip] = textFitter.fitAllDayEvent(eventChip)
                 } else {
                     eventsLabelLayouts.remove(eventChip)
                 }
             }
+            previousIndexTaken.clear()
+            previousIndexTaken.addAll(currentIndexTaken)
         }
 
         val maximumChipHeight = eventsLabelLayouts.keys
@@ -314,8 +374,33 @@ private class AllDayEventsUpdater(
         viewState.maxNumberOfAllDayEvents = maximumChipsPerDay
     }
 
-    private fun EventChip.updateBounds(index: Int, startPixel: Float) {
-        val candidate = boundsCalculator.calculateAllDayEvent(index, eventChip = this, startPixel)
+    private fun getClosestDatePixelStart(dates: List<Pair<Calendar, Float>>, dateToFind: Long): Float? {
+        var minDiff: Long = -1
+        var pixel: Float? = null
+        dates.forEach {
+            val date = it.first
+            val diffStart: Long = abs(dateToFind - date.timeInMillis)
+            if (minDiff == -1L || diffStart < minDiff) {
+                minDiff = diffStart
+                pixel = it.second
+            }
+        }
+        return pixel
+    }
+
+    private fun EventChip.updateBounds(
+        startPixel: Float,
+        firstPixelForStartDate: Float? = null,
+        lastPixelForEndDate: Float? = null,
+        topPixel: Float? = null
+    ) {
+        val candidate = boundsCalculator.calculateAllDayEvent(
+            eventChip = this,
+            startPixel,
+            firstPixelForStartDate,
+            lastPixelForEndDate,
+            topPixel
+        )
         if (candidate.isValid) {
             bounds.set(candidate)
         } else {
@@ -340,16 +425,19 @@ internal class AllDayEventsDrawer(
     private val eventChipDrawer = EventChipDrawer(viewState)
 
     override fun draw(canvas: Canvas) = canvas.drawInBounds(viewState.headerBounds) {
+        val previousEvents = arrayListOf<Pair<EventChip, StaticLayout>>()
         for (date in viewState.dateRange) {
             val events = allDayEventLayouts
                 .filter { it.key.startTime.isSameDate(date) }
                 .toList()
 
             if (viewState.arrangeAllDayEventsVertically) {
-                renderEventsVertically(events.sortedBy { it.first.bounds.top })
+                renderEventsVertically(events.sortedBy { it.first.bounds.top }, previousEvents)
             } else {
                 renderEventsHorizontally(events)
             }
+            previousEvents.clear()
+            previousEvents.addAll(events)
         }
     }
 
@@ -359,10 +447,16 @@ internal class AllDayEventsDrawer(
         }
     }
 
-    private fun Canvas.renderEventsVertically(events: List<Pair<EventChip, StaticLayout>>) {
+    private fun Canvas.renderEventsVertically(events: List<Pair<EventChip, StaticLayout>>, previousEvents: List<Pair<EventChip, StaticLayout>>) {
         // Un-hide all events. To prevent any click handler from mapping a click to a hidden event,
         // we set isHidden to true for all events that aren't shown in the collapsed state.
-        events.forEach { it.first.isHidden = false }
+        events.forEach { event ->
+            if (event.first.event.isMultiDay) {
+                // Hide multi day event occurrence if previous one was hidden
+                val previousEvent = previousEvents.firstOrNull { it.first.eventId == event.first.eventId }
+                event.first.isHidden = previousEvent?.first?.isHidden ?: false
+            } else event.first.isHidden = false
+        }
 
         if (viewState.allDayEventsExpanded || events.size <= 3) {
             // Draw them all!
@@ -397,17 +491,23 @@ internal class AllDayEventsDrawer(
 
         val textLayout = text.semibold().toTextLayout(textPaint, priorEventChip.bounds.width().toInt())
 
+        val datesWithStartPixels = viewState.dateRangeWithStartPixels
+        val left =
+            if (priorEventChip.event.isMultiDay) datesWithStartPixels.firstOrNull { it.first.isSameDate(priorEventChip.startTime) }?.second ?: priorEventChip.bounds.left
+            else priorEventChip.bounds.left
+        val right =
+            if (priorEventChip.event.isMultiDay) left + viewState.dayWidth - viewState.columnGap
+            else priorEventChip.bounds.right
+
         val x = if (viewState.isLtr) {
-            priorEventChip.bounds.left + viewState.eventPaddingHorizontal.toFloat()
+            left + viewState.eventPaddingHorizontal.toFloat()
         } else {
-            priorEventChip.bounds.right - viewState.eventPaddingHorizontal.toFloat()
+            right - viewState.eventPaddingHorizontal.toFloat()
         }
 
         // Draw text background
         val radius = viewState.eventCornerRadius.toFloat()
-        val left = priorEventChip.bounds.left
         val top = priorEventChip.bounds.bottom + viewState.eventMarginVertical
-        val right = priorEventChip.bounds.right
         val bottom = priorEventChip.bounds.bottom + viewState.eventPaddingVertical * 2 + textLayout.height
         val backgroundRectF = RectF(left, top, right, bottom)
         viewState.allDayMoreMap[priorEventChip.startTime] = backgroundRectF
@@ -462,7 +562,7 @@ private class HeaderDrawer(
             canvas.drawAllDayEventsToggleArrow()
         }
 
-        if (viewState.numberOfVisibleDays == 1 && eventChipsCacheProvider()?.allEventChipsInDateRange(viewState.dateRange)?.isEmpty() == true) {
+        if (viewState.isSingleDay && eventChipsCacheProvider()?.allEventChipsInDateRange(viewState.dateRange)?.isEmpty() == true) {
             canvas.drawNoEventsLabel()
         }
 

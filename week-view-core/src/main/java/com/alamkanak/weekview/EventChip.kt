@@ -31,6 +31,11 @@ internal data class EventChip(
     var bounds: RectF = RectF()
 
     /**
+     * The vertical index at which [EventChip] will be drawn.
+     */
+    var verticalIndex: Int = 0
+
+    /**
      * We display events with a minimum height of 10min
      */
     val minimumHeightMinutes = 10
@@ -77,6 +82,12 @@ internal data class EventChip(
 
     var eventTextDoesNotFit: Boolean = false
     var verticalPaddingReduction: Int = 0
+
+    val isLastIndex: Boolean
+        get() = index + 1 == event.daysCount
+
+    val isNotLastIndex: Boolean
+        get() = index + 1 != event.daysCount
 
     fun setEmpty() {
         bounds.setEmpty()

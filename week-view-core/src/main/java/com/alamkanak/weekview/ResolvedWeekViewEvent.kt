@@ -62,6 +62,9 @@ internal sealed class ResolvedWeekViewEntity {
     internal val isSingleDay: Boolean
         get() = startTime.isSameDate(endTime)
 
+    internal val daysCount: Int
+        get() = if (isSingleDay) 1 else daysDiff(startTime.atStartOfDay, endTime.atEndOfDay)
+
     internal fun isWithin(
         minHour: Int,
         maxHour: Int

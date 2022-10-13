@@ -14,7 +14,7 @@ internal class WeekViewTouchHandler(
     var adapter: WeekView.Adapter<*>? = null
 
     private fun getDateClicked(x: Float): Calendar {
-        return if (viewState.numberOfVisibleDays == 1) viewState.firstVisibleDate
+        return if (viewState.isSingleDay) viewState.firstVisibleDate
         else {
             val gridWidth = viewState.headerBounds.right - viewState.headerBounds.left
             val dayWidth = gridWidth / viewState.numberOfVisibleDays

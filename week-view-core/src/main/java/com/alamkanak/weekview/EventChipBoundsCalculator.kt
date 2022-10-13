@@ -67,9 +67,11 @@ internal class EventChipBoundsCalculator(
     }
 
     fun calculateAllDayEvent(
-        index: Int,
         eventChip: EventChip,
-        startPixel: Float
+        startPixel: Float,
+        firstPixelForStartDate: Float?,
+        lastPixelForEndDate: Float?,
+        topPixel: Float?
     ): RectF {
         val padding = viewState.headerPadding
         val dayWidth = viewState.drawableDayWidth
@@ -84,29 +86,57 @@ internal class EventChipBoundsCalculator(
         val chipHeight = viewState.allDayEventTextPaint.textSize + viewState.eventPaddingVertical * 2
 
         val top = if (viewState.arrangeAllDayEventsVertically) {
-            val previousChipsHeight = index * (eventChip.bounds.height() + viewState.eventMarginVertical)
-            val fixedPreviousChipsHeight =
-                if (previousChipsHeight > 0 && previousChipsHeight < chipHeight) index * (chipHeight + viewState.eventMarginVertical)
-                else previousChipsHeight
-            dateLabelHeight + fixedPreviousChipsHeight
+            if (eventChip.event.isMultiDay && topPixel != null) {
+                // Use top pixel info so that it stays vertically aligned with previous child of multi day event
+                topPixel
+            } else {
+                val previousChipsHeight = eventChip.verticalIndex * (eventChip.bounds.height() + viewState.eventMarginVertical)
+                val fixedPreviousChipsHeight =
+                    if (previousChipsHeight > 0 && previousChipsHeight < chipHeight) eventChip.verticalIndex * (chipHeight + viewState.eventMarginVertical)
+                    else previousChipsHeight
+                dateLabelHeight + fixedPreviousChipsHeight
+            }
         } else {
             dateLabelHeight
         }
 
         var left = if (viewState.arrangeAllDayEventsVertically) {
-            startPixel + leftTextOffset
+
+            if (viewState.isSingleDay) {
+                startPixel + leftTextOffset
+            } else {
+                val computeLeft = if (eventChip.event.isMultiDay && startPixel < viewState.timeColumnWidth && eventChip.isNotLastIndex) {
+                    // startPixel < viewState.timeColumnWidth -> Scrolling right
+                    viewState.timeColumnWidth
+                } else if (eventChip.event.isMultiDay && startPixel > viewState.timeColumnWidth && eventChip.index != 0) {
+                    // startPixel > viewState.timeColumnWidth -> Scrolling left
+                    viewState.timeColumnWidth
+                } else {
+                    startPixel + leftTextOffset
+                }
+
+                // Make sure we don't draw too far left when scrolling back
+                if (firstPixelForStartDate != null && computeLeft < firstPixelForStartDate) firstPixelForStartDate
+                else computeLeft
+            }
         } else {
             startPixel + leftTextOffset + eventChip.relativeStart * dayWidth
         }
 
         var right = if (viewState.arrangeAllDayEventsVertically) {
-            left + dayWidth
+            if (viewState.isSingleDay || eventChip.event.isSingleDay) {
+                left + dayWidth
+            } else {
+                lastPixelForEndDate?.let {it - viewState.columnGap} ?: (left + dayWidth)
+            }
         } else {
             left + eventChip.relativeWidth * dayWidth
         }
 
         val isLeftMostColumn = left == startPixel
         val isRightMostColumn = right == startPixel + dayWidth
+
+        val endOfView = viewState.viewWidth.toFloat() == startPixel + viewState.dayWidth
 
         if (!isLeftMostColumn) {
             left += viewState.overlappingEventGap / 2f

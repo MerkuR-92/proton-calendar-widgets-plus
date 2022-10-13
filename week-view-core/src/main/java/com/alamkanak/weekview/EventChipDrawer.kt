@@ -29,6 +29,10 @@ internal class EventChipDrawer(
         canvas: Canvas,
         textLayout: StaticLayout?
     ) = with(canvas) {
+
+        // Don't draw event if it is supposed be hidden
+        if (eventChip.isHidden) return@with
+
         val entity = eventChip.event
         val bounds = eventChip.bounds
         val cornerRadius = (entity.style.cornerRadius ?: viewState.eventCornerRadius).toFloat()
@@ -245,9 +249,8 @@ internal class EventChipDrawer(
     ) {
         val bounds = eventChip.bounds
 
-        val isMultiDayFirstDay = eventChip.event.isMultiDay && eventChip.index == 0
         val multiDayTimeText =
-            if (isMultiDayFirstDay && eventChip.event.isNotAllDay) {
+            if (eventChip.event.isMultiDay && eventChip.event.isNotAllDay) {
                 val hour = eventChip.event.startTime.hour
                 val minutes = eventChip.event.startTime.minute
                 viewState.timeFormatter(hour, minutes)
@@ -268,11 +271,9 @@ internal class EventChipDrawer(
             } else viewState.eventPaddingVertical.toFloat()
         }
 
-        val eventCountText = if (viewState.numberOfVisibleDays == 1 && eventChip.event.isMultiDay) {
-            val dayCount = daysDiff(eventChip.event.startTime.atStartOfDay, eventChip.event.endTime.atEndOfDay)
-            val eventCountText = "${eventChip.index + 1}/$dayCount"
-            eventCountText
-        } else ""
+        val eventCountText =
+            if (viewState.isSingleDay && eventChip.event.isMultiDay) "${eventChip.index + 1}/${eventChip.event.daysCount}"
+            else ""
         val eventCountTextWidth = textLayout.paint.measureText(eventCountText)
         val eventCountMargin = if (eventCountTextWidth > 0) viewState.eventPaddingHorizontal * 2 else 0
         val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2 - eventCountTextWidth - eventCountMargin
