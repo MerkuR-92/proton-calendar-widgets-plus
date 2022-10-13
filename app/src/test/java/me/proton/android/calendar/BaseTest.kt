@@ -14,7 +14,9 @@ internal abstract class BaseTest {
             1,
             true,
             type,
-            if (calendarIsSharedWithMe) (127 and 16.inv() /* remove bit with write permissions */) else 127
+            if (calendarIsSharedWithMe) (127 and 2.inv() /* remove bit with owner permissions */) else 127,
+            emptyList(),
+            emptyList()
         ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!
     }
 
