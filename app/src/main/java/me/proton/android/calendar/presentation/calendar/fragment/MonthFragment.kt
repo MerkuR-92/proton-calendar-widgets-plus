@@ -906,6 +906,13 @@ class MonthFragment : BaseFragment() {
                 calendarViewModel.handleDaySelected(it)
                 weekView.scrollToDate(it)
             }
+        } else if (previousViewMode == ViewMode.WEEK) {
+            // We need to adjust the view when coming from week view because it sticks to week start
+            val selectedDate = calendarViewModel.selectedDate.value
+            selectedDate?.let {
+                calendarViewModel.handleDaySelected(it)
+                weekView.scrollToDate(it)
+            }
         }
 
         if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)) return
