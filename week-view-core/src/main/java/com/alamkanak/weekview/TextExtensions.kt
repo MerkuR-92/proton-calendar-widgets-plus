@@ -8,7 +8,6 @@ import android.text.SpannableStringBuilder
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.style.TypefaceSpan
-import com.alamkanak.weekview.base.TextProcessors
 
 internal val CharSequence.processed: CharSequence
     get() = TextProcessors.process(this)

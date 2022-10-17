@@ -1,8 +1,5 @@
-package com.alamkanak.weekview.jsr310
+package com.alamkanak.weekview
 
-import com.alamkanak.weekview.PublicApi
-import com.alamkanak.weekview.WeekView
-import com.alamkanak.weekview.WeekViewEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime

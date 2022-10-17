@@ -9,8 +9,8 @@ import android.text.style.TypefaceSpan
 import androidx.core.content.ContextCompat
 import biweekly.parameter.ParticipationStatus
 import com.alamkanak.weekview.WeekViewEntity
-import com.alamkanak.weekview.jsr310.setEndTime
-import com.alamkanak.weekview.jsr310.setStartTime
+import com.alamkanak.weekview.setEndTime
+import com.alamkanak.weekview.setStartTime
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus

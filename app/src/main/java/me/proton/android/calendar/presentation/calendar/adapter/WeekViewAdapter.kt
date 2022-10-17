@@ -3,9 +3,8 @@ package me.proton.android.calendar.presentation.calendar.adapter
 import android.graphics.RectF
 import android.util.Log
 import com.alamkanak.weekview.WeekViewEntity
-import com.alamkanak.weekview.jsr310.WeekViewPagingAdapterJsr310
+import com.alamkanak.weekview.WeekViewPagingAdapterJsr310
 import me.proton.android.calendar.common.FeatureFlag.DRAG_AND_DROP
-import me.proton.android.calendar.common.utils.AndroidUtils.showToast
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
 import me.proton.android.calendar.domain.model.toWeekViewEntity
 import java.time.LocalDate
@@ -13,7 +12,6 @@ import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import java.util.Calendar
 
 class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,

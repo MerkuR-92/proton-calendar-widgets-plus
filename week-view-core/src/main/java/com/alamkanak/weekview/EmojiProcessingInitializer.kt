@@ -1,10 +1,8 @@
-package com.alamkanak.weekview.emoji
+package com.alamkanak.weekview
 
 import android.content.Context
 import androidx.emoji.text.EmojiCompat
 import androidx.startup.Initializer
-import com.alamkanak.weekview.base.TextProcessor
-import com.alamkanak.weekview.base.TextProcessors
 import java.lang.IllegalStateException
 
 @Suppress("unused")

@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.jsr310
+package com.alamkanak.weekview
 
 import java.time.Instant
 import java.time.LocalDate

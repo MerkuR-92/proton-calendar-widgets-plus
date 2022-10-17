@@ -1,4 +1,4 @@
-package com.alamkanak.weekview.base
+package com.alamkanak.weekview
 
 typealias TextProcessor = (CharSequence) -> CharSequence
 
