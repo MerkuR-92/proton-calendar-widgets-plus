@@ -93,9 +93,9 @@
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_failure">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a></string>
-    <string name="event_signature_verification_in_progress">Verification of the event signature is in progress.</string>
-    <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
+    <string name="event_signature_verification_failure">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
+    <string name="event_signature_verification_in_progress">La vérification de la signature de l\'événement est en cours.</string>
+    <string name="event_signature_verification_network_error">La vérification de la signature de l\'événement a été interrompue par une erreur. <a href="">Essayez à nouveau</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_change_answer_recurring_description">Souhaitez-vous changer votre réponse pour tous les événements de la série?</string>
     <string name="event_change_answer_recurring_overwrite_description">Souhaitez-vous changer votre réponse pour tous les événements de cette série?\nCertaines de vos réponses aux événements précédemment mis à jour par l\'organisateur·rice seront perdues.</string>

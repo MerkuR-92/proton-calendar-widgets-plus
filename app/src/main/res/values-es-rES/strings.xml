@@ -348,7 +348,7 @@
     <string name="settings_theme_info">Este ajuste sólo afecta a la apariencia de la aplicación Proton Calendar en este dispositivo. La aplicación se reiniciará después de cambiar el tema.</string>
     <string name="settings_timezone_title">Zona horaria</string>
     <string name="settings_language_title">Idioma de la aplicación</string>
-    <string name="settings_language_default">Auto detectar</string>
+    <string name="settings_language_default">Detectar automáticamente</string>
     <string name="settings_update_timezone_title">Preguntar para actualizar la configuración de zona horaria</string>
     <string name="settings_update_timezone_subtitle">Si la zona horaria del sistema no coincide con la configuración actual de zona horaria, se te preguntará si quieres actualizarla.</string>
     <string name="settings_update_timezone_checkbox">No volver a preguntarme</string>
@@ -400,9 +400,9 @@
     <string name="create_calendar_limit_reached_paid_manage">Gestionar calendario</string>
     <string name="create_calendar_limit_reached_close">Cerrar</string>
     <string name="create_calendar_limit_reached_free_title">Actualice Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Create up to 20 calendars and access many more exclusive features when you upgrade your plan.</string>
+    <string name="create_calendar_limit_reached_free_description">Crear hasta 20 calendarios y acceder a muchas más funciones exclusivas cuando actualice su plan.</string>
     <string name="create_calendar_limit_reached_free_not_now">Ahora no</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Actualizar</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Mejorar</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
@@ -434,7 +434,7 @@
     <string name="dialog_feedback_rating_best">Maravillosa</string>
     <string name="dialog_feedback_hint">Cuéntanos tu experiencia. (Opcional)</string>
     <string name="dialog_feedback_submit">Enviar</string>
-    <string name="dialog_feedback_submit_thank_you">Thank you! Your feedback helps us improve Proton.</string>
+    <string name="dialog_feedback_submit_thank_you">¡Gracias! Tu feedback nos ayuda a mejorar Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget de Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">No hay eventos hoy</string>
@@ -447,13 +447,13 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Vista del mes</string>
+    <string name="spotlight_dialog_month_view_title">Vista de mes</string>
     <string name="spotlight_dialog_month_view_description">De un vistazo a sus eventos con nuestra nueva vista mensual. Cambie entre vistas usando el menú.</string>
-    <string name="spotlight_dialog_easy_switch_description">Importing events and other data from Google Calendar to Proton Calendar is easier than ever. Our Easy Switch importer will guide you each step of the way.</string>
+    <string name="spotlight_dialog_easy_switch_description">Importar eventos y otros datos del Calendario de Google a Proton Calendar es más fácil que nunca. Nuestro fácil importador te guiará con cada paso.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Iniciar importación</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ahora no</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
-    <string name="spotlight_dialog_auto_invites_description">Now invitations appear in your calendar as pending events. Just open an event to respond.\n\nTo manage this, go to settings.</string>
+    <string name="spotlight_dialog_auto_invites_title">Acepta invitaciones fácilmente</string>
+    <string name="spotlight_dialog_auto_invites_description">Ahora las invitaciones aparecen en tu calendario como eventos pendientes. Solo abre un evento para responder.\n\nPara gestionar esto, acude a ajustes.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Siguiente</string>
     <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
@@ -463,9 +463,9 @@
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
     <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
-    <string name="import_assistant_prepare_import">Preparing import</string>
+    <string name="import_assistant_prepare_import">Preparando importación</string>
     <string name="import_assistant_gathering_data_loader_title">Obteniendo tus datos</string>
-    <string name="import_assistant_summary_title">Import summary</string>
+    <string name="import_assistant_summary_title">Resumen de la importación</string>
     <string name="import_assistant_summary_customize_import">Personalizar importación</string>
     <string name="import_assistant_error">Error en la obtención de los datos</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
@@ -480,7 +480,7 @@
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>
     <string name="import_assistant_new_calendar_badge">Nuevo</string>
-    <string name="import_assistant_merge_calendar_badge">Merged</string>
+    <string name="import_assistant_merge_calendar_badge">Combinado</string>
     <string name="import_assistant_creating_calendars">Creando calendarios nuevos</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Ya casi está…</string>
     <string name="import_assistant_new_calendar_header">Crear nuevo</string>
@@ -492,7 +492,7 @@
     <string name="import_assistant_guide_subtitle">Make the switch to privacy. Easily and securely.</string>
     <string name="import_assistant_guide_description">Move your events and other data from Google to Proton. The Easy Switch importer guides you each step of the way and encrypts your data as it\'s moved.</string>
     <string name="import_assistant_new_import">Nueva importación</string>
-    <string name="import_assistant_previous_import">Previous imports</string>
+    <string name="import_assistant_previous_import">Importaciones anteriores</string>
     <string name="import_assistant_report_details">%s • %s</string>
     <string name="import_assistant_report_details_date_time">%s %s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Iniciada</string>
@@ -505,7 +505,7 @@
     <string name="import_assistant_status_paused_lost_connection_title">Se perdió la conexión con Google</string>
     <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
-    <string name="import_assistant_status_paused_storage_full_title">Tu almacenamiento está completo</string>
+    <string name="import_assistant_status_paused_storage_full_title">Tu almacenamiento está lleno</string>
     <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reanudar</string>
     <string name="import_assistant_delete_report_title">¿Eliminar de la lista?</string>
