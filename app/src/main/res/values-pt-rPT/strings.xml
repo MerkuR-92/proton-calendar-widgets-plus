@@ -93,7 +93,7 @@
     <string name="event_decryption_error_dialog_confirmation">Eliminar evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Eliminar eventos</string>
     <string name="event_decryption_error_dialog_close">Fechar</string>
-    <string name="event_signature_verification_failure">The verification of the event signature failed. <a href="https://proton.me/support/what-is-a-digital-signature">Learn more</a></string>
+    <string name="event_signature_verification_failure">A verificação da assinatura do evento falhou. <a href="https://proton.me/support/what-is-a-digital-signature">Saiba mais</a></string>
     <string name="event_signature_verification_in_progress">Verification of the event signature is in progress.</string>
     <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
     <string name="event_change_answer_recurring_title">Actualizar evento recorrente</string>
@@ -219,7 +219,7 @@
     <string name="event_send_cancel_mail_subject_prefix">Cancelamento de %s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">um evento a partir de %1$s às %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day_multiple">um evento a partir de %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">an event on %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day">um evento em %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s foi cancelado.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">As minhas agendas</string>
@@ -236,7 +236,7 @@
     <string name="nav_view_settings">Definições</string>
     <string name="nav_view_feedback">Enviar comentários</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Geral</string>
-    <string name="nav_view_more_bug">Report a problem</string>
+    <string name="nav_view_more_bug">Relatar um problema</string>
     <string name="nav_view_more_subscription">Subscrição</string>
     <string name="nav_view_more_logout">Terminar sessão</string>
     <string name="nav_view_more_login">Iniciar sessão</string>
@@ -299,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">O seu endereço não está na lista de participantes</string>
     <string name="snack_ics_reply_party_crasher_error">Não é possível adicionar participantes que não foram convidados pelo organizador</string>
     <string name="snack_ics_missing_uid_error">UID do evento em falta</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active personal calendar associated with this account</string>
+    <string name="snack_ics_no_active_calendar_error">Não há uma agenda pessoal ativa associada a esta conta.</string>
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é suportada</string>
     <string name="snack_ics_too_many_events_error">Múltiplos eventos ainda não são suportados</string>
     <string name="snack_ics_no_events_error">Esta agenda não contém nenhum evento</string>
@@ -365,11 +365,11 @@
     <string name="settings_general_info_theme"> tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">fuso horário</string>
-    <string name="settings_general_info_calendar_layout">calendar layout</string>
+    <string name="settings_general_info_calendar_layout">disposição da agenda</string>
     <string name="settings_calendars">As minhas agendas</string>
     <string name="settings_subscribed_calendars">Agendas subscritas</string>
     <string name="settings_calendar_default" comment="Default calendar">Predefinição</string>
-    <string name="settings_calendar_disabled" comment="Disabled calendar">Disabled</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Desativado</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Não sincronizado</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">A sincronizar</string>
     <string name="settings_calendar_subscribed_invalid_ics">Formato de agenda não suportado</string>
@@ -415,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Para configurar uma agora, visite <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Erro ao preparar agendas</string>
     <string name="bootstrap_error_some_calendars_failed_message">As agendas seguintes não puderam ser configuradas</string>
-    <string name="bootstrap_error_no_active_calendar_title">There is no active personal calendar associated with this account.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Não há uma agenda pessoal ativa associada a esta conta.</string>
     <string name="bootstrap_error_no_active_calendar_message">Para saber como ativar uma agenda, consulte a nossa <a href="https://proton.me/support">base de conhecimento</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Sem espaço de armazenamento disponível.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Saiba mais</string>
@@ -436,7 +436,7 @@
     <string name="dialog_feedback_submit">Enviar</string>
     <string name="dialog_feedback_submit_thank_you">Obrigado! Os seus comentários irão ajudar-nos a melhorar o Proton.</string>
     <!-- Calendar Widget -->
-    <string name="calendar_widget_description">Proton Calendar widget</string>
+    <string name="calendar_widget_description">Widget do Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">Sem mais eventos hoje</string>
     <string name="calendar_widget_loading_events">A carregar eventos…</string>
     <string name="calendar_widget_loading_events_error">Não foi possível carregar os eventos</string>
@@ -454,7 +454,7 @@
     <string name="spotlight_dialog_easy_switch_negative_button">Agora não</string>
     <string name="spotlight_dialog_auto_invites_title">Aceite convites facilmente</string>
     <string name="spotlight_dialog_auto_invites_description">Os convites para eventos aparecem agora na sua agenda como eventos pendentes. Desta forma, para responder basta abrir o evento.\n\nPara gerir a funcionalidade, aceda às configurações.</string>
-    <string name="spotlight_dialog_auto_invites_positive_button">Next</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Seguinte</string>
     <string name="spotlight_v5_dialog_got_it_button">Entendi</string>
     <string name="spotlight_v5_dialog_learn_more_button">Saiba mais</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton atualizado, proteção unificada</string>
@@ -472,7 +472,7 @@
     <string name="import_assistant_update_import_error">Falha ao atualizar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Conta errada. Por favor, inicie sessão na conta usada para a importação da agenda.</string>
     <string name="import_assistant_start_import_error">Falha ao iniciar importação, por favor, tente novamente mais tarde.</string>
-    <string name="import_assistant_delete_import_success">Import record deleted</string>
+    <string name="import_assistant_delete_import_success">Registo de importação eliminado</string>
     <string name="import_assistant_delete_import_error">Falha ao eliminar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_cancel_import_error">Falha ao cancelar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_resume_import_error">Falha ao retomar importação, por favor, tente novamente mais tarde.</string>
@@ -521,9 +521,9 @@
     <string name="import_assistant_discard_import_message">A importação não está concluída e não poderá ser retomada se a cancelar.</string>
     <string name="import_assistant_discard_import_positive">Cancelar importação</string>
     <string name="import_assistant_discard_import_negative">Retomar importação</string>
-    <string name="import_assistant_authentication_canceled">Authentication canceled</string>
+    <string name="import_assistant_authentication_canceled">Autenticação cancelada</string>
     <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
-    <string name="import_assistant_in_progress_error_snack">There is still an import in progress</string>
+    <string name="import_assistant_in_progress_error_snack">Ainda há uma importação em curso.</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">agenda</item>
@@ -598,20 +598,20 @@
         <item quantity="other">participantes</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">A cada %1$d %2$s</item>
+        <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">A cada %1$d %2$s</item>
+        <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">A cada %1$d %2$s</item>
+        <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Every %1$d %2$s</item>
-        <item quantity="other">Every %1$d %2$s</item>
+        <item quantity="one">A cada %1$d %2$s</item>
+        <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%s minuto</item>
@@ -625,7 +625,7 @@
     <string-array name="ordinals_as_words">
         <item translatable="false"/>
         <item>first</item>
-        <item>second</item>
+        <item>segundo</item>
         <item>third</item>
         <item>fourth</item>
         <item>fifth</item>
@@ -646,7 +646,7 @@
     <string-array name="time_formats">
         <item>Predefinição do sistema</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>01:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Predefinição do sistema</item>
