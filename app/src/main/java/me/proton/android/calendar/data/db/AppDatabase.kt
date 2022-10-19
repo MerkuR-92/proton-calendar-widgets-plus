@@ -42,6 +42,8 @@ import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.mailsettings.data.entity.MailSettingsEntity
+import me.proton.core.payment.data.local.db.PaymentDatabase
+import me.proton.core.payment.data.local.entity.GooglePurchaseEntity
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserConverters
 import me.proton.core.user.data.db.UserDatabase
@@ -81,6 +83,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         EventMetadataEntity::class,
         FeatureFlagEntity::class,
         ChallengeFrameEntity::class,
+        GooglePurchaseEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -124,7 +127,8 @@ abstract class AppDatabase :
     ContactDatabase,
     EventMetadataDatabase,
     FeatureFlagDatabase,
-    ChallengeDatabase {
+    ChallengeDatabase,
+    PaymentDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -155,7 +159,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 44
+        const val version = 45
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -181,7 +185,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_40_41,
             AppDatabaseMigrations.MIGRATION_41_42,
             AppDatabaseMigrations.MIGRATION_42_43,
-            AppDatabaseMigrations.MIGRATION_43_44
+            AppDatabaseMigrations.MIGRATION_43_44,
+            AppDatabaseMigrations.MIGRATION_44_45
         )
 
         fun buildDatabase(context: Context): AppDatabase =

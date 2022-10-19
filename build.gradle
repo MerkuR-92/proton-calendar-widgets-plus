@@ -22,7 +22,7 @@ buildscript {
                 "assisted_inject" : "0.6.0",
                 "hilt_android": "2.38.1",
                 "hilt_androidx": "1.0.0",
-                "proton_core": "9.0.1",
+                "proton_core": "9.1.2",
         ]
     }
 
@@ -32,7 +32,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.0'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${rootProject.ext.version.kotlin}"
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:${rootProject.ext.version.navigation}"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0"

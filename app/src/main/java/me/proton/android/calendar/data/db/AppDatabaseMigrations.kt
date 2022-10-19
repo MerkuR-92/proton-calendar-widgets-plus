@@ -45,6 +45,7 @@ import me.proton.core.key.data.entity.KeySaltEntity
 import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
+import me.proton.core.payment.data.local.db.PaymentDatabase
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserDatabase
 import me.proton.core.user.data.entity.AddressEntity
@@ -321,6 +322,12 @@ object AppDatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             // delete all existing EMAIL notifications because we don't
             database.execSQL("DELETE FROM `${TABLE_EVENT_ALARMS}` WHERE `action` = 1")
+        }
+    }
+
+    val MIGRATION_44_45 = object : Migration(44, 45) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            PaymentDatabase.MIGRATION_0.migrate(database)
         }
     }
 }
