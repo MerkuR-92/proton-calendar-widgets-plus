@@ -44,7 +44,6 @@ import kotlinx.android.synthetic.main.fragment_month.miniCalendarDaysHeaderLayou
 import kotlinx.android.synthetic.main.fragment_month.miniCalendarLayout
 import kotlinx.android.synthetic.main.fragment_month.miniCalendarPager
 import kotlinx.android.synthetic.main.fragment_month.miniCalendarPagerLayout
-import kotlinx.android.synthetic.main.fragment_month.mini_calendar_slider
 import kotlinx.android.synthetic.main.fragment_month.viewPagerSliderGuideline
 import kotlinx.android.synthetic.main.fragment_month.viewPagerTopGuideline
 import kotlinx.android.synthetic.main.fragment_month.weekView
@@ -884,7 +883,7 @@ class MonthFragment : BaseFragment() {
 
         fragmentMonthLayout.setOnTouchListener(onTouchListener)
         fragmentMonthLayout.agendaPager = agendaPager
-        fragmentMonthLayout.sliderView = mini_calendar_slider
+        fragmentMonthLayout.weekView = weekView
 
         miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
     }
@@ -927,7 +926,6 @@ class MonthFragment : BaseFragment() {
                 agendaPager?.visibleOrGone(false)
                 weekView?.visibleOrGone(false)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(false)
-                mini_calendar_slider?.visibleOrGone(false)
                 mini_calendar_chevron.clearAnimation()
                 mini_calendar_chevron.visibleOrGone(false)
 
@@ -965,7 +963,6 @@ class MonthFragment : BaseFragment() {
                 agendaPager?.visibleOrGone(true)
                 weekView?.visibleOrGone(false)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(true)
-                mini_calendar_slider?.visibleOrGone(true)
                 mini_calendar_chevron.clearAnimation()
                 mini_calendar_chevron.visibleOrGone(true)
 
@@ -997,7 +994,6 @@ class MonthFragment : BaseFragment() {
                 agendaPager?.visibleOrGone(false)
                 weekView?.visibleOrGone(true)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(true)
-                mini_calendar_slider?.visibleOrGone(true)
                 mini_calendar_chevron.clearAnimation()
                 mini_calendar_chevron.visibleOrGone(true)
 
