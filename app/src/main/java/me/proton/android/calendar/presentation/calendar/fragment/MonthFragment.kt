@@ -630,11 +630,7 @@ class MonthFragment : BaseFragment() {
         weekView.hourHeight = mainViewModel.getWeekViewHourHeight(resources.getDimensionPixelSize(R.dimen.default_week_view_hour_height).toFloat()).roundToInt()
 
         weekView.setWeekDayFormatter { date: LocalDate ->
-            val weekdayFormatter =
-                when (weekView.numberOfVisibleDays) {
-                    in 1..6 -> DateTimeFormatter.ofPattern("EEE", Locale.getDefault()) // first three characters
-                    else -> DateTimeFormatter.ofPattern("EEEEE", Locale.getDefault()) // first character
-                }
+            val weekdayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault()) // first three characters
             weekdayFormatter.format(date)
         }
         val dateFormatter = DateTimeFormatter.ofPattern("d", Locale.getDefault())

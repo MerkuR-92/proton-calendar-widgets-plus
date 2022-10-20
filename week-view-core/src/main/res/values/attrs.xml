@@ -52,12 +52,14 @@
         <attr name="hintHeaderTextColor" format="color" />
         <attr name="noEventsLabel" format="string" />
         <attr name="headerLabelsInnerMargin" format="dimension" />
+        <attr name="headerLabelsSeparatorHeight" format="dimension" />
+        <attr name="headerNoEventsMarginStart" format="dimension" />
         <attr name="todayHeaderTextColor" format="color" />
         <attr name="weekendHeaderTextColor" format="color" />
         <attr name="showHeaderDownArrow" format="boolean" />
         <attr name="expandInfoBackgroundColor" format="color" />
         <attr name="expandInfoTextColor" format="color" />
-        <attr name="singleDayNumberHeaderTextSize" format="dimension" />
+        <attr name="dateHeaderTextSize" format="dimension" />
         <attr name="headerTodaySquareSize" format="dimension" />
         <attr name="headerTodaySquareStrokeWidth" format="dimension" />
         <attr name="headerTodaySquareMarginTop" format="dimension" />

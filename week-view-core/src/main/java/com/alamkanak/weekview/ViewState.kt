@@ -62,8 +62,10 @@ internal class ViewState {
     var timeColumnHoursInterval: Int = 0
 
     var headerPadding: Float = 0f
-    var singleDayNumberHeaderTextSize: Float = 0f
+    var dateHeaderTextSize: Float = 0f
     var headerLabelsInnerMargin: Float = 0f
+    var headerLabelsSeparatorHeight: Float = 0f
+    var headerNoEventsMarginStart: Float = 0f
     var headerDateLabelHeight: Float = 0f
     var headerTodaySquareSize: Float = 0f
     var headerTodaySquareStrokeWidth: Float = 0f
@@ -295,7 +297,7 @@ internal class ViewState {
     val weekNumberBounds: RectF
         get() = _weekNumberBounds.apply {
             left = if (isLtr) 0f else (viewWidth - timeColumnWidth)
-            top = 0f
+            top = headerPadding
             right = if (isLtr) timeColumnWidth else viewWidth.toFloat()
             bottom = headerPadding + dateLabelHeight + headerPadding
         }
@@ -489,7 +491,7 @@ internal class ViewState {
     }
 
     private fun calculateHeaderHeightInSingleDayView(): Float {
-        val labelHeight = headerPadding + dateLabelHeight + headerPadding
+        val labelHeight = headerPadding + dateLabelHeight + headerPadding / 2f
         var chipsHeight = 0f
 
         if (maxNumberOfAllDayEvents > 0) {
@@ -519,7 +521,7 @@ internal class ViewState {
     }
 
     private fun calculateHeaderHeightInMultiDayView(): Float {
-        var newHeight = headerPadding + dateLabelHeight + headerPadding
+        var newHeight = headerPadding + dateLabelHeight + headerPadding / 2f
 
         if (maxNumberOfAllDayEvents > 0) {
             val numberOfRows = if (arrangeAllDayEventsVertically && allDayEventsExpanded) {

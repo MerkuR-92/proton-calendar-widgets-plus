@@ -181,8 +181,10 @@ internal object ViewStateFactory {
 
         viewState.apply {
             headerPadding = a.getDimension(R.styleable.WeekView_headerPadding, context.dp(8))
-            singleDayNumberHeaderTextSize = a.getDimension(R.styleable.WeekView_singleDayNumberHeaderTextSize, context.sp(20))
+            dateHeaderTextSize = a.getDimension(R.styleable.WeekView_dateHeaderTextSize, context.sp(16))
             headerLabelsInnerMargin = a.getDimension(R.styleable.WeekView_headerLabelsInnerMargin, context.dp(6))
+            headerLabelsSeparatorHeight = a.getDimension(R.styleable.WeekView_headerLabelsSeparatorHeight, context.dp(20))
+            headerNoEventsMarginStart = a.getDimension(R.styleable.WeekView_headerNoEventsMarginStart, context.dp(7))
             headerTodaySquareSize = a.getDimension(R.styleable.WeekView_headerTodaySquareSize, context.sp(24))
             headerTodaySquareStrokeWidth = a.getDimension(R.styleable.WeekView_headerTodaySquareStrokeWidth, context.sp(1))
             headerTodaySquareMarginTop = a.getDimension(R.styleable.WeekView_headerTodaySquareMarginTop, context.sp(2))
