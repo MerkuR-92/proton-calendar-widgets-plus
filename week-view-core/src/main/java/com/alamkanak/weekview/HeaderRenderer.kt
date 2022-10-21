@@ -272,7 +272,7 @@ private class DateLabelsDrawer(
             startPixel + viewState.dayWidth,
             0f,
             startPixel + viewState.dayWidth,
-            viewState.headerLabelsSeparatorHeight,
+            viewState.headerPadding + weekDayTextLayout.height,
             viewState.headerBottomLinePaint
         )
     }
@@ -633,7 +633,7 @@ private class HeaderDrawer(
         }
 
         val startY = 0f
-        val stopY = viewState.headerLabelsSeparatorHeight
+        val stopY = viewState.headerHeight
 
         drawLine(startX, startY, startX, stopY, viewState.timeColumnSeparatorPaint)
     }
