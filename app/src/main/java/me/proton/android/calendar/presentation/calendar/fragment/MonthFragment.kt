@@ -910,7 +910,11 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)) return
+        if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)){
+            mini_calendar_chevron.clearAnimation()
+            mini_calendar_chevron.visibleOrGone(true)
+            return
+        }
 
         fragmentMonthLayout?.allowScrolling = viewMode == ViewMode.AGENDA
 
