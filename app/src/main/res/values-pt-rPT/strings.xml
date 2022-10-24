@@ -79,7 +79,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sim</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d talvez</string>
     <string name="event_attendee_no" comment="How many attendees answered NO">%1$d não</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pendentes</string>
     <string name="event_attendee_is_organizer">É o organizador</string>
     <string name="event_attendee_organizer">Organizador</string>
     <string name="event_attendee_optional">Opcional</string>
@@ -399,10 +399,10 @@
     <string name="create_calendar_limit_reached_paid_message">Elimine agendas não usadas para poder criar novas agendas.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gerir agendas</string>
     <string name="create_calendar_limit_reached_close">Fechar</string>
-    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_title">Actualizar o Proton Calendar</string>
     <string name="create_calendar_limit_reached_free_description">Crie até 20 agendas e aceda a muitos mais recursos exclusivos, quando atualizar o seu plano.</string>
     <string name="create_calendar_limit_reached_free_not_now">Agora não</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Actualizar</string>
     <string name="delete_calendar_dialog_title">Eliminar agenda</string>
     <string name="delete_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda?</string>
     <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda? \"%1$s\" será definida como agenda predefinida.</string>
@@ -463,7 +463,7 @@
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Calendar e permita que o Proton aceda aos seus dados.</string>
     <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
-    <string name="import_assistant_prepare_import">Preparing import</string>
+    <string name="import_assistant_prepare_import">A preparar a importação</string>
     <string name="import_assistant_gathering_data_loader_title">Recolhendo os seus dados</string>
     <string name="import_assistant_summary_title">Resumo da importação</string>
     <string name="import_assistant_summary_customize_import">Personalizar importação</string>

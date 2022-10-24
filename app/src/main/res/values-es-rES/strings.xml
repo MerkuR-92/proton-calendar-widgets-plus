@@ -27,7 +27,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee">Se notificará al organizador de esta serie de eventos de que rechazas la invitación. ¿Quieres eliminar todos los eventos de la serie?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">El organizador de esta serie de eventos no será notificado de que rechaza la invitación ya que no puede enviar correos electrónicos desde la dirección invitada. ¿Desea eliminar todos los eventos de esta serie de todos modos?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Este evento ha sido actualizado. Se notificará al organizador de que rechazas la invitación. ¿Quieres eliminar este evento?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Este evento ha sido actualizado. El organizador no será notificado de que rechazas la invitación ya que no puedes enviar correos electrónicos desde la dirección invitada. ¿Deseas eliminar este evento?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Este evento ha sido actualizado. El organizador no será notificado de que rechazas la invitación, ya que no puedes enviar correos electrónicos desde la dirección invitada. ¿Deseas eliminar este evento?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Se mantendrán las ocurrencias actualizadas previamente por el organizador, pero tus respuestas se perderán</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Se mantendrán las ocurrencias actualizadas previamente por el organizador</string>
@@ -234,7 +234,7 @@
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Zona horaria</string>
     <string name="nav_view_settings">Ajustes</string>
-    <string name="nav_view_feedback">Deja un comentario</string>
+    <string name="nav_view_feedback">Danos tu opinión</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
     <string name="nav_view_more_bug">Notificar un problema</string>
     <string name="nav_view_more_subscription">Suscripción</string>
@@ -383,7 +383,7 @@
     <string name="calendar_form_update_title">Editar calendario</string>
     <string name="calendar_form_save">Guardar</string>
     <string name="calendar_form_name">Nombre</string>
-    <string name="calendar_form_name_placeholder">Añadir un nombre al calendario</string>
+    <string name="calendar_form_name_placeholder">Añadir nombre al calendario</string>
     <string name="calendar_form_color">Color del calendario</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones de eventos</string>
@@ -404,7 +404,7 @@
     <string name="create_calendar_limit_reached_free_not_now">Ahora no</string>
     <string name="create_calendar_limit_reached_free_upgrade">Mejorar</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
-    <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
+    <string name="delete_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
@@ -428,7 +428,7 @@
     <string name="splash_init">Descifrando eventos</string>
     <string name="default_calendar_name">Mi calendario</string>
     <!-- FEEDBACK DIALOG -->
-    <string name="dialog_feedback_header">Deja un comentario</string>
+    <string name="dialog_feedback_header">Danos tu opinión</string>
     <string name="dialog_feedback_text">¿Cómo describirías tu experiencia con Proton Calendar?</string>
     <string name="dialog_feedback_rating_worst">Terrible</string>
     <string name="dialog_feedback_rating_best">Maravillosa</string>
@@ -437,11 +437,11 @@
     <string name="dialog_feedback_submit_thank_you">¡Gracias! Tu feedback nos ayuda a mejorar Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget de Proton Calendar</string>
-    <string name="calendar_widget_no_upcoming_events_today">No hay eventos hoy</string>
+    <string name="calendar_widget_no_upcoming_events_today">No hay eventos próximos para hoy</string>
     <string name="calendar_widget_loading_events">Cargando eventos…</string>
     <string name="calendar_widget_loading_events_error">No se pudieron cargar los eventos</string>
-    <string name="calendar_widget_no_upcoming_events">No hay eventos hoy</string>
-    <string name="calendar_widget_please_log_in">Acceda para ver sus eventos</string>
+    <string name="calendar_widget_no_upcoming_events">No hay eventos próximos</string>
+    <string name="calendar_widget_please_log_in">Inicia sesión para ver tus eventos</string>
     <string name="calendar_widget_part_day_event_starts_at">Empieza a las %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
@@ -458,7 +458,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentamos la nueva imagen de Proton. Muchos servicios, pero una misma misión. Bienvenido a una Internet concebida sobre la base de la privacidad. <a href="https://proton.me/news/updated-proton">Más información</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
@@ -469,13 +469,13 @@
     <string name="import_assistant_summary_customize_import">Personalizar importación</string>
     <string name="import_assistant_error">Error en la obtención de los datos</string>
     <string name="import_assistant_data_gathering_error">Data gathering failed</string>
-    <string name="import_assistant_update_import_error">No se pudo actualizar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_update_import_error">No se pudo actualizar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Cuenta errónea. Por favor, inicie sesión con la cuenta que usa para la importación del calendario.</string>
-    <string name="import_assistant_start_import_error">No se pudo iniciar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_start_import_error">No se pudo iniciar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_delete_import_success">Se ha eliminado el registro importación</string>
     <string name="import_assistant_delete_import_error">No se pudo eliminar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_cancel_import_error">No se pudo cancelar la importación. Por favor, inténtalo más tarde.</string>
-    <string name="import_assistant_resume_import_error">No se pudo reanudar la importación. Por favor, inténtalo más tarde.</string>
+    <string name="import_assistant_resume_import_error">No se pudo reanudar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_create_calendar_error">Uno o varios calendarios fallaron al ser creados</string>
     <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>
@@ -486,7 +486,7 @@
     <string name="import_assistant_new_calendar_header">Crear nuevo</string>
     <string name="import_assistant_merge_calendar_header">Merge with existing</string>
     <string name="import_assistant_in_progress_title">Importación en progreso</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %s to %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importando datos de %s a %s.</string>
     <string name="import_assistant_in_progress_redirect">Comprobar el progreso</string>
     <string name="import_assistant_in_progress_sub_description">Large imports can take several days. We will let you know when the import is done. You can close this screen.</string>
     <string name="import_assistant_guide_subtitle">Make the switch to privacy. Easily and securely.</string>
@@ -522,8 +522,8 @@
     <string name="import_assistant_discard_import_positive">Cancelar la importación</string>
     <string name="import_assistant_discard_import_negative">Reanudar la importación</string>
     <string name="import_assistant_authentication_canceled">Autenticación cancelada</string>
-    <string name="import_assistant_sign_in_in_progress">Ya hay un proceso de registro en proceso</string>
-    <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en progreso</string>
+    <string name="import_assistant_sign_in_in_progress">Ya hay un proceso de inicio de sesión en curso</string>
+    <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendario</item>
@@ -550,8 +550,8 @@
         <item quantity="other">Importar %d de %d calendarios desde</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Unir %d calendario en Proton Calendar.</item>
-        <item quantity="other">Unir %d calendarios en Proton Calendar.</item>
+        <item quantity="one">Fusionar %d calendario en Proton Calendar.</item>
+        <item quantity="other">Fusionar %d calendarios en Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
