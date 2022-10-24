@@ -299,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">Ваша адреса електронної пошти не входить до списку учасників</string>
     <string name="snack_ics_reply_party_crasher_error">Неможливо додати учасників, які не були запрошені організатором</string>
     <string name="snack_ics_missing_uid_error">В події відсутній UID</string>
-    <string name="snack_ics_no_active_calendar_error">Немає активного особистого календаря повʼязаного з обліковим записом</string>
+    <string name="snack_ics_no_active_calendar_error">Немає активного особистого календаря, повʼязаного з цим обліковим записом</string>
     <string name="snack_ics_unsupported_duration_error">Властивість тривалості не підтримується</string>
     <string name="snack_ics_too_many_events_error">Кілька подій поки не підтримується</string>
     <string name="snack_ics_no_events_error">Цей календар не містить жодної події</string>
@@ -415,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Щоб налаштувати його, перейдіть до <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Помилка підготовки календарів</string>
     <string name="bootstrap_error_some_calendars_failed_message">Не вдається налаштувати зазначені календарі</string>
-    <string name="bootstrap_error_no_active_calendar_title">Немає активного особистого календаря повʼязаного з обліковим записом.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Немає активного особистого календаря, повʼязаного з цим обліковим записом.</string>
     <string name="bootstrap_error_no_active_calendar_message">Щоб дізнатися, як активувати календар, відвідайте нашу <a href="https://proton.me/support">базу знань</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Немає вільного місця для зберігання.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Докладніше</string>

@@ -14,7 +14,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event">Dieser Termin wurde vom Organisator aktualisiert. Möchtest du den Termin aus deinem Kalender entfernen?</string>
     <string name="dialog_button_delete">Löschen</string>
     <string name="dialog_button_cancel">Abbrechen</string>
-    <string name="dialog_button_continue">Weiter</string>
+    <string name="dialog_button_continue">Fortfahren</string>
     <string name="dialog_button_close">Schließen</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Alle Teilnehmer werden eine E-Mail zur Absage des Termins erhalten. Möchtest du diesen Termin löschen?</string>
@@ -94,7 +94,7 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Termine löschen</string>
     <string name="event_decryption_error_dialog_close">Schließen</string>
     <string name="event_signature_verification_failure">Die Überprüfung der Terminsignatur ist fehlgeschlagen. <a href="https://proton.me/support/what-is-a-digital-signature">Mehr erfahren</a></string>
-    <string name="event_signature_verification_in_progress">Überprüfung der Terminsignatur ist im Gange.</string>
+    <string name="event_signature_verification_in_progress">Überprüfung der Terminsignatur läuft gerade.</string>
     <string name="event_signature_verification_network_error">Die Überprüfung der Terminsignatur wurde durch einen Fehler unterbrochen. <a href="">Erneut versuchen</a></string>
     <string name="event_change_answer_recurring_title">Terminserie aktualisieren</string>
     <string name="event_change_answer_recurring_description">Möchtest du die Antwort für alle Termine in dieser Serie ändern?</string>
@@ -264,8 +264,8 @@
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termins</string>
     <string name="snack_event_calendar_error">Fehler beim Wechseln des Kalenders</string>
     <string name="snack_event_maximum_alarm_reached_error">Die maximale Anzahl von Benachrichtigungen wurde erreicht</string>
-    <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung</string>
-    <string name="snack_send_bug_report_error">Fehler beim Senden des Berichts. Bitte versuche es später erneut</string>
+    <string name="snack_send_bug_report_success">Bericht gesendet. Vielen Dank für deine Rückmeldung.</string>
+    <string name="snack_send_bug_report_error">Fehler beim Senden des Berichts. Bitte versuche es später erneut.</string>
     <string name="snack_send_bug_report_description_empty">Bitte gib eine Beschreibung deines Berichts an</string>
     <string name="snack_create_event_no_active_personal_calendar">Du benötigst einen persönlichen aktiven Kalender, um Termine erstellen zu können</string>
     <string name="snack_add_self_as_participant">Selbsteinladung nicht erlaubt</string>
@@ -341,7 +341,7 @@
     <string name="bug_report_hint_description">Bitte beschreibe das Problem und füge alle Fehlermeldungen hinzu.</string>
     <string name="bug_report_discard_changes_title">Ungespeicherte Änderungen</string>
     <string name="bug_report_discard_changes_description">Ungespeicherte Elemente im Formular vorhanden. Möchtest du diese wirklich verwerfen?</string>
-    <string name="bug_report_discard_changes_cancel">Bearbeitung fortsetzen</string>
+    <string name="bug_report_discard_changes_cancel">Bearbeiten fortsetzen</string>
     <string name="bug_report_discard_changes_confirm">Verwerfen</string>
     <!-- Settings -->
     <string name="settings_theme_title">Farbschema</string>
@@ -460,8 +460,8 @@
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
     <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="https://proton.me/news/updated-proton">Mehr erfahren</a></string>
     <!-- Import -->
-    <string name="dialog_google_auth_title">Zugang erlauben</string>
-    <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlauben Proton den Zugriff auf deine Daten.</string>
+    <string name="dialog_google_auth_title">Zugriff erlauben</string>
+    <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>
     <string name="import_assistant_prepare_import_error">Fehler beim Vorbereiten des Imports. Bitte versuche es später erneut</string>
     <string name="import_assistant_prepare_import">Import wird vorbereitet</string>
     <string name="import_assistant_gathering_data_loader_title">Deine Daten werden zusammengestellt</string>
@@ -485,7 +485,7 @@
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Fast geschafft …</string>
     <string name="import_assistant_new_calendar_header">Neuen erstellen</string>
     <string name="import_assistant_merge_calendar_header">Mit vorhandenem zusammenführen</string>
-    <string name="import_assistant_in_progress_title">Datenimport im Gange</string>
+    <string name="import_assistant_in_progress_title">Datenimport läuft gerade</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Daten von %s nach %s importieren.</string>
     <string name="import_assistant_in_progress_redirect">Fortschritt überprüfen</string>
     <string name="import_assistant_in_progress_sub_description">Umfangreiche Importe können mehrere Tage dauern. Wir benachrichtigen dich, wenn der Import abgeschlossen ist. Du kannst diesen Bildschirm schließen.</string>
@@ -500,7 +500,7 @@
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Abgeschlossen</string>
     <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Abgebrochen</string>
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Wird abgebrochen</string>
-    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Angehalten</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Pausiert</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Fehlgeschlagen</string>
     <string name="import_assistant_status_paused_lost_connection_title">Verbindung zu Google unterbrochen</string>
     <string name="import_assistant_status_paused_lost_connection_description">Um den Import fortzusetzen, tippe auf \"Erneut verbinden\", melde dich bei Google an und gewähre Proton erneut Zugriff auf deine Google-Daten.</string>
@@ -522,7 +522,7 @@
     <string name="import_assistant_discard_import_positive">Import abbrechen</string>
     <string name="import_assistant_discard_import_negative">Import fortsetzen</string>
     <string name="import_assistant_authentication_canceled">Authentifizierung abgebrochen</string>
-    <string name="import_assistant_sign_in_in_progress">Ein Anmeldevorgang wird bereits ausgeführt</string>
+    <string name="import_assistant_sign_in_in_progress">Ein Anmeldevorgang läuft bereits</string>
     <string name="import_assistant_in_progress_error_snack">Ein Importvorgang wird derzeit noch ausgeführt</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
