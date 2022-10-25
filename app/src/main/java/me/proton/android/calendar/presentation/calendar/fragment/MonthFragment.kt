@@ -645,40 +645,43 @@ class MonthFragment : BaseFragment() {
 
     private fun updateWeekView(selectedDate: LocalDate, selectedDateTime: LocalDateTime? = null, animate: Boolean = true) {
         lifecycleScope.launch {
-            if (currentFromDate?.month != selectedDate.month) {
-                val fromDate = selectedDate.minusMonths(1).withDayOfMonth(1)
-                val toDate =
-                    selectedDate.plusMonths(1).withDayOfMonth(selectedDate.plusMonths(1).lengthOfMonth())
+            val weekStart = calendarViewModel.getWeekStart()
+            val firstDayOfWeek = selectedDate.firstDayOfWeek(weekStart)
+            if (firstDayOfWeek != null && currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek) {
+                val fromDate = firstDayOfWeek.minusDays(7)
+                val toDate = firstDayOfWeek.plusDays(13)
+
                 val timeZoneId = calendarViewModel.getTimeZoneId()?.id
                 getEvents(fromDate, toDate, timeZoneId ?: return@launch)
                 currentFromDate = selectedDate
             }
-        }
 
-        if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
-            // For week view we need to use set date as first day of the week so that we stick to user week start choice
-            lifecycleScope.launch {
-                calendarViewModel.getWeekStart()?.let { weekStart ->
-                    selectedDate.firstDayOfWeek(weekStart)?.let {
-                        if (selectedDateTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedDateTime.toLocalTime()))
-                        else if (selectedDateTime != null) weekView.setDateTime(it.atTime(selectedDateTime.toLocalTime()))
-                        else if (animate) weekView.scrollToDate(it)
-                        else weekView.setDate(it)
+            if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
+                // For week view we need to use set date as first day of the week so that we stick to user week start choice
+                lifecycleScope.launch {
+                    weekStart?.let { weekStart ->
+                        selectedDate.firstDayOfWeek(weekStart)?.let {
+                            if (selectedDateTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedDateTime.toLocalTime()))
+                            else if (selectedDateTime != null) weekView.setDateTime(it.atTime(selectedDateTime.toLocalTime()))
+                            else if (animate) weekView.scrollToDate(it)
+                            else weekView.setDate(it)
+                        }
                     }
                 }
+            } else if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
+                if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
+                else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
+                else if (animate) weekView.scrollToDate(selectedDate)
+                else weekView.setDate(selectedDate)
+                currentSelectedDate = selectedDate
             }
-        } else if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
-            if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
-            else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
-            else if (animate) weekView.scrollToDate(selectedDate)
-            else weekView.setDate(selectedDate)
-            currentSelectedDate = selectedDate
-        }
 
-        lifecycleScope.launch {
-            calendarViewModel.getWeekStart()?.let { weekStart ->
+            weekStart?.let {
                 val startWeekOn = getWeekStartDayOfWeek(weekStart)
-                weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                val weekNumber = selectedDate.weekNumber(startWeekOn)
+                if (weekNumber != weekView.weekNumber) {
+                    weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                }
             }
         }
     }
