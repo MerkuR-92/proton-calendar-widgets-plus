@@ -3,7 +3,7 @@ package com.alamkanak.weekview
 import java.util.Calendar
 
 internal fun ResolvedWeekViewEntity.split(viewState: ViewState): List<ResolvedWeekViewEntity> {
-    if (startTime >= endTime) {
+    if (startTime > endTime) {
         return emptyList()
     }
 
@@ -13,7 +13,7 @@ internal fun ResolvedWeekViewEntity.split(viewState: ViewState): List<ResolvedWe
         listOf(limitTo(minHour = viewState.minHour, maxHour = viewState.maxHour))
     }
 
-    return entities.filter { it.startTime < it.endTime }
+    return entities.filter { it.startTime <= it.endTime }
 }
 
 private fun ResolvedWeekViewEntity.splitByDates(
