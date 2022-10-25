@@ -250,7 +250,7 @@ internal class EventChipDrawer(
         val bounds = eventChip.bounds
 
         val multiDayTimeText =
-            if (eventChip.event.isMultiDay && eventChip.event.isNotAllDay) {
+            if (eventChip.event.isMultiDay && eventChip.event.isNotAllDay && ((viewState.isSingleDay && eventChip.index == 0) || !viewState.isSingleDay)) {
                 val hour = eventChip.event.startTime.hour
                 val minutes = eventChip.event.startTime.minute
                 viewState.timeFormatter(hour, minutes)
