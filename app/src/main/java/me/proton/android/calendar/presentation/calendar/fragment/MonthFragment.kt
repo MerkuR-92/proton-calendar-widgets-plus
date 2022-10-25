@@ -529,6 +529,9 @@ class MonthFragment : BaseFragment() {
 
             weekStart?.let {
                 setupMonthLayoutGestures(weekStart)
+                calendarViewModel.selectedDate.value?.let {
+                    updateWeekView(it)
+                }
             }
 
             if (startWeekOn == null && weekStart != null) {
