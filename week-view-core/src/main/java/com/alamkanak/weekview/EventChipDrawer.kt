@@ -274,7 +274,7 @@ internal class EventChipDrawer(
         val eventCountText =
             if (viewState.isSingleDay && eventChip.event.isMultiDay) "(${eventChip.index + 1}/${eventChip.event.daysCount})"
             else ""
-        val eventCountTextWidth = textLayout.paint.measureText(eventCountText)
+        val eventCountTextWidth = textLayout.paint.measureText(eventCountText) + viewState.columnGap
         val eventCountMargin = if (eventCountTextWidth > 0) viewState.eventPaddingHorizontal * 2 else 0
         val titleWidth = bounds.width() - viewState.eventPaddingHorizontal - viewState.eventSideStripWidth / 2 - eventCountTextWidth - eventCountMargin
         // Use ellipsize to calculate the max length we can draw
