@@ -271,6 +271,8 @@ private class NowLineDrawer(
             .map { (_, startPixel) -> startPixel }
             .firstOrNull() ?: return
 
+        if (startPixel.toInt() == viewState.viewWidth) return
+
         canvas.drawLine(startPixel)
     }
 
