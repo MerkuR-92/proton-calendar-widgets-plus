@@ -671,12 +671,11 @@ class MonthFragment : BaseFragment() {
                         }
                     }
                 }
-            } else if (currentSelectedDate != selectedDate && weekView.firstVisibleDateAsLocalDate != selectedDate) {
+            } else if (weekView.firstVisibleDateAsLocalDate != selectedDate) {
                 if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
                 else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
                 else if (animate) weekView.scrollToDate(selectedDate)
                 else weekView.setDate(selectedDate)
-                currentSelectedDate = selectedDate
             }
 
             weekStart?.let {
