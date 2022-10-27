@@ -1352,7 +1352,7 @@ class WeekView @JvmOverloads constructor(
         }
 
         val sanitizedHour = hour.coerceIn(minimumValue = minHour, maximumValue = maxHour)
-        val desired = now().withTime(hour = sanitizedHour, minutes = 0)
+        val desired = nowAtTimezone(viewState.customTimeZone).withTime(hour = sanitizedHour, minutes = 0)
 
         if (desired.hour > minHour) {
             // Add some padding above the current time (and thus: the now line)

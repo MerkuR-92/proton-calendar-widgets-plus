@@ -519,7 +519,17 @@ class MonthFragment : BaseFragment() {
 
             setToolbarListeners(zoneId)
 
-            weekView.customTimeZone = TimeZone.getTimeZone(zoneId)
+            if (weekView.customTimeZone != TimeZone.getTimeZone(zoneId)) {
+                weekView.customTimeZone = TimeZone.getTimeZone(zoneId)
+                lifecycleScope.launch {
+                    val weekStart = calendarViewModel.getWeekStart()
+                    val firstDayOfWeek = calendarViewModel.selectedDate.value?.firstDayOfWeek(weekStart) ?: return@launch
+                    val fromDate = firstDayOfWeek.minusDays(7)
+                    val toDate = firstDayOfWeek.plusDays(13)
+
+                    getEvents(fromDate, toDate, zoneId?.id ?: return@launch)
+                }
+            }
 
             if (timeZoneId != null && startWeekOn != null) {
                 headerDaysMediator.value = Pair(startWeekOn!!, timeZoneId!!)
@@ -642,7 +652,7 @@ class MonthFragment : BaseFragment() {
     }
 
     private var currentFromDate: LocalDate? = null
-    private var currentSelectedDate: LocalDate? = null
+    private var currentToDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
@@ -650,13 +660,13 @@ class MonthFragment : BaseFragment() {
         lifecycleScope.launch {
             val weekStart = calendarViewModel.getWeekStart()
             val firstDayOfWeek = selectedDate.firstDayOfWeek(weekStart)
-            if (firstDayOfWeek != null && currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek) {
+            firstDayOfWeek?.let {
                 val fromDate = firstDayOfWeek.minusDays(7)
                 val toDate = firstDayOfWeek.plusDays(13)
-
-                val timeZoneId = calendarViewModel.getTimeZoneId()?.id
-                getEvents(fromDate, toDate, timeZoneId ?: return@launch)
-                currentFromDate = selectedDate
+                if (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate) {
+                    val timeZoneId = calendarViewModel.getTimeZoneId()?.id
+                    getEvents(fromDate, toDate, timeZoneId ?: return@launch)
+                }
             }
 
             if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
@@ -693,6 +703,8 @@ class MonthFragment : BaseFragment() {
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         // Get and display decrypted events
+        currentFromDate = fromDate
+        currentToDate = toDate
         eventsLiveData = calendarViewModel.getEvents(fromDate, toDate, timeZoneId, this.lifecycle)
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 

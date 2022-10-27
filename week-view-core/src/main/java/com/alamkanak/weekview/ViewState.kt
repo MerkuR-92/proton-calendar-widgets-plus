@@ -235,7 +235,7 @@ internal class ViewState {
     }
 
     var timeFormatter: TimeFormatter = { hour, minutes ->
-        val date = nowAtTimezone(customTimeZone).withTime(hour = hour, minutes = minutes ?: 0)
+        val date = now().withTime(hour = hour, minutes = minutes ?: 0)
         val dateFormat =
             if (timeFormatIs24Hour) SimpleDateFormat("HH:mm", Locale.getDefault())
             else if (minutes != null) SimpleDateFormat("hh:mm a", Locale.getDefault())
