@@ -1201,26 +1201,35 @@ class MonthFragment : BaseFragment() {
     private fun simulateCollapseWithScroll(startWeekOn: DayOfWeek) {
         val desiredHeight = resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
 
-        if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
+        if (calendarViewModel.monthView.value == false) {
+            // Mini calendar should already be collapsed, skip animation
+            updateMiniCalendarHeight(
+                startWeekOn,
+                isMonthView = false,
+                animateChange = true
+            )
+            timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+        } else {
+            if (currentViewMode != ViewMode.MONTH) mini_calendar_chevron?.let { AndroidUtils.rotateArrowDownward(it) }
 
-        // Animate mini calendar collapse
-        viewPagerTopGuideline?.animateGuidelineHeightChange(
-            desiredHeight,
-            object : AndroidUtils.AnimateGuidelineListener {
-                override fun onHeightChange(animatedValue: Int) {
-                }
+            // Animate mini calendar collapse
+            viewPagerTopGuideline?.animateGuidelineHeightChange(
+                desiredHeight,
+                object : AndroidUtils.AnimateGuidelineListener {
+                    override fun onHeightChange(animatedValue: Int) {
+                    }
 
-                override fun onAnimationEnd() {
-                    // Set mini calendar to collapsed state
-                    calendarViewModel.monthView.value = false
-                    updateMiniCalendarHeight(
-                        startWeekOn,
-                        isMonthView = false,
-                        animateChange = true
-                    )
-                    timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
-                }
-            })
-
+                    override fun onAnimationEnd() {
+                        // Set mini calendar to collapsed state
+                        calendarViewModel.monthView.value = false
+                        updateMiniCalendarHeight(
+                            startWeekOn,
+                            isMonthView = false,
+                            animateChange = true
+                        )
+                        timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
+                    }
+                })
+        }
     }
 }
