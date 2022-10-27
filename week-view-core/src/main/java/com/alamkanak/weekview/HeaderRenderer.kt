@@ -268,13 +268,13 @@ private class DateLabelsDrawer(
         }
 
         // Draw labels separator line
-        drawLine(
-            startPixel + viewState.dayWidth,
-            0f,
-            startPixel + viewState.dayWidth,
-            viewState.headerPadding + weekDayTextLayout.height,
-            viewState.headerBottomLinePaint
-        )
+//        drawLine(
+//            startPixel + viewState.dayWidth,
+//            0f,
+//            startPixel + viewState.dayWidth,
+//            viewState.headerPadding + weekDayTextLayout.height,
+//            viewState.headerBottomLinePaint
+//        )
     }
 }
 
