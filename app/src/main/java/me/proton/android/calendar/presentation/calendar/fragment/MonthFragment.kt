@@ -414,6 +414,8 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
             weekView.timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(timeFormat, requireContext())
+            // Time formatter is already taking timeFormatIs24Hour value into account, we just need to trigger onTimeFormatterChanged
+            weekView.setTimeFormatter(weekView.getTimeFormatter())
         }
 
         calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->

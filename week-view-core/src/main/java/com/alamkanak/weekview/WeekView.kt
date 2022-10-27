@@ -1503,6 +1503,11 @@ class WeekView @JvmOverloads constructor(
         invalidate()
     }
 
+    @PublicApi
+    fun getTimeFormatter(): TimeFormatter {
+        return viewState.timeFormatter
+    }
+
     override fun dispatchHoverEvent(event: MotionEvent): Boolean {
         if (accessibilityTouchHelper.dispatchHoverEvent(event)) {
             return true
