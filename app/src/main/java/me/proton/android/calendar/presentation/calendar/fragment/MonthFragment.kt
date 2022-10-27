@@ -1002,7 +1002,7 @@ class MonthFragment : BaseFragment() {
 
                     val timeZoneId = calendarViewModel.getTimeZoneId()
                     val selectedDate = calendarViewModel.selectedDate.value
-                    if (timeZoneId != null && selectedDate == LocalDate.now()) {
+                    if (timeZoneId != null && (selectedDate == LocalDate.now() || (viewMode == ViewMode.WEEK && selectedDate?.firstDayOfWeek(weekStart) == LocalDate.now().firstDayOfWeek(weekStart)))) {
                         updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId), animate = false)
                     } else if (selectedDate != null) {
                         val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
