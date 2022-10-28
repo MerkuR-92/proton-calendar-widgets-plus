@@ -105,6 +105,8 @@
         app:weakHeaderTextColor="@color/text_weak"
         app:hintHeaderTextColor="@color/text_hint"
         app:noEventsLabel="@string/agenda_no_events"
+        app:loadingEventsLabel="@string/agenda_loading_events"
+        app:showLoadingEvents="false"
         app:headerTextColor="@color/text_norm"
         app:headerTextSize="12sp"
         app:headerLabelsInnerMargin="4dp"

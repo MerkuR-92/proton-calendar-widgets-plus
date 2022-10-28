@@ -51,6 +51,8 @@
         <attr name="weakHeaderTextColor" format="color" />
         <attr name="hintHeaderTextColor" format="color" />
         <attr name="noEventsLabel" format="string" />
+        <attr name="loadingEventsLabel" format="string" />
+        <attr name="showLoadingEvents" format="boolean" />
         <attr name="headerLabelsInnerMargin" format="dimension" />
         <attr name="headerLabelsSeparatorHeight" format="dimension" />
         <attr name="headerNoEventsMarginStart" format="dimension" />

@@ -606,6 +606,17 @@ class WeekView @JvmOverloads constructor(
             invalidate()
         }
 
+    /**
+     * Returns whether we show the loading events text in header.
+     */
+    @PublicApi
+    var showLoadingEvents: Boolean
+        get() = viewState.showLoadingEvents
+        set(value) {
+            viewState.showLoadingEvents = value
+            invalidate()
+        }
+
     /*
      ***********************************************************************************************
      *

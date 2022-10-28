@@ -566,8 +566,12 @@ private class HeaderDrawer(
             canvas.drawAllDayEventsToggleArrow()
         }
 
-        if (viewState.isSingleDay && eventChipsCacheProvider()?.allEventChipsInDateRange(viewState.dateRange)?.isEmpty() == true) {
-            canvas.drawNoEventsLabel()
+        if (viewState.isSingleDay && !viewState.showLoadingEvents && eventChipsCacheProvider()?.allEventChipsInDateRange(viewState.dateRange)?.isEmpty() == true) {
+            canvas.drawDayViewHeaderText(viewState.noEventsLabel)
+        }
+
+        if (viewState.isSingleDay && viewState.showLoadingEvents) {
+            canvas.drawDayViewHeaderText(viewState.loadingEventsLabel)
         }
 
         if (viewState.showHeaderBottomLine) {
@@ -576,9 +580,8 @@ private class HeaderDrawer(
         }
     }
 
-    private fun Canvas.drawNoEventsLabel() {
+    private fun Canvas.drawDayViewHeaderText(text: String) {
 
-        val text = viewState.noEventsLabel
         val textPaint = TextPaint(viewState.headerTextPaint).apply {
             textAlign = Paint.Align.LEFT
             color = viewState.hintHeaderTextColor

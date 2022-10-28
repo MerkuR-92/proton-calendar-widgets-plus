@@ -702,6 +702,7 @@ class MonthFragment : BaseFragment() {
 
     private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            weekView.showLoadingEvents = false
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         // Get and display decrypted events
@@ -713,7 +714,7 @@ class MonthFragment : BaseFragment() {
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-
+                        weekView.showLoadingEvents = true
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         lifecycleScope.launch {
@@ -724,10 +725,11 @@ class MonthFragment : BaseFragment() {
                             weekViewAdapter.submitList(
                                 weekViewCalendarEntities
                             )
+                            weekView.showLoadingEvents = false
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
-
+                        weekView.showLoadingEvents = false
                     }
                 }
             }

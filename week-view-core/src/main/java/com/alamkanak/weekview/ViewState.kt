@@ -109,6 +109,7 @@ internal class ViewState {
     var showHeaderBottomLine: Boolean = false
     var showHeaderBottomShadow: Boolean = false
     var showHeaderDownArrow: Boolean = false
+    var showLoadingEvents: Boolean = false
 
     var customTimeColumnHourSeparatorWidth: Float = 0f
 
@@ -135,6 +136,7 @@ internal class ViewState {
     var weakHeaderTextColor: Int = 0
     var hintHeaderTextColor: Int = 0
     var noEventsLabel: String = ""
+    var loadingEventsLabel: String = ""
 
     val headerTextPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER

@@ -40,6 +40,7 @@ internal object ViewStateFactory {
         viewState.hintHeaderTextColor = a.getColor(R.styleable.WeekView_hintHeaderTextColor, context.textColorPrimary)
 
         viewState.noEventsLabel = a.getString(R.styleable.WeekView_noEventsLabel) ?: ""
+        viewState.loadingEventsLabel = a.getString(R.styleable.WeekView_loadingEventsLabel) ?: ""
 
         viewState.headerTextPaint.apply {
             color = a.getColor(R.styleable.WeekView_headerTextColor, context.textColorPrimary)
@@ -172,6 +173,10 @@ internal object ViewStateFactory {
 
         viewState.apply {
             showTimeColumnSeparator = a.getBoolean(R.styleable.WeekView_showTimeColumnSeparator, false)
+        }
+
+        viewState.apply {
+            showLoadingEvents = a.getBoolean(R.styleable.WeekView_showLoadingEvents, false)
         }
 
         viewState.apply {
