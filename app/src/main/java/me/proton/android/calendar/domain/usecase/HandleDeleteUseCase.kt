@@ -392,12 +392,13 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             } ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee userAttendee was null")
 
             // If address is disabled, cancellation can't be sent
+            val organizerEmail = event.iCalEvent.organizer.extractEmail() ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee organizerEmail was null")
             val sendCancellationResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
                 event,
                 event.iCalendar.timezoneInfo,
                 userAttendee.copy(),
-                event.iCalEvent.organizer.email,
+                organizerEmail,
                 ParticipationStatus.DECLINED,
                 sendPreferences,
                 Date.from(updateTime),

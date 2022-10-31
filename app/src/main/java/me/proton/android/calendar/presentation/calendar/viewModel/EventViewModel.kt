@@ -2841,12 +2841,16 @@ class EventViewModel @Inject constructor(
 
         // We first send the reply to the organizer
         val sendEmailUseCaseResult = if (sendPreferences.isNotEmpty()) {
+            val organizerEmail = event.iCalEvent.organizer.extractEmail() ?: run {
+                handleChangeAnswerError()
+                return
+            }
             sendEmailUseCase.sendReplyToOrganizer(
                 userId,
                 eventCopy,
                 dbEvent?.iCalendar?.timezoneInfo,
                 userAttendee.copy(),
-                event.iCalEvent.organizer.email,
+                organizerEmail,
                 participationStatus,
                 sendPreferences,
                 Date.from(updateTime),
@@ -2931,15 +2935,15 @@ class EventViewModel @Inject constructor(
         } else UseCase.Result.Error("handleChangeAnswerProtonToProton could not upgrade Event: ${upgradedEventEntity}")
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
-        if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty()) {
-
+        val organizerEmail = event.iCalEvent.organizer.extractEmail()
+        if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty() && organizerEmail != null) {
             // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
             val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
                 userId,
                 eventCopy,
                 dbEvent?.iCalendar?.timezoneInfo,
                 userAttendee.copy(),
-                event.iCalEvent.organizer.email,
+                organizerEmail,
                 participationStatus,
                 sendPreferences,
                 Date.from(updateTime), // Use same updateTime as for Update part stat BE call
