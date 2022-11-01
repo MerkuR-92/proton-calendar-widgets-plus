@@ -90,10 +90,10 @@ internal class EventChipBoundsCalculator(
                 // Use top pixel info so that it stays vertically aligned with previous child of multi day event
                 topPixel
             } else {
-                val previousChipsHeight = eventChip.verticalIndex * (eventChip.bounds.height() + viewState.eventMarginVertical)
+                val previousChipsEndY = eventChip.verticalIndex * (eventChip.bounds.height() + viewState.eventMarginVertical)
                 val fixedPreviousChipsHeight =
-                    if (previousChipsHeight > 0 && previousChipsHeight < chipHeight) eventChip.verticalIndex * (chipHeight + viewState.eventMarginVertical)
-                    else previousChipsHeight
+                    if (previousChipsEndY > 0 && previousChipsEndY < chipHeight) eventChip.verticalIndex * (chipHeight + viewState.eventMarginVertical)
+                    else previousChipsEndY
                 val dayViewMarginTop =
                     if (viewState.isSingleDay) viewState.headerPadding / 2f
                     else 0f

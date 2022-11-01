@@ -33,7 +33,7 @@ internal data class EventChip(
     /**
      * The vertical index at which [EventChip] will be drawn.
      */
-    var verticalIndex: Int = 0
+    var verticalIndex: Int = -1
 
     /**
      * We display events with a minimum height of 10min
