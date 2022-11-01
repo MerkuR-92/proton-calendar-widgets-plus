@@ -563,11 +563,11 @@ private class HeaderDrawer(
 ) : Drawer {
 
     private val upArrow: Drawable by lazy {
-        checkNotNull(ContextCompat.getDrawable(context, R.drawable.ic_arrow_up))
+        checkNotNull(viewState.headerChevronUp ?: ContextCompat.getDrawable(context, R.drawable.ic_arrow_up))
     }
 
     private val downArrow: Drawable by lazy {
-        checkNotNull(ContextCompat.getDrawable(context, R.drawable.ic_arrow_down))
+        checkNotNull(viewState.headerChevronDown ?: ContextCompat.getDrawable(context, R.drawable.ic_arrow_down))
     }
 
     override fun draw(canvas: Canvas) {

@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.annotation.AttrRes
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat.LAYOUT_DIRECTION_LTR
 import kotlin.math.roundToInt
@@ -194,6 +195,15 @@ internal object ViewStateFactory {
             headerTodaySquareStrokeWidth = a.getDimension(R.styleable.WeekView_headerTodaySquareStrokeWidth, context.sp(1))
             headerTodaySquareMarginTop = a.getDimension(R.styleable.WeekView_headerTodaySquareMarginTop, context.sp(2))
             headerTodaySquareRadius = a.getDimension(R.styleable.WeekView_headerTodaySquareRadius, context.sp(5))
+        }
+
+        viewState.apply {
+            headerChevronColor = a.getColor(R.styleable.WeekView_defaultEventColor, context.lineColor)
+            headerChevronUp = a.getDrawable(R.styleable.WeekView_headerChevronUp)
+            headerChevronDown = a.getDrawable(R.styleable.WeekView_headerChevronDown)
+            val headerChevronColorString = String.format("#%06X", (0xFFFFFF and viewState.headerChevronColor))
+            headerChevronUp?.setTint(Color.parseColor(headerChevronColorString))
+            headerChevronDown?.setTint(Color.parseColor(headerChevronColorString))
         }
 
         viewState.apply {

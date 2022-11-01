@@ -66,6 +66,9 @@
         <attr name="headerTodaySquareStrokeWidth" format="dimension" />
         <attr name="headerTodaySquareMarginTop" format="dimension" />
         <attr name="headerTodaySquareRadius" format="dimension" />
+        <attr name="headerChevronUp" format="reference" />
+        <attr name="headerChevronDown" format="reference" />
+        <attr name="headerChevronColor" format="color" />
 
         <!-- Week number -->
         <attr name="showWeekNumber" format="boolean" />

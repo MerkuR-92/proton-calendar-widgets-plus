@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.text.TextPaint
 import android.view.View
@@ -70,6 +71,10 @@ internal class ViewState {
     var headerTodaySquareStrokeWidth: Float = 0f
     var headerTodaySquareMarginTop: Float = 0f
     var headerTodaySquareRadius: Float = 0f
+
+    var headerChevronUp: Drawable? = null
+    var headerChevronDown: Drawable? = null
+    var headerChevronColor: Int = 0
 
     var showWeekNumber: Boolean = false
     var weekNumber: Int = 0
