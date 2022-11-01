@@ -271,6 +271,7 @@ private class NowLineDrawer(
             .map { (_, startPixel) -> startPixel }
             .firstOrNull() ?: return
 
+        // Hide now line when date is not in range
         if (startPixel.toInt() == viewState.viewWidth) return
 
         canvas.drawLine(startPixel)

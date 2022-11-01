@@ -53,9 +53,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
+import me.proton.android.calendar.common.DAY_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.THREE_DAYS_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.WEEK_VIEW_DATE_FORMATTER_PATTERN
+import me.proton.android.calendar.common.WEEK_VIEW_DAYS_COUNT
+import me.proton.android.calendar.common.WEEK_VIEW_FUTURE_DAYS_TO_LOAD
+import me.proton.android.calendar.common.WEEK_VIEW_PAST_DAYS_TO_LOAD
+import me.proton.android.calendar.common.WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.animateGuidelineHeightChange
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -70,6 +77,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -137,6 +145,12 @@ class MonthFragment : BaseFragment() {
     private var timeZoneId: String? = null
 
     private var currentViewMode: ViewMode? = null
+
+    // Week view values
+    private var currentFromDate: LocalDate? = null
+    private var currentToDate: LocalDate? = null
+    private lateinit var weekViewAdapter: WeekViewAdapter
+    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
@@ -369,9 +383,9 @@ class MonthFragment : BaseFragment() {
 
         calendarViewModel.viewMode.value?.let { viewMode ->
             when (viewMode) {
-                ViewMode.DAY -> weekView.numberOfVisibleDays = 1
-                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = 3
-                ViewMode.WEEK -> weekView.numberOfVisibleDays = 7
+                ViewMode.DAY -> weekView.numberOfVisibleDays = DAY_VIEW_DAYS_COUNT
+                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = THREE_DAYS_VIEW_DAYS_COUNT
+                ViewMode.WEEK -> weekView.numberOfVisibleDays = WEEK_VIEW_DAYS_COUNT
                 else -> {}
             }
             fragmentMonthLayout.viewMode = viewMode
@@ -385,9 +399,9 @@ class MonthFragment : BaseFragment() {
         // Switch between Agenda and Day views
         calendarViewModel.viewMode.observe(viewLifecycleOwner) { viewMode ->
             when (viewMode) {
-                ViewMode.DAY -> weekView.numberOfVisibleDays = 1
-                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = 3
-                ViewMode.WEEK -> weekView.numberOfVisibleDays = 7
+                ViewMode.DAY -> weekView.numberOfVisibleDays = DAY_VIEW_DAYS_COUNT
+                ViewMode.THREE_DAY -> weekView.numberOfVisibleDays = THREE_DAYS_VIEW_DAYS_COUNT
+                ViewMode.WEEK -> weekView.numberOfVisibleDays = WEEK_VIEW_DAYS_COUNT
                 else -> {}
             }
             fragmentMonthLayout.viewMode = viewMode
@@ -521,13 +535,14 @@ class MonthFragment : BaseFragment() {
 
             setToolbarListeners(zoneId)
 
+            // Update week view time zone if necessary
             if (weekView.customTimeZone != TimeZone.getTimeZone(zoneId)) {
                 weekView.customTimeZone = TimeZone.getTimeZone(zoneId)
                 lifecycleScope.launch {
                     val weekStart = calendarViewModel.getWeekStart()
                     val firstDayOfWeek = calendarViewModel.selectedDate.value?.firstDayOfWeek(weekStart) ?: return@launch
-                    val fromDate = firstDayOfWeek.minusDays(7)
-                    val toDate = firstDayOfWeek.plusDays(13)
+                    val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
+                    val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
 
                     getEvents(fromDate, toDate, zoneId?.id ?: return@launch)
                 }
@@ -607,10 +622,9 @@ class MonthFragment : BaseFragment() {
             dragHandler = { _, _, _ ->
                 // TODO DRAG
             },
-            loadMoreHandler = { yearMonthList ->
-                // TODO Needed ? Or use selectedDate only ?
+            loadMoreHandler = { _ ->
             },
-            rangeChangedHandler = { firstVisibleDate, lastVisibleDate ->
+            rangeChangedHandler = { firstVisibleDate, _ ->
                 if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
                     // For week view we need to use set date as first day of the week so that we stick to user week start choice
                     lifecycleScope.launch {
@@ -644,27 +658,22 @@ class MonthFragment : BaseFragment() {
         weekView.hourHeight = mainViewModel.getWeekViewHourHeight(resources.getDimensionPixelSize(R.dimen.default_week_view_hour_height).toFloat()).roundToInt()
 
         weekView.setWeekDayFormatter { date: LocalDate ->
-            val weekdayFormatter = DateTimeFormatter.ofPattern("EEE", Locale.getDefault()) // first three characters
+            val weekdayFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN, Locale.getDefault())
             weekdayFormatter.format(date)
         }
-        val dateFormatter = DateTimeFormatter.ofPattern("d", Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_DATE_FORMATTER_PATTERN, Locale.getDefault())
         weekView.setDateFormatter { date: LocalDate ->
             dateFormatter.format(date)
         }
     }
-
-    private var currentFromDate: LocalDate? = null
-    private var currentToDate: LocalDate? = null
-    private lateinit var weekViewAdapter: WeekViewAdapter
-    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
 
     private fun updateWeekView(selectedDate: LocalDate, selectedDateTime: LocalDateTime? = null, animate: Boolean = true) {
         lifecycleScope.launch {
             val weekStart = calendarViewModel.getWeekStart()
             val firstDayOfWeek = selectedDate.firstDayOfWeek(weekStart)
             firstDayOfWeek?.let {
-                val fromDate = firstDayOfWeek.minusDays(7)
-                val toDate = firstDayOfWeek.plusDays(13)
+                val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
+                val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
                 if (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate) {
                     val timeZoneId = calendarViewModel.getTimeZoneId()?.id
                     getEvents(fromDate, toDate, timeZoneId ?: return@launch)
@@ -765,41 +774,33 @@ class MonthFragment : BaseFragment() {
                 )
             )
         } else {
-            val confirmationMessage =
-                if (weekViewEvent.isRecurring) R.string.event_decryption_error_dialog_confirmation_recurring
-                else R.string.event_decryption_error_dialog_confirmation
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(R.string.event_decryption_error_dialog_title)
-                .setMessage(R.string.event_decryption_error_dialog_message)
-                .setPositiveButton(confirmationMessage) { _, _ ->
-                    lifecycleScope.launch { // TODO
-                        val deleteResult = withContext(Dispatchers.Default) {
-                            calendarViewModel.handleDeleteEvent(
-                                weekViewEvent.getActualEventId(),
-                                weekViewEvent.calendarId,
-                                EventEditDeleteOption.ALL_EVENTS
-                            )
+            requireContext().displayEventDecryptionErrorDialog(weekViewEvent.isRecurring) { _, _ ->
+                lifecycleScope.launch {
+                    val deleteResult = withContext(Dispatchers.Default) {
+                        calendarViewModel.handleDeleteEvent(
+                            weekViewEvent.getActualEventId(),
+                            weekViewEvent.calendarId,
+                            EventEditDeleteOption.ALL_EVENTS
+                        )
+                    }
+                    if (deleteResult is UseCase.Result.Success<*>) {
+                        requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+                    } else {
+                        var userErrorMessage: String? = null
+                        if (deleteResult is UseCase.Result.Error) {
+                            logger.e("Error deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
+                        } else if (deleteResult is UseCase.Result.InvalidParams) {
+                            logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
                         }
-                        if (deleteResult is UseCase.Result.Success<*>) {
-                            requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
-                        } else {
-                            var userErrorMessage: String? = null
-                            if (deleteResult is UseCase.Result.Error) {
-                                logger.e("Error deleting event: ${deleteResult.message}")
-                                userErrorMessage = deleteResult.userErrorMessage
-                            } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                                userErrorMessage = deleteResult.userErrorMessage
-                            }
-                            requireActivity().displaySnackBar(
-                                if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                                else userErrorMessage
-                            )
-                        }
+                        requireActivity().displaySnackBar(
+                            if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                            else userErrorMessage
+                        )
                     }
                 }
-                .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-                .show()
+            }
         }
     }
 

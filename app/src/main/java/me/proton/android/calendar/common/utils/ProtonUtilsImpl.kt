@@ -1,8 +1,20 @@
 package me.proton.android.calendar.common.utils
 
+import android.content.Context
+import android.content.DialogInterface
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import me.proton.android.calendar.R
+import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
+import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.domain.model.getActualEventId
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.core.presentation.utils.InputValidationResult
 
@@ -43,5 +55,16 @@ object ProtonUtilsImpl : ProtonUtils {
         return email.endsWith(PROTON_MAIL_SHORT_DOMAIN)
     }
 
+    override fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener) {
+        val confirmationMessage =
+            if (isRecurring) R.string.event_decryption_error_dialog_confirmation_recurring
+            else R.string.event_decryption_error_dialog_confirmation
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.event_decryption_error_dialog_title)
+            .setMessage(R.string.event_decryption_error_dialog_message)
+            .setPositiveButton(confirmationMessage, callback)
+            .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
+            .show()
+    }
 }
 

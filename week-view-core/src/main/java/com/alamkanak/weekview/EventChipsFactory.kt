@@ -50,8 +50,8 @@ internal class EventChipsFactory {
     }
 
     internal class EventTimeRange(
-        val startMinute: Int,
-        val endMinute: Int
+        private val startMinute: Int,
+        private val endMinute: Int
     ) {
         fun conflicts(range: EventTimeRange): Boolean {
             return startMinute >= range.startMinute && startMinute < range.endMinute

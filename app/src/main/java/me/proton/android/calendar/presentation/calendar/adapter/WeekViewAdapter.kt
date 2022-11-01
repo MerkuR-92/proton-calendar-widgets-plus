@@ -1,7 +1,6 @@
 package me.proton.android.calendar.presentation.calendar.adapter
 
 import android.graphics.RectF
-import android.util.Log
 import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.WeekViewPagingAdapterJsr310
 import me.proton.android.calendar.common.FeatureFlag.DRAG_AND_DROP
@@ -10,8 +9,6 @@ import me.proton.android.calendar.domain.model.toWeekViewEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 class WeekViewAdapter(
     private val dragHandler: (String, LocalDateTime, LocalDateTime) -> Unit,
@@ -22,11 +19,6 @@ class WeekViewAdapter(
     private val dateHeaderClickHandler: (LocalDate) -> Unit,
     private val onHourHeightChangedHandler: (Float) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
-
-    private val defaultDateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(
-        FormatStyle.MEDIUM,
-        FormatStyle.SHORT
-    )
 
     override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity(context)
 
@@ -63,11 +55,9 @@ class WeekViewAdapter(
     }
 
     override fun onVerticalScrollPositionChanged(currentOffset: Float, distance: Float) {
-        Log.d("BasicActivity", "Scrolling vertically (distance: ${distance.toInt()}, current offset ${currentOffset.toInt()})")
     }
 
     override fun onVerticalScrollFinished(currentOffset: Float) {
-        Log.d("BasicActivity", "Vertical scroll finished (current offset ${currentOffset.toInt()})")
     }
 
     override fun onHourHeightChanged(newHourHeight: Float) {

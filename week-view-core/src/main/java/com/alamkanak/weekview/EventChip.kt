@@ -43,6 +43,7 @@ internal data class EventChip(
     val durationInMinutes: Int by lazy {
         val duration = endTime minutesUntil startTime
         if (duration < minimumHeightMinutes) {
+            // Force duration of event to match minimum value
             minimumHeightMinutes
         } else duration
     }
@@ -81,7 +82,7 @@ internal data class EventChip(
         get() = event.endTime > endTime
 
     var eventTextDoesNotFit: Boolean = false
-    var verticalPaddingReduction: Int = 0
+    var verticalPaddingReduction: Int = 0 // Used to reduce title padding before reducing text size
 
     val isLastIndex: Boolean
         get() = index + 1 == event.daysCount

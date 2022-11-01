@@ -44,14 +44,17 @@ sealed class WeekViewCalendarEntity {
     ) : WeekViewCalendarEntity()
 }
 
+const val OCCURRENCE_NUMBER_SUFFIX = "&occurrenceNumber="
+const val CUSTOM_FONT = "sans-serif-medium"
+
 fun WeekViewCalendarEntity.Event.getActualEventId(): String {
-    val occurrenceNumberIndex = id.indexOf("&occurrenceNumber=")
+    val occurrenceNumberIndex = id.indexOf(OCCURRENCE_NUMBER_SUFFIX)
     return id.substring(0, if (occurrenceNumberIndex >= 0) occurrenceNumberIndex else id.length)
 }
 
 fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: String, defaultEventTitle: String): WeekViewCalendarEntity.Event {
     val occurrenceNumberSuffix = this.occurrence?.occurrenceNumber?.let {
-        "&occurrenceNumber=" + this.occurrence?.occurrenceNumber
+        OCCURRENCE_NUMBER_SUFFIX + this.occurrence?.occurrenceNumber
     } ?: ""
     val weekViewEventId = this.id + occurrenceNumberSuffix
     val participationStatus =
@@ -61,7 +64,7 @@ fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: S
         id = weekViewEventId,
         // Use empty title for failed to decrypt event state
         title = if (this.decryptionStatus == Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
-        location = "", // TODO Do we want to display event location as subtitle ?
+        location = "",
         startTime = this.getStart(timeZoneId).toLocalDateTime(),
         endTime = this.getEnd(timeZoneId).toLocalDateTime(),
         color = Color.parseColor(this.calendar.color),
@@ -121,7 +124,7 @@ fun WeekViewCalendarEntity.Event.toWeekViewEntity(context: Context): WeekViewEnt
     val style = styleBuilder.build()
 
     val title = SpannableStringBuilder(title).apply {
-        val titleSpan = TypefaceSpan("sans-serif-medium")
+        val titleSpan = TypefaceSpan(CUSTOM_FONT)
         setSpan(titleSpan, 0, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         if (strikeThroughTitle) {
             setSpan(StrikethroughSpan(), 0, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

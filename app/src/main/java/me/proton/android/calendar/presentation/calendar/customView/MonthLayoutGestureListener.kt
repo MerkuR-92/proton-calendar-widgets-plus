@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.viewpager2.widget.ViewPager2
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MiniCalendarGestures
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel

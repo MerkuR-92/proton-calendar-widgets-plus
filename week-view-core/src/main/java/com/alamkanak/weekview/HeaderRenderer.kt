@@ -96,7 +96,10 @@ private class HeaderUpdater(
         dateLabels: List<Pair<StaticLayout, StaticLayout>>
     ) {
         val maximumLayoutHeight = dateLabels.map {
-            it.first.height.toFloat() + viewState.headerTodaySquareMarginTop + it.second.height.toFloat() + viewState.headerPadding / 2f
+            it.first.height.toFloat() +
+                    viewState.headerTodaySquareMarginTop +
+                    it.second.height.toFloat() +
+                    (viewState.headerPadding / 2f)
         }.maxOrNull() ?: 0f
         viewState.dateLabelHeight = maximumLayoutHeight
 

@@ -78,6 +78,16 @@ const val MAX_CALENDAR_FREE = 1
 
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 
+const val DAY_VIEW_DAYS_COUNT = 1
+const val THREE_DAYS_VIEW_DAYS_COUNT = 3
+const val WEEK_VIEW_DAYS_COUNT = 7
+
+const val WEEK_VIEW_PAST_DAYS_TO_LOAD = 7L
+const val WEEK_VIEW_FUTURE_DAYS_TO_LOAD = 13L
+
+const val WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN = "EEE"
+const val WEEK_VIEW_DATE_FORMATTER_PATTERN = "d"
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
     145, // Rebranding (2.0.2)
