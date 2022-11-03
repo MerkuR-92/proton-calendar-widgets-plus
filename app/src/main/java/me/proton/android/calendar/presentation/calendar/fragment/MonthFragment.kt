@@ -75,6 +75,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatMonth
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
@@ -658,10 +659,10 @@ class MonthFragment : BaseFragment() {
         weekView.hourHeight = mainViewModel.getWeekViewHourHeight(resources.getDimensionPixelSize(R.dimen.default_week_view_hour_height).toFloat()).roundToInt()
 
         weekView.setWeekDayFormatter { date: LocalDate ->
-            val weekdayFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN, Locale.getDefault())
+            val weekdayFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN, getLocaleForFormatting())
             weekdayFormatter.format(date)
         }
-        val dateFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_DATE_FORMATTER_PATTERN, Locale.getDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern(WEEK_VIEW_DATE_FORMATTER_PATTERN, getLocaleForFormatting())
         weekView.setDateFormatter { date: LocalDate ->
             dateFormatter.format(date)
         }

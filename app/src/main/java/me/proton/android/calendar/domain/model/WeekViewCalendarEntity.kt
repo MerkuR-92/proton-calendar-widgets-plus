@@ -30,7 +30,6 @@ sealed class WeekViewCalendarEntity {
         val strikeThroughTitle: Boolean,
         val isPastEvent: Boolean,
         val isUnanswered: Boolean,
-        val decryptionFailed: Boolean,
         val calendarId: String,
         val decrypted: Boolean,
         val isRecurring: Boolean,
@@ -53,6 +52,7 @@ fun WeekViewCalendarEntity.Event.getActualEventId(): String {
 }
 
 fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: String, defaultEventTitle: String): WeekViewCalendarEntity.Event {
+    // We add the occurrence number as a suffix to the event id so that week view doesn't recycle events with the same id, and so that we easily find the event occurrence on click
     val occurrenceNumberSuffix = this.occurrence?.occurrenceNumber?.let {
         OCCURRENCE_NUMBER_SUFFIX + this.occurrence?.occurrenceNumber
     } ?: ""
@@ -72,7 +72,6 @@ fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: S
         strikeThroughTitle = this.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
         isPastEvent = this.isInThePast(timeZoneId),
         isUnanswered = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-        decryptionFailed = this.decryptionStatus == Event.DecryptionStatus.FAILURE,
         calendarId = this.calendar.id,
         decrypted = this.decryptionStatus == Event.DecryptionStatus.SUCCESS,
         isRecurring = this.isRecurring(),
@@ -89,7 +88,7 @@ fun WeekViewCalendarEntity.toWeekViewEntity(context: Context): WeekViewEntity {
 
 fun WeekViewCalendarEntity.Event.toWeekViewEntity(context: Context): WeekViewEntity {
     val backgroundColor =
-        if (isUnanswered || (strikeThroughTitle && !decryptionFailed)) ContextCompat.getColor(context, R.color.background_norm)
+        if (isUnanswered || (strikeThroughTitle && decrypted)) ContextCompat.getColor(context, R.color.background_norm)
         else if (isPastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
         else color
     val textColor =
