@@ -274,8 +274,8 @@ dependencies {
     kapt "androidx.room:room-compiler:${rootProject.ext.version.room}"
     implementation "androidx.room:room-ktx:${rootProject.ext.version.room}"
 
-    implementation "org.koin:koin-android:${rootProject.ext.version.koin}"
-    implementation "org.koin:koin-android-viewmodel:${rootProject.ext.version.koin}"
+    implementation "io.insert-koin:koin-android:${rootProject.ext.version.koin}"
+    implementation "io.insert-koin:koin-android-viewmodel:${rootProject.ext.version.koin}"
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
     implementation "com.squareup.retrofit2:retrofit:${rootProject.ext.version.retrofit}"
@@ -324,7 +324,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
 
-    testImplementation "org.koin:koin-test:${rootProject.ext.version.koin}"
+    testImplementation "io.insert-koin:koin-test:${rootProject.ext.version.koin}"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.9.1'
 
