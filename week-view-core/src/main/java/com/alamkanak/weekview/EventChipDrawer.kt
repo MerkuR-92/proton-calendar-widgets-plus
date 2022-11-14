@@ -170,79 +170,6 @@ internal class EventChipDrawer(
         }
     }
 
-    private fun Canvas.drawCornersForMultiDayEvents(
-        eventChip: EventChip,
-        cornerRadius: Float
-    ) {
-        val event = eventChip.event
-        val bounds = eventChip.bounds
-
-        val isBeingDragged = event.id == viewState.dragState?.eventId
-        updateBackgroundPaint(event, isBeingDragged, backgroundPaint)
-
-        if (eventChip.startsOnEarlierDay) {
-            val topRect = RectF(bounds)
-            topRect.bottom = topRect.top + cornerRadius
-            drawRect(topRect, backgroundPaint)
-        }
-
-        if (eventChip.endsOnLaterDay) {
-            val bottomRect = RectF(bounds)
-            bottomRect.top = bottomRect.bottom - cornerRadius
-            drawRect(bottomRect, backgroundPaint)
-        }
-
-        if (event.style.borderWidth != null) {
-            drawMultiDayBorderStroke(eventChip, cornerRadius)
-        }
-    }
-
-    private fun Canvas.drawMultiDayBorderStroke(
-        eventChip: EventChip,
-        cornerRadius: Float
-    ) {
-        val event = eventChip.event
-        val bounds = eventChip.bounds
-
-        val borderWidth = event.style.borderWidth ?: 0
-        val borderStart = bounds.left + borderWidth / 2
-        val borderEnd = bounds.right - borderWidth / 2
-
-        updateBorderPaint(event, backgroundPaint)
-
-        if (eventChip.startsOnEarlierDay) {
-            drawVerticalLine(
-                horizontalOffset = borderStart,
-                startY = bounds.top,
-                endY = bounds.top + cornerRadius,
-                paint = backgroundPaint
-            )
-
-            drawVerticalLine(
-                horizontalOffset = borderEnd,
-                startY = bounds.top,
-                endY = bounds.top + cornerRadius,
-                paint = backgroundPaint
-            )
-        }
-
-        if (eventChip.endsOnLaterDay) {
-            drawVerticalLine(
-                horizontalOffset = borderStart,
-                startY = bounds.bottom - cornerRadius,
-                endY = bounds.bottom,
-                paint = backgroundPaint
-            )
-
-            drawVerticalLine(
-                horizontalOffset = borderEnd,
-                startY = bounds.bottom - cornerRadius,
-                endY = bounds.bottom,
-                paint = backgroundPaint
-            )
-        }
-    }
-
     private fun Canvas.drawEventTitle(
         eventChip: EventChip,
         textLayout: StaticLayout
@@ -281,7 +208,7 @@ internal class EventChipDrawer(
         val ellipsizedTitle =
             if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
                 TextUtils.ellipsize(
-                    if (multiDayTimeText.isEmpty()) textLayout.text
+                    if (multiDayTimeText.isBlank()) textLayout.text
                     else "$multiDayTimeText ${textLayout.text}",
                     textLayout.paint,
                     titleWidth,
