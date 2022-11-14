@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Canceled</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Disabled)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d yes</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d maybe</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d yes</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d maybe</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d no</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pending</string>
     <string name="event_attendee_is_organizer">You are the organizer</string>
     <string name="event_attendee_organizer">Organizer</string>
