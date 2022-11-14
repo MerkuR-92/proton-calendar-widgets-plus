@@ -152,7 +152,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus =
-                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.InitResult.Error.Default("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
                     userId,
                     editMode = false,
@@ -306,7 +306,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus = withContext(Dispatchers.Main) {
-                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.InitResult.Error.Default("user ID is null in EventDetailsFragment onViewCreated")
                 else eventViewModel.initialise(
                     userId,
                     editMode = true,
@@ -346,6 +346,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
+                            else if (viewModeInitStatus is EventViewModel.InitResult.Error.InitDefaultCalendarError) getString(R.string.snack_create_event_no_active_personal_calendar)
                             else getString(R.string.snack_event_init_error)
                         )
                     }

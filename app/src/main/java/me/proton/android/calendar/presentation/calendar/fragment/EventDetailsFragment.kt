@@ -268,7 +268,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus =
-                if (userId == null) EventViewModel.InitResult.Error("user ID is null in EventDetailsFragment onViewCreated")
+                if (userId == null) EventViewModel.InitResult.Error.Default("user ID is null in EventDetailsFragment onViewCreated")
                 else withContext(Dispatchers.Default) {
                     eventViewModel.initialise(
                         userId,

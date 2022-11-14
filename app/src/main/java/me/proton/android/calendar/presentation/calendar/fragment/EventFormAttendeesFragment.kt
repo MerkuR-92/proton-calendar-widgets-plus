@@ -211,12 +211,12 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                     organizerEmail
                 )
 
-                if (organizer.email != null) {
-                    attendeeListAdapter.setOrganizerEmail(organizer.email)
-                    searchAttendeeListAdapter.setOrganizerEmail(organizer.email)
+                organizer.extractEmail()?.let {
+                    attendeeListAdapter.setOrganizerEmail(it)
+                    searchAttendeeListAdapter.setOrganizerEmail(it)
                 }
                 val attendeeList = ArrayList(event.iCalEvent.attendees.reversed()) // Last added at the top, first at the bottom
-                if (!attendeeList.isNullOrEmpty() && organizer.email != null && !attendeeList.contains(organizer)) {
+                if (!attendeeList.isNullOrEmpty() && organizer.extractEmail() != null && !attendeeList.contains(organizer)) {
                     attendeeList.add(organizer)
                 }
 

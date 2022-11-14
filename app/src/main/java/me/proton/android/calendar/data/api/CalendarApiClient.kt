@@ -3,6 +3,7 @@ package me.proton.android.calendar.data.api
 import android.os.Build
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.API_APPLICATION_NAME
+import me.proton.android.calendar.common.API_DEBUG_APPLICATION_SUFFIX
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.USER_AGENT_NAME
@@ -18,7 +19,7 @@ class CalendarApiClient @Inject constructor(
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
 ) : ApiClient {
 
-    override val appVersionHeader = "${API_APPLICATION_NAME}@${BuildConfig.VERSION_NAME}"
+    override val appVersionHeader = "${API_APPLICATION_NAME}@${BuildConfig.VERSION_NAME}${if (BuildConfig.DEBUG) API_DEBUG_APPLICATION_SUFFIX else ""}"
     override val enableDebugLogging = BuildConfig.DEBUG
     override val shouldUseDoh get() = defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
         SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
