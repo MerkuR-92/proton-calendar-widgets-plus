@@ -30,7 +30,7 @@ class CalendarUserAddressListener @Inject constructor(
         response: EventsResponse
     ): List<Event<String, AddressResponse>>? {
         return response.body.deserializeOrNull<UserAddressEvents>()?.addresses?.map {
-            Event(requireNotNull(Action.map[it.action]), it.address.id, it.address)
+            Event(requireNotNull(Action.map[it.action]), it.id, it.address)
         }
     }
 
