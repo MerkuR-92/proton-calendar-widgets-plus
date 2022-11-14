@@ -103,9 +103,9 @@
     <string name="event_change_answer_recurring_cancel">Abbrechen</string>
     <string name="event_change_answer_recurring_confirm">Aktualisieren</string>
     <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Einladung für %s</string>
-    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s” bestätigt</string>
-    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s” abgelehnt</string>
-    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s” unter Vorbehalt bestätigt</string>
+    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s“ angenommen</string>
+    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s“ abgelehnt</string>
+    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s hat deine Einladung zu „%2$s“ unter Vorbehalt angenommen</string>
     <string name="event_organizer_send_prefs_error_title">Organisator konnte nicht benachrichtigt werden</string>
     <string name="event_organizer_send_prefs_message_accepted_title">Der Organisator konnte nicht darüber informiert werden, dass du die Einladung bestätigt hast</string>
     <string name="event_organizer_send_prefs_message_declined_title">Der Organisator konnte nicht darüber informiert werden, dass du die Einladung abgelehnt hast</string>
@@ -300,7 +300,7 @@
     <string name="snack_ics_reply_party_crasher_error">Teilnehmer, die nicht vom Organisator eingeladen wurden, können nicht hinzugefügt werden</string>
     <string name="snack_ics_missing_uid_error">Dem Termin fehlt die UID</string>
     <string name="snack_ics_no_active_calendar_error">Diesem Konto ist kein aktiver persönlicher Kalender zugeordnet</string>
-    <string name="snack_ics_unsupported_duration_error">Die Eigenschaft „Dauer” wird nicht unterstützt</string>
+    <string name="snack_ics_unsupported_duration_error">Die Eigenschaft „Dauer“ wird nicht unterstützt</string>
     <string name="snack_ics_too_many_events_error">Mehrfachtermine werden noch nicht unterstützt</string>
     <string name="snack_ics_no_events_error">Dieser Kalender enthält keine Termine</string>
     <string name="snack_ics_invalid_error">Diese Einladung ist ungültig</string>
@@ -341,7 +341,7 @@
     <string name="bug_report_hint_description">Bitte beschreibe das Problem und füge alle Fehlermeldungen hinzu.</string>
     <string name="bug_report_discard_changes_title">Ungespeicherte Änderungen</string>
     <string name="bug_report_discard_changes_description">Ungespeicherte Elemente im Formular vorhanden. Möchtest du diese wirklich verwerfen?</string>
-    <string name="bug_report_discard_changes_cancel">Bearbeiten fortsetzen</string>
+    <string name="bug_report_discard_changes_cancel">Bearbeitung fortsetzen</string>
     <string name="bug_report_discard_changes_confirm">Verwerfen</string>
     <!-- Settings -->
     <string name="settings_theme_title">Farbschema</string>
@@ -482,7 +482,7 @@
     <string name="import_assistant_new_calendar_badge">Neu</string>
     <string name="import_assistant_merge_calendar_badge">Zusammengeführt</string>
     <string name="import_assistant_creating_calendars">Neue Kalender werden erstellt</string>
-    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Fast geschafft …</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Fast geschafft…</string>
     <string name="import_assistant_new_calendar_header">Neuen erstellen</string>
     <string name="import_assistant_merge_calendar_header">Mit vorhandenem zusammenführen</string>
     <string name="import_assistant_in_progress_title">Datenimport läuft gerade</string>
@@ -599,7 +599,7 @@
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
         <item quantity="one">Jeden Tag</item>
-        <item quantity="other">Aller %1$d %2$s</item>
+        <item quantity="other">Alle %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
         <item quantity="one">Jede Woche</item>

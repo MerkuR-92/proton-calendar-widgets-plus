@@ -57,20 +57,20 @@
     <string name="event_alarm_label_before">%1$s prima</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s prima via email</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s alle %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s a %2$s via email</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s prima alle %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s prima alle %2$s via email</string>
-    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s su %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s il %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s il giorno %2$d</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s su %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s ogni %2$s</string>
     <string name="event_recurrence_none">Nessuna ripetizione</string>
     <string name="event_recurrence_daily">Giornaliero</string>
     <string name="event_recurrence_weekly">Settimanale</string>
     <string name="event_recurrence_monthly">Mensile</string>
     <string name="event_recurrence_yearly">Annuale</string>
     <string name="event_recurrence_weekly_on_all_days">tutti i giorni</string>
-    <string name="event_recurrence_until" comment="Event happens regularly until a date">fino a %1$s</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">fino al %1$s</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">fino a %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annullato</string>
@@ -78,7 +78,7 @@
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sì</string>
     <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d forse</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d NO</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d in attesa</string>
     <string name="event_attendee_is_organizer">Tu sei l\'organizzatore</string>
     <string name="event_attendee_organizer">Organizzatore</string>

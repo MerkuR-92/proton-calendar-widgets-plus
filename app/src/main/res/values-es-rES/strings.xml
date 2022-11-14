@@ -461,14 +461,14 @@
     <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
-    <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
-    <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
+    <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>
+    <string name="import_assistant_prepare_import_error">Error preparando la importación. Inténtalo de nuevo más tarde</string>
     <string name="import_assistant_prepare_import">Preparando importación</string>
     <string name="import_assistant_gathering_data_loader_title">Obteniendo tus datos</string>
     <string name="import_assistant_summary_title">Resumen de la importación</string>
     <string name="import_assistant_summary_customize_import">Personalizar importación</string>
     <string name="import_assistant_error">Error en la obtención de los datos</string>
-    <string name="import_assistant_data_gathering_error">Data gathering failed</string>
+    <string name="import_assistant_data_gathering_error">Falló la recolección de datos</string>
     <string name="import_assistant_update_import_error">No se pudo actualizar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Cuenta errónea. Por favor, inicie sesión con la cuenta que usa para la importación del calendario.</string>
     <string name="import_assistant_start_import_error">No se pudo iniciar la importación. Inténtalo de nuevo más tarde.</string>
@@ -477,20 +477,20 @@
     <string name="import_assistant_cancel_import_error">No se pudo cancelar la importación. Por favor, inténtalo más tarde.</string>
     <string name="import_assistant_resume_import_error">No se pudo reanudar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_create_calendar_error">Uno o varios calendarios fallaron al ser creados</string>
-    <string name="import_assistant_start_import_empty_error">Failed to start import, there are no calendars to import</string>
+    <string name="import_assistant_start_import_empty_error">Error al iniciar la importación. No hay calendarios a importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>
     <string name="import_assistant_new_calendar_badge">Nuevo</string>
     <string name="import_assistant_merge_calendar_badge">Combinado</string>
     <string name="import_assistant_creating_calendars">Creando calendarios nuevos</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Ya casi está…</string>
     <string name="import_assistant_new_calendar_header">Crear nuevo</string>
-    <string name="import_assistant_merge_calendar_header">Merge with existing</string>
+    <string name="import_assistant_merge_calendar_header">Combinar con uno existente</string>
     <string name="import_assistant_in_progress_title">Importación en progreso</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importando datos de %s a %s.</string>
     <string name="import_assistant_in_progress_redirect">Comprobar el progreso</string>
-    <string name="import_assistant_in_progress_sub_description">Large imports can take several days. We will let you know when the import is done. You can close this screen.</string>
-    <string name="import_assistant_guide_subtitle">Make the switch to privacy. Easily and securely.</string>
-    <string name="import_assistant_guide_description">Move your events and other data from Google to Proton. The Easy Switch importer guides you each step of the way and encrypts your data as it\'s moved.</string>
+    <string name="import_assistant_in_progress_sub_description">Las importaciones grandes pueden llevar varios días. Te informaremos cuando la importación haya terminado. Puedes cerrar esta ventana.</string>
+    <string name="import_assistant_guide_subtitle">Pásate a la privacidad. Sin esfuerzo y de forma segura.</string>
+    <string name="import_assistant_guide_description">Mueve tus eventos y otros datos de Google a Proton. El importador Easy Switch te guía paso a paso y cifra tus datos mientras los mueve.</string>
     <string name="import_assistant_new_import">Nueva importación</string>
     <string name="import_assistant_previous_import">Importaciones anteriores</string>
     <string name="import_assistant_report_details">%s • %s</string>
@@ -503,10 +503,10 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Pausado</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Fallido</string>
     <string name="import_assistant_status_paused_lost_connection_title">Se perdió la conexión con Google</string>
-    <string name="import_assistant_status_paused_lost_connection_description">To continue the import, tap Reconnect, sign in to Google, and grant Proton access to your Google data again.</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Para continuar con la importación, pulsa Reconectar, inicia sesión en Google y permite a Proton acceder de nuevo a tus datos de Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
     <string name="import_assistant_status_paused_storage_full_title">Tu almacenamiento está lleno</string>
-    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
+    <string name="import_assistant_status_paused_storage_full_description">Tu cuenta de Proton no tiene almacenamiento suficiente para finalizar esta importación de calendario. Libera espacio o añade más almacenamiento y vuelve aquí para continuar.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reanudar</string>
     <string name="import_assistant_delete_report_title">¿Eliminar de la lista?</string>
     <string name="import_assistant_delete_report_message">Ya no verás este registro de importación en la lista.</string>
@@ -518,7 +518,7 @@
     <string name="import_assistant_cancel_import_negative_button">Reanudar la importación</string>
     <string name="import_assistant_in_progress_snack">Importación en progreso</string>
     <string name="import_assistant_discard_import_title">¿Cancelar la importación?</string>
-    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_message">La importación está incompleta y no se puede reanudar si la cancelas.</string>
     <string name="import_assistant_discard_import_positive">Cancelar la importación</string>
     <string name="import_assistant_discard_import_negative">Reanudar la importación</string>
     <string name="import_assistant_authentication_canceled">Autenticación cancelada</string>
@@ -554,8 +554,8 @@
         <item quantity="other">Fusionar %d calendarios en Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
-        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
+        <item quantity="one">No se pueden crear nuevos calendarios para todos los calendarios importados debido al límite de calendarios personales.\n Deselecciona al menos %1$d calendario</item>
+        <item quantity="other">No se pueden crear nuevos calendarios para todos los calendarios importados debido al límite de calendarios personales.\n Deselecciona al menos %1$d calendarios</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020or\n • Unir al menos %1$d calendario con calendarios Proton existentes.</item>
