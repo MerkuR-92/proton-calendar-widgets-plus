@@ -67,6 +67,13 @@ object SpotlightUtils {
         )
     }
 
+    private fun getWeekViewDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_week_view_title,
+            R.string.spotlight_dialog_week_view_description
+        )
+    }
+
     fun Activity.showLastSpotlightDialog() {
         if (!SPOTLIGHT) return
 
@@ -115,6 +122,15 @@ object SpotlightUtils {
                             customPositiveButtonCallback = positiveButtonCallback
                         )
                     }
+                )
+            }
+            163 -> {
+                // Week view
+                val weekViewContent = getWeekViewDialogContent()
+                this.displaySpotlightDialog(
+                    weekViewContent.first,
+                    weekViewContent.second,
+                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
                 )
             }
             else -> {

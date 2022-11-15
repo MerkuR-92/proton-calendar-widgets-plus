@@ -244,8 +244,8 @@ internal class ViewState {
         val date = now().withTime(hour = hour, minutes = minutes ?: 0)
         val dateFormat =
             if (timeFormatIs24Hour) SimpleDateFormat("HH:mm", Locale.getDefault())
-            else if (minutes != null) SimpleDateFormat("hh:mm a", Locale.getDefault())
-            else SimpleDateFormat("hh a", Locale.getDefault())
+            else if (minutes != null) SimpleDateFormat("h:mm a", Locale.getDefault())
+            else SimpleDateFormat("h a", Locale.getDefault())
         dateFormat.format(date.time)
     }
 

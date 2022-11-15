@@ -91,7 +91,8 @@ const val WEEK_VIEW_DATE_FORMATTER_PATTERN = "d"
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
     145, // Rebranding (2.0.2)
-    150 // Easy switch (2.2.0)
+    150, // Easy switch (2.2.0)
+    163 // Week view (2.3.9)
 )
 
 object FeatureFlag {
