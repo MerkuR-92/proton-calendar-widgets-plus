@@ -94,8 +94,8 @@
     <string name="event_decryption_error_dialog_confirmation_recurring">Eliminar eventos</string>
     <string name="event_decryption_error_dialog_close">Fechar</string>
     <string name="event_signature_verification_failure">A verificação da assinatura do evento falhou. <a href="https://proton.me/support/what-is-a-digital-signature">Saiba mais</a></string>
-    <string name="event_signature_verification_in_progress">Verification of the event signature is in progress.</string>
-    <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
+    <string name="event_signature_verification_in_progress">A verificação da assinatura do evento está em curso.</string>
+    <string name="event_signature_verification_network_error">A verificação da assinatura do evento foi interrompida por um erro. <a href="">Tente novamente</a>.</string>
     <string name="event_change_answer_recurring_title">Actualizar evento recorrente</string>
     <string name="event_change_answer_recurring_description">Deseja alterar a sua resposta para todos os eventos na série?</string>
     <string name="event_change_answer_recurring_overwrite_description">Deseja alterar a resposta a todos os eventos desta série?\nAlgumas respostas a ocorrências previamente actualizadas pelo organizador serão perdidas.</string>
@@ -462,7 +462,7 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Calendar e permita que o Proton aceda aos seus dados.</string>
-    <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
+    <string name="import_assistant_prepare_import_error">Erro ao preparar a importação. Por favor, tente mais tarde.</string>
     <string name="import_assistant_prepare_import">A preparar a importação</string>
     <string name="import_assistant_gathering_data_loader_title">Recolhendo os seus dados</string>
     <string name="import_assistant_summary_title">Resumo da importação</string>
@@ -522,7 +522,7 @@
     <string name="import_assistant_discard_import_positive">Cancelar importação</string>
     <string name="import_assistant_discard_import_negative">Retomar importação</string>
     <string name="import_assistant_authentication_canceled">Autenticação cancelada</string>
-    <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
+    <string name="import_assistant_sign_in_in_progress">Um processo de início de sessão já está em curso.</string>
     <string name="import_assistant_in_progress_error_snack">Ainda há uma importação em curso.</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -538,28 +538,28 @@
         <item quantity="other">%d importações em curso</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d of %d created in %s</item>
-        <item quantity="other">%d of %d created in %s</item>
+        <item quantity="one">%d de %d criado em %s</item>
+        <item quantity="other">%d de %d criados em %s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
         <item quantity="one">Criar %d agenda no Proton Calendar.</item>
         <item quantity="other">Criar %d agendas no Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Import %d of %d calendar from</item>
-        <item quantity="other">Import %d of %d calendars from</item>
+        <item quantity="one">Importar %d de %d agenda de</item>
+        <item quantity="other">Importar %d de %d agendas de</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
         <item quantity="one">Unir %d agenda no Proton Calendar.</item>
         <item quantity="other">Unir %d agendas no Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
-        <item quantity="other">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendars</item>
+        <item quantity="one">Não é possível criar agendas para todas as agendas importadas devido ao limite de agenda pessoal.\n • Desmarque pelo menos %1$d agenda.</item>
+        <item quantity="other">Não é possível criar agendas para todas as agendas importadas devido ao limite de agenda pessoal.\n • Desmarque pelo menos %1$d agendas.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
-        <item quantity="other">\u0020or\n • Merge at least %1$d calendars with existing Proton calendars.</item>
+        <item quantity="one">\u0020ou\n • Una pelo menos %1$d agenda com agendas Proton existentes.</item>
+        <item quantity="other">\u0020ou\n • Una pelo menos %1$d agendas com agendas Proton existentes.</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuto</item>
@@ -624,19 +624,19 @@
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
         <item translatable="false"/>
-        <item>first</item>
+        <item>primeiro</item>
         <item>segundo</item>
-        <item>third</item>
-        <item>fourth</item>
-        <item>fifth</item>
+        <item>terceiro</item>
+        <item>quarto</item>
+        <item>quinto</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
         <item translatable="false"/>
         <item>último(a)</item>
-        <item>second to last</item>
-        <item>third to last</item>
-        <item>fourth to last</item>
-        <item>fifth to last</item>
+        <item>penúltimo</item>
+        <item>terceiro a último</item>
+        <item>quarto a último</item>
+        <item>quinto a último</item>
     </string-array>
     <string-array name="app_themes">
         <item>Claro</item>

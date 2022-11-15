@@ -508,7 +508,7 @@
     <string name="import_assistant_status_paused_storage_full_title">Uw opslagruimte is vol</string>
     <string name="import_assistant_status_paused_storage_full_description">Uw Proton-account heeft niet genoeg opslagruimte om deze agenda-import te voltooien. Maak ruimte vrij of voeg meer opslagruimte toe en kom dan hier terug om verder te gaan.</string>
     <string name="import_assistant_status_paused_storage_full_button">Hervatten</string>
-    <string name="import_assistant_delete_report_title">Dit bericht komt van een mailinglist?</string>
+    <string name="import_assistant_delete_report_title">Verwijderen van de lijst?</string>
     <string name="import_assistant_delete_report_message">U ziet dit importrecord niet meer in de lijst.</string>
     <string name="import_assistant_delete_report_positive_button">Verwijderen</string>
     <string name="import_assistant_delete_report_negative_button">Behouden</string>

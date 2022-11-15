@@ -95,7 +95,7 @@
     <string name="event_decryption_error_dialog_close">Tanca</string>
     <string name="event_signature_verification_failure">La verificació de la signatura de l\'esdeveniment ha fallat. <a href="https://proton.me/support/what-is-a-digital-signature">Saber-ne més</a></string>
     <string name="event_signature_verification_in_progress">La verificació de la signatura de l\'esdeveniment està en curs.</string>
-    <string name="event_signature_verification_network_error">Verification of the event signature was interrupted by an error. <a href="">Try again</a></string>
+    <string name="event_signature_verification_network_error">La verificació de la signatura de l\'esdeveniment s\'ha interromput per un error. <a href="">Torna-ho a provar</a></string>
     <string name="event_change_answer_recurring_title">Actualitzar esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador/a es perdran.</string>
@@ -299,7 +299,7 @@
     <string name="snack_ics_party_crasher_error">El vostre correu electrònic no es troba a la llista de participants</string>
     <string name="snack_ics_reply_party_crasher_error">No es poden afegir participants que no han estat convidats per l\'organitzador</string>
     <string name="snack_ics_missing_uid_error">A l\'esdeveniment li manca UID</string>
-    <string name="snack_ics_no_active_calendar_error">No hi ha cap calendari personal actiu associat amb aquest compte</string>
+    <string name="snack_ics_no_active_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte.</string>
     <string name="snack_ics_unsupported_duration_error">No s\'admet la propietat de durada</string>
     <string name="snack_ics_too_many_events_error">Encara no s\'admeten esdeveniments múltiples</string>
     <string name="snack_ics_no_events_error">Aquest calendari no conté cap esdeveniment</string>
@@ -415,7 +415,7 @@
     <string name="bootstrap_error_no_calendar_message">Per configurar-ne un ara, visiteu <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparant els calendaris</string>
     <string name="bootstrap_error_some_calendars_failed_message">Els calendaris següents no s\'han pogut configurar</string>
-    <string name="bootstrap_error_no_active_calendar_title">No hi ha cap calendari personal actiu associat amb aquest compte.</string>
+    <string name="bootstrap_error_no_active_calendar_title">No hi ha un calendari personal actiu associat amb aquest compte.</string>
     <string name="bootstrap_error_no_active_calendar_message">Per aprendre com activar un calendari, visiteu la nostra <a href="https://proton.me/support">base de coneixements</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hi ha més espai d\'emmagatzematge disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Saber-ne més</string>
@@ -554,12 +554,13 @@
         <item quantity="other">Combina %d calendaris a Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Can’t create new calendars for all imported calendars due to the personal calendar limit.\n • Deselect at least %1$d calendar</item>
+        <item quantity="one">No es poden importar tots els calendaris perquè heu arribat al límit personal de calendaris.\n
+• Deseleccioneu %1$d calendaris com a mínim</item>
         <item quantity="other">No es poden importar tots els calendaris perquè heu arribat al límit personal de calendaris.\n
-• Deselecciona %1$d calendaris com a mínim</item>
+• Deseleccioneu %1$d calendaris com a mínim</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020or\n • Merge at least %1$d calendar with existing Proton calendars.</item>
+        <item quantity="one">\u0020o\n • Combineu almenys %1$d calendari importat amb els vostres calendaris Proton existents.</item>
         <item quantity="other">\u0020o\n • Combineu almenys %1$d calendaris importats amb els vostres calendaris Proton existents.</item>
     </plurals>
     <plurals name="plural_minute">
