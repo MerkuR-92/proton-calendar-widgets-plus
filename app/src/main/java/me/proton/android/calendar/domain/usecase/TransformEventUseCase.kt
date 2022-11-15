@@ -306,7 +306,7 @@ class TransformEventUseCase @Inject constructor(
                 val pinnedKeyResult = obtainPinnedKeysUseCase.execute(userId, listOf(canonicalizedAuthorEmail))[eventPart.author]
                 if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Success) {
                     pinnedKeyResult.pinnedPublicKeys
-                } else if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Error.EmailNotInContacts) {
+                } else if (pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Error.EmailNotInContacts || pinnedKeyResult is ObtainPinnedKeysUseCase.Result.Error.NoCorrectlySignedTrustedKeys) {
                     // case when we can't verify the signature and we don't treat it as error
                     emptyList()
                 } else null // getting pinned keys failed for legitimate reason
