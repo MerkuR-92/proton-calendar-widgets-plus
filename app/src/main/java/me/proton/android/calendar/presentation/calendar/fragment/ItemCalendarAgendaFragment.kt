@@ -106,7 +106,7 @@ class ItemCalendarAgendaFragment: Fragment() {
                     )
                 } else {
                     requireContext().displayEventDecryptionErrorDialog(it.isRecurring()) { _, _ ->
-                        lifecycleScope.launch { // TODO
+                        lifecycleScope.launch {
                             val deleteResult = withContext(Dispatchers.Default) {
                                 calendarViewModel.handleDeleteEvent(
                                     it.id,
