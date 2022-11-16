@@ -78,10 +78,21 @@ const val MAX_CALENDAR_FREE = 1
 
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 
+const val DAY_VIEW_DAYS_COUNT = 1
+const val THREE_DAYS_VIEW_DAYS_COUNT = 3
+const val WEEK_VIEW_DAYS_COUNT = 7
+
+const val WEEK_VIEW_PAST_DAYS_TO_LOAD = 7L
+const val WEEK_VIEW_FUTURE_DAYS_TO_LOAD = 13L
+
+const val WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN = "EEE"
+const val WEEK_VIEW_DATE_FORMATTER_PATTERN = "d"
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     112, // Month view (0.30.3)
     145, // Rebranding (2.0.2)
-    150 // Easy switch (2.2.0)
+    150, // Easy switch (2.2.0)
+    163 // Week view (2.3.9)
 )
 
 object FeatureFlag {
@@ -104,6 +115,9 @@ object FeatureFlag {
     const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
+    const val THREE_DAYS_VIEW = true
+    const val WEEK_VIEW = true
+    const val DRAG_AND_DROP = false
 }
 
 object HttpResponseCode {
@@ -125,6 +139,7 @@ object SharedPreferencesKeys {
     const val APP_SETTINGS_LANGUAGE = "app_settings_language"
     const val APP_CURRENT_LANGUAGE = "app_current_language"
     const val APP_INSTALLATION_ID = "app_installation_id"
+    const val WEEK_VIEW_HOUR_HEIGHT = "week_view_hour_height"
 }
 
 object MiniCalendarGestures {
@@ -155,8 +170,10 @@ enum class AlarmAction(val value: Int) {
 
 enum class ViewMode(val value: Int) {
     AGENDA(0),
-    DAY(1),
-    MONTH(2)
+    MONTH(1),
+    DAY(2),
+    THREE_DAY(3),
+    WEEK(4)
 }
 
 enum class EventEditDeleteOption {

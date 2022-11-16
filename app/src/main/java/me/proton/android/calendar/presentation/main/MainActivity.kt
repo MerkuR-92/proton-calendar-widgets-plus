@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -55,6 +56,8 @@ import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_agenda_pre
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_day_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_layout
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_three_day_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_week_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_timezone
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_user_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_calendars_list
@@ -77,6 +80,10 @@ import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_i
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_icon
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_layout
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_icon
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_user_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_version
 import kotlinx.coroutines.Dispatchers
@@ -102,6 +109,8 @@ import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.FeatureFlag.THREE_DAYS_VIEW
+import me.proton.android.calendar.common.FeatureFlag.WEEK_VIEW
 import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
@@ -121,10 +130,12 @@ import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.getActualEventId
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -177,7 +188,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     // Save the current view mode so that we know if we are navigating to day view from the month view
     private var currentViewMode: ViewMode? = null
     // Lets us know whether we need to navigate back to month when triggering back action
-    private var returnToMonthView: Boolean = false
+    private var returnToView: ViewMode? = null
 
     private var googleSignInClient: GoogleSignInClient? = null
 
@@ -489,11 +500,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 } else if (showDayIntent != null && showDayIntent.data != null) {
 
                     val dayToShow = showDayIntent.data?.getQueryParameter("date")?.let { LocalDate.parse(it) }
-                    dayToShow?.let {
-                        lifecycleScope.launch {
-                            calendarViewModel.setJumpToCurrentTimeIfNeeded(it)
-                        }
-                    }
                     safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
@@ -593,41 +599,33 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
                 is EventViewModel.EventLinkResult.DecryptionFailed -> {
                     safeNavigateToMonth()
-                    val confirmationMessage =
-                        if (handleEventLinkResult.event.isRecurring()) R.string.event_decryption_error_dialog_confirmation_recurring
-                        else R.string.event_decryption_error_dialog_confirmation
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.event_decryption_error_dialog_title)
-                        .setMessage(R.string.event_decryption_error_dialog_message)
-                        .setPositiveButton(confirmationMessage) { _, _ ->
-                            lifecycleScope.launch { // TODO
-                                val deleteResult = withContext(Dispatchers.Default) {
-                                    calendarViewModel.handleDeleteEvent(
-                                        eventId,
-                                        calendarId,
-                                        EventEditDeleteOption.ALL_EVENTS
-                                    )
+                    displayEventDecryptionErrorDialog(handleEventLinkResult.event.isRecurring()) { _, _ ->
+                        lifecycleScope.launch { // TODO
+                            val deleteResult = withContext(Dispatchers.Default) {
+                                calendarViewModel.handleDeleteEvent(
+                                    eventId,
+                                    calendarId,
+                                    EventEditDeleteOption.ALL_EVENTS
+                                )
+                            }
+                            if (deleteResult is UseCase.Result.Success<*>) {
+                                this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                            } else {
+                                var userErrorMessage: String? = null
+                                if (deleteResult is UseCase.Result.Error) {
+                                    logger.e("Error deleting event: ${deleteResult.message}")
+                                    userErrorMessage = deleteResult.userErrorMessage
+                                } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                    logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                    userErrorMessage = deleteResult.userErrorMessage
                                 }
-                                if (deleteResult is UseCase.Result.Success<*>) {
-                                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
-                                } else {
-                                    var userErrorMessage: String? = null
-                                    if (deleteResult is UseCase.Result.Error) {
-                                        logger.e("Error deleting event: ${deleteResult.message}")
-                                        userErrorMessage = deleteResult.userErrorMessage
-                                    } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                                        userErrorMessage = deleteResult.userErrorMessage
-                                    }
-                                    this@MainActivity.displaySnackBar(
-                                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                                        else userErrorMessage
-                                    )
-                                }
+                                this@MainActivity.displaySnackBar(
+                                    if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                    else userErrorMessage
+                                )
                             }
                         }
-                        .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-                        .show()
+                    }
                 }
                 is EventViewModel.EventLinkResult.EventDoesNotExist -> {
                     this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
@@ -718,41 +716,33 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun deleteFailedToDecryptEvent(eventId: String, calendarId: String, isRecurring: Boolean?) {
-        val confirmationMessage =
-            if (isRecurring == true) R.string.event_decryption_error_dialog_confirmation_recurring
-            else R.string.event_decryption_error_dialog_confirmation
-        MaterialAlertDialogBuilder(this@MainActivity)
-            .setTitle(R.string.event_decryption_error_dialog_title)
-            .setMessage(R.string.event_decryption_error_dialog_message)
-            .setPositiveButton(confirmationMessage) { _, _ ->
-                lifecycleScope.launch { // TODO
-                    val deleteResult = withContext(Dispatchers.Default) {
-                        calendarViewModel.handleDeleteEvent(
-                            eventId,
-                            calendarId,
-                            EventEditDeleteOption.ALL_EVENTS
-                        )
+        displayEventDecryptionErrorDialog(isRecurring == true) { _, _ ->
+            lifecycleScope.launch { // TODO
+                val deleteResult = withContext(Dispatchers.Default) {
+                    calendarViewModel.handleDeleteEvent(
+                        eventId,
+                        calendarId,
+                        EventEditDeleteOption.ALL_EVENTS
+                    )
+                }
+                if (deleteResult is UseCase.Result.Success<*>) {
+                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                } else {
+                    var userErrorMessage: String? = null
+                    if (deleteResult is UseCase.Result.Error) {
+                        logger.e("Error deleting event: ${deleteResult.message}")
+                        userErrorMessage = deleteResult.userErrorMessage
+                    } else if (deleteResult is UseCase.Result.InvalidParams) {
+                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                        userErrorMessage = deleteResult.userErrorMessage
                     }
-                    if (deleteResult is UseCase.Result.Success<*>) {
-                        this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
-                    } else {
-                        var userErrorMessage: String? = null
-                        if (deleteResult is UseCase.Result.Error) {
-                            logger.e("Error deleting event: ${deleteResult.message}")
-                            userErrorMessage = deleteResult.userErrorMessage
-                        } else if (deleteResult is UseCase.Result.InvalidParams) {
-                            logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                            userErrorMessage = deleteResult.userErrorMessage
-                        }
-                        this@MainActivity.displaySnackBar(
-                            if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                            else userErrorMessage
-                        )
-                    }
+                    this@MainActivity.displaySnackBar(
+                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                        else userErrorMessage
+                    )
                 }
             }
-            .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-            .show()
+        }
     }
 
     private fun displayErrorAndOpenDetails(eventId: String?, errorMessage: String): Boolean {
@@ -834,13 +824,31 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
-            returnToMonthView = currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY
+            returnToView =
+                if (currentViewMode == ViewMode.MONTH && viewMode == ViewMode.DAY) ViewMode.MONTH
+                else if (currentViewMode == ViewMode.WEEK && viewMode == ViewMode.DAY) ViewMode.WEEK
+                else if (currentViewMode == ViewMode.THREE_DAY && viewMode == ViewMode.DAY) ViewMode.THREE_DAY
+                else null
             currentViewMode = viewMode
         })
 
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setViewMode(ViewMode.DAY)
+            drawer_layout.close()
+        }
+
+        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(FeatureFlag.THREE_DAYS_VIEW)
+        nav_view_switcher_three_day_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
+            mainViewModel.setViewMode(ViewMode.THREE_DAY)
+            drawer_layout.close()
+        }
+
+        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(FeatureFlag.WEEK_VIEW)
+        nav_view_switcher_week_press.setOnSingleClickListener {
+            calendarViewModel.viewMode.postValue(ViewMode.WEEK)
+            mainViewModel.setViewMode(ViewMode.WEEK)
             drawer_layout.close()
         }
 
@@ -874,41 +882,40 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
             viewMode ?: return@Observer
-            when (viewMode) {
-                ViewMode.AGENDA -> {
-                    // Set selected background
-                    nav_view_main_content.nav_view_switcher_agenda_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
-                    nav_view_main_content.nav_view_switcher_day_layout.background = null
-                    nav_view_main_content.nav_view_switcher_month_layout.background = null
 
-                    // Set icon tint
-                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
-                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                }
-                ViewMode.DAY -> {
-                    // Set selected background
-                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
-                    nav_view_main_content.nav_view_switcher_day_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
-                    nav_view_main_content.nav_view_switcher_month_layout.background = null
+            // Set selected background
+            nav_view_main_content.nav_view_switcher_agenda_layout.background =
+                if (viewMode == ViewMode.AGENDA) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                else null
+            nav_view_main_content.nav_view_switcher_day_layout.background =
+                if (viewMode == ViewMode.DAY) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                else null
+            nav_view_main_content.nav_view_switcher_three_day_layout.background =
+                if (viewMode == ViewMode.THREE_DAY) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                else null
+            nav_view_main_content.nav_view_switcher_week_layout.background =
+                if (viewMode == ViewMode.WEEK) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                else null
+            nav_view_main_content.nav_view_switcher_month_layout.background =
+                if (viewMode == ViewMode.MONTH) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
+                else null
 
-                    // Set icon tint
-                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
-                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                }
-                ViewMode.MONTH -> {
-                    // Set selected background
-                    nav_view_main_content.nav_view_switcher_agenda_layout.background = null
-                    nav_view_main_content.nav_view_switcher_day_layout.background = null
-                    nav_view_main_content.nav_view_switcher_month_layout.background = ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
-
-                    // Set icon tint
-                    nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_day_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-                    nav_view_main_content.nav_view_switcher_month_icon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
-                }
-            }
+            // Set icon tint
+            nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList =
+                if (viewMode == ViewMode.AGENDA) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+            nav_view_main_content.nav_view_switcher_day_icon.imageTintList =
+                if (viewMode == ViewMode.DAY) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+            nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList =
+                if (viewMode == ViewMode.THREE_DAY) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+            nav_view_main_content.nav_view_switcher_week_icon.imageTintList =
+                if (viewMode == ViewMode.WEEK) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
+            nav_view_main_content.nav_view_switcher_month_icon.imageTintList =
+                if (viewMode == ViewMode.MONTH) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
+                else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
         })
     }
 
@@ -1393,13 +1400,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if (returnToMonthView && MONTH_VIEW) {
+        } else if (returnToView == ViewMode.MONTH && MONTH_VIEW) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)
             }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setViewMode(ViewMode.MONTH)
+        } else if (returnToView == ViewMode.WEEK && WEEK_VIEW) {
+            // Navigate back to week view
+            calendarViewModel.viewMode.postValue(ViewMode.WEEK)
+            mainViewModel.setViewMode(ViewMode.WEEK)
+        } else if (returnToView == ViewMode.THREE_DAY && THREE_DAYS_VIEW) {
+            // Navigate back to 3 days view
+            calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
+            mainViewModel.setViewMode(ViewMode.THREE_DAY)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {
@@ -1411,21 +1426,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         super.onDestroy()
         if (this::updateCalendarsJob.isInitialized && updateCalendarsJob.isActive) {
             updateCalendarsJob.cancel()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-        // Check if we the app is opened on Day view and selected date is today.
-        //  If it is, then make it scroll to current time.
-        if (calendarViewModel.initialised.value == true) {
-            val selectedDate = calendarViewModel.selectedDate.value
-            if (calendarViewModel.viewMode.value == ViewMode.DAY && selectedDate != null && selectedDate == LocalDate.now()) {
-                lifecycleScope.launch {
-                    calendarViewModel.setJumpToCurrentTimeIfNeeded(selectedDate)
-                }
-            }
         }
     }
 }

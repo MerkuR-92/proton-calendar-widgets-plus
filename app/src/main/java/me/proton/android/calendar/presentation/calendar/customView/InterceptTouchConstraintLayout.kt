@@ -17,7 +17,7 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
     var allowScrolling: Boolean = false
     var viewMode: ViewMode = ViewMode.DAY
     var agendaPager: View? = null
-    var sliderView: View? = null
+    var weekView: View? = null
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         /*
@@ -32,13 +32,12 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 
-                val sliderDelegateArea = Rect()
-                sliderView?.getHitRect(sliderDelegateArea)
+                val weekViewDelegateArea = Rect()
+                weekView?.getHitRect(weekViewDelegateArea)
 
-                (!allowScrolling && delegateArea.contains(
-                    ev.x.toInt(),
-                    ev.y.toInt()
-                )) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                !allowScrolling &&
+                        (delegateArea.contains(ev.x.toInt(), ev.y.toInt()) ||
+                                weekViewDelegateArea.contains(ev.x.toInt(), ev.y.toInt()))
             }
             MotionEvent.ACTION_UP -> {
                 // Do not intercept touch event, let the child handle it
@@ -49,13 +48,12 @@ class InterceptTouchConstraintLayout @JvmOverloads constructor(
                 val delegateArea = Rect()
                 agendaPager?.getHitRect(delegateArea)
 
-                val sliderDelegateArea = Rect()
-                sliderView?.getHitRect(sliderDelegateArea)
+                val weekViewDelegateArea = Rect()
+                weekView?.getHitRect(weekViewDelegateArea)
 
-                (!allowScrolling && delegateArea.contains(
-                    ev.x.toInt(),
-                    ev.y.toInt()
-                )) || sliderDelegateArea.contains(ev.x.toInt(), ev.y.toInt())
+                !allowScrolling &&
+                        (delegateArea.contains(ev.x.toInt(), ev.y.toInt()) ||
+                                weekViewDelegateArea.contains(ev.x.toInt(), ev.y.toInt()))
             }
             else -> {
                 // In general, we don't want to intercept touch events. They should be handled by the child view.

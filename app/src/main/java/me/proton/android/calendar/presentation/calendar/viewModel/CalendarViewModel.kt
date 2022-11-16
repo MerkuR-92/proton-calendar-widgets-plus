@@ -122,14 +122,11 @@ class CalendarViewModel @Inject constructor(
     // monthView: true means that mini calendar is fully expanded, false means that it's collapsed
     var monthView: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    var jumpToCurrentTime: MutableLiveData<Boolean> = MutableLiveData(false)
-
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
 
     // Pair with position of the resumed fragment and loading status for the view
     //  so that we know when to load and display the events for a fragment without having multiple process running
     val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
-    val dayViewLoading = MutableLiveData<Pair<Int, Boolean>>()
 
     // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
     val resumedMonthViewPosition = MutableLiveData<Int>()
@@ -1048,14 +1045,5 @@ class CalendarViewModel @Inject constructor(
         }
 
         return monthViewEventsMap
-    }
-
-    suspend fun setJumpToCurrentTimeIfNeeded(date: LocalDate) {
-        val primaryTimeZone = getCalendarUserSettingsPrimaryTimezone()
-        val zoneId = if (primaryTimeZone != null) ZoneId.of(primaryTimeZone) else null
-        val jumpToCurrentTime =
-            if (zoneId != null) date == LocalDate.now(zoneId)
-            else date == LocalDate.now()
-        if (jumpToCurrentTime) this.jumpToCurrentTime.value = true
     }
 }

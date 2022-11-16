@@ -3,8 +3,6 @@ package me.proton.android.calendar.domain.utils
 import biweekly.util.ICalDate
 import me.proton.android.calendar.domain.CalendarsRepository
 import java.time.*
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.util.*
 
 interface DateTimeUtils {
@@ -85,4 +83,11 @@ interface DateTimeUtils {
      */
     fun Collection<CalendarsRepository.EventsWindow>.getFullyOverlappingWindow(eventsWindow: CalendarsRepository.EventsWindow): CalendarsRepository.EventsWindow?
 
+    fun LocalDate.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDate
+
+    fun LocalDate.firstDayOfWeek(weekStart: Int?): LocalDate?
+
+    fun LocalDateTime.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDateTime
+
+    fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime?
 }

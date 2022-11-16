@@ -103,7 +103,8 @@ class ItemMiniCalendarFragment : Fragment() {
                     else (fullWeeksInMonth) * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)) +
                     fullWeeksInMonth * 2 * context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_spacing) +
                     context.resources.getDimensionPixelSize(R.dimen.calendar_bottom_spacing) +
-                    context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
+                    context.resources.getDimensionPixelSize(R.dimen.calendar_slider_height) +
+                    context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
         }
 
         fun calculateFullWeeksInMonth(firstDayOfMonth: LocalDate, startWeekOn: DayOfWeek): Int {

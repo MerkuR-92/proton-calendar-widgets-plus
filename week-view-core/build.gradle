@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'maven-publish'
+}
+
+group = 'com.github.thellmund.Android-Week-View'
+version = '5.4.0'
+
+android {
+    compileSdkVersion 32
+    defaultConfig {
+        minSdkVersion 23
+        targetSdkVersion 32
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.6.21"
+
+    implementation "androidx.appcompat:appcompat:1.4.1"
+    implementation "androidx.core:core-ktx:1.3.2"
+    implementation "androidx.customview:customview:1.1.0"
+
+    implementation "androidx.emoji:emoji-bundled:1.1.0"
+    implementation "androidx.startup:startup-runtime:1.0.0"
+
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:1.1.5"
+
+    testImplementation "androidx.test.ext:junit:1.1.1"
+    testImplementation "androidx.test:runner:1.4.0"
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "org.mockito:mockito-core:4.5.1"
+    testImplementation "org.mockito:mockito-inline:4.5.1"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testImplementation "com.google.truth:truth:1.1.3"
+}

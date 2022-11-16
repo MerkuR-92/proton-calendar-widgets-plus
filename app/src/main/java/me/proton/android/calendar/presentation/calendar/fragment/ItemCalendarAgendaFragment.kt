@@ -26,6 +26,7 @@ import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -34,8 +35,9 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.LocalDate
-import javax.inject.Inject
+import java.time.LocalTime
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ItemCalendarAgendaFragment: Fragment() {
@@ -57,6 +59,8 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var selectedDate: LocalDate? = null
 
     private lateinit var eventsListLayoutAdapter: EventAdapter
+
+    private var firstEventOfTheDayTime: LocalTime? = null
 
     companion object {
         fun newInstance(position: Int, date: LocalDate) : ItemCalendarAgendaFragment {
@@ -101,41 +105,33 @@ class ItemCalendarAgendaFragment: Fragment() {
                         )
                     )
                 } else {
-                    val confirmationMessage =
-                        if (it.isRecurring()) R.string.event_decryption_error_dialog_confirmation_recurring
-                        else R.string.event_decryption_error_dialog_confirmation
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle(R.string.event_decryption_error_dialog_title)
-                        .setMessage(R.string.event_decryption_error_dialog_message)
-                        .setPositiveButton(confirmationMessage) { _, _ ->
-                            lifecycleScope.launch { // TODO
-                                val deleteResult = withContext(Dispatchers.Default) {
-                                    calendarViewModel.handleDeleteEvent(
-                                        it.id,
-                                        it.calendar.id,
-                                        EventEditDeleteOption.ALL_EVENTS
-                                    )
+                    requireContext().displayEventDecryptionErrorDialog(it.isRecurring()) { _, _ ->
+                        lifecycleScope.launch {
+                            val deleteResult = withContext(Dispatchers.Default) {
+                                calendarViewModel.handleDeleteEvent(
+                                    it.id,
+                                    it.calendar.id,
+                                    EventEditDeleteOption.ALL_EVENTS
+                                )
+                            }
+                            if (deleteResult is UseCase.Result.Success<*>) {
+                                requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+                            } else {
+                                var userErrorMessage: String? = null
+                                if (deleteResult is UseCase.Result.Error) {
+                                    logger.e("Error deleting event: ${deleteResult.message}")
+                                    userErrorMessage = deleteResult.userErrorMessage
+                                } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                    logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                    userErrorMessage = deleteResult.userErrorMessage
                                 }
-                                if (deleteResult is UseCase.Result.Success<*>) {
-                                    requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
-                                } else {
-                                    var userErrorMessage: String? = null
-                                    if (deleteResult is UseCase.Result.Error) {
-                                        logger.e("Error deleting event: ${deleteResult.message}")
-                                        userErrorMessage = deleteResult.userErrorMessage
-                                    } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                                        userErrorMessage = deleteResult.userErrorMessage
-                                    }
-                                    requireActivity().displaySnackBar(
-                                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                                        else userErrorMessage
-                                    )
-                                }
+                                requireActivity().displaySnackBar(
+                                    if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                    else userErrorMessage
+                                )
                             }
                         }
-                        .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-                        .show()
+                    }
                 }
             }
         rv_agenda.adapter = eventsListLayoutAdapter
@@ -190,6 +186,10 @@ class ItemCalendarAgendaFragment: Fragment() {
                 return@observe
             }
             this.selectedDate = selectedDate
+            if (selectedDate == immutableDate && firstEventOfTheDayTime != null) {
+                // Set the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
+            }
             if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers() &&
                 immutableDate != selectedDate &&
                 immutableDate != selectedDate.minusDays(1) &&
@@ -231,20 +231,18 @@ class ItemCalendarAgendaFragment: Fragment() {
                         // Sort the events
                         val sortedEvents = it.events.sortForAgendaView(timeZoneId)
 
-                        if (immutableDate == calendarViewModel.selectedDate.value) {
-                            val partDayEvents = it.events.filter {
-                                !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
-                            }
-                            // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
-                            calendarViewModel.firstEventOfTheDayTime =
-                                if (partDayEvents.isNotEmpty()) {
-                                    Collections.min(
-                                        partDayEvents.map {
-                                            it.getOccurrenceStart(timeZoneId).toLocalTime()
-                                        }
-                                    )
-                                } else null
+                        val partDayEvents = it.events.filter {
+                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
                         }
+                        // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                        firstEventOfTheDayTime =
+                            if (partDayEvents.isNotEmpty()) {
+                                Collections.min(
+                                    partDayEvents.map {
+                                        it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                    }
+                                )
+                            } else null
 
                         if (sortedEvents.isEmpty()) {
                             list_view_status.visibleOrInvisible(true)

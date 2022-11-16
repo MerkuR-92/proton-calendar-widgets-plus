@@ -22,10 +22,10 @@
     <dimen name="calendar_week_number_width">24dp</dimen>
     <dimen name="calendar_week_number_height">24dp</dimen>
     <dimen name="calendar_week_number_spacing_top_first">6dp</dimen>
-    <dimen name="calendar_week_number_spacing_start">7dp</dimen>
+    <dimen name="calendar_week_number_spacing_start">6dp</dimen>
     <dimen name="calendar_week_number_spacing_top">13dp</dimen>
     <dimen name="calendar_week_number_spacing_bottom">9dp</dimen>
-    <dimen name="calendar_slider_height">32dp</dimen>
+    <dimen name="calendar_slider_height">1dp</dimen>
 
     <dimen name="nav_view_user_margin_top">48dp</dimen>
     <dimen name="nav_view_user_initials_box_size">28dp</dimen>
@@ -136,5 +136,10 @@
     <dimen name="month_view_plus_icon_width">6dp</dimen>
     <dimen name="month_view_plus_icon_line_width">0.7dp</dimen>
     <dimen name="month_view_plus_icon_end_margin">5dp</dimen>
+
+    <!--  Week view  -->
+    <dimen name="week_view_no_border_width">0dp</dimen>
+    <dimen name="week_view_border_width">1dp</dimen>
+    <dimen name="default_week_view_hour_height">60dp</dimen>
 
 </resources>

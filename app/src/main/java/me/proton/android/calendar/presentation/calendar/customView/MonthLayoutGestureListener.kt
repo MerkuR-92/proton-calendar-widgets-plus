@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.viewpager2.widget.ViewPager2
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MiniCalendarGestures
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -16,7 +15,7 @@ class MonthLayoutGestureListener(
     private val calendarViewModel: CalendarViewModel,
     private val viewPagerTopGuideline: View,
     private val viewPagerSliderGuideline: View,
-    private val agendaPager: ViewPager2,
+    private val weekView: View,
     private val monthLayoutOnFinishMoveListener: MonthLayoutOnFinishMoveListener
 ) : View.OnTouchListener {
     private var oldScrollY: Float? = null
@@ -130,7 +129,7 @@ class MonthLayoutGestureListener(
 
                 val pressDuration = System.currentTimeMillis() - pressStartTime
                 val delegateArea = Rect()
-                agendaPager.getHitRect(delegateArea)
+                weekView.getHitRect(delegateArea)
                 val isWithinPager =
                     delegateArea.contains(pressedX.toInt(), pressedY.toInt()) // Check if click is within agenda view
 

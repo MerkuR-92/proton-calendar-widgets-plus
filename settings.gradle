@@ -17,3 +17,4 @@ if (includeCoreLibsHelper.exists()) {
 } else {
     println("Use core libs from Maven artifacts")
 }
+include ':week-view-core'
