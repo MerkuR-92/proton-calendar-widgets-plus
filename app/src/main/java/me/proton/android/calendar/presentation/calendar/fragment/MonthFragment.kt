@@ -32,7 +32,6 @@ import com.alamkanak.weekview.setDate
 import com.alamkanak.weekview.setDateFormatter
 import com.alamkanak.weekview.setDateTime
 import com.alamkanak.weekview.setWeekDayFormatter
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_base.fragment_progress_bar
 import kotlinx.android.synthetic.main.fragment_base.fragment_toolbar_content
@@ -107,7 +106,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import java.util.Collections
-import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
 import kotlin.math.roundToInt
@@ -152,6 +150,7 @@ class MonthFragment : BaseFragment() {
     private var currentToDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
+    private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
@@ -631,9 +630,11 @@ class MonthFragment : BaseFragment() {
                     lifecycleScope.launch {
                         val selectedDate = calendarViewModel.selectedDate.value
                         calendarViewModel.getWeekStart()?.let { weekStart ->
-                            if (selectedDate?.firstDayOfWeek(weekStart) != firstVisibleDate) {
+                            val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
+                            if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
                                 calendarViewModel.handleDaySelected(firstVisibleDate)
                             }
+                            initWeekView = false
                         }
                     }
                 } else {
@@ -920,8 +921,13 @@ class MonthFragment : BaseFragment() {
         if (viewMode == ViewMode.WEEK) {
             val selectedDate = calendarViewModel.selectedDate.value
             val weekStart = calendarViewModel.weekStart.value
+            initWeekView = true
             selectedDate?.firstDayOfWeek(weekStart)?.let {
-                calendarViewModel.handleDaySelected(it)
+                if (selectedDate == calendarViewModel.initialToday) {
+                    calendarViewModel.handleDaySelected(selectedDate)
+                }else {
+                    calendarViewModel.handleDaySelected(it)
+                }
                 weekView.scrollToDate(it)
             }
         } else if (previousViewMode == ViewMode.WEEK) {
