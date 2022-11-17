@@ -18,10 +18,14 @@ import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
+import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
+import me.proton.android.calendar.common.REBRANDING_VERSION_CODE
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.WEEK_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.presentation.main.MainActivity
@@ -84,7 +88,7 @@ object SpotlightUtils {
         if (lastSpotlightShown >= lastSpotlightVersionCode) return
 
         when (lastSpotlightVersionCode) {
-            112 -> {
+            MONTH_VIEW_VERSION_CODE -> {
                 // Month view
                 val monthViewContent = getMonthViewDialogContent()
                 this.displaySpotlightDialog(
@@ -92,7 +96,7 @@ object SpotlightUtils {
                     monthViewContent.second
                 )
             }
-            145 -> {
+            REBRANDING_VERSION_CODE -> {
                 // Rebranding
                 val rebrandingContent = getRebrandingDialogContent()
                 this.displayV5SpotlightDialog(
@@ -100,7 +104,7 @@ object SpotlightUtils {
                     rebrandingContent.second
                 )
             }
-            150 -> {
+            EASY_SWITCH_VERSION_CODE -> {
                 // Display auto added invites dialog, followed by easy switch dialog
                 val autoAddedInvitesContent = getAutoAddedInvitesDialogContent()
                 this.displaySpotlightDialog(
@@ -124,7 +128,7 @@ object SpotlightUtils {
                     }
                 )
             }
-            163 -> {
+            WEEK_VIEW_VERSION_CODE -> {
                 // Week view
                 val weekViewContent = getWeekViewDialogContent()
                 this.displaySpotlightDialog(
