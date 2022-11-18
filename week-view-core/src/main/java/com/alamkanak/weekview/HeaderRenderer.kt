@@ -189,7 +189,7 @@ private class DateLabelsDrawer(
             draw(dateTextLayout)
         }
 
-        if (date.withTimeZone(viewState.customTimeZone).isSameDate(nowAtTimezone(viewState.customTimeZone))) {
+        if (date.isToday) {
             val rect = RectF(
                 bounds.centerX() - viewState.headerTodaySquareSize / 2f,
                 squareTop,
@@ -231,7 +231,7 @@ private class DateLabelsDrawer(
         val squareTop = viewState.headerPadding + viewState.headerTodaySquareMarginTop + weekDayTextLayout.height
         val dateY = squareTop + viewState.headerTodaySquareSize / 2f - dateTextLayout.height / 2f
 
-        if (date.withTimeZone(viewState.customTimeZone).isSameDate(nowAtTimezone(viewState.customTimeZone))) {
+        if (date.isToday) {
             val rect = RectF(
                 centerSquareX - viewState.headerTodaySquareSize / 2f,
                 squareTop,

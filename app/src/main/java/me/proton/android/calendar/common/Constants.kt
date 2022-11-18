@@ -88,11 +88,16 @@ const val WEEK_VIEW_FUTURE_DAYS_TO_LOAD = 13L
 const val WEEK_VIEW_WEEKDAY_FORMATTER_PATTERN = "EEE"
 const val WEEK_VIEW_DATE_FORMATTER_PATTERN = "d"
 
+const val MONTH_VIEW_VERSION_CODE = 112
+const val REBRANDING_VERSION_CODE = 145
+const val EASY_SWITCH_VERSION_CODE = 150
+const val WEEK_VIEW_VERSION_CODE = 164
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
-    112, // Month view (0.30.3)
-    145, // Rebranding (2.0.2)
-    150, // Easy switch (2.2.0)
-    163 // Week view (2.3.9)
+    MONTH_VIEW_VERSION_CODE, // Month view (0.30.3)
+    REBRANDING_VERSION_CODE, // Rebranding (2.0.2)
+    EASY_SWITCH_VERSION_CODE, // Easy switch (2.2.0)
+    WEEK_VIEW_VERSION_CODE // Week view (2.3.10)
 )
 
 object FeatureFlag {
