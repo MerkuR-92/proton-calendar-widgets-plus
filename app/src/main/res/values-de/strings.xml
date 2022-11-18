@@ -230,6 +230,8 @@
     <string name="nav_view_more">Mehr</string>
     <string name="nav_view_switcher">Anzeigen</string>
     <string name="nav_view_switcher_day">Tag</string>
+    <string name="nav_view_switcher_three_day">3 Tage</string>
+    <string name="nav_view_switcher_week">Woche</string>
     <string name="nav_view_switcher_agenda">Terminübersicht</string>
     <string name="nav_view_switcher_month">Monat</string>
     <string name="nav_view_timezone">Zeitzone</string>
@@ -459,6 +461,8 @@
     <string name="spotlight_v5_dialog_learn_more_button">Mehr erfahren</string>
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
     <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="https://proton.me/news/updated-proton">Mehr erfahren</a></string>
+    <string name="spotlight_dialog_week_view_title">Weitere Anzeigeoptionen</string>
+    <string name="spotlight_dialog_week_view_description">• Entdecke die neue <b>3-Tages-</b> und <b>Wochenansicht</b>. Wechsele über das <b>Menü</b> zwischen den Ansichten.\n\n• Passe die Reihenhöhe im Tagesraster mittels Zusammenziehen mit zwei Fingern an, um hinein- und heraus zu zoomen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>
