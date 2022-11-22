@@ -219,7 +219,11 @@ class MonthFragment : BaseFragment() {
             textField.visibility = View.VISIBLE
         }
         buttonToday.setOnSingleClickListener {
-            updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId))
+            if (currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK) {
+                updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId))
+            } else {
+                calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId))
+            }
         }
     }
 
