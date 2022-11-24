@@ -434,6 +434,24 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     /**
+     * Generates Proton UID for an imported event.
+     */
+    override fun generateProtonUidForImport(originalEventUid: String?, ics: String): String {
+        val messageDigest = MessageDigest.getInstance(SHA1)
+        messageDigest.update(ics.toByteArray())
+        val token = messageDigest.digest()
+        val icsHash = Hex.encode(token)
+        return if (originalEventUid.isNullOrBlank()) {
+            "sha1-uid-${icsHash}"
+        } else {
+            val croppedOriginalEventUid =
+                if (originalEventUid.length > 128) originalEventUid.takeLast(128)
+                else originalEventUid
+            "original-uid-$croppedOriginalEventUid-sha1-uid-${icsHash}"
+        }
+    }
+
+    /**
      * Generates Proton Product Identifier.
      */
     override fun generateProtonProdId() = "-//Proton AG//$PROD_ID_APPLICATION_NAME ${BuildConfig.VERSION_NAME}//EN"

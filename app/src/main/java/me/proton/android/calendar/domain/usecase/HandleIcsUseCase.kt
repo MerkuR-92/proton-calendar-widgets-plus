@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
+import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Method
 import biweekly.property.Status
@@ -9,23 +10,25 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.AndroidUtils.toInt
-import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.utils.AndroidUtils.toInt
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils
-import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -56,7 +59,11 @@ class HandleIcsUseCase @Inject constructor(
 
     suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+        val isOpeningFromProtonMail = senderEmail != null || recipientEmail != null
+
+        val timeZoneId = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = timeZoneId, isOpeningFromProtonMail = isOpeningFromProtonMail)
 
         if (cleanIcsResult !is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
             // Only log error as it doesn't contain any sensitive information
@@ -66,7 +73,110 @@ class HandleIcsUseCase @Inject constructor(
 
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
-        if (iCalendar.method.isPublish) return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish // TODO Remove once PUBLISH is handled
+        return if (iCalendar.method.isPublish || !isOpeningFromProtonMail) {
+            handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
+        } else {
+            handleInviteIcs(iCalendar, userId, senderEmail, recipientEmail)
+        }
+    }
+
+    private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isInvitation: Boolean): IcsSurgeryUtils.HandleIcsResult {
+
+        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
+            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.allowEditEvents }.firstOrNull()
+                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+        }
+
+        val newEvent = Event.from(
+            ICalUtilsImpl.generateOfflineEventId(), Calendar(
+                defaultCalendar.id,
+                defaultCalendar.name,
+                defaultCalendar.email,
+                defaultCalendar.color,
+                defaultCalendar.flags,
+                defaultCalendar.display,
+                defaultCalendar.type,
+                defaultCalendar.permissions
+            ), iCalendar, 0
+        ) ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError // TODO Return default error ?
+
+        if (isInvitation && newEvent.iCalEvent.alarms.isNullOrEmpty()) {
+            // We drop alarms when importing invitations as this would not be the user's. We must set the default calendar alarms instead.
+            val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendar.id)
+            calendarSettings?.getDefaultAlarms(json, newEvent.isAllDay())?.forEach {
+                if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) newEvent.iCalEvent.addAlarm(it)
+            }
+        }
+
+        // Fetch all events sharing UID from BE
+        val eventsSharingUidResponse = (
+                calendarsRepository.getEventsByUid(userId, iCalendar.events.first().uid.value).valueOrNullAndLogErrors(logger)
+                    ?: return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
+                ).events
+
+        // Find an existing event from the ones sharing the same UID
+        var existingEvent: Event? = null
+        var existingEventEntity: EventEntity? = null
+        eventsSharingUidResponse.let {
+            for (eventEntity in eventsSharingUidResponse) {
+                val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    eventDecryptor.decrypt(eventEntity)
+                } else {
+                    transformEventUseCase.execute(eventEntity)
+                }
+                if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
+                    existingEvent = event
+                    existingEventEntity = eventEntity
+                    calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
+                    break
+                }
+            }
+        }
+
+        val immutableExistingEvent = existingEvent
+
+        return if (immutableExistingEvent != null) {
+            // Event already exists
+
+            /*
+            If it does, there are two possibilities:
+                1. Nothing relevant in the event (date-times, recurring rule, summary, location or description) has changed.
+                    In this case, no action for importing should be offered as the user has already imported the event
+                    (if she added notifications or changed the calendar we still consider it as the same event).
+                2. Something relevant has changed. In this case, since the UID hasn't changed,
+                    we can be sure that it's been the user changing something in the event herself, and not the original provider.
+                    Clients can then inform the user that she's opening an outdated version of the event.
+             */
+
+            return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
+        } else {
+            when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent, isImport = true)) {
+                is UseCase.Result.Success<*> -> {
+                    var eventId: String? = null
+                    editCreateEventResult.returnValue.tryCast<List<String>> {
+                        eventId = this.firstOrNull()
+                    }
+
+                    makeCalendarVisible(newEvent, userId)
+
+                    return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, isRecurring = newEvent.isRecurring())
+                }
+                is UseCase.Result.InvalidParams -> {
+                    logger.i("HandleIcsUseCase: invalid params in create event: ${editCreateEventResult.message}")
+                    return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(editCreateEventResult.userErrorMessage)
+                }
+                is UseCase.Result.Error -> {
+                    logger.i("HandleIcsUseCase: error in create event: ${editCreateEventResult.message}")
+                    return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(editCreateEventResult.userErrorMessage)
+                }
+            }
+        }
+    }
+
+    private suspend fun handleInviteIcs(iCalendar: ICalendar, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
 
         val canonicalUserEmails = userManager.getAddressesOrNull(userId)?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
@@ -94,20 +204,6 @@ class HandleIcsUseCase @Inject constructor(
         val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)
         val isOrganizerMode = canonicalUserEmails.firstOrNull { canonicalOrganizerEmail == it } != null
 
-        var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
-        if (!OPEN_ICS_FILES || (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank())) {
-
-            isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true
-            val isCurrentUserRecipient = canonicalUserEmails.contains(canonicalRecipientEmail)
-
-            if (!isCurrentUserSender && !isCurrentUserRecipient) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
-
-            val attendeeEmails = iCalendar.events.first().attendees.mapNotNull { it.extractEmail() }
-            val canonicalAttendeeEmails = canonicalizeProtonEmails(attendeeEmails, forceCanonicalization = true)
-
-            if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.values.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
-        }
-
         // METHOD: We support REQUEST, CANCEL, REPLY.
         if (iCalendar.method.isAdd) {
             // TODO Remove once ADD is handled
@@ -127,7 +223,23 @@ class HandleIcsUseCase @Inject constructor(
 
         if (!iCalendar.method.isRequest &&
             !iCalendar.method.isCancel &&
-            !iCalendar.method.isReply) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method // TODO Remove once other methods are handled
+            !iCalendar.method.isReply) {
+            return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
+        } // TODO Remove once other methods are handled
+
+        var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
+        if (!OPEN_ICS_FILES || (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank())) {
+
+            isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true
+            val isCurrentUserRecipient = canonicalUserEmails.contains(canonicalRecipientEmail)
+
+            if (!isCurrentUserSender && !isCurrentUserRecipient) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+
+            val attendeeEmails = iCalendar.events.first().attendees.mapNotNull { it.extractEmail() }
+            val canonicalAttendeeEmails = canonicalizeProtonEmails(attendeeEmails, forceCanonicalization = true)
+
+            if (isOrganizerMode && isCurrentUserRecipient && !canonicalAttendeeEmails.values.contains(canonicalSenderEmail)) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+        }
 
         if (iCalendar.method.isCancel && isOrganizerMode) return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Method
 

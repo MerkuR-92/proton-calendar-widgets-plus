@@ -92,6 +92,11 @@ interface ICalUtils {
     fun generateProtonUid(originalUid: String, recurrenceId: String): String
 
     /**
+     * Generates Proton UID for an imported event.
+     */
+    fun generateProtonUidForImport(originalEventUid: String?, ics: String): String
+
+    /**
      * Generates Proton Product Identifier.
      */
     fun generateProtonProdId(): String

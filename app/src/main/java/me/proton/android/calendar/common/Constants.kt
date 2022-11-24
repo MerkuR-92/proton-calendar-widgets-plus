@@ -107,7 +107,7 @@ object FeatureFlag {
     const val ADD_ATTENDEES = true
     const val CHANGE_ANSWER = true
     const val OPEN_ICS = true
-    const val OPEN_ICS_FILES = false
+    const val OPEN_ICS_FILES = true
     const val APP_LINKS = true
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true

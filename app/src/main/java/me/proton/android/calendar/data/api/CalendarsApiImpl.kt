@@ -323,6 +323,8 @@ data class EventApiResponse(
 data class SyncEventsUpdateApiRequest(
     @SerialName("MemberID")
     val memberId: String,
+    @SerialName("IsImport")
+    val isImport: Int = 0,
     @SerialName("Events")
     val events: List<SyncEventContainer>
 )
@@ -450,7 +452,9 @@ sealed class SyncEventContainer
 @Serializable
 data class SyncEventCreateContainer(
     @SerialName("Event")
-    val event: SyncEvent
+    val event: SyncEvent,
+    @SerialName("Overwrite")
+    val overwrite: Int = 0
 ) : SyncEventContainer()
 
 @Serializable

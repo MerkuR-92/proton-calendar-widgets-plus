@@ -6,23 +6,19 @@ import biweekly.component.VEvent
 import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
+import biweekly.property.Action
+import biweekly.property.Action.DISPLAY
 import biweekly.property.DateOrDateTimeProperty
+import biweekly.property.DateTimeProperty
 import biweekly.property.ExceptionDates
 import biweekly.property.ICalProperty
 import biweekly.property.Method
 import biweekly.util.DateTimeComponents
+import biweekly.util.Duration
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateTimeToDate
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.FormValidation.ALARM_COUNT_MAX
 import me.proton.android.calendar.common.IcsParsingValidation.CONTACT_NAME_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.DESCRIPTION_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGTH
@@ -41,9 +37,20 @@ import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.logger.TimberLogger
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateTimeToDate
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonUidForImport
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
+import me.proton.core.util.kotlin.toBoolean
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -126,7 +133,7 @@ object IcsSurgeryUtils {
         }
     }
 
-    fun cleanIcs(iCalString: String, allowMultipleEvents: Boolean = false): HandleIcsResult {
+    fun cleanIcs(iCalString: String, timeZoneId: String? = null, allowMultipleEvents: Boolean = false, isOpeningFromProtonMail: Boolean = false): HandleIcsResult {
         // Clean the iCal String first to check for invalid Date or DateTime Properties
         val cleanRawIcsResult = iCalString.cleanRawIcs()
 
@@ -164,21 +171,46 @@ object IcsSurgeryUtils {
 
         iCalendar.cleanXWrTimezone()
 
-        if (!iCalendar.cleanTimezones()) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
-
         // If method is not provided, set to PUBLISH by default
         if (iCalendar.method == null) iCalendar.method = Method.publish()
+
+        val isImport = iCalendar.method?.isPublish == true
+
+        if (!iCalendar.cleanTimezones(isImport, timeZoneId)) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         /* Event properties */
 
         // TODO Once we handle multiple events, allow them to fail separately
         iCalendar.events.forEach { event ->
 
+            if (isImport) {
+                // We just drop RECURRENCE-ID for import "invitations", but we don't support RECURRENCE-ID for other imports
+                if (!isOpeningFromProtonMail && event.recurrenceId?.value != null) return HandleIcsResult.Error.Invalid.RecurrenceId
+
+                event.handleImport(iCalendar, iCalString, isOpeningFromProtonMail)
+
+                event.cleanAlarms()
+            } else if (!isOpeningFromProtonMail) {
+                // Importing an invitation (Method != PUBLISH) from outside of Proton Mail.
+                // Drop organizer and attendees
+                event.attendees.clear()
+                event.organizer = null
+
+                // The UID must be always overwritten, and re-generated. The reason to do that here is that we don't want to have UID collisions in case the user is later invited to the event.
+                event.setUid(generateProtonUidForImport(event.uid?.value, iCalString))
+
+                // If present, RECURRENCE-ID should be dropped. This is because a recurrence id without the original UID is useless
+                event.recurrenceId = null
+
+                // We drop alarms when importing invitations as this would not be the user's. We must set the default calendar alarms instead (done later in the use case).
+                event.alarms.clear()
+            }
+
             event.applyBiweeklyDstParsingFix(iCalendar)
 
             event.dropUnsupportedProperties()
 
-            if (event.dateTimeStamp?.value == null) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
+            if (!event.cleanDtStamp(iCalendar, isImport || !isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
             if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
 
@@ -209,6 +241,31 @@ object IcsSurgeryUtils {
         }
 
         return HandleIcsResult.ParsingSuccessful(iCalendar)
+    }
+
+    fun VEvent.handleImport(iCalendar: ICalendar, iCalString: String, isOpeningFromProtonMail: Boolean) {
+        // Drop organizer and attendees
+        this.attendees.clear()
+        this.organizer = null
+
+        if (this.uid?.value.isNullOrBlank() && !iCalendar.uid?.value.isNullOrBlank()) {
+            // If UID was set in VCalendar instead of VEvent, move it
+            // TODO Once we handle importing multiple VEvent per VCalendar, make sure this does not apply
+            this.uid = iCalendar.uid
+        }
+        if (isOpeningFromProtonMail) {
+            // For import of invitations, the UID must be always overwritten, and re-generated
+            this.setUid(generateProtonUidForImport(this.uid?.value, iCalString))
+
+            // If present, RECURRENCE-ID should be dropped. This is because a recurrence id without the original UID is useless
+            this.recurrenceId = null
+
+            // We drop alarms when importing invitations as this would not be the user's. We must set the default calendar alarms instead (done later in the use case).
+            this.alarms.clear()
+        } else if (this.uid?.value.isNullOrBlank()) {
+            // For other imports, we keep the UID if present, and generate a new one if not
+            this.setUid(generateProtonUidForImport(null, iCalString))
+        }
     }
 
     /**
@@ -321,6 +378,86 @@ object IcsSurgeryUtils {
 
     private fun ICalendar.getXWrTimezone(): String? {
         return this.getExperimentalProperty(X_WR_TIMEZONE)?.value
+    }
+
+    fun VEvent.cleanAlarms() {
+        // Remove duplicate alarms
+        val alarms = this.alarms.distinctBy {
+            "${it.trigger?.duration?.toMillis()} ${it.action}"
+        }.take(ALARM_COUNT_MAX) // Keep at max the first 10
+        this.alarms.clear()
+        this.alarms.addAll(alarms)
+
+        val alarmsIterator = this.alarms.iterator()
+        while (alarmsIterator.hasNext()) {
+            val alarm = alarmsIterator.next()
+
+            // Alarms with RELATED=END are not supported.
+            // TODO Can we spot this parameter with some other method ? Trigger doesn't seem to be parsed by biweekly
+            if (alarm.toString().contains("RELATED=[END]")) {
+                alarmsIterator.remove()
+            }
+
+            // Alarms with positive triggers (i.e. alarms that are triggered after the event started) are not supported
+            if (alarm.trigger?.duration != null && alarm.trigger.duration.toMillis() > 0) {
+                alarmsIterator.remove()
+            }
+
+            // Action is mandatory according to RFC.
+            if (alarm.action == null) {
+                alarm.action = Action(DISPLAY)
+            }
+
+            // A trigger for partial-day event cannot contain more than one-time component
+            if (this.dateStart.value.hasTime() && alarm?.trigger?.duration != null) {
+                val hasWeeks = alarm.trigger.duration.weeks?.let { 1 } ?: 0
+                val hasDays = alarm.trigger.duration.days?.let { 1 } ?: 0
+                val hasHours = alarm.trigger.duration.hours?.let { 1 } ?: 0
+                val hasMinutes = alarm.trigger.duration.minutes?.let { 1 } ?: 0
+                val hasSeconds = alarm.trigger.duration.seconds?.let { 1 } ?: 0
+                if (hasWeeks + hasDays + hasHours + hasMinutes + hasSeconds > 1) {
+                    val durationInMs = alarm.trigger.duration.toMillis()
+                    val simplifiedDuration =
+                        if (hasSeconds.toBoolean()) {
+                            Duration.builder().seconds(TimeUnit.MILLISECONDS.toSeconds(durationInMs).toInt()).build()
+                        } else if (hasMinutes.toBoolean()) {
+                            Duration.builder().minutes(TimeUnit.MILLISECONDS.toMinutes(durationInMs).toInt()).build()
+                        } else if (hasHours.toBoolean()) {
+                            Duration.builder().hours(TimeUnit.MILLISECONDS.toHours(durationInMs).toInt()).build()
+                        } else if (hasDays.toBoolean()) {
+                            Duration.builder().days(TimeUnit.MILLISECONDS.toDays(durationInMs).toInt()).build()
+                        } else {
+                            Duration.builder().weeks(TimeUnit.MILLISECONDS.toDays(durationInMs).div(7).toInt()).build()
+                        }
+                    alarm.trigger.setDuration(simplifiedDuration, alarm.trigger.related)
+                }
+            }
+        }
+    }
+
+    fun VEvent.cleanDtStamp(iCalendar: ICalendar, isImport: Boolean): Boolean {
+        // DTSTAMP: mandatory field as per RFC.
+        // For Imports: if not present, use the current time timestamp.
+        if (isImport && this.dateTimeStamp?.value == null) this.setDateTimeStamp(Date.from(Instant.now()))
+
+        // TODO For Invites: if not present, use the email timestamp. We need Mail to give us that data. For now consider as invalid.
+        if (!isImport && this.dateTimeStamp?.value == null) return false
+
+        // Extract TZID parameter to timezoneInfo if Biweekly didn't process it during parsing
+        if (this.dateTimeStamp?.value != null && !this.dateTimeStamp.getParameter(TZID).isNullOrEmpty()) {
+            val supportedTzid = fallbackTimeZone(this.dateTimeStamp.getParameter(TZID), fallbackToDefault = false) ?: return false
+            iCalendar.timezoneInfo.setTimezone(this.dateTimeStamp, TimezoneAssignment(TimeZone.getTimeZone(supportedTzid), supportedTzid))
+        }
+
+        // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
+        if (!iCalendar.convertToSupportedTimezone(this.dateTimeStamp)) return false
+
+        // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), assume TZID=UTC.
+        if ((this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == false && iCalendar.timezoneInfo.getTimezone(this.dateTimeStamp) == null) {
+            this.dateTimeStamp.localizeDateToTimezone("UTC")
+        }
+
+        return true
     }
 
     fun VEvent.cleanUid(): Boolean {
@@ -696,7 +833,7 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun ICalendar.cleanTimezones(): Boolean {
+    fun ICalendar.cleanTimezones(isImport: Boolean = false, timeZoneId: String? = null): Boolean {
 
         this.events.forEach {
             it.exceptionDates.forEach { exDate ->
@@ -722,9 +859,9 @@ object IcsSurgeryUtils {
             if (!this.convertToSupportedTimezone(it.recurrenceId)) return false
 
             // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), localize it to the x-wr-timezone if supported.
-            if (it.dateStart?.localizeFloatingDate(this) == false) return false
-            if (it.dateEnd?.localizeFloatingDate(this) == false) return false
-            if (it.recurrenceId?.localizeFloatingDate(this) == false) return false
+            if (it.dateStart?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
+            if (it.dateEnd?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
+            if (it.recurrenceId?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
 
             // If it's a Zulu time, the event is non-recurring and x-wr-timezone is present and supported, localize the date-time to the supported timezone.
             it.dateStart?.localizeZuluTimeDate(this, it)
@@ -753,18 +890,19 @@ object IcsSurgeryUtils {
         return true
     }
 
-    private fun DateOrDateTimeProperty.localizeFloatingDate(iCalendar: ICalendar): Boolean {
+    private fun DateOrDateTimeProperty.localizeFloatingDate(iCalendar: ICalendar, isImport: Boolean, timeZoneId: String?): Boolean {
         // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), localize it to the x-wr-timezone if supported.
         val xWrTimezone = iCalendar.getXWrTimezone()
         if (this.value.hasTime() && iCalendar.timezoneInfo.getTimezone(this) == null && !this.value.rawComponents.toString().contains("Z")) {
-            if (xWrTimezone == null) return false
-            else {
+            if (xWrTimezone != null) {
                 iCalendar.timezoneInfo.setTimezone(
                     this,
                     TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone)
                 )
                 this.localizeDateToTimezone(xWrTimezone)
-            }
+            } else if (isImport && timeZoneId != null) {
+                this.localizeDateToTimezone(timeZoneId)
+            } else return false
         }
         return true
     }
@@ -779,6 +917,19 @@ object IcsSurgeryUtils {
     }
 
     private fun DateOrDateTimeProperty.localizeDateToTimezone(timezone: String) {
+        val date = Date.from(
+            this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
+                .toInstant()
+        )
+        this.value = ICalDate(
+            date,
+            DateTimeComponents(date),
+            true
+        )
+        this.setParameter(TZID, timezone)
+    }
+
+    private fun DateTimeProperty.localizeDateToTimezone(timezone: String) {
         val date = Date.from(
             this.value.toInstant().atZone(ZoneId.systemDefault()).withZoneSameLocal(ZoneId.of(timezone))
                 .toInstant()
