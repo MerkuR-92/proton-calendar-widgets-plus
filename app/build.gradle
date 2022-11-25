@@ -198,7 +198,7 @@ dependencies {
     implementation project(path: ':week-view-core')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
-    implementation fileTree(dir: "libs", include: ["*.jar", "*.aar"])
+    implementation(files("../../proton-libs/gopenpgp/gopenpgp.aar"))
 
     // Proton Core libraries.
     implementation "me.proton.core:account:${rootProject.ext.version.proton_core}"
