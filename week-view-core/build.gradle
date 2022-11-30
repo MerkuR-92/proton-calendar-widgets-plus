@@ -1,11 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'maven-publish'
 }
-
-group = 'com.github.thellmund.Android-Week-View'
-version = '5.4.0'
 
 android {
     compileSdkVersion 32
@@ -14,8 +10,8 @@ android {
         targetSdkVersion 32
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
         coreLibraryDesugaringEnabled true
     }
 }
