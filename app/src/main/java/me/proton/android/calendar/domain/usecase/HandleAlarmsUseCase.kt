@@ -7,6 +7,7 @@ import android.content.Intent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.AlarmAction
+import me.proton.android.calendar.common.FeatureFlag.USE_ALARM_CLOCK_FOR_NOTIFICATIONS
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.Logger
@@ -81,8 +82,6 @@ class HandleAlarmsUseCase @Inject constructor(
 
     private fun rescheduleSystemAlarm(atInstant: Instant) {
 
-        logger.d("HandleAlarmsUseCase scheduling next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
-
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         val intent = Intent(context, ProtonCalendarBroadcastReceiver::class.java).apply {
@@ -97,7 +96,13 @@ class HandleAlarmsUseCase @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
+        if (USE_ALARM_CLOCK_FOR_NOTIFICATIONS) {
+            logger.d("HandleAlarmsUseCase setAlarmClock next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
+            alarmManager.setAlarmClock(AlarmManager.AlarmClockInfo(atInstant.toEpochMilli(), pendingIntent), pendingIntent)
+        } else {
+            logger.d("HandleAlarmsUseCase setExactAndAllowWhileIdle next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
+        }
     }
 
 }

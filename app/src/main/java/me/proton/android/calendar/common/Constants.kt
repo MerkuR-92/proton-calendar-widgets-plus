@@ -123,6 +123,7 @@ object FeatureFlag {
     const val THREE_DAYS_VIEW = true
     const val WEEK_VIEW = true
     const val DRAG_AND_DROP = false
+    const val USE_ALARM_CLOCK_FOR_NOTIFICATIONS = true
 }
 
 object HttpResponseCode {
