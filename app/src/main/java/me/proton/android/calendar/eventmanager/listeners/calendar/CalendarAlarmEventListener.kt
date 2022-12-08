@@ -74,7 +74,7 @@ class CalendarAlarmEventListener @Inject constructor(
         calendarsRepository.persistEvents(*missingEvents.toTypedArray())
     }
 
-    override suspend fun onCreate(config: EventManagerConfig, entities: List<EventAlarmEntity>) {
+    override suspend fun onCreateOrUpdate(config: EventManagerConfig, entities: List<EventAlarmEntity>) {
         entities.filter { !invalidAlarmIds.contains(it.id) }.forEach { calendarsRepository.persistEventAlarm(logger, it) }
     }
 

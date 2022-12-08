@@ -92,11 +92,11 @@ class CalendarAlarmEventListenerTest {
     }
 
     @Test
-    fun `onCreate persists the alarms`() {
+    fun `onCreateOrUpdate persists the alarms`() {
         runBlocking {
             val alarms = listOf(createAlarmEntity("alarm_id_1"), createAlarmEntity("alarm_id_2"))
 
-            listener.onCreate(config, alarms)
+            listener.onCreateOrUpdate(config, alarms)
 
             coVerify(exactly = alarms.count()) { calendarsRepository.persistEventAlarm(any(), any()) }
         }
