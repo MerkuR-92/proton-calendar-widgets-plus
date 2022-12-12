@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Cancelado</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitado)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sí</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d quizás</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d quizás</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d no</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pendiente</string>
     <string name="event_attendee_is_organizer">Eres el organizador</string>
     <string name="event_attendee_organizer">Organizador</string>
@@ -95,7 +95,7 @@
     <string name="event_decryption_error_dialog_close">Cerrar</string>
     <string name="event_signature_verification_failure">La verificación de la firma del evento ha fallado. <a href="https://proton.me/support/what-is-a-digital-signature">Más información</a></string>
     <string name="event_signature_verification_in_progress">La verificación de la firma del evento está en progreso.</string>
-    <string name="event_signature_verification_network_error">La verificación de la firma del evento fue interrumpida por un error. <a href="">Try again</a></string>
+    <string name="event_signature_verification_network_error">La verificación de la firma del evento fue interrumpida por un error. <a href="">Reintentar</a></string>
     <string name="event_change_answer_recurring_title">Actualizar evento recurrente</string>
     <string name="event_change_answer_recurring_description">¿Quieres cambiar tu respuesta para todos los eventos de la serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">¿Quieres cambiar tu respuesta para todos los eventos de esta serie?\nAlgunas de tus respuestas a ocurrencias previamente actualizadas por el organizador se perderán.</string>
@@ -230,6 +230,8 @@
     <string name="nav_view_more">Más</string>
     <string name="nav_view_switcher">Vista</string>
     <string name="nav_view_switcher_day">Día</string>
+    <string name="nav_view_switcher_three_day">3 Días</string>
+    <string name="nav_view_switcher_week">Semana</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Zona horaria</string>
@@ -420,7 +422,7 @@
     <string name="bootstrap_error_store_quota_reached_message">No hay más espacio de almacenamiento disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Más información</string>
     <string name="bootstrap_error_reset_needed_title">Restablecer claves del calendario</string>
-    <string name="bootstrap_error_reset_needed_message">Ha reseteado su contraseña y los eventos enlazados a los siguientes calendarios no pudieron ser desencriptados. Cualquier calendario activo subscrito será sincronizado en unos minutos.</string>
+    <string name="bootstrap_error_reset_needed_message">Has restablecido tu contraseña y los eventos enlazados a los siguientes calendarios no pudieron ser descifrados. Cualquier calendario activo suscrito será sincronizado en unos minutos.</string>
     <string name="bootstrap_error_update_passphrase_title">Reactivar claves del calendario</string>
     <string name="bootstrap_error_update_passphrase_message">Has reactivado tus claves y los eventos vinculados a los siguientes calendarios ahora se pueden descifrar.</string>
     <string name="bootstrap_error_continue_button">Continuar</string>
@@ -459,6 +461,8 @@
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
     <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
+    <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
+    <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Selecciona tu vista preferida en el <b>menú</b>.\n\n• Ajusta la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>

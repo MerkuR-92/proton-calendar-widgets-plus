@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Cancel·lat</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitat)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sí</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d potser</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d potser</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d no</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pendents</string>
     <string name="event_attendee_is_organizer">Sou l\'organitzador</string>
     <string name="event_attendee_organizer">Organitzador</string>
@@ -230,6 +230,8 @@
     <string name="nav_view_more">Més</string>
     <string name="nav_view_switcher">Visualització</string>
     <string name="nav_view_switcher_day">Dia</string>
+    <string name="nav_view_switcher_three_day">3 dies</string>
+    <string name="nav_view_switcher_week">Setmana</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Fus horari</string>
@@ -459,24 +461,26 @@
     <string name="spotlight_v5_dialog_learn_more_button">Saber-ne més</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
     <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
+    <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
+    <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permetre l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicia sessió a Google Calendar i dona permís a Proton per accedir a les teves dades.</string>
-    <string name="import_assistant_prepare_import_error">Error preparing import, please try again later</string>
+    <string name="import_assistant_prepare_import_error">Error preparant la importació. Torneu-ho a provar més tard.</string>
     <string name="import_assistant_prepare_import">Prepara per importar</string>
     <string name="import_assistant_gathering_data_loader_title">Obtenint les vostres dades</string>
-    <string name="import_assistant_summary_title">Import summary</string>
+    <string name="import_assistant_summary_title">Resum de la importació</string>
     <string name="import_assistant_summary_customize_import">Personalitzar importació</string>
     <string name="import_assistant_error">Error aconseguint informació</string>
     <string name="import_assistant_data_gathering_error">Recollida d\'informació fallida</string>
-    <string name="import_assistant_update_import_error">Failed to update import, please try again later.</string>
+    <string name="import_assistant_update_import_error">No s\'ha pogut actualitzar la importació. Torneu-ho a provar més tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">Compte erroni. Si us plau, inicieu sessió amb el compte que ha fet servir per la importació de calendari.</string>
     <string name="import_assistant_start_import_error">No s\'ha pogut començar la importació. Si us plau, intenteu-ho més endavant.</string>
     <string name="import_assistant_delete_import_success">S\'ha suprimit el registre d\'importació</string>
     <string name="import_assistant_delete_import_error">No s\'ha pogut eliminar la importació. Si us plau, inicieu-ho més endavant.</string>
     <string name="import_assistant_cancel_import_error">No s\'ha pogut cancel·lar la importació. Si us plau, intenteu-ho més endavant.</string>
     <string name="import_assistant_resume_import_error">No s\'ha pogut reprendre la importació. Si us plau, intenteu-ho més endavant.</string>
-    <string name="import_assistant_create_calendar_error">One or more calendars failed to be created</string>
+    <string name="import_assistant_create_calendar_error">No s\'han pogut crear un o més calendaris.</string>
     <string name="import_assistant_start_import_empty_error">Error en començar la importació. No hi ha calendaris per importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa com a</string>
     <string name="import_assistant_new_calendar_badge">Nou</string>
@@ -509,7 +513,7 @@
     <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reprèn</string>
     <string name="import_assistant_delete_report_title">Esborra de la llista?</string>
-    <string name="import_assistant_delete_report_message">You will not see this import record in the list anymore.</string>
+    <string name="import_assistant_delete_report_message">Ja no veureu aquest registre d\'importació a la llista.</string>
     <string name="import_assistant_delete_report_positive_button">Suprimir</string>
     <string name="import_assistant_delete_report_negative_button">Mantenir</string>
     <string name="import_assistant_cancel_import_title">La importació és incompleta!</string>

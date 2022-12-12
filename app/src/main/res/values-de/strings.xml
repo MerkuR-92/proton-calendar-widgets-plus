@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Abgesagt</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deaktiviert)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d Ja</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d Vielleicht</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d Nein</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d Ja</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d Vielleicht</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d Nein</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d ausstehend</string>
     <string name="event_attendee_is_organizer">Du bist der Organisator</string>
     <string name="event_attendee_organizer">Organisator</string>
@@ -462,7 +462,7 @@
     <string name="spotlight_v5_dialog_rebranding_title">Aktualisiertes Proton, einheitlicher Schutz</string>
     <string name="spotlight_v5_dialog_rebranding_description">Proton präsentiert sich in neuem Gewand. Viele Dienste, eine Aufgabe. Willkommen in einem Internet, in dem der Datenschutz Standard ist. <a href="https://proton.me/news/updated-proton">Mehr erfahren</a></string>
     <string name="spotlight_dialog_week_view_title">Weitere Anzeigeoptionen</string>
-    <string name="spotlight_dialog_week_view_description">• Entdecke die neue <b>3-Tages-</b> und <b>Wochenansicht</b>. Wechsele über das <b>Menü</b> zwischen den Ansichten.\n\n• Passe die Reihenhöhe im Tagesraster mittels Zusammenziehen mit zwei Fingern an, um hinein- und heraus zu zoomen.</string>
+    <string name="spotlight_dialog_week_view_description">• Einführung der <b>3-Tage</b>- und <b>Wochen</b>-Kalenderansichten. Wähle deine bevorzugte Ansicht im <b>Menü</b>.\n\n• Passe die Höhe der Zeilen im Tagesraster an, indem du mit zwei Fingern hinein- oder herauszoomst.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>

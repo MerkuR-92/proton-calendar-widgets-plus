@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Geannuleerd</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Uitgeschakeld)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d ja</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d misschien</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nee</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d misschien</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d nee</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d in afwachting</string>
     <string name="event_attendee_is_organizer">U bent de organisator</string>
     <string name="event_attendee_organizer">Organisator</string>
@@ -230,6 +230,8 @@
     <string name="nav_view_more">Meer</string>
     <string name="nav_view_switcher">Bekijken</string>
     <string name="nav_view_switcher_day">Dag</string>
+    <string name="nav_view_switcher_three_day">3 Dagen</string>
+    <string name="nav_view_switcher_week">Week</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_switcher_month">Maand</string>
     <string name="nav_view_timezone">Tijdzone</string>
@@ -459,6 +461,8 @@
     <string name="spotlight_v5_dialog_learn_more_button">Meer informatie</string>
     <string name="spotlight_v5_dialog_rebranding_title">Geüpdatete Proton, verenigde bescherming</string>
     <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="https://proton.me/news/updated-proton">Meer leren</a></string>
+    <string name="spotlight_dialog_week_view_title">Meer weergaveopties</string>
+    <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b> en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
