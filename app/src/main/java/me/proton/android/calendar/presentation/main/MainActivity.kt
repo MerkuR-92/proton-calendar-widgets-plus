@@ -1321,6 +1321,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         calendarViewModel.userCalendars.observe(this@MainActivity, Observer { userCalendars ->
             userCalendars ?: return@Observer
             setUserCalendarsList(userCalendars)
+
+            if (userCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
+                // TODO Uncomment once calendar key reactivation has been fixed
+                // handleUpdatePassphrase()
+
+                lifecycleScope.launch {
+                    // TODO Temporary workaround: Force logout user if we get key reactivation
+                    accountViewModel.logoutPrimary()
+                    calendarViewModel.shutdown()
+                }
+            }
         })
 
         calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->
@@ -1334,11 +1345,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         calendarViewModel.inactiveUserCalendars.observe(this@MainActivity, Observer { inactiveCalendars ->
             inactiveCalendars ?: return@Observer
-
-            // TODO Uncomment once calendar key reactivation has been fixed
-            // if (inactiveCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
-            //     handleUpdatePassphrase()
-            // }
         })
 
         subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
