@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Anulat</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Dezactivat)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d da</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d poate</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d nu</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d da</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d poate</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d nu</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d în așteptare</string>
     <string name="event_attendee_is_organizer">Sunteți organizatorul</string>
     <string name="event_attendee_organizer">Organizator</string>
@@ -187,7 +187,7 @@
     <string name="event_discard_changes_title">Anulare modificări?</string>
     <string name="event_discard_changes_description">Veți pierde toate modificările nesalvate.</string>
     <string name="event_discard_changes_cancel">Continuare editare</string>
-    <string name="event_discard_changes_confirm">Renunțare</string>
+    <string name="event_discard_changes_confirm">Anulare</string>
     <string name="event_recurring_update_this_title">Actualizare eveniment recurent</string>
     <string name="event_recurring_update_this_description">Modificările de frecvență vor fi pierdute</string>
     <string name="event_recurring_update_all_description">Modificările anterioare ale acestei serii vor fi pierdute</string>
@@ -230,6 +230,8 @@
     <string name="nav_view_more">Mai mult</string>
     <string name="nav_view_switcher">Afișare</string>
     <string name="nav_view_switcher_day">zi</string>
+    <string name="nav_view_switcher_three_day">3 zile</string>
+    <string name="nav_view_switcher_week">Săptămână</string>
     <string name="nav_view_switcher_agenda">Agendă</string>
     <string name="nav_view_switcher_month">lună</string>
     <string name="nav_view_timezone">Fus orar</string>
@@ -459,6 +461,8 @@
     <string name="spotlight_v5_dialog_learn_more_button">Detalii</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizat, protecție unificată</string>
     <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="https://proton.me/news/updated-proton">Detalii</a></string>
+    <string name="spotlight_dialog_week_view_title">Mai multe opțiuni de afișare</string>
+    <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>

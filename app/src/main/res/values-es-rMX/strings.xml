@@ -76,9 +76,9 @@
     <string name="event_status_canceled">Cancelado</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitado)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
-    <string name="event_attendee_yes" comment="How many attendees answered YES">%1$d sí</string>
-    <string name="event_attendee_maybe" comment="How many attendees answered MAYBE">%1$d quizás</string>
-    <string name="event_attendee_no" comment="How many attendees answered NO">%1$d no</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d quizás</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d no</string>
     <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d pendiente</string>
     <string name="event_attendee_is_organizer">Usted es quien organiza</string>
     <string name="event_attendee_organizer">Organizador</string>
@@ -230,6 +230,8 @@
     <string name="nav_view_more">Más</string>
     <string name="nav_view_switcher">Vista</string>
     <string name="nav_view_switcher_day">Día</string>
+    <string name="nav_view_switcher_three_day">3 Días</string>
+    <string name="nav_view_switcher_week">Semana</string>
     <string name="nav_view_switcher_agenda">Agenda</string>
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Zona horaria</string>
@@ -459,6 +461,8 @@
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
     <string name="spotlight_v5_dialog_rebranding_description">Presentamos el aspecto renovado de Proton. Muchos servicios, una misión. Bienvenido a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
+    <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
+    <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Seleccione su vista preferida en el <b>menú</b>.\n\n• Ajuste la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para iniciar la importación, inicie sesión en Google Calendar y permita el acceso de Proton a sus datos.</string>
