@@ -4,9 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.common.API_HOST
 import me.proton.android.calendar.common.HV_HOST
-import me.proton.core.humanverification.presentation.CaptchaApiHost
 import me.proton.core.humanverification.presentation.HumanVerificationApiHost
 import me.proton.core.humanverification.presentation.utils.HumanVerificationVersion
 
@@ -20,8 +18,4 @@ object HumanVerificationModule {
     @Provides
     @HumanVerificationApiHost
     fun provideHumanVerificationApiHost(): String = "https://verify.${HV_HOST}"
-
-    @Provides
-    @CaptchaApiHost
-    fun provideCaptchaApiHost(): String = API_HOST
 }
