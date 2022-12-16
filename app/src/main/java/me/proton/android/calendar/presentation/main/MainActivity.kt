@@ -1,10 +1,14 @@
 package me.proton.android.calendar.presentation.main
 
+import android.Manifest
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +16,10 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
@@ -32,6 +36,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -49,6 +54,9 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.drawer_layout
 import kotlinx.android.synthetic.main.activity_main.nav_view_main_content
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_create
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout_press
@@ -119,6 +127,7 @@ import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
+import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
@@ -135,7 +144,6 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
-import me.proton.android.calendar.domain.model.getActualEventId
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -269,6 +277,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 logger.i("MainActivity onResume force handleAccountState to get out of limbo")
                 handleAccountState(this, state)
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkNotificationsPermissions(this)
         }
     }
 
@@ -1419,6 +1435,59 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             moveTaskToBack(true)
         } else {
             super.onBackPressed()
+        }
+    }
+
+    /**
+     * Checks if we have granted permissions to show notifications and displays appropriate dialogs if not.
+     */
+    private fun checkNotificationsPermissions(context: Context) {
+
+        fun shouldShowNotificationsPermissionsDialog(context: Context) = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
+            SharedPreferencesKeys.SHOW_NOTIFICATIONS_PERMISSIONS_DIALOG, true)
+
+        fun displayRationale(context: Context) {
+
+            val view = LayoutInflater.from(context).inflate(R.layout.dialog_checkbox, null, false)
+
+            view.dialog_checkbox_header.text = getString(R.string.notifications_permission_dialog_message)
+            view.dialog_checkbox_press.setOnClickListener {
+                view.dialog_checkbox.performClick()
+            }
+
+            MaterialAlertDialogBuilder(context)
+                .setTitle(R.string.notifications_permission_dialog_title)
+                .setView(view)
+                .setPositiveButton(R.string.notifications_permission_dialog_open_settings) { _, _ ->
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    intent.data = Uri.fromParts("package", context.packageName, null)
+                    startActivity(intent)
+                }
+                .setNegativeButton(R.string.notifications_permission_dialog_cancel) { _, _ -> }
+                .setOnCancelListener { }
+                .setOnDismissListener {
+                    if (view.dialog_checkbox.isChecked) {
+                        with (PreferenceManager.getDefaultSharedPreferences(context).edit()) {
+                            putBoolean(SharedPreferencesKeys.SHOW_NOTIFICATIONS_PERMISSIONS_DIALOG, false)
+                            apply()
+                        }
+                    }
+                }
+                .show()
+        }
+
+        when {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED -> {
+                // permission granted, nothing to do
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) && shouldShowNotificationsPermissionsDialog(context) -> {
+                displayRationale(context)
+            }
+            shouldShowNotificationsPermissionsDialog(context) -> {
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { }.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            else -> {}
         }
     }
 

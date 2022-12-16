@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.ProtonCalendarBroadcastReceiver
 import me.proton.android.calendar.common.AlarmAction
@@ -81,8 +82,6 @@ class HandleAlarmsUseCase @Inject constructor(
 
     private fun rescheduleSystemAlarm(atInstant: Instant) {
 
-        logger.d("HandleAlarmsUseCase scheduling next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
-
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         val intent = Intent(context, ProtonCalendarBroadcastReceiver::class.java).apply {
@@ -97,7 +96,13 @@ class HandleAlarmsUseCase @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
+            logger.d("HandleAlarmsUseCase setExactAndAllowWhileIdle next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
+        } else {
+            logger.i("HandleAlarmsUseCase: can't schedule exact alarms")
+        }
+
     }
 
 }

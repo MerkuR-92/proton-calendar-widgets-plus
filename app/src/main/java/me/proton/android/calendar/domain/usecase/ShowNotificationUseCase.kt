@@ -45,6 +45,14 @@ class ShowNotificationUseCase @Inject constructor(
 
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (!notificationManager.areNotificationsEnabled()) {
+                // we ignore the fact that showing notifications is not allowed, but log it
+                logger.i("ShowNotificationUseCase: Notifications disabled")
+            }
+        }
+
         val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID_EVENT_ALARMS)
         val systemDefaultZoneId = ZoneId.systemDefault()
         val displayTimeZoneId = database.calendarUserSettingsDao().select(userId)?.primaryTimezone

@@ -107,7 +107,7 @@ android {
     defaultConfig {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 165
         versionName "2.3.11"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
