@@ -462,7 +462,7 @@
     <string name="spotlight_v5_dialog_rebranding_title">Geüpdatete Proton, verenigde bescherming</string>
     <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="https://proton.me/news/updated-proton">Meer leren</a></string>
     <string name="spotlight_dialog_week_view_title">Meer weergaveopties</string>
-    <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b> en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
+    <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b>- en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>

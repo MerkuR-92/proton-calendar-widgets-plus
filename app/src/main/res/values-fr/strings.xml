@@ -88,12 +88,12 @@
     <string name="event_answer_yes">Oui</string>
     <string name="event_answer_no">Non</string>
     <string name="event_answer_maybe">Peut-être</string>
-    <string name="event_decryption_error_dialog_title">Le déchiffrement de l\'événement a échoué.</string>
-    <string name="event_decryption_error_dialog_message">Le déchiffrement du contenu de cet événement a échoué.</string>
+    <string name="event_decryption_error_dialog_title">L\'événement n\'a pas pu être déchiffré.</string>
+    <string name="event_decryption_error_dialog_message">Le contenu de cet événement n\'a pas pu être déchiffré.</string>
     <string name="event_decryption_error_dialog_confirmation">Supprimer l\'événement</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Supprimer les événements</string>
     <string name="event_decryption_error_dialog_close">Fermer</string>
-    <string name="event_signature_verification_failure">La vérification de la signature de l\'événement a échoué. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
+    <string name="event_signature_verification_failure">La signature de l\'événement n\'a pas pu être vérifiée. <a href="https://proton.me/support/what-is-a-digital-signature">En savoir plus</a></string>
     <string name="event_signature_verification_in_progress">La vérification de la signature de l\'événement est en cours.</string>
     <string name="event_signature_verification_network_error">La vérification de la signature de l\'événement a été interrompue par une erreur. <a href="">Essayez à nouveau</a></string>
     <string name="event_change_answer_recurring_title">Mettre à jour l\'événement récurrent</string>
@@ -283,8 +283,8 @@
     <string name="snack_calendar_init_error">Une erreur s\'est produite lors du chargement des informations du calendrier.</string>
     <string name="snack_update_calendar_error">Une erreur s\'est produite lors de la mise à jour des informations du calendrier, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_update_calendar_settings_error">Une erreur s\'est produite lors de la mise à jour de certaines informations du calendrier. Nous vous invitons à réessayer plus tard.</string>
-    <string name="snack_update_calendar_success">Le calendrier est mis à jour.</string>
-    <string name="snack_create_calendar_success">Le calendrier est créé.</string>
+    <string name="snack_update_calendar_success">Le calendrier a été mis à jour.</string>
+    <string name="snack_create_calendar_success">Le calendrier a été créé.</string>
     <string name="snack_calendar_saving">Le calendrier est en cours d\'enregistrement.</string>
     <string name="snack_create_calendar_error">Une erreur s\'est produite lors de la création du calendrier, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_create_calendar_settings_error">Le calendrier est créé mais certaines informations n\'ont pas été mises à jour, nous vous invitons à réessayer plus tard.</string>
@@ -472,16 +472,16 @@
     <string name="import_assistant_summary_title">Résumé de l\'importation</string>
     <string name="import_assistant_summary_customize_import">Personnaliser l\'importation</string>
     <string name="import_assistant_error">Une erreur s\'est produite lors de la récupération des données.</string>
-    <string name="import_assistant_data_gathering_error">Les données n\'ont pas été collectées.</string>
-    <string name="import_assistant_update_import_error">La mise à jour de l\'importation a échoué, nous vous invitons à réessayer plus tard.</string>
+    <string name="import_assistant_data_gathering_error">Les données n\'ont pas pu être collectées.</string>
+    <string name="import_assistant_update_import_error">L\'importation n\'a pas pu être mise à jour, nous vous invitons à réessayer plus tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">Ce n\'est pas le bon compte. Connectez-vous avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
     <string name="import_assistant_start_import_error">L\'importation n\'a pas pu commencer, nous vous invitons à réessayer plus tard.</string>
     <string name="import_assistant_delete_import_success">L\'enregistrement d\'importation a été supprimé.</string>
-    <string name="import_assistant_delete_import_error">La suppression de l\'importation a échoué, nous vous invitons à réessayer plus tard.</string>
-    <string name="import_assistant_cancel_import_error">L\'annulation de l\'importation a échoué, nous vous invitons à réessayer plus tard.</string>
-    <string name="import_assistant_resume_import_error">La reprise de l\'importation a échoué, nous vous invitons à réessayer plus tard.</string>
+    <string name="import_assistant_delete_import_error">L\'importation n\'a pas pu être supprimée, nous vous invitons à réessayer plus tard.</string>
+    <string name="import_assistant_cancel_import_error">L\'importation n\'a pas pu être annulée, nous vous invitons à réessayer plus tard.</string>
+    <string name="import_assistant_resume_import_error">L\'importation n\'a pas pu être relancée, nous vous invitons à réessayer plus tard.</string>
     <string name="import_assistant_create_calendar_error">Un ou plusieurs calendriers n\'ont pas pu être créés.</string>
-    <string name="import_assistant_start_import_empty_error">Le démarrage de l\'importation a échoué, il n\'y a aucun calendrier à importer.</string>
+    <string name="import_assistant_start_import_empty_error">L\'importation n\'a pas pu démarrer, il n\'y a aucun calendrier à importer.</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importer comme</string>
     <string name="import_assistant_new_calendar_badge">Nouveau</string>
     <string name="import_assistant_merge_calendar_badge">Fusionné</string>
