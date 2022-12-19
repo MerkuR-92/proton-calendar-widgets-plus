@@ -632,6 +632,8 @@ class EventViewModel @Inject constructor(
      */
     fun persistRecurrenceFormData(summary: String?, location: String?, description: String?) {
 
+        if (!this::event.isInitialized) return
+
         if (event.iCalEvent.summary?.value != summary ||
             event.iCalEvent.location?.value != location ||
             event.iCalEvent.description?.value != description
