@@ -454,7 +454,7 @@
     <string name="spotlight_dialog_easy_switch_description">Importar esdeveniments i altres dades de Google Calendar a Proton Calendar mai havia estat tan fàcil. El nostre Easy Switch et guiarà pas a pas.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Comença la importació</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ara no</string>
-    <string name="spotlight_dialog_auto_invites_title">Easily accept invites</string>
+    <string name="spotlight_dialog_auto_invites_title">Accepta invitacions fàcilment</string>
     <string name="spotlight_dialog_auto_invites_description">Ara les invitacions apareixen al vostre calendari en forma d\'esdeveniments pendents. Simplement, obre un esdeveniment Per respondre. \n\n Per gestionar-ho, ves a preferències.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Següent</string>
     <string name="spotlight_v5_dialog_got_it_button">Entesos</string>
@@ -462,7 +462,7 @@
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
     <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
     <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
-    <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
+    <string name="spotlight_dialog_week_view_description">• Presentem la vista de calendari de <b>3 dies</b> i <b>Setmanal</b>. Seleccioneu la vostra vista preferida del <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permetre l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicia sessió a Google Calendar i dona permís a Proton per accedir a les teves dades.</string>
@@ -509,8 +509,8 @@
     <string name="import_assistant_status_paused_lost_connection_title">Connexió amb Google perduda</string>
     <string name="import_assistant_status_paused_lost_connection_description">Per continuar amb la importació, premeu Reconnectar, inicieu sessió a Google, i doni permís a Proton per accedir a la informació de Google un altre cop.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnectar</string>
-    <string name="import_assistant_status_paused_storage_full_title">Your storage is full</string>
-    <string name="import_assistant_status_paused_storage_full_description">Your Proton Account does not have enough storage to finish this calendar import. Free up space or add more storage, then come back here to Resume.</string>
+    <string name="import_assistant_status_paused_storage_full_title">L\'emmagatzematge és ple</string>
+    <string name="import_assistant_status_paused_storage_full_description">El vostre compte de Proton no té prou espai d\'emmagatzematge per a completar la importació de calendari actual. Allibereu espai o afegiu més espai d\'emmagatzematge, després torneu aquí per a continuar.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reprèn</string>
     <string name="import_assistant_delete_report_title">Esborra de la llista?</string>
     <string name="import_assistant_delete_report_message">Ja no veureu aquest registre d\'importació a la llista.</string>
@@ -522,11 +522,11 @@
     <string name="import_assistant_cancel_import_negative_button">Reprèn la importació</string>
     <string name="import_assistant_in_progress_snack">Importació en curs</string>
     <string name="import_assistant_discard_import_title">Cancel·la la importació?</string>
-    <string name="import_assistant_discard_import_message">Import is incomplete and can’t resume if you cancel it.</string>
+    <string name="import_assistant_discard_import_message">La importació és incompleta, i no es pot reprendre si la cancel·leu.</string>
     <string name="import_assistant_discard_import_positive">Cancel·la la importació</string>
     <string name="import_assistant_discard_import_negative">Reprèn la importació</string>
     <string name="import_assistant_authentication_canceled">S\'ha cancel·lat l\'autenticació</string>
-    <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
+    <string name="import_assistant_sign_in_in_progress">Hi ha una operació d\'inici de sessió actualment en marxa</string>
     <string name="import_assistant_in_progress_error_snack">Encara hi ha una importació en curs</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -542,16 +542,16 @@
         <item quantity="other">%d importacions en curs</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d of %d created in %s</item>
-        <item quantity="other">%d of %d created in %s</item>
+        <item quantity="one">S\'ha creat %d de %d a %s</item>
+        <item quantity="other">S\'han creat %d de %d a %s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Create %d new calendar in Proton Calendar.</item>
-        <item quantity="other">Create %d new calendars in Proton Calendar.</item>
+        <item quantity="one">Crea %d calendari nou a Proton Calendar.</item>
+        <item quantity="other">Crea %d calendaris nous a Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Import %d of %d calendar from</item>
-        <item quantity="other">Import %d of %d calendars from</item>
+        <item quantity="one">Importa %d de %d calendari des de</item>
+        <item quantity="other">Importa %d de %d calendaris des de</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
         <item quantity="one">Combina %d calendaris a Proton Calendar.</item>

@@ -401,10 +401,10 @@
     <string name="create_calendar_limit_reached_paid_message">Ștergeți calendarele neutilizate pentrru a crea altele.</string>
     <string name="create_calendar_limit_reached_paid_manage">Gestionare calendare</string>
     <string name="create_calendar_limit_reached_close">Închidere</string>
-    <string name="create_calendar_limit_reached_free_title">Upgrade Proton Calendar</string>
+    <string name="create_calendar_limit_reached_free_title">Modernizare Proton Calendar</string>
     <string name="create_calendar_limit_reached_free_description">Creați până la 20 de calendare și accesați multe alte funcții exclusive când treceți la alt plan.</string>
     <string name="create_calendar_limit_reached_free_not_now">Nu acum</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
+    <string name="create_calendar_limit_reached_free_upgrade">Modernizare</string>
     <string name="delete_calendar_dialog_title">Ștergere calendar</string>
     <string name="delete_calendar_dialog_message">Sigur doriți să ștergeți acest calendar?</string>
     <string name="delete_default_calendar_dialog_message">Sigur doriți ștergerea acestui calendar? „%1$s” va fi setat ca și calendar implicit.</string>
