@@ -382,6 +382,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
                         dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
                     }
+                    else -> Unit
                 }
 
                 // This can not happen
@@ -555,6 +556,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     spinnerText = resources.getString(R.string.splash_after_login_init)
                 )
             }
+            else -> Unit
         }
     }
 
@@ -691,6 +693,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         }
                     }
                     //IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> TODO()
+                    else -> Unit
                 }
 
                 val eventId = handleIcsImportResult.eventId

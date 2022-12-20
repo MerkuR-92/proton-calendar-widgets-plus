@@ -1,6 +1,6 @@
 plugins {
 //    id 'org.jetbrains.kotlin.multiplatform' version '1.4.10'
-    id 'org.jetbrains.kotlin.plugin.serialization' version "1.6.10"
+    id 'org.jetbrains.kotlin.plugin.serialization' version "1.7.20"
     id "org.sonarqube" version "3.3"
 }
 
@@ -313,7 +313,7 @@ dependencies {
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
     detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
-    androidTestImplementation "io.mockk:mockk-android:1.12.0"
+    androidTestImplementation "io.mockk:mockk-android:1.13.3"
     androidTestImplementation "androidx.test:core:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.version.androidx_test}"
@@ -321,7 +321,7 @@ dependencies {
 //    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.21'
-    testImplementation "io.mockk:mockk:1.12.0"
+    testImplementation "io.mockk:mockk:1.13.3"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.5.0'
 

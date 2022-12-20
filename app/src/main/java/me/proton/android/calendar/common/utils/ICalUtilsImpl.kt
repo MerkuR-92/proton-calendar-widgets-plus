@@ -184,6 +184,7 @@ object ICalUtilsImpl : ICalUtils {
                     )
                 }
             }
+            else -> Unit
         }
 
         iCalEvent.recurrenceRule.value.until?.let {

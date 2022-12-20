@@ -182,6 +182,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                     }
+                    else -> Unit
                 }
                 jumpToMonthView()
             }
@@ -350,6 +351,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                             else getString(R.string.snack_event_init_error)
                         )
                     }
+                    else -> Unit
                 }
                 if (navigationArguments.eventId == null) jumpToMonthView()
                 else onBackPressedCustom()
