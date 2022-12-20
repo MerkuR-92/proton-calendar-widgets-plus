@@ -25,23 +25,15 @@ class UpdateCalendarUseCase @Inject constructor(
     }
 
     // Update Single Calendar on Server
-    suspend fun executeUpdateFromDb(userId: UserId, calendarId: String) : UseCase.Result {
+    suspend fun executeUpdateDisplayFromDb(userId: UserId, calendarId: String) : UseCase.Result {
 
-        val dbCalendar = database.calendarsDao().selectById(calendarId) ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb DB Calendar was null")
         val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb DB Member was null")
 
-        val updateCalendarApiRequest = UpdateCalendarApiRequest(
-            name = dbCalendar.name,
-            description = dbCalendar.description
-        )
-
         val updateMemberApiRequest = UpdateMemberApiRequest(
-            color = dbMember.color,
             display = dbMember.display
         )
 
-        return updateSingleCalendar(userId, calendarId, updateCalendarApiRequest, dbMember.id, updateMemberApiRequest)
-
+        return updateSingleCalendarDisplay(userId, calendarId, dbMember.id, updateMemberApiRequest)
     }
 
     suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
@@ -50,14 +42,31 @@ class UpdateCalendarUseCase @Inject constructor(
             description = description
         )
 
+        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
+
         val updateMemberApiRequest = UpdateMemberApiRequest(
-            color = color,
+            color = if (!dbMember.color.equals(color, ignoreCase = true)) color else null, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.
             display = display
         )
 
-        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
-
         return updateSingleCalendar(userId, calendarId, updateCalendarApiRequest, dbMember.id, updateMemberApiRequest)
+    }
+
+    private suspend fun updateSingleCalendarDisplay(
+        userId: UserId,
+        calendarId: String,
+        memberId: String,
+        updateMemberApiRequest: UpdateMemberApiRequest
+    ): UseCase.Result {
+        return when (val updateMemberResponse =
+            calendarsApi.updateMember(userId, calendarId, memberId, updateMemberApiRequest)) {
+            is ApiResponse.Success -> {
+                calendarsRepository.persistMember(updateMemberResponse.data.member)
+                UseCase.Result.Success<Unit>()
+            }
+            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.error}")
+            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.exception.message ?: "(no exception message)"}")
+        }
     }
 
     private suspend fun updateSingleCalendar(

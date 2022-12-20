@@ -18,8 +18,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.*
@@ -632,6 +630,8 @@ class EventViewModel @Inject constructor(
      */
     fun persistRecurrenceFormData(summary: String?, location: String?, description: String?) {
 
+        if (!this::event.isInitialized) return
+
         if (event.iCalEvent.summary?.value != summary ||
             event.iCalEvent.location?.value != location ||
             event.iCalEvent.description?.value != description
@@ -1156,7 +1156,7 @@ class EventViewModel @Inject constructor(
         // 1. Update in DB
         calendarsRepository.updateCalendarDisplay(calendar.id, display)
         // 2. Update on Server
-        updateCalendarUseCase.executeUpdateFromDb(userId, calendar.id)
+        updateCalendarUseCase.executeUpdateDisplayFromDb(userId, calendar.id)
     }
 
     suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {

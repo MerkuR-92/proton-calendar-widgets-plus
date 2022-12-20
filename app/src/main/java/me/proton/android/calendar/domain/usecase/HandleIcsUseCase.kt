@@ -491,7 +491,7 @@ class HandleIcsUseCase @Inject constructor(
             // 1. Update in DB
             calendarsRepository.updateCalendarDisplay(event.calendar.id, true)
             // 2. Update on Server
-            updateCalendarUseCase.executeUpdateFromDb(userId, event.calendar.id)
+            updateCalendarUseCase.executeUpdateDisplayFromDb(userId, event.calendar.id)
         }
     }
 }

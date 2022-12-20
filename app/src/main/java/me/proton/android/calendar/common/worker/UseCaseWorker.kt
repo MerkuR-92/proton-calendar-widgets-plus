@@ -17,7 +17,6 @@ import org.koin.core.inject
 class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
     private val logger: Logger by inject()
-    private val valueStoreProvider: ValueStoreProvider by inject()
 
     /**
      * Used to inject and execute different usecases from this Worker
@@ -27,7 +26,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             // const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS" deprecated, don't remove this comment
             const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
             const val HANDLE_ALARMS = HandleAlarmsUseCase.WORKER_ID
-            const val UPDATE_CALENDAR = UpdateCalendarUseCase.WORKER_ID
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
@@ -50,8 +48,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
         const val INPUT_ALARM_EPOCH_SECONDS = "INPUT_ALARM_EPOCH_SECONDS"
-        const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
-        const val INPUT_ATTENDEE_ID = "INPUT_ATTENDEE_ID"
         const val INPUT_PARTICIPATION_STATUS = "INPUT_PARTICIPATION_STATUS"
         const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
         const val INPUT_AUTO_DETECT_PRIMARY_TIMEZONE = "INPUT_AUTO_DETECT_PRIMARY_TIMEZONE"
@@ -59,8 +55,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         const val INPUT_AUTO_IMPORT_INVITE = "INPUT_AUTO_IMPORT_INVITE"
         const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
-        const val INPUT_PERSONAL_ICAL_STRING = "INPUT_PERSONAL_ICAL_STRING"
-        const val INPUT_UPDATE_TIME = "INPUT_UPDATE_TIME"
         const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
         const val INPUT_USER_EMAILS = "INPUT_USER_EMAILS"
 
@@ -83,18 +77,15 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
             // const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS" deprecated, don't remove this comment
             const val SYNC_ALARMS = "SYNC_ALARMS"
             const val HANDLE_ALARMS = "HANDLE_ALARMS"
-            const val UPDATE_CALENDAR = "UPDATE_CALENDAR"
             const val UPDATE_CALENDAR_LIST = "UPDATE_CALENDAR_LIST"
             const val SEND_BUG_REPORT = "SEND_BUG_REPORT"
             const val UPDATE_PRIMARY_TIMEZONE = "UPDATE_PRIMARY_TIMEZONE"
             const val UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE = "UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE"
             const val UPDATE_DISPLAY_WEEK_NUMBER = "UPDATE_DISPLAY_WEEK_NUMBER"
             const val UPDATE_AUTO_IMPORT_INVITE = "UPDATE_AUTO_IMPORT_INVITE"
-            const val UPDATE_DEFAULT_CALENDAR_ID = "UPDATE_DEFAULT_CALENDAR_ID"
             const val UPDATE_TIME_FORMAT = "UPDATE_TIME_FORMAT"
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
-            const val FETCH_ADDRESSES = "FETCH_ADDRESSES"
             const val FETCH_PUBLIC_KEYS = "FETCH_PUBLIC_KEYS"
         }
     }
@@ -116,12 +107,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 } else null
                 val handleAlarmsUseCase: HandleAlarmsUseCase = get()
                 handleAlarmsUseCase.execute(userId, alarmEpochSeconds)
-            }
-            UseCaseId.UPDATE_CALENDAR -> {
-                val updateCalendarUseCase: UpdateCalendarUseCase = get()
-                updateCalendarUseCase.executeUpdateFromDb(
-                    userId,
-                    inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure())
             }
             UseCaseId.UPDATE_CALENDAR_LIST -> {
                 val updateCalendarUseCase: UpdateCalendarUseCase = get()
