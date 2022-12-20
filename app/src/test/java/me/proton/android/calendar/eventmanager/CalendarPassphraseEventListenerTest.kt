@@ -93,8 +93,7 @@ class CalendarPassphraseEventListenerTest {
         }
     }
 
-    @Ignore
-    @Test
+    @Ignore("You cannot mock listener here. You should use listener.notifyComplete(...)")
     fun `onComplete caches the created or update passphrases if present`() {
         runBlocking {
             val entities = listOf(

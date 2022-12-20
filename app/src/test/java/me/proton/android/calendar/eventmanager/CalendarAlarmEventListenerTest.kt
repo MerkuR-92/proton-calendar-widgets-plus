@@ -6,7 +6,6 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
@@ -23,15 +22,13 @@ import me.proton.android.calendar.mocks.eventId
 import me.proton.android.calendar.mocks.memberId
 import me.proton.android.calendar.mocks.userId
 import me.proton.core.eventmanager.domain.EventManagerConfig
-import me.proton.core.eventmanager.domain.entity.Action
-import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.eventmanager.domain.entity.EventId
+import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Duration
 import java.time.Instant
-import java.time.temporal.TemporalAmount
 
 class CalendarAlarmEventListenerTest {
 
@@ -47,13 +44,13 @@ class CalendarAlarmEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = spyk(CalendarAlarmEventListener(
+        listener = CalendarAlarmEventListener(
             db,
             calendarsRepository,
             handleAlarmsUseCase,
             syncAlarmsUseCase,
-            logger,
-        ))
+            logger
+        )
     }
 
     @Test
@@ -82,7 +79,7 @@ class CalendarAlarmEventListenerTest {
                 // This one is too far away in the future
                 createAlarmEntity("alarm_id_4", Instant.MAX),
                 // This one is too far away in the future too
-                createAlarmEntity("alarm_id_5", Instant.now().plus(Duration.ofDays(31))),
+                createAlarmEntity("alarm_id_5", Instant.now().plus(Duration.ofDays(31)))
             )
 
             listener.onPrepare(config, alarms)
@@ -136,11 +133,17 @@ class CalendarAlarmEventListenerTest {
     @Test
     fun `onSuccess post-process the alarms calling HandleAlarmsUseCase`() {
         runBlocking {
-            coEvery { listener.getActionMap(any()) } returns listOf(
-                Event(Action.Create, eventId, createAlarmEntity("alarm_id"))
-            ).groupByAction()
 
-            listener.onSuccess(config)
+            listener.notifySuccess(
+                config,
+                EventMetadata(
+                    userId = userId,
+                    eventId = EventId(eventId),
+                    config = config,
+                    createdAt = 0,
+                    response = EventsResponse(eventsResponse)
+                )
+            )
 
             coVerify { handleAlarmsUseCase.execute(any()) }
         }
