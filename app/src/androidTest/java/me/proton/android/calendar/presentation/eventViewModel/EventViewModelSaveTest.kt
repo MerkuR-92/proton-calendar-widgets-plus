@@ -48,7 +48,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateDisplayFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Handle save use case call
             coEvery {
@@ -97,7 +97,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateDisplayFromDb(userId, calendarId) }
 
             // Success snack
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.snack_event_created) }
@@ -189,7 +189,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Display calendar if it was hidden
             coEvery { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) } just Runs
-            coEvery { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
+            coEvery { updateCalendarUseCaseMock.executeUpdateDisplayFromDb(userId, calendarId) } returns UseCase.Result.Success<Unit>()
 
             // Get address for current user
             coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
@@ -259,7 +259,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Update calendar display
             coVerify(exactly = 1) { calendarsRepositoryMock.updateCalendarDisplay(calendarId, true) }
-            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateFromDb(userId, calendarId) }
+            coVerify(exactly = 1) { updateCalendarUseCaseMock.executeUpdateDisplayFromDb(userId, calendarId) }
 
             // Edit option picker dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_text_edit_event) }
