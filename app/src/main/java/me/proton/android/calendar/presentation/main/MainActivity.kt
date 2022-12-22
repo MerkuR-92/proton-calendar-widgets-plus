@@ -387,6 +387,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 // This can not happen
                 if (dialogTitle == null || dialogMessage == null) {
                     clearError()
+                    accountViewModel.logoutPrimary()
                     handleAccountState(this, state.value!!)
                     return@Observer
                 }
@@ -426,6 +427,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             calendars.filter { errorReport.failedCalendarIds.contains(it.id) }
                         ) { _, _ ->
                             clearError()
+                            accountViewModel.logoutPrimary()
                             handleAccountState(accountViewModel, state.value!!)
                         }
                     }
@@ -437,6 +439,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         .setCancelable(false)
                         .setPositiveButton(dialogPositiveButton) { _, _ ->
                             clearError()
+                            accountViewModel.logoutPrimary()
                             handleAccountState(this, state.value!!)
                         }.show()
                     materialDialog.findViewById<TextView>(android.R.id.message)?.movementMethod =

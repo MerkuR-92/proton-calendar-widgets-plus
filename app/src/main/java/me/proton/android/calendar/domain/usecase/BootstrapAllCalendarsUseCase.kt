@@ -167,7 +167,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         val failedCalendarIds = mutableListOf<String>()
 
-        allCalendars.forEach { calendar ->
+        // TODO For now we ignore the inactive calendars where user is not an owner
+        allCalendars.filterNot { !it.isOwner && it.isInactive }.forEach { calendar ->
             val calendarEntity = allCalendarEntities.find { it.id == calendar.id }
 
             val executeBootstrapResult = if (calendarEntity != null) {

@@ -113,8 +113,9 @@ class AccountViewModel @Inject constructor(
                 if (bootstrapResult.error == UseCase.Error.Bootstrap.ResetNeeded ||
                     bootstrapResult.error == UseCase.Error.Bootstrap.UpdatePassphrase
                 ) return
+            } else {
+                removeUser(userId)
             }
-            removeUser(userId)
             return
         }
 
