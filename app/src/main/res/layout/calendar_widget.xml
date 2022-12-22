@@ -19,6 +19,8 @@
         android:clickable="true"
         android:focusable="true"
         android:padding="2dp"
+        android:layout_toStartOf="@+id/ib_refresh"
+        android:layout_alignParentStart="true"
         >
 
         <TextView
@@ -62,12 +64,14 @@
         android:layout_height="@dimen/action_background_size"
         android:layout_alignTop="@id/rl_header_container"
         android:layout_alignEnd="@id/ib_plus"
-        android:layout_marginEnd="48dp"
+        android:layout_marginEnd="40dp"
         android:layout_toStartOf="@+id/ib_plus"
         android:background="@drawable/ripple_action_button_oval"
         android:src="@drawable/ic_proton_arrows_rotate"
         android:tint="@color/icon_norm"
-        tools:ignore="UseAppTint" />
+        android:visibility="invisible"
+        tools:ignore="UseAppTint"
+        tools:visibility="visible" />
 
     <ListView
         android:id="@+id/lv_widget"
