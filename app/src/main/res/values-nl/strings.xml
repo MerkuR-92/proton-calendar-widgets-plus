@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Weigeren</string>
     <string name="dialog_title_calendar_picker">Agenda</string>
     <string name="import_from_google_title">Importeren uit Google</string>
+    <string name="notifications_permission_dialog_title">Proton Calender toestaan om meldingen weer te geven?</string>
+    <string name="notifications_permission_dialog_message">Proton Calender heeft toestemming nodig om u meldingen over toekomstige afspraken te tonen.</string>
+    <string name="notifications_permission_dialog_open_settings">Instellingen openen</string>
+    <string name="notifications_permission_dialog_cancel">Weigeren</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Afspraakmelding</string>
     <string name="notification_channel_sync">Agenda Synchronisatie</string>

@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Refuzare</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
     <string name="import_from_google_title">Importare din Google</string>
+    <string name="notifications_permission_dialog_title">Permiteți ca Proton Calendar să afișeze notificări?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar necesită permisiunea afișării notificărilor de evenimente viitoare.</string>
+    <string name="notifications_permission_dialog_open_settings">Deschidere setări</string>
+    <string name="notifications_permission_dialog_cancel">Refuzare</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificări eveniment</string>
     <string name="notification_channel_sync">Sincronizare calendar</string>
