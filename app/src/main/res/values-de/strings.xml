@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Ablehnen</string>
     <string name="dialog_title_calendar_picker">Kalender</string>
     <string name="import_from_google_title">Von Google importieren</string>
+    <string name="notifications_permission_dialog_title">Proton Calendar erlauben, Benachrichtigungen anzuzeigen?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar benötigt die Erlaubnis, um Benachrichtigungen über bevorstehende Termine anzuzeigen.</string>
+    <string name="notifications_permission_dialog_open_settings">Einstellungen öffnen</string>
+    <string name="notifications_permission_dialog_cancel">Ablehnen</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Terminbenachrichtigungen</string>
     <string name="notification_channel_sync">Kalendersynchronisierung</string>

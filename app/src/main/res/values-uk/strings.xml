@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Заборонити</string>
     <string name="dialog_title_calendar_picker">Календар</string>
     <string name="import_from_google_title">Імпортувати з Google</string>
+    <string name="notifications_permission_dialog_title">Дозволити Proton Calendar показувати сповіщення?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar потребує дозволу, щоб показувати вам сповіщення про майбутні події.</string>
+    <string name="notifications_permission_dialog_open_settings">Відкрити налаштування</string>
+    <string name="notifications_permission_dialog_cancel">Заборонити</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Сповіщення про події</string>
     <string name="notification_channel_sync">Синхронізація календаря</string>

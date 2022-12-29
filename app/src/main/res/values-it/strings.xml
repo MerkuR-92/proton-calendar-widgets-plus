@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Nega</string>
     <string name="dialog_title_calendar_picker">Calendario</string>
     <string name="import_from_google_title">Importa da Google</string>
+    <string name="notifications_permission_dialog_title">Consentire a Proton Calendar di mostrare notifiche?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar ha bisogno dell\'autorizzazione per mostrarti le notifiche degli eventi in arrivo.</string>
+    <string name="notifications_permission_dialog_open_settings">Apri Impostazioni</string>
+    <string name="notifications_permission_dialog_cancel">Rifiuta</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notifiche Evento</string>
     <string name="notification_channel_sync">Sincronizzazione del Calendario</string>

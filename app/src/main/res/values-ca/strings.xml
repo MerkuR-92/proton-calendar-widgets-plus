@@ -329,6 +329,10 @@
     <string name="contacts_permission_dialog_cancel">Denegar</string>
     <string name="dialog_title_calendar_picker">Calendari</string>
     <string name="import_from_google_title">Importa des de Google</string>
+    <string name="notifications_permission_dialog_title">Permetre a Proton Calendar mostrar notificacions?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar necessita permís per mostrar-vos les notificacions dels pròxims esdeveniments.</string>
+    <string name="notifications_permission_dialog_open_settings">Obre la Configuració</string>
+    <string name="notifications_permission_dialog_cancel">Denega</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificacions d\'esdeveniment</string>
     <string name="notification_channel_sync">Sincronització del calendari</string>
