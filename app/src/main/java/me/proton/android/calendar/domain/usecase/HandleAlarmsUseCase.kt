@@ -96,11 +96,11 @@ class HandleAlarmsUseCase @Inject constructor(
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && alarmManager.canScheduleExactAlarms()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            logger.i("HandleAlarmsUseCase: can't schedule exact alarms")
+        } else {
             logger.d("HandleAlarmsUseCase setExactAndAllowWhileIdle next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
-        } else {
-            logger.i("HandleAlarmsUseCase: can't schedule exact alarms")
         }
 
     }
