@@ -13,10 +13,14 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarPassphraseEventListener
 import me.proton.android.calendar.mocks.calendarId
+import me.proton.android.calendar.mocks.userId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.eventmanager.domain.entity.EventId
+import me.proton.core.eventmanager.domain.entity.EventMetadata
+import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
@@ -93,19 +97,52 @@ class CalendarPassphraseEventListenerTest {
         }
     }
 
-    @Ignore("You cannot mock listener here. You should use listener.notifyComplete(...)")
+    @Test
     fun `onComplete caches the created or update passphrases if present`() {
         runBlocking {
-            val entities = listOf(
-                PassphraseEntity("passphrase_id", 0, emptyList(), calendarId),
-                PassphraseEntity("passphrase_id_2", 0, emptyList(), calendarId)
-            )
-            coEvery { listener.getActionMap(any()) } returns entities.map { Event(Action.Create, it.id, it) }.groupByAction()
 
-            listener.onComplete(config)
+            listener.notifyComplete(config, EventMetadata(
+                userId,
+                EventId("eventId"),
+                config,
+                response = EventsResponse(eventsResponseWithPassphrases),
+                createdAt = 0L
+            )
+            )
 
             coVerify(exactly = 1) { cacheCalendarPassphraseUseCase.execute(any(), any()) }
         }
     }
 
 }
+
+private const val eventsResponseWithPassphrases = """
+{
+    "Code": 1000,
+    "CalendarModelEventID": "q-aXxL2ncTtY-zGNxoc-oEfJC5Q577195AE3hx5hYdUtTzgZNjwgIeqY6fE9iiqrraPIFrzNfjJAhH3XFHb-Pg==",
+    "Refresh": 0,
+    "More": 0,
+    "CalendarPassphrases": [
+        {
+            "ID": "passphrase_id",
+            "Action": 1,
+             "Key": {
+                "ID": "passphrase_id",
+                "MemberPassphrases": [],
+                "Flags": 0,
+                "CalendarID": "$calendarId"
+             }
+        },
+        {
+            "ID": "passphrase_id_2",
+            "Action": 1,
+             "Key": {
+                "ID": "passphrase_id_2",
+                "MemberPassphrases": [],
+                "Flags": 0,
+                "CalendarID": "$calendarId"
+             }
+        }
+    ]
+}
+"""

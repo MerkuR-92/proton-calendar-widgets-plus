@@ -13,10 +13,14 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarKeyEventListener
 import me.proton.android.calendar.mocks.calendarId
 import me.proton.android.calendar.mocks.eventId
+import me.proton.android.calendar.mocks.userId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.eventmanager.domain.entity.EventId
+import me.proton.core.eventmanager.domain.entity.EventMetadata
+import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
@@ -78,19 +82,43 @@ class CalendarKeyEventListenerTest {
         }
     }
 
-    @Ignore("You cannot mock listener here. You should use listener.notifySuccess(...)")
+    @Test
     fun `onSuccess calls refreshCalendarsFlags`() {
         runBlocking {
-            val entity = CalendarKeyEntity("key_id", 0, "", "", calendarId)
 
-            coEvery { listener.getActionMap(any()) } returns listOf(
-                Event(Action.Create, "id", entity)
-            ).groupByAction()
-
-            listener.onSuccess(config)
+            listener.notifySuccess(config, EventMetadata(
+                userId,
+                EventId("eventId"),
+                config,
+                response = EventsResponse(eventsResponseCreateCalendarKey),
+                createdAt = 0L
+                )
+            )
 
             coVerify { calendarsRepository.refreshCalendarsFlags(any()) }
         }
     }
 
 }
+
+private const val eventsResponseCreateCalendarKey = """
+{
+    "Code": 1000,
+    "CalendarModelEventID": "q-aXxL2ncTtY-zGNxoc-oEfJC5Q577195AE3hx5hYdUtTzgZNjwgIeqY6fE9iiqrraPIFrzNfjJAhH3XFHb-Pg==",
+    "Refresh": 0,
+    "More": 0,
+    "CalendarKeys": [
+        {
+            "ID": "key_id",
+            "Action": 1,
+             "Key": {
+                "ID": "O5z62XQXs0fDt0Aj-Qho8R7VSbAwb1pz9RZncLxPxAwJg9KJNN9tgfbZGZ-ZJnwecjSzqzamx9V-UWVQ5_Sjow==",
+                "PrivateKey": "-----BEGIN PGP PRIVATE KEY BLOCK-----\nVersion: ProtonMail\n\nxYYEYCqa/xYJKwYBBAHaRw8BAQdAy3aDY44P87WmvswGozb+raIXYeRGHF8w\nkm6WHj1uw2f+CQMIHxMesAW1+gRglqu3FyEXdXNZzZFjFSIJkJJISd9DxKTK\n2R6ohcqeNLlULLnoNakl9gEXrYJjI+o6XdDXW0jZ5HK3mBlAA8EojDmuaOkb\nPM0MQ2FsZW5kYXIga2V5wo8EEBYKACAFAmAqmv8GCwkHCAMCBBUICgIEFgIB\nAAIZAQIbAwIeAQAhCRCndAgBhQwQThYhBMJapVvf0uy7lBEZaqd0CAGFDBBO\n1scA/2PGiffPTQyq863HJrMdhuqlCfI2pmfT3wGmxM2QbCwJAQCkB9rvCNro\n1Px5IV77mx9rYmnZHeW0hh3u+eea+tlUCseLBGAqmv8SCisGAQQBl1UBBQEB\nB0BwRlw4dJ10F3dG/I8lT9sSJl7ONVOf4oafKyJgbo66awMBCAf+CQMIQf8j\ndZg/r/Rg1sETN7yXuwtlyIkedId3yGxAKK2BqKChW9T3kNarQ1xRu75i1aLd\nNsyJEv7ReKlzDjwDpC6/hV9e9YAaaLhGgpZpjfjIRsJ4BBgWCAAJBQJgKpr/\nAhsMACEJEKd0CAGFDBBOFiEEwlqlW9/S7LuUERlqp3QIAYUMEE6l4QEAhncd\nO8wUq3w5AMk/Prf9kwNLk+T4PM/wEajaPwoV7EUA/RjQPQ+YNk8KSxlpXW5y\nVrgH6KBvPpyYqrEirNj2pIYM\n=xMJu\n-----END PGP PRIVATE KEY BLOCK-----\n",
+                "PassphraseID": "O5z62XQXs0fDt0Aj-Qho8R7VSbAwb1pz9RZncLxPxAwJg9KJNN9tgfbZGZ-ZJnwecjSzqzamx9V-UWVQ5_Sjow==",
+                "Flags": 0,
+                "CalendarID": "kvQPsAxpLGDWNiDxT2BIxf__u-88lAB4b6FPmPngETRM6oC1g9Bi0zBNVxn3yncjQutdJPnFbY_YomTRulFKQQ=="
+             }
+        }
+    ]
+}
+"""
