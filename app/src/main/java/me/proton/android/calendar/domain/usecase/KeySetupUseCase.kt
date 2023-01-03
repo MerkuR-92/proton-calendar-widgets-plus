@@ -93,7 +93,7 @@ class KeySetupUseCase @Inject constructor(
                 when (keySetupResult) {
                     is UseCase.Result.InvalidParams -> { logger.e("KeySetupUseCase: InvalidParams: ${keySetupResult.message}") }
                     is UseCase.Result.Error -> { logger.e("KeySetupUseCase: Error: ${keySetupResult.message}") }
-                    else -> Unit
+                    is UseCase.Result.Success<*> -> Unit
                 }
 
                 return keySetupResult

@@ -313,7 +313,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(getString(R.string.snack_event_opening_error))
                     }
-                    else -> Unit
+                    else -> Unit // TODO refactor and use one `when` expression
                 }
                 // Use jumpToMonthView to handle navigation when opening details from notification
                 jumpToMonthView()

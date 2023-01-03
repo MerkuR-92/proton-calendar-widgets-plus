@@ -71,7 +71,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                     )) {
                     is ApiResponse.Error -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
                     is ApiResponse.Exception -> logger.e("api error updating user timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                    else -> Unit
+                    is ApiResponse.Success -> Unit
                 }
             }
 

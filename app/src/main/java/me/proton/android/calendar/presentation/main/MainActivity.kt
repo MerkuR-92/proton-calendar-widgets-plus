@@ -360,29 +360,34 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 var dialogMessage: Int? = null
                 var dialogPositiveButton = R.string.bootstrap_error_default_confirm
                 when (errorReport) {
-                    UseCase.Error.Bootstrap.NoCalendar -> {
-                        dialogTitle = R.string.bootstrap_error_no_calendar_title
-                        dialogMessage = R.string.bootstrap_error_no_calendar_message
+                    is UseCase.Error.Bootstrap -> {
+                        when (errorReport) {
+                            UseCase.Error.Bootstrap.NoCalendar -> {
+                                dialogTitle = R.string.bootstrap_error_no_calendar_title
+                                dialogMessage = R.string.bootstrap_error_no_calendar_message
+                            }
+                            UseCase.Error.Bootstrap.NoActiveCalendar -> {
+                                dialogTitle = R.string.bootstrap_error_no_active_calendar_title
+                                dialogMessage = R.string.bootstrap_error_no_active_calendar_message
+                            }
+                            UseCase.Error.Bootstrap.ResetNeeded -> {
+                                dialogTitle = R.string.bootstrap_error_reset_needed_title
+                                dialogMessage = R.string.bootstrap_error_reset_needed_message
+                                dialogPositiveButton = R.string.bootstrap_error_continue_button
+                            }
+                            UseCase.Error.Bootstrap.UpdatePassphrase -> {
+                                dialogTitle = R.string.bootstrap_error_update_passphrase_title
+                                dialogMessage = R.string.bootstrap_error_update_passphrase_message
+                                dialogPositiveButton = R.string.bootstrap_error_continue_button
+                            }
+                            is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap -> {
+                                dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
+                                dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
+                            }
+                        }
                     }
-                    UseCase.Error.Bootstrap.NoActiveCalendar -> {
-                        dialogTitle = R.string.bootstrap_error_no_active_calendar_title
-                        dialogMessage = R.string.bootstrap_error_no_active_calendar_message
-                    }
-                    UseCase.Error.Bootstrap.ResetNeeded -> {
-                        dialogTitle = R.string.bootstrap_error_reset_needed_title
-                        dialogMessage = R.string.bootstrap_error_reset_needed_message
-                        dialogPositiveButton = R.string.bootstrap_error_continue_button
-                    }
-                    UseCase.Error.Bootstrap.UpdatePassphrase -> {
-                        dialogTitle = R.string.bootstrap_error_update_passphrase_title
-                        dialogMessage = R.string.bootstrap_error_update_passphrase_message
-                        dialogPositiveButton = R.string.bootstrap_error_continue_button
-                    }
-                    is UseCase.Error.Bootstrap.SomeCalendarsFailedBootstrap -> {
-                        dialogTitle = R.string.bootstrap_error_some_calendars_failed_title
-                        dialogMessage = R.string.bootstrap_error_some_calendars_failed_message
-                    }
-                    else -> Unit
+                    else -> Unit // TODO maybe we should extract `HandleSave` and `Crypto` from UseCase.Error hierarchy?
+
                 }
 
                 // This can not happen
@@ -556,7 +561,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     spinnerText = resources.getString(R.string.splash_after_login_init)
                 )
             }
-            else -> Unit
+            AccountViewModel.State.Initial -> Unit
+            AccountViewModel.State.StepNeeded -> Unit // handled by core
         }
     }
 
@@ -692,8 +698,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             else -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
                         }
                     }
-                    //IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> TODO()
-                    else -> Unit
+                    IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> Unit // TODO not yet implemented
                 }
 
                 val eventId = handleIcsImportResult.eventId
