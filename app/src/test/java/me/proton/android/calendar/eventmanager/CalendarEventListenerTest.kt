@@ -22,10 +22,9 @@ import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventL
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerDelegate
 import me.proton.android.calendar.mocks.*
 import me.proton.core.eventmanager.domain.EventManagerConfig
-import me.proton.core.eventmanager.domain.entity.Action
-import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.eventmanager.domain.entity.EventId
+import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.eventmanager.domain.extension.groupByAction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -45,14 +44,14 @@ class CalendarEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = spyk(CalendarEventListener(
+        listener = CalendarEventListener(
             db,
             calendarsRepository,
             delegate,
             getMinimalCalendarEventsUseCase,
             updateAlarmsUseCase,
             logger,
-        ))
+        )
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -150,13 +149,13 @@ class CalendarEventListenerTest {
             val capturedIds = slot<List<String>>()
             coEvery { delegate.onSuccess(any(), capture(capturedIds)) } returns Unit
 
-            coEvery { listener.getActionMap(any()) } returns mapOf(
-                Action.Create to listOf(Event(Action.Create, "id_1", createEventMetadata("id_1"))),
-                Action.Update to listOf(Event(Action.Update, "id_2", createEventMetadata("id_2"))),
-                Action.Delete to listOf(Event(Action.Delete, "id_3", null)),
-            )
-
-            listener.onSuccess(config)
+            listener.notifySuccess(config, EventMetadata(
+                userId,
+                EventId("eventId"),
+                config,
+                response = EventsResponse(eventsResponseWithCreateUpdateDelete),
+                createdAt = 0L
+            ))
 
             coVerify(exactly = 1) { delegate.onSuccess(any(), any()) }
             assertThat(capturedIds.captured).isEqualTo(listOf("id_1", "id_2"))
@@ -405,3 +404,61 @@ private const val eventsResponse = """
     ]
 }
 """
+
+private const val eventsResponseWithCreateUpdateDelete = """
+{
+    "Code": 1000,
+    "CalendarModelEventID": "q-aXxL2ncTtY-zGNxoc-oEfJC5Q577195AE3hx5hYdUtTzgZNjwgIeqY6fE9iiqrraPIFrzNfjJAhH3XFHb-Pg==",
+    "Refresh": 0,
+    "More": 0,
+    "CalendarEvents": [
+        {
+            "ID": "id_1",
+            "Action": 1,
+            "Event": {
+                "ID": "id_1",
+                "CalendarID": "q6PiQMq2FU0RnxzC2ly5cRQ7AjB1A-3IvKOmKUT4vwmPxGqJuXUvshsnor2q59pgXUISYBjycLu7WcNj_gt7-A==",
+                "SharedEventID": "9WO6jlhdJQbw46gBKjMR6yXpTC-H8LtLsCad65bcKmsg7NCeDSi7O-QlnrBce0T15VkjiVlcNnScJ61RN44BWLq9VbLYBgI0Xg-jripj1lE=",
+                "StartTime": 1637933400,
+                "StartTimezone": "Europe/Madrid",
+                "EndTime": 1637935200,
+                "EndTimezone": "Europe/Madrid",
+                "FullDay": 0,
+                "UID": "nEa_hXjoeJiOgoyBKWzqxPSU-Zda@proton.me",
+                "RecurrenceID": null,
+                "Exdates": [],
+                "RRule": null,
+                "CreateTime": 1637683433,
+                "ModifyTime": 1637927851,
+                "IsOrganizer": 1
+            }
+        },
+        {
+            "ID": "id_2",
+            "Action": 2,
+            "Event": {
+                "ID": "id_2",
+                "CalendarID": "q6PiQMq2FU0RnxzC2ly5cRQ7AjB1A-3IvKOmKUT4vwmPxGqJuXUvshsnor2q59pgXUISYBjycLu7WcNj_gt7-A==",
+                "SharedEventID": "9WO6jlhdJQbw46gBKjMR6yXpTC-H8LtLsCad65bcKmsg7NCeDSi7O-QlnrBce0T15VkjiVlcNnScJ61RN44BWLq9VbLYBgI0Xg-jripj1lE=",
+                "StartTime": 1637933400,
+                "StartTimezone": "Europe/Madrid",
+                "EndTime": 1637935200,
+                "EndTimezone": "Europe/Madrid",
+                "FullDay": 0,
+                "UID": "nEa_hXjoeJiOgoyBKWzqxPSU-Zda@proton.me",
+                "RecurrenceID": null,
+                "Exdates": [],
+                "RRule": null,
+                "CreateTime": 1637683433,
+                "ModifyTime": 1637927851,
+                "IsOrganizer": 1
+            }
+        },
+        {
+            "ID": "id_3",
+            "Action": 0
+        }
+    ]
+}
+"""
+

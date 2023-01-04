@@ -444,6 +444,7 @@ object IcsSurgeryUtils {
                 Frequency.WEEKLY -> if (recurrenceRule.value.interval > MAX_WEEKLY_INTERVAL) return false
                 Frequency.MONTHLY -> if (recurrenceRule.value.interval > MAX_MONTHLY_INTERVAL) return false
                 Frequency.YEARLY -> if (recurrenceRule.value.interval > MAX_YEARLY_INTERVAL) return false
+                else -> Unit
             }
         }
 

@@ -2,7 +2,7 @@
 buildscript {
     ext {
         version = [
-                "kotlin": "1.6.21",
+                "kotlin": "1.7.20",
                 "coroutine": "1.5.2",
                 "retrofit": "2.7.1",
                 "room": "2.4.1",
@@ -22,7 +22,7 @@ buildscript {
                 "assisted_inject" : "0.6.0",
                 "hilt_android": "2.44",
                 "hilt_androidx": "1.0.0",
-                "proton_core": "9.6.0",
+                "proton_core": "9.8.0",
         ]
     }
 

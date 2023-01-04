@@ -9,7 +9,6 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.common.utils.extractSignedVCard
 import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.data.api.ApiResponse
@@ -32,6 +31,7 @@ import me.proton.core.key.domain.entity.key.Recipient
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
+import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -234,15 +234,11 @@ internal class ObtainSendPreferencesUseCaseTest {
                 "contact_external_pinned_key+alias@email.com" to "contact_external_pinned_key@email.com"
             )
 
-            sut.execute(userId, canonicalEmails)
+            val map = sut.execute(userId, canonicalEmails)
 
             coVerify(exactly = 1) { contactEmailsRepositoryMock.getContactWithCards(userId, ContactId("contact_1"), refresh = true) }
-            coVerify(exactly = 1) { externalContactWithPinnedKeyBrokenSignature.extractSignedVCard(
-                userMock,
-                cryptoContextMock,
-                logger
-            ) }
-
+            val result = map["contact_external_pinned_key+alias@email.com"]
+            assertInstanceOf(ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys::class.java, result)
         }
     }
 
@@ -254,12 +250,12 @@ internal class ObtainSendPreferencesUseCaseTest {
                 "contact_external_pinned_key+alias@email.com" to "contact_external_pinned_key@email.com"
             )
 
-            val result = sut.execute(userId, canonicalEmails)
+            val map = sut.execute(userId, canonicalEmails)
 
             coVerify(exactly = 1) { contactEmailsRepositoryMock.getContactWithCards(userId, ContactId("contact_1"), refresh = true) }
-            coVerify(exactly = 1) { externalContactWithPinnedKeyBrokenSignature.extractSignedVCard(userMock, cryptoContextMock, logger) }
 
-            assertThat(result["contact_external_pinned_key+alias@email.com"]).isEqualTo(ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys)
+            val result = map["contact_external_pinned_key+alias@email.com"]
+            assertInstanceOf(ObtainSendPreferencesUseCase.Result.Error.NoCorrectlySignedTrustedKeys::class.java, result)
         }
     }
 

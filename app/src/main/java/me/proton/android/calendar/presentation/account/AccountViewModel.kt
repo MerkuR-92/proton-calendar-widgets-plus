@@ -176,7 +176,11 @@ class AccountViewModel @Inject constructor(
     }
 
     fun addAccount() {
-        authOrchestrator.startAddAccountWorkflow(AccountType.Internal, product)
+        authOrchestrator.startAddAccountWorkflow(
+            requiredAccountType = AccountType.Internal,
+            creatableAccountType = AccountType.Internal,
+            product = product
+        )
     }
 
     fun onAddAccountClosed(block: () -> Unit) {
