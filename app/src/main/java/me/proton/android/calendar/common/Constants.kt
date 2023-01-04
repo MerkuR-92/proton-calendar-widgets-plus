@@ -1325,6 +1325,7 @@ val windowsTimeZoneMap: Map<String, String> = mapOf(
     "petropavlovsk-kamchatsky - old" to "Asia/Anadyr",
     "chatham islands" to "Pacific/Chatham",
     "coordinated universal time+13" to "Pacific/Fakaofo",
+    "utc+13" to "Pacific/Fakaofo",
     "nuku'alofa" to "Pacific/Tongatapu",
     "kiritimati island" to "Pacific/Kiritimati",
     "helsinki, kyiv, riga, sofia, tallinn, vilnius" to "Europe/Helsinki"
