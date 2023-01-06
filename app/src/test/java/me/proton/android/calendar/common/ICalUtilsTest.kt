@@ -380,7 +380,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         var oldStartDate = event.iCalEvent.getStart(displayTimeZoneId)
@@ -432,7 +434,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         // original event should occur on 4th Tuesday every month
@@ -501,7 +505,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.iCalendar.adjustRRuleToStartDate()
@@ -540,7 +546,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.iCalendar.adjustRRuleToStartDate()
@@ -581,7 +589,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.iCalendar.setDefaultTimeZone(newTimeZoneId)
@@ -705,7 +715,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
         val displayTimeZoneId = "Europe/Zurich"
 
@@ -766,7 +778,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
         val displayTimeZoneId = "Europe/Zurich"
 
@@ -833,7 +847,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
         val displayTimeZoneId = "UTC"
 
@@ -894,7 +910,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
         val displayTimeZoneId = "UTC"
 
@@ -955,7 +973,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
         val displayTimeZoneId = "UTC"
 
@@ -1033,7 +1053,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
@@ -1078,7 +1100,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
@@ -1128,7 +1152,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         // In Europe/Vilnius DST change is on Sunday, 27 March 2022 — 1 hour forward
@@ -1190,7 +1216,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrencesUntil(LocalDate.of(2021, 11, 26), displayTimeZoneId)!!
@@ -1242,7 +1270,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeFrom = LocalDate.of(2020, 7, 1)
@@ -1291,7 +1321,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrencesUntil(LocalDate.of(2023, 2, 1), displayTimeZoneId)!!
@@ -1342,7 +1374,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 5)!!
@@ -1395,7 +1429,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2030, 8, 1)
@@ -1443,7 +1479,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2022, 1, 31)
@@ -1495,7 +1533,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2022, 1, 31)
@@ -1552,7 +1592,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2020, 10, 1)
@@ -1605,7 +1647,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeFrom = ZonedDateTime.of(LocalDate.of(2020, 9, 20), LocalTime.of(15, 0), ZoneId.of("Europe/Vilnius"))
@@ -1651,7 +1695,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 3)!!
@@ -1707,7 +1753,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, LocalDate.of(2022, 3, 5), null, null)!!
@@ -1747,7 +1795,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2020, 12, 31)
@@ -1797,7 +1847,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeFrom = LocalDate.of(2020, 7, 1)
@@ -1843,7 +1895,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeFrom = LocalDate.of(2020, 7, 1)
@@ -1894,7 +1948,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2020, 7, 30)
@@ -1946,7 +2002,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val displayRangeTo = LocalDate.of(2020, 7, 30)
@@ -2033,7 +2091,9 @@ internal class ICalUtilsTest {
                 1,
                 true,
                 0,
-                127
+                127,
+                emptyList(),
+                emptyList()
             ), ICalUtilsImpl.parseICalString(iCal)!!, 0, null)!!
         }
 
@@ -2171,7 +2231,9 @@ internal class ICalUtilsTest {
                 1,
                 true,
                 0,
-                127
+                127,
+                emptyList(),
+                emptyList()
             ), ICalUtilsImpl.parseICalString(iCal)!!, 0, null)!!
         }
 
@@ -2282,7 +2344,9 @@ internal class ICalUtilsTest {
                 1,
                 true,
                 0,
-                127
+                127,
+                emptyList(),
+                emptyList()
             ), ICalUtilsImpl.parseICalString(iCal)!!, 0, null)!!
         }
 
@@ -2326,7 +2390,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val mapped = ICalUtilsImpl.expandOccurrencesWithSingleEdits(event, arrayListOf(), displayRangeTo, displayTimeZoneId)!!
@@ -2367,7 +2433,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -2420,7 +2488,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), calendar, 0, null)!!
 
         event.addExceptionDate(1)
@@ -2466,7 +2536,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.addExceptionDate(1)
@@ -2503,7 +2575,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), calendar, 0, null)!!
 
         event.addExceptionDate(1)
@@ -2545,7 +2619,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.handleDeleteThisAndFuture(4)
@@ -2582,7 +2658,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.handleDeleteThisAndFuture(6)
@@ -2623,7 +2701,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.handleDeleteThisAndFuture(4)
@@ -2668,7 +2748,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         event.handleDeleteThisAndFuture(4)
@@ -2716,7 +2798,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)
@@ -2756,7 +2840,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)!!
@@ -2804,7 +2890,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)!!
@@ -2853,7 +2941,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         TestsLogger.d("Timezone : ${ZoneId.systemDefault()}")
@@ -2893,7 +2983,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val firstOccurrence = event.generateFirstOccurrenceSince(ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))!!
@@ -2937,7 +3029,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val firstOccurrence = event.generateFirstRealOccurrenceSince(listOf(event), ZonedDateTime.of(LocalDate.of(2021, 1, 21), LocalTime.MIDNIGHT, ZoneId.of(displayTimeZoneId)))!!
@@ -2980,7 +3074,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val firstOccurrence = event.generateFirstOccurrenceSince(ZonedDateTime.of(LocalDate.of(2020, 7, 4), LocalTime.of(10, 0, 0), ZoneId.of(displayTimeZoneId)))!!
@@ -3023,7 +3119,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 10)
@@ -3065,7 +3163,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 1)
@@ -3108,7 +3208,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId) // Before DST
@@ -3164,7 +3266,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId) // Before DST (Winter time)
@@ -3231,7 +3335,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -3282,7 +3388,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -3337,7 +3445,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -3386,7 +3496,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -3434,7 +3546,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrence1 = event.generateOccurrence(1, displayTimeZoneId)
@@ -3486,7 +3600,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val eventWithOccurrence1 = Event.withOccurrence(event, 1, displayTimeZoneId)!!
@@ -3599,7 +3715,7 @@ internal class ICalUtilsTest {
         newICalendar.setEndTimeZone(eventTimeZoneId)
         newICalendar.setDefaultTimeZone(eventTimeZoneId)
 
-        val event = Event.from("id", Calendar("", "", "", "", 1, true, 0, 127), newICalendar, 0)!!
+        val event = Event.from("id", Calendar("", "", "", "", 1, true, 0, 127, emptyList(), emptyList()), newICalendar, 0)!!
         val eventCopy = Event.from(event)
 
         event.iCalEvent.setStart(LocalDate.of(2021, 1, 1), LocalTime.of(18, 0), "Europe/Vilnius")
@@ -3645,7 +3761,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val eventCopy = Event.from(event)
@@ -3703,7 +3821,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
@@ -3738,7 +3858,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
@@ -3774,7 +3896,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
@@ -3809,7 +3933,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
@@ -3844,7 +3970,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
@@ -3879,7 +4007,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
@@ -3914,7 +4044,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
@@ -3950,7 +4082,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
@@ -3989,7 +4123,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isTrue()
@@ -4028,7 +4164,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isSingleOccurrenceRecurring(timeZoneId)).isFalse()
@@ -4079,7 +4217,9 @@ internal class ICalUtilsTest {
                 1,
                 true,
                 0,
-                127
+                127,
+                emptyList(),
+                emptyList()
             ), ICalUtilsImpl.parseICalString(iCal)!!, 0, null)!!
         }
 
@@ -4121,7 +4261,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val timeZoneId = "UTC"
@@ -4240,7 +4382,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), originalEventICal, 0, null)!!
 
         val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
@@ -4252,7 +4396,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isEventFirstOccurrence(originalEvent, timeZoneId)).isTrue()
@@ -4310,7 +4456,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), originalEventICal, 0, null)!!
 
         val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
@@ -4322,7 +4470,9 @@ internal class ICalUtilsTest {
             1,
             true,
             0,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         assertThat(event.isEventFirstOccurrence(originalEvent, timeZoneId)).isTrue()
@@ -4512,7 +4662,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, emptyList(), emptyList()), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getInviteIcs(
             event,
@@ -4573,7 +4723,7 @@ internal class ICalUtilsTest {
 
         val eventIcal = ICalUtilsImpl.parseICalString(iCalString)!!
 
-        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127), eventIcal, 0)!!
+        val event = Event.from("eventId", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, emptyList(), emptyList()), eventIcal, 0)!!
         event.iCalendar.setDefaultTimeZone("Europe/Paris")
         val ics = getCancelIcs(
             event,
@@ -4668,9 +4818,9 @@ internal class ICalUtilsTest {
         val displayTimeZoneId = "Europe/Zurich"
 
         val events = listOf(
-            Event.from("event-all-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
-            Event.from("event-part-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
-            Event.from("event-1-hour", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
+            Event.from("event-all-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, emptyList(), emptyList()), ICalUtilsImpl.parseICalString(allDayMultiDayString)!!, 0)!!,
+            Event.from("event-part-day", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, emptyList(), emptyList()), ICalUtilsImpl.parseICalString(partDayMultiDayString)!!, 0)!!,
+            Event.from("event-1-hour", Calendar("id", "name", "email", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, emptyList(), emptyList()), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
         )
 
         val explodedEvents = events.explodeDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)
@@ -4733,8 +4883,8 @@ internal class ICalUtilsTest {
 
         val ics4DifferentUid = "BEGIN:VCALENDAR\r\nPRODID:-//Proton AG//ProtonCalendar 1.0.0//EN\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nDTSTAMP:20220404T104736Z\r\nUID:bobeventDifferentUid@hibob.com\r\nDTSTART;VALUE=DATE:20220411\r\nDTEND;VALUE=DATE:20220415\r\nEND:VEVENT\r\nEND:VCALENDAR"
 
-        val calendarSubscribed = Calendar("calendar 1", "calendar 1", "email 1", "", 1, true, 1, 127)
-        val calendarRegular = Calendar("calendar 2", "calendar 2", "email 2", "", 1, true, 0, 127)
+        val calendarSubscribed = Calendar("calendar 1", "calendar 1", "email 1", "", 1, true, 1, 127, emptyList(), emptyList())
+        val calendarRegular = Calendar("calendar 2", "calendar 2", "email 2", "", 1, true, 0, 127, emptyList(), emptyList())
 
         val skeletonEntities = listOf<SkeletonEvent>(
             // original event
@@ -4791,7 +4941,9 @@ internal class ICalUtilsTest {
             1,
             true,
             1,
-            127
+            127,
+            emptyList(),
+            emptyList()
         ), iCal, 0, null)!!
 
         val occurrences = event.generateOccurrences(displayTimeZoneId, null, null, 3)!!
@@ -4969,6 +5121,6 @@ internal class ICalUtilsTest {
         iCalendar.setStartTimeZone(timeZoneId)
         iCalendar.setEndTimeZone(timeZoneId)
 
-        return Event.from("", Calendar("", "", "", "", 1, true, 0, 127), iCalendar, 0)!!
+        return Event.from("", Calendar("", "", "", "", 1, true, 0, 127, emptyList(), emptyList()), iCalendar, 0)!!
     }
 }

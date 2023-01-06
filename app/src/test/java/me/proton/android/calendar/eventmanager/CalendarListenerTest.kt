@@ -8,8 +8,10 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -18,6 +20,8 @@ import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
+import me.proton.android.calendar.mocks.CalendarMocks
+import me.proton.android.calendar.mocks.CalendarMocks.provideCalendarSettingsEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventsResponse
@@ -30,6 +34,7 @@ class CalendarListenerTest {
     private val calendarsRepository: CalendarsRepository = mockk()
     private val logger: Logger = mockk(relaxed = true)
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase = mockk()
+    private val json: Json = mockk()
 
     private lateinit var listener: CalendarListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
@@ -115,9 +120,16 @@ class CalendarListenerTest {
                 CalendarEntity("calendar_id", "Name", "Description"),
             )
 
+            val calendarSettingsEntity: CalendarSettingsEntity = mockk()
+
+            coEvery { calendarSettingsEntity.defaultPartDayNotifications } returns emptyList()
+            coEvery { calendarSettingsEntity.defaultFullDayNotifications } returns emptyList()
+
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar.from(
                 CalendarEntity("calendar_id", "Previous name", "Description"),
-                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1)
+                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1),
+                calendarSettingsEntity,
+                json
             )
 
             listener.onUpdate(config, entities)

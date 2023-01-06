@@ -10,8 +10,8 @@ import java.time.ZonedDateTime
 typealias CalDuration = biweekly.util.Duration
 
 const val API_VERSION_CALENDAR = "v1"
-const val HV_HOST = "proton.me"
-const val API_HOST = "calendar-api.proton.me"
+const val HV_HOST = "pasteur.proton.black"
+const val API_HOST = "api.pasteur.proton.black"
 const val BASE_URL = "https://$API_HOST/"
 const val API_APPLICATION_NAME = "android-calendar"
 const val API_DEBUG_APPLICATION_SUFFIX = "-dev"
@@ -107,7 +107,6 @@ object FeatureFlag {
     const val OPEN_ICS = true
     const val OPEN_ICS_FILES = false
     const val APP_LINKS = true
-    const val ADD_EMAIL_NOTIFICATIONS = true
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
@@ -117,8 +116,6 @@ object FeatureFlag {
     const val SUBSCRIPTION = false
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = true
-    const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
-    const val ALARMS_IN_SHARED_CALENDARS = false
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
     const val THREE_DAYS_VIEW = true

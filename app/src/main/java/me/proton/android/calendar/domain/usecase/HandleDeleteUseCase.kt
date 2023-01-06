@@ -434,6 +434,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 attendeeId,
                 ParticipationStatus.DECLINED.toInt(),
                 null, // No need to update the alarms since the event will be deleted
+                null, // update personal part will not be called because of null PersonalPartString
                 updateTime.epochSecond.toInt()
             )
             updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }

@@ -161,8 +161,8 @@ class SettingsCalendarListAdapter(
             }
 
             val calendarSettingsCanBeEdited = (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
-                    (calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) || // subscribed calendar
-                    (calendar.isSharedWithMe && FeatureFlag.ALARMS_IN_SHARED_CALENDARS) // shared calendar
+                    (calendar.isSubscribed) || // subscribed calendar
+                    (calendar.isSharedWithMe) // shared calendar
 
             // Only show menu icon when calendar can be edited
             calendarItemMenuIcon.visibleOrGone(calendarSettingsCanBeEdited)

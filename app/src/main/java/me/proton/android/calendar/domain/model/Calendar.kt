@@ -1,7 +1,11 @@
 package me.proton.android.calendar.domain.model
 
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.getDefaultAlarms
+import me.proton.android.calendar.data.entity.getDefaultNotifications
 import me.proton.core.util.kotlin.toBoolean
 
 data class Calendar(
@@ -12,11 +16,13 @@ data class Calendar(
         val flags: Int,
         val display: Boolean,
         val type: Int,
-        val permissions: Int
+        val permissions: Int,
+        val defaultPartDayNotifications: List<Notification>,
+        val defaultFullDayNotifications: List<Notification>
 ) : BaseModel() {
 
         companion object {
-                fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity) = Calendar(
+                fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity, calendarSettingsEntity: CalendarSettingsEntity, json: Json) = Calendar(
                         id = calendarEntity.id,
                         name = calendarEntity.name,
                         email = memberEntity.email,
@@ -24,7 +30,9 @@ data class Calendar(
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),
                         type = calendarEntity.type,
-                        permissions = memberEntity.permissions
+                        permissions = memberEntity.permissions,
+                        defaultPartDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = false),
+                        defaultFullDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = true)
                 )
         }
 

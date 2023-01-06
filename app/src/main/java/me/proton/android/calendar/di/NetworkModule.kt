@@ -33,7 +33,7 @@ object NetworkModule {
 
     @CertificatePins
     @Provides
-    fun provideCertificatePins(): Array<String> = Constants.DEFAULT_SPKI_PINS
+    fun provideCertificatePins(): Array<String> = emptyArray() // Constants.DEFAULT_SPKI_PINS
 
     @AlternativeApiPins
     @Provides

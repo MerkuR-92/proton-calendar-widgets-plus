@@ -261,7 +261,9 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,
                 existingCalendar?.type ?: defaultCalendar.type,
-                existingCalendar?.permissions ?: defaultCalendar.permissions
+                existingCalendar?.permissions ?: defaultCalendar.permissions,
+                defaultCalendar.defaultPartDayNotifications,
+                defaultCalendar.defaultFullDayNotifications
             ), iCalendar, Instant.now().epochSecond) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
@@ -363,7 +365,7 @@ class HandleIcsUseCase @Inject constructor(
 
             // Cancel the event via the sync route by changing STATUS, DTSTAMP (update with the ICS DTSTAMP), and drop the alarms
             existingEvent.iCalEvent.status = Status.cancelled()
-            existingEvent.iCalEvent.alarms?.clear()
+            existingEvent.clearAlarms()
             existingEvent.iCalEvent.dateTimeStamp = newICalendar.events.first().dateTimeStamp
             existingEvent
         } else {
@@ -381,6 +383,9 @@ class HandleIcsUseCase @Inject constructor(
                         currentParticipationStatus
 
                     // Copy existing alarms
+                    // TODO newICalendar seems unused later on, if it really is used we need to make sure
+                    //  we setup the "notifications" property correctly (can't do it here because we're not working
+                    //  with Event.kt, but ICalendar)
                     newICalendar.events.first().alarms.clear()
                     newICalendar.events.first().alarms.addAll(existingEvent.iCalEvent.alarms)
                 }
@@ -436,6 +441,7 @@ class HandleIcsUseCase @Inject constructor(
                         existingEvent.id,
                         attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(),
                         updatedAttendee.participationStatus.toInt(),
+                        null,
                         null,
                         newUpdateTime
                     )

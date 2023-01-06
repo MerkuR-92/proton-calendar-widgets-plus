@@ -501,6 +501,8 @@ data class SyncEvent(
     val uid: String? = null,
     @SerialName("SourceCalendarID") // original Calendar ID when creating new Event for "change calendar"
     val sourceCalendarId: String? = null,
+    @SerialName("Notifications") // notifications that used to be in the PersonalEventContent
+    val notifications: List<NotificationEntity>? = null
 )
 
 @Serializable
@@ -602,7 +604,9 @@ data class UpdateEventPersonalPartApiRequest(
     @SerialName("MemberID")
     val memberID: String,
     @SerialName("PersonalEventContent")
-    val personalEventContent: PersonalEventContentApiRequest? = null
+    val personalEventContent: PersonalEventContentApiRequest? = null,
+    @SerialName("Notifications")
+    val notifications: List<NotificationEntity>?
 )
 
 @Serializable
@@ -620,9 +624,9 @@ data class UpdateCalendarSettingsApiRequest(
     @SerialName("DefaultEventDuration")
     val defaultEventDuration: Int? = null,
     @SerialName("DefaultPartDayNotifications")
-    val defaultPartDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null,
+    val defaultPartDayNotifications: List<NotificationEntity>? = null,
     @SerialName("DefaultFullDayNotifications")
-    val defaultFullDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null
+    val defaultFullDayNotifications: List<NotificationEntity>? = null
 )
 
 @Serializable

@@ -22,17 +22,18 @@ import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALAR
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
-import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
@@ -190,10 +191,10 @@ class CalendarFormViewModel @Inject constructor(
         _defaultEventDuration.value = calendarSettings.defaultEventDuration
 
         // Default part day event notifications
-        setDefaultAlarms(calendarSettings.defaultPartDayNotifications, isAllDay = false)
+        setDefaultAlarms(calendar.defaultPartDayNotifications, isAllDay = false)
 
         // Default all day event notifications
-        setDefaultAlarms(calendarSettings.defaultFullDayNotifications, isAllDay = true)
+        setDefaultAlarms(calendar.defaultFullDayNotifications, isAllDay = true)
     }
 
     suspend fun initCreateCalendarForm(calendarColor: Int) {
@@ -205,12 +206,12 @@ class CalendarFormViewModel @Inject constructor(
 
         // Set default part day event notifications (15 minutes before)
         val defaultPartDayAlarms = arrayListOf(DEFAULT_PART_DAY_ALARM)
-        if (ADD_EMAIL_NOTIFICATIONS) defaultPartDayAlarms.add(DEFAULT_PART_DAY_EMAIL_ALARM)
+        defaultPartDayAlarms.add(DEFAULT_PART_DAY_EMAIL_ALARM)
         _defaultPartDayAlarms.value = defaultPartDayAlarms
 
         // Set default all day event notifications (1 day before at 9am)
         val defaultAllDayAlarms = arrayListOf(DEFAULT_ALL_DAY_ALARM)
-        if (ADD_EMAIL_NOTIFICATIONS) defaultAllDayAlarms.add(DEFAULT_ALL_DAY_EMAIL_ALARM)
+        defaultAllDayAlarms.add(DEFAULT_ALL_DAY_EMAIL_ALARM)
         _defaultAllDayAlarms.value = defaultAllDayAlarms
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
@@ -254,21 +255,9 @@ class CalendarFormViewModel @Inject constructor(
         return calendarEdited || calendarSettingsEdited
     }
 
-    private fun setDefaultAlarms(defaultNotifications: List<JsonElement>, isAllDay: Boolean) {
-        val alarms = ArrayList<VAlarm>()
-        defaultNotifications.mapNotNull {
-            if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
-                it
-            ) else null
-        }.forEach { alarm ->
-            alarm.parseTrigger()?.let {
-                if (alarm.type == 0) {
-                    alarms.add(VAlarm.email(it, null, null))
-                } else {
-                    alarms.add(VAlarm.display(it, null))
-                }
-            }
-        }
+    private fun setDefaultAlarms(defaultNotifications: List<Notification>, isAllDay: Boolean) {
+        val alarms = arrayListOf<VAlarm>().apply { addAll(defaultNotifications.map { it.toVAlarm() }) }
+
         if (isAllDay) _defaultAllDayAlarms.value = alarms
         else _defaultPartDayAlarms.value = alarms
     }

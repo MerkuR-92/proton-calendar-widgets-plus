@@ -22,6 +22,7 @@ import me.proton.android.calendar.data.api.SyncEventUpdateContainer
 import me.proton.android.calendar.data.api.SyncEventsUpdateApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Ciphertext
 import me.proton.android.calendar.domain.Crypto
@@ -315,7 +316,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 personalEventContent = personalEventContent,
                                 sharedEventId = newEvent.sharedEventId,
                                 uid = newEvent.uid,
-                                sourceCalendarId = oldCalendarId
+                                sourceCalendarId = oldCalendarId,
+                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -340,7 +342,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 // We don't allow for editing invitations yet so we only really add new attendees when creating new invitation or editing non-invitation event.
                                 // In both cases adding attendees happens in the "second call to /sync after the first one that created event", which is right here.
                                 // If we sent the SharedSessionKey already before, the attendee has the event auto-created in their calendar already, so we are done.
-                                addedProtonAttendees = addedProtonAttendees
+                                addedProtonAttendees = addedProtonAttendees,
+                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -360,7 +363,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 personalEventContent = personalEventContent,
                                 attendees = attendees,
                                 sharedEventId = sharedEventId,
-                                uid = newEvent.uid
+                                uid = newEvent.uid,
+                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -383,7 +387,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 else null, // We first create without attendees
                                 attendees =
                                 if (newEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
-                                else null // We first create without attendees
+                                else null, // We first create without attendees,
+                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )

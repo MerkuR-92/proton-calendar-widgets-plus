@@ -42,6 +42,7 @@ import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
 import java.security.MessageDigest
@@ -639,7 +640,7 @@ object ICalUtilsImpl : ICalUtils {
      * ID is generated locally.
      */
     override fun calculateAlarmEntities(event: Event, timeZoneId: String, memberId: String): List<EventAlarmEntity> {
-        return event.iCalEvent.alarms.map {
+        return event.alarms.map {
             calculateAlarmEntity(event, it, timeZoneId, memberId)
         }
     }
@@ -654,7 +655,7 @@ object ICalUtilsImpl : ICalUtils {
     override fun calculateUpcomingAlarmEntities(events: List<Event>, now: ZonedDateTime, memberId: String
     ): List<EventAlarmEntity> {
         return events.flatMap { event ->
-            event.iCalEvent.alarms.mapNotNull { vAlarm ->
+            event.alarms.mapNotNull { vAlarm ->
 
                 val triggerRelativeSeconds = vAlarm.trigger.duration.toMillis() / 1000
 
@@ -677,25 +678,6 @@ object ICalUtilsImpl : ICalUtils {
 
     override fun List<EventAlarmEntity>.onlyDisplayType(): List<EventAlarmEntity> {
         return this.filter { it.action == 2 }
-    }
-
-    override fun injectVAlarmsIntoSubscribedOrSharedEvents(
-        events: List<Event>,
-        calendarSettings: List<CalendarSettingsEntity>,
-        json: Json
-    ): List<Event> {
-        events.map { event ->
-            event.apply {
-                if ((event.calendar.isSubscribed || event.calendar.isSharedWithMe) && event.iCalEvent.alarms.isEmpty()) {
-                    calendarSettings.find { it.calendarId == event.calendar.id }?.getDefaultAlarms(json, event.isAllDay())?.let { alarms ->
-                        alarms.forEach {
-                            event.iCalEvent.addAlarm(it)
-                        }
-                    }
-                }
-            }
-        }
-        return events
     }
 
     override fun isCalendarChangeAllowed(fromEvent: Event, toEvent: Event): Boolean {
@@ -1109,6 +1091,12 @@ object ICalUtilsImpl : ICalUtils {
         alarm: VAlarm
     ): Boolean {
         return this.action == alarm.action && this.trigger?.duration?.toMillis() == alarm.trigger?.duration?.toMillis()
+    }
+
+    override fun Notification.isTheSameAs(
+        notification: Notification
+    ): Boolean {
+        return this.toVAlarm().isTheSameAs(notification.toVAlarm())
     }
 
     override fun List<VAlarm>.isTheSameAs(alarms: List<VAlarm>): Boolean {

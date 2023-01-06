@@ -524,14 +524,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
 
             lifecycleScope.launch {
-                val alarmLabels = if ((event.calendar.isSubscribed && FeatureFlag.ALARMS_IN_SUBSCRIBED_CALENDARS) || (event.calendar.isSharedWithMe && FeatureFlag.ALARMS_IN_SHARED_CALENDARS)) {
-                    calendarViewModel.getDefaultAlarms(event.calendar.id, event.isAllDay())
-                        ?: emptyList<VAlarm>().also {
-                            logger.e("could not get DefaultAlarms in EventDetailsFragment for subscribed event")
-                        }
-                } else {
-                    event.iCalEvent.alarms
-                }.filter { it.action == Action.display() || it.action == Action.email() }
+                val alarmLabels = event.alarms.filter { it.action == Action.display() || it.action == Action.email() }
                     .sortedBy { it.trigger.duration.toMillis() }
                     .mapNotNull { alarm ->
                         AndroidUtils.formatAlarm(

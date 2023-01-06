@@ -2,6 +2,7 @@ package me.proton.android.calendar.data
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.EventDecryptor
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 class EventDecryptorImpl @Inject constructor(
     private val transformEventUseCase: TransformEventUseCase,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val json: Json
 ): EventDecryptor {
 
     private data class CacheKey(
@@ -36,7 +38,7 @@ class EventDecryptorImpl @Inject constructor(
 
             val cachedValue = cacheValue.event
 
-            database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database)?.let { calendar ->
+            database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database, json)?.let { calendar ->
                 if (calendar != cacheValue.event.calendar) {
                     val eventCopy = Event.from(cachedValue, calendar = calendar)
                     cache[cacheKey] = CacheValue(eventEntity, eventCopy)

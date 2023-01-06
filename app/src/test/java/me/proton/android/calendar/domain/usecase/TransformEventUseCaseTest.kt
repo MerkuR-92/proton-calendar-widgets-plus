@@ -119,6 +119,10 @@ internal class TransformEventUseCaseTest {
                 database.membersDao().select(any())
             } returns listOf(CalendarMocks.provideMemberEntity())
 
+            coEvery {
+                database.calendarSettingsDao().select(any())
+            } returns CalendarMocks.provideCalendarSettingsEntity()
+
             // calendarPassphrase
             val memberPassphrase = MemberPassphrase(
                 "memberId",

@@ -19,6 +19,9 @@ class CalendarSettingsChangedUseCase @Inject constructor(
 
     suspend fun execute(userId: UserId, calendarSettings: CalendarSettingsEntity): UseCase.Result {
 
+
+        // TODO just do it for all calendars?
+
         if (calendarsRepository.selectCalendar(calendarSettings.id)?.isSubscribed == true) {
             handleDefaultAlarmsInSubscribedCalendar(userId, calendarsRepository, calendarSettings)
         }

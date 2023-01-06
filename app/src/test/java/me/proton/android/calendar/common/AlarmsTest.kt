@@ -683,7 +683,7 @@ internal class AlarmsTest : BaseTest() {
 
         val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
 
-        assertThat(eventsWithInjectedAlarms.first().iCalEvent.alarms.size).isEqualTo(1)
+        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(1)
 
     }
 
@@ -698,7 +698,7 @@ internal class AlarmsTest : BaseTest() {
 
         val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
 
-        assertThat(eventsWithInjectedAlarms.first().iCalEvent.alarms.size).isEqualTo(1)
+        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(1)
 
     }
 
@@ -713,7 +713,7 @@ internal class AlarmsTest : BaseTest() {
 
         val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
 
-        assertThat(eventsWithInjectedAlarms.first().iCalEvent.alarms.size).isEqualTo(0)
+        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(0)
 
     }
 

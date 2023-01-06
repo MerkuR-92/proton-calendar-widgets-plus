@@ -61,6 +61,7 @@ import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -73,6 +74,7 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
+import okhttp3.internal.notify
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -411,11 +413,13 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
-                defaultCalendar.permissions
+                defaultCalendar.permissions,
+                defaultCalendar.defaultPartDayNotifications,
+                defaultCalendar.defaultFullDayNotifications
             ), newICalendar, 0
         ) ?: return InitResult.Error.Default("could not create Event using factory method")
 
-        setDefaultAlarms(newEvent, this.calendarSettings)
+        newEvent.setDefaultAlarms()
         return InitResult.InitEventSuccess(newEvent)
     }
 
@@ -608,13 +612,6 @@ class EventViewModel @Inject constructor(
         return singleEditsInfo
     }
 
-    private fun setDefaultAlarms(event: Event, calendarSettings: CalendarSettingsEntity) {
-        event.iCalEvent.alarms.clear()
-        calendarSettings.getDefaultAlarms(json, event.isAllDay()).forEach {
-            if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) event.iCalEvent.addAlarm(it)
-        }
-    }
-
     /**
      * Resets temporary values for Recurrence
      */
@@ -653,7 +650,7 @@ class EventViewModel @Inject constructor(
     private var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
     var tempAlarmTime: LocalTime = LocalTime.of(9, 0)
 
-    fun isAlarmLimitReached() = this.event.iCalEvent.alarms.size >= FormValidation.ALARM_COUNT_MAX
+    fun isAlarmLimitReached() = this.event.alarms.size >= FormValidation.ALARM_COUNT_MAX
 
     fun isCalendarChangeAllowed(): Boolean {
         return dbEvent?.let {
@@ -695,13 +692,15 @@ class EventViewModel @Inject constructor(
                     calendar.flags,
                     calendar.display,
                     calendar.type,
-                    calendar.permissions
+                    calendar.permissions,
+                    calendar.defaultPartDayNotifications,
+                    calendar.defaultFullDayNotifications
                 )
             )
 
             // when changing calendar, don't apply its default alarms
             if (!alarmsEdited && (!isCalendarBeingChanged || dbEvent?.isAllDay() != event.isAllDay())) {
-                setDefaultAlarms(event, calendarSettings)
+                event.setDefaultAlarms()
             }
             _event.postValue(event)
             true
@@ -803,15 +802,13 @@ class EventViewModel @Inject constructor(
         // if calendar has been changed during this editing, set its default alarms
         if ((isAllDay && eventCustomAllDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay())) ||
             (!isAllDay && eventCustomPartialDayAlarmsSave == null && (!hasCalendarBeenChanged() || isAllDay != dbEvent?.isAllDay()))) {
-            setDefaultAlarms(event, calendarSettings)
+            event.setDefaultAlarms()
         } else {
-            event.iCalEvent.alarms.clear()
+            event.clearAlarms()
             // If user choice has been saved then use it even if alarm list is empty
             val savedAlarms =
                 if (isAllDay) eventCustomAllDayAlarmsSave?.toList() else eventCustomPartialDayAlarmsSave?.toList()
-            savedAlarms?.forEach {
-                event.iCalEvent.addAlarm(it)
-            }
+            savedAlarms?.let { event.addAlarms(it) }
         }
 
         event.iCalendar.adjustRRuleToStartDate()
@@ -1075,29 +1072,28 @@ class EventViewModel @Inject constructor(
     }
 
     fun saveAlarm(alarm: VAlarm) {
-        val currentAlarms = event.iCalEvent.alarms
-        if (currentAlarms?.contains(alarm) == true || currentAlarms.any { it.isTheSameAs(alarm) }) {
+        if (event.alarms.any { it.isTheSameAs(alarm) }) {
             eventFormSnackState.value = EventSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_notification_already_added)
             )
             return
         }
-        event.iCalEvent.addAlarm(alarm)
+        event.addAlarms(listOf(alarm))
         saveUserEditedAlarms()
         _event.postValue(event)
     }
 
-    fun handleAlarmDelete(index: Int) {
+    fun handleAlarmDelete(alarm: VAlarm) {
         markEventAsEdited()
-        event.iCalEvent.alarms.removeAt(index)
+        event.removeAlarm(alarm)
         saveUserEditedAlarms()
         _event.postValue(event)
     }
 
     private fun saveUserEditedAlarms() {
         // If an action is done on alarms we go into edited alarm mode and save the user choice over default alarms
-        if (event.isAllDay()) eventCustomAllDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
-        else eventCustomPartialDayAlarmsSave = ArrayList(event.iCalEvent.alarms)
+        if (event.isAllDay()) eventCustomAllDayAlarmsSave = ArrayList(event.alarms)
+        else eventCustomPartialDayAlarmsSave = ArrayList(event.alarms)
     }
 
     fun hasExDates(afterSelectedEvent: Boolean = false): Boolean {
@@ -2747,27 +2743,27 @@ class EventViewModel @Inject constructor(
         val userParticipationStatus = userAttendee.participationStatus
 
         val eventCopy = Event.from(event)
-        val personalPartICalString =
-            if (participationStatus == ParticipationStatus.DECLINED &&
-                event.iCalEvent.alarms != null && event.iCalEvent.alarms.isNotEmpty()
+        val (personalPartICalString, notifications) =
+            if (participationStatus == ParticipationStatus.DECLINED && event.alarms.isNotEmpty()
             ) {
                 // if changes to NO, remove all notifications if there are any
-                eventCopy.iCalEvent.alarms.clear()
-                ""
+                eventCopy.clearAlarms()
+                "" to emptyList<Notification>()
             } else if ((userParticipationStatus == ParticipationStatus.DECLINED ||
                         userParticipationStatus == ParticipationStatus.NEEDS_ACTION) &&
                 (participationStatus == ParticipationStatus.ACCEPTED || participationStatus == ParticipationStatus.TENTATIVE) &&
-                event.iCalEvent.alarms.isNullOrEmpty()
+                event.alarms.isEmpty()
             ) {
                 // if changes from NO to YES/MAYBE add default calendar notifications
                 if (loadSettingsForCalendar(event.calendar.id)) {
-                    setDefaultAlarms(eventCopy, calendarSettings)
+                    // we don't need to load settings here anymore, but let's keep it in case of side effects
+                    eventCopy.setDefaultAlarms()
                     val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(eventCopy.iCalendar)
-                    calendarSplit.personalPart?.printToString()
-                } else null
+                    calendarSplit.personalPart?.printToString() to eventCopy.notifications.notifications
+                } else null to null
             } else {
                 // else keep notifications as it is
-                null
+                null to null
             }
 
         val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
@@ -2802,6 +2798,7 @@ class EventViewModel @Inject constructor(
                 participationStatus,
                 status,
                 personalPartICalString,
+                notifications,
                 timeFormatIs24Hours,
                 attendeeId,
                 userEmails
@@ -2815,6 +2812,7 @@ class EventViewModel @Inject constructor(
                 participationStatus,
                 status,
                 personalPartICalString,
+                notifications,
                 timeFormatIs24Hours,
                 attendeeId,
                 userEmails
@@ -2833,6 +2831,7 @@ class EventViewModel @Inject constructor(
         participationStatus: ParticipationStatus,
         status: Int,
         personalPartICalString: String?,
+        notifications: List<Notification>?,
         timeFormatIs24Hours: Boolean,
         attendeeId: String,
         userEmails: List<String>
@@ -2887,6 +2886,7 @@ class EventViewModel @Inject constructor(
             attendeeId,
             status,
             personalPartICalString,
+            notifications,
             updateTime.epochSecond.toInt()
         )
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
@@ -2912,6 +2912,7 @@ class EventViewModel @Inject constructor(
         participationStatus: ParticipationStatus,
         status: Int,
         personalPartICalString: String?,
+        notifications: List<Notification>?,
         timeFormatIs24Hours: Boolean,
         attendeeId: String,
         userEmails: List<String>
@@ -2930,6 +2931,7 @@ class EventViewModel @Inject constructor(
                 attendeeId,
                 status,
                 personalPartICalString,
+                notifications,
                 updateTime.epochSecond.toInt()
             )
         } else UseCase.Result.Error("handleChangeAnswerProtonToProton could not upgrade Event: ${upgradedEventEntity}")
@@ -2988,10 +2990,10 @@ class EventViewModel @Inject constructor(
         // Apply alarms modifications
         if (personalPartICalString?.isEmpty() == true) {
             // clear alarms
-            event.iCalEvent.alarms.clear()
+            event.clearAlarms()
         } else if (personalPartICalString?.isNotEmpty() == true) {
             // add default alarms
-            setDefaultAlarms(event, calendarSettings)
+            event.setDefaultAlarms()
         }
 
         // Update the event participation status to reflect changes in view

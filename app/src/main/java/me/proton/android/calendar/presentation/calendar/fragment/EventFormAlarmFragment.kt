@@ -39,7 +39,6 @@ import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm
 import kotlinx.android.synthetic.main.fragment_event_form_alarm.event_form_alarm_send_by_layout
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag.ADD_EMAIL_NOTIFICATIONS
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
@@ -186,9 +185,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         isAllDay = navigationArguments.isAllDay
         isCalendarDefaultEventNotification = navigationArguments.isCalendarDefaultEventNotification
 
-        event_form_alarm_send_by_layout.visibleOrGone(
-            (!isCalendarDefaultEventNotification && eventViewModel.hasEmailNotifications) || ADD_EMAIL_NOTIFICATIONS
-        )
+        event_form_alarm_send_by_layout.visibleOrGone(true)
 
         event_form_alarm_5.visibleOrGone(!isAllDay)
         resetAlarmText(-1)

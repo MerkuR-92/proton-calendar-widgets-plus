@@ -4,6 +4,7 @@ import biweekly.component.VAlarm
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpdateCalendarSettingsApiRequest
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -31,13 +32,13 @@ class UpdateCalendarSettingsUseCase @Inject constructor(
         val updateCalendarSettingsApiRequest = UpdateCalendarSettingsApiRequest(
             defaultEventDuration = defaultEventDuration,
             defaultPartDayNotifications = defaultPartDayNotifications?.map {
-                CalendarSettingsEntity.AlarmEntity(
+                NotificationEntity(
                     type = if (it.action.isEmail) 0 else 1,
                     trigger = it.trigger.duration.toString()
                 )
             },
             defaultFullDayNotifications = defaultFullDayNotifications?.map {
-                CalendarSettingsEntity.AlarmEntity(
+                NotificationEntity(
                     type = if (it.action.isEmail) 0 else 1,
                     trigger = it.trigger.duration.toString()
                 )

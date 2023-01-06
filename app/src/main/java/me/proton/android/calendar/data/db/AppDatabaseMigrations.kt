@@ -330,4 +330,13 @@ object AppDatabaseMigrations {
             PaymentDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_45_46 = object : Migration(45, 46) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.addTableColumn(AppDatabase.TABLE_EVENTS, "isPersonalMigrated", "INTEGER")
+            database.addTableColumn(AppDatabase.TABLE_EVENTS, "notifications", "TEXT")
+
+        }
+    }
 }
