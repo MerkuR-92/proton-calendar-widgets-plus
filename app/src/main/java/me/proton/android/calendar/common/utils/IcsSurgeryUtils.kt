@@ -1,12 +1,14 @@
 package me.proton.android.calendar.common.utils
 
 import biweekly.Biweekly
+import biweekly.ICalVersion
 import biweekly.ICalendar
 import biweekly.component.VEvent
 import biweekly.io.TimezoneAssignment
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
+import biweekly.property.Action.AUDIO
 import biweekly.property.Action.DISPLAY
 import biweekly.property.DateOrDateTimeProperty
 import biweekly.property.DateTimeProperty
@@ -51,9 +53,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -113,7 +112,6 @@ object IcsSurgeryUtils {
             }
 
             sealed class Invalid: Error() {
-                object Version: Invalid()
                 object CalScale: Invalid()
                 object DateOrDateTimeProperty: Invalid()
                 object DateStart: Invalid()
@@ -167,6 +165,11 @@ object IcsSurgeryUtils {
 
         /* Calendar properties */
 
+        // VERSION: The ICS we produce should always have version 2.0
+        if (iCalendar.version != ICalVersion.V2_0) {
+            iCalendar.version = ICalVersion.V2_0
+        }
+
         if (!iCalendar.cleanCalscale()) return HandleIcsResult.Error.Invalid.CalScale
 
         iCalendar.cleanXWrTimezone()
@@ -176,7 +179,7 @@ object IcsSurgeryUtils {
 
         val isImport = iCalendar.method?.isPublish == true
 
-        if (!iCalendar.cleanTimezones(isImport, timeZoneId)) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
+        if (!iCalendar.cleanTimezones(isImport || !isOpeningFromProtonMail, timeZoneId)) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         /* Event properties */
 
@@ -320,17 +323,8 @@ object IcsSurgeryUtils {
             TimberLogger.e("IcsSurgeryUtils: getBiweeklyDstParsingFix rawComponents was null")
             return null
         }
-        val parsed = this.toZonedDateTime(
-            timezone
-        )
-        val rawLocalTime = LocalDateTime.of(
-            LocalDate.of(raw.year, raw.month, raw.date),
-            LocalTime.of(raw.hour, raw.minute)
-        )
-        val parsedLocalTime = LocalDateTime.of(
-            LocalDate.of(parsed.year, parsed.month, parsed.dayOfMonth),
-            LocalTime.of(parsed.hour, parsed.minute)
-        )
+        val rawLocalTime = raw.toDate().toZonedDateTime(timezone, false).toLocalDateTime()
+        val parsedLocalTime = this.toZonedDateTime(timezone).toLocalDateTime()
         val diff = ChronoUnit.MILLIS.between(parsedLocalTime, rawLocalTime)
         val date = this.clone() as ICalDate
         date.time += diff
@@ -339,9 +333,6 @@ object IcsSurgeryUtils {
 
     fun String.cleanRawIcs(): HandleIcsResult {
         var cleanICalString = this
-
-        // VERSION: We don't support iCal versions other than 2.0.
-        if (!cleanICalString.contains(Regex("VERSION:2\\.0\\r?\\n"))) return HandleIcsResult.Error.Invalid.Version
 
         // DATETIME or DATE properties
 
@@ -408,6 +399,11 @@ object IcsSurgeryUtils {
                 alarm.action = Action(DISPLAY)
             }
 
+            // We also support 'AUDIO' action but it should be considered as a DISPLAY action.
+            if (alarm.action == Action(AUDIO)) {
+                alarm.action = Action(DISPLAY)
+            }
+
             // A trigger for partial-day event cannot contain more than one-time component
             if (this.dateStart.value.hasTime() && alarm?.trigger?.duration != null) {
                 val hasWeeks = alarm.trigger.duration.weeks?.let { 1 } ?: 0
@@ -438,24 +434,57 @@ object IcsSurgeryUtils {
     fun VEvent.cleanDtStamp(iCalendar: ICalendar, isImport: Boolean): Boolean {
         // DTSTAMP: mandatory field as per RFC.
         // For Imports: if not present, use the current time timestamp.
-        if (isImport && this.dateTimeStamp?.value == null) this.setDateTimeStamp(Date.from(Instant.now()))
+        if (isImport && this.dateTimeStamp?.value == null) {
+            val date = Date.from(Instant.now())
+            val rawComponents = DateTimeComponents(date)
+            this.setDateTimeStamp(ICalDate(date, rawComponents, true))
+            return true
+        }
 
         // TODO For Invites: if not present, use the email timestamp. We need Mail to give us that data. For now consider as invalid.
         if (!isImport && this.dateTimeStamp?.value == null) return false
 
-        // Extract TZID parameter to timezoneInfo if Biweekly didn't process it during parsing
-        if (this.dateTimeStamp?.value != null && !this.dateTimeStamp.getParameter(TZID).isNullOrEmpty()) {
+        // If TZID is empty, remove it
+        if (this.dateTimeStamp?.value != null && this.dateTimeStamp.getParameter(TZID)?.isEmpty() == true) this.dateTimeStamp.removeParameter(TZID)
+
+        // If it's an all-day event
+        if (!(this.dateTimeStamp?.value as ICalDate).hasTime()) {
+            val timeZoneId =
+                if (this.dateTimeStamp.getParameter(TZID).isNullOrEmpty()) {
+                    // If it's an all-day event, assume 0 hours, 0 minutes, 0 seconds in UTC to convert to timestamp
+                    "UTC"
+                } else {
+                    // If it's an all-day event with TZID, assume 0 hours, 0 minutes, 0 seconds in the indicated time zone, then convert to UTC
+                    fallbackTimeZone(this.dateTimeStamp.getParameter(TZID), fallbackToDefault = false) ?: return false
+                }
+            val instant = this.dateTimeStamp?.value?.toZonedDateTime(ZoneId.systemDefault().id, false)?.withZoneSameLocal(ZoneId.of(timeZoneId))?.toInstant()
+            val date = Date.from(instant)
+            val rawComponents = DateTimeComponents.parse(date.toInstant().toString()) // Use parse here since the date may use a different timezone than device timezone
+            this.setDateTimeStamp(ICalDate(date, rawComponents, true))
+        }
+
+        // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), assume TZID=UTC.
+        if ((this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == false && iCalendar.timezoneInfo.getTimezone(this.dateTimeStamp) == null) {
+            this.dateTimeStamp.localizeDateToTimezone("UTC")
+            iCalendar.timezoneInfo.setFloating(this.dateTimeStamp, false)
+            this.dateTimeStamp.removeParameter(TZID) // TZID parameter is not needed anymore
+            return true
+        }
+
+        // If both the Zulu marker and a TZID are present in the property, it is to be interpreted as a Zulu one
+        if (!this.dateTimeStamp.getParameter(TZID).isNullOrEmpty() && (this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == true) {
+            this.dateTimeStamp.removeParameter(TZID)
+            return true
+        }
+
+        // Extract TZID parameter to timezoneInfo if dtstamp has one and Biweekly didn't process it during parsing
+        if (!this.dateTimeStamp.getParameter(TZID).isNullOrEmpty() && (this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == false) {
             val supportedTzid = fallbackTimeZone(this.dateTimeStamp.getParameter(TZID), fallbackToDefault = false) ?: return false
             iCalendar.timezoneInfo.setTimezone(this.dateTimeStamp, TimezoneAssignment(TimeZone.getTimeZone(supportedTzid), supportedTzid))
         }
 
         // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
         if (!iCalendar.convertToSupportedTimezone(this.dateTimeStamp)) return false
-
-        // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), assume TZID=UTC.
-        if ((this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == false && iCalendar.timezoneInfo.getTimezone(this.dateTimeStamp) == null) {
-            this.dateTimeStamp.localizeDateToTimezone("UTC")
-        }
 
         return true
     }
@@ -848,6 +877,11 @@ object IcsSurgeryUtils {
 
             // DATESTART, DATEEND, RECURRENCE-ID:
 
+            // If TZID is empty, remove it
+            if (it.dateStart?.value != null && it.dateStart.getParameter(TZID)?.isEmpty() == true) it.dateStart.removeParameter(TZID)
+            if (it.dateEnd?.value != null && it.dateEnd.getParameter(TZID)?.isEmpty() == true) it.dateEnd.removeParameter(TZID)
+            if (it.recurrenceId?.value != null && it.recurrenceId.getParameter(TZID)?.isEmpty() == true) it.recurrenceId.removeParameter(TZID)
+
             // Extract TZID parameter to timezoneInfo if Biweekly didn't process it during parsing
             if (!this.extractTzid(it.dateStart)) return false
             if (!this.extractTzid(it.dateEnd)) return false
@@ -859,6 +893,7 @@ object IcsSurgeryUtils {
             if (!this.convertToSupportedTimezone(it.recurrenceId)) return false
 
             // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), localize it to the x-wr-timezone if supported.
+            // If no x-wr-timezone is present, we check if there's a single vtimezone in the ICS string
             if (it.dateStart?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
             if (it.dateEnd?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
             if (it.recurrenceId?.localizeFloatingDate(this, isImport, timeZoneId) == false) return false
@@ -895,12 +930,27 @@ object IcsSurgeryUtils {
         val xWrTimezone = iCalendar.getXWrTimezone()
         if (this.value.hasTime() && iCalendar.timezoneInfo.getTimezone(this) == null && !this.value.rawComponents.toString().contains("Z")) {
             if (xWrTimezone != null) {
+                iCalendar.timezoneInfo.setFloating(this, false)
                 iCalendar.timezoneInfo.setTimezone(
                     this,
                     TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone)
                 )
                 this.localizeDateToTimezone(xWrTimezone)
+            } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() && iCalendar.timezoneInfo.timezones.size == 1 && !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
+                // If no x-wr-timezone is present, we check if there's a single VTIMEZONE to use in the ICS string
+                val fallbackTimeZoneId = fallbackTimeZone(iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id ?: return false, fallbackToDefault = false) ?: return false
+                iCalendar.timezoneInfo.setFloating(this, false)
+                iCalendar.timezoneInfo.setTimezone(
+                    this,
+                    TimezoneAssignment(TimeZone.getTimeZone(fallbackTimeZoneId), fallbackTimeZoneId)
+                )
+                this.localizeDateToTimezone(fallbackTimeZoneId)
             } else if (isImport && timeZoneId != null) {
+                iCalendar.timezoneInfo.setFloating(this, false)
+                iCalendar.timezoneInfo.setTimezone(
+                    this,
+                    TimezoneAssignment(TimeZone.getTimeZone(timeZoneId), timeZoneId)
+                )
                 this.localizeDateToTimezone(timeZoneId)
             } else return false
         }

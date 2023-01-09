@@ -3,9 +3,9 @@ package me.proton.android.calendar.common
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import assertk.assertions.isNullOrEmpty
 import assertk.assertions.isTrue
 import biweekly.Biweekly
 import biweekly.util.ICalDate
@@ -14,8 +14,8 @@ import me.proton.android.calendar.common.IcsParsingValidation.LOCATION_MAX_LENGT
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanAlarms
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanAttendees
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanCalscale
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanDescription
@@ -39,7 +39,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -48,7 +47,7 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 
-internal class IcsSurgeryUtilsTest {
+internal class InviteIcsSurgeryUtilsTest {
 
     @Test
     fun `clean ics success test`() {
@@ -76,7 +75,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
@@ -113,7 +112,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
@@ -199,7 +198,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanICalString = cleanIcs(iCalString)
+        val cleanICalString = cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
         assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty).isTrue()
     }
@@ -244,6 +243,7 @@ internal class IcsSurgeryUtilsTest {
                 )
             )
             assertThat(iCalendar.timezoneInfo.getTimezone(event.dateStart).globalId).isEqualTo("Europe/Vilnius")
+            assertThat(iCalendar.printToString().contains("DTSTART;TZID=Europe/Vilnius:20200102T133000")).isEqualTo(true)
         }
     }
 
@@ -370,9 +370,16 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version).isTrue()
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("VERSION:2.0")).isEqualTo(true)
+        }
     }
 
     @Test
@@ -396,9 +403,16 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.Version).isTrue()
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("VERSION:2.0")).isEqualTo(true)
+        }
     }
 
     @Test
@@ -624,173 +638,6 @@ internal class IcsSurgeryUtilsTest {
     }
 
     @Test
-    fun `cleanDtstamp missing DTSTAMP for Import test`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-// calendar.com //NONSGML Version 1//EN
-    SEQUENCE:0
-    STATUS:CONFIRMED
-    UID:475i5djdmpjt342igfvfc7bo0c@google.com
-    BEGIN:VEVENT
-    SUMMARY:test
-    DTSTART:20210115T130000Z
-    DTEND:20210115T140000Z
-    ATTENDEE;CN=test.test@protonmail.com;CUTYPE=INDIVIDUAL;EMAIL=test.test@pro
-     tonmail.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:te
-     st.test@protonmail.com
-    DESCRIPTION:\n
-    ORGANIZER;CN=test@gmail.com:mailto:test@gmail.com
-    TRANSP:OPAQUE
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanDtStamp(iCalendar, isImport = true)).isTrue()
-        }
-    }
-
-    @Test
-    fun `cleanDtstamp DTSTAMP no timezone for Import test`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-// calendar.com //NONSGML Version 1//EN
-    SEQUENCE:0
-    STATUS:CONFIRMED
-    UID:475i5djdmpjt342igfvfc7bo0c@google.com
-    BEGIN:VEVENT
-    SUMMARY:test
-    DTSTART:20210115T130000Z
-    DTEND:20210115T140000Z
-    ATTENDEE;CN=test.test@protonmail.com;CUTYPE=INDIVIDUAL;EMAIL=test.test@pro
-     tonmail.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:te
-     st.test@protonmail.com
-    DESCRIPTION:\n
-    ORGANIZER;CN=test@gmail.com:mailto:test@gmail.com
-    DTSTAMP:20210302T115550
-    TRANSP:OPAQUE
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanDtStamp(iCalendar, isImport = true)).isTrue()
-            assertThat(event.dateTimeStamp.value).isEqualTo(Date.from(
-                ZonedDateTime.of(
-                    2021,
-                    3,
-                    2,
-                    11,
-                    55,
-                    50,
-                    0,
-                    ZoneId.of("UTC")
-                ).toInstant()
-            ))
-        }
-    }
-
-    @Test
-    fun `cleanDtstamp DTSTAMP date no time for Import test`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-// calendar.com //NONSGML Version 1//EN
-    SEQUENCE:0
-    STATUS:CONFIRMED
-    UID:475i5djdmpjt342igfvfc7bo0c@google.com
-    BEGIN:VEVENT
-    SUMMARY:test
-    DTSTART:20210115T130000Z
-    DTEND:20210115T140000Z
-    ATTENDEE;CN=test.test@protonmail.com;CUTYPE=INDIVIDUAL;EMAIL=test.test@pro
-     tonmail.com;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:te
-     st.test@protonmail.com
-    DESCRIPTION:\n
-    ORGANIZER;CN=test@gmail.com:mailto:test@gmail.com
-    DTSTAMP;VALUE=DATE:20210302
-    TRANSP:OPAQUE
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.cleanDtStamp(iCalendar, isImport = true)).isTrue()
-            assertThat(event.dateTimeStamp.value).isEqualTo(Date.from(
-                ZonedDateTime.of(
-                    2021,
-                    3,
-                    2,
-                    0,
-                    0,
-                    0,
-                    0,
-                    ZoneId.of("UTC")
-                ).toInstant()
-            ))
-        }
-    }
-
-    @Test
-    fun `cleanTimezones date no timezone for Import test`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-//DigitalU//NONSGML 32030344//EN
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    SUMMARY:Retrait de votre commande CoursesU.com
-    CLASS:PUBLIC
-    STATUS:CONFIRMED
-    UID:1649423783427@www.coursesu.com
-    DTSTART:20220409T103000
-    DTEND:20220409T113000
-    DTSTAMP:20220408T125428
-    LOCATION:Super U LOISIN,RD 1206,74140,LOISIN
-    BEGIN:VALARM
-    TRIGGER:-PT1H
-    DESCRIPTION:Retrait de votre commande CoursesU.com
-    ACTION:DISPLAY
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanIcsResult = cleanIcs(iCalString, timeZoneId = "Europe/Vilnius")
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-        val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
-
-        assertThat(iCalendar).isNotNull()
-        iCalendar?.events?.forEach { event ->
-        }
-    }
-
-    @Test
     fun `cleanDateProperties fail test`() {
 
         // TODO
@@ -955,7 +802,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1006,7 +853,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1055,7 +902,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1104,7 +951,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1153,7 +1000,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1202,7 +1049,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1251,7 +1098,7 @@ internal class IcsSurgeryUtilsTest {
 
         val defaultTimezone = "Europe/Zurich"
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1295,7 +1142,7 @@ internal class IcsSurgeryUtilsTest {
     DURATION:PT36H
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1349,7 +1196,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1403,7 +1250,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1458,7 +1305,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -1513,7 +1360,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2252,7 +2099,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2309,7 +2156,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2346,7 +2193,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2378,7 +2225,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2429,7 +2276,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
         val iCalendar = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar
 
@@ -2499,7 +2346,7 @@ internal class IcsSurgeryUtilsTest {
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = cleanIcs(iCalString)
+        val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
     }
 
@@ -2772,90 +2619,90 @@ END:VCALENDAR
     fun `cleanRecurrenceId RECURRENCE-ID timezone (with TZ definition) same as the parent DTSTART test`() {
 
         val parentICalString = """
-BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-DTSTAMP:20210601T134616Z
-DTSTART;TZID=Africa/El_Aaiun:20210601T100000
-DTEND;TZID=Africa/El_Aaiun:20210601T103000
-RRULE:FREQ=WEEKLY;UNTIL=20210901T225959Z;BYDAY=FR,SA,TH,TU,WE
-ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
-SEQUENCE:0
-DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
- :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descripti
- on.\n\nView your event at https://calendar.google.com/calendar/event?actio
- n=VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2YgY2FsZW5kYXJhdXRvbWF0aW9uOTk
- 5QHByb3Rvbm1haWwuY29t&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY29tMDRjOWNmNTJhNzQ1
- YTAyYTJiODM4NTE4NzljNTU2YjY5OTM4YThjNw&ctz=Europe%2FVilnius&hl=en_GB&es=1.
- \n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
- ~:~:~:~::~:~::-
-SUMMARY:Timezone +1
-UID:0qgumlnakhh7u9bbfdp3on99ofadam@google.com
-ATTENDEE;X-PM-TOKEN=bd25aa978853c40eec974a60a8b1911a1c0ec567;RSVP=TRUE;ROLE
- =REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=adamtst@protonmail.com:mailto:adamt
- st@protonmail.com
-ATTENDEE;X-PM-TOKEN=cb098dff9886f4688bb50b9138d796357144dfa2;RSVP=TRUE;ROLE
- =REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=iamblueuser@gmail.com:mailto:iamblue
- user@gmail.com
-BEGIN:VALARM
-ACTION:DISPLAY
-TRIGGER:-PT15M
-END:VALARM
-END:VEVENT
-END:VCALENDAR
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTAMP:20210601T134616Z
+    DTSTART;TZID=Africa/El_Aaiun:20210601T100000
+    DTEND;TZID=Africa/El_Aaiun:20210601T103000
+    RRULE:FREQ=WEEKLY;UNTIL=20210901T225959Z;BYDAY=FR,SA,TH,TU,WE
+    ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
+    SEQUENCE:0
+    DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+     :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descripti
+     on.\n\nView your event at https://calendar.google.com/calendar/event?actio
+     n=VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2YgY2FsZW5kYXJhdXRvbWF0aW9uOTk
+     5QHByb3Rvbm1haWwuY29t&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY29tMDRjOWNmNTJhNzQ1
+     YTAyYTJiODM4NTE4NzljNTU2YjY5OTM4YThjNw&ctz=Europe%2FVilnius&hl=en_GB&es=1.
+     \n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:
+     ~:~:~:~::~:~::-
+    SUMMARY:Timezone +1
+    UID:0qgumlnakhh7u9bbfdp3on99ofadam@google.com
+    ATTENDEE;X-PM-TOKEN=bd25aa978853c40eec974a60a8b1911a1c0ec567;RSVP=TRUE;ROLE
+     =REQ-PARTICIPANT;PARTSTAT=TENTATIVE;CN=adamtst@protonmail.com:mailto:adamt
+     st@protonmail.com
+    ATTENDEE;X-PM-TOKEN=cb098dff9886f4688bb50b9138d796357144dfa2;RSVP=TRUE;ROLE
+     =REQ-PARTICIPANT;PARTSTAT=ACCEPTED;CN=iamblueuser@gmail.com:mailto:iamblue
+     user@gmail.com
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    TRIGGER:-PT15M
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
     """.trimIndent()
 
         val iCalString = """
-BEGIN:VCALENDAR
-PRODID:-//Google Inc//Google Calendar 70.9054//EN
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:REQUEST
-BEGIN:VTIMEZONE
-TZID:Africa/El_Aaiun
-X-LIC-LOCATION:Africa/El_Aaiun
-BEGIN:STANDARD
-TZOFFSETFROM:+0000
-TZOFFSETTO:+0000
-TZNAME:+00
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-BEGIN:VEVENT
-DTSTART;VALUE=DATE:20210729
-DTEND;VALUE=DATE:20210730
-DTSTAMP:20210601T135021Z
-ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
-UID:0qgumlnakhh7u9bbfdp3on99ofadam2@google.com
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
- ;CN=iamblueuser@gmail.com;X-NUM-GUESTS=0:mailto:iamblueuser@gmail.com
-ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
- TRUE;CN=adamtst@protonmail.com;X-NUM-GUESTS=0:mailto:adamtst
- @protonmail.com
-X-MICROSOFT-CDO-OWNERAPPTID:-462541747
-RECURRENCE-ID;TZID=Africa/El_Aaiun:20210729T100000
-CREATED:20210601T134615Z
-DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
- :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descriptio
- n.\n\nView your event at https://calendar.google.com/calendar/event?action=
- VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2ZfMjAyMTA3MjlUMDkwMDAwWiBjYWxlbm
- RhcmF1dG9tYXRpb245OTlAcHJvdG9ubWFpbC5jb20&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY
- 29tOGQwZTZjNTc5ZWY1NDgyN2UzODc0ZDU5ZjQ3NmRiMTA5YzFhOTdkOQ&ctz=Europe%2FViln
- ius&hl=en_GB&es=0.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
- :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
-LAST-MODIFIED:20210601T135020Z
-LOCATION:
-SEQUENCE:1
-STATUS:CONFIRMED
-SUMMARY:Timezone To full day
-TRANSP:OPAQUE
-END:VEVENT
-END:VCALENDAR
+    BEGIN:VCALENDAR
+    PRODID:-//Google Inc//Google Calendar 70.9054//EN
+    VERSION:2.0
+    CALSCALE:GREGORIAN
+    METHOD:REQUEST
+    BEGIN:VTIMEZONE
+    TZID:Africa/El_Aaiun
+    X-LIC-LOCATION:Africa/El_Aaiun
+    BEGIN:STANDARD
+    TZOFFSETFROM:+0000
+    TZOFFSETTO:+0000
+    TZNAME:+00
+    DTSTART:19700101T000000
+    END:STANDARD
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210729
+    DTEND;VALUE=DATE:20210730
+    DTSTAMP:20210601T135021Z
+    ORGANIZER;CN=iamblueuser@gmail.com:mailto:iamblueuser@gmail.com
+    UID:0qgumlnakhh7u9bbfdp3on99ofadam2@google.com
+    ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=ACCEPTED;RSVP=TRUE
+     ;CN=iamblueuser@gmail.com;X-NUM-GUESTS=0:mailto:iamblueuser@gmail.com
+    ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+     TRUE;CN=adamtst@protonmail.com;X-NUM-GUESTS=0:mailto:adamtst
+     @protonmail.com
+    X-MICROSOFT-CDO-OWNERAPPTID:-462541747
+    RECURRENCE-ID;TZID=Africa/El_Aaiun:20210729T100000
+    CREATED:20210601T134615Z
+    DESCRIPTION:-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+     :~:~:~:~:~:~:~:~::~:~::-\nPlease do not edit this section of the descriptio
+     n.\n\nView your event at https://calendar.google.com/calendar/event?action=
+     VIEW&eid=MHFndW1sbmFraGg3dTliYmZkcDNvbjk5b2ZfMjAyMTA3MjlUMDkwMDAwWiBjYWxlbm
+     RhcmF1dG9tYXRpb245OTlAcHJvdG9ubWFpbC5jb20&tok=MjEjaWFtYmx1ZXVzZXJAZ21haWwuY
+     29tOGQwZTZjNTc5ZWY1NDgyN2UzODc0ZDU5ZjQ3NmRiMTA5YzFhOTdkOQ&ctz=Europe%2FViln
+     ius&hl=en_GB&es=0.\n-::~:~::~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~:~
+     :~:~:~:~:~:~:~:~:~:~:~:~::~:~::-
+    LAST-MODIFIED:20210601T135020Z
+    LOCATION:
+    SEQUENCE:1
+    STATUS:CONFIRMED
+    SUMMARY:Timezone To full day
+    TRANSP:OPAQUE
+    END:VEVENT
+    END:VCALENDAR
     """.trimIndent()
 
         val parentICal = ICalUtilsImpl.parseICalString(parentICalString)
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
@@ -3232,334 +3079,6 @@ END:VCALENDAR
     }
 
     @Test
-    fun `cleanAlarms VALARM with RELATED END`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;TZID=Europe/Paris:20210223T090000
-    DTEND;TZID=Europe/Paris:20210223T094000
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT15M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER;RELATED=END:-P2D    
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.size).isEqualTo(2)
-            event.cleanAlarms()
-            assertThat(event.alarms.size).isEqualTo(1)
-        }
-    }
-
-    @Test
-    fun `cleanAlarms VALARM with duplicates`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;TZID=Europe/Paris:20210223T090000
-    DTEND;TZID=Europe/Paris:20210223T094000
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT15M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT15M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT15M
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.size).isEqualTo(3)
-            event.cleanAlarms()
-            assertThat(event.alarms.size).isEqualTo(1)
-        }
-    }
-
-    @Test
-    fun `cleanAlarms VALARM with one duplicate and more than 10`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;TZID=Europe/Paris:20210223T090000
-    DTEND;TZID=Europe/Paris:20210223T094000
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT1M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT1M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT2M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT3M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT4M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT5M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT6M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT7M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT8M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT9M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT10M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT11M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT12M
-    END:VALARM
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-PT13M
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.size).isEqualTo(14)
-            event.cleanAlarms()
-            assertThat(event.alarms.first().trigger?.duration?.toMillis()).isEqualTo(Duration.ofMinutes(1).toMillis() * -1)
-            assertThat(event.alarms.last().trigger?.duration?.toMillis()).isEqualTo(Duration.ofMinutes(10).toMillis() * -1)
-            assertThat(event.alarms.size).isEqualTo(10)
-        }
-    }
-
-    @Test
-    fun `cleanAlarms VALARM with positive TRIGGER`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;TZID=Europe/Paris:20210223T090000
-    DTEND;TZID=Europe/Paris:20210223T094000
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:PT1M
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.size).isEqualTo(1)
-            event.cleanAlarms()
-            assertThat(event.alarms.size).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun `cleanAlarms part day event VALARM with mixed components TRIGGER`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;TZID=Europe/Paris:20210223T090000
-    DTEND;TZID=Europe/Paris:20210223T094000
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-P1W3DT4H
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-P1W3DT4H")
-            event.cleanAlarms()
-            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("PT-244H")
-        }
-    }
-
-    @Test
-    fun `cleanAlarms all day event VALARM with mixed components TRIGGER`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:icalendar
-    CALSCALE:GREGORIAN
-    METHOD:PUBLISH
-    BEGIN:VEVENT
-    DTSTAMP:20210204T130756Z
-    DTSTART;VALUE=DATE:20210223
-    DTEND;VALUE=DATE:20210223
-    CLASS:PRIVATE
-    PRIORITY:2
-    SUMMARY:Test alarms
-    BEGIN:VALARM
-    ACTION:DISPLAY
-    TRIGGER:-P1W3DT4H
-    END:VALARM
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanRawIcsResult = iCalString.cleanRawIcs()
-        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
-        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
-
-        val iCalendar = Biweekly.parse(cleanICalString).first()
-        assertThat(iCalendar).isNotNull()
-        iCalendar.events.forEach { event ->
-            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-P1W3DT4H")
-            event.cleanAlarms()
-            assertThat(event.alarms.first().trigger.duration.toString()).isEqualTo("-P1W3DT4H")
-        }
-    }
-
-    @Test
-    fun `test handle import invitation`() {
-
-        val iCalString = """
-    BEGIN:VCALENDAR
-    VERSION:2.0
-    PRODID:-//Recruitee//Recruitee Events//EN
-    CALSCALE:GREGORIAN
-    BEGIN:VEVENT
-    DTSTART:20201125T130000Z
-    DTEND:20201125T140000Z
-    CREATED:20201124T170307Z
-    DTSTAMP:20201124T170310Z
-    RECURRENCE-ID:20201125T130000Z
-    RRULE:FREQ=WEEKLY;UNTIL=20210328;BYDAY=WE
-    ORGANIZER;CN=Test:MAILTO:testOrga@proton.me
-    ATTENDEE;CN=Test:MAILTO:testAttendee@proton.me
-    SUMMARY:Test this out
-    DESCRIPTION:Test this description
-    LOCATION:Test this location
-    UID:123456970bluemnday@recruitee.com
-    END:VEVENT
-    END:VCALENDAR
-    """.trimIndent()
-
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
-
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-
-        val expectedUid = "sha1-uid-2f56b753fd19967006672eaa365fec86821c8e74-original-uid-123456970bluemnday@recruitee.com"
-        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
-            val iCalendar = cleanIcsResult.iCalendar
-
-            assertThat(iCalendar).isNotNull()
-            assertThat(iCalendar?.events?.firstOrNull()?.recurrenceId).isNull()
-            assertThat(iCalendar?.events?.firstOrNull()?.alarms).isNullOrEmpty()
-            assertThat(iCalendar?.events?.firstOrNull()?.uid?.value).isEqualTo(expectedUid)
-        }
-    }
-
-    @Test
     fun `test your VALID ics here`() {
 
         val iCalString = """
@@ -3588,7 +3107,7 @@ END:VCALENDAR
     END:VCALENDAR
     """.trimIndent()
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString)
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
 
@@ -3611,7 +3130,7 @@ END:VCALENDAR
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
             val iCalString = bufferedReader.use { it.readText() }
 
-            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true, allowMultipleEvents = true)
 
             print("File tested: ${it.name}\n")
             assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error).isTrue()
@@ -3630,7 +3149,7 @@ END:VCALENDAR
             val bufferedReader = BufferedReader(InputStreamReader(inputStream))
             val iCalString = bufferedReader.use { it.readText() }
 
-            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+            val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true, allowMultipleEvents = true)
 
             print("File tested: ${it.name}\n")
             assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
@@ -3644,62 +3163,8 @@ END:VCALENDAR
         val bufferedReader = BufferedReader(InputStreamReader(inputStream))
         val iCalString = bufferedReader.use { it.readText() }
 
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, allowMultipleEvents = true)
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true, allowMultipleEvents = true)
 
         assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error).isTrue()
-    }
-
-    @Test
-    fun `ics import from file generate UID`() {
-        val file = File("./src/test/resources/importWithNoUid.ics")
-
-        assertThat(file).isNotNull()
-
-        val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream(file.name)
-        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-        val iCalString = bufferedReader.use { it.readText() }
-
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
-
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-
-        val event = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar?.events?.firstOrNull()
-        assertThat(event?.uid?.value).isEqualTo("sha1-uid-45bcf24f9032a3f0865fa55492876b770e96e5ab")
-    }
-
-    @Test
-    fun `ics import from file generate UID with short original UID`() {
-        val file = File("./src/test/resources/importWithShortUid.ics")
-
-        assertThat(file).isNotNull()
-
-        val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream(file.name)
-        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-        val iCalString = bufferedReader.use { it.readText() }
-
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
-
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-
-        val event = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar?.events?.firstOrNull()
-        assertThat(event?.uid?.value).isEqualTo("original-uid-123456970bluemnday@recruitee.com-sha1-uid-db2828aaf1b1084fbf004530e2008f945fb796fd")
-    }
-
-    @Test
-    fun `ics import from file generate UID with long original UID`() {
-        val file = File("./src/test/resources/importWithLongUid.ics")
-
-        assertThat(file).isNotNull()
-
-        val inputStream: InputStream? = this.javaClass.classLoader?.getResourceAsStream(file.name)
-        val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-        val iCalString = bufferedReader.use { it.readText() }
-
-        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, isOpeningFromProtonMail = true)
-
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-
-        val event = (cleanIcsResult as IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).iCalendar?.events?.firstOrNull()
-        assertThat(event?.uid?.value).isEqualTo("original-uid-FmcWKJ0q0eeNWIN4OLZ8yJnSDdC8DT9CndSxOnnPC47VWjQHu0psXB25lZuCt4EWsWAtgmCPWe1Wa0AIL0y8rlPn0qbB05u3WuyOst8XYkJNWz6gYx@recruitee.com-sha1-uid-a058b52a132530144c9fa59597036c8aac8ae550")
     }
 }
