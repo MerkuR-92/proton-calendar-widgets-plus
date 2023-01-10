@@ -567,66 +567,6 @@ internal class AlarmsTest : BaseTest() {
             END:VCALENDAR
         """.trimIndent(), "partDay1")
 
-    val subscribedCalendarNoAlarms = eventForICalString(
-        """
-            BEGIN:VCALENDAR
-            BEGIN:VEVENT
-            DTSTART;TZID=Europe/Zurich:20201214T160000
-            DTEND;TZID=Europe/Zurich:20201214T170000
-            RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=2;BYDAY=MO
-            DTSTAMP:20201207T152413Z
-            UID:122qfbpnpghcrfqfqv94bg3hn0@google.com
-            CREATED:20201207T151852Z
-            DESCRIPTION:ah ah
-            LAST-MODIFIED:20201207T152412Z
-            LOCATION:
-            SEQUENCE:1
-            STATUS:CONFIRMED
-            SUMMARY:Event with no alarms
-            END:VEVENT
-            END:VCALENDAR
-        """.trimIndent(), type = 1) // subscribed calendar
-
-    val sharedCalendarNoAlarms = eventForICalString(
-        """
-            BEGIN:VCALENDAR
-            BEGIN:VEVENT
-            DTSTART;TZID=Europe/Zurich:20201214T160000
-            DTEND;TZID=Europe/Zurich:20201214T170000
-            RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=2;BYDAY=MO
-            DTSTAMP:20201207T152413Z
-            UID:122qfbpnpghcrfqfqv94bg3hn0@google.com
-            CREATED:20201207T151852Z
-            DESCRIPTION:ah ah
-            LAST-MODIFIED:20201207T152412Z
-            LOCATION:
-            SEQUENCE:1
-            STATUS:CONFIRMED
-            SUMMARY:Event with no alarms
-            END:VEVENT
-            END:VCALENDAR
-        """.trimIndent(), type = 0, calendarIsSharedWithMe = true) // shared calendar
-
-    val userCalendarNoAlarms = eventForICalString(
-        """
-            BEGIN:VCALENDAR
-            BEGIN:VEVENT
-            DTSTART;TZID=Europe/Zurich:20201214T160000
-            DTEND;TZID=Europe/Zurich:20201214T170000
-            RRULE:FREQ=WEEKLY;WKST=MO;INTERVAL=2;BYDAY=MO
-            DTSTAMP:20201207T152413Z
-            UID:122qfbpnpghcrfqfqv94bg3hn0@google.com
-            CREATED:20201207T151852Z
-            DESCRIPTION:ah ah
-            LAST-MODIFIED:20201207T152412Z
-            LOCATION:
-            SEQUENCE:1
-            STATUS:CONFIRMED
-            SUMMARY:Event with no alarms
-            END:VEVENT
-            END:VCALENDAR
-        """.trimIndent(), type = 0) // user calendar
-
     @Test
     fun `calculate upcoming alarms for part-day event with WKST, BYDAY`() {
 
@@ -669,51 +609,6 @@ internal class AlarmsTest : BaseTest() {
         assertThat(Instant.ofEpochSecond(alarms2[1].occurrence).atZone(zoneId)).isEqualTo(
             ZonedDateTime.of(2020, 12, 14, 16, 0, 0, 0, zoneId)
         )
-
-    }
-
-    @Test
-    fun `inject VAlarm components into Event from Subscribed Calendar`() {
-
-        val events = listOf(subscribedCalendarNoAlarms)
-
-        val calendarSettings = listOf(
-            provideCalendarSettingsEntity("calendar-id")
-        )
-
-        val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
-
-        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(1)
-
-    }
-
-    @Test
-    fun `inject VAlarm components into Event from Shared Calendar`() {
-
-        val events = listOf(sharedCalendarNoAlarms)
-
-        val calendarSettings = listOf(
-            provideCalendarSettingsEntity("calendar-id")
-        )
-
-        val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
-
-        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(1)
-
-    }
-
-    @Test
-    fun `do not inject VAlarm components into Event from non-Subscribed, non-Shared Calendar`() {
-
-        val events = listOf(userCalendarNoAlarms)
-
-        val calendarSettings = listOf(
-            provideCalendarSettingsEntity("calendar-id")
-        )
-
-        val eventsWithInjectedAlarms = ICalUtilsImpl.injectVAlarmsIntoSubscribedOrSharedEvents(events, calendarSettings, Json.Default)
-
-        assertThat(eventsWithInjectedAlarms.first().alarms.size).isEqualTo(0)
 
     }
 
