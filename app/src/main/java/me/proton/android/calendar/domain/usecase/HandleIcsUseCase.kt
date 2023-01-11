@@ -303,7 +303,7 @@ class HandleIcsUseCase @Inject constructor(
         } else null
 
         // IMPORTANT: Unlike the rest of the surgery, clean recurrence id is called outside of cleanIcs, but it is still mandatory
-        if (!iCalendar.cleanRecurrenceId(iCalendar.method == Method.reply(), parentEvent?.iCalendar)) {
+        if (!iCalendar.cleanRecurrenceId(parentEvent?.iCalendar)) {
             logger.i("HandleIcsUseCase error invalid recurrence id")
             return IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RecurrenceId
         }

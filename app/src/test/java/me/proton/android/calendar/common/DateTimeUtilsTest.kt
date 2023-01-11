@@ -9,7 +9,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlap
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLastWeekOfMonthOffset
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimezoneOffsetDifferenceSeconds
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils.getBiweeklyDstParsingFix
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.model.Calendar
@@ -193,12 +192,13 @@ internal class DateTimeUtilsTest {
         // the actual dateTimes should always be the same, no matter when Biweekly parsed the ICS (during standard
         //  or daylight saving time)
 
-        event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
-            event.iCalEvent.dateStart.value = it
-        }
-        event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
-            event.iCalEvent.dateEnd.value = it
-        }
+        // TODO This is not applied anymore during ICS surgery, uncomment if this test starts to fail someday
+        // event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
+        //     event.iCalEvent.dateStart.value = it
+        // }
+        // event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
+        //     event.iCalEvent.dateEnd.value = it
+        // }
 
         assertThat(event.getStart(timeZoneId)).isEqualTo(ZonedDateTime.of(
             LocalDate.of(2021, 11, 2),
@@ -255,12 +255,13 @@ internal class DateTimeUtilsTest {
             0
         )!!
 
-        event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
-            event.iCalEvent.dateStart.value = it
-        }
-        event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
-            event.iCalEvent.dateEnd.value = it
-        }
+        // TODO This is not applied anymore during ICS surgery, uncomment if this test starts to fail someday
+        // event.iCalEvent.dateStart.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateStart).timeZone.id)?.let {
+        //     event.iCalEvent.dateStart.value = it
+        // }
+        // event.iCalEvent.dateEnd.value.getBiweeklyDstParsingFix(event.iCalendar.timezoneInfo.getTimezone(event.iCalEvent.dateEnd).timeZone.id)?.let {
+        //     event.iCalEvent.dateEnd.value = it
+        // }
 
         // the actual dateTimes should always be the same, no matter when Biweekly parsed the ICS (during standard
         //  or daylight saving time)

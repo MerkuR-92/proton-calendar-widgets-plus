@@ -38,6 +38,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.TZID
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
+import me.proton.android.calendar.common.aliasesTimezonesMap
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateTimeToDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.dateToDateTime
@@ -49,6 +50,9 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonUidForImport
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
+import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanDuration
+import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
 import me.proton.core.util.kotlin.toBoolean
@@ -200,6 +204,7 @@ object IcsSurgeryUtils {
                 event.organizer = null
 
                 // The UID must be always overwritten, and re-generated. The reason to do that here is that we don't want to have UID collisions in case the user is later invited to the event.
+                event.moveUid(iCalendar)
                 event.setUid(generateProtonUidForImport(event.uid?.value, iCalString))
 
                 // If present, RECURRENCE-ID should be dropped. This is because a recurrence id without the original UID is useless
@@ -209,25 +214,29 @@ object IcsSurgeryUtils {
                 event.alarms.clear()
             }
 
-            event.applyBiweeklyDstParsingFix(iCalendar)
+            // TODO Useless now ?
+            // event.applyBiweeklyDstParsingFix(iCalendar)
 
             event.dropUnsupportedProperties()
 
             if (!event.cleanDtStamp(iCalendar, isImport || !isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
-            if (!event.cleanUid()) return HandleIcsResult.Error.MissingUid
+            if (!event.cleanUid(iCalendar)) return HandleIcsResult.Error.MissingUid
 
             if (!event.cleanDtStart()) return HandleIcsResult.Error.Invalid.DateStart
 
-            if (!event.cleanDuration()) return HandleIcsResult.Error.DurationNotSupported
+            if (!event.cleanDuration(iCalendar)) return HandleIcsResult.Error.DurationNotSupported
 
-            if (!event.cleanDtEnd()) return HandleIcsResult.Error.Invalid.DateEnd
+            if (!event.cleanDtEnd(iCalendar)) return HandleIcsResult.Error.Invalid.DateEnd
 
             if (!event.cleanDescription()) return HandleIcsResult.Error.Invalid.Description
 
             if (!event.cleanLocation()) return HandleIcsResult.Error.Invalid.Location
 
             if (!event.cleanSummary()) return HandleIcsResult.Error.Invalid.Summary
+
+            // RECURRENCE-ID: If the event contains both a RECURRENCE-ID and an RRULE, it is rejected (as unsupported) unless it's an invitation with REPLY method.
+            if (iCalendar.method?.isReply == false && event.recurrenceId?.value != null && event.recurrenceRule?.value != null) return HandleIcsResult.Error.Invalid.RecurrenceId
 
             if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.Invalid.RRule
 
@@ -251,11 +260,8 @@ object IcsSurgeryUtils {
         this.attendees.clear()
         this.organizer = null
 
-        if (this.uid?.value.isNullOrBlank() && !iCalendar.uid?.value.isNullOrBlank()) {
-            // If UID was set in VCalendar instead of VEvent, move it
-            // TODO Once we handle importing multiple VEvent per VCalendar, make sure this does not apply
-            this.uid = iCalendar.uid
-        }
+        this.moveUid(iCalendar)
+
         if (isOpeningFromProtonMail) {
             // For import of invitations, the UID must be always overwritten, and re-generated
             this.setUid(generateProtonUidForImport(this.uid?.value, iCalString))
@@ -304,7 +310,7 @@ object IcsSurgeryUtils {
 
     fun VEvent.dropUnsupportedProperties() {
 
-        // only supported status is CONFIRMED but it's also default if empty
+        // Only supported status is CONFIRMED but it's also default if empty
         this.status = null
     }
 
@@ -345,7 +351,27 @@ object IcsSurgeryUtils {
         // If the type DATE is not specified for an all-day event, we currently reject (as invalid) the event.
         if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\r?\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
+        cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, aliasesTimezonesMap)
+        cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, windowsTimeZoneMap)
+
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
+    }
+
+    private fun replaceUnsupportedTimeZoneId(iCalString: String, supportedTimeZoneMap: Map<String, String>): String {
+        var cleanICalString = iCalString
+        supportedTimeZoneMap.forEach {
+            var index = cleanICalString.indexOf(";TZID=${it.key}:", ignoreCase = true)
+            if (index >= 0) {
+                cleanICalString = cleanICalString.replaceRange(index, index + ";TZID=${it.key}:".length, ";TZID=${it.value}:")
+            }
+            while (index >= 0) {
+                index = cleanICalString.indexOf(";TZID=${it.key}:", startIndex = index, ignoreCase = true)
+                if (index >= 0) {
+                    cleanICalString = cleanICalString.replaceRange(index, index + ";TZID=${it.key}:".length, ";TZID=${it.value}:")
+                }
+            }
+        }
+        return cleanICalString
     }
 
     fun ICalendar.cleanCalscale(): Boolean {
@@ -489,7 +515,18 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanUid(): Boolean {
+    private fun VEvent.moveUid(iCalendar: ICalendar) {
+        if (this.uid?.value.isNullOrBlank() && !iCalendar.uid?.value.isNullOrBlank()) {
+            // If UID was set in VCalendar instead of VEvent, move it
+            // TODO Once we handle importing multiple VEvent per VCalendar, make sure this does not apply
+            this.uid = iCalendar.uid
+            iCalendar.uid = null
+        }
+    }
+
+    fun VEvent.cleanUid(iCalendar: ICalendar): Boolean {
+        this.moveUid(iCalendar)
+
         // UID: As per RFC, we require it to be present. Also, there's a BE limit of 191 characters. If we need to crop, we keep the last 191 characters of the uid.
         if (this.uid?.value == null || this.uid.value.isEmpty()) return false
         else if (this.uid.value.length > UID_MAX_LENGTH) {
@@ -509,14 +546,16 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanDuration(): Boolean {
+    fun VEvent.cleanDuration(iCalendar: ICalendar): Boolean {
         // DURATION property should be transformed into the corresponding DTEND
         val dateEnd = this.dateStart.value.clone() as ICalDate
+        val dateStartTimeZone = iCalendar.timezoneInfo.getTimezone(this.dateStart)
         if (this.duration?.value != null && this.dateEnd?.value == null) {
             if (this.dateStart.value.hasTime()) {
                 val durationInMillis = this.duration.value.toMillis()
                 dateEnd.time += durationInMillis
                 this.setDateEnd(dateEnd)
+                if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             } else {
                 // Round up
                 val durationInMsDouble = this.duration.value.toMillis().toDouble()
@@ -528,13 +567,14 @@ object IcsSurgeryUtils {
                     else durationInDaysRoundedUp
                 ).toInstant().toEpochMilli()
                 this.setDateEnd(dateEnd)
+                if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }
             this.removeProperty(this.duration)
         }
         return true
     }
 
-    fun VEvent.cleanDtEnd(): Boolean {
+    fun VEvent.cleanDtEnd(iCalendar: ICalendar): Boolean {
         // DTEND: If not present, we don't add it either. If present, the standard DATETIME/DATE sanitization operations must be performed.
         if (this.dateEnd?.value != null && (
                     this.dateEnd.value.before(this.dateStart.value) ||
@@ -545,14 +585,19 @@ object IcsSurgeryUtils {
         }
         if (this.dateEnd?.value == null) {
             // DTEND can be omitted
+            val dateStartTimeZone = iCalendar.timezoneInfo.getTimezone(this.dateStart)
             if (this.dateStart.value.hasTime()) {
                 // For partial day, the DTEND is by default set to the DTSTART value
+                //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
+                //  set to avoid NPE in the app. We remove it when sending the ICS to BE.
                 this.setDateEnd(this.dateStart.value)
+                if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             } else {
                 // For full day, the DTEND is by default set to the day after DTSTART such that the event is one day long
                 val dateEnd = this.dateStart.value.clone() as ICalDate
                 dateEnd.time += TimeUnit.DAYS.toMillis(1)
                 this.setDateEnd(dateEnd)
+                if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }
         } else {
             // DTEND: If present check if in bounds
@@ -663,13 +708,10 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun ICalendar.cleanRecurrenceId(isReply: Boolean, parentCalendar: ICalendar? = null): Boolean {
+    fun ICalendar.cleanRecurrenceId(parentCalendar: ICalendar? = null): Boolean {
         val event = this.events.firstOrNull() ?: return false
 
         if (event.recurrenceId?.value == null) return true
-
-        // RECURRENCE-ID: If the event contains both a RECURRENCE-ID and an RRULE, it is rejected (as unsupported) unless it's an invitation with REPLY method.
-        if (!isReply && event.recurrenceId?.value != null && event.recurrenceRule?.value != null) return false
 
         // Allow standalone single edits
         val parentEvent = parentCalendar?.events?.firstOrNull() ?: return true
@@ -761,14 +803,15 @@ object IcsSurgeryUtils {
                         }
                 }
 
+                // TODO Still needed ?
                 // Fix Biweekly DST parsing on ExDates values
-                if (exceptionDateValue.hasTime() && this.dateStart.value.hasTime()) {
-                    iCalendar.timezoneInfo?.getTimezone(exceptionDates)?.timeZone?.id?.let { timeZone ->
-                        exceptionDateValue.getBiweeklyDstParsingFix(timeZone)?.let {
-                            exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] = it
-                        }
-                    }
-                }
+                // if (exceptionDateValue.hasTime() && this.dateStart.value.hasTime()) {
+                //     iCalendar.timezoneInfo?.getTimezone(exceptionDates)?.timeZone?.id?.let { timeZone ->
+                //         exceptionDateValue.getBiweeklyDstParsingFix(timeZone)?.let {
+                //             exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] = it
+                //         }
+                //     }
+                // }
             }
         }
 
@@ -865,15 +908,6 @@ object IcsSurgeryUtils {
     fun ICalendar.cleanTimezones(isImport: Boolean = false, timeZoneId: String? = null): Boolean {
 
         this.events.forEach {
-            it.exceptionDates.forEach { exDate ->
-                // If EXDATE has a timezone different from the DTSTART, re-localize in the DTSTART timezone.
-                if (this.timezoneInfo.getTimezone(exDate) != this.timezoneInfo.getTimezone(this.events.first().dateStart)) {
-                    this.timezoneInfo.setTimezone(exDate, this.timezoneInfo.getTimezone(this.events.first().dateStart))
-                }
-
-                // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
-                if (!this.convertToSupportedTimezone(exDate)) return false
-            }
 
             // DATESTART, DATEEND, RECURRENCE-ID:
 
@@ -902,6 +936,18 @@ object IcsSurgeryUtils {
             it.dateStart?.localizeZuluTimeDate(this, it)
             it.dateEnd?.localizeZuluTimeDate(this, it)
             it.recurrenceId?.localizeZuluTimeDate(this, it)
+
+            // EXDATE
+            it.exceptionDates.forEach { exDate ->
+
+                // If EXDATE has a timezone different from the DTSTART, re-localize in the DTSTART timezone.
+                if (this.timezoneInfo.getTimezone(exDate) != this.timezoneInfo.getTimezone(this.events.first().dateStart)) {
+                    this.timezoneInfo.setTimezone(exDate, this.timezoneInfo.getTimezone(this.events.first().dateStart))
+                }
+
+                // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
+                if (!this.convertToSupportedTimezone(exDate)) return false
+            }
         }
 
         return true
@@ -917,6 +963,7 @@ object IcsSurgeryUtils {
     }
 
     private fun ICalendar.convertToSupportedTimezone(date: ICalProperty?): Boolean {
+        // TODO This shouldn't be needed as long as we do the replace unsupported tzid in cleanRawIcs
         // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
         this.timezoneInfo.getTimezone(date)?.let { timezoneAssignment ->
             val supportedTzid = fallbackTimeZone(timezoneAssignment.timeZone.id, fallbackToDefault = false) ?: return false
