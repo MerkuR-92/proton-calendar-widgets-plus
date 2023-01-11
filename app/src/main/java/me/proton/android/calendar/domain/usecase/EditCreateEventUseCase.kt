@@ -9,12 +9,13 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.SESSION_KEY_ALGO
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitiseForExternal
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.SyncEvent
 import me.proton.android.calendar.data.api.SyncEventCreateContainer
@@ -35,13 +36,11 @@ import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.encryptSessionKey
 import me.proton.core.key.domain.entity.key.PrivateKey
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
-import me.proton.core.key.domain.useKeys
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
@@ -75,6 +74,8 @@ class EditCreateEventUseCase @Inject constructor(
         sendPreferences: Map<Email, SendPreferences> = emptyMap(),
         isImport: Boolean = false
     ) : UseCase.Result {
+
+        newEvent.iCalEvent.sanitiseForExternal()
 
         val oldEventEntity = if (newEvent.isSyncedWithApi()) {
             (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")

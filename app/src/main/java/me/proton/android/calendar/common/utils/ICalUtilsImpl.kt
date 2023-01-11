@@ -118,6 +118,18 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     /**
+     * Sanitise the event before sending it to BE or by email so that it matches RFC.
+     */
+    override fun VEvent.sanitiseForExternal() {
+
+        //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
+        //  set to avoid NPE in the app. We remove it when sending the ICS to BE or by mail.
+        if (this.dateStart?.value == this.dateEnd?.value) {
+            this.dateEnd = null
+        }
+    }
+
+    /**
      * This methods clones Recurrence and overwrites only parameters supplied.
      */
     override fun Recurrence.clone(
@@ -1011,7 +1023,12 @@ object ICalUtilsImpl : ICalUtils {
         responseICalendar.events.first().organizer?.let { event.organizer = it }
         responseICalendar.events.first().uid?.let { event.uid = it }
         responseICalendar.events.first().dateStart?.let { event.dateStart = it }
-        responseICalendar.events.first().dateEnd?.let { event.dateEnd = it }
+        responseICalendar.events.first().dateEnd?.let {
+            //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
+            //  set to avoid NPE in the app. We remove it when sending the ICS.
+            if (it.value == responseICalendar.events.first().dateStart?.value) null
+            else event.dateEnd = it
+        }
         responseICalendar.events.first().sequence?.let { event.sequence = it }
         responseICalendar.events.first().recurrenceId?.let { event.recurrenceId = it }
         responseICalendar.events.first().recurrenceRule?.let { event.recurrenceRule = it }
@@ -1038,6 +1055,10 @@ object ICalUtilsImpl : ICalUtils {
     ): ICalendar {
 
         val iCalendar = newEvent.iCalendar.clone()
+
+        //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
+        //  set to avoid NPE in the app. We remove it when sending the ICS.
+        iCalendar.events.first().sanitiseForExternal()
 
         if (iCalendar.productId == null) iCalendar.setProductId(generateProtonProdId())
         if (iCalendar.version == null) iCalendar.version = ICalVersion.V2_0
