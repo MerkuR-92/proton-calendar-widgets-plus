@@ -50,8 +50,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonUidForImport
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanDuration
 import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
@@ -691,7 +689,7 @@ object IcsSurgeryUtils {
         val eventTimezone = (if (dateStart.value.hasTime()) iCalendar.iCalTimeZone(dateStart) else TimeZone.getDefault()) ?: return false
         val dummyEventForOccurrences = Event.dummyFrom(iCalendar) ?: return false
 
-        // Do not generate any occurrence.
+        // Do not generate any occurrence. We check if we can generate at least DTSTART as first occurrence since it's mandatory as per RFC.
         val firstOccurrence = dummyEventForOccurrences.generateOccurrence(1, eventTimezone.id) ?: return false
         val firstExDatedOccurrence = (listOf(firstOccurrence)).filterOutEventOccurrencesByExdates(dummyEventForOccurrences, eventTimezone.id).firstOrNull() ?: return false
 
