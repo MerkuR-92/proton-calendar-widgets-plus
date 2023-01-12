@@ -236,7 +236,7 @@ class TransformEventUseCase @Inject constructor(
             id = eventEntity.id,
             calendar = Calendar(
                 calendarEntity.id,
-                calendarEntity.name,
+                calendar.name,
                 calendar.email,
                 calendar.color,
                 calendar.flags,

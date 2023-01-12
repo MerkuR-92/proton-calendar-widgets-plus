@@ -17,8 +17,6 @@ object CalendarMocks {
     fun provideCalendarEntity(id: String = calendarId): CalendarEntity {
         return CalendarEntity(
             id = id,
-            name = calendarName,
-            description = calendarDescription,
             type = calendarType,
             fkUserId = userId.id
         )
@@ -72,7 +70,9 @@ object CalendarMocks {
             calendarId = calendarId,
             color = calendarColor,
             display = calendarDisplay,
-            flags = flags
+            flags = flags,
+            name = calendarName,
+            description = calendarDescription,
         )
     }
 }

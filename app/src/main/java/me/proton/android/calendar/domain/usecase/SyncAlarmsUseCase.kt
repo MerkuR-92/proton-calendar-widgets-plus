@@ -44,16 +44,16 @@ class SyncAlarmsUseCase @Inject constructor(
             val lastSuccessfulSyncTimestamp = valueStore.getLongFromSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id)
             val lastSuccessfulSyncDate = ZonedDateTime.ofInstant(Instant.ofEpochSecond(lastSuccessfulSyncTimestamp ?: 0L), ZoneId.of("UTC"))
             if (force || lastSuccessfulSyncDate.plus(ALARMS_CACHE_OVERLAP_WINDOW_SIZE).isBefore(syncStartDate)) {
-                logger.v("have to sync alarms calendar ${it.name}, at $syncStartDate")
+                logger.v("have to sync alarms calendar ${it.id}, at $syncStartDate")
                 val result = handleCalendarAlarms(userId, it)
                 result.ifSuccessAndLogErrors(logger) {
-                    logger.v("success syncing alarms for calendar ${it.name}, writing timestamp $syncStartDate")
+                    logger.v("success syncing alarms for calendar ${it.id}, writing timestamp $syncStartDate")
                     valueStore.putLongInSet(ValueSet.LAST_CALENDAR_ALARM_SYNC_SUCCESS_TIMESTAMP, it.id, syncStartDate.toEpochSecond())
                 }
 
                 result
             } else {
-                logger.v("no need for sync of calendar ${it.name} at $syncStartDate")
+                logger.v("no need for sync of calendar ${it.id} at $syncStartDate")
                 UseCase.Result.Success<Unit>()
             }
         }
@@ -84,7 +84,7 @@ class SyncAlarmsUseCase @Inject constructor(
 
             when (val alarmsResponse = calendarsApi.getAlarms(userId, calendarEntity.id, windowStart.toEpochSecond(ZoneOffset.UTC), windowEnd.toEpochSecond(ZoneOffset.UTC), ALARMS_REQUEST_PAGE_SIZE)) {
                 is ApiResponse.Success -> {
-                    logger.v("fetched alarms for: ${calendarEntity.name}")
+                    logger.v("fetched alarms for: ${calendarEntity.id}")
                     logger.v("alarms response: ${alarmsResponse.data}")
 
                     // if we got as many alarms as we requested, it's possible that not all of them

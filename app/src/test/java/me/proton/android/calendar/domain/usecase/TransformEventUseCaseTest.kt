@@ -94,8 +94,6 @@ internal class TransformEventUseCaseTest {
             // calendarEntity
             val calendarEntity = CalendarEntity(
                 "id",
-                "name",
-                "description",
                 1,
                 fkUserId = "fkUserId")
             coEvery { database.calendarsDao().selectById(any()) } returns calendarEntity

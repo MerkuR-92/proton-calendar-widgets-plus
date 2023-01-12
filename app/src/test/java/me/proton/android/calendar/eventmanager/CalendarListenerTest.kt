@@ -87,7 +87,7 @@ class CalendarListenerTest {
     fun `onCreate starts calendar bootstraping`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id", "Name", "Description"),
+                CalendarEntity("calendar_id"),
             )
             coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success(Unit)
 
@@ -102,7 +102,7 @@ class CalendarListenerTest {
     fun `If bootstraping in onCreate fails, the calendar is just persisted`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id", "Name", "Description"),
+                CalendarEntity("calendar_id"),
             )
             coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("error")
 
@@ -117,7 +117,7 @@ class CalendarListenerTest {
     fun `onUpdate just persists the calendar`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id", "Name", "Description"),
+                CalendarEntity("calendar_id"),
             )
 
             val calendarSettingsEntity: CalendarSettingsEntity = mockk()
@@ -126,8 +126,8 @@ class CalendarListenerTest {
             coEvery { calendarSettingsEntity.defaultFullDayNotifications } returns emptyList()
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar.from(
-                CalendarEntity("calendar_id", "Previous name", "Description"),
-                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1),
+                CalendarEntity("calendar_id"),
+                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1,  "Name", "Description"),
                 calendarSettingsEntity,
                 json
             )
@@ -142,7 +142,7 @@ class CalendarListenerTest {
     fun `onUpdate calendar doesn't exist yet in db do bootstrap`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id", "Name", "Description"),
+                CalendarEntity("calendar_id"),
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
@@ -159,7 +159,7 @@ class CalendarListenerTest {
     fun `onUpdate calendar doesn't exist yet in db bootstrap failed persist calendar`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id", "Name", "Description"),
+                CalendarEntity("calendar_id"),
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
@@ -219,7 +219,9 @@ private const val validResponse = """
                 "CalendarID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
                 "Flags": 1,
                 "Color": "#9DB99F",
-                "Display": 1
+                "Display": 1,
+                "Name": "ASDADADSASD",
+                "Description": ""
             }
         }
     ],
@@ -238,13 +240,9 @@ private const val brokenResponse = """
             "ID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
             "Action": 1,
             "Calendar": {
-                "ID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
-                "Naaaaaaame": "ASDADADSASD",
-                "Description": "",
+                "ID_malformed_property": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
                 "Type": 0,
                 "Flags": 1,
-                "Color": "#9DB99F",
-                "Display": 1,
                 "CalendarID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw=="
             }
         }

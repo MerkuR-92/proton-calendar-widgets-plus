@@ -24,7 +24,7 @@ data class Calendar(
         companion object {
                 fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity, calendarSettingsEntity: CalendarSettingsEntity, json: Json) = Calendar(
                         id = calendarEntity.id,
-                        name = calendarEntity.name,
+                        name = memberEntity.name,
                         email = memberEntity.email,
                         color = memberEntity.color,
                         flags = memberEntity.flags,
