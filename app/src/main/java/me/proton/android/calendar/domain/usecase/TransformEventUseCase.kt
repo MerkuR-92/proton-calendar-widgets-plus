@@ -279,7 +279,8 @@ class TransformEventUseCase @Inject constructor(
             currentUserAttendeeId = currentUserAttendeeId,
             sharedEventId = eventEntity.sharedEventId,
             isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean(),
-            notifications = NotificationMigration(eventEntity.isPersonalMigrated ?: false, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() })
+            // if isPersonalMigrated is not provided, we fallback to `true` for subscribed calendars and `false` otherwise
+            notifications = NotificationMigration(eventEntity.isPersonalMigrated ?: calendar.isSubscribed, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() })
         )
 
     }
