@@ -229,11 +229,14 @@ data class Event private constructor(
             iCalEvent.alarms.removeAt(it)
         }
 
-        Notification.fromVAlarm(alarm)?.let { notificationToDelete ->
+        val notificationsWithAlarmRemoved = Notification.fromVAlarm(alarm)?.let { notificationToDelete ->
             notifications.notifications?.indexOfFirst { it.isTheSameAs(notificationToDelete) }.takeIf { it != -1 }?.let {
-                notifications = notifications.copy(notifications = notifications.notifications?.toMutableList()?.apply { removeAt(it) })
+                notifications.notifications?.toMutableList()?.apply { removeAt(it) }
             }
         }
+
+        // when removing alarms, we replace null `notifications` with empty list
+        notifications = notifications.copy(notifications = notificationsWithAlarmRemoved ?: emptyList())
     }
     
     val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
