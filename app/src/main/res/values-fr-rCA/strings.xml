@@ -16,6 +16,8 @@
     <string name="dialog_button_cancel">Annuler</string>
     <string name="dialog_button_continue">Continuer</string>
     <string name="dialog_button_close">Fermer</string>
+    <string name="dialog_button_remove">Remove</string>
+    <string name="dialog_button_download">Download</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Un courriel d\'annulation sera envoyé aux participant·e·s de l\'événement. Voulez-vous supprimer cet événement?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Votre adresse est désactivée. Un courriel d\'annulation ne peut donc pas être envoyé aux participant·e·s à l\'événement. Voulez-vous tout de même supprimer cet événement?</string>
@@ -142,6 +144,29 @@
     <string name="event_text_attendees_none">Aucun</string>
     <string name="event_text_calendar">Calendrier</string>
     <string name="event_text_timezone_start">Fuseau horaire</string>
+    <!-- SEARCH -->
+    <string name="search_hint_input_field">What are you looking for?</string>
+    <string name="search_empty_results_title">No results found</string>
+    <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
+    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
+    <string name="search_downloading_pause">Pause download</string>
+    <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
+    <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
+    <string name="search_settings_dialog_toggle_on_title">Download calendars to this device?</string>
+    <string name="search_settings_dialog_toggle_on_text">This is required so you can search.</string>
+    <string name="search_onboarding_header">Searching for something in your calendar?</string>
+    <string name="search_onboarding_text">In order to search your calendars you first need to download a local encrypted copy of your calendars. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_onboarding_action_download_calendars">Download calendars</string>
+    <string name="search_onboarding_action_pause">Pause</string>
+    <string name="search_onboarding_action_resume">Resume</string>
+    <string name="search_onboarding_action_retry">Retry</string>
+    <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
+    <string name="search_onboarding_progress_header_completed">Downloading completed</string>
+    <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
+    <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
+    <string name="search_spotlight_activation_snack">Calendar search activated</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Ajouter une notification</string>
     <string name="event_text_description">Description</string>
@@ -336,6 +361,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notifications de l\'événement</string>
     <string name="notification_channel_sync">Synchronisation de Calendar</string>
+    <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
     <string name="notification_sync">Synchronisation des calendriers…</string>
     <string name="notification_text_today">Aujourd\'hui</string>
     <string name="notification_text_today_part_time">Aujourd\'hui à %1$s</string>
@@ -362,6 +388,8 @@
     <string name="settings_time_format_title">Format de l\'heure</string>
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
     <string name="settings_auto_invites_title">Ajouter les invitations au calendrier et marquer comme en attente</string>
+    <string name="settings_search_title">Search calendars</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un routage réseau alternatif pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de conserver ce paramètre activé pour une plus grande fiabilité.</string>
     <string name="settings_value_placeholder">Touchez pour sélectionner</string>
@@ -467,6 +495,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Voici le nouveau Proton: plusieurs services, une seule mission. Bienvenue sur un internet où la vie privée est la règle absolue. <a href="https://proton.me/news/updated-proton">En savoir plus</a></string>
     <string name="spotlight_dialog_week_view_title">Plus d\'options d\'affichage</string>
     <string name="spotlight_dialog_week_view_description">• Voici les vues de calendrier <b>3 jours</b> et <b>Semaine</b>. Sélectionnez votre vue préférée dans le <b>menu</b>.\n\n• Ajustez la hauteur des lignes de la grille des jours en pinçant avec deux doigts pour faire un zoom avant ou arrière.</string>
+    <string name="spotlight_dialog_search_title">Search seamlessly</string>
+    <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
@@ -568,6 +598,14 @@
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ou\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>
         <item quantity="other">\u0020ou\n • Fusionner au moins %1$d calendriers avec les calendriers Proton existants.</item>
+    </plurals>
+    <plurals name="plural_seconds">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
+    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
+        <item quantity="one">%1$s remaining…</item>
+        <item quantity="other">%1$s remaining…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>

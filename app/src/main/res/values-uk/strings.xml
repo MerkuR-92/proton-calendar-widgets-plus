@@ -16,6 +16,8 @@
     <string name="dialog_button_cancel">Скасувати</string>
     <string name="dialog_button_continue">Продовжити</string>
     <string name="dialog_button_close">Закрити</string>
+    <string name="dialog_button_remove">Вилучити</string>
+    <string name="dialog_button_download">Завантажити</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Лист про скасування буде надіслано всім учасникам події. Бажаєте видалити цю подію?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Ваша адреса вимкнена. Неможливо надіслати лист про скасування учасникам події. Бажаєте все одно видалити цю подію?</string>
@@ -142,6 +144,29 @@
     <string name="event_text_attendees_none">Ніхто</string>
     <string name="event_text_calendar">Календар</string>
     <string name="event_text_timezone_start">Часовий пояс</string>
+    <!-- SEARCH -->
+    <string name="search_hint_input_field">Що ви шукаєте?</string>
+    <string name="search_empty_results_title">Результатів не знайдено</string>
+    <string name="search_empty_results_subtitle">Спробуйте інший термін, наприклад, Андрій, день народження, вебінар, книжковий клуб.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Завантаження календарів (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">Залишилося %1$s…</string>
+    <string name="search_downloading_time_remaining_unknown">обчислення часу до завершення…</string>
+    <string name="search_downloading_pause">Призупинити завантаження</string>
+    <string name="search_settings_dialog_toggle_off_title">Вилучити всі завантажені календарі?</string>
+    <string name="search_settings_dialog_toggle_off_text">Вам потрібно буде завантажити календарі ще раз, якщо ви хочете здійснити пошук.</string>
+    <string name="search_settings_dialog_toggle_on_title">Завантажити календарі на цей пристрій?</string>
+    <string name="search_settings_dialog_toggle_on_text">Це необхідно, щоб ви могли здійснювати пошук.</string>
+    <string name="search_onboarding_header">Шукаєте щось у своєму календарі?</string>
+    <string name="search_onboarding_text">Для пошуку календарів спочатку необхідно завантажити локальну зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="search_onboarding_action_download_calendars">Завантажити календарі</string>
+    <string name="search_onboarding_action_pause">Призупинити</string>
+    <string name="search_onboarding_action_resume">Продовжити</string>
+    <string name="search_onboarding_action_retry">Повторити спробу</string>
+    <string name="search_onboarding_progress_header_ongoing">Завантаження календарів…</string>
+    <string name="search_onboarding_progress_header_completed">Завантаження завершено</string>
+    <string name="search_onboarding_progress_header_paused">Завантаження календарів призупинено</string>
+    <string name="search_onboarding_progress_header_error">Помилка завантаження календарів</string>
+    <string name="search_spotlight_activation_snack">Активовано пошук за календарем</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Додати сповіщення</string>
     <string name="event_text_description">Опис</string>
@@ -336,6 +361,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Сповіщення про події</string>
     <string name="notification_channel_sync">Синхронізація календаря</string>
+    <string name="notification_channel_calendar_fetch">Отримання календарів</string>
     <string name="notification_sync">Синхронізація календарів…</string>
     <string name="notification_text_today">Сьогодні</string>
     <string name="notification_text_today_part_time">Сьогодні о %1$s</string>
@@ -362,6 +388,8 @@
     <string name="settings_time_format_title">Формат часу</string>
     <string name="settings_week_numbers_title">Показати номери тижнів</string>
     <string name="settings_auto_invites_title">Додати запрошення до календаря та додати його в чергу</string>
+    <string name="settings_search_title">Пошук календарів</string>
+    <string name="settings_search_subtitle">Завантаження та збереження вмісту календаря на пристрої для подальшого пошуку. Якщо вимкнути цю функцію, завантажений вміст буде видалено.</string>
     <string name="settings_alternative_routing_title">Дозволити альтернативну маршрутизацію</string>
     <string name="settings_alternative_routing_subtitle">У випадку блокування сайтів Proton, цей параметр дозволяє програмі спробувати альтернативний мережевий маршрут для доступу до Proton, що може бути корисним для обходу мережевих екранів чи мережевих проблем. Рекомендовано увімкнути цей параметр для більшої надійності.</string>
     <string name="settings_value_placeholder">Торкніться, щоб вибрати</string>
@@ -467,6 +495,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до Інтернету, де приватність — це стандарт. <a href="https://proton.me/news/updated-proton">Докладніше</a></string>
     <string name="spotlight_dialog_week_view_title">Більше варіантів перегляду</string>
     <string name="spotlight_dialog_week_view_description">• Представляємо перегляд календаря на <b>3 дні</b> й на <b>тиждень</b>. Виберіть потрібний вигляд у <b>меню</b>.\n\n• Налаштуйте висоту рядків у сітці дня, зводячи двома пальцями, щоб збільшити або зменшити масштаб.</string>
+    <string name="spotlight_dialog_search_title">Легкий пошук</string>
+    <string name="spotlight_dialog_search_description">Тепер ви можете здійснювати пошук подій. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
@@ -586,6 +616,18 @@
         <item quantity="few">\u0020або\n • Обʼєднайте принаймні %1$d календарі з наявними календарями Proton.</item>
         <item quantity="many">\u0020або\n • Обʼєднайте принаймні %1$d календарів з наявними календарями Proton.</item>
         <item quantity="other">\u0020або\n • Обʼєднайте принаймні %1$d календарів із наявними календарями Proton.</item>
+    </plurals>
+    <plurals name="plural_seconds">
+        <item quantity="one">секунда</item>
+        <item quantity="few">секунди</item>
+        <item quantity="many">секунд</item>
+        <item quantity="other">секунди</item>
+    </plurals>
+    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
+        <item quantity="one">Залишилася %1$s…</item>
+        <item quantity="few">Залишилося %1$s…</item>
+        <item quantity="many">Залишилося %1$s…</item>
+        <item quantity="other">Залишилося %1$s…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">хвилина</item>

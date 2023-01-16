@@ -16,6 +16,8 @@
     <string name="dialog_button_cancel">Cancel·la</string>
     <string name="dialog_button_continue">Continua</string>
     <string name="dialog_button_close">Tanca</string>
+    <string name="dialog_button_remove">Remove</string>
+    <string name="dialog_button_download">Download</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">S\'enviarà un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">La vostra adreça està desactivada. No es pot enviar un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir l\'esdeveniment igualment?</string>
@@ -142,6 +144,29 @@
     <string name="event_text_attendees_none">Cap</string>
     <string name="event_text_calendar">Calendari</string>
     <string name="event_text_timezone_start">Fus horari</string>
+    <!-- SEARCH -->
+    <string name="search_hint_input_field">What are you looking for?</string>
+    <string name="search_empty_results_title">No results found</string>
+    <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
+    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
+    <string name="search_downloading_pause">Pause download</string>
+    <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
+    <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
+    <string name="search_settings_dialog_toggle_on_title">Download calendars to this device?</string>
+    <string name="search_settings_dialog_toggle_on_text">This is required so you can search.</string>
+    <string name="search_onboarding_header">Searching for something in your calendar?</string>
+    <string name="search_onboarding_text">In order to search your calendars you first need to download a local encrypted copy of your calendars. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_onboarding_action_download_calendars">Download calendars</string>
+    <string name="search_onboarding_action_pause">Pause</string>
+    <string name="search_onboarding_action_resume">Resume</string>
+    <string name="search_onboarding_action_retry">Retry</string>
+    <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
+    <string name="search_onboarding_progress_header_completed">Downloading completed</string>
+    <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
+    <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
+    <string name="search_spotlight_activation_snack">Calendar search activated</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Afegir notificació</string>
     <string name="event_text_description">Descripció</string>
@@ -336,6 +361,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificacions d\'esdeveniment</string>
     <string name="notification_channel_sync">Sincronització del calendari</string>
+    <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
     <string name="notification_sync">Sincronitzant calendaris…</string>
     <string name="notification_text_today">Avui</string>
     <string name="notification_text_today_part_time">Avui, %1$s</string>
@@ -362,6 +388,8 @@
     <string name="settings_time_format_title">Format d\'hora</string>
     <string name="settings_week_numbers_title">Mostrar el número de setmana</string>
     <string name="settings_auto_invites_title">Afegir invitacions al calendari i marcar-les com a pendents</string>
+    <string name="settings_search_title">Search calendars</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
     <string name="settings_alternative_routing_title">Permetre encaminament alternatiu</string>
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
     <string name="settings_value_placeholder">Toqueu per seleccionar</string>
@@ -467,6 +495,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
     <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
     <string name="spotlight_dialog_week_view_description">• Presentem la vista de calendari de <b>3 dies</b> i <b>Setmanal</b>. Seleccioneu la vostra vista preferida del <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
+    <string name="spotlight_dialog_search_title">Search seamlessly</string>
+    <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permetre l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicia sessió a Google Calendar i dona permís a Proton per accedir a les teves dades.</string>
@@ -570,6 +600,14 @@
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020o\n • Combineu almenys %1$d calendari importat amb els vostres calendaris Proton existents.</item>
         <item quantity="other">\u0020o\n • Combineu almenys %1$d calendaris importats amb els vostres calendaris Proton existents.</item>
+    </plurals>
+    <plurals name="plural_seconds">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
+    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
+        <item quantity="one">%1$s remaining…</item>
+        <item quantity="other">%1$s remaining…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
