@@ -388,15 +388,12 @@ class HandleIcsUseCase @Inject constructor(
                         currentParticipationStatus
 
                     // Copy existing alarms
-                    // TODO newICalendar seems unused later on, if it really is used we need to make sure
-                    //  we setup the "notifications" property correctly (can't do it here because we're not working
-                    //  with Event.kt, but ICalendar)
                     newICalendar.events.first().alarms.clear()
                     newICalendar.events.first().alarms.addAll(existingEvent.iCalEvent.alarms)
                 }
             }
 
-            Event.from(existingEvent)
+            Event.from(existingEvent, iCalendar = newICalendar)
         }
 
         return editCreateEventFromIcs(
