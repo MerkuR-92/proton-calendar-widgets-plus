@@ -138,19 +138,8 @@ class HandleIcsUseCase @Inject constructor(
 
         val immutableExistingEvent = existingEvent
 
-        return if (immutableExistingEvent != null) {
+        if (immutableExistingEvent != null && immutableExistingEvent == newEvent) {
             // Event already exists
-
-            /*
-            If it does, there are two possibilities:
-                1. Nothing relevant in the event (date-times, recurring rule, summary, location or description) has changed.
-                    In this case, no action for importing should be offered as the user has already imported the event
-                    (if she added notifications or changed the calendar we still consider it as the same event).
-                2. Something relevant has changed. In this case, since the UID hasn't changed,
-                    we can be sure that it's been the user changing something in the event herself, and not the original provider.
-                    Clients can then inform the user that she's opening an outdated version of the event.
-             */
-
             return IcsSurgeryUtils.HandleIcsResult.Success(immutableExistingEvent.id, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = immutableExistingEvent.isRecurring())
         } else {
             when (val editCreateEventResult = editCreateEventUseCase.execute(userId, newEvent, isImport = true)) {

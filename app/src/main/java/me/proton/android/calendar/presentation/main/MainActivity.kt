@@ -685,8 +685,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
         lifecycleScope.launch {
+            val snackBar = displaySnackBar(getString(R.string.snack_opening_ics), Snackbar.LENGTH_INDEFINITE)
             val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, senderEmail, recipientEmail)
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
+                snackBar.dismiss()
                 when (handleIcsImportResult.action) {
                     // We use Toast because we do not have the EventDetails view required for SnackBar to be displayed
                     IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT ->
@@ -707,6 +709,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
                 safeNavigateToDialogFragment(eventDetailsDeepLink)
             } else {
+                snackBar.dismiss()
                 var navigatedToDetails = false
                 when (handleIcsImportResult) {
                     is Error.DefaultError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
