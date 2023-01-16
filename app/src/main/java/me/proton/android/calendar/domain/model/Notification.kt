@@ -1,7 +1,6 @@
 package me.proton.android.calendar.domain.model
 
 import biweekly.component.VAlarm
-import biweekly.property.Action
 import biweekly.property.Trigger
 
 sealed class Notification(val trigger: Trigger) {
@@ -11,11 +10,11 @@ sealed class Notification(val trigger: Trigger) {
     fun toVAlarm(): VAlarm = if (this is Display) VAlarm.display(trigger, null) else VAlarm.email(trigger, null, null)
 
     companion object {
-        fun fromVAlarm(vAlarm: VAlarm) = if (vAlarm.action.isDisplay) {
-            Display(vAlarm.trigger)
-        } else if (vAlarm.action.isEmail) {
-            Email(vAlarm.trigger)
-        } else null
+        fun fromVAlarm(vAlarm: VAlarm) = when {
+            vAlarm.action.isDisplay -> Display(vAlarm.trigger)
+            vAlarm.action.isEmail -> Email(vAlarm.trigger)
+            else -> null
+        }
     }
 }
 

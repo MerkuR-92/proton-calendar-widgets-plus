@@ -15,40 +15,32 @@ data class NotificationEntity(
     @SerialName("Trigger")
     val trigger: String // RFC5545 encoded trigger
 ) {
-    fun parseTrigger(): Trigger? {
+    private fun parseTrigger(): Trigger? {
         return try {
             Trigger(Duration.parse(trigger), Related.START)
-        } catch(e: IllegalArgumentException) {
+        } catch (e: IllegalArgumentException) {
             null
         }
     }
 
-    fun toNotification(): Notification? = parseTrigger()?.let {
+    fun toNotification(): Notification? = parseTrigger()?.let { trigger ->
         when (type) {
-            0 -> {
-                Notification.Email(it)
-            }
-            1 -> {
-                Notification.Display(it)
-            }
+            0 -> Notification.Email(trigger)
+            1 -> Notification.Display(trigger)
             else -> null
         }
     }
 
-    fun toVAlarm(): VAlarm? = parseTrigger()?.let {
+    fun toVAlarm(): VAlarm? = parseTrigger()?.let { trigger ->
         when (type) {
-            0 -> {
-                VAlarm.email(it, null, null)
-            }
-            1 -> {
-                VAlarm.display(it, null)
-            }
+            0 -> VAlarm.email(trigger, null, null)
+            1 -> VAlarm.display(trigger, null)
             else -> null
         }
     }
 
     companion object {
-        fun fromNotification(notification: Notification) = when(notification) {
+        fun fromNotification(notification: Notification) = when (notification) {
             is Notification.Email -> NotificationEntity(0, notification.trigger.duration.toString())
             is Notification.Display -> NotificationEntity(1, notification.trigger.duration.toString())
         }
