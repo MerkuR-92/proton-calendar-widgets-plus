@@ -16,6 +16,8 @@
     <string name="dialog_button_cancel">Anulare</string>
     <string name="dialog_button_continue">Continuare</string>
     <string name="dialog_button_close">Închidere</string>
+    <string name="dialog_button_remove">Eliminare</string>
+    <string name="dialog_button_download">Descărcare</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Un e-mail de anulare va fi trimis participanților la eveniment. Doriți să ștergeți acest eveniment?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Adresa vă este dezactivată. Un e-mail de anulare nu poate fi trimis participanților la eveniment. Doriți totuși să ștergeți acest eveniment?</string>
@@ -142,6 +144,29 @@
     <string name="event_text_attendees_none">Niciunul</string>
     <string name="event_text_calendar">Calendar</string>
     <string name="event_text_timezone_start">Fus orar</string>
+    <!-- SEARCH -->
+    <string name="search_hint_input_field">Ce căutați?</string>
+    <string name="search_empty_results_title">Nu s-au găsit rezultate.</string>
+    <string name="search_empty_results_subtitle">Încercați alt termen, de exemplu: Eric, aniversare, conferinta, club carte.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Calendarele se descarcă (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">Timp rămas %1$s…</string>
+    <string name="search_downloading_time_remaining_unknown">Se estimează timpul rămas…</string>
+    <string name="search_downloading_pause">Suspendare descărcare</string>
+    <string name="search_settings_dialog_toggle_off_title">Eliminați toate calendarele descărcate?</string>
+    <string name="search_settings_dialog_toggle_off_text">Trebuie să descărcați toate calendarele dacă doriți să căutați.</string>
+    <string name="search_settings_dialog_toggle_on_title">Descărcați calendarele pe acest dispozitiv?</string>
+    <string name="search_settings_dialog_toggle_on_text">Este necesar pentru a putea căuta.</string>
+    <string name="search_onboarding_header">Căutați ceva în calendar?</string>
+    <string name="search_onboarding_text">Pentru a căuta în calendare mai întâi trebuie descărcată o copie locală criptată a acestora. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
+    <string name="search_onboarding_action_download_calendars">Descărcare calendare</string>
+    <string name="search_onboarding_action_pause">Suspendare</string>
+    <string name="search_onboarding_action_resume">Reluare</string>
+    <string name="search_onboarding_action_retry">Reîncercare</string>
+    <string name="search_onboarding_progress_header_ongoing">Calendarele se descarcă…</string>
+    <string name="search_onboarding_progress_header_completed">Descărcare finalizată</string>
+    <string name="search_onboarding_progress_header_paused">Descărcare calendare suspendată</string>
+    <string name="search_onboarding_progress_header_error">Eroare la descărcarea calendarelor</string>
+    <string name="search_spotlight_activation_snack">Căutarea în calendare activată</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Adăugare notificare</string>
     <string name="event_text_description">Descriere</string>
@@ -336,6 +361,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificări eveniment</string>
     <string name="notification_channel_sync">Sincronizare calendar</string>
+    <string name="notification_channel_calendar_fetch">Se preiau calendarele</string>
     <string name="notification_sync">Se sincronizează calendarele…</string>
     <string name="notification_text_today">Astăzi</string>
     <string name="notification_text_today_part_time">Astăzi, la %1$s</string>
@@ -362,6 +388,8 @@
     <string name="settings_time_format_title">Format oră</string>
     <string name="settings_week_numbers_title">Afișare număr săptămână</string>
     <string name="settings_auto_invites_title">Adăugare invitații în calendar și marcare ca fiind în așteptare</string>
+    <string name="settings_search_title">Căutare calendare</string>
+    <string name="settings_search_subtitle">Se descarcă și se stochează conținutul calendarelor pe dispozitiv pentru a putea căuta. Dezactivarea acestei opțiuni va șterge conținutul descărcat.</string>
     <string name="settings_alternative_routing_title">Permitere rută alternativă</string>
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
@@ -467,6 +495,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="https://proton.me/news/updated-proton">Detalii</a></string>
     <string name="spotlight_dialog_week_view_title">Mai multe opțiuni de afișare</string>
     <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
+    <string name="spotlight_dialog_search_title">Căutați fără probleme</string>
+    <string name="spotlight_dialog_search_description">Acum puteți căuta evenimentele. Se va descărca o copie criptată a calendarelor pe dispozitiv. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
@@ -577,6 +607,16 @@
         <item quantity="one">\u0020sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
         <item quantity="few">\u0020sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
         <item quantity="other">\u0020sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>
+    </plurals>
+    <plurals name="plural_seconds">
+        <item quantity="one">secundă</item>
+        <item quantity="few">secunde</item>
+        <item quantity="other">de secunde</item>
+    </plurals>
+    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
+        <item quantity="one">Timp rămas %1$s…</item>
+        <item quantity="few">Timp rămas %1$s…</item>
+        <item quantity="other">Timp rămas %1$s…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
