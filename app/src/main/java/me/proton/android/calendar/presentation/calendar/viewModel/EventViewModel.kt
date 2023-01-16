@@ -2759,7 +2759,7 @@ class EventViewModel @Inject constructor(
                     // we don't need to load settings here anymore, but let's keep it in case of side effects
                     eventCopy.setDefaultAlarms()
                     val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(eventCopy.iCalendar)
-                    calendarSplit.personalPart?.printToString() to eventCopy.notifications.notifications
+                    calendarSplit.personalPart?.printToString() to null // null means default calendar notifications in "revamped system"
                 } else null to null
             } else {
                 // else keep notifications as it is
