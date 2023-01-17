@@ -36,7 +36,7 @@ class CalendarSettingsEventListenerTest {
     }
 
     @Test
-    fun `onCreateOrUpdate persists the calendar settings if calendar is present`() {
+    fun `onCreateOrUpdate calls calendarSettingsChangedUseCase if calendars are present`() {
         runBlocking {
             val entities = listOf(
                 CalendarSettingsEntity(calendarSettingsId, calendarId, defaultEventDuration, emptyList(), emptyList()),
@@ -45,23 +45,7 @@ class CalendarSettingsEventListenerTest {
 
             listener.onCreateOrUpdate(config, entities)
 
-            coVerify(exactly = entities.count()) { calendarsRepository.persistCalendarSettings(any()) }
-        }
-    }
-
-    @Test
-    fun `onCreateOrUpdate doesn't persist the calendar settings if calendar is not present`() {
-        runBlocking {
-            coEvery { calendarsRepository.hasCalendar(any()) } returns false
-            val entities = listOf(
-                CalendarSettingsEntity(calendarSettingsId, calendarId, defaultEventDuration, emptyList(), emptyList()),
-                CalendarSettingsEntity(calendarSettingsId, calendarId, defaultEventDuration, emptyList(), emptyList()),
-            )
-
-            listener.onCreateOrUpdate(config, entities)
-
-            coVerify(exactly = 0) { calendarsRepository.persistCalendarSettings(any()) }
-            coVerify { logger.i(any()) }
+            coVerify(exactly = entities.count()) { calendarSettingsChangedUseCase.execute(any(), any()) }
         }
     }
 

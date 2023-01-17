@@ -31,6 +31,8 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Notification
+import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
@@ -251,6 +253,9 @@ class HandleIcsUseCase @Inject constructor(
             existingCalendarEntity
         } else null
 
+        // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones
+        val notifications = NotificationMigration(false, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
+
         // Create a new event with the clean iCalendar
         val newEvent = Event.from(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
@@ -261,8 +266,10 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,
                 existingCalendar?.type ?: defaultCalendar.type,
-                existingCalendar?.permissions ?: defaultCalendar.permissions
-            ), iCalendar, Instant.now().epochSecond) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
+                existingCalendar?.permissions ?: defaultCalendar.permissions,
+                defaultCalendar.defaultPartDayNotifications,
+                defaultCalendar.defaultFullDayNotifications
+            ), iCalendar, Instant.now().epochSecond, notifications = notifications) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel
         val isNewSingleEditCancelled = isNew && existingEvent == null && iCalendar.method.isCancel
@@ -363,7 +370,7 @@ class HandleIcsUseCase @Inject constructor(
 
             // Cancel the event via the sync route by changing STATUS, DTSTAMP (update with the ICS DTSTAMP), and drop the alarms
             existingEvent.iCalEvent.status = Status.cancelled()
-            existingEvent.iCalEvent.alarms?.clear()
+            existingEvent.clearAlarms()
             existingEvent.iCalEvent.dateTimeStamp = newICalendar.events.first().dateTimeStamp
             existingEvent
         } else {
@@ -386,7 +393,7 @@ class HandleIcsUseCase @Inject constructor(
                 }
             }
 
-            Event.from(existingEvent)
+            Event.from(existingEvent, iCalendar = newICalendar)
         }
 
         return editCreateEventFromIcs(
@@ -436,6 +443,7 @@ class HandleIcsUseCase @Inject constructor(
                         existingEvent.id,
                         attendeeStatusEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(),
                         updatedAttendee.participationStatus.toInt(),
+                        null,
                         null,
                         newUpdateTime
                     )

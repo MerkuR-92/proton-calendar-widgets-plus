@@ -57,5 +57,9 @@ data class EventEntity(
     @SerialName("Attendees")
     val attendees: List<JsonElement>,
     @SerialName("IsProtonProtonInvite")
-    val isProtonProtonInvite: Int? // 1 if is proton to proton invite
+    val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
+    @SerialName("IsPersonalMigrated")
+    val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
+    @SerialName("Notifications")
+    val notifications: List<JsonElement>? = null
 )

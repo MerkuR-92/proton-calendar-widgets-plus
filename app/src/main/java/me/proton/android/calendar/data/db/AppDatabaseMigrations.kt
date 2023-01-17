@@ -330,4 +330,53 @@ object AppDatabaseMigrations {
             PaymentDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_45_46 = object : Migration(45, 46) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            database.addTableColumn(AppDatabase.TABLE_EVENTS, "isPersonalMigrated", "INTEGER")
+            database.addTableColumn(AppDatabase.TABLE_EVENTS, "notifications", "TEXT")
+
+        }
+    }
+
+    val MIGRATION_46_47 = object : Migration(46, 47) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+
+            // 1. add new columns to Member
+            database.addTableColumn(
+                table = TABLE_MEMBERS,
+                column = "name",
+                type = "TEXT NOT NULL",
+                defaultValue = ""
+            )
+            database.addTableColumn(
+                table = TABLE_MEMBERS,
+                column = "description",
+                type = "TEXT NOT NULL",
+                defaultValue = ""
+            )
+
+            // 2. copy the values from Calendar to Member
+            database.query("SELECT id, name, description FROM $TABLE_CALENDARS").let {
+                while (it.moveToNext()) {
+                    database.execSQL("UPDATE $TABLE_MEMBERS SET name = \"${it.getString(1)}\", description = ${it.getInt(2)} WHERE calendarId = \"${it.getString(0)}\"")
+                }
+            }
+
+            // 3. create temp Calendar table with new schema and copy values
+            database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_CALENDARS + "_temp"}` (`id` TEXT NOT NULL, `type` INTEGER NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            database.execSQL("INSERT INTO `${TABLE_CALENDARS + "_temp"}`(id, type, fkUserId) SELECT id, type, fkUserId FROM `${TABLE_CALENDARS}`")
+
+            // 4. drop old Calendar table
+            database.execSQL("DROP TABLE `${TABLE_CALENDARS}`")
+
+            // 5. rename temp Calendar to new Calendar table
+            database.execSQL("ALTER TABLE `${TABLE_CALENDARS + "_temp"}` RENAME TO `${TABLE_CALENDARS}`")
+
+            // 6. recreate index
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_calendars_fkUserId` ON `${TABLE_CALENDARS}` (`fkUserId`)")
+
+        }
+    }
 }

@@ -151,7 +151,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val skeletonEventsCacheMutex = Mutex()
 
     private val visibleCalendarEntitiesFlow =
-        database.calendarsDao().flowCalendars().joinToCalendars(database).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
+        database.calendarsDao().flowCalendars().joinToCalendars(database, json).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
             .map { it.filterVisibleCalendars() }.distinctUntilChanged()
             .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
@@ -353,7 +353,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun selectCalendar(calendarId: String): Calendar? {
-        return database.calendarsDao().selectById(calendarId)?.joinToCalendar(database)
+        return database.calendarsDao().selectById(calendarId)?.joinToCalendar(database, json)
     }
 
     override suspend fun selectCalendars(userId: String): List<CalendarEntity> {
@@ -361,19 +361,19 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun selectUserCalendars(userId: String): List<Calendar> {
-        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database)
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json)
     }
 
     override suspend fun selectActiveUserCalendars(userId: String): List<Calendar> {
-        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isActive }
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter { it.isActive }
     }
 
     override suspend fun selectDisabledUserCalendars(userId: String): List<Calendar> {
-        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isDisabled }
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter { it.isDisabled }
     }
 
     override suspend fun selectInactiveUserCalendars(userId: String): List<Calendar> {
-        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database).filter { it.isInactive }
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter { it.isInactive }
     }
 
     override suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity> {
@@ -381,23 +381,23 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isActive } }.distinctUntilChanged()
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).transform<List<Calendar>, List<Calendar>> { it.filter { it.isActive } }.distinctUntilChanged()
     }
 
     override fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isDisabled } }.distinctUntilChanged()
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).transform<List<Calendar>, List<Calendar>> { it.filter { it.isDisabled } }.distinctUntilChanged()
     }
 
     override fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).transform<List<Calendar>, List<Calendar>> { it.filter { it.isInactive } }.distinctUntilChanged()
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).transform<List<Calendar>, List<Calendar>> { it.filter { it.isInactive } }.distinctUntilChanged()
     }
 
     override fun flowUserCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database).distinctUntilChanged()
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
     override fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowSubscribedCalendars(userId).joinToCalendars(database).distinctUntilChanged()
+        return database.calendarsDao().flowSubscribedCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
@@ -425,8 +425,11 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
         return fetchCalendarEntities(userId)?.map {
-            val member = fetchMembers(userId, it.id)?.firstOrNull() ?: return null
-            Calendar.from(it, member)
+            Calendar.from(
+                it,
+                fetchMembers(userId, it.id)?.firstOrNull() ?: return null,
+                fetchCalendarSettings(userId, it.id) ?: return null,
+                json)
         }
     }
 
@@ -437,7 +440,11 @@ class CalendarsRepositoryImpl @Inject constructor(
         calendars: List<CalendarEntity>
     ): List<Calendar>? {
         return calendars.map {
-            Calendar.from(it, fetchMembers(userId, it.id)?.firstOrNull() ?: return null)
+            Calendar.from(
+                it,
+                fetchMembers(userId, it.id)?.firstOrNull() ?: return null,
+                fetchCalendarSettings(userId, it.id) ?: return null,
+                json)
         }
     }
 
@@ -451,12 +458,23 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    private suspend fun fetchCalendarSettings(userId: UserId, calendarId: String): CalendarSettingsEntity? {
+        val settingsResponse = calendarsApi.getCalendarSettings(userId, calendarId)
+        return if (settingsResponse !is ApiResponse.Success) {
+            logger.e("error getting CalendarSettings from API in CalendarsRepositoryImpl")
+            null
+        } else {
+            settingsResponse.data.calendarSettings
+        }
+    }
+
     override suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar? {
 
         val fetchedCalendar = calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar ?: return null
         val fetchedMember = calendarsApi.getMemberList(userId, calendarId).valueOrNullAndLogErrors(logger)?.members?.firstOrNull() ?: return null
+        val fetchedCalendarSettings = calendarsApi.getCalendarSettings(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendarSettings ?: return null
 
-        return Calendar.from(fetchedCalendar, fetchedMember)
+        return Calendar.from(fetchedCalendar, fetchedMember, fetchedCalendarSettings, json)
     }
 
     override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
@@ -1236,7 +1254,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
-fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List<Calendar>> {
+fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json): Flow<List<Calendar>> {
     return this.combine(database.membersDao().selectMembersFlow()) { calendars, members ->
         if (calendars.isNotEmpty()) {
             // Get user addresses so we can find the calendar member for current user
@@ -1244,6 +1262,7 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List
                 canonicalizeProtonEmail(it.email, forceCanonicalization = true)
             }
             calendars.mapNotNull { calendarEntity ->
+                val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
                 // Find the member that belongs to the current user
                 val userMember = members.firstOrNull {
                     // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members
@@ -1253,7 +1272,7 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List
                     ) }
                 }
                 // Map to Calendar
-                userMember?.let { Calendar.from(calendarEntity, it) }
+                userMember?.let { Calendar.from(calendarEntity, it, calendarSettings, json) }
             }
         } else emptyList()
     }
@@ -1262,26 +1281,27 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase): Flow<List
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
-suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase): List<Calendar> {
+suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase, json: Json): List<Calendar> {
     if (this.isEmpty()) return emptyList()
     // Get user addresses so we can find the calendar member for current user
     val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.first().fkUserId)).map {
         canonicalizeProtonEmail(it.email, forceCanonicalization = true)
     }
     return this.mapNotNull { calendarEntity ->
+        val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
         // Get all members for that calendar
         val calendarMembers = database.membersDao().select(calendarEntity.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
         // Map to Calendar
-        userMember?.let { Calendar.from(calendarEntity, it) }
+        userMember?.let { Calendar.from(calendarEntity, it, calendarSettings, json) }
     }
 }
 
 /**
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
-suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase): Calendar? {
+suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase, json: Json): Calendar? {
     return if (this == null) {
         null
     } else {
@@ -1289,12 +1309,13 @@ suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase): Calendar? {
         val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.fkUserId)).map {
             canonicalizeProtonEmail(it.email, forceCanonicalization = true)
         }
+        val calendarSettings = database.calendarSettingsDao().select(this.id) ?: return null
         // Get all members for that calendar
         val calendarMembers = database.membersDao().select(this.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
         // Map to Calendar
-        userMember?.let { Calendar.from(this, it) }
+        userMember?.let { Calendar.from(this, it, calendarSettings, json) }
     }
 }
 

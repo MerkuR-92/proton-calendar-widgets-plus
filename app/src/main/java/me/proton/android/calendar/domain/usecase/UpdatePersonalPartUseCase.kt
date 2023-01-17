@@ -1,12 +1,16 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PersonalEventContentApiRequest
 import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
@@ -26,7 +30,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
         const val WORKER_ID = "WORKER_ID_UPDATE_PERSONAL_PART"
     }
 
-    suspend fun execute(userId: UserId, calendarId: String, eventId: String, personalPartICalString: String): UseCase.Result {
+    suspend fun execute(userId: UserId, calendarId: String, eventId: String, personalPartICalString: String, notifications: List<Notification>?): UseCase.Result {
 
         val member = database.membersDao().select(calendarId).firstOrNull()
             ?: return UseCase.Result.InvalidParams("there is no valid first Member when updating Event personal part")
@@ -56,11 +60,12 @@ class UpdatePersonalPartUseCase @Inject constructor(
             eventId,
             UpdateEventPersonalPartApiRequest(
                 member.id,
-                personalEventContentApiRequest
+                personalEventContentApiRequest,
+                notifications = notifications?.map { NotificationEntity.fromNotification(it) }
             )
         )) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success<Unit>()
+                UseCase.Result.Success(updateEventPersonalPartResponse.data.event)
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("api error updating event personal part: $updateEventPersonalPartResponse")

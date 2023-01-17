@@ -35,8 +35,12 @@ data class MemberEntity(
     @SerialName("Display")
     val display: Int, // 0: hide, 1: show
     @SerialName("Flags")
-    val flags: Int
-) {
+    val flags: Int,
+    @SerialName("Name")
+    val name: String,
+    @SerialName("Description")
+    val description: String
+    ) {
     enum class Permission(val value: Int) { // TODO see if this is even deserialized
         /** has financial responsibility. There must always be exactly one owner but it can be transferred */
         SUPEROWNER(1),

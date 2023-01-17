@@ -39,9 +39,7 @@ class CalendarSettingsEventListener @Inject constructor(
             return
         }
         entities.forEach {
-            // we have to call this before persisting settings in DB, because otherwise new and old settings will be the same
             calendarSettingsChangedUseCase.execute(config.userId, it)
-            calendarsRepository.persistCalendarSettings(it)
         }
     }
 

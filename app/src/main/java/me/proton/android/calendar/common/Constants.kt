@@ -107,7 +107,6 @@ object FeatureFlag {
     const val OPEN_ICS = true
     const val OPEN_ICS_FILES = false
     const val APP_LINKS = true
-    const val ADD_EMAIL_NOTIFICATIONS = true
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
     const val USE_EVENT_DECRYPTOR = true
@@ -117,7 +116,6 @@ object FeatureFlag {
     const val SUBSCRIPTION = false
     const val FEEDBACK = true
     const val AUTO_INVITES_SETTING = true
-    const val ALARMS_IN_SUBSCRIBED_CALENDARS = true
     const val IMPORT_ASSISTANT = true
     const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
     const val THREE_DAYS_VIEW = true

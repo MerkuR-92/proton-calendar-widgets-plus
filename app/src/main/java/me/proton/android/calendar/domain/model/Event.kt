@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.model
 
 import biweekly.ICalendar
+import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
@@ -16,6 +17,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
@@ -33,7 +35,8 @@ data class Event private constructor(
     val decryptionStatus: DecryptionStatus? = null,
     val currentUserAttendeeId: String? = null,
     val sharedEventId: String? = null,
-    val isProtonProtonInvite: Boolean? = null
+    val isProtonProtonInvite: Boolean? = null,
+    var notifications: NotificationMigration = NotificationMigration(false, null)
 ) : BaseModel() {
 
     companion object {
@@ -47,7 +50,8 @@ data class Event private constructor(
             decryptionStatus: DecryptionStatus? = null,
             currentUserAttendeeId: String? = null,
             sharedEventId: String? = null,
-            isProtonProtonInvite: Boolean? = null
+            isProtonProtonInvite: Boolean? = null,
+            notifications: NotificationMigration? = null
         ): Event? {
 
             val vEvent = iCalendar.events.firstOrNull()
@@ -62,7 +66,8 @@ data class Event private constructor(
                     decryptionStatus,
                     currentUserAttendeeId,
                     sharedEventId,
-                    isProtonProtonInvite
+                    isProtonProtonInvite,
+                    notifications ?: NotificationMigration(false, null)
                 )
             } else null
 
@@ -70,13 +75,14 @@ data class Event private constructor(
 
         /**
          * Makes sure we have deep copy of [ICalendar] object inside [Event].
-         * Copy event with specified id / calendar / iCalendar values
+         * Copy event with specified id / calendar / iCalendar / notifications values
          * and Timezone Assignments
          */
         fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
             val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
             val endTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
+            val notifications = NotificationMigration(event.notifications.isMigrated, (iCalendar ?: event.iCalendar).events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
             return event.copy(
                 id = id ?: event.id,
                 calendar = calendar ?: event.calendar,
@@ -104,7 +110,8 @@ data class Event private constructor(
                     setStartTimeZone(startTimezoneId)
                     setEndTimeZone(endTimezoneId)
                     setDefaultTimeZone(defaultTimezoneId)
-                })
+                },
+                notifications = notifications)
         }
 
         /**
@@ -119,7 +126,7 @@ data class Event private constructor(
             return if (vEvent?.sanitise() == true) {
                 Event(
                     "",
-                    Calendar("", "", "", "", 1, true, 0, 0),
+                    Calendar("", "", "", "", 1, true, 0, 0, emptyList(), emptyList()),
                     iCalendar,
                     0
                 )
@@ -169,6 +176,71 @@ data class Event private constructor(
 
     val status: Status? get() = iCalEvent.status
 
+    /**
+     * Use this getter to handle Alarms instead of taking them directly from ICS. This contains custom logic
+     * for supporting default Calendar Alarms that can't be represented easily in ICS.
+     */
+    val alarms: List<VAlarm> get() {
+        return if (notifications.isMigrated) {
+            if (notifications.notifications == null) { // take defaults from Calendar
+                if (isAllDay()) {
+                    calendar.defaultFullDayNotifications.map { it.toVAlarm() }
+                } else {
+                    calendar.defaultPartDayNotifications.map { it.toVAlarm() }
+                }
+            } else { // take migrated Alarms
+                notifications.notifications?.map { it.toVAlarm() } ?: emptyList()
+            }
+        } else { // take Alarms from PersonalPart baked into ICS
+            iCalEvent.alarms
+        }
+    }
+
+    fun clearAlarms() {
+        iCalEvent.alarms?.clear()
+        notifications = notifications.copy(notifications = emptyList())
+    }
+
+    fun setDefaultAlarms() {
+        iCalEvent.alarms?.clear()
+
+        // as long as we need PersonalPart generated from ICS, we keep injecting VAlarms
+        if (isAllDay()) {
+            calendar.defaultFullDayNotifications
+        } else {
+            calendar.defaultPartDayNotifications
+        }.forEach {
+            iCalEvent.addAlarm(it.toVAlarm())
+        }
+
+        notifications = notifications.copy(notifications = null)
+    }
+
+    fun addAlarms(alarmsToAdd: List<VAlarm>) {
+        iCalEvent.alarms.addAll(alarmsToAdd) // as long as we need PersonalPart generated from ICS, we keep injecting VAlarms
+
+        val currentNotifications = if (notifications.notifications == null) { // before adding new alarms, inject the default calendar alarms
+            if (this.isAllDay()) calendar.defaultFullDayNotifications else calendar.defaultPartDayNotifications
+        } else notifications.notifications
+
+        notifications = notifications.copy(notifications = currentNotifications?.plus( alarmsToAdd.mapNotNull { Notification.fromVAlarm(it) }))
+    }
+
+    fun removeAlarm(alarm: VAlarm) {
+        iCalEvent.alarms.indexOfFirst { it.isTheSameAs(alarm) }.takeIf { it != -1 }?.let {
+            iCalEvent.alarms.removeAt(it)
+        }
+
+        val notificationsWithAlarmRemoved = Notification.fromVAlarm(alarm)?.let { notificationToDelete ->
+            notifications.notifications?.indexOfFirst { it.isTheSameAs(notificationToDelete) }.takeIf { it != -1 }?.let {
+                notifications.notifications?.toMutableList()?.apply { removeAt(it) }
+            }
+        }
+
+        // when removing alarms, we replace null `notifications` with empty list
+        notifications = notifications.copy(notifications = notificationsWithAlarmRemoved ?: emptyList())
+    }
+    
     val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
 
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
@@ -182,7 +254,7 @@ data class Event private constructor(
 
     val isProtonProtonReply = iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_PROTON_REPLY)?.value == "TRUE"
 
-    val hasEmailNotifications: Boolean get() = this.iCalEvent.alarms.any { it.action == Action.email() }
+    val hasEmailNotifications: Boolean get() = this.alarms.any { it.action == Action.email() }
 
     fun getStart(timeZoneId: String): ZonedDateTime {
         return iCalEvent.getStart(timeZoneId)!!

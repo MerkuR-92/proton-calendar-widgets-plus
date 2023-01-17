@@ -794,7 +794,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             }
 
             // Default alarms will be added when changing answer from Declined to Accepted. Need to add it to the copy to match the event in sendReplyToOrganizer.
-            eventCopy.iCalEvent.alarms.clear()
+            eventCopy.clearAlarms()
 
             val userAttendee = Attendee(userName, userEmail)
             userAttendee.participationStatus = ParticipationStatus.ACCEPTED
@@ -919,7 +919,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
             }
 
             // Default alarms will be added when changing answer from Declined to Accepted. Need to add it to the copy to match the event in sendReplyToOrganizer.
-            eventCopy.iCalEvent.alarms.clear()
+            eventCopy.clearAlarms()
 
             val userAttendee = Attendee(userName, userEmail)
             userAttendee.participationStatus = ParticipationStatus.ACCEPTED

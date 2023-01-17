@@ -783,7 +783,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         val event = eventViewModel.eventLiveData.value!!
 
-        event.iCalEvent.alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
+        event.alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
             val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
             alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
@@ -793,7 +793,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
                 setOnSingleClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
-                    eventViewModel.handleAlarmDelete(index)
+                    eventViewModel.handleAlarmDelete(alarm)
                 }
                 isClickable = true
             }

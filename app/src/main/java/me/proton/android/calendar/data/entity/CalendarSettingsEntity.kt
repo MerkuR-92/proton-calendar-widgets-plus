@@ -5,9 +5,6 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import biweekly.component.VAlarm
-import biweekly.parameter.Related
-import biweekly.property.Trigger
-import biweekly.util.Duration
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -15,6 +12,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.model.Notification
 
 // settings specific to Calendar, shared by all Calendar Members
 
@@ -40,42 +38,28 @@ data class CalendarSettingsEntity(
     @SerialName("DefaultFullDayNotifications")
     val defaultFullDayNotifications: List<JsonElement>
 
-) {
-
-    @Serializable
-    data class AlarmEntity(
-        @SerialName("Type")
-        val type: Int, // 0: Email reminder, 1: Desktop reminder
-        @SerialName("Trigger")
-        val trigger: String // RFC5545 encoded trigger
-    ) {
-        fun parseTrigger(): Trigger? {
-            return try {
-                Trigger(Duration.parse(trigger), Related.START)
-            } catch(e: IllegalArgumentException) {
-                null
-            }
-        }
-    }
-
-}
+)
 
 fun CalendarSettingsEntity.getDefaultAlarms(json: Json, isAllDay: Boolean): List<VAlarm> {
-    val alarms = ArrayList<VAlarm>()
+
     val defaultNotifications =
         if (isAllDay) this.defaultFullDayNotifications else this.defaultPartDayNotifications
-    defaultNotifications.mapNotNull {
-        if ((it as? JsonObject) != null) json.decodeFromJsonElement<CalendarSettingsEntity.AlarmEntity>(
+
+    return defaultNotifications.mapNotNull {
+        if ((it as? JsonObject) != null) json.decodeFromJsonElement<NotificationEntity>(
             it
         ) else null
-    }.forEach { alarm ->
-        alarm.parseTrigger()?.let {
-            if (alarm.type == 0) {
-                alarms.add(VAlarm.email(it, null, null))
-            } else {
-                alarms.add(VAlarm.display(it, null))
-            }
-        }
-    }
-    return alarms
+    }.mapNotNull { it.toVAlarm() }
+}
+
+fun CalendarSettingsEntity.getDefaultNotifications(json: Json, isAllDay: Boolean): List<Notification> {
+
+    val defaultNotifications =
+        if (isAllDay) this.defaultFullDayNotifications else this.defaultPartDayNotifications
+
+    return defaultNotifications.mapNotNull {
+        if ((it as? JsonObject) != null) json.decodeFromJsonElement<NotificationEntity>(
+            it
+        ) else null
+    }.mapNotNull { it.toNotification() }
 }

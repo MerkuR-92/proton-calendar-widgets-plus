@@ -3,12 +3,15 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.parameter.ParticipationStatus
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.toParticipationStatus
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.core.domain.entity.UserId
 import javax.inject.Inject
 
@@ -17,6 +20,7 @@ class UpdateParticipationStatusUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
     private val updatePersonalPartUseCase: UpdatePersonalPartUseCase,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase
 ): UseCase {
 
     companion object {
@@ -30,7 +34,8 @@ class UpdateParticipationStatusUseCase @Inject constructor(
         eventId: String,
         attendeeId: String,
         status: Int,
-        personalPartICalString: String?,
+        personalPartICalString: String?, // if null, we don't update personal part on the server
+        notifications: List<Notification>?,
         updateTime: Int? = null
     ): UseCase.Result {
         return when (val updateParticipationStatusResponse =
@@ -41,19 +46,10 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                 // personalPartICalString == null ignore alarms update, personalPartICalString == "" clear alarms, else update event with new alarms
                 if (personalPartICalString != null) {
                     // TODO Ignore update alarms errors or display snack ?
-                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, personalPartICalString)
-                    updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
-
-                    // Fetch updated event after updating its alarms
-                    when (val eventResponse = calendarsApi.getEvent(userId, calendarId, eventId)) {
-                        is ApiResponse.Success -> {
-                            calendarsRepository.persistEvents(eventResponse.data.event)
-                        }
-                        is ApiResponse.Error -> {
-                            logger.e("api error fetching event by id: $eventResponse")
-                        }
-                        is ApiResponse.Exception -> {
-                            logger.e("api error fetching event by id: ${eventResponse.exception.message ?: "(no exception message)"}")
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, personalPartICalString, notifications)
+                    if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
+                        updatePersonalPartUseCaseUseCaseResult.tryCastOrNull<EventEntity>()?.let {
+                            calendarsRepository.persistEvents(it)
                         }
                     }
                 } else {
@@ -61,7 +57,8 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                     calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event)
                 }
 
-                // If getEvent failed we still return success and will receive updated event in next server event loop
+                handleAlarmsUseCase.execute(userId)
+
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
@@ -89,7 +86,7 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                 is ApiResponse.Success -> {
                     // Clear alarms
                     // TODO Ignore update alarms errors or display snack ?
-                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, "")
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, "", emptyList())
                     updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
                 }
                 is ApiResponse.Error -> {
@@ -103,9 +100,10 @@ class UpdateParticipationStatusUseCase @Inject constructor(
             }
         }
 
-        when (val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100)) {
+        when (val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100)) { // TODO pagination
             is ApiResponse.Success -> {
                 calendarsRepository.persistEvents(*eventsSharingUidResponse.data.events.toTypedArray())
+                handleAlarmsUseCase.execute(userId)
             }
             is ApiResponse.Error -> {
                 logger.e("api error fetching events by uid: ${eventsSharingUidResponse.error}")

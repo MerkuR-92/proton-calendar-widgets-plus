@@ -58,9 +58,6 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/events")
     suspend fun getEventsByUid(@Query("UID") eventUid: String, @Query("Page") page: Int, @Query("PageSize") pageSize: Int) : EventsByUidApiResponse
 
-    @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}")
-    suspend fun updateCalendar(@Path("calendarId") calendarId: String, @Body body: UpdateCalendarApiRequest) : CalendarApiResponse
-
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
     suspend fun updateCalendarDisplay(@Path("calendarId") calendarId: String, @Path("memberId") memberId: String, @Body body: UpdateCalendarDisplayApiRequest) : MemberApiResponse
 
@@ -201,11 +198,6 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             getEventsByUid(eventUid, page, pageSize)
         }.toApiResponse()
 
-    override suspend fun updateCalendar(userId: UserId, calendarId: String, body: UpdateCalendarApiRequest): ApiResponse<CalendarApiResponse> =
-        apiProvider.get<CalendarsApiService>(userId).invoke {
-            updateCalendar(calendarId, body)
-        }.toApiResponse()
-
     override suspend fun updateCalendarDisplay(userId: UserId, calendarId: String, memberId: String, body: UpdateCalendarDisplayApiRequest): ApiResponse<MemberApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateCalendarDisplay(calendarId, memberId, body)
@@ -342,19 +334,15 @@ data class UpgradeEventApiResponse(
 ): BaseApiResponse()
 
 @Serializable
-data class UpdateCalendarApiRequest(
-    @SerialName("Name")
-    val name: String? = null,
-    @SerialName("Description")
-    val description: String? = null
-)
-
-@Serializable
 data class UpdateMemberApiRequest(
     @SerialName("Color")
     val color: String? = null,
     @SerialName("Display")
-    val display: Int? = null
+    val display: Int? = null,
+    @SerialName("Name")
+    val name: String? = null,
+    @SerialName("Description")
+    val description: String? = null
 )
 
 @Serializable
@@ -501,6 +489,8 @@ data class SyncEvent(
     val uid: String? = null,
     @SerialName("SourceCalendarID") // original Calendar ID when creating new Event for "change calendar"
     val sourceCalendarId: String? = null,
+    @SerialName("Notifications") // notifications that used to be in the PersonalEventContent
+    val notifications: List<NotificationEntity>? = null
 )
 
 @Serializable
@@ -602,7 +592,9 @@ data class UpdateEventPersonalPartApiRequest(
     @SerialName("MemberID")
     val memberID: String,
     @SerialName("PersonalEventContent")
-    val personalEventContent: PersonalEventContentApiRequest? = null
+    val personalEventContent: PersonalEventContentApiRequest? = null,
+    @SerialName("Notifications")
+    val notifications: List<NotificationEntity>?
 )
 
 @Serializable
@@ -620,9 +612,9 @@ data class UpdateCalendarSettingsApiRequest(
     @SerialName("DefaultEventDuration")
     val defaultEventDuration: Int? = null,
     @SerialName("DefaultPartDayNotifications")
-    val defaultPartDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null,
+    val defaultPartDayNotifications: List<NotificationEntity>? = null,
     @SerialName("DefaultFullDayNotifications")
-    val defaultFullDayNotifications: List<CalendarSettingsEntity.AlarmEntity>? = null
+    val defaultFullDayNotifications: List<NotificationEntity>? = null
 )
 
 @Serializable

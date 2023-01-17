@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.utils.CalendarSplit
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import java.time.LocalDate
 import java.time.LocalTime
@@ -174,12 +175,6 @@ interface ICalUtils {
      */
     fun List<EventAlarmEntity>.onlyDisplayType(): List<EventAlarmEntity>
 
-    /**
-     * Events from Subscribed Calendars have no VAlarms inside ICS, so we take the default Alarms for that Calendar
-     * and inject it when needed, because all the other logic relies on having them inside [VEvent] object.
-     */
-    fun injectVAlarmsIntoSubscribedEvents(events: List<Event>, calendarSettings: List<CalendarSettingsEntity>, json: Json): List<Event>
-
     fun isCalendarChangeAllowed(from: Event, to: Event): Boolean
 
     /**
@@ -273,6 +268,10 @@ interface ICalUtils {
 
     fun VAlarm.isTheSameAs(
         alarm: VAlarm
+    ): Boolean
+
+    fun Notification.isTheSameAs(
+        notification: Notification
     ): Boolean
 
     fun List<VAlarm>.isTheSameAs(

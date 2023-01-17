@@ -159,7 +159,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 45
+        const val version = 47
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -186,7 +186,9 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_41_42,
             AppDatabaseMigrations.MIGRATION_42_43,
             AppDatabaseMigrations.MIGRATION_43_44,
-            AppDatabaseMigrations.MIGRATION_44_45
+            AppDatabaseMigrations.MIGRATION_44_45,
+            AppDatabaseMigrations.MIGRATION_45_46,
+            AppDatabaseMigrations.MIGRATION_46_47
         )
 
         fun buildDatabase(context: Context): AppDatabase =
@@ -208,13 +210,13 @@ abstract class AppDatabase :
 class DatabaseTypeConverters {
 
     @TypeConverter
-    fun toListOfJsonElements(value: String): List<JsonElement> {
-        return Json { ignoreUnknownKeys = true }.decodeFromString<List<JsonElement>>(value)
+    fun toListOfJsonElements(value: String?): List<JsonElement>? {
+        return value?.run { Json { ignoreUnknownKeys = true }.decodeFromString<List<JsonElement>>(value) }
     }
 
     @TypeConverter
-    fun fromListOfJsonElement(json: List<JsonElement>): String {
-        return Json { ignoreUnknownKeys = true }.encodeToString(json)
+    fun fromListOfJsonElement(json: List<JsonElement>?): String? {
+        return json?.run { Json { ignoreUnknownKeys = true }.encodeToString(json) }
     }
 
 }

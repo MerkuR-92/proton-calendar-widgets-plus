@@ -1,7 +1,11 @@
 package me.proton.android.calendar.domain.model
 
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.getDefaultAlarms
+import me.proton.android.calendar.data.entity.getDefaultNotifications
 import me.proton.core.util.kotlin.toBoolean
 
 data class Calendar(
@@ -12,19 +16,23 @@ data class Calendar(
         val flags: Int,
         val display: Boolean,
         val type: Int,
-        val permissions: Int
+        val permissions: Int,
+        val defaultPartDayNotifications: List<Notification>,
+        val defaultFullDayNotifications: List<Notification>
 ) : BaseModel() {
 
         companion object {
-                fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity) = Calendar(
+                fun from(calendarEntity: CalendarEntity, memberEntity: MemberEntity, calendarSettingsEntity: CalendarSettingsEntity, json: Json) = Calendar(
                         id = calendarEntity.id,
-                        name = calendarEntity.name,
+                        name = memberEntity.name,
                         email = memberEntity.email,
                         color = memberEntity.color,
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),
                         type = calendarEntity.type,
-                        permissions = memberEntity.permissions
+                        permissions = memberEntity.permissions,
+                        defaultPartDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = false),
+                        defaultFullDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = true)
                 )
         }
 
@@ -38,6 +46,7 @@ data class Calendar(
         val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 
         val isSubscribed: Boolean get() = type == 1
+        val isSharedWithMe: Boolean get() = !isOwner
 
         val isOwner: Boolean get() = permissions and 2 == 2
         val allowEditEvents: Boolean get() = permissions and 2 == 2 // TODO Change to 16 so that we check actual write permissions

@@ -1,7 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.UpdateCalendarApiRequest
 import me.proton.android.calendar.data.api.UpdateCalendarDisplayApiRequest
 import me.proton.android.calendar.data.api.UpdateMemberApiRequest
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
@@ -37,19 +36,16 @@ class UpdateCalendarUseCase @Inject constructor(
     }
 
     suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
-        val updateCalendarApiRequest = UpdateCalendarApiRequest(
-            name = name,
-            description = description
-        )
-
         val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
 
         val updateMemberApiRequest = UpdateMemberApiRequest(
             color = if (!dbMember.color.equals(color, ignoreCase = true)) color else null, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.
-            display = display
+            display = display,
+            name = name,
+            description = description
         )
 
-        return updateSingleCalendar(userId, calendarId, updateCalendarApiRequest, dbMember.id, updateMemberApiRequest)
+        return updateSingleCalendar(userId, calendarId, dbMember.id, updateMemberApiRequest)
     }
 
     private suspend fun updateSingleCalendarDisplay(
@@ -72,21 +68,10 @@ class UpdateCalendarUseCase @Inject constructor(
     private suspend fun updateSingleCalendar(
         userId: UserId,
         calendarId: String,
-        updateCalendarApiRequest: UpdateCalendarApiRequest,
         memberId: String,
         updateMemberApiRequest: UpdateMemberApiRequest
     ): UseCase.Result {
-        val updateCalendarApiResponse = when (val updateCalendarResponse =
-            calendarsApi.updateCalendar(userId, calendarId, updateCalendarApiRequest)) {
-            is ApiResponse.Success -> {
-                calendarsRepository.persistCalendar(userId.id, updateCalendarResponse.data.calendar)
-                UseCase.Result.Success<Unit>()
-            }
-            is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.error}")
-            is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update calendar: ${updateCalendarResponse.exception.message ?: "(no exception message)"}")
-        }
-
-        val updateMemberApiResponse = when (val updateMemberResponse =
+        return when (val updateMemberResponse =
             calendarsApi.updateMember(userId, calendarId, memberId, updateMemberApiRequest)) {
             is ApiResponse.Success -> {
                 calendarsRepository.persistMember(updateMemberResponse.data.member)
@@ -94,14 +79,6 @@ class UpdateCalendarUseCase @Inject constructor(
             }
             is ApiResponse.Error -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate error in update member: ${updateMemberResponse.exception.message ?: "(no exception message)"}")
-        }
-
-        val responses = listOf(updateCalendarApiResponse, updateMemberApiResponse)
-
-        return if (responses.all { it is UseCase.Result.Success<*> }) {
-            UseCase.Result.Success<Unit>()
-        } else {
-            responses.first { it !is UseCase.Result.Success<*> }
         }
     }
 

@@ -72,7 +72,9 @@ internal class HandleDeleteUseCaseTest {
                 calendarId = "calendarId",
                 color = calendarColor,
                 display = calendarDisplay,
-                flags = calendarFlags
+                flags = calendarFlags,
+                name = calendarName,
+                description = calendarDescription,
             )
         )
 

@@ -26,10 +26,6 @@ data class CalendarEntity(
     @SerialName("ID")
     @PrimaryKey
     val id: String,
-    @SerialName("Name")
-    val name: String,
-    @SerialName("Description")
-    val description: String,
     @SerialName("Type")
     val type: Int = 0, // normal calendar: 0, subscribed calendar: 1
     @NonNull

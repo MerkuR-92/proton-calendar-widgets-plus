@@ -16,10 +16,13 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProto
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.Notification
+import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.decryptDataOrNull
@@ -54,7 +57,7 @@ class TransformEventUseCase @Inject constructor(
 
         val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
         val userId = calendarEntity.fkUserId
-        val calendar = calendarEntity.joinToCalendar(database) ?: return null
+        val calendar = calendarEntity.joinToCalendar(database, json) ?: return null
 
         val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
         if (calendarPrivateKeys.isEmpty()) {
@@ -233,13 +236,15 @@ class TransformEventUseCase @Inject constructor(
             id = eventEntity.id,
             calendar = Calendar(
                 calendarEntity.id,
-                calendarEntity.name,
+                calendar.name,
                 calendar.email,
                 calendar.color,
                 calendar.flags,
                 calendar.display,
                 calendarEntity.type,
-                calendar.permissions
+                calendar.permissions,
+                calendar.defaultPartDayNotifications,
+                calendar.defaultFullDayNotifications
             ),
             iCalendar = iCalendar,
             modifyTime = eventEntity.modifyTime,
@@ -273,7 +278,9 @@ class TransformEventUseCase @Inject constructor(
             },
             currentUserAttendeeId = currentUserAttendeeId,
             sharedEventId = eventEntity.sharedEventId,
-            isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean()
+            isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean(),
+            // if isPersonalMigrated is not provided, we fallback to `true` for subscribed calendars and `false` otherwise
+            notifications = NotificationMigration(eventEntity.isPersonalMigrated ?: calendar.isSubscribed, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() })
         )
 
     }
