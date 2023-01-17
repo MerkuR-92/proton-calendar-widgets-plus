@@ -398,7 +398,7 @@ class EditCreateEventUseCase @Inject constructor(
                                 else null, // We first create without attendees,
                                 notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             ),
-                            overwrite = isImport.toInt()
+                            overwrite = isImport.toInt() // We always overwrite for imports
                         )
                     ),
                     isImport = isImport.toInt()

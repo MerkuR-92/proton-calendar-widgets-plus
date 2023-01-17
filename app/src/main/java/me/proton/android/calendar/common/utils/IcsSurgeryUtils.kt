@@ -35,7 +35,9 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_YEARLY_INTERVA
 import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
 import me.proton.android.calendar.common.IcsParsingValidation.SUMMARY_MAX_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.TZID
+import me.proton.android.calendar.common.IcsParsingValidation.TZID_PARAMETER
 import me.proton.android.calendar.common.IcsParsingValidation.UID_MAX_LENGTH
+import me.proton.android.calendar.common.IcsParsingValidation.UTC_TIME_ZONE_ID
 import me.proton.android.calendar.common.IcsParsingValidation.X_PM_TOKEN_LENGTH
 import me.proton.android.calendar.common.IcsParsingValidation.X_WR_TIMEZONE
 import me.proton.android.calendar.common.aliasesTimezonesMap
@@ -212,7 +214,7 @@ object IcsSurgeryUtils {
                 event.alarms.clear()
             }
 
-            // TODO Useless now ?
+            // TODO Might be useless now, but keep it in case the issue comes back and we need to revert.
             // event.applyBiweeklyDstParsingFix(iCalendar)
 
             event.dropUnsupportedProperties()
@@ -253,7 +255,7 @@ object IcsSurgeryUtils {
         return HandleIcsResult.ParsingSuccessful(iCalendar)
     }
 
-    fun VEvent.handleImport(iCalendar: ICalendar, iCalString: String, isOpeningFromProtonMail: Boolean) {
+    private fun VEvent.handleImport(iCalendar: ICalendar, iCalString: String, isOpeningFromProtonMail: Boolean) {
         // Drop organizer and attendees
         this.attendees.clear()
         this.organizer = null
@@ -306,7 +308,7 @@ object IcsSurgeryUtils {
 
     }
 
-    fun VEvent.dropUnsupportedProperties() {
+    private fun VEvent.dropUnsupportedProperties() {
 
         // Only supported status is CONFIRMED but it's also default if empty
         this.status = null
@@ -316,6 +318,7 @@ object IcsSurgeryUtils {
      * Fixes the ICalDate value if Biweekly made it incorrect due to DST
      * @return ICalDate if fix is needed. null if nothing needs to be fixed.
      */
+    // TODO Might be useless now, but keep it in case the issue comes back and we need to revert.
     fun ICalDate.getBiweeklyDstParsingFix(timezone: String): ICalDate? {
         // Ex: Device is in GMT+1 (No DST), ICalDate is in GMT+2 (DST): will return ICalDate minus 1 hour
         // Ex: Device is in GMT+2 (DST), ICalDate is in GMT+1 (No DST): will return ICalDate plus 1 hour
@@ -358,14 +361,14 @@ object IcsSurgeryUtils {
     private fun replaceUnsupportedTimeZoneId(iCalString: String, supportedTimeZoneMap: Map<String, String>): String {
         var cleanICalString = iCalString
         supportedTimeZoneMap.forEach {
-            var index = cleanICalString.indexOf(";TZID=${it.key}:", ignoreCase = true)
+            var index = cleanICalString.indexOf("$TZID_PARAMETER${it.key}:", ignoreCase = true)
             if (index >= 0) {
-                cleanICalString = cleanICalString.replaceRange(index, index + ";TZID=${it.key}:".length, ";TZID=${it.value}:")
+                cleanICalString = cleanICalString.replaceRange(index, index + "$TZID_PARAMETER${it.key}:".length, "$TZID_PARAMETER${it.value}:")
             }
             while (index >= 0) {
-                index = cleanICalString.indexOf(";TZID=${it.key}:", startIndex = index, ignoreCase = true)
+                index = cleanICalString.indexOf("$TZID_PARAMETER${it.key}:", startIndex = index, ignoreCase = true)
                 if (index >= 0) {
-                    cleanICalString = cleanICalString.replaceRange(index, index + ";TZID=${it.key}:".length, ";TZID=${it.value}:")
+                    cleanICalString = cleanICalString.replaceRange(index, index + "$TZID_PARAMETER${it.key}:".length, "$TZID_PARAMETER${it.value}:")
                 }
             }
         }
@@ -437,6 +440,7 @@ object IcsSurgeryUtils {
                 val hasSeconds = alarm.trigger.duration.seconds?.let { 1 } ?: 0
                 if (hasWeeks + hasDays + hasHours + hasMinutes + hasSeconds > 1) {
                     val durationInMs = alarm.trigger.duration.toMillis()
+                    // Use smallest unit for the duration
                     val simplifiedDuration =
                         if (hasSeconds.toBoolean()) {
                             Duration.builder().seconds(TimeUnit.MILLISECONDS.toSeconds(durationInMs).toInt()).build()
@@ -476,7 +480,7 @@ object IcsSurgeryUtils {
             val timeZoneId =
                 if (this.dateTimeStamp.getParameter(TZID).isNullOrEmpty()) {
                     // If it's an all-day event, assume 0 hours, 0 minutes, 0 seconds in UTC to convert to timestamp
-                    "UTC"
+                    UTC_TIME_ZONE_ID
                 } else {
                     // If it's an all-day event with TZID, assume 0 hours, 0 minutes, 0 seconds in the indicated time zone, then convert to UTC
                     fallbackTimeZone(this.dateTimeStamp.getParameter(TZID), fallbackToDefault = false) ?: return false
@@ -489,7 +493,7 @@ object IcsSurgeryUtils {
 
         // If it's a floating date (i.e. no TZID present, e.g. DTSTART:20200101T120000), assume TZID=UTC.
         if ((this.dateTimeStamp?.value as ICalDate).rawComponents?.toString()?.contains("Z") == false && iCalendar.timezoneInfo.getTimezone(this.dateTimeStamp) == null) {
-            this.dateTimeStamp.localizeDateToTimezone("UTC")
+            this.dateTimeStamp.localizeDateToTimezone(UTC_TIME_ZONE_ID)
             iCalendar.timezoneInfo.setFloating(this.dateTimeStamp, false)
             this.dateTimeStamp.removeParameter(TZID) // TZID parameter is not needed anymore
             return true
@@ -522,7 +526,7 @@ object IcsSurgeryUtils {
         }
     }
 
-    fun VEvent.cleanUid(iCalendar: ICalendar): Boolean {
+    private fun VEvent.cleanUid(iCalendar: ICalendar): Boolean {
         this.moveUid(iCalendar)
 
         // UID: As per RFC, we require it to be present. Also, there's a BE limit of 191 characters. If we need to crop, we keep the last 191 characters of the uid.
@@ -544,29 +548,34 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun VEvent.cleanDuration(iCalendar: ICalendar): Boolean {
+    private fun VEvent.cleanDuration(iCalendar: ICalendar): Boolean {
         // DURATION property should be transformed into the corresponding DTEND
         val dateEnd = this.dateStart.value.clone() as ICalDate
         val dateStartTimeZone = iCalendar.timezoneInfo.getTimezone(this.dateStart)
         if (this.duration?.value != null && this.dateEnd?.value == null) {
             if (this.dateStart.value.hasTime()) {
+                // Part day
                 val durationInMillis = this.duration.value.toMillis()
                 dateEnd.time += durationInMillis
                 this.setDateEnd(dateEnd)
+                // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             } else {
-                // Round up
+                // All day
                 val durationInMsDouble = this.duration.value.toMillis().toDouble()
                 val oneDayAsMsDouble = TimeUnit.DAYS.toMillis(1).toDouble()
                 val durationInDaysDouble = durationInMsDouble.div(oneDayAsMsDouble)
+                // Round up
                 val durationInDaysRoundedUp = ceil(durationInDaysDouble).toLong()
                 dateEnd.time = this.dateStart.value.toZonedDateTime(ZoneId.systemDefault().id).plusDays(
-                    if (durationInDaysRoundedUp == 0L) 1
+                    if (durationInDaysRoundedUp == 0L) 1 // DTEND must always be at least DTSTART + 1 day for all day event
                     else durationInDaysRoundedUp
                 ).toInstant().toEpochMilli()
                 this.setDateEnd(dateEnd)
+                // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }
+            // Remove duration once DTEND has been set
             this.removeProperty(this.duration)
         }
         return true
@@ -589,12 +598,14 @@ object IcsSurgeryUtils {
                 //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
                 //  set to avoid NPE in the app. We remove it when sending the ICS to BE.
                 this.setDateEnd(this.dateStart.value)
+                // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             } else {
                 // For full day, the DTEND is by default set to the day after DTSTART such that the event is one day long
                 val dateEnd = this.dateStart.value.clone() as ICalDate
                 dateEnd.time += TimeUnit.DAYS.toMillis(1)
                 this.setDateEnd(dateEnd)
+                // Set DTEND timezone
                 if (dateStartTimeZone != null) iCalendar.timezoneInfo.setTimezone(this.dateEnd, dateStartTimeZone)
             }
         } else {
@@ -666,7 +677,7 @@ object IcsSurgeryUtils {
         // UNTIL: we should use UTC dates if and only if the event is not all-day.
         if (!this.dateStart.value.hasTime() && this.recurrenceRule.value.until?.hasTime() == true) {
             val timeZone = iCalendar.timezoneInfo.timezones.firstOrNull()?.timeZone
-            val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: "UTC" else "UTC"
+            val supportedTimeZone = if (timeZone != null) fallbackTimeZone(timeZone.id, false) ?: UTC_TIME_ZONE_ID else UTC_TIME_ZONE_ID
             val untilDate = this.recurrenceRule.value.until
             this.recurrenceRule.value = this.recurrenceRule.value.clone(until = dateTimeToDate(untilDate, supportedTimeZone, setRawComponents = true))
         }
@@ -801,7 +812,7 @@ object IcsSurgeryUtils {
                         }
                 }
 
-                // TODO Still needed ?
+                // TODO Might be useless now, but keep it in case the issue comes back and we need to revert.
                 // Fix Biweekly DST parsing on ExDates values
                 // if (exceptionDateValue.hasTime() && this.dateStart.value.hasTime()) {
                 //     iCalendar.timezoneInfo?.getTimezone(exceptionDates)?.timeZone?.id?.let { timeZone ->
@@ -903,11 +914,11 @@ object IcsSurgeryUtils {
         return true
     }
 
-    fun ICalendar.cleanTimezones(isImport: Boolean = false, timeZoneId: String? = null): Boolean {
+    private fun ICalendar.cleanTimezones(isImport: Boolean = false, timeZoneId: String? = null): Boolean {
 
         this.events.forEach {
 
-            // DATESTART, DATEEND, RECURRENCE-ID:
+            // DTSTART, DTEND, RECURRENCE-ID:
 
             // If TZID is empty, remove it
             if (it.dateStart?.value != null && it.dateStart.getParameter(TZID)?.isEmpty() == true) it.dateStart.removeParameter(TZID)
@@ -961,7 +972,7 @@ object IcsSurgeryUtils {
     }
 
     private fun ICalendar.convertToSupportedTimezone(date: ICalProperty?): Boolean {
-        // TODO This shouldn't be needed as long as we do the replace unsupported tzid in cleanRawIcs
+        // TODO This shouldn't be needed anymore as long as we do the replace unsupported tzid in cleanRawIcs. We keep it for now if biweekly parses a timezone we haven't converted.
         // If a TZID is present, we try to convert it into a supported timezone. If not possible, reject (as unsupported) the event. Otherwise localize it to the supported timezone.
         this.timezoneInfo.getTimezone(date)?.let { timezoneAssignment ->
             val supportedTzid = fallbackTimeZone(timezoneAssignment.timeZone.id, fallbackToDefault = false) ?: return false
@@ -975,6 +986,7 @@ object IcsSurgeryUtils {
         val xWrTimezone = iCalendar.getXWrTimezone()
         if (this.value.hasTime() && iCalendar.timezoneInfo.getTimezone(this) == null && !this.value.rawComponents.toString().contains("Z")) {
             if (xWrTimezone != null) {
+                // Remove floating timezone property and localize
                 iCalendar.timezoneInfo.setFloating(this, false)
                 iCalendar.timezoneInfo.setTimezone(
                     this,
@@ -984,6 +996,7 @@ object IcsSurgeryUtils {
             } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() && iCalendar.timezoneInfo.timezones.size == 1 && !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
                 // If no x-wr-timezone is present, we check if there's a single VTIMEZONE to use in the ICS string
                 val fallbackTimeZoneId = fallbackTimeZone(iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id ?: return false, fallbackToDefault = false) ?: return false
+                // Remove floating timezone property and localize
                 iCalendar.timezoneInfo.setFloating(this, false)
                 iCalendar.timezoneInfo.setTimezone(
                     this,
@@ -991,6 +1004,7 @@ object IcsSurgeryUtils {
                 )
                 this.localizeDateToTimezone(fallbackTimeZoneId)
             } else if (isImport && timeZoneId != null) {
+                // Remove floating timezone property and localize
                 iCalendar.timezoneInfo.setFloating(this, false)
                 iCalendar.timezoneInfo.setTimezone(
                     this,
