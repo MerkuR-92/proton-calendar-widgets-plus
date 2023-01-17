@@ -111,8 +111,8 @@ android {
         applicationId "me.proton.android.calendar"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 179
-        versionName "2.5.3"
+        versionCode 180
+        versionName "2.6.0"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs 'en', 'ca', 'es-rES', 'es-rMX', 'fr', 'fr-rCA', 'pl', 'pt-rPT', 'ro', 'de', 'it', 'nl', 'uk'
