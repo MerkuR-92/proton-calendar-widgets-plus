@@ -90,6 +90,9 @@ class HandleIcsUseCase @Inject constructor(
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
+        // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones
+        val notifications = NotificationMigration(false, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
+
         val newEvent = Event.from(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
                 defaultCalendar.id,
@@ -99,15 +102,17 @@ class HandleIcsUseCase @Inject constructor(
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
-                defaultCalendar.permissions
-            ), iCalendar, 0
-        ) ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError // TODO Return default error ?
+                defaultCalendar.permissions,
+                defaultCalendar.defaultPartDayNotifications,
+                defaultCalendar.defaultFullDayNotifications
+            ), iCalendar, Instant.now().epochSecond, notifications = notifications
+        ) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         if (isInvitation && newEvent.iCalEvent.alarms.isNullOrEmpty()) {
             // We drop alarms when importing invitations as this would not be the user's. We must set the default calendar alarms instead.
             val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendar.id)
-            calendarSettings?.getDefaultAlarms(json, newEvent.isAllDay())?.forEach {
-                if (it.action == Action.display() || (FeatureFlag.ADD_EMAIL_NOTIFICATIONS && it.action == Action.email())) newEvent.iCalEvent.addAlarm(it)
+            calendarSettings?.getDefaultAlarms(json, newEvent.isAllDay())?.let { defaultAlarms ->
+                newEvent.addAlarms(defaultAlarms)
             }
         }
 
