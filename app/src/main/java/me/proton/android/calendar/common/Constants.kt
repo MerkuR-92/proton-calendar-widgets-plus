@@ -73,8 +73,8 @@ const val MAX_EMAILS_PER_QUERY: Int = 8
 
 const val DAY_VIEW_ALL_DAY_MAX = 3
 
-const val MAX_CALENDAR_PAID = 20
-const val MAX_CALENDAR_FREE = 1
+const val MAX_CALENDAR_PAID = 25
+const val MAX_CALENDAR_FREE = 3
 
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 

@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Nome obrigatório</string>
     <string name="add_calendar_text">Adicionar agenda</string>
     <string name="create_calendar_limit_reached">Atingiu o número máximo de agendas.</string>
-    <string name="create_calendar_limit_reached_paid_title">Foi atingido o limite de 20 agendas</string>
-    <string name="create_calendar_limit_reached_paid_message">Elimine agendas não usadas para poder criar novas agendas.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Gerir agendas</string>
-    <string name="create_calendar_limit_reached_close">Fechar</string>
-    <string name="create_calendar_limit_reached_free_title">Actualizar o Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Crie até 20 agendas e aceda a muitos mais recursos exclusivos, quando atualizar o seu plano.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Agora não</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Actualizar</string>
+    <string name="create_calendar_limit_reached_manage">Gerir agendas</string>
     <string name="delete_calendar_dialog_title">Eliminar agenda</string>
     <string name="delete_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda?</string>
     <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda? \"%1$s\" será definida como agenda predefinida.</string>

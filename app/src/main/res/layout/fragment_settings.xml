@@ -141,8 +141,7 @@
             android:id="@+id/settings_calendars_list_add_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:visibility="visible"
+            android:visibility="visible"
             app:layout_constraintTop_toBottomOf="@+id/settings_calendars_list"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">

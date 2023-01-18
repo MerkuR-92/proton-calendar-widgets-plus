@@ -140,6 +140,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -950,45 +952,29 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         lifecycleScope.launch {
             // Check if calendar limit was reached
             when (calendarViewModel.isUserCalendarLimitReached()) {
-                CalendarViewModel.UserCalendarLimit.ERROR -> { } // We ignore and do nothing
+                CalendarViewModel.UserCalendarLimit.ERROR -> {
+                    this@MainActivity.displaySnackBar(this@MainActivity.getString(R.string.snack_create_calendar_error))
+                }
                 CalendarViewModel.UserCalendarLimit.NOT_REACHED -> {
                     // If limit has not been reached, open create calendar form
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
                 CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
-                    // Display upgrade dialog for free user dialog
-                    if (SUBSCRIPTION) {
-                        MaterialAlertDialogBuilder(this@MainActivity)
-                            .setTitle(R.string.create_calendar_limit_reached_free_title)
-                            .setMessage(R.string.create_calendar_limit_reached_free_description)
-                            .setPositiveButton(R.string.create_calendar_limit_reached_free_upgrade) { _, _ ->
-                                plansViewModel.onPlansUpgradeClicked(this@MainActivity)
-                            }
-                            .setNegativeButton(R.string.create_calendar_limit_reached_free_not_now) { _, _ ->
-                            }
-                            .show()
-                    } else {
-                        MaterialAlertDialogBuilder(this@MainActivity)
-                            .setMessage(R.string.create_calendar_limit_reached)
-                            .setPositiveButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                            }
-                            .show()
+                    // Display limit reached for free user dialog
+                    this@MainActivity.displayFreeUserCalendarLimitReached() { _, _ ->
+                        // Open calendar settings view
+                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                        drawer_layout.close()
                     }
                 }
                 CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
                     // Display limit reached for paid user dialog
-                    MaterialAlertDialogBuilder(this@MainActivity)
-                        .setTitle(R.string.create_calendar_limit_reached_paid_title)
-                        .setMessage(R.string.create_calendar_limit_reached_paid_message)
-                        .setPositiveButton(R.string.create_calendar_limit_reached_paid_manage) { _, _ ->
-                            // Open calendar settings view
-                            navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                            drawer_layout.close()
-                        }
-                        .setNegativeButton(R.string.create_calendar_limit_reached_close) { _, _ ->
-                        }
-                        .show()
+                    this@MainActivity.displayPaidUserCalendarLimitReached() { _, _ ->
+                        // Open calendar settings view
+                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                        drawer_layout.close()
+                    }
                 }
             }
         }

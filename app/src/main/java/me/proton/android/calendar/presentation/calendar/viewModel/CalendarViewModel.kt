@@ -746,8 +746,13 @@ class CalendarViewModel @Inject constructor(
         PAID_REACHED
     }
 
-    suspend fun isUserCalendarLimitReached(calendars: List<Calendar>? = null): UserCalendarLimit {
-        val userCalendarsCount = calendars?.size ?: getUserCalendars()?.size ?: return UserCalendarLimit.ERROR
+    suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
+        val userCalendarsCount = run {
+            val userCalendarsCount = getUserCalendars()?.size
+            val subscribedCalendarsCount = getSubscribedCalendars()?.size
+            if (userCalendarsCount != null && subscribedCalendarsCount != null) userCalendarsCount + subscribedCalendarsCount
+            else userCalendarsCount ?: subscribedCalendarsCount
+        } ?: return UserCalendarLimit.ERROR
         val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
 
         if (isFreeUser && userCalendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
@@ -793,6 +798,15 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         return inactiveUserCalendars.value ?: calendarsRepository.selectInactiveUserCalendars(userId.id)
+    }
+
+    suspend fun getSubscribedCalendars(): List<Calendar>? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getSubscribedCalendars")
+            return null
+        }
+        return subscribedCalendars.value ?: calendarsRepository.selectSubscribedCalendars(userId.id)
     }
 
     suspend fun getUserAddresses(): List<UserAddress>? {

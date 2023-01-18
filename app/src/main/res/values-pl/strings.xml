@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Nazwa jest wymagana</string>
     <string name="add_calendar_text">Dodaj kalendarz</string>
     <string name="create_calendar_limit_reached">Osiągnięto maksymalną liczbę kalendarzy.</string>
-    <string name="create_calendar_limit_reached_paid_title">Limit 20 kalendarzy został osiągnięty</string>
-    <string name="create_calendar_limit_reached_paid_message">Aby utworzyć nowe kalendarze, usuń nieużywane.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Zarządzaj kalendarzami</string>
-    <string name="create_calendar_limit_reached_close">Zamknij</string>
-    <string name="create_calendar_limit_reached_free_title">Ulepsz Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Ulepsz plan, aby utworzyć do 20 kalendarzy i uzyskać dostęp do ekskluzywnych funkcji.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Nie teraz</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Ulepsz</string>
+    <string name="create_calendar_limit_reached_manage">Zarządzaj kalendarzami</string>
     <string name="delete_calendar_dialog_title">Usuń kalendarz</string>
     <string name="delete_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz?</string>
     <string name="delete_default_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz? Domyślnym kalendarzem zostanie \"%1$s\".</string>

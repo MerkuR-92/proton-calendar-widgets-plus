@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Назва обов\'язкова</string>
     <string name="add_calendar_text">Додати календар</string>
     <string name="create_calendar_limit_reached">Ви досягли максимальної кількості календарів.</string>
-    <string name="create_calendar_limit_reached_paid_title">Досягнуто ліміту 20 календарів</string>
-    <string name="create_calendar_limit_reached_paid_message">Видалити календарі, які не використовуються, щоб створити новий календар.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Керувати календарями</string>
-    <string name="create_calendar_limit_reached_close">Закрити</string>
-    <string name="create_calendar_limit_reached_free_title">Покращити Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Створюйте до 20 календарів та отримайте доступ до багатьох інших ексклюзивних функцій покращивши свій тарифний план.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Не зараз</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Покращити</string>
+    <string name="create_calendar_limit_reached_manage">Керувати календарями</string>
     <string name="delete_calendar_dialog_title">Видалити календар</string>
     <string name="delete_calendar_dialog_message">Ви дійсно хочете видалити цей календар?</string>
     <string name="delete_default_calendar_dialog_message">Ви впевнені, що хочете видалити цей календар? \"%1$s\" буде встановлено типовим календарем.</string>

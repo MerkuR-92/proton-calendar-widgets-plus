@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Nombre requerido</string>
     <string name="add_calendar_text">Añadir calendario</string>
     <string name="create_calendar_limit_reached">Ha alcanzado el número máximo de calendarios.</string>
-    <string name="create_calendar_limit_reached_paid_title">Máximo de 20 calendarios alcanzado</string>
-    <string name="create_calendar_limit_reached_paid_message">Elimine calendarios sin usar para crear calendarios nuevos.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Gestionar calendarios</string>
-    <string name="create_calendar_limit_reached_close">Cerrar</string>
-    <string name="create_calendar_limit_reached_free_title">Actualizar Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Cree hasta 20 calendarios y acceda a más funciones exclusivas cuando actualiza su plan.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Ahora no</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Actualizar</string>
+    <string name="create_calendar_limit_reached_manage">Gestionar calendarios</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿En verdad desea eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿En verdad desea eliminar este calendario? \"%1$s\" será establecido como predeterminado.</string>

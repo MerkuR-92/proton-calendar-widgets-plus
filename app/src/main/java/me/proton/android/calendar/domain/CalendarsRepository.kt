@@ -46,7 +46,7 @@ interface CalendarsRepository {
 
     suspend fun selectInactiveUserCalendars(userId: String): List<Calendar>
 
-    suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectSubscribedCalendars(userId: String): List<Calendar>
 
     fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 

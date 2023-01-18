@@ -376,8 +376,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter { it.isInactive }
     }
 
-    override suspend fun selectSubscribedCalendars(userId: String): List<CalendarEntity> {
-        return database.calendarsDao().selectSubscribedCalendars(userId)
+    override suspend fun selectSubscribedCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectSubscribedCalendars(userId).joinToCalendars(database, json).filter { it.isSubscribed }
     }
 
     override fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>> {

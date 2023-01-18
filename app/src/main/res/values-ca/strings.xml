@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Cal indicar un nom</string>
     <string name="add_calendar_text">Afegir calendari</string>
     <string name="create_calendar_limit_reached">Heu arribat al nombre màxim de calendaris.</string>
-    <string name="create_calendar_limit_reached_paid_title">Màxim de 20 calendaris assolit</string>
-    <string name="create_calendar_limit_reached_paid_message">Elimineu calendaris sense ús per crear-ne de nous.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Gestionar els calendaris</string>
-    <string name="create_calendar_limit_reached_close">Tanca</string>
-    <string name="create_calendar_limit_reached_free_title">Millorar la subscripció a Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Creeu fins a 20 calendaris i accediu a moltes més funcions exclusives en millorar la subscripció.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Ara no</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Millorar la subscripció</string>
+    <string name="create_calendar_limit_reached_manage">Gestionar els calendaris</string>
     <string name="delete_calendar_dialog_title">Suprimir calendari</string>
     <string name="delete_calendar_dialog_message">Està segur de que vol suprimir aquest calendari?</string>
     <string name="delete_default_calendar_dialog_message">Està segur que vol suprimir aquest calendari? \"%1$s\" passarà a ser el calendari per defecte.</string>
