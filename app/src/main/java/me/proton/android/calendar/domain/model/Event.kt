@@ -8,9 +8,6 @@ import biweekly.property.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
-import java.time.*
-import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
@@ -18,12 +15,15 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
+import java.time.*
+import java.time.temporal.ChronoUnit
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(
@@ -148,7 +148,7 @@ data class Event private constructor(
          * Returns copy of an [Event] with overwritten start & end datetime with [Occurrence] values.
          */
         fun withOccurrence(event: Event, occurrence: Occurrence): Event {
-            return event.copy(iCalendar = event.iCalendar.copy() as ICalendar).apply {
+            return Event.from(event).apply {
                 if (this.isAllDay()) {
                     this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
                     this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate())

@@ -473,7 +473,7 @@ class EventViewModel @Inject constructor(
         }
 
         val adjustedEvent =
-            (dbEventWithOccurrence ?: dbEvent?.copy(iCalendar = dbEvent?.iCalendar?.clone() as ICalendar))?.apply {
+            (dbEventWithOccurrence ?: Event.from(dbEvent!!)).apply {
 
                 if (this.isAllDay()) { // adjust endDate to -1 day if event has no time
                     this.iCalEvent.setEnd(this.getEnd(timeZoneForOccurrence).toLocalDate().minusDays(1))
