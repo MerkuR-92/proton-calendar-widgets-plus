@@ -78,11 +78,10 @@ data class Event private constructor(
          * Copy event with specified id / calendar / iCalendar / notifications values
          * and Timezone Assignments
          */
-        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null): Event {
+        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null, notifications: NotificationMigration? = null): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
             val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
             val endTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
-            val notifications = NotificationMigration(event.notifications.isMigrated, (iCalendar ?: event.iCalendar).events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
             return event.copy(
                 id = id ?: event.id,
                 calendar = calendar ?: event.calendar,
@@ -111,7 +110,7 @@ data class Event private constructor(
                     setEndTimeZone(endTimezoneId)
                     setDefaultTimeZone(defaultTimezoneId)
                 },
-                notifications = notifications)
+                notifications = notifications ?: event.notifications)
         }
 
         /**
