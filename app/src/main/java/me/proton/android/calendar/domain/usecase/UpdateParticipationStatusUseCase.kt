@@ -48,12 +48,13 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                     // TODO Ignore update alarms errors or display snack ?
                     val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, personalPartICalString, notifications)
                     if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
-                        updatePersonalPartUseCaseUseCaseResult.tryCastOrNull<EventEntity>()?.let {
+                        updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventEntity>()?.let {
                             calendarsRepository.persistEvents(it)
                         }
+                    } else {
+                        calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event)
                     }
                 } else {
-                    // Use EventEntity returned by updateParticipationStatus route if we don't need to update alarms
                     calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event)
                 }
 
