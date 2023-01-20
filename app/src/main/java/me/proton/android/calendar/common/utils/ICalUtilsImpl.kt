@@ -1026,8 +1026,9 @@ object ICalUtilsImpl : ICalUtils {
         responseICalendar.events.first().dateEnd?.let {
             //  DTEND value MUST be later in time than the value of the "DTSTART" property, but we need it to be
             //  set to avoid NPE in the app. We remove it when sending the ICS.
-            if (it.value == responseICalendar.events.first().dateStart?.value) null
-            else event.dateEnd = it
+            event.dateEnd =
+                if (it.value == responseICalendar.events.first().dateStart?.value) null
+                else it
         }
         responseICalendar.events.first().sequence?.let { event.sequence = it }
         responseICalendar.events.first().recurrenceId?.let { event.recurrenceId = it }

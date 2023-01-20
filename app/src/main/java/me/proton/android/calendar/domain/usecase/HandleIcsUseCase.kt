@@ -124,7 +124,6 @@ class HandleIcsUseCase @Inject constructor(
 
         // Find an existing event from the ones sharing the same UID
         var existingEvent: Event? = null
-        var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
                 val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
@@ -134,7 +133,6 @@ class HandleIcsUseCase @Inject constructor(
                 }
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
-                    existingEventEntity = eventEntity
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
                     break
                 }
