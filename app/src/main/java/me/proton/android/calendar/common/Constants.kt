@@ -92,6 +92,7 @@ const val MONTH_VIEW_VERSION_CODE = 112
 const val REBRANDING_VERSION_CODE = 145
 const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
+const val IMPORT_VERSION_CODE = 172
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -99,7 +100,8 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     MONTH_VIEW_VERSION_CODE, // Month view (0.30.3)
     REBRANDING_VERSION_CODE, // Rebranding (2.0.2)
     EASY_SWITCH_VERSION_CODE, // Easy switch (2.2.0)
-    WEEK_VIEW_VERSION_CODE // Week view (2.3.10)
+    WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
+    IMPORT_VERSION_CODE // Import (2.5.0)
 )
 
 object FeatureFlag {

@@ -21,6 +21,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
+import me.proton.android.calendar.common.IMPORT_VERSION_CODE
 import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.REBRANDING_VERSION_CODE
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
@@ -78,6 +79,13 @@ object SpotlightUtils {
         )
     }
 
+    private fun getImportDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_import_title,
+            R.string.spotlight_dialog_import_description
+        )
+    }
+
     fun Activity.showLastSpotlightDialog() {
         if (!SPOTLIGHT) return
 
@@ -131,6 +139,15 @@ object SpotlightUtils {
             WEEK_VIEW_VERSION_CODE -> {
                 // Week view
                 val weekViewContent = getWeekViewDialogContent()
+                this.displaySpotlightDialog(
+                    weekViewContent.first,
+                    weekViewContent.second,
+                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
+                )
+            }
+            IMPORT_VERSION_CODE -> {
+                // Import
+                val weekViewContent = getImportDialogContent()
                 this.displaySpotlightDialog(
                     weekViewContent.first,
                     weekViewContent.second,
