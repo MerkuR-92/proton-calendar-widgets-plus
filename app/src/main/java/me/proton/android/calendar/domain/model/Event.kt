@@ -8,9 +8,6 @@ import biweekly.property.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
-import java.time.*
-import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
@@ -18,12 +15,15 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
+import java.time.*
+import java.time.temporal.ChronoUnit
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(
@@ -78,11 +78,10 @@ data class Event private constructor(
          * Copy event with specified id / calendar / iCalendar / notifications values
          * and Timezone Assignments
          */
-        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null): Event {
+        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null, notifications: NotificationMigration? = null): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
             val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
             val endTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
-            val notifications = NotificationMigration(event.notifications.isMigrated, (iCalendar ?: event.iCalendar).events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
             return event.copy(
                 id = id ?: event.id,
                 calendar = calendar ?: event.calendar,
@@ -111,7 +110,7 @@ data class Event private constructor(
                     setEndTimeZone(endTimezoneId)
                     setDefaultTimeZone(defaultTimezoneId)
                 },
-                notifications = notifications)
+                notifications = notifications ?: event.notifications)
         }
 
         /**
@@ -148,7 +147,7 @@ data class Event private constructor(
          * Returns copy of an [Event] with overwritten start & end datetime with [Occurrence] values.
          */
         fun withOccurrence(event: Event, occurrence: Occurrence): Event {
-            return event.copy(iCalendar = event.iCalendar.copy() as ICalendar).apply {
+            return Event.from(event).apply {
                 if (this.isAllDay()) {
                     this.iCalEvent.setStart(occurrence.startDateTime.toLocalDate())
                     this.iCalEvent.setEnd(occurrence.endDateTime.toLocalDate())

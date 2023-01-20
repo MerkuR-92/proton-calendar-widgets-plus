@@ -393,7 +393,9 @@ class HandleIcsUseCase @Inject constructor(
                 }
             }
 
-            Event.from(existingEvent, iCalendar = newICalendar)
+            val notifications = NotificationMigration(existingEvent.notifications.isMigrated, newICalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
+
+            Event.from(existingEvent, iCalendar = newICalendar, notifications = notifications)
         }
 
         return editCreateEventFromIcs(
