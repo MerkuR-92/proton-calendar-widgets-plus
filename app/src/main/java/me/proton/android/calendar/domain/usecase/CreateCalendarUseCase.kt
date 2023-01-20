@@ -28,7 +28,13 @@ class CreateCalendarUseCase @Inject constructor(
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, name: String, description: String = "", color: Int = DEFAULT_CALENDAR_COLOR, display: Int = 1, email: String? = null) : UseCase.Result {
+    suspend fun execute(
+        userId: UserId,
+        name: String,
+        description: String = "",
+        color: Int = DEFAULT_CALENDAR_COLOR,
+        display: Int = 1,
+        email: String? = null) : UseCase.Result {
 
         val address = userManager.getAddressesOrNull(userId, refresh = true)?.firstOrNull { address ->
             email?.let { address.email == it } ?: address.canSend && address.canReceive
@@ -53,8 +59,14 @@ class CreateCalendarUseCase @Inject constructor(
                 return when (val memberListApiResponse = calendarsApi.getMemberList(userId, calendarId)) {
                     is ApiResponse.Success -> {
 
+                        val calendarSettings = calendarsApi.getCalendarSettings(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendarSettings
+
                         // Save calendar in DB
                         calendarsRepository.persistCalendar(userId.id, createCalendarApiResponse.data.calendar)
+
+                        calendarSettings?.let {
+                            calendarsRepository.persistCalendarSettings(it)
+                        }
 
                         // Save member in DB
                         val memberEntity = memberListApiResponse.data.members.firstOrNull() ?: return UseCase.Result.Error("CreateCalendarUseCase: member was null")
