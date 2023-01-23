@@ -119,12 +119,12 @@
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Ces participants ne peuvent pas être informés de vos modifications :\n\n• %1$s\n\nVoulez-vous quand même continuer ?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continuer</string>
     <string name="event_attendees_send_prefs_error_cancel">Annuler</string>
-    <string name="event_send_prefs_error_address_disabled">cette adresse n\'existe pas</string>
-    <string name="event_send_prefs_error_getting_contact">n\'a pas pu obtenir les données de contact</string>
-    <string name="event_send_prefs_error_network">erreur réseau</string>
-    <string name="event_send_prefs_trusted_keys_invalid">les clés de confiance ne sont pas valides</string>
-    <string name="event_send_prefs_public_keys_invalid">les clés publiques ne sont pas valides</string>
-    <string name="event_send_prefs_trusted_keys_signature_invalid">la signature de contact n\'est pas valide</string>
+    <string name="event_send_prefs_error_address_disabled">cette adresse n\'existe pas.</string>
+    <string name="event_send_prefs_error_getting_contact">impossible d\'obtenir les données de contact.</string>
+    <string name="event_send_prefs_error_network">erreur réseau.</string>
+    <string name="event_send_prefs_trusted_keys_invalid">les clés de confiance ne sont pas valides.</string>
+    <string name="event_send_prefs_public_keys_invalid">les clés publiques ne sont pas valides.</string>
+    <string name="event_send_prefs_trusted_keys_signature_invalid">la signature de contact n\'est pas valide.</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nouvel événement</string>
@@ -146,11 +146,11 @@
     <string name="event_text_timezone_start">Fuseau horaire</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Que recherchez-vous ?</string>
-    <string name="search_empty_results_title">Aucun résultat trouvé</string>
+    <string name="search_empty_results_title">Aucun résultat n\'a été trouvé.</string>
     <string name="search_empty_results_subtitle">Essayez un autre terme, comme Eric, anniversaire, webinaire ou club de lecture par exemple.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Téléchargement des calendriers (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
-    <string name="search_downloading_time_remaining_unknown">Estimation du temps restant...</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">Temps restant : %1$s</string>
+    <string name="search_downloading_time_remaining_unknown">estimation du temps restant...</string>
     <string name="search_downloading_pause">Suspendre le téléchargement</string>
     <string name="search_settings_dialog_toggle_off_title">Supprimer tous les calendriers téléchargés ?</string>
     <string name="search_settings_dialog_toggle_off_text">Vous devrez à nouveau télécharger vos calendriers si vous voulez faire des recherches.</string>
@@ -162,11 +162,11 @@
     <string name="search_onboarding_action_pause">Suspendre</string>
     <string name="search_onboarding_action_resume">Reprendre</string>
     <string name="search_onboarding_action_retry">Réessayer</string>
-    <string name="search_onboarding_progress_header_ongoing">Téléchargement des calendriers...</string>
+    <string name="search_onboarding_progress_header_ongoing">Téléchargement des calendriers…</string>
     <string name="search_onboarding_progress_header_completed">Le téléchargement est terminé.</string>
-    <string name="search_onboarding_progress_header_paused">Le téléchargement des calendriers est suspendu.</string>
-    <string name="search_onboarding_progress_header_error">Une erreur s\'est produite lors du téléchargement des calendriers.</string>
-    <string name="search_spotlight_activation_snack">La recherche dans le calendrier est activée.</string>
+    <string name="search_onboarding_progress_header_paused">Téléchargement des calendriers suspendu</string>
+    <string name="search_onboarding_progress_header_error">Erreur lors du téléchargement des calendriers</string>
+    <string name="search_spotlight_activation_snack">Recherche dans le calendrier activée</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Ajouter une notification</string>
     <string name="event_text_description">Description</string>
@@ -495,7 +495,7 @@
     <string name="spotlight_v5_dialog_rebranding_description">Voici le nouveau Proton : plusieurs services, une seule mission. Bienvenue sur un internet où la vie privée est la règle absolue. <a href="https://proton.me/news/updated-proton">En savoir plus</a></string>
     <string name="spotlight_dialog_week_view_title">Plus d\'options d\'affichage</string>
     <string name="spotlight_dialog_week_view_description">• Voici les vues de calendrier <b>3 jours</b> et <b>Semaine</b>. Sélectionnez votre vue préférée dans le <b>menu</b>.\n\n• Ajustez la hauteur des lignes de la grille des jours en pinçant avec deux doigts pour faire un zoom avant ou arrière.</string>
-    <string name="spotlight_dialog_search_title">Search seamlessly</string>
+    <string name="spotlight_dialog_search_title">Recherche facile</string>
     <string name="spotlight_dialog_search_description">Vous pouvez désormais faire des recherches d\'événements dans votre calendrier. Cela télécharge une copie chiffrée de vos calendriers sur votre appareil. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
@@ -604,8 +604,8 @@
         <item quantity="other">secondes</item>
     </plurals>
     <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">%1$s remaining…</item>
-        <item quantity="other">%1$s remaining…</item>
+        <item quantity="one">Temps restant : %1$s…</item>
+        <item quantity="other">Temps restant : %1$s…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
