@@ -95,7 +95,7 @@ class SendEmailUseCase @Inject constructor(
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address ID for sender") // TODO better error
 
         val senderAddress =
-            userManager.getAddressesOrNull(userId, refresh = true)?.find {
+            userManager.getAddressesOrNull(userId)?.find {
                 it.addressId.id == senderAddressId
             } ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
 
@@ -284,9 +284,8 @@ class SendEmailUseCase @Inject constructor(
             canonicalizeProtonEmail(it.email, forceCanonicalization = true) == senderCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
 
-        // TODO Check with core if refresh true can be removed
         val senderAddress =
-            userManager.getAddressesOrNull(userId, refresh = true)?.find {
+            userManager.getAddressesOrNull(userId)?.find {
                 it.addressId.id == senderAddressId
             } ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
 

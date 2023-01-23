@@ -33,7 +33,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
 
         // We pass the user address list as a parameter because it has refresh flag set at true so we want to reduce
         //  the amount of calls needed in case we're reactivating keys for a list of calendars.
-        val userAddresses = addresses ?: userManager.getAddressesOrNull(userId, refresh = true)
+        val userAddresses = addresses ?: userManager.getAddressesOrNull(userId)
 
         // Get all keys
         val keysResponse = calendarsApi.getKeys(userId, calendarId)
