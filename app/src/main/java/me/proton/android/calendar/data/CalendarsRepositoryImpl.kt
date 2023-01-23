@@ -743,15 +743,15 @@ class CalendarsRepositoryImpl @Inject constructor(
             emit(CalendarsRepository.GetEventsResult.Exception(it))
         }.distinctUntilChanged()
 
-    override fun deleteSearchEvents(userId: String) {
+    override suspend fun deleteSearchEvents(userId: String) {
         searchDatabase.searchDao().delete(userId)
     }
 
-    override fun deleteSearchEvents(userId: String, calendarId: String) {
+    override suspend fun deleteSearchEvents(userId: String, calendarId: String) {
         searchDatabase.searchDao().delete(userId, calendarId)
     }
 
-    override fun deleteSearchEvents(userId: String, calendarId: String, eventIds: List<String>) {
+    override suspend fun deleteSearchEvents(userId: String, calendarId: String, eventIds: List<String>) {
         searchDatabase.searchDao().delete(userId, calendarId, eventIds)
     }
 
