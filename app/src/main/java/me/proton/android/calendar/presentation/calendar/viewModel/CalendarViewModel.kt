@@ -404,6 +404,8 @@ class CalendarViewModel @Inject constructor(
                             }${it.summary}"
                         }
 
+                        val today = LocalDate.now()
+
                         sortedEvents.forEachIndexed { index, event ->
                             // show date column only in the first Event on a given day
                             val timelineEvent = event.toTimelineEvent(
@@ -411,6 +413,7 @@ class CalendarViewModel @Inject constructor(
                                 entry.key,
                                 timeZoneId,
                                 index == 0,
+                                entry.key == today,
                                 index == sortedEvents.size - 1,
                                 userEmails,
                                 is24Hour,

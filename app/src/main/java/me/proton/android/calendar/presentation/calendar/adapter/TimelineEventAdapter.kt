@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.item_timeline.view.tv_event_subheader_side
 import kotlinx.android.synthetic.main.item_timeline.view.v_event_spacing
 import kotlinx.android.synthetic.main.item_timeline_header.view.text_header
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
@@ -87,6 +88,15 @@ class TimelineEventAdapter(
                 tv_event_date_header.text = if (event.showDateColumn) event.happensOn.month.formatShort() else ""
                 tv_event_date_text.text = if (event.showDateColumn) "${event.happensOn.dayOfMonth}" else ""
 
+                // highlight date column
+                if (event.highlightDateColumn) {
+                    tv_event_date_header.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
+                    tv_event_date_text.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
+                } else {
+                    tv_event_date_header.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
+                    tv_event_date_text.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
+                }
+
                 // strikethrough if event is cancelled
                 if (event.isCancelledOrDeclined) {
                     tv_event_header.paintFlags = tv_event_header.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
@@ -150,6 +160,7 @@ class TimelineEventAdapter(
         // LocalDate that this Event spans, not necessarily the same as dateStart
         val happensOn: LocalDate,
         val showDateColumn: Boolean,
+        val highlightDateColumn: Boolean,
         val showBottomSpacing: Boolean,
         val fullDayCounter: String?,
         val occurrenceNumber: Int,
