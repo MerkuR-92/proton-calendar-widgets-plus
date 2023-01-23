@@ -159,7 +159,7 @@
     <string name="search_onboarding_header">Searching for something in your calendar?</string>
     <string name="search_onboarding_text">In order to search your calendars you first need to download a local encrypted copy of your calendars. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">Agenda\'s downloaden</string>
-    <string name="search_onboarding_action_pause">Pause</string>
+    <string name="search_onboarding_action_pause">Pauzeer</string>
     <string name="search_onboarding_action_resume">Hervatten</string>
     <string name="search_onboarding_action_retry">Opnieuw proberen</string>
     <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
@@ -602,8 +602,8 @@ Vink minstens %1$d agenda\'s af</item>
         <item quantity="other">\u0020or\n • Tenminste %1$d agenda\'s samenvoegen met bestaande Proton agenda\'s.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">second</item>
-        <item quantity="other">seconds</item>
+        <item quantity="one">seconde</item>
+        <item quantity="other">seconden</item>
     </plurals>
     <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
         <item quantity="one">%1$s remaining…</item>

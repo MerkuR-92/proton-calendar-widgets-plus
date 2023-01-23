@@ -16,8 +16,8 @@
     <string name="dialog_button_cancel">Cancel·la</string>
     <string name="dialog_button_continue">Continua</string>
     <string name="dialog_button_close">Tanca</string>
-    <string name="dialog_button_remove">Remove</string>
-    <string name="dialog_button_download">Download</string>
+    <string name="dialog_button_remove">Suprimeix</string>
+    <string name="dialog_button_download">Baixa</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">S\'enviarà un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">La vostra adreça està desactivada. No es pot enviar un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir l\'esdeveniment igualment?</string>
@@ -145,28 +145,28 @@
     <string name="event_text_calendar">Calendari</string>
     <string name="event_text_timezone_start">Fus horari</string>
     <!-- SEARCH -->
-    <string name="search_hint_input_field">What are you looking for?</string>
-    <string name="search_empty_results_title">No results found</string>
-    <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
-    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
-    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
-    <string name="search_downloading_pause">Pause download</string>
-    <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
-    <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
-    <string name="search_settings_dialog_toggle_on_title">Download calendars to this device?</string>
-    <string name="search_settings_dialog_toggle_on_text">This is required so you can search.</string>
-    <string name="search_onboarding_header">Searching for something in your calendar?</string>
+    <string name="search_hint_input_field">Què esteu buscant?</string>
+    <string name="search_empty_results_title">No s\'han trobat resultats</string>
+    <string name="search_empty_results_subtitle">Inteneu un altre terme, per ex., Enric, aniversari, webinar, club del llibre.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Descarregant els calendaris (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">resten %1$s…</string>
+    <string name="search_downloading_time_remaining_unknown">calculant el temps restant…</string>
+    <string name="search_downloading_pause">Pausa la baixada</string>
+    <string name="search_settings_dialog_toggle_off_title">Eliminar tots els calendaris descarregats?</string>
+    <string name="search_settings_dialog_toggle_off_text">Necessitareu tornar a descarregar els calendaris si voleu cercar-hi.</string>
+    <string name="search_settings_dialog_toggle_on_title">Descarregar els calendaris a aquest dispositiu?</string>
+    <string name="search_settings_dialog_toggle_on_text">Es requereix per a poder cercar.</string>
+    <string name="search_onboarding_header">Busqueu alguna cosa al vostre calendari?</string>
     <string name="search_onboarding_text">In order to search your calendars you first need to download a local encrypted copy of your calendars. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
-    <string name="search_onboarding_action_download_calendars">Download calendars</string>
-    <string name="search_onboarding_action_pause">Pause</string>
-    <string name="search_onboarding_action_resume">Resume</string>
-    <string name="search_onboarding_action_retry">Retry</string>
-    <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
-    <string name="search_onboarding_progress_header_completed">Downloading completed</string>
-    <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
-    <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
-    <string name="search_spotlight_activation_snack">Calendar search activated</string>
+    <string name="search_onboarding_action_download_calendars">Baixa els calendaris</string>
+    <string name="search_onboarding_action_pause">Pausa</string>
+    <string name="search_onboarding_action_resume">Continua</string>
+    <string name="search_onboarding_action_retry">Torna a provar</string>
+    <string name="search_onboarding_progress_header_ongoing">Baixant els calendaris…</string>
+    <string name="search_onboarding_progress_header_completed">Baixada completada</string>
+    <string name="search_onboarding_progress_header_paused">Baixada dels calendaris pausada</string>
+    <string name="search_onboarding_progress_header_error">Error baixant els calendaris</string>
+    <string name="search_spotlight_activation_snack">Cerca dels calendaris activada</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Afegir notificació</string>
     <string name="event_text_description">Descripció</string>
@@ -361,7 +361,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificacions d\'esdeveniment</string>
     <string name="notification_channel_sync">Sincronització del calendari</string>
-    <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
+    <string name="notification_channel_calendar_fetch">Obtenint els calendaris</string>
     <string name="notification_sync">Sincronitzant calendaris…</string>
     <string name="notification_text_today">Avui</string>
     <string name="notification_text_today_part_time">Avui, %1$s</string>
@@ -388,7 +388,7 @@
     <string name="settings_time_format_title">Format d\'hora</string>
     <string name="settings_week_numbers_title">Mostrar el número de setmana</string>
     <string name="settings_auto_invites_title">Afegir invitacions al calendari i marcar-les com a pendents</string>
-    <string name="settings_search_title">Search calendars</string>
+    <string name="settings_search_title">Cerca calendaris</string>
     <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
     <string name="settings_alternative_routing_title">Permetre encaminament alternatiu</string>
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
@@ -602,8 +602,8 @@
         <item quantity="other">\u0020o\n • Combineu almenys %1$d calendaris importats amb els vostres calendaris Proton existents.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">second</item>
-        <item quantity="other">seconds</item>
+        <item quantity="one">segon</item>
+        <item quantity="other">segons</item>
     </plurals>
     <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
         <item quantity="one">%1$s remaining…</item>
