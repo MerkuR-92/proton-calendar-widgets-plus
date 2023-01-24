@@ -291,6 +291,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val editPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_edit_press)
         val markDefaultPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_default_press)
         val deletePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_delete_press)
+        val recreatePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_recreate_press)
 
         editPress?.setOnSingleClickListener {
             val bundle = Bundle().apply {
@@ -340,27 +341,49 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     with (MaterialAlertDialogBuilder(requireContext())) {
                         setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
                         setMessage(dialogMessage)
-                        setPositiveButton(R.string.dialog_button_delete, object : DialogInterface.OnClickListener {
-                            override fun onClick(p0: DialogInterface?, p1: Int) {
-                                lifecycleScope.launch {
-                                    val deleteResult = calendarViewModel.deleteCalendar(prepareOption)
-                                    when (deleteResult) {
-                                        is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
-                                        is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
-                                        is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
-                                    }
-                                    bottomSheetDialog.dismiss()
+                        setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                            lifecycleScope.launch {
+                                when (calendarViewModel.deleteCalendar(prepareOption)) {
+                                    is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                                    is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
+                                    is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
                                 }
+                                bottomSheetDialog.dismiss()
                             }
-                        })
+                        }
                         setNegativeButton(R.string.dialog_button_cancel, null)
                     }.create().show()
                 }
             }
         }
 
+        recreatePress?.setOnSingleClickListener {
+            lifecycleScope.launch {
+                bottomSheetDialog.dismiss()
+                with (MaterialAlertDialogBuilder(requireContext())) {
+                    setTitle(resourceProvider.provideString(R.string.recreate_calendar_dialog_title))
+                    setMessage(resourceProvider.provideString(R.string.recreate_calendar_dialog_message))
+                    setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                        lifecycleScope.launch {
+                            when (calendarViewModel.recreateCalendar(calendar.id)) {
+                                is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.recreate_calendar_snack_error))
+                                is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
+                                is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.recreate_calendar_snack_deleted))
+                            }
+                            bottomSheetDialog.dismiss()
+                        }
+                    }
+                    setNegativeButton(R.string.dialog_button_cancel, null)
+                }.create().show()
+            }
+        }
+
+        val userCalendarsCount = calendarViewModel.userCalendars.value?.size ?: 0
         val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not() && calendar.isSharedWithMe.not())
+        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not() && calendar.isSharedWithMe.not() && userCalendarsCount > 1)
+
+        val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
+        recreateLayout?.visibleOrGone(DELETE_CALENDAR && userCalendarsCount == 1)
 
         val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
         markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not() && calendar.isSharedWithMe.not())

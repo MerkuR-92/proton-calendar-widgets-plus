@@ -50,6 +50,12 @@ interface CalendarsApi {
     suspend fun deleteCalendar(userId: UserId, calendarId: String): ApiResponse<StatusCodeApiResponse>
 
     /**
+     * Deletes a calendar and creates a new one with the same name, description, color, and display.
+     * Note: If calendar was shared, all members will be removed and will receive a deletion email.
+     */
+    suspend fun recreateCalendar(userId: UserId, calendarId: String): ApiResponse<RecreateCalendarApiResponse>
+
+    /**
      * Gets all "active" (occuring in the future) alarms of type "DISPLAY" for given calendar.
      */
     suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int) : ApiResponse<AlarmsApiResponse>

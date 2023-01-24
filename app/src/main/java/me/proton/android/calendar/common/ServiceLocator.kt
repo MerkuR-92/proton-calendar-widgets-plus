@@ -81,7 +81,7 @@ val repositoryModule = module {
 }
 
 val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<MainViewModel> {
         MainViewModel(
             get(),
@@ -116,6 +116,7 @@ val useCaseModule = module {
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
     factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<RecreateCalendarUseCase> { RecreateCalendarUseCase(get(), get(), get(), get(), get()) }
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get()) }

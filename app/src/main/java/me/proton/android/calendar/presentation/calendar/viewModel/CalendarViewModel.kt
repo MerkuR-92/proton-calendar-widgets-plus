@@ -70,6 +70,7 @@ class CalendarViewModel @Inject constructor(
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val deleteCalendarUseCase: DeleteCalendarUseCase,
+    private val recreateCalendarUseCase: RecreateCalendarUseCase,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
@@ -385,6 +386,15 @@ class CalendarViewModel @Inject constructor(
             return UseCase.Result.Error("userID == null in deleteCalendar")
         }
         return deleteCalendarUseCase.execute(UserId(userId), deleteOption)
+    }
+
+    suspend fun recreateCalendar(calendarId: String): UseCase.Result {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel recreateCalendar")
+            return UseCase.Result.Error("userID == null in recreateCalendar")
+        }
+        return recreateCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
     fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {

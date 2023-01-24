@@ -46,6 +46,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}")
     suspend fun deleteCalendar(@Path("calendarId") calendarId: String): StatusCodeApiResponse
 
+    @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/recreate")
+    suspend fun recreateCalendar(@Path("calendarId") calendarId: String): RecreateCalendarApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/alarms")
     suspend fun getAlarms(@Path("calendarId") calendarId: String, @Query("Start") startTimestamp: Long, @Query("End") endTimestamp: Long, @Query("PageSize") pageSize: Int) : AlarmsApiResponse
 
@@ -172,6 +175,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     override suspend fun deleteCalendar(userId: UserId, calendarId: String): ApiResponse<StatusCodeApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             deleteCalendar(calendarId)
+        }.toApiResponse()
+
+    override suspend fun recreateCalendar(userId: UserId, calendarId: String): ApiResponse<RecreateCalendarApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            recreateCalendar(calendarId)
         }.toApiResponse()
 
     override suspend fun getAlarms(userId: UserId, calendarId: String, startTimestamp: Long, endTimestamp: Long, pageSize: Int): ApiResponse<AlarmsApiResponse> =
@@ -628,3 +636,10 @@ data class GetCalendarSettingsApiResponse(
     @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity
 )
+
+@Serializable
+data class RecreateCalendarApiResponse(
+    @SerialName("Calendar")
+    val calendar: CalendarEntity
+)
+
