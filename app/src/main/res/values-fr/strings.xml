@@ -575,8 +575,8 @@
         <item quantity="other">Fusionner %d calendriers dans Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendrier.</item>
-        <item quantity="other">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers.</item>
+        <item quantity="one">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers.\n • Désélectionnez au moins %1$d calendrier</item>
+        <item quantity="other">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers.\n • Désélectionnez au moins %1$d calendriers</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ou\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>

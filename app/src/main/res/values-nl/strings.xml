@@ -575,9 +575,9 @@
         <item quantity="other">Voeg %d agenda‘s samen in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor persoonlijke agenda.\n • 
+        <item quantity="one">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor agenda.\n •
 Vink minstens %1$d agenda af</item>
-        <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor persoonlijke agenda.\n • 
+        <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor agenda.\n •
 Vink minstens %1$d agenda\'s af</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">

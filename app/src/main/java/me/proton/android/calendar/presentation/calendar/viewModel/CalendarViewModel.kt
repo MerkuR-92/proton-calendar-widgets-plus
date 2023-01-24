@@ -746,17 +746,19 @@ class CalendarViewModel @Inject constructor(
         PAID_REACHED
     }
 
+    suspend fun getCalendarsCount(): Int? {
+        val userCalendarsCount = getUserCalendars()?.size
+        val subscribedCalendarsCount = getSubscribedCalendars()?.size
+        return if (userCalendarsCount != null && subscribedCalendarsCount != null) userCalendarsCount + subscribedCalendarsCount
+        else userCalendarsCount ?: subscribedCalendarsCount
+    }
+
     suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
-        val userCalendarsCount = run {
-            val userCalendarsCount = getUserCalendars()?.size
-            val subscribedCalendarsCount = getSubscribedCalendars()?.size
-            if (userCalendarsCount != null && subscribedCalendarsCount != null) userCalendarsCount + subscribedCalendarsCount
-            else userCalendarsCount ?: subscribedCalendarsCount
-        } ?: return UserCalendarLimit.ERROR
+        val calendarsCount = getCalendarsCount() ?: return UserCalendarLimit.ERROR
         val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
 
-        if (isFreeUser && userCalendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
-        if (!isFreeUser && userCalendarsCount >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
+        if (isFreeUser && calendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
+        if (!isFreeUser && calendarsCount >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
         return UserCalendarLimit.NOT_REACHED
     }
 

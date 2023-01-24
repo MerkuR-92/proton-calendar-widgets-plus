@@ -574,10 +574,6 @@
         <item quantity="one">Unir %d agenda no Proton Calendar.</item>
         <item quantity="other">Unir %d agendas no Proton Calendar.</item>
     </plurals>
-    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Não é possível criar agendas para todas as agendas importadas devido ao limite de agenda pessoal.\n • Desmarque pelo menos %1$d agenda.</item>
-        <item quantity="other">Não é possível criar agendas para todas as agendas importadas devido ao limite de agenda pessoal.\n • Desmarque pelo menos %1$d agendas.</item>
-    </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ou\n • Una pelo menos %1$d agenda com agendas Proton existentes.</item>
         <item quantity="other">\u0020ou\n • Una pelo menos %1$d agendas com agendas Proton existentes.</item>

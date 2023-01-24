@@ -582,9 +582,9 @@
         <item quantity="other">Îmbinare %d de calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin un calendar</item>
-        <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d calendare</item>
-        <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare personale.\n • Deselectați cel puțin %1$d de calendare</item>
+        <item quantity="one">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare.\n • Deselectați cel puțin un calendar</item>
+        <item quantity="few">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare.\n • Deselectați cel puțin %1$d calendare</item>
+        <item quantity="other">Nu se pot crea calendare pentru toate calendarele importate datorită limitei de calendare.\n • Deselectați cel puțin %1$d de calendare</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
