@@ -216,34 +216,46 @@ data class Event private constructor(
     }
 
     fun addAlarms(alarmsToAdd: List<VAlarm>) {
+        val currentNotifications =
+            if (notifications.isMigrated) {
+                notifications.notifications ?: run {
+                    // If notifications is null, event uses default alarms
+                    if (this.isAllDay()) calendar.defaultFullDayNotifications
+                    else calendar.defaultPartDayNotifications
+                }
+            } else {
+                iCalEvent.alarms.mapNotNull { Notification.fromVAlarm(it) }
+            }
+
         iCalEvent.alarms.addAll(alarmsToAdd) // as long as we need PersonalPart generated from ICS, we keep injecting VAlarms
 
-        val currentNotifications = if (notifications.notifications == null) { // before adding new alarms, inject the default calendar alarms
-            if (this.isAllDay()) calendar.defaultFullDayNotifications else calendar.defaultPartDayNotifications
-        } else notifications.notifications
-
-        notifications = notifications.copy(notifications = currentNotifications?.plus( alarmsToAdd.mapNotNull { Notification.fromVAlarm(it) }))
+        notifications = notifications.copy(notifications = currentNotifications.plus( alarmsToAdd.mapNotNull { Notification.fromVAlarm(it) }))
     }
 
     fun removeAlarm(alarm: VAlarm) {
-        iCalEvent.alarms.indexOfFirst { it.isTheSameAs(alarm) }.takeIf { it != -1 }?.let {
-            iCalEvent.alarms.removeAt(it)
-        }
-
         val notificationsWithAlarmRemoved = Notification.fromVAlarm(alarm)?.let { notificationToDelete ->
-            val notifications = notifications.notifications ?: run {
-                // If notifications is null, event uses default alarms, so we need to get the list to remove notificationToDelete
-                if (isAllDay()) calendar.defaultFullDayNotifications
-                else calendar.defaultPartDayNotifications
-            }
+            val notifications =
+                if (notifications.isMigrated) {
+                    notifications.notifications ?: run {
+                        // If notifications is null, event uses default alarms, so we need to get the list to remove notificationToDelete
+                        if (isAllDay()) calendar.defaultFullDayNotifications
+                        else calendar.defaultPartDayNotifications
+                    }
+                } else {
+                    iCalEvent.alarms.mapNotNull { Notification.fromVAlarm(it) }
+                }
             notifications.indexOfFirst { it.isTheSameAs(notificationToDelete) }.takeIf { it != -1 }?.let {
                 notifications.toMutableList().apply { removeAt(it) }
             }
         }
 
+        iCalEvent.alarms.indexOfFirst { it.isTheSameAs(alarm) }.takeIf { it != -1 }?.let {
+            iCalEvent.alarms.removeAt(it)
+        }
+
         notifications = notifications.copy(notifications = notificationsWithAlarmRemoved)
     }
-    
+
     val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
 
     val defaultTimeZone: String? get() = iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
