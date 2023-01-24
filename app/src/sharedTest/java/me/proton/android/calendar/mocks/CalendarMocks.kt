@@ -47,7 +47,7 @@ object CalendarMocks {
         )
     }
 
-    fun provideCalendar(isDisabled: Boolean = false, isHidden: Boolean = false, id: String = calendarId): Calendar {
+    fun provideCalendar(isDisabled: Boolean = false, isHidden: Boolean = false, id: String = calendarId, defaultPartDayNotifications: List<Notification>? = null): Calendar {
         return Calendar(
             id,
             calendarName,
@@ -57,7 +57,7 @@ object CalendarMocks {
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType,
             calendarPermissions,
-            defaultPartDayNotifications = listOf(Notification.Display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START))),
+            defaultPartDayNotifications = defaultPartDayNotifications ?: listOf(Notification.Display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START))),
             defaultFullDayNotifications = listOf(Notification.Display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START)))
         )
     }

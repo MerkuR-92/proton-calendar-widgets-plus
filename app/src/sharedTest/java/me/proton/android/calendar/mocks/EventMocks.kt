@@ -16,6 +16,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar
 import java.time.LocalDate
 import java.time.LocalTime
@@ -35,7 +36,8 @@ object EventMocks {
         hasExDate: Boolean = false,
         hasHiddenCalendar: Boolean = false,
         hasDefaultAlarms: Boolean = true,
-        participationStatus: ParticipationStatus = ParticipationStatus.DECLINED
+        participationStatus: ParticipationStatus = ParticipationStatus.DECLINED,
+        notifications: NotificationMigration = NotificationMigration(false, null)
     ): Event {
 
         val ics = when {
@@ -105,7 +107,8 @@ object EventMocks {
             0,
             null, // TODO
             isProtonProtonInvite = isProtonProtonInvite,
-            currentUserAttendeeId = if (isAttendee) attendeeId else null
+            currentUserAttendeeId = if (isAttendee) attendeeId else null,
+            notifications = notifications
         )!!
     }
 
