@@ -299,7 +299,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                             }
 
                             // Save the current month in order to know where to return if user presses back from day view
-                            calendarViewModel.monthViewDate = calendarViewModel.selectedDate.value
+                            calendarViewModel.monthViewDate = date
 
                             // Set the selected date value and switch to day view
                             calendarViewModel.handleDaySelected(date)
