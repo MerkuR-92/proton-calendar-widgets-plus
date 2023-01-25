@@ -3,9 +3,14 @@ package me.proton.android.calendar.domain.model
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
+import biweekly.component.VAlarm
 import biweekly.component.VEvent
+import biweekly.parameter.Related
+import biweekly.property.Trigger
 import biweekly.util.DayOfWeek
+import biweekly.util.Duration
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.logger.TestsLogger
@@ -14,6 +19,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
+import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar
+import me.proton.android.calendar.mocks.EventMocks.provideEvent
 import org.junit.jupiter.api.Test
 import java.sql.Date
 import java.time.LocalDate
@@ -279,6 +286,274 @@ internal class EventTest {
         }
 
     }
+
+    @Test
+    fun `setDefaultAlarms for non-migrated events`() {
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(false, null)
+        )
+
+        assertThat(event.calendar.defaultPartDayNotifications).isNotEmpty()
+
+        event.setDefaultAlarms()
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.size).isEqualTo(event.calendar.defaultPartDayNotifications.size)
+
+    }
+
+    @Test
+    fun `setDefaultAlarms for migrated event`() {
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(true, null)
+        )
+
+        assertThat(event.calendar.defaultPartDayNotifications).isNotEmpty()
+
+        event.setDefaultAlarms()
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.size).isEqualTo(event.calendar.defaultPartDayNotifications.size)
+
+
+    }
+
+    @Test
+    fun `addAlarms for non-migrated event with default alarms`() {
+
+        val event = provideEvent(
+            hasDefaultAlarms = true,
+            notifications = NotificationMigration(false, null)
+        )
+
+        assertThat(event.calendar.defaultPartDayNotifications).isNotEmpty()
+
+        val customAlarm = VAlarm.display(Trigger(Duration.builder().prior(true).hours(20).build(), Related.START), null)
+
+        event.setDefaultAlarms()
+
+        event.addAlarms(listOf(customAlarm))
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.contains(customAlarm))
+
+        assertThat(event.alarms.size).isEqualTo(event.calendar.defaultPartDayNotifications.size + 1)
+
+    }
+
+    @Test
+    fun `addAlarms for non-migrated event with custom alarms`() {
+
+        val customAlarms = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        )
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(false, customAlarms.map { Notification.fromVAlarm(it)!! })
+        )
+
+        customAlarms.forEach {
+            event.iCalEvent.addAlarm(it)
+        }
+
+        val customAlarm = VAlarm.display(Trigger(Duration.builder().prior(true).hours(20).build(), Related.START), null)
+
+        event.addAlarms(listOf(customAlarm))
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.contains(customAlarm))
+
+        assertThat(event.alarms.size).isEqualTo(customAlarms.size + 1)
+
+    }
+
+    @Test
+    fun `addAlarms for migrated event with default alarms`() {
+
+        val event = provideEvent(
+            hasDefaultAlarms = true,
+            notifications = NotificationMigration(true, null)
+        )
+
+        assertThat(event.calendar.defaultPartDayNotifications).isNotEmpty()
+
+        val customAlarm = VAlarm.display(Trigger(Duration.builder().prior(true).hours(20).build(), Related.START), null)
+
+        event.setDefaultAlarms()
+
+        event.addAlarms(listOf(customAlarm))
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.contains(customAlarm))
+
+        assertThat(event.alarms.size).isEqualTo(event.calendar.defaultPartDayNotifications.size + 1)
+
+    }
+
+    @Test
+    fun `addAlarms for migrated event with custom alarms`() {
+
+        val customAlarms = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        )
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(true, customAlarms.map { Notification.fromVAlarm(it)!! })
+        )
+
+        customAlarms.forEach {
+            event.iCalEvent.addAlarm(it)
+        }
+
+        val customAlarm = VAlarm.display(Trigger(Duration.builder().prior(true).hours(20).build(), Related.START), null)
+
+        event.addAlarms(listOf(customAlarm))
+
+        event.calendar.defaultPartDayNotifications.forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+        assertThat(event.alarms.contains(customAlarm))
+
+        assertThat(event.alarms.size).isEqualTo(customAlarms.size + 1)
+
+    }
+
+    @Test
+    fun `removeAlarm for non-migrated event with default alarms`() {
+
+        val defaultNotifications = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        ).map { Notification.fromVAlarm(it)!! }
+
+        val event = provideEvent(
+            hasDefaultAlarms = false, // we'll add default alarms by injecting calendar below
+            notifications = NotificationMigration(false, defaultNotifications)
+        ).copy(calendar = provideCalendar(defaultPartDayNotifications = defaultNotifications))
+
+        event.setDefaultAlarms()
+
+        event.removeAlarm(defaultNotifications.first().toVAlarm())
+
+        assertThat(event.alarms.size).isEqualTo(2)
+        assertThat(event.notifications.notifications!!.size).isEqualTo(2)
+
+        defaultNotifications.takeLast(2).forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+    }
+
+    @Test
+    fun `removeAlarm for non-migrated event with custom alarms`() {
+
+        val customNotifications = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        ).map { Notification.fromVAlarm(it)!! }
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(false, customNotifications)
+        ).copy(calendar = provideCalendar(defaultPartDayNotifications = emptyList())) // calendar has empty default alarms
+
+        customNotifications.forEach {
+            event.iCalEvent.addAlarm(it.toVAlarm())
+        }
+
+        event.removeAlarm(customNotifications.first().toVAlarm())
+
+        assertThat(event.alarms.size).isEqualTo(2)
+        assertThat(event.notifications.notifications!!.size).isEqualTo(2)
+
+        customNotifications.takeLast(2).forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+    }
+    @Test
+    fun `removeAlarm for migrated event with default alarms`() {
+
+        val defaultNotifications = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        ).map { Notification.fromVAlarm(it)!! }
+
+        val event = provideEvent(
+            hasDefaultAlarms = false, // we'll add default alarms by injecting calendar below
+            notifications = NotificationMigration(true, defaultNotifications)
+        ).copy(calendar = provideCalendar(defaultPartDayNotifications = defaultNotifications))
+
+        event.setDefaultAlarms()
+
+        event.removeAlarm(defaultNotifications.first().toVAlarm())
+
+        assertThat(event.alarms.size).isEqualTo(2)
+        assertThat(event.notifications.notifications!!.size).isEqualTo(2)
+
+        defaultNotifications.takeLast(2).forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+    }
+
+    @Test
+    fun `removeAlarm for migrated event with custom alarms`() {
+
+        val customNotifications = listOf(
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(16).build(), Related.START), null),
+            VAlarm.display(Trigger(Duration.builder().prior(true).hours(17).build(), Related.START), null),
+        ).map { Notification.fromVAlarm(it)!! }
+
+        val event = provideEvent(
+            hasDefaultAlarms = false,
+            notifications = NotificationMigration(true, customNotifications)
+        ).copy(calendar = provideCalendar(defaultPartDayNotifications = emptyList())) // calendar has empty default alarms
+
+        customNotifications.forEach {
+            event.iCalEvent.addAlarm(it.toVAlarm())
+        }
+
+        event.removeAlarm(customNotifications.first().toVAlarm())
+
+        assertThat(event.alarms.size).isEqualTo(2)
+        assertThat(event.notifications.notifications!!.size).isEqualTo(2)
+
+        customNotifications.takeLast(2).forEach {
+            assertThat(event.alarms.contains(it.toVAlarm()))
+        }
+
+    }
+
 
     val calendarStartEndTimeDifferentDays = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR

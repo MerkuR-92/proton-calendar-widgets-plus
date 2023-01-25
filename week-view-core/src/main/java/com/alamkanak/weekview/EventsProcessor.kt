@@ -82,6 +82,11 @@ internal class EventsProcessor(
         eventChipsCache.removeAll(diffResult.itemsToRemove)
 
         val eventChips = eventChipsFactory.create(diffResult.itemsToAddOrUpdate, viewState)
+
+        // We remove the events sharing the same ID so that we make sure we removed all multi day events chips before updating
+        val removeBeforeAdding = eventChipsCache.allEventChips.map { it.event }.filter { it.id in diffResult.itemsToAddOrUpdate.map { it.id } }.distinctBy { it.id }
+        eventChipsCache.removeAll(removeBeforeAdding)
+
         eventChipsCache.addAll(eventChips)
     }
 

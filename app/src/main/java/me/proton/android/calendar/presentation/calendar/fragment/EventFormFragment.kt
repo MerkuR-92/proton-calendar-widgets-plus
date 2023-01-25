@@ -79,6 +79,7 @@ import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
 import me.proton.android.calendar.common.FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
@@ -90,6 +91,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
@@ -543,8 +545,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
-                            calendarViewModel.handleDaySelected(it.newSelectedDate)
+                        val newSelectedDate = it.newSelectedDate
+                        val selectedDate = calendarViewModel.selectedDate.value
+                        val isDifferentSelectedDate = newSelectedDate != null && selectedDate != newSelectedDate
+                        val isDayVisibleInThreeDays = calendarViewModel.viewMode.value == ViewMode.THREE_DAY &&
+                                selectedDate?.let {
+                                    newSelectedDate?.isBetween(selectedDate, selectedDate.plusDays(2))
+                                } ?: false
+                        if (newSelectedDate != null && isDifferentSelectedDate && !isDayVisibleInThreeDays) {
+                            calendarViewModel.handleDaySelected(newSelectedDate)
                         }
 
                         // Use jumpToMonthView to handle navigation when opening details from notification
