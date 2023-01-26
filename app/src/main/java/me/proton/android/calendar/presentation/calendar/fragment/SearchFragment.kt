@@ -6,7 +6,6 @@ import android.os.Looper
 import android.text.method.LinkMovementMethod
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.postDelayed
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -30,12 +29,13 @@ import kotlinx.android.synthetic.main.layout_search_onboarding.tv_search_onboard
 import kotlinx.android.synthetic.main.layout_search_onboarding.tv_search_onboarding_progress_text
 import kotlinx.android.synthetic.main.layout_search_onboarding.tv_search_onboarding_text
 import kotlinx.android.synthetic.main.toolbar_action_button.view.imageButton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SEARCH_MIN_QUERY_LENGTH
@@ -99,59 +99,52 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
 
             val query = rawQuery.trim().toString()
 
-            if (query.isNotBlank() && query.trim().length >= SEARCH_MIN_QUERY_LENGTH) {
+            val (userEmails, userId) = withContext(Dispatchers.Default) {
+                (calendarViewModel.getUserEmails() ?: emptyList()) to (calendarViewModel.userId.value)
+            }
 
+            if (query.isNotBlank() && query.length >= SEARCH_MIN_QUERY_LENGTH && userEmails.isNotEmpty() && userId != null) {
                 fragment_progress_bar?.visibleOrInvisible(true)
 
                 searchJob?.cancel()
-                searchJob = lifecycleScope.launch {
+                searchJob = calendarViewModel.getTimelineEvents(
+                    userId.id,
+                    query,
+                    userEmails,
+                    calendarViewModel.timeFormatIs24Hour(requireContext()),
+                    calendarViewModel.getCalendarUserSettingsPrimaryTimezone() ?: ZoneId.systemDefault().id).onEach {
 
-                    val userEmails = calendarViewModel.getUserEmails() ?: emptyList()
-                    val userId = calendarViewModel.userId.value
+                    if (it?.isNotEmpty() == true) {
+                        ll_search_no_results.visibleOrGone(false)
+                        fragment_progress_bar?.visibleOrInvisible(false)
 
-                    userId?.let {
-                        val searchFlow = calendarViewModel.getTimelineEvents(
-                            userId.id,
-                            query.toString(),
-                            userEmails,
-                            calendarViewModel.timeFormatIs24Hour(requireContext()),
-                            calendarViewModel.getCalendarUserSettingsPrimaryTimezone() ?: ZoneId.systemDefault().id)
+                        // truncate the list from both ends and center on "today"
 
-                        searchFlow.onEach {
+                        val range = SEARCH_RESULTS_RANGE // how many events to show before and after "today"
+                        val indexToScrollTo = it.findIndexToScrollTo(calendarViewModel.getTimeZoneId() ?: ZoneId.systemDefault())
 
-                            if (it?.isNotEmpty() == true) {
-                                ll_search_no_results.visibleOrGone(false)
-                                fragment_progress_bar?.visibleOrInvisible(false)
+                        val leftIndex = maxOf(0, indexToScrollTo - range)
+                        val rightIndex = minOf(it.size, indexToScrollTo + range)
 
-                                // truncate the list from both ends and center on "today"
+                        val truncatedList = if (it[leftIndex] !is TimelineEventAdapter.TimelineItem.Header) {
+                            // we truncated the header from beginning of the list, we need to put it back
+                            val headerIndex = it.subList(0, leftIndex).indexOfLast { it is TimelineEventAdapter.TimelineItem.Header }
 
-                                val range = SEARCH_RESULTS_RANGE // how many events to show before and after "today"
-                                val indexToScrollTo = it.findIndexToScrollTo(calendarViewModel.getTimeZoneId() ?: ZoneId.systemDefault())
+                            listOf(it[headerIndex]) + it.subList(leftIndex + 1, rightIndex)
+                        } else it.subList(leftIndex, rightIndex)
 
-                                val leftIndex = maxOf(0, indexToScrollTo - range)
-                                val rightIndex = minOf(it.size, indexToScrollTo + range)
-
-                                val truncatedList = if (it[leftIndex] !is TimelineEventAdapter.TimelineItem.Header) {
-                                    // we truncated the header from beginning of the list, we need to put it back
-                                    val headerIndex = it.subList(0, leftIndex).indexOfLast { it is TimelineEventAdapter.TimelineItem.Header }
-
-                                    listOf(it[headerIndex]) + it.subList(leftIndex + 1, rightIndex)
-                                } else it.subList(leftIndex, rightIndex)
-
-                                timelineEventAdapter.submitList(truncatedList) {
-                                    val adjustedIndexToScrollTo = if (indexToScrollTo < range) indexToScrollTo else range
-                                    search_result_list.scrollToPosition(adjustedIndexToScrollTo)
-                                }
-                            } else {
-                                timelineEventAdapter.submitList(emptyList())
-                                fragment_progress_bar?.visibleOrInvisible(false)
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    ll_search_no_results?.visibleOrGone(true)
-                                }, 500)
-                            }
-                        }.launchIn(lifecycleScope)
+                        timelineEventAdapter.submitList(truncatedList) {
+                            val adjustedIndexToScrollTo = if (indexToScrollTo < range) indexToScrollTo else range
+                            search_result_list.scrollToPosition(adjustedIndexToScrollTo)
+                        }
+                    } else {
+                        timelineEventAdapter.submitList(emptyList())
+                        fragment_progress_bar?.visibleOrInvisible(false)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            ll_search_no_results?.visibleOrGone(true)
+                        }, 500)
                     }
-                }
+                }.launchIn(lifecycleScope)
 
             } else {
                 searchJob?.cancel()

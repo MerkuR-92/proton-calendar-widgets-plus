@@ -436,7 +436,7 @@ class CalendarViewModel @Inject constructor(
                 }
             }
 
-        }.cancellable()
+        }.flowOn(Dispatchers.IO).cancellable()
 
     }
 

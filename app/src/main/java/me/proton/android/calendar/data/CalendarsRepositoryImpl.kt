@@ -17,6 +17,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
@@ -728,8 +729,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override fun getSearchEvents(userId: String, searchTerm: String): Flow<CalendarsRepository.GetEventsResult<Event>> =
-        searchDatabase.searchDao().flowSearchEvents(userId).transform<List<SearchEventEntity>, CalendarsRepository.GetEventsResult<Event>> { searchEventEntities ->
-
+        searchDatabase.searchDao().flowSearchEvents(userId).distinctUntilChanged().transform<List<SearchEventEntity>, CalendarsRepository.GetEventsResult<Event>> { searchEventEntities ->
             val containSearchTerm = searchEventEntities.filterOutBySearchTerm(searchTerm)
 
             val deduplicated = containSearchTerm.mapNotNull { searchEventEntity ->
@@ -741,7 +741,7 @@ class CalendarsRepositoryImpl @Inject constructor(
             emit(CalendarsRepository.GetEventsResult.InProgress)
         }.catch {
             emit(CalendarsRepository.GetEventsResult.Exception(it))
-        }.distinctUntilChanged()
+        }.distinctUntilChanged().cancellable()
 
     override suspend fun deleteSearchEvents(userId: String) {
         searchDatabase.searchDao().delete(userId)
