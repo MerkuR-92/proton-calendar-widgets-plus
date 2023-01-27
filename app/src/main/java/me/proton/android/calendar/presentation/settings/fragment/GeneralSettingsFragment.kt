@@ -266,7 +266,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
-                settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled(requireContext())
+                settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
             }
         }
 
@@ -297,7 +297,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 // bring back the correct toggle value in case user changed their mind
                 lifecycleScope.launch {
                     withContext(Dispatchers.Main) {
-                        settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled(requireContext())
+                        settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
                     }
                 }
             }

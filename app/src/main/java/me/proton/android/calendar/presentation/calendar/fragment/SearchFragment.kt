@@ -184,7 +184,7 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
             when (it) {
                 SearchViewModel.DownloadingState.NONE -> {
                     lifecycleScope.launchWhenResumed {
-                        if (searchViewModel.isCalendarDownloadEnabled(requireContext())) {
+                        if (searchViewModel.isCalendarDownloadEnabled()) {
                             showSearchInterface()
                         } else {
                             showSearchOnboarding()
@@ -298,6 +298,7 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         tv_search_onboarding_progress_text.visibleOrInvisible(false)
         pb_search_onboarding.progressDrawable = AppCompatResources.getDrawable(requireContext(), R.drawable.custom_progress_background_finished)
         pb_search_onboarding.progress = 100
+        tv_search_onboarding_progress_percentage.text = "${100}%"
 
         pb_search_onboarding_action.visibleOrGone(false)
     }

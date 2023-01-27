@@ -761,6 +761,15 @@ class CalendarViewModel @Inject constructor(
         return true
     }
 
+    suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
+            return null
+        }
+        return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
+    }
+
     private suspend fun checkLocalTimezone(context: Context) {
         if (LocalDate.now() == updateTimeZoneDialogLastShown) return
 

@@ -83,21 +83,28 @@ class SearchViewModel @Inject constructor(
                         _downloadingState.update { DownloadingState.ONGOING(progressPercentage, progressText) }
                     }
                     WorkInfo.State.SUCCEEDED -> {
-
                         if (lastWorkerState != null) { // just finished downloading
                             _downloadingState.update { DownloadingState.FINISHED }
                         } else {
                             // worker finished correctly before, but we're running it again
                             //  (most likely after manually clearing search DB)
                         }
-
                     }
                     WorkInfo.State.FAILED, WorkInfo.State.BLOCKED -> {
                         _downloadingState.update { DownloadingState.ERROR }
                     }
                     WorkInfo.State.CANCELLED -> {
-                        // there is no real pause in WorkManager so we use this state for pausing
-                        _downloadingState.update { DownloadingState.PAUSED }
+
+                        coroutineScope.launch {
+                            if (isCalendarDownloadEnabled()) {
+                                // there is no real pause in WorkManager so we use this state for pausing
+                                _downloadingState.update { DownloadingState.PAUSED }
+                            } else {
+                                // we paused downloading but after that, also disabled search altogether
+                                _downloadingState.update { DownloadingState.NONE }
+                            }
+                        }
+
                     }
                     null -> {}
                 }
@@ -176,7 +183,7 @@ class SearchViewModel @Inject constructor(
 
     }
 
-    suspend fun isCalendarDownloadEnabled(context: Context): Boolean {
+    suspend fun isCalendarDownloadEnabled(): Boolean {
 
         return accountManager.getPrimaryUserId().firstOrNull()?.let {
             valueStoreProvider.provideValueStore(it.id).getBoolean(ValueKey.SEARCH_ENABLED) ?: false
