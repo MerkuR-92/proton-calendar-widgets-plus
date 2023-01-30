@@ -80,14 +80,6 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
             }
 
-            // Fetch and persist calendar settings of the newly created calendar. Should not be blocking.
-            createDefaultCalendarResult.returnValue.tryCast<String> {
-                val calendarSettings = calendarsApi.getCalendarSettings(userId, this).valueOrNullAndLogErrors(logger)?.calendarSettings
-                calendarSettings?.let {
-                    calendarsRepository.persistCalendarSettings(it)
-                }
-            }
-
             redoGetCalendars = true
         }
 
