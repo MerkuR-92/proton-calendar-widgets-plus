@@ -57,6 +57,7 @@ import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
 import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
 import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
@@ -1149,13 +1150,13 @@ object AndroidUtils {
     }
 
     // Call this method to display SnackBar in a Fragment
-    fun Activity.displaySnackBar(message: String, length: Int? = null) {
-        this.findViewById<View>(android.R.id.content).normSnack(message)
+    fun Activity.displaySnackBar(message: String, length: Int? = null): Snackbar {
+        return this.findViewById<View>(android.R.id.content).normSnack(message, length ?: Snackbar.LENGTH_LONG)
     }
 
     // Call this method to display SnackBar in a DialogFragment
-    fun View.displaySnackBar(message: String, length: Int? = null) {
-        this.normSnack(message)
+    fun View.displaySnackBar(message: String, length: Int? = null): Snackbar {
+        return this.normSnack(message, length ?: Snackbar.LENGTH_LONG)
     }
 
     @BindingAdapter("onSingleClick")

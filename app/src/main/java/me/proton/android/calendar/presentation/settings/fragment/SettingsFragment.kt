@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_add_layout_press
@@ -365,11 +366,13 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     setMessage(resourceProvider.provideString(R.string.recreate_calendar_dialog_message))
                     setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                         lifecycleScope.launch {
+                            val snackBar = view?.displaySnackBar(getString(R.string.recreate_calendar_snack_clearing), Snackbar.LENGTH_INDEFINITE)
                             when (calendarViewModel.recreateCalendar(calendar.id)) {
                                 is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.recreate_calendar_snack_error))
                                 is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                 is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.recreate_calendar_snack_deleted))
                             }
+                            snackBar?.dismiss()
                             bottomSheetDialog.dismiss()
                         }
                     }
