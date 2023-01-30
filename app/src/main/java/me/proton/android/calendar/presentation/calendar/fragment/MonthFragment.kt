@@ -28,6 +28,7 @@ import androidx.work.Operation
 import com.alamkanak.weekview.firstVisibleDateAsLocalDate
 import com.alamkanak.weekview.scrollToDate
 import com.alamkanak.weekview.scrollToDateTime
+import com.alamkanak.weekview.scrollToTime
 import com.alamkanak.weekview.setDate
 import com.alamkanak.weekview.setDateFormatter
 import com.alamkanak.weekview.setDateTime
@@ -75,6 +76,8 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toLocalDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
@@ -108,6 +111,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Collections
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @AndroidEntryPoint
@@ -191,7 +195,8 @@ class MonthFragment : BaseFragment() {
                 } ?: false
                 if (hasWritableActiveCalendars) {
                     // Each item in the adapter is one day
-                    calendarViewModel.selectedDate.value?.let { currentDate ->
+                    calendarViewModel.selectedDateTime.value?.let { currentDateTime ->
+                        val currentDate = currentDateTime.first
 
                         val date = if (currentViewMode == ViewMode.MONTH) {
                             if (currentDate.month == LocalDate.now().month && currentDate.year == LocalDate.now().year) LocalDate.now()
@@ -220,7 +225,9 @@ class MonthFragment : BaseFragment() {
         }
         buttonToday.setOnSingleClickListener {
             if (currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK) {
-                updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId))
+
+                updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId).getTimeWithPadding())
+                calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding())
             } else {
                 calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId))
             }
@@ -264,7 +271,7 @@ class MonthFragment : BaseFragment() {
         animateChange: Boolean
     ) {
 
-        val firstDayOfMonth = calendarViewModel.selectedDate.value?.withDayOfMonth(1) ?: return // We will retry this once calendarViewModel.selectedDate has been set
+        val firstDayOfMonth = calendarViewModel.selectedDateTime.value?.first?.withDayOfMonth(1) ?: return // We will retry this once calendarViewModel.selectedDate has been set
 
         // Calculate current month's desired height for both mini calendar mode (month / week)
         val desiredHeight = calculateAdapterHeight(
@@ -434,19 +441,20 @@ class MonthFragment : BaseFragment() {
             weekView.timeFormatIs24Hour = calendarViewModel.timeFormatIs24Hour(timeFormat, requireContext())
             // Time formatter is already taking timeFormatIs24Hour value into account, we just need to trigger onTimeFormatterChanged
             weekView.setTimeFormatter(weekView.getTimeFormatter())
-            calendarViewModel.selectedDate.value?.let {
-                weekView.setDate(it)
+            calendarViewModel.selectedDateTime.value?.let {
+                weekView.setDate(it.first)
             }
         }
 
-        calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
+        calendarViewModel.selectedDateTime.observe(viewLifecycleOwner) { selectedDateTime ->
+            val selectedDate = selectedDateTime.first
             setToolbarMonthYearTitle(selectedDate, miniCalendarPager.currentItem)
 
             // Only update those when we are in week views
             if (calendarViewModel.viewMode.value == ViewMode.WEEK ||
                 calendarViewModel.viewMode.value == ViewMode.THREE_DAY ||
                 calendarViewModel.viewMode.value == ViewMode.DAY) {
-                updateWeekView(selectedDate)
+                updateWeekView(selectedDate, selectedDateTime.toLocalDateTime())
             }
 
             lifecycleScope.launch {
@@ -547,7 +555,7 @@ class MonthFragment : BaseFragment() {
                 weekView.customTimeZone = TimeZone.getTimeZone(zoneId)
                 lifecycleScope.launch {
                     val weekStart = calendarViewModel.getWeekStart()
-                    val firstDayOfWeek = calendarViewModel.selectedDate.value?.firstDayOfWeek(weekStart) ?: return@launch
+                    val firstDayOfWeek = calendarViewModel.selectedDateTime.value?.first?.firstDayOfWeek(weekStart) ?: return@launch
                     val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
                     val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
 
@@ -563,8 +571,8 @@ class MonthFragment : BaseFragment() {
 
             weekStart?.let {
                 setupMonthLayoutGestures(weekStart)
-                calendarViewModel.selectedDate.value?.let {
-                    updateWeekView(it)
+                calendarViewModel.selectedDateTime.value?.let {
+                    updateWeekView(it.first)
                 }
             }
 
@@ -581,7 +589,7 @@ class MonthFragment : BaseFragment() {
             startWeekOn = weekStart?.let { getWeekStartDayOfWeek(it) }
 
             startWeekOn?.let { startWeekOn ->
-                calendarViewModel.selectedDate.value?.weekNumber(startWeekOn)?.let { weekNumber ->
+                calendarViewModel.selectedDateTime.value?.first?.weekNumber(startWeekOn)?.let { weekNumber ->
                     weekView.weekNumber = weekNumber
                 }
             }
@@ -635,17 +643,23 @@ class MonthFragment : BaseFragment() {
                 if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
                     // For week view we need to use set date as first day of the week so that we stick to user week start choice
                     lifecycleScope.launch {
-                        val selectedDate = calendarViewModel.selectedDate.value
+                        val selectedDate = calendarViewModel.selectedDateTime.value?.first
                         calendarViewModel.getWeekStart()?.let { weekStart ->
                             val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
                             if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
-                                calendarViewModel.handleDaySelected(firstVisibleDate)
+                                val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
+                                val minute = (((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60).toInt()
+                                calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(hour, minute))
                             }
                             initWeekView = false
                         }
                     }
                 } else {
-                    calendarViewModel.handleDaySelected(firstVisibleDate)
+                    if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
+                        val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
+                        val minute = ceil((((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60)).toInt()
+                        calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(hour, minute))
+                    }
                 }
             },
             viewClickHandler = { startTime, isAllDay ->
@@ -706,6 +720,10 @@ class MonthFragment : BaseFragment() {
                 else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
                 else if (animate) weekView.scrollToDate(selectedDate)
                 else weekView.setDate(selectedDate)
+            } else if (selectedDateTime != null &&
+                (selectedDateTime.toLocalTime().isBefore(LocalTime.of(weekView.firstFullyVisibleHour, 0)) ||
+                        selectedDateTime.toLocalTime().isAfter(LocalTime.of(weekView.lastVisibleHour - 1, 0)))) {
+                weekView.scrollToTime(selectedDateTime.toLocalTime())
             }
 
             weekStart?.let {
@@ -830,7 +848,7 @@ class MonthFragment : BaseFragment() {
         }
 
         // Calculate current month's desired height for both mini calendar mode (month / week)
-        calendarViewModel.selectedDate.value?.withDayOfMonth(1)?.let { firstDayOfMonth ->
+        calendarViewModel.selectedDateTime.value?.first?.withDayOfMonth(1)?.let { firstDayOfMonth ->
             calendarViewModel.currentPosDesiredMonthHeight = calculateAdapterHeight(
                 requireContext(),
                 firstDayOfMonth,
@@ -926,7 +944,7 @@ class MonthFragment : BaseFragment() {
         currentViewMode = viewMode
 
         if (viewMode == ViewMode.WEEK) {
-            val selectedDate = calendarViewModel.selectedDate.value
+            val selectedDate = calendarViewModel.selectedDateTime.value?.first
             val weekStart = calendarViewModel.weekStart.value
             initWeekView = true
             selectedDate?.firstDayOfWeek(weekStart)?.let {
@@ -939,7 +957,7 @@ class MonthFragment : BaseFragment() {
             }
         } else if (previousViewMode == ViewMode.WEEK) {
             // We need to adjust the view when coming from week view because it sticks to week start
-            val selectedDate = calendarViewModel.selectedDate.value
+            val selectedDate = calendarViewModel.selectedDateTime.value?.first
             selectedDate?.let {
                 calendarViewModel.handleDaySelected(it)
                 weekView.scrollToDate(it)
@@ -983,10 +1001,10 @@ class MonthFragment : BaseFragment() {
                 }
                 agendaPager?.apply {
                     val currentItem =
-                        calendarViewModel.selectedDate.value?.let { selectedDate ->
+                        calendarViewModel.selectedDateTime.value?.let { selectedDateTime ->
                             val startingDate = agendaPagerAdapter.startingDate
                             val startingPosition = agendaPagerAdapter.startingPosition
-                            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
+                            val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDateTime.first).toInt()
                             startingPosition + selectedDayOffset
                         } ?: agendaPagerAdapter.startingPosition
 
@@ -1018,13 +1036,16 @@ class MonthFragment : BaseFragment() {
                     }
 
                     val timeZoneId = calendarViewModel.getTimeZoneId()
-                    val selectedDate = calendarViewModel.selectedDate.value
+                    val selectedDate = calendarViewModel.selectedDateTime.value?.first
                     if (timeZoneId != null && (selectedDate == LocalDate.now() || (viewMode == ViewMode.WEEK && selectedDate?.firstDayOfWeek(weekStart) == LocalDate.now().firstDayOfWeek(weekStart)))) {
-                        updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId), animate = false)
+                        updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId).getTimeWithPadding(), animate = false)
+                        calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding())
                     } else if (selectedDate != null) {
                         val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
                         if (firstEventOfTheDayTime != null) {
-                            updateWeekView(selectedDate, selectedDate.atTime(firstEventOfTheDayTime), animate = false)
+                            updateWeekView(selectedDate, selectedDate.atTime(firstEventOfTheDayTime).getTimeWithPadding(), animate = false)
+                            calendarViewModel.firstEventOfTheDayTime = null
+                            calendarViewModel.handleDaySelected(selectedDate, firstEventOfTheDayTime.getTimeWithPadding())
                         } else {
                             updateWeekView(selectedDate, animate = false)
                         }
@@ -1077,10 +1098,10 @@ class MonthFragment : BaseFragment() {
         // Update the pager to use month adapter
         miniCalendarPager?.apply {
             val currentItem =
-                calendarViewModel.selectedDate.value?.let { selectedDate ->
+                calendarViewModel.selectedDateTime.value?.let { selectedDateTime ->
                     val startingDate = monthPagerAdapter.firstDayOfMonth
                     val startingPosition = monthPagerAdapter.startingPosition
-                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDateTime.first.withDayOfMonth(1)).toInt()
                     startingPosition + selectedDayOffset
                 } ?: monthPagerAdapter.startingPosition
 
@@ -1099,10 +1120,10 @@ class MonthFragment : BaseFragment() {
         // Update the pager to use mini calendar adapter
         miniCalendarPager?.apply {
             val currentItem =
-                calendarViewModel.selectedDate.value?.let { selectedDate ->
+                calendarViewModel.selectedDateTime.value?.let { selectedDateTime ->
                     val startingDate = miniCalendarPagerAdapter.firstDayOfMonth
                     val startingPosition = miniCalendarPagerAdapter.startingPosition
-                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDate.withDayOfMonth(1)).toInt()
+                    val selectedDayOffset = ChronoUnit.MONTHS.between(startingDate, selectedDateTime.first.withDayOfMonth(1)).toInt()
                     startingPosition + selectedDayOffset
                 } ?: miniCalendarPagerAdapter.startingPosition
 
@@ -1126,7 +1147,7 @@ class MonthFragment : BaseFragment() {
         miniCalendarDaysHeaderLayout?.run {
 
             val today = LocalDate.now(ZoneId.of(timeZoneId))
-            val selectedDate = calendarViewModel.selectedDate.value
+            val selectedDate = calendarViewModel.selectedDateTime.value?.first
             var dayToHighlight: DayOfWeek? = null
             selectedDate?.let {
                 // Calculate what day to highlight, depending on mini calendar mode

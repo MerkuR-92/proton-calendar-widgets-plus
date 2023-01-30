@@ -2,19 +2,11 @@ package me.proton.android.calendar.common.utils
 
 import android.content.Context
 import android.content.DialogInterface
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
-import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
-import me.proton.android.calendar.domain.model.getActualEventId
-import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.core.presentation.utils.InputValidationResult
 

@@ -5,7 +5,6 @@ import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 import androidx.work.*
-import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
@@ -38,7 +37,6 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOrigi
 import me.proton.android.calendar.common.utils.EventUtilsImpl.updateParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartDate
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
@@ -74,7 +72,6 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
-import okhttp3.internal.notify
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -197,7 +194,8 @@ class EventViewModel @Inject constructor(
 
         data class DisplaySnackReturnToMonth(
             val message: String,
-            val newSelectedDate: LocalDate? = null
+            val newSelectedDate: LocalDate? = null,
+            val newSelectedTime: LocalTime? = null
         ): EventSnackState()
     }
 
@@ -1766,7 +1764,9 @@ class EventViewModel @Inject constructor(
                     // Display event updated snack and return to month view with focus on the event's start date
                     eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                         resourceProvider.provideString(R.string.snack_event_updated),
-                        eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
+                        eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate(),
+                        if (eventLiveData.value?.isAllDay() == false) eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalTime()
+                        else null
                     )
                 }
                 SaveResult.EDIT_ERROR_SEND_MAIL -> {
@@ -1823,7 +1823,9 @@ class EventViewModel @Inject constructor(
                         if (saveResult == SaveResult.SUCCESS) R.string.snack_event_created
                         else R.string.snack_event_created_failed_mail
                     ), // Display event created but invitation failed to be sent snack
-                    eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate()
+                    eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate(),
+                    if (eventLiveData.value?.isAllDay() == false) eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalTime()
+                    else null
                 )
             } else if (saveResult == SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION) {
 

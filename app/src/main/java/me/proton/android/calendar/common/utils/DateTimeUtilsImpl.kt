@@ -82,7 +82,22 @@ object DateTimeUtilsImpl : DateTimeUtils {
         }
 
         return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+    }
 
+    /**
+     * Calculate ISO week number for given date time, taking custom week start into account.
+     */
+    override fun LocalDateTime.weekNumber(startWeekOn: DayOfWeek): Int {
+
+        val firstDayOfTheWeekNumber = this.dayOfWeek.value - startWeekOn.value
+        val firstDayOfTheWeekOffset = if (firstDayOfTheWeekNumber < 0) firstDayOfTheWeekNumber + DAYS_IN_A_WEEK else firstDayOfTheWeekNumber
+
+        var monday: LocalDateTime = this.minusDays(firstDayOfTheWeekOffset.toLong())
+        while (monday.dayOfWeek != DayOfWeek.MONDAY) {
+            monday = monday.plusDays(1)
+        }
+
+        return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
     }
 
     /**
@@ -445,4 +460,26 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
+    override fun LocalDateTime.getTimeWithPadding(): LocalDateTime {
+        return if (this.hour > 0) {
+            // Add some padding above the current time (and thus: the now line)
+            this.minusHours(1)
+        } else {
+            this.minusMinutes(this.minute.toLong())
+        }
+    }
+
+    override fun LocalTime.getTimeWithPadding(): LocalTime {
+        return if (this.hour > 0) {
+            // Add some padding above the current time (and thus: the now line)
+            this.minusHours(1)
+        } else {
+            this.minusMinutes(this.minute.toLong())
+        }
+    }
+
+    override fun Pair<LocalDate, LocalTime?>.toLocalDateTime(): LocalDateTime? {
+        if (this.second == null) return null
+        return LocalDateTime.of(this.first, this.second)
+    }
 }

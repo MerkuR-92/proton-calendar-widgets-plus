@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import biweekly.ICalendar
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +34,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.util.*
 import javax.inject.Inject
@@ -177,7 +177,8 @@ class ItemCalendarAgendaFragment: Fragment() {
             }
         }
 
-        calendarViewModel.selectedDate.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDate ->
+        calendarViewModel.selectedDateTime.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDateTime ->
+            val selectedDate = selectedDateTime.first
             if (this.selectedDate == null) {
                 // View pager creates fragment for selectedDate + 2 when you start swiping, so comparing immutableDate
                 //  and selectedDate would make us remove the observer for the flow we just created on start.

@@ -72,7 +72,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOf
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
