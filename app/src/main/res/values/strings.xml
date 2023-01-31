@@ -499,7 +499,7 @@
     <string name="spotlight_dialog_week_view_title">More viewing options</string>
     <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Search seamlessly</string>
-    <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_search_description">You can now search your calendars for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
