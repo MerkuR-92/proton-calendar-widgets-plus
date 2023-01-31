@@ -104,7 +104,6 @@
     <string name="event_change_answer_recurring_single_edit_description">Este evento foi actualizado pelo organizador. Deseja alterar a sua resposta só para esta ocorrência da série?</string>
     <string name="event_change_answer_recurring_cancel">Cancelar</string>
     <string name="event_change_answer_recurring_confirm">Actualizar</string>
-    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Convite para %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s aceitou o seu convite para %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s recusou o seu convite para %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s aceitou provisoriamente o seu convite para %2$s</string>
@@ -222,10 +221,6 @@
     <string name="event_allow_contacts_description">O Proton Calendar precisa de acesso aos seus contactos para fornecer preenchimento automático</string>
     <string name="event_allow_contacts_cancel">Recusar</string>
     <string name="event_allow_contacts_confirm">Permitir</string>
-    <string name="event_send_invite_mail_subject_prefix">Convite para %s</string>
-    <string name="event_send_invite_mail_subject_all_day">um evento %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">um evento a partir de %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">um evento a partir de %1$s às %2$s %3$s</string>
     <string name="event_send_invite_mail_body">Recebeu um convite para %1$s\nQuando: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (dia inteiro)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -241,10 +236,6 @@
     <string name="event_add_participants_overwrite_dialog_description">Um convite será enviado para participantes adicionados para todos os eventos desta série.\nModificações anteriores nesta série serão perdidas.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
-    <string name="event_send_cancel_mail_subject_prefix">Cancelamento de %s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">um evento a partir de %1$s às %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">um evento a partir de %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">um evento em %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s foi cancelado.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">As minhas agendas</string>
