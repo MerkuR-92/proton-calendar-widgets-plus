@@ -498,7 +498,7 @@
     <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
     <string name="spotlight_dialog_week_view_title">More viewing options</string>
     <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
-    <string name="spotlight_dialog_search_title">Search seamlessly</string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Search seamlessly</string>
     <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
