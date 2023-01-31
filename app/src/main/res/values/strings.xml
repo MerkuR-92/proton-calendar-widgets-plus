@@ -149,8 +149,8 @@
     <string name="search_empty_results_title">No results found</string>
     <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
-    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Time remaining: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculating time remaining…</string>
     <string name="search_downloading_pause">Pause download</string>
     <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
     <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
@@ -605,10 +605,6 @@
     <plurals name="plural_seconds">
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
-    </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">%1$s remaining…</item>
-        <item quantity="other">%1$s remaining…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
