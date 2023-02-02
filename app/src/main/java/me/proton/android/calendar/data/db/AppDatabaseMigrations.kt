@@ -379,4 +379,10 @@ object AppDatabaseMigrations {
 
         }
     }
+
+    val MIGRATION_47_48 = object : Migration(47, 48) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            AccountDatabase.MIGRATION_5.migrate(database)
+        }
+    }
 }

@@ -8,7 +8,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.proton.android.calendar.presentation.account.CalendarUserCheck
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.domain.ClientSecret
 import me.proton.core.auth.domain.usecase.PostLoginAccountSetup
 import me.proton.core.auth.presentation.DefaultHelpOptionHandler
 import me.proton.core.auth.presentation.HelpOptionHandler
@@ -19,10 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AuthModule {
-
-    @Provides
-    @ClientSecret
-    fun provideClientSecret(): String = ""
 
     @Provides
     @Singleton
