@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Kalender bearbeiten</string>
     <string name="calendar_form_save">Speichern</string>
     <string name="calendar_form_name">Name</string>
-    <string name="calendar_form_name_placeholder">Kalendername hinzufügen</string>
     <string name="calendar_form_color">Kalenderfarbe</string>
     <string name="calendar_form_default_event_duration">Standard-Termindauer</string>
     <string name="calendar_form_default_event_notifications">Terminbenachrichtigungen</string>

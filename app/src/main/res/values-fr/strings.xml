@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Modifier le calendrier</string>
     <string name="calendar_form_save">Enregistrer</string>
     <string name="calendar_form_name">Nom</string>
-    <string name="calendar_form_name_placeholder">Ajouter un nom de calendrier</string>
     <string name="calendar_form_color">Couleur du calendrier</string>
     <string name="calendar_form_default_event_duration">Durée de l’événement</string>
     <string name="calendar_form_default_event_notifications">Notifications de l’événement</string>

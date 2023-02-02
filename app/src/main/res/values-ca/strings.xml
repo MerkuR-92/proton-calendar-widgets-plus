@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Editar Calendari</string>
     <string name="calendar_form_save">Desa</string>
     <string name="calendar_form_name">Nom</string>
-    <string name="calendar_form_name_placeholder">Afegir un nom de calendari</string>
     <string name="calendar_form_color">Color del calendari</string>
     <string name="calendar_form_default_event_duration">Durada de l\'esdeveniment</string>
     <string name="calendar_form_default_event_notifications">Notificacions d\'esdeveniment</string>

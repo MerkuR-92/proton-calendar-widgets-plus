@@ -97,6 +97,9 @@ class CalendarFormViewModel @Inject constructor(
     private val _calendarName = MutableLiveData("")
     val calendarName: LiveData<String> = _calendarName
 
+    private val _calendarDescription = MutableLiveData("")
+    val calendarDescription: LiveData<String> = _calendarDescription
+
     private val _calendarEmail = MutableLiveData<String>()
     val calendarEmail: LiveData<String> = _calendarEmail
 
@@ -129,6 +132,7 @@ class CalendarFormViewModel @Inject constructor(
 
     fun resetFormValues() {
         _calendarName.value = ""
+        _calendarDescription.value = ""
         _calendarColor.value = 0
         _calendarEmail.value = ""
         _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
@@ -180,6 +184,9 @@ class CalendarFormViewModel @Inject constructor(
 
         // Calendar name
         _calendarName.value = calendar.name
+
+        // Calendar description
+        _calendarDescription.value = calendar.description
 
         // Calendar default email (can't be updated for existing calendar)
         _calendarEmail.value = calendar.email
@@ -308,6 +315,12 @@ class CalendarFormViewModel @Inject constructor(
         _calendarName.value = calendarName
     }
 
+    fun handleCalendarDescription(calendarDescription: String) {
+        if (_calendarDescription.value == calendarDescription) return
+        calendarEdited = true
+        _calendarDescription.value = calendarDescription
+    }
+
     fun handleCalendarColor(calendarColor: Int) {
         if (_calendarColor.value == calendarColor) return
         calendarEdited = true
@@ -343,6 +356,7 @@ class CalendarFormViewModel @Inject constructor(
                 val updateCalendarUseCaseResult = updateCalendarUseCase.executeUpdate(
                     userId,
                     calendarId,
+                    description = _calendarDescription.value,
                     name = _calendarName.value,
                     color = _calendarColor.value?.toHexColor()
                 )
@@ -410,6 +424,7 @@ class CalendarFormViewModel @Inject constructor(
             val createCalendarResult = createCalendarUseCase.execute(
                 userId = userId,
                 name = _calendarName.value!!,
+                description = _calendarDescription.value!!,
                 color = _calendarColor.value!!,
                 email = _calendarEmail.value!!
             )

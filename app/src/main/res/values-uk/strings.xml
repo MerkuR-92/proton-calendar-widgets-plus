@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Редагувати календар</string>
     <string name="calendar_form_save">Зберегти</string>
     <string name="calendar_form_name">Назва</string>
-    <string name="calendar_form_name_placeholder">Додати назву календаря</string>
     <string name="calendar_form_color">Колір календаря</string>
     <string name="calendar_form_default_event_duration">Тривалість події</string>
     <string name="calendar_form_default_event_notifications">Сповіщення про події</string>

@@ -298,6 +298,7 @@ object FormValidation {
 
 object CalendarForm {
     const val CALENDAR_NAME_CHARACTER_LIMIT = 100
+    const val CALENDAR_DESCRIPTION_CHARACTER_LIMIT = 255
     const val DEFAULT_NOTIFICATIONS_COUNT_MAX = 5
 
     val EVENT_DEFAULT_DURATION_MINUTES = listOf(30, 60, 90, 120)

@@ -262,6 +262,7 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.id ?: defaultCalendar.id,
                 existingCalendar?.name ?: defaultCalendar.name,
                 existingCalendar?.email ?: defaultCalendar.email,
+                existingCalendar?.description ?: defaultCalendar.description,
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,

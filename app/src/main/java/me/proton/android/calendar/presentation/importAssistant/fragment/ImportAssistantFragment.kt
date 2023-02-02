@@ -351,6 +351,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 // Create calendar
                 val newCalendarId = importAssistantViewModel.createCalendar(
                     calendarToImport.destinationName,
+                    calendarToImport.destinationDescription,
                     calendarToImport.destinationEmail,
                     calendarToImport.destinationColor
                 )
