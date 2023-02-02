@@ -37,7 +37,7 @@ class ResetCalendarsKeyUseCase @Inject constructor(
 
         val setupKeyApiRequestMap = hashMapOf<String, SetupKeyApiRequest>()
 
-        val addresses = userManager.getAddressesOrNull(userId, refresh = true) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: error getting Addresses")
+        val addresses = userManager.getAddressesOrNull(userId) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: error getting Addresses")
 
         // Reset key for each calendar
         resetInfoResponse.data.calendars.forEach {

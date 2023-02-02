@@ -95,7 +95,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         val addresses =
             if (allCalendars.any { it.hasIncompleteKeySetup || it.hasUpdatePassphrase }) {
                 // Fetch the user addresses only once if we need to do key setup or reactivate calendar keys
-                userManager.getAddressesOrNull(userId, refresh = true)
+                userManager.getAddressesOrNull(userId)
             } else null
         allCalendars.forEach {
             if (it.hasIncompleteKeySetup) {

@@ -36,7 +36,7 @@ class CreateCalendarUseCase @Inject constructor(
         display: Int = 1,
         email: String? = null) : UseCase.Result {
 
-        val address = userManager.getAddressesOrNull(userId, refresh = true)?.firstOrNull { address ->
+        val address = userManager.getAddressesOrNull(userId)?.firstOrNull { address ->
             email?.let { address.email == it } ?: address.canSend && address.canReceive
         } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found")
 
