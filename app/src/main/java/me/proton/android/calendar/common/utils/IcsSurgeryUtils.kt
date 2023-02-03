@@ -341,21 +341,68 @@ object IcsSurgeryUtils {
     fun String.cleanRawIcs(): HandleIcsResult {
         var cleanICalString = this
 
-        // DATETIME or DATE properties
-
-        // 1) For all day events
-        // We need to check in iCal string for all day dates with bad format because Biweekly doesn't properly save VALUE parameter
-
-        // If the type DATE is specified, drop time information in case it could be there.
-        cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
-
-        // If the type DATE is not specified for an all-day event, we currently reject (as invalid) the event.
-        if (cleanICalString.contains(Regex("(DTSTART|DTEND|RECURRENCE-ID):\\d{8}\\r?\\n"))) return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
+        cleanICalString = fixDateOrDateTimeFormat(cleanICalString) ?: return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
         cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, aliasesTimezonesMap)
         cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, windowsTimeZoneMap)
 
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
+    }
+
+    private fun fixDateOrDateTimeFormat(iCalString: String): String? {
+        // DATETIME or DATE properties
+        var cleanICalString = iCalString
+
+        // Remove invalid whitespaces in properties
+        val whiteSpaceRegex = Regex("(DTSTAMP|DTSTART|DTEND|RECURRENCE-ID|CREATED|LAST-MODIFIED)(;([^:]*))?:([^\\r?\\n]*)")
+        whiteSpaceRegex.findAll(cleanICalString).iterator().forEach {
+            val cleanDate = it.value.replace(it.groupValues.last(), it.groupValues.last().replace(" ", ""))
+            cleanICalString = cleanICalString.replace(it.value, cleanDate)
+        }
+
+        // Capitalize Time markers
+        val lowerCaseTimeMarker = Regex(":\\d{8}[t]\\d{6}[zZ]?\\r?\\n")
+        lowerCaseTimeMarker.findAll(cleanICalString).iterator().forEach {
+            cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
+        }
+
+        // Capitalize Zulu markers
+        val lowerCaseZuluMarker = Regex(":\\d{8}[T]\\d{6}[z]?\\r?\\n")
+        lowerCaseZuluMarker.findAll(cleanICalString).iterator().forEach {
+            cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
+        }
+
+        // Add missing seconds to DATETIME properties
+        val missingSecondsRegex = Regex(":\\d{8}[T]\\d{4}[Z]?\\r?\\n")
+        missingSecondsRegex.findAll(cleanICalString).iterator().forEach {
+            cleanICalString = cleanICalString.replace(
+                it.value,
+                if (it.value.endsWith("Z\r\n")) it.value.replace("Z\r\n", "00Z\r\n")
+                else if (it.value.endsWith("Z\n")) it.value.replace("Z\n", "00Z\n")
+                else if (it.value.endsWith("\r\n")) it.value.replace("\r\n", "00\r\n")
+                else it.value.replace("\n", "00\n")
+            )
+        }
+
+        // Convert following ISO date times (2022-10-24T11:30:00.000Z)
+        val isoDateRegex = Regex(":\\d{4}[-]\\d{2}[-]\\d{2}[T]\\d{2}[:]\\d{2}[:]\\d{2}[.]\\d{3}[Z]\\r?\\n")
+        isoDateRegex.findAll(cleanICalString).iterator().forEach {
+            var cleanDate = it.value.replace("-", "")
+            cleanDate = cleanDate.replace(":", "")
+            cleanDate = cleanDate.replace(Regex("[.]\\d{3}[Z]"), "Z")
+            cleanICalString = cleanICalString.replace(
+                it.value,
+                ":$cleanDate" // Add back the first ':' since we removed it along with the others using replace
+            )
+        }
+
+        // For all day events
+        // We need to check in iCal string for all day dates with bad format because Biweekly doesn't properly save VALUE parameter
+
+        // If the type DATE is specified, drop time information in case it could be there.
+        cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
+
+        return cleanICalString
     }
 
     private fun replaceUnsupportedTimeZoneId(iCalString: String, supportedTimeZoneMap: Map<String, String>): String {

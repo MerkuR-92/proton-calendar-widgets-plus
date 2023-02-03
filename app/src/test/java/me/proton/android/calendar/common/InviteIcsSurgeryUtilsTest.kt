@@ -142,7 +142,7 @@ internal class InviteIcsSurgeryUtilsTest {
     }
 
     @Test
-    fun `cleanRawIcs all day event with invalid format test`() {
+    fun `All day event with missing VALUE=DATE test`() {
 
         val iCalString = """
     BEGIN:VCALENDAR
@@ -163,7 +163,28 @@ internal class InviteIcsSurgeryUtilsTest {
 
         val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty).isTrue()
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar!!
+            val event = iCalendar.events?.first()!!
+            assertThat(event.dateStart.value).isEqualTo(
+                ICalDate.from(
+                    ZonedDateTime.of(
+                        2020, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault()
+                    ).toInstant()
+                )
+            )
+            assertThat(event.dateEnd.value).isEqualTo(
+                ICalDate.from(
+                    ZonedDateTime.of(
+                        2020, 1, 2, 0, 0, 0, 0, ZoneId.systemDefault()
+                    ).toInstant()
+                )
+            )
+            assertThat(iCalendar.printToString().contains("DTSTART;VALUE=DATE:20200101")).isEqualTo(true)
+            assertThat(iCalendar.printToString().contains("DTEND;VALUE=DATE:20200102")).isEqualTo(true)
+        }
     }
 
     @Test

@@ -637,7 +637,21 @@ internal class ImportIcsSurgeryUtilsTest {
 
         val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
 
-        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.Error.Invalid.DateOrDateTimeProperty::class)
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART;VALUE=DATE:20220101")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND;VALUE=DATE:20220102")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 1, 1, 0, 0, 0, 0, ZoneId.systemDefault()).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 1, 2, 0, 0, 0, 0, ZoneId.systemDefault()).toInstant()
+            ))
+        }
     }
 
     @Disabled // TODO For now we ignore this test because biweekly doesn't parse DTSTART with VALUE=DATE-TIME as a DATE-TIME, we need to parse using regex before biweekly to ICalendar
@@ -1918,5 +1932,352 @@ internal class ImportIcsSurgeryUtilsTest {
 
         assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule::class)
 
+    }
+
+    @Test
+    fun `Multiple DATETIME with Time and Zulu markers in lower case test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:20221024t090000z
+    DTSTART:20221024t090000
+    DTSTART;TZID=Atlantic/Azores:20221024t090000
+    DTSTART;VALUE=DATE-TIME:20221024t090000z
+    DTSTART;VALUE=DATE-TIME;TZID=Atlantic/Azores:20221024t090000z
+    DTEND:20221024t113000z
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+
+        assertThat(cleanRawIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful::class)
+
+        if (cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful) {
+            val cleanICalString = cleanRawIcsResult.cleanICalString
+
+            // This lets us test the regex that turns Time and Zulu markers to uppercase.
+            // Use a TZID that contains both a t and a z
+            assertThat(cleanICalString.contains("DTSTART:20221024T090000Z")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTSTART:20221024T090000")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTSTART;TZID=Atlantic/Azores:20221024T090000")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTSTART;VALUE=DATE-TIME:20221024T090000Z")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTSTART;VALUE=DATE-TIME;TZID=Atlantic/Azores:20221024T090000Z")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTEND:20221024T113000Z")).isEqualTo(true)
+            assertThat(cleanICalString.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `DATETIME with Time and Zulu markers in lower case test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:20221024t090000z
+    DTEND:20221024T113000z
+    DTSTAMP:20221024t113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART:20221024T090000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATETIME missing seconds test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:20221024T0900
+    DTEND:20221024T113000
+    DTSTAMP:20221024T1130Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            // Missing seconds
+            assertThat(iCalendar?.printToString()?.contains("DTSTART;TZID=Europe/Paris:20221024T090000")).isEqualTo(true)
+            // No fix applied
+            assertThat(iCalendar?.printToString()?.contains("DTEND;TZID=Europe/Paris:20221024T113000")).isEqualTo(true)
+            // Missing seconds but has Zulu marker
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("Europe/Paris")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("Europe/Paris")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATETIME in ISO format test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:2022-10-24T09:00:00.000Z
+    DTEND:2022-10-24T11:30:00.000Z
+    DTSTAMP:2022-10-24T11:30:00.000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART:20221024T090000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATETIME with double Zulu marker test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:20221024T090000ZZ
+    DTEND:20221024T113000ZZ
+    DTSTAMP:20221024T113000ZZ
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART:20221024T090000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATETIME with whitespace in property test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART: 20221024T090000Z
+    DTEND: 20221024T113000Z
+    DTSTAMP: 20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART:20221024T090000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATETIME with Microsoft TZID and with whitespace in property test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;TZID=eastern time (us & canada): 20221024T090000
+    DTEND;TZID=eastern time (us & canada): 20221024T113000
+    DTSTAMP: 20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART;TZID=America/New_York:20221024T090000")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND;TZID=America/New_York:20221024T113000")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 9, 0, 0, 0, ZoneId.of("America/New_York")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("America/New_York")).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
+    }
+
+    @Test
+    fun `DATE missing VALUE=DATE and DTSTART == DTEND test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART:20221024
+    DTEND:20221024
+    DTSTAMP: 20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.printToString()?.contains("DTSTART;VALUE=DATE:20221024")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTEND;VALUE=DATE:20221025")).isEqualTo(true)
+            assertThat(iCalendar?.printToString()?.contains("DTSTAMP:20221024T113000Z")).isEqualTo(true)
+            assertThat(iCalendar?.events?.first()?.dateStart?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 0, 0, 0, 0, ZoneId.systemDefault()).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateEnd?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 25, 0, 0, 0, 0, ZoneId.systemDefault()).toInstant()
+            ))
+            assertThat(iCalendar?.events?.first()?.dateTimeStamp?.value).isEqualTo(Date.from(
+                ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
+            ))
+        }
     }
 }
