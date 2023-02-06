@@ -223,7 +223,7 @@ object IcsSurgeryUtils {
 
             if (!event.cleanDtStamp(iCalendar, isImport || !isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
-            if (!event.cleanUid(iCalendar)) return HandleIcsResult.Error.MissingUid
+            if (!event.cleanUid(iCalendar, iCalString)) return HandleIcsResult.Error.MissingUid
 
             if (!event.cleanDtStart()) return HandleIcsResult.Error.Invalid.DateStart
 
@@ -373,19 +373,19 @@ object IcsSurgeryUtils {
         }
 
         // Capitalize Time markers
-        val lowerCaseTimeMarker = Regex(":\\d{8}[t]\\d{6}[zZ]?\\r?\\n")
+        val lowerCaseTimeMarker = Regex(":\\d{8}t\\d{6}[zZ]?\\r?\\n")
         lowerCaseTimeMarker.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
         }
 
         // Capitalize Zulu markers
-        val lowerCaseZuluMarker = Regex(":\\d{8}[T]\\d{6}[z]?\\r?\\n")
+        val lowerCaseZuluMarker = Regex(":\\d{8}T\\d{6}z?\\r?\\n")
         lowerCaseZuluMarker.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
         }
 
         // Add missing seconds to DATETIME properties
-        val missingSecondsRegex = Regex(":\\d{8}[T]\\d{4}[Z]?\\r?\\n")
+        val missingSecondsRegex = Regex(":\\d{8}T\\d{4}Z?\\r?\\n")
         missingSecondsRegex.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(
                 it.value,
@@ -397,11 +397,11 @@ object IcsSurgeryUtils {
         }
 
         // Convert following ISO date times (2022-10-24T11:30:00.000Z)
-        val isoDateRegex = Regex(":\\d{4}[-]\\d{2}[-]\\d{2}[T]\\d{2}[:]\\d{2}[:]\\d{2}[.]\\d{3}[Z]\\r?\\n")
+        val isoDateRegex = Regex(":\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[.]\\d{3}Z\\r?\\n")
         isoDateRegex.findAll(cleanICalString).iterator().forEach {
             var cleanDate = it.value.replace("-", "")
             cleanDate = cleanDate.replace(":", "")
-            cleanDate = cleanDate.replace(Regex("[.]\\d{3}[Z]"), "Z")
+            cleanDate = cleanDate.replace(Regex("[.]\\d{3}Z"), "Z")
             cleanICalString = cleanICalString.replace(
                 it.value,
                 ":$cleanDate" // Add back the first ':' since we removed it along with the others using replace
@@ -412,7 +412,7 @@ object IcsSurgeryUtils {
         // We need to check in iCal string for all day dates with bad format because Biweekly doesn't properly save VALUE parameter
 
         // If the type DATE is specified, drop time information in case it could be there.
-        cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}[Z]?"), "")
+        cleanICalString = cleanICalString.replace(Regex("(?<=;VALUE=DATE:\\d{8})T\\d{6}Z?"), "")
 
         return cleanICalString
     }
@@ -585,12 +585,13 @@ object IcsSurgeryUtils {
         }
     }
 
-    private fun VEvent.cleanUid(iCalendar: ICalendar): Boolean {
+    private fun VEvent.cleanUid(iCalendar: ICalendar, iCalString: String): Boolean {
         this.moveUid(iCalendar)
 
-        // UID: As per RFC, we require it to be present. Also, there's a BE limit of 191 characters. If we need to crop, we keep the last 191 characters of the uid.
-        if (this.uid?.value == null || this.uid.value.isEmpty()) return false
-        else if (this.uid.value.length > UID_MAX_LENGTH) {
+        // UID: We generate UID if it's missing. Also, there's a BE limit of 191 characters. If we need to crop, we keep the last 191 characters of the uid.
+        if (this.uid?.value == null || this.uid.value.isEmpty()) {
+            this.setUid(generateProtonUidForImport(null, iCalString))
+        } else if (this.uid.value.length > UID_MAX_LENGTH) {
             this.setUid(this.uid.value.takeLast(UID_MAX_LENGTH))
         }
         return true
