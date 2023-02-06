@@ -214,6 +214,9 @@ object IcsParsingValidation {
     const val MAX_YEARLY_INTERVAL = 99
     const val MAX_ATTENDEES = 100
 
+    const val MAX_ICALENDAR = 1
+    const val MAX_VEVENT = 1
+
     val MIN_DATE = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
     val MAX_DATE = ZonedDateTime.of(2038, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
 

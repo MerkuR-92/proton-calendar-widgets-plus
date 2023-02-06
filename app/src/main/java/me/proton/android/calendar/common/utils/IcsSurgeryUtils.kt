@@ -29,7 +29,9 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT_INVITATION
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DAILY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DATE
+import me.proton.android.calendar.common.IcsParsingValidation.MAX_ICALENDAR
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_MONTHLY_INTERVAL
+import me.proton.android.calendar.common.IcsParsingValidation.MAX_VEVENT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_WEEKLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_YEARLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
@@ -145,7 +147,7 @@ object IcsSurgeryUtils {
             val importedICalendars = Biweekly.parse(cleanRawIcsResult.cleanICalString).all() ?: return HandleIcsResult.Error.ParsingFailed
 
             // We only allow importing one calendar at a time for now
-            if (importedICalendars.size > 1) return HandleIcsResult.Error.TooManyEvents
+            if (importedICalendars.size > MAX_ICALENDAR) return HandleIcsResult.Error.TooManyEvents
 
             if (importedICalendars.isEmpty()) return HandleIcsResult.Error.NoEvents
 
@@ -162,7 +164,7 @@ object IcsSurgeryUtils {
         if (iCalendar.events.isEmpty()) return HandleIcsResult.Error.NoEvents
 
         // We only allow importing one event at a time for now
-        if (iCalendar.events.size > 1 && !allowMultipleEvents) {
+        if (iCalendar.events.size > MAX_VEVENT && !allowMultipleEvents) {
             // TODO If is an invitation we take first event only
             return HandleIcsResult.Error.TooManyEvents
         }
@@ -340,6 +342,16 @@ object IcsSurgeryUtils {
 
     fun String.cleanRawIcs(): HandleIcsResult {
         var cleanICalString = this
+
+        // Start by checking number of events
+        val multipleEventsRegex = Regex("BEGIN:VEVENT")
+        val multipleEventsIterator = multipleEventsRegex.findAll(cleanICalString).iterator()
+        var eventCount = 0
+        while (multipleEventsIterator.hasNext()) {
+            eventCount++
+            if (eventCount > MAX_VEVENT) return HandleIcsResult.Error.TooManyEvents
+            multipleEventsIterator.next()
+        }
 
         cleanICalString = fixDateOrDateTimeFormat(cleanICalString) ?: return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
 
