@@ -1343,6 +1343,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     calendarViewModel.shutdown()
                 }
             }
+
+            lifecycleScope.launch {
+                userCalendars.forEach {
+                    // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
+                    if (it.description == "0") calendarViewModel.refreshMember(calendarId = it.id)
+                }
+            }
         })
 
         calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->

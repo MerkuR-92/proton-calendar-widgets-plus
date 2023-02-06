@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 abstract class MembersDao : BaseDao<MemberEntity> {
 
     @Query("SELECT * FROM members")
-    abstract fun selectMembersFlow(): Flow<List<MemberEntity>>
+    abstract fun flowMembers(): Flow<List<MemberEntity>>
 
     @Query("SELECT * FROM members")
     suspend abstract fun selectMembers(): List<MemberEntity>

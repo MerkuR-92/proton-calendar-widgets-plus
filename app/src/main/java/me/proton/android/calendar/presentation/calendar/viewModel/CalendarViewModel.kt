@@ -598,6 +598,18 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.fetchCalendars(userId)
     }
 
+    suspend fun refreshMember(calendarId: String): Boolean {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel refreshMembers")
+            return false
+        }
+        calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull()?.let {
+            calendarsRepository.persistMember(it)
+        } ?: return false
+        return true
+    }
+
     suspend fun getCalendarUserSettingsAutoDetectPrimaryTimezone(): Boolean {
         val userId = userId.value?.id
         if (userId == null) {

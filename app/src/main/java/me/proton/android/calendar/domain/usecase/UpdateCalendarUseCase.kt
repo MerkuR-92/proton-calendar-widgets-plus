@@ -40,9 +40,9 @@ class UpdateCalendarUseCase @Inject constructor(
 
         val updateMemberApiRequest = UpdateMemberApiRequest(
             color = if (!dbMember.color.equals(color, ignoreCase = true)) color else null, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.
-            display = display,
-            name = name,
-            description = description
+            display = if (dbMember.display != display) display else null,
+            name = if (!dbMember.name.equals(name, ignoreCase = true)) name else null,
+            description = if (!dbMember.description.equals(description, ignoreCase = true)) description else null
         )
 
         return updateSingleCalendar(userId, calendarId, dbMember.id, updateMemberApiRequest)

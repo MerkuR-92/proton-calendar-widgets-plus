@@ -1255,7 +1255,7 @@ class CalendarsRepositoryImpl @Inject constructor(
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
 fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json): Flow<List<Calendar>> {
-    return this.combine(database.membersDao().selectMembersFlow()) { calendars, members ->
+    return this.combine(database.membersDao().flowMembers()) { calendars, members ->
         if (calendars.isNotEmpty()) {
             // Get user addresses so we can find the calendar member for current user
             val userCanonicalEmails = database.addressDao().getByUserId(UserId(calendars.first().fkUserId)).map {
