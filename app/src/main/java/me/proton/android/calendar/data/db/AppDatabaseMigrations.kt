@@ -360,7 +360,7 @@ object AppDatabaseMigrations {
             // 2. copy the values from Calendar to Member
             database.query("SELECT id, name, description FROM $TABLE_CALENDARS").let {
                 while (it.moveToNext()) {
-                    database.execSQL("UPDATE $TABLE_MEMBERS SET name = \"${it.getString(1)}\", description = ${it.getInt(2)} WHERE calendarId = \"${it.getString(0)}\"")
+                    database.execSQL("UPDATE $TABLE_MEMBERS SET name = \"${it.getString(1)}\", description = \"${it.getString(2)}\" WHERE calendarId = \"${it.getString(0)}\"")
                 }
             }
 
