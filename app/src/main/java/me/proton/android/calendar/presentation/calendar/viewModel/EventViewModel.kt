@@ -3008,6 +3008,11 @@ class EventViewModel @Inject constructor(
 
         // Force the Widget to refresh, because we just changed the Event answer
         widgetRefresher.refreshEventList()
+
+        // Display part stat updated snack and return to month view with focus on the event's start date
+        eventDetailsSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
+            resourceProvider.provideString(R.string.snack_event_part_stat_updated)
+        )
     }
 
     private fun clearSingleEditsParticipationStatus(
