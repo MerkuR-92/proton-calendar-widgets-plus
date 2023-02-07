@@ -77,7 +77,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toLocalDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
@@ -226,7 +225,7 @@ class MonthFragment : BaseFragment() {
         buttonToday.setOnSingleClickListener {
             if (currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK) {
 
-                updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId).getTimeWithPadding())
+                updateWeekView(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding())
                 calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding())
             } else {
                 calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId))
@@ -454,7 +453,7 @@ class MonthFragment : BaseFragment() {
             if (calendarViewModel.viewMode.value == ViewMode.WEEK ||
                 calendarViewModel.viewMode.value == ViewMode.THREE_DAY ||
                 calendarViewModel.viewMode.value == ViewMode.DAY) {
-                updateWeekView(selectedDate, selectedDateTime.toLocalDateTime())
+                updateWeekView(selectedDate, selectedDateTime.second)
             }
 
             lifecycleScope.launch {
@@ -690,7 +689,7 @@ class MonthFragment : BaseFragment() {
         }
     }
 
-    private fun updateWeekView(selectedDate: LocalDate, selectedDateTime: LocalDateTime? = null, animate: Boolean = true) {
+    private fun updateWeekView(selectedDate: LocalDate, selectedTime: LocalTime? = null, animate: Boolean = true) {
         lifecycleScope.launch {
             val weekStart = calendarViewModel.getWeekStart()
             val firstDayOfWeek = selectedDate.firstDayOfWeek(weekStart)
@@ -708,22 +707,22 @@ class MonthFragment : BaseFragment() {
                 lifecycleScope.launch {
                     weekStart?.let { weekStart ->
                         selectedDate.firstDayOfWeek(weekStart)?.let {
-                            if (selectedDateTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedDateTime.toLocalTime()))
-                            else if (selectedDateTime != null) weekView.setDateTime(it.atTime(selectedDateTime.toLocalTime()))
+                            if (selectedTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedTime))
+                            else if (selectedTime != null) weekView.setDateTime(it.atTime(selectedTime))
                             else if (animate) weekView.scrollToDate(it)
                             else weekView.setDate(it)
                         }
                     }
                 }
             } else if (weekView.firstVisibleDateAsLocalDate != selectedDate) {
-                if (selectedDateTime != null && animate) weekView.scrollToDateTime(selectedDateTime)
-                else if (selectedDateTime != null) weekView.setDateTime(selectedDateTime)
+                if (selectedTime != null && animate) weekView.scrollToDateTime(LocalDateTime.of(selectedDate, selectedTime))
+                else if (selectedTime != null) weekView.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
                 else if (animate) weekView.scrollToDate(selectedDate)
                 else weekView.setDate(selectedDate)
-            } else if (selectedDateTime != null &&
-                (selectedDateTime.toLocalTime().isBefore(LocalTime.of(weekView.firstFullyVisibleHour, 0)) ||
-                        selectedDateTime.toLocalTime().isAfter(LocalTime.of(weekView.lastVisibleHour - 1, 0)))) {
-                weekView.scrollToTime(selectedDateTime.toLocalTime())
+            } else if (selectedTime != null &&
+                (selectedTime.isBefore(LocalTime.of(weekView.firstFullyVisibleHour, 0)) ||
+                        selectedTime.isAfter(LocalTime.of(weekView.lastVisibleHour - 1, 0)))) {
+                weekView.scrollToTime(selectedTime)
             }
 
             weekStart?.let {
@@ -1038,12 +1037,12 @@ class MonthFragment : BaseFragment() {
                     val timeZoneId = calendarViewModel.getTimeZoneId()
                     val selectedDate = calendarViewModel.selectedDateTime.value?.first
                     if (timeZoneId != null && (selectedDate == LocalDate.now() || (viewMode == ViewMode.WEEK && selectedDate?.firstDayOfWeek(weekStart) == LocalDate.now().firstDayOfWeek(weekStart)))) {
-                        updateWeekView(LocalDate.now(timeZoneId), LocalDateTime.now(timeZoneId).getTimeWithPadding(), animate = false)
+                        updateWeekView(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding(), animate = false)
                         calendarViewModel.handleDaySelected(LocalDate.now(timeZoneId), LocalTime.now(timeZoneId).getTimeWithPadding())
                     } else if (selectedDate != null) {
                         val firstEventOfTheDayTime = calendarViewModel.firstEventOfTheDayTime
                         if (firstEventOfTheDayTime != null) {
-                            updateWeekView(selectedDate, selectedDate.atTime(firstEventOfTheDayTime).getTimeWithPadding(), animate = false)
+                            updateWeekView(selectedDate, firstEventOfTheDayTime.getTimeWithPadding(), animate = false)
                             calendarViewModel.firstEventOfTheDayTime = null
                             calendarViewModel.handleDaySelected(selectedDate, firstEventOfTheDayTime.getTimeWithPadding())
                         } else {

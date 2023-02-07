@@ -22,7 +22,6 @@ interface DateTimeUtils {
      * Calculate ISO week number for given date, taking custom week start into account.
      */
     fun LocalDate.weekNumber(startWeekOn: DayOfWeek): Int
-    fun LocalDateTime.weekNumber(startWeekOn: DayOfWeek): Int
     fun calculateWeekNumberBetween(start: LocalDate, end: LocalDate, startWeekOn: DayOfWeek): Int
     fun calculateWeekNumberInYear(date: LocalDate, startWeekOn: DayOfWeek): Int
     fun LocalDate.toDate(timeZoneId: String? = null): Date
@@ -92,10 +91,8 @@ interface DateTimeUtils {
 
     fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime?
 
-    fun Pair<LocalDate, LocalTime?>.toLocalDateTime(): LocalDateTime?
     /**
-     * Returns the time with a one hour padding
+     * Returns the given time minus one hour. If hour is equal to 0, return 00:00 LocalTime.
      */
-    fun LocalDateTime.getTimeWithPadding(): LocalDateTime
     fun LocalTime.getTimeWithPadding(): LocalTime
 }

@@ -330,18 +330,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        val newSelectedDate = it.newSelectedDate
-                        val newSelectedTime = it.newSelectedTime
-                        val selectedDateTime = calendarViewModel.selectedDateTime.value
-                        val selectedDate = selectedDateTime?.first
-                        val selectedTime = selectedDateTime?.second
-                        val isDifferentSelectedDateTime =
-                            (newSelectedDate != null && selectedDate != newSelectedDate) ||
-                                    (newSelectedTime != null && selectedTime != newSelectedTime)
-                        if (it.newSelectedDate != null && isDifferentSelectedDateTime) {
-                            calendarViewModel.handleDaySelected(it.newSelectedDate, it.newSelectedTime?.getTimeWithPadding())
-                        }
-
                         // Use jumpToMonthView to handle navigation when opening details from notification
                         jumpToMonthView()
                     }
