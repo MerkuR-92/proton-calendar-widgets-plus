@@ -37,10 +37,12 @@ import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_defau
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_icon
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_list
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_press
+import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_description_value
 import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_name_value
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarForm
+import me.proton.android.calendar.common.CalendarForm.CALENDAR_DESCRIPTION_CHARACTER_LIMIT
 import me.proton.android.calendar.common.CalendarForm.CALENDAR_NAME_CHARACTER_LIMIT
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX
 import me.proton.android.calendar.common.FragmentArguments
@@ -98,6 +100,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         // Save calendar name in VM
         calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
 
+        // Save calendar description in VM
+        calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString())
+
         // Check if we need to display discard changes dialog
         if (calendarFormViewModel.hasFormBeenEdited()) {
             MaterialAlertDialogBuilder(requireContext())
@@ -132,6 +137,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
                 // Save calendar name in VM
                 calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
+
+                // Save calendar description in VM
+                calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString())
 
                 if (!mainViewModel.isConnectedToNetwork) {
                     view?.displaySnackBar(getString(R.string.snack_network_error))
@@ -193,6 +201,14 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     CALENDAR_NAME_CHARACTER_LIMIT
                 )
 
+                // Init character limit text
+                calendar_form_description_value.helpText = resources.getQuantityString(
+                    R.plurals.calendar_form_description_character_limit,
+                    CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
+                    0,
+                    CALENDAR_DESCRIPTION_CHARACTER_LIMIT
+                )
+
                 calendar_form_name_value.requestFocus()
                 requireContext().showKeyboard()
 
@@ -215,6 +231,16 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
+        calendar_form_description_value.onTextChange {
+            if (it.isNotEmpty()) calendar_form_description_value.clearInputError()
+            calendar_form_description_value.helpText = resources.getQuantityString(
+                R.plurals.calendar_form_description_character_limit,
+                CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
+                it.length,
+                CALENDAR_DESCRIPTION_CHARACTER_LIMIT
+            )
+        }
+
         observeCalendarFormSnackState(lifecycleScope.coroutineContext)
         observeCalendarFormValues()
     }
@@ -228,6 +254,15 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 CALENDAR_NAME_CHARACTER_LIMIT,
                 calendarName.length,
                 CALENDAR_NAME_CHARACTER_LIMIT
+            )
+        }
+        calendarFormViewModel.calendarDescription.observe(viewLifecycleOwner) { calendarDescription ->
+            calendar_form_description_value.text = calendarDescription
+            calendar_form_description_value.helpText = resources.getQuantityString(
+                R.plurals.calendar_form_description_character_limit,
+                CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
+                calendarDescription.length,
+                CALENDAR_DESCRIPTION_CHARACTER_LIMIT
             )
         }
         calendarFormViewModel.calendarEmail.observe(viewLifecycleOwner) { calendarEmail ->
@@ -279,6 +314,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Disable/Enable all items linked to actions from our view
             calendar_form_name_value.isEnabled = !processingEvent
+            calendar_form_description_value.isEnabled = !processingEvent
             calendar_form_color_press.isEnabled = !processingEvent
             calendar_form_default_event_duration_press.isEnabled = !processingEvent
 

@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Agenda bijwerken</string>
     <string name="calendar_form_save">Opslaan</string>
     <string name="calendar_form_name">Naam</string>
-    <string name="calendar_form_name_placeholder">Voeg een agendanaam toe</string>
     <string name="calendar_form_color">Agendakleur</string>
     <string name="calendar_form_default_event_duration">Duur van de afspraak</string>
     <string name="calendar_form_default_event_notifications">Afspraakmeldingen</string>

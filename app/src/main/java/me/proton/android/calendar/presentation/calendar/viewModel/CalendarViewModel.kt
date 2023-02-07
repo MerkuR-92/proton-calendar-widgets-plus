@@ -89,8 +89,6 @@ class CalendarViewModel @Inject constructor(
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
 
-    var dayViewScrollYPosition: MutableLiveData<Int> = MutableLiveData(0)
-
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
@@ -298,12 +296,6 @@ class CalendarViewModel @Inject constructor(
         }
 
         return indicators.mapValues { it.value.toList().sorted().take(MAX_CALENDAR_INDICATORS) }
-    }
-
-    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<List<Event>?> {
-        return liveData<List<Event>?> {
-            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId).asLiveData(Dispatchers.Default))
-        }
     }
 
     fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
@@ -598,13 +590,18 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.fetchCalendars(userId)
     }
 
-    suspend fun getCalendarUserSettingsAutoDetectPrimaryTimezone(): Boolean {
-        val userId = userId.value?.id
+    suspend fun refreshMember(calendarId: String): Boolean {
+        val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel checkLocalTimezone")
-            return true // TODO Define default value for auto detect primary timezone
+            logger.e("User ID was null in CalendarViewModel refreshMember")
+            return false
         }
-        return calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId)?.toBoolean() ?: true
+        val memberEntity = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull() ?: run {
+            logger.e("MemberEntity was null in CalendarViewModel refreshMember")
+            return false
+        }
+        calendarsRepository.persistMember(memberEntity)
+        return true
     }
 
     private suspend fun checkLocalTimezone(context: Context) {
@@ -689,40 +686,6 @@ class CalendarViewModel @Inject constructor(
 
     suspend fun getCanonicalUserEmails(forceCanonicalization: Boolean = false): List<String>? {
         return getUserAddresses()?.map { ProtonUtilsImpl.canonicalizeProtonEmail(it.email, forceCanonicalization) }
-    }
-
-    suspend fun getDefaultCalendarSettings(): CalendarSettingsEntity? {
-        val userId = userId.value
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
-            return null
-        }
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-        if (defaultCalendarId == null) {
-            logger.e("defaultCalendarId was null in CalendarViewModel getDefaultCalendarSettings")
-            return null
-        }
-        return calendarsRepository.selectCalendarSettings(defaultCalendarId)
-    }
-
-    suspend fun getCalendarSettings(calendarId: String): CalendarSettingsEntity? {
-        val userId = userId.value
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getDefaultCalendarSettings")
-            return null
-        }
-        return calendarsRepository.selectCalendarSettings(calendarId)
-    }
-
-    suspend fun getDefaultAlarms(calendarId: String, isEventAllDay: Boolean) = getCalendarSettings(calendarId)?.getDefaultAlarms(json, isEventAllDay)
-
-    suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
-        val userId = userId.value
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
-            return null
-        }
-        return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
     }
 
     suspend fun transformEventAllowingApiCall(eventId: String, calendarId: String): Event? {

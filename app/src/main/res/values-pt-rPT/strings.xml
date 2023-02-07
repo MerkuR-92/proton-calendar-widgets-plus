@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Editar agenda</string>
     <string name="calendar_form_save">Guardar</string>
     <string name="calendar_form_name">Nome</string>
-    <string name="calendar_form_name_placeholder">Adicionar nome à agenda</string>
     <string name="calendar_form_color">Cor da agenda</string>
     <string name="calendar_form_default_event_duration">Duração do evento</string>
     <string name="calendar_form_default_event_notifications">Notificação de eventos</string>

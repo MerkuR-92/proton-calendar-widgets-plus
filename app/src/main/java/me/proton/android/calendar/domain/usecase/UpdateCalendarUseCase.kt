@@ -39,10 +39,10 @@ class UpdateCalendarUseCase @Inject constructor(
         val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
 
         val updateMemberApiRequest = UpdateMemberApiRequest(
-            color = if (!dbMember.color.equals(color, ignoreCase = true)) color else null, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.
-            display = display,
-            name = name,
-            description = description
+            color = color?.takeIf { !dbMember.color.equals(color, ignoreCase = true) }, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.
+            display = display?.takeIf { dbMember.display != display },
+            name = name?.takeIf { !dbMember.name.equals(name, ignoreCase = true) },
+            description = description?.takeIf { !dbMember.description.equals(description, ignoreCase = true) }
         )
 
         return updateSingleCalendar(userId, calendarId, dbMember.id, updateMemberApiRequest)

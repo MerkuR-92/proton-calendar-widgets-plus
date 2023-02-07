@@ -419,7 +419,7 @@
     <string name="calendar_form_update_title">Edit calendar</string>
     <string name="calendar_form_save">Save</string>
     <string name="calendar_form_name">Name</string>
-    <string name="calendar_form_name_placeholder">Add a calendar name</string>
+    <string name="calendar_form_description">Description</string>
     <string name="calendar_form_color">Calendar color</string>
     <string name="calendar_form_default_event_duration">Event duration</string>
     <string name="calendar_form_default_event_notifications">Event notifications</string>
@@ -429,6 +429,7 @@
     <string name="calendar_form_default_email_value_error">Failed to load default email</string>
     <string name="calendar_form_name_hint">Add a calendar name</string>
     <string name="calendar_form_name_required_error">Name required</string>
+    <string name="calendar_form_description_hint">Add a calendar description</string>
     <string name="add_calendar_text">Add calendar</string>
     <string name="create_calendar_limit_reached">You have reached the maximum number of calendars.</string>
     <string name="create_calendar_limit_reached_paid_title">20-calendar maximum reached</string>
@@ -666,6 +667,10 @@
         <item quantity="other">%s minutes</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d character</item>
+        <item quantity="other">%d/%d characters</item>
+    </plurals>
+    <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%d/%d character</item>
         <item quantity="other">%d/%d characters</item>
     </plurals>

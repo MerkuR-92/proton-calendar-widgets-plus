@@ -52,11 +52,13 @@ object CalendarMocks {
             id,
             calendarName,
             userEmail,
+            calendarDescription,
             calendarColor,
             if (isDisabled) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType,
             calendarPermissions,
+            defaultEventDuration,
             defaultPartDayNotifications = defaultPartDayNotifications ?: listOf(Notification.Display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START))),
             defaultFullDayNotifications = listOf(Notification.Display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START)))
         )

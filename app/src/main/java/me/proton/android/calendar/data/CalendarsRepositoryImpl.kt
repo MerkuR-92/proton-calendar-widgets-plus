@@ -1255,14 +1255,19 @@ class CalendarsRepositoryImpl @Inject constructor(
  * Joins [CalendarEntity] with [MemberEntity] to [Calendar] object.
  */
 fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json): Flow<List<Calendar>> {
-    return this.combine(database.membersDao().selectMembersFlow()) { calendars, members ->
+    return combine(
+        this,
+        database.membersDao().flowMembers(),
+        database.calendarSettingsDao().flowCalendarSettings()
+    ) { calendars, members, calendarSettingsList ->
         if (calendars.isNotEmpty()) {
             // Get user addresses so we can find the calendar member for current user
             val userCanonicalEmails = database.addressDao().getByUserId(UserId(calendars.first().fkUserId)).map {
                 canonicalizeProtonEmail(it.email, forceCanonicalization = true)
             }
             calendars.mapNotNull { calendarEntity ->
-                val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
+                // Find the calendar settings for that calendar
+                val calendarSettings = calendarSettingsList.firstOrNull { it.calendarId == calendarEntity.id } ?: return@mapNotNull null
                 // Find the member that belongs to the current user
                 val userMember = members.firstOrNull {
                     // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members

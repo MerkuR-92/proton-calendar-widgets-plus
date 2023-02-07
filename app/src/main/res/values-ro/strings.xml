@@ -417,7 +417,6 @@
     <string name="calendar_form_update_title">Editare calendar</string>
     <string name="calendar_form_save">Salvare</string>
     <string name="calendar_form_name">Nume</string>
-    <string name="calendar_form_name_placeholder">Adăugare nume calendar</string>
     <string name="calendar_form_color">Culoare calendar</string>
     <string name="calendar_form_default_event_duration">Durată eveniment</string>
     <string name="calendar_form_default_event_notifications">Notificări eveniment</string>

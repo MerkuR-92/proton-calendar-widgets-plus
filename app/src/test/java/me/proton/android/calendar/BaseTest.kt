@@ -10,11 +10,13 @@ internal abstract class BaseTest {
             "calendar-id",
             "calendar",
             "email",
+            "description",
             "",
             1,
             true,
             type,
             if (calendarIsSharedWithMe) (127 and 2.inv() /* remove bit with owner permissions */) else 127,
+            30,
             emptyList(),
             emptyList()
         ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!

@@ -409,11 +409,13 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.email,
+                defaultCalendar.description,
                 defaultCalendar.color,
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
                 defaultCalendar.permissions,
+                defaultCalendar.defaultEventDuration,
                 defaultCalendar.defaultPartDayNotifications,
                 defaultCalendar.defaultFullDayNotifications
             ), newICalendar, 0
@@ -688,11 +690,13 @@ class EventViewModel @Inject constructor(
                     calendar.id,
                     calendar.name,
                     calendar.email,
+                    calendar.description,
                     calendar.color,
                     calendar.flags,
                     calendar.display,
                     calendar.type,
                     calendar.permissions,
+                    calendar.defaultEventDuration,
                     calendar.defaultPartDayNotifications,
                     calendar.defaultFullDayNotifications
                 )

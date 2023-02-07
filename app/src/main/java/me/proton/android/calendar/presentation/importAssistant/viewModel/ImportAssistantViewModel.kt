@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarImport
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
@@ -165,10 +164,12 @@ class ImportAssistantViewModel @Inject constructor(
                     sourceId = it.id,
                     sourceName = it.source.ellipsize(100),
                     sourceEmail = account,
+                    sourceDescription = it.description,
                     createDestinationCalendar = true, // Set to true by default
                     destinationId = null, // Set to null by default (calendar has yet to be created)
                     destinationName = it.source.ellipsize(100),
                     destinationEmail = defaultUserEmail.value!!,
+                    destinationDescription = it.description.ellipsize(255),
                     destinationColor = calendarColors.random()
                 )
             )
@@ -230,13 +231,19 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    suspend fun createCalendar(calendarName: String, calendarEmail: String, calendarColor: Int): String? {
+    suspend fun createCalendar(
+        calendarName: String,
+        calendarDescription: String,
+        calendarEmail: String,
+        calendarColor: Int
+    ): String? {
         val userId = getPrimaryUserIdOrNull() ?: return null
 
         // Create calendar
         val createCalendarResult = createCalendarUseCase.execute(
             userId = userId,
             name = calendarName,
+            description = calendarDescription,
             color = calendarColor,
             email = calendarEmail
         )
@@ -292,10 +299,12 @@ class ImportAssistantViewModel @Inject constructor(
             sourceId = calendarToImport.sourceId,
             sourceName = calendarToImport.sourceName,
             sourceEmail = calendarToImport.sourceEmail,
+            sourceDescription = calendarToImport.sourceDescription,
             createDestinationCalendar = true,
             destinationId = null,
             destinationName = calendarToImport.sourceName,
             destinationEmail = defaultUserEmail,
+            destinationDescription = calendarToImport.sourceDescription,
             destinationColor = calendarColor
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
@@ -312,10 +321,12 @@ class ImportAssistantViewModel @Inject constructor(
             sourceId = calendarToImport.sourceId,
             sourceName = calendarToImport.sourceName,
             sourceEmail = calendarToImport.sourceEmail,
+            sourceDescription = calendarToImport.sourceDescription,
             createDestinationCalendar = false,
             destinationId = calendar.id,
             destinationName = calendar.name,
             destinationEmail = calendar.email,
+            destinationDescription = calendar.description,
             destinationColor = Color.parseColor(calendar.color)
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return

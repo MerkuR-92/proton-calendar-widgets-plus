@@ -262,13 +262,15 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.id ?: defaultCalendar.id,
                 existingCalendar?.name ?: defaultCalendar.name,
                 existingCalendar?.email ?: defaultCalendar.email,
+                existingCalendar?.description ?: defaultCalendar.description,
                 existingCalendar?.color ?: defaultCalendar.color,
                 existingCalendar?.flags ?: defaultCalendar.flags,
-                if (existingCalendar != null) existingCalendar.display else defaultCalendar.display,
+                existingCalendar?.display ?: defaultCalendar.display,
                 existingCalendar?.type ?: defaultCalendar.type,
                 existingCalendar?.permissions ?: defaultCalendar.permissions,
-                defaultCalendar.defaultPartDayNotifications,
-                defaultCalendar.defaultFullDayNotifications
+                existingCalendar?.defaultEventDuration ?: defaultCalendar.defaultEventDuration,
+                existingCalendar?.defaultPartDayNotifications ?: defaultCalendar.defaultPartDayNotifications,
+                existingCalendar?.defaultFullDayNotifications ?: defaultCalendar.defaultFullDayNotifications
             ), iCalendar, Instant.now().epochSecond, notifications = notifications) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         val isNewNonCancelled  = isNew && !isOrganizerMode && !iCalendar.method.isCancel

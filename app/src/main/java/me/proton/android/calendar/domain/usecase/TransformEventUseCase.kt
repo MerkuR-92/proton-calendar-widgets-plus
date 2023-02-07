@@ -238,11 +238,13 @@ class TransformEventUseCase @Inject constructor(
                 calendarEntity.id,
                 calendar.name,
                 calendar.email,
+                calendar.description,
                 calendar.color,
                 calendar.flags,
                 calendar.display,
                 calendarEntity.type,
                 calendar.permissions,
+                calendar.defaultEventDuration,
                 calendar.defaultPartDayNotifications,
                 calendar.defaultFullDayNotifications
             ),

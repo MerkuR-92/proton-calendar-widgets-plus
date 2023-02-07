@@ -12,11 +12,13 @@ data class Calendar(
         override val id: String,
         val name: String,
         val email: String,
+        val description: String,
         val color: String,
         val flags: Int,
         val display: Boolean,
         val type: Int,
         val permissions: Int,
+        val defaultEventDuration: Int,
         val defaultPartDayNotifications: List<Notification>,
         val defaultFullDayNotifications: List<Notification>
 ) : BaseModel() {
@@ -26,11 +28,13 @@ data class Calendar(
                         id = calendarEntity.id,
                         name = memberEntity.name,
                         email = memberEntity.email,
+                        description = memberEntity.description,
                         color = memberEntity.color,
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),
                         type = calendarEntity.type,
                         permissions = memberEntity.permissions,
+                        defaultEventDuration = calendarSettingsEntity.defaultEventDuration,
                         defaultPartDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = false),
                         defaultFullDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = true)
                 )
