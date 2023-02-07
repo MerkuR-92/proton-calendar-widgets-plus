@@ -415,6 +415,7 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.display,
                 defaultCalendar.type,
                 defaultCalendar.permissions,
+                defaultCalendar.defaultEventDuration,
                 defaultCalendar.defaultPartDayNotifications,
                 defaultCalendar.defaultFullDayNotifications
             ), newICalendar, 0
@@ -695,6 +696,7 @@ class EventViewModel @Inject constructor(
                     calendar.display,
                     calendar.type,
                     calendar.permissions,
+                    calendar.defaultEventDuration,
                     calendar.defaultPartDayNotifications,
                     calendar.defaultFullDayNotifications
                 )

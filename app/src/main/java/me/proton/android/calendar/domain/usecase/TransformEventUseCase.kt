@@ -244,6 +244,7 @@ class TransformEventUseCase @Inject constructor(
                 calendar.display,
                 calendarEntity.type,
                 calendar.permissions,
+                calendar.defaultEventDuration,
                 calendar.defaultPartDayNotifications,
                 calendar.defaultFullDayNotifications
             ),

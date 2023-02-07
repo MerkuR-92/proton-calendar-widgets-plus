@@ -122,6 +122,7 @@ class CalendarListenerTest {
 
             val calendarSettingsEntity: CalendarSettingsEntity = mockk()
 
+            coEvery { calendarSettingsEntity.defaultEventDuration } returns 30
             coEvery { calendarSettingsEntity.defaultPartDayNotifications } returns emptyList()
             coEvery { calendarSettingsEntity.defaultFullDayNotifications } returns emptyList()
 

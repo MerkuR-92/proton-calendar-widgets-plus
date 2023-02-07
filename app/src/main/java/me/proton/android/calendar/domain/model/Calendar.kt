@@ -18,6 +18,7 @@ data class Calendar(
         val display: Boolean,
         val type: Int,
         val permissions: Int,
+        val defaultEventDuration: Int,
         val defaultPartDayNotifications: List<Notification>,
         val defaultFullDayNotifications: List<Notification>
 ) : BaseModel() {
@@ -33,6 +34,7 @@ data class Calendar(
                         display = memberEntity.display.toBoolean(),
                         type = calendarEntity.type,
                         permissions = memberEntity.permissions,
+                        defaultEventDuration = calendarSettingsEntity.defaultEventDuration,
                         defaultPartDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = false),
                         defaultFullDayNotifications = calendarSettingsEntity.getDefaultNotifications(json, isAllDay = true)
                 )
