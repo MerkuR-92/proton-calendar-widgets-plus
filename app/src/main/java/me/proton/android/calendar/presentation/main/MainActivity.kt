@@ -1368,6 +1368,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
             subscribedCalendars = value
 
+            lifecycleScope.launch {
+                value.forEach {
+                    // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
+                    if (it.description == "0") calendarViewModel.refreshMember(calendarId = it.id)
+                }
+            }
+
             if (subscribedCalendars != null && calendarSubscriptions != null) {
                 subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
             }
