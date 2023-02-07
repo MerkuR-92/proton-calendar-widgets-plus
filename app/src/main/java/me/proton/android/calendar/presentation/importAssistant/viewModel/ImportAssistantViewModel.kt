@@ -231,7 +231,12 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    suspend fun createCalendar(calendarName: String, calendarDescription: String, calendarEmail: String, calendarColor: Int): String? {
+    suspend fun createCalendar(
+        calendarName: String,
+        calendarDescription: String,
+        calendarEmail: String,
+        calendarColor: Int
+    ): String? {
         val userId = getPrimaryUserIdOrNull() ?: return null
 
         // Create calendar

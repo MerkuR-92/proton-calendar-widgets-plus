@@ -593,12 +593,14 @@ class CalendarViewModel @Inject constructor(
     suspend fun refreshMember(calendarId: String): Boolean {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel refreshMembers")
+            logger.e("User ID was null in CalendarViewModel refreshMember")
             return false
         }
-        calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull()?.let {
-            calendarsRepository.persistMember(it)
-        } ?: return false
+        val memberEntity = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull() ?: run {
+            logger.e("MemberEntity was null in CalendarViewModel refreshMember")
+            return false
+        }
+        calendarsRepository.persistMember(memberEntity)
         return true
     }
 
