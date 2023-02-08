@@ -156,6 +156,11 @@ class HandleIcsUseCase @Inject constructor(
 
                     makeCalendarVisible(newEvent, userId)
 
+                    if (immutableExistingEvent != null) {
+                        // If event with same UID existed and sync call succeeded, delete existing event locally since we overwrite on import
+                        calendarsRepository.deleteEventsById(listOf(immutableExistingEvent.id))
+                    }
+
                     return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, isRecurring = newEvent.isRecurring())
                 }
                 is UseCase.Result.InvalidParams -> {
