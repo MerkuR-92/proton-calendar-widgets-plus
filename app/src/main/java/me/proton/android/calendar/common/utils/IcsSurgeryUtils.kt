@@ -223,7 +223,7 @@ object IcsSurgeryUtils {
 
             if (!event.cleanDtStamp(iCalendar, isImport || !isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.MissingDateTimeStamp
 
-            if (!event.cleanUid(iCalendar, iCalString)) return HandleIcsResult.Error.MissingUid
+            if (!event.cleanUid(iCalendar)) return HandleIcsResult.Error.MissingUid
 
             if (!event.cleanDtStart()) return HandleIcsResult.Error.Invalid.DateStart
 
@@ -585,13 +585,13 @@ object IcsSurgeryUtils {
         }
     }
 
-    private fun VEvent.cleanUid(iCalendar: ICalendar, iCalString: String): Boolean {
+    private fun VEvent.cleanUid(iCalendar: ICalendar): Boolean {
         this.moveUid(iCalendar)
 
-        // UID: We generate UID if it's missing. Also, there's a BE limit of 191 characters. If we need to crop, we keep the last 191 characters of the uid.
-        if (this.uid?.value == null || this.uid.value.isEmpty()) {
-            this.setUid(generateProtonUidForImport(null, iCalString))
-        } else if (this.uid.value.length > UID_MAX_LENGTH) {
+        // UID: As per RFC, we require it to be present. Also, there's a BE limit of 191 characters.
+        //  If we need to crop, we keep the last 191 characters of the uid.
+        if (this.uid?.value == null || this.uid.value.isEmpty()) return false
+        else if (this.uid.value.length > UID_MAX_LENGTH) {
             this.setUid(this.uid.value.takeLast(UID_MAX_LENGTH))
         }
         return true
