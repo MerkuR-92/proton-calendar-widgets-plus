@@ -90,7 +90,9 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
@@ -545,19 +547,45 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        val newSelectedDate = it.newSelectedDate
-                        val selectedDate = calendarViewModel.selectedDate.value
-                        val isDifferentSelectedDate = newSelectedDate != null && selectedDate != newSelectedDate
-                        val isDayVisibleInThreeDays = calendarViewModel.viewMode.value == ViewMode.THREE_DAY &&
-                                selectedDate?.let {
-                                    newSelectedDate?.isBetween(selectedDate, selectedDate.plusDays(2))
-                                } ?: false
-                        if (newSelectedDate != null && isDifferentSelectedDate && !isDayVisibleInThreeDays) {
-                            calendarViewModel.handleDaySelected(newSelectedDate)
-                        }
+                        lifecycleScope.launch {
+                            val newSelectedDate = it.newSelectedDate
+                            val newSelectedTime = it.newSelectedTime
+                            val selectedDateTime = calendarViewModel.selectedDateTime.value
+                            val selectedDate = selectedDateTime?.first
+                            val selectedTime = selectedDateTime?.second
+                            val isDifferentSelectedDate = newSelectedDate != null && selectedDate != newSelectedDate
+                            val isDifferentSelectedTime = newSelectedTime != null && selectedTime != newSelectedTime
+                            val isDayVisible =
+                                when (calendarViewModel.viewMode.value) {
+                                    ViewMode.AGENDA,
+                                    ViewMode.DAY -> newSelectedDate == selectedDate
+                                    ViewMode.MONTH -> {
+                                        newSelectedDate?.year == selectedDate?.year && newSelectedDate?.month == selectedDate?.month
+                                    }
+                                    ViewMode.THREE_DAY -> {
+                                        selectedDate?.let {
+                                            newSelectedDate?.isBetween(selectedDate, selectedDate.plusDays(2))
+                                        } ?: false
+                                    }
+                                    ViewMode.WEEK -> {
+                                        val weekStart = calendarViewModel.getWeekStart()
+                                        val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
+                                        if (selectedDate != null && newSelectedDate != null && firstDayOfWeek != null) {
+                                            newSelectedDate.isBetween(firstDayOfWeek, firstDayOfWeek.plusDays(7))
+                                        } else false
+                                    }
+                                    else -> false
+                                }
+                            if (newSelectedDate != null && isDifferentSelectedDate && !isDayVisible) {
+                                calendarViewModel.handleDaySelected(newSelectedDate, newSelectedTime?.getTimeWithPadding())
+                            } else if (selectedDate != null && isDayVisible && isDifferentSelectedTime) {
+                                // Use currently selected date and new selected time
+                                calendarViewModel.handleDaySelected(selectedDate, newSelectedTime?.getTimeWithPadding())
+                            }
 
-                        // Use jumpToMonthView to handle navigation when opening details from notification
-                        jumpToMonthView()
+                            // Use jumpToMonthView to handle navigation when opening details from notification
+                            jumpToMonthView()
+                        }
                     }
                 }
                 eventViewModel.eventFormSnackState.value = null

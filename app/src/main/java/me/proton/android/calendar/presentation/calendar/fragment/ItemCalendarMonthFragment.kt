@@ -296,6 +296,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                                             it.getOccurrenceStart(timeZoneId).toLocalTime()
                                         }
                                     )
+                            } else {
+                                calendarViewModel.firstEventOfTheDayTime = null
                             }
 
                             // Save the current month in order to know where to return if user presses back from day view

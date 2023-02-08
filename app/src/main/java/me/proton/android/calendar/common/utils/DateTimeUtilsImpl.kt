@@ -82,7 +82,6 @@ object DateTimeUtilsImpl : DateTimeUtils {
         }
 
         return monday.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-
     }
 
     /**
@@ -445,4 +444,16 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return this.with(TemporalAdjusters.previousOrSame(weekStartDayOfWeek))
     }
 
+    /**
+     * Returns the given time minus one hour. If hour is equal to 0, return 00:00 LocalTime.
+     */
+    override fun LocalTime.getTimeWithPadding(): LocalTime {
+        return if (this.hour > 0) {
+            // Add a 1 hour padding above the current time (and thus: the now line)
+            this.minusHours(1)
+        } else {
+            // If hour is equal to 0, return 00:00 LocalTime
+            this.minusMinutes(this.minute.toLong())
+        }
+    }
 }

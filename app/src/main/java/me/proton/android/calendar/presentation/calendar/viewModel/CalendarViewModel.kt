@@ -10,7 +10,6 @@ import android.text.format.DateFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.*
 import androidx.work.*
-import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,10 +31,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
-import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.Logger
@@ -55,6 +52,7 @@ import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -96,8 +94,8 @@ class CalendarViewModel @Inject constructor(
 
     var updateSelectedLocalDate: LocalDate? = null
 
-    private val _selectedDate: MutableLiveData<LocalDate> = MutableLiveData()
-    val selectedDate: LiveData<LocalDate> = _selectedDate
+    private val _selectedDateTime: MutableLiveData<Pair<LocalDate, LocalTime?>> = MutableLiveData()
+    val selectedDateTime: LiveData<Pair<LocalDate, LocalTime?>> = _selectedDateTime
 
     // userCalendars contains all non-subscribed calendars regardless of their flags
     var userCalendars: LiveData<List<Calendar>> = MutableLiveData()
@@ -256,22 +254,26 @@ class CalendarViewModel @Inject constructor(
         } else handleDaySelected(date)
     }
 
-    fun handleDaySelected(date: LocalDate, fromMonthPagerCallback: Boolean = false) {
+    fun handleDaySelected(date: LocalDate, time: LocalTime? = null, fromMonthPagerCallback: Boolean = false) {
         // prevent mini-calendar scroll from overriding selected date
-        _selectedDate.value?.let {
-            if (fromMonthPagerCallback && it.month == date.month && it.year == date.year) {
+        _selectedDateTime.value?.let { selectedDateTime ->
+            val selectedDate = selectedDateTime.first
+            if (fromMonthPagerCallback && selectedDate.month == date.month && selectedDate.year == date.year) {
                 return
             }
             weekStart.value?.let { weekStart ->
                 val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart)
-                if (fromMonthPagerCallback && monthView.value == false && it.weekNumber(startWeekOn) == date.weekNumber(startWeekOn) && it.year == date.year) {
+                if (fromMonthPagerCallback &&
+                    monthView.value == false &&
+                    selectedDate.weekNumber(startWeekOn) == date.weekNumber(startWeekOn) &&
+                    selectedDate.year == date.year) {
                     // TODO is this early return logic really needed for week view here ?
                     return
                 }
             }
         }
 
-        _selectedDate.value = date
+        _selectedDateTime.value = Pair(date, time)
     }
 
     private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {

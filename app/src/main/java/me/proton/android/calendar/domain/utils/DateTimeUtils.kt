@@ -90,4 +90,9 @@ interface DateTimeUtils {
     fun LocalDateTime.firstDayOfWeek(weekStartDayOfWeek: DayOfWeek): LocalDateTime
 
     fun LocalDateTime.firstDayOfWeek(weekStart: Int?): LocalDateTime?
+
+    /**
+     * Returns the given time minus one hour. If hour is equal to 0, return 00:00 LocalTime.
+     */
+    fun LocalTime.getTimeWithPadding(): LocalTime
 }

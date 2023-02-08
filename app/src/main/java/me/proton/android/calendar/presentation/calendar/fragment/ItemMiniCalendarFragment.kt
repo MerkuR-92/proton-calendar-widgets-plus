@@ -251,9 +251,9 @@ class ItemMiniCalendarFragment : Fragment() {
                 applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
             }
 
-            calendarViewModel.selectedDate.observe(viewLifecycleOwner) { selectedDate ->
+            calendarViewModel.selectedDateTime.observe(viewLifecycleOwner) { selectedDateTime ->
                 applySelectedDate(
-                    selectedDate,
+                    selectedDateTime.first,
                     firstMiniCalendarDay,
                     firstDayOfTheMonth,
                     this@ItemMiniCalendarFragment.timeZoneId ?: timeZoneId
@@ -284,7 +284,7 @@ class ItemMiniCalendarFragment : Fragment() {
             this.addMiniCalendarItemView(skeletonList, forDate)
         }
 
-        val selectedDate = calendarViewModel.selectedDate.value
+        val selectedDate = calendarViewModel.selectedDateTime.value?.first
         if (selectedDate != null) {
             applySelectedDate(selectedDate, firstMiniCalendarDay, firstDay, timeZoneId)
         }

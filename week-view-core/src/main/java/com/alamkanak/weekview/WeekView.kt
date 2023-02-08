@@ -1363,14 +1363,15 @@ class WeekView @JvmOverloads constructor(
         }
 
         val sanitizedHour = hour.coerceIn(minimumValue = minHour, maximumValue = maxHour)
-        val desired = nowAtTimezone(viewState.customTimeZone).withTime(hour = sanitizedHour, minutes = 0)
+        val desired = nowAtTimezone(viewState.customTimeZone).withTime(hour = sanitizedHour, minutes = minute)
 
-        if (desired.hour > minHour) {
-            // Add some padding above the current time (and thus: the now line)
-            desired.subtractHours(1)
-        } else {
-            desired.subtractMinutes(desired.minute)
-        }
+        // the time passed to scrollToTime already has the padding
+//        if (desired.hour > minHour) {
+//            // Add some padding above the current time (and thus: the now line)
+//            desired.subtractHours(1)
+//        } else {
+//            desired.subtractMinutes(desired.minute)
+//        }
 
         val fraction = desired.minute / 60f
         val verticalOffset = hourHeight * (desired.hour + fraction)
@@ -1381,6 +1382,10 @@ class WeekView @JvmOverloads constructor(
         val maxOffset = viewState.dayHeight - height
         val finalOffset = min(maxOffset, verticalOffset) * (-1)
 
+        if (verticalScrollOffset >= finalOffset * -1 - 5 && verticalScrollOffset <= finalOffset * -1 + 5) {
+            // To avoid micro adjustments due to calculating minutes from offset
+            return
+        }
         navigator.scrollVerticallyTo(offset = finalOffset)
     }
 

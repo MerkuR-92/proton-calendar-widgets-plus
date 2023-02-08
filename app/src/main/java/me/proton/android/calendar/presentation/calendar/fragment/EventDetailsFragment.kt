@@ -2,7 +2,6 @@ package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.os.Build
 import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
@@ -25,7 +24,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
 import biweekly.property.Attendee
@@ -87,6 +85,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.rotateArrowUpward
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartEndForActualEndDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
@@ -330,10 +329,6 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
-
-                        if (it.newSelectedDate != null && calendarViewModel.selectedDate.value != it.newSelectedDate) {
-                            calendarViewModel.handleDaySelected(it.newSelectedDate)
-                        }
 
                         // Use jumpToMonthView to handle navigation when opening details from notification
                         jumpToMonthView()
