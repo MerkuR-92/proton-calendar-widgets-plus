@@ -353,7 +353,7 @@ object IcsSurgeryUtils {
             multipleEventsIterator.next()
         }
 
-        cleanICalString = fixDateOrDateTimeFormat(cleanICalString) ?: return HandleIcsResult.Error.Invalid.DateOrDateTimeProperty
+        cleanICalString = fixDateOrDateTimeFormat(cleanICalString)
 
         cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, aliasesTimezonesMap)
         cleanICalString = replaceUnsupportedTimeZoneId(cleanICalString, windowsTimeZoneMap)
@@ -361,7 +361,7 @@ object IcsSurgeryUtils {
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
     }
 
-    private fun fixDateOrDateTimeFormat(iCalString: String): String? {
+    private fun fixDateOrDateTimeFormat(iCalString: String): String {
         // DATETIME or DATE properties
         var cleanICalString = iCalString
 
@@ -1053,8 +1053,8 @@ object IcsSurgeryUtils {
                     TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone)
                 )
                 this.localizeDateToTimezone(xWrTimezone)
-            } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() && iCalendar.timezoneInfo.timezones.size == 1 && !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
-                // If no x-wr-timezone is present, we check if there's a single VTIMEZONE to use in the ICS string
+            } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() && (iCalendar.timezoneInfo.timezones.size == 1 || iCalendar.timezoneInfo.timezones.map { it.timeZone?.id }.all { it == iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id }) && !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
+                // If no x-wr-timezone is present, we check if there's a single VTIMEZONE to use in the ICS string (Exclude those with same id)
                 val fallbackTimeZoneId = fallbackTimeZone(iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id ?: return false, fallbackToDefault = false) ?: return false
                 // Remove floating timezone property and localize
                 iCalendar.timezoneInfo.setFloating(this, false)
