@@ -397,11 +397,11 @@ object IcsSurgeryUtils {
         }
 
         // Convert following ISO date times (2022-10-24T11:30:00.000Z)
-        val isoDateRegex = Regex(":\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[.]\\d{3}Z\\r?\\n")
+        val isoDateRegex = Regex(":\\d{4}-\\d{2}-\\d{2}T\\d{2}[.:]\\d{2}[.:](\\d{2}[.:])?\\d{3}Z\\r?\\n")
         isoDateRegex.findAll(cleanICalString).iterator().forEach {
             var cleanDate = it.value.replace("-", "")
-            cleanDate = cleanDate.replace(":", "")
-            cleanDate = cleanDate.replace(Regex("[.]\\d{3}Z"), "Z")
+            cleanDate = cleanDate.replace(Regex("[.:]"), "")
+            cleanDate = cleanDate.replace(Regex("[.:]\\d{3}Z"), "Z")
             cleanICalString = cleanICalString.replace(
                 it.value,
                 ":$cleanDate" // Add back the first ':' since we removed it along with the others using replace
