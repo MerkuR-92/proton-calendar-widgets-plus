@@ -104,7 +104,6 @@
     <string name="event_change_answer_recurring_single_edit_description">Acest eveniment a fost actualizat de către organizator. Doriți să vă schimbați răspunsul doar pentru această manifestare din serie?</string>
     <string name="event_change_answer_recurring_cancel">Anulare</string>
     <string name="event_change_answer_recurring_confirm">Actualizare</string>
-    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Răsp.: Invitație pentru %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s v-a acceptat invitația la %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s v-a refuzat invitația la %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s v-a acceptat provizoriu invitația la %2$s</string>
@@ -222,10 +221,6 @@
     <string name="event_allow_contacts_description">Calendarul Proton are nevoie de acces la contacte pentru a vă oferi autocompletarea.</string>
     <string name="event_allow_contacts_cancel">Refuzare</string>
     <string name="event_allow_contacts_confirm">Permitere</string>
-    <string name="event_send_invite_mail_subject_prefix">Invitație pentru %s</string>
-    <string name="event_send_invite_mail_subject_all_day">un eveniment la %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">un eveniment începând de la %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">un eveniment începând de la %1$s la %2$s %3$s</string>
     <string name="event_send_invite_mail_body">Sunteți invitat la %1$s\nCând: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toată ziua)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -241,10 +236,6 @@
     <string name="event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
     <string name="event_add_participants_dialog_confirm">Trimitere</string>
     <string name="event_add_participants_dialog_cancel">Anulare</string>
-    <string name="event_send_cancel_mail_subject_prefix">Anulare pentru %s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">un eveniment începând de la %1$s la %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">un eveniment începând de la %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">un eveniment la %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s a fost anulat.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendarele mele</string>

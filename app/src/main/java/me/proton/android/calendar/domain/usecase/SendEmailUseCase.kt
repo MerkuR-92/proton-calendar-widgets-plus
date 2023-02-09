@@ -4,14 +4,15 @@ import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
 import biweekly.property.Method
-import biweekly.util.ICalDate
 import com.google.crypto.tink.subtle.Base64
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.INVITE_EMAIL_MIME_TYPE
+import me.proton.android.calendar.common.INVITE_ICS_FILE_NAME
+import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE_TEMPLATE
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
@@ -19,12 +20,15 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.ValueSet
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
@@ -33,7 +37,7 @@ import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class SendEmailUseCase @Inject constructor(
@@ -311,15 +315,6 @@ class SendEmailUseCase @Inject constructor(
         userAttendeeEmail: String? = null
     ): Pair<String, String> {
         val eventCopy = Event.from(newEvent)
-        if (eventCopy.isAllDay()) {
-            eventCopy.iCalEvent.setDateEnd(
-                ICalDate(
-                    eventCopy.getEnd(defaultTimeZone).toLocalDate()?.minusDays(1)
-                        ?.toDate(defaultTimeZone),
-                    false
-                )
-            )
-        }
         return Pair(
             // Subject
             getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, mailType),
@@ -333,52 +328,48 @@ class SendEmailUseCase @Inject constructor(
     }
 
     private fun getMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean, mailType: MailType): String {
-        return resourceProvider.provideString(
-            when (mailType) {
-                MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_prefix
-                MailType.REPLY -> R.string.event_change_answer_mail_subject_prefix
-                MailType.INVITE -> R.string.event_send_invite_mail_subject_prefix
-            },
-            if (!event.isAllDay()) {
-                val dateTimeStart =
-                    event.formatStart(timezone, timeFormatIs24Hours)
-                resourceProvider.provideString(
-                    when (mailType) {
-                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_part_day
-                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_part_day
-                    },
-                    dateTimeStart.first,
-                    dateTimeStart.second,
-                    DateTimeUtilsImpl.formatTimeZoneId(
-                        timezone,
-                        event.iCalEvent.dateStart.value.toInstant(),
-                        displayId = false
-                    )
+        return if (!event.isAllDay()) {
+            val dateTimeStart =
+                event.formatStart(timezone, timeFormatIs24Hours)
+            resourceProvider.provideString(
+                when (mailType) {
+                    MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_part_day
+                    MailType.REPLY -> R.string.event_change_answer_mail_subject_part_day
+                    MailType.INVITE -> R.string.event_send_invite_mail_subject_part_day
+                },
+                dateTimeStart.first,
+                dateTimeStart.second,
+                DateTimeUtilsImpl.formatTimeZoneId(
+                    timezone,
+                    event.iCalEvent.dateStart.value.toInstant(),
+                    displayId = false
                 )
-            } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
-                resourceProvider.provideString(
-                    when (mailType) {
-                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day_multiple
-                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day_multiple
-                    },
-                    event.formatStart(
-                        timezone,
-                        timeFormatIs24Hours
-                    ).first
-                )
-            } else {
-                resourceProvider.provideString(
-                    when (mailType) {
-                        MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day
-                        MailType.REPLY, MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day
-                    },
-                    event.formatStart(
-                        timezone,
-                        timeFormatIs24Hours
-                    ).first
-                )
-            }
-        )
+            )
+        } else if (!event.spansSingleDay(true, timeZoneId = timezone)) {
+            resourceProvider.provideString(
+                when (mailType) {
+                    MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_multiple_day
+                    MailType.REPLY -> R.string.event_change_answer_mail_subject_multiple_day
+                    MailType.INVITE -> R.string.event_send_invite_mail_subject_multiple_day
+                },
+                event.formatStart(
+                    timezone,
+                    timeFormatIs24Hours
+                ).first
+            )
+        } else {
+            resourceProvider.provideString(
+                when (mailType) {
+                    MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day
+                    MailType.REPLY -> R.string.event_change_answer_mail_subject_all_day
+                    MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day
+                },
+                event.formatStart(
+                    timezone,
+                    timeFormatIs24Hours
+                ).first
+            )
+        }
     }
 
     private fun getInviteMailBody(

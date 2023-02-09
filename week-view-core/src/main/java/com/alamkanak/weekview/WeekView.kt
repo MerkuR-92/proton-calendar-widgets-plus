@@ -1583,7 +1583,10 @@ class WeekView @JvmOverloads constructor(
                 candidates.isEmpty() -> null
                 // Two events hit. This is most likely because an all-day event was clicked, but a
                 // single event is rendered underneath it. We return the all-day event.
-                candidates.size == 2 -> candidates.first { it.event.isAllDay || it.event.isMultiDay }.takeUnless { it.isHidden }
+                candidates.size == 2 -> {
+                    candidates.first { it.event.isAllDay || it.event.isMultiDay }.takeUnless { it.isHidden }
+                        ?: candidates.first().takeUnless { it.isHidden }
+                }
                 else -> candidates.first().takeUnless { it.isHidden }
             }
         }

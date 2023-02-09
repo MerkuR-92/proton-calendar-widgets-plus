@@ -104,7 +104,6 @@
     <string name="event_change_answer_recurring_single_edit_description">Deze afspraak is bijgewerkt door de organisator. Wilt u uw antwoord wijzigen alleen voor deze herhaling in deze serie?</string>
     <string name="event_change_answer_recurring_cancel">Annuleren</string>
     <string name="event_change_answer_recurring_confirm">Updaten</string>
-    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Uitnodiging voor %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s geaccepteerd</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s heeft uw uitnodiging aan %2$s geweigerd</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s onder voorbehoud geaccepteerd</string>
@@ -222,10 +221,6 @@
     <string name="event_allow_contacts_description">Proton Calendar heeft toegang nodig tot uw contactpersonen om u te voorzien van automatische voltooiing</string>
     <string name="event_allow_contacts_cancel">Weigeren</string>
     <string name="event_allow_contacts_confirm">Toestaan</string>
-    <string name="event_send_invite_mail_subject_prefix">Uitnodiging voor %s</string>
-    <string name="event_send_invite_mail_subject_all_day">een afspraak op %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">een afspraak die begint op %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">een afspraak die begint op %1$s om %2$s %3$s</string>
     <string name="event_send_invite_mail_body">U bent uitgenodigd voor %1$s\nWanneer: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hele dag)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -241,10 +236,6 @@
     <string name="event_add_participants_overwrite_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers voor alle afspraken in deze serie.\nVorige wijzigingen in deze serie gaan verloren.</string>
     <string name="event_add_participants_dialog_confirm">Verzenden</string>
     <string name="event_add_participants_dialog_cancel">Annuleren</string>
-    <string name="event_send_cancel_mail_subject_prefix">Annulering van %s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">een afspraak die begint op %1$s om %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">een afspraak die begint op %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">een afspraak op %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s is geannuleerd.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mijn agenda</string>

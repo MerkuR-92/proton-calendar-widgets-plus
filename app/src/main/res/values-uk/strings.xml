@@ -104,7 +104,6 @@
     <string name="event_change_answer_recurring_single_edit_description">Ця подія була оновлена організатором. Бажаєте змінити свою відповідь лише для цього повторення в серії?</string>
     <string name="event_change_answer_recurring_cancel">Скасувати</string>
     <string name="event_change_answer_recurring_confirm">Оновити</string>
-    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Відповідь: Запрошення на %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s приймає ваше запрошення на %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s відхиляє ваше запрошення на %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s приймає із сумнівом ваше запрошення на %2$s</string>
@@ -222,10 +221,6 @@
     <string name="event_allow_contacts_description">Proton Calendar потребує доступу до ваших контактів для можливості автозавершення</string>
     <string name="event_allow_contacts_cancel">Заборонити</string>
     <string name="event_allow_contacts_confirm">Дозволити</string>
-    <string name="event_send_invite_mail_subject_prefix">Запрошення на %s</string>
-    <string name="event_send_invite_mail_subject_all_day">подія на %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">подія починається %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">подія почнеться %1$s, %2$s %3$s</string>
     <string name="event_send_invite_mail_body">Вас запрошено на %1$s\nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -241,10 +236,6 @@
     <string name="event_add_participants_overwrite_dialog_description">Запрошення буде надіслано доданим учасникам на всі події цієї серії.\nПопередні зміни в цій серії будуть втрачені.</string>
     <string name="event_add_participants_dialog_confirm">Надіслати</string>
     <string name="event_add_participants_dialog_cancel">Скасувати</string>
-    <string name="event_send_cancel_mail_subject_prefix">Скасування %s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">подія почнеться %1$s, %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">подія починається %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">подія на %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s було скасовано.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мої календарі</string>

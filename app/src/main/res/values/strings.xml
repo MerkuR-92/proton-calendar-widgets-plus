@@ -104,7 +104,6 @@
     <string name="event_change_answer_recurring_single_edit_description">This event has been updated by the organizer. Would you like to change your answer only for this occurrence in this series?</string>
     <string name="event_change_answer_recurring_cancel">Cancel</string>
     <string name="event_change_answer_recurring_confirm">Update</string>
-    <string name="event_change_answer_mail_subject_prefix" comment="Example: Re: Invitation for an event starting on Monday">Re: Invitation for %s</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s has accepted your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s has declined your invitation to %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s has tentatively accepted your invitation to %2$s</string>
@@ -149,8 +148,8 @@
     <string name="search_empty_results_title">No results found</string>
     <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
-    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Time remaining: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculating time remaining…</string>
     <string name="search_downloading_pause">Pause download</string>
     <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
     <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
@@ -223,10 +222,15 @@
     <string name="event_allow_contacts_description">Proton Calendar needs access to your contacts to provide you with autocompletion</string>
     <string name="event_allow_contacts_cancel">Deny</string>
     <string name="event_allow_contacts_confirm">Allow</string>
-    <string name="event_send_invite_mail_subject_prefix">Invitation for %s</string>
-    <string name="event_send_invite_mail_subject_all_day">an event on %1$s</string>
-    <string name="event_send_invite_mail_subject_all_day_multiple">an event starting on %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="Example: Invitation for an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invitation for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invitation for an event on %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invitation for an event starting on %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation for an event on %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation for an event starting on %1$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellation of an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancellation of an event on %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancellation of an event starting on %1$s</string>
     <string name="event_send_invite_mail_body">You are invited to %1$s\nWhen: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (all day)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -242,10 +246,6 @@
     <string name="event_add_participants_overwrite_dialog_description">An invitation will be sent to added participants for all the events in this series.\nPrevious modifications on this series will be lost.</string>
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Cancel</string>
-    <string name="event_send_cancel_mail_subject_prefix">Cancellation of %s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="Example: Cancellation of an event starting on Monday, June 7, 2021 at 18:00 (GMT+2)">an event starting on %1$s at %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day_multiple">an event starting on %1$s</string>
-    <string name="event_send_cancel_mail_subject_all_day">an event on %1$s</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s has been canceled.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
@@ -498,8 +498,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Introducing Proton\'s refreshed look. Many services, one mission. Welcome to an Internet where privacy is the default. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
     <string name="spotlight_dialog_week_view_title">More viewing options</string>
     <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
-    <string name="spotlight_dialog_search_title">Search seamlessly</string>
-    <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Search seamlessly</string>
+    <string name="spotlight_dialog_search_description">You can now search your calendars for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
@@ -605,10 +605,6 @@
     <plurals name="plural_seconds">
         <item quantity="one">second</item>
         <item quantity="other">seconds</item>
-    </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">%1$s remaining…</item>
-        <item quantity="other">%1$s remaining…</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minute</item>
