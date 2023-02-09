@@ -18,7 +18,9 @@
 
 package me.proton.android.calendar.data.db
 
+import android.content.ContentValues
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.RenameColumn
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -281,9 +283,14 @@ object AppDatabaseMigrations {
             )
 
             // 2. copy the values from Calendar to Member
-            database.query("SELECT id, color, display, flags FROM $TABLE_CALENDARS").let {
-                while (it.moveToNext()) {
-                    database.execSQL("UPDATE $TABLE_MEMBERS SET color = \"${it.getString(1)}\", display = ${it.getInt(2)}, flags = ${it.getInt(3)} WHERE calendarId = \"${it.getString(0)}\"")
+            database.query("SELECT id, color, display, flags FROM $TABLE_CALENDARS").let { cursor ->
+                while (cursor.moveToNext()) {
+                    val contentValues = ContentValues().apply {
+                        put("color", cursor.getString(1))
+                        put("display", cursor.getInt(2))
+                        put("flags", cursor.getInt(3))
+                    }
+                    database.update(TABLE_MEMBERS, SQLiteDatabase.CONFLICT_IGNORE, contentValues, "calendarId = \"${cursor.getString(0)}\"", null)
                 }
             }
 
@@ -358,9 +365,13 @@ object AppDatabaseMigrations {
             )
 
             // 2. copy the values from Calendar to Member
-            database.query("SELECT id, name, description FROM $TABLE_CALENDARS").let {
-                while (it.moveToNext()) {
-                    database.execSQL("UPDATE $TABLE_MEMBERS SET name = \"${it.getString(1)}\", description = \"${it.getString(2)}\" WHERE calendarId = \"${it.getString(0)}\"")
+            database.query("SELECT id, name, description FROM $TABLE_CALENDARS").let { cursor ->
+                while (cursor.moveToNext()) {
+                    val contentValues = ContentValues().apply {
+                        put("name", cursor.getString(1))
+                        put("description", cursor.getString(2))
+                    }
+                    database.update(TABLE_MEMBERS, SQLiteDatabase.CONFLICT_IGNORE, contentValues, "calendarId = \"${cursor.getString(0)}\"", null)
                 }
             }
 
