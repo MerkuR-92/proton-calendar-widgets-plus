@@ -128,6 +128,12 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             checkCalendarLimit()
         }
 
+        calendarViewModel.subscribedCalendars.observe(viewLifecycleOwner) { subscribedCalendars ->
+            subscribedCalendars ?: return@observe
+
+            checkCalendarLimit()
+        }
+
         fragment_import_assistant_summary_customize_import_layout.setOnSingleClickListener {
             fragment_import_assistant_scroll_view.smoothScrollTo(
                 0,
@@ -212,31 +218,30 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun checkCalendarLimit() {
-        val userCalendars = calendarViewModel.userCalendars.value ?: return
-        val userCalendarsCount = userCalendars.size
-        val importCalendarMappingList = importAssistantViewModel.importCalendarMappingList.value ?: return
-        val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
-        val importCalendarsToImportCount = importCalendarMappingList.filter { it.importCalendar }.size
-
         lifecycleScope.launch {
+            val calendarsCount = calendarViewModel.getCalendarsCount() ?: return@launch
+            val importCalendarMappingList = importAssistantViewModel.importCalendarMappingList.value ?: return@launch
+            val importCalendarsToCreateCount = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
+            val importCalendarsToImportCount = importCalendarMappingList.filter { it.importCalendar }.size
+
             val isFreeUser = calendarViewModel.isFreeUser() ?: return@launch
             if (importCalendarsToCreateCount > 0 &&
-                (isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
-                !isFreeUser && (userCalendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID)) {
+                (isFreeUser && (calendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
+                        !isFreeUser && (calendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID)) {
                 fragment_import_assistant_summary_header_layout.visibleOrGone(false)
                 fragment_import_assistant_summary_error_layout.visibleOrGone(true)
                 val countCalendarsOverLimit =
                     if (isFreeUser) {
-                        if (userCalendarsCount >= MAX_CALENDAR_FREE) importCalendarsToCreateCount
-                        else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
+                        if (calendarsCount >= MAX_CALENDAR_FREE) importCalendarsToCreateCount
+                        else calendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_FREE
                     } else {
-                        if (userCalendarsCount >= MAX_CALENDAR_PAID) importCalendarsToCreateCount
-                        else userCalendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
+                        if (calendarsCount >= MAX_CALENDAR_PAID) importCalendarsToCreateCount
+                        else calendarsCount + importCalendarsToCreateCount - MAX_CALENDAR_PAID
                     }
 
-                val activeWritableUserCalendarsCount = userCalendars.filter { it.isActive && it.allowEditEvents }.size
+                val activeWritableUserCalendarsCount = calendarViewModel.userCalendars.value?.filter { it.isActive && it.allowEditEvents }?.size
                 // Only show merge calendars disclaimer if we can merge
-                val mergeCalendarsMessage = if (activeWritableUserCalendarsCount > 0) {
+                val mergeCalendarsMessage = if (activeWritableUserCalendarsCount != null && activeWritableUserCalendarsCount > 0) {
                     resources.getQuantityString(
                         R.plurals.import_assistant_import_summary_error_merge,
                         countCalendarsOverLimit,

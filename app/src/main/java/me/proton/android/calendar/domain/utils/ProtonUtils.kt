@@ -10,4 +10,6 @@ interface ProtonUtils {
     fun isProtonDomain(email: String): Boolean
     fun isShortDomainAddress(email: String): Boolean
     fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener)
+    fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
+    fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
 }

@@ -58,5 +58,31 @@ object ProtonUtilsImpl : ProtonUtils {
             .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
             .show()
     }
+
+    override fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener?) {
+        // Display limit reached for free user dialog
+        val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_calendar_limit_reached_title)
+            .setMessage(R.string.create_calendar_limit_reached_free_description)
+            .setNegativeButton(R.string.dialog_button_cancel) { _, _ -> }
+        if (manageCalendarsCallback != null) {
+            materialAlertDialogBuilder
+                .setPositiveButton(R.string.create_calendar_limit_reached_manage, manageCalendarsCallback)
+        }
+        materialAlertDialogBuilder.show()
+    }
+
+    override fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener?) {
+        // Display limit reached for paid user dialog
+        val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_calendar_limit_reached_title)
+            .setMessage(R.string.create_calendar_limit_reached_paid_description)
+            .setNegativeButton(R.string.dialog_button_cancel) { _, _ -> }
+        if (manageCalendarsCallback != null) {
+            materialAlertDialogBuilder
+                .setPositiveButton(R.string.create_calendar_limit_reached_manage, manageCalendarsCallback)
+        }
+        materialAlertDialogBuilder.show()
+    }
 }
 

@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Le nom est nécessaire.</string>
     <string name="add_calendar_text">Ajouter un calendrier</string>
     <string name="create_calendar_limit_reached">Vous avez atteint le nombre maximum de calendriers.</string>
-    <string name="create_calendar_limit_reached_paid_title">limite de 20 calendriers atteinte</string>
-    <string name="create_calendar_limit_reached_paid_message">Supprimez des calendriers que vous n\'utilisez plus pour en créer de nouveaux.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Gérer les calendriers</string>
-    <string name="create_calendar_limit_reached_close">Fermer</string>
-    <string name="create_calendar_limit_reached_free_title">Mettre à jour Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Créez jusqu\'à 20 calendriers et accédez à de nombreuses autres fonctionnalités exclusives en passant à un abonnement supérieur.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Pas maintenant</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Passer à un abonnement supérieur</string>
+    <string name="create_calendar_limit_reached_manage">Gérer les calendriers</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ?</string>
     <string name="delete_default_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
@@ -582,8 +575,8 @@
         <item quantity="other">Fusionner %d calendriers dans Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendrier.</item>
-        <item quantity="other">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers personnels.\n • Désélectionnez au moins %1$d calendriers.</item>
+        <item quantity="one">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers.\n • Désélectionnez au moins %1$d calendrier</item>
+        <item quantity="other">Impossible de créer autant de nouveaux calendriers que nécessaire pour importer tous les calendriers, en raison de la limite de calendriers.\n • Désélectionnez au moins %1$d calendriers</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ou\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>

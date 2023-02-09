@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Cal indicar un nom</string>
     <string name="add_calendar_text">Afegir calendari</string>
     <string name="create_calendar_limit_reached">Heu arribat al nombre màxim de calendaris.</string>
-    <string name="create_calendar_limit_reached_paid_title">Màxim de 20 calendaris assolit</string>
-    <string name="create_calendar_limit_reached_paid_message">Elimineu calendaris sense ús per crear-ne de nous.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Gestionar els calendaris</string>
-    <string name="create_calendar_limit_reached_close">Tanca</string>
-    <string name="create_calendar_limit_reached_free_title">Millorar la subscripció a Proton Calendar</string>
-    <string name="create_calendar_limit_reached_free_description">Creeu fins a 20 calendaris i accediu a moltes més funcions exclusives en millorar la subscripció.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Ara no</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Millorar la subscripció</string>
+    <string name="create_calendar_limit_reached_manage">Gestionar els calendaris</string>
     <string name="delete_calendar_dialog_title">Suprimir calendari</string>
     <string name="delete_calendar_dialog_message">Està segur de que vol suprimir aquest calendari?</string>
     <string name="delete_default_calendar_dialog_message">Està segur que vol suprimir aquest calendari? \"%1$s\" passarà a ser el calendari per defecte.</string>
@@ -582,9 +575,9 @@
         <item quantity="other">Combina %d calendaris a Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">No es poden importar tots els calendaris perquè heu arribat al límit personal de calendaris.\n
+        <item quantity="one">No es poden importar tots els calendaris perquè heu arribat al límit de calendaris.\n
 • Deseleccioneu %1$d calendaris com a mínim</item>
-        <item quantity="other">No es poden importar tots els calendaris perquè heu arribat al límit personal de calendaris.\n
+        <item quantity="other">No es poden importar tots els calendaris perquè heu arribat al límit de calendaris.\n
 • Deseleccioneu %1$d calendaris com a mínim</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">

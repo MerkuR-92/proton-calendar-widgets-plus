@@ -419,14 +419,7 @@
     <string name="calendar_form_name_required_error">Bitte Namen angeben</string>
     <string name="add_calendar_text">Kalender hinzufügen</string>
     <string name="create_calendar_limit_reached">Du hast die maximale Anzahl an Kalendern erreicht.</string>
-    <string name="create_calendar_limit_reached_paid_title">Höchstwert von 20 Kalendern erreicht</string>
-    <string name="create_calendar_limit_reached_paid_message">Lösche ungenutzte Kalender, um neue Kalender erstellen zu können.</string>
-    <string name="create_calendar_limit_reached_paid_manage">Kalender verwalten</string>
-    <string name="create_calendar_limit_reached_close">Schließen</string>
-    <string name="create_calendar_limit_reached_free_title">Proton Calendar upgraden</string>
-    <string name="create_calendar_limit_reached_free_description">Erstelle bis zu 20 Kalender. Wenn du ein Upgrade deines Abonnements vornimmst, erhältst du Zugang zu vielen weiteren exklusiven Funktionen.</string>
-    <string name="create_calendar_limit_reached_free_not_now">Nicht jetzt</string>
-    <string name="create_calendar_limit_reached_free_upgrade">Upgrade</string>
+    <string name="create_calendar_limit_reached_manage">Kalender verwalten</string>
     <string name="delete_calendar_dialog_title">Kalender löschen</string>
     <string name="delete_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen?</string>
     <string name="delete_default_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen? \"%1$s\" wird dann zum Standardkalender.</string>
@@ -582,8 +575,8 @@
         <item quantity="other">Führe %d Kalender in Proton Calendar zusammen.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Aufgrund des Limits für persönliche Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
-        <item quantity="other">Aufgrund des Limits für persönliche Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
+        <item quantity="one">Aufgrund des Limits für Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
+        <item quantity="other">Aufgrund des Limits für Kalender können nicht für alle importierten Kalender neue Kalender erstellt werden.\n • Wähle mindestens %1$d Kalender ab</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020oder\n • Mindestens %1$d Kalender mit bestehenden Proton-Kalendern zusammenführen.</item>
