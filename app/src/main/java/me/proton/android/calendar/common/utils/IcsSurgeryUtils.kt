@@ -361,30 +361,40 @@ object IcsSurgeryUtils {
         return HandleIcsResult.RawParsingSuccessful(cleanICalString)
     }
 
-    private fun fixDateOrDateTimeFormat(iCalString: String): String {
-        // DATETIME or DATE properties
+    private fun removeWhitespacesInProperties(iCalString: String): String {
         var cleanICalString = iCalString
-
         // Remove invalid whitespaces in properties
         val whiteSpaceRegex = Regex("(DTSTAMP|DTSTART|DTEND|RECURRENCE-ID|CREATED|LAST-MODIFIED)(;([^:]*))?:([^\\r?\\n]*)")
         whiteSpaceRegex.findAll(cleanICalString).iterator().forEach {
             val cleanDate = it.value.replace(it.groupValues.last(), it.groupValues.last().replace(" ", ""))
             cleanICalString = cleanICalString.replace(it.value, cleanDate)
         }
+        return cleanICalString
+    }
 
-        // Capitalize Time markers
+    private fun capitalizeTimeMarkers(iCalString: String): String {
+        var cleanICalString = iCalString
+        // Capitalize Time markers. ex: DTSTART:20230209t140000Z
         val lowerCaseTimeMarker = Regex(":\\d{8}t\\d{6}[zZ]?\\r?\\n")
         lowerCaseTimeMarker.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
         }
+        return cleanICalString
+    }
 
-        // Capitalize Zulu markers
+    private fun capitalizeZuluMarkers(iCalString: String): String {
+        var cleanICalString = iCalString
+        // Capitalize Zulu markers. ex: DTSTART:20230209T140000z
         val lowerCaseZuluMarker = Regex(":\\d{8}T\\d{6}z?\\r?\\n")
         lowerCaseZuluMarker.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(it.value, it.value.uppercase())
         }
+        return cleanICalString
+    }
 
-        // Add missing seconds to DATETIME properties
+    private fun addMissingSecondsToDateTimeProperties(iCalString: String): String {
+        var cleanICalString = iCalString
+        // Add missing seconds to DATETIME properties. ex: DTSTART:20230209T1400Z / DTSTART:20230209T1400
         val missingSecondsRegex = Regex(":\\d{8}T\\d{4}Z?\\r?\\n")
         missingSecondsRegex.findAll(cleanICalString).iterator().forEach {
             cleanICalString = cleanICalString.replace(
@@ -395,18 +405,35 @@ object IcsSurgeryUtils {
                 else it.value.replace("\n", "00\n")
             )
         }
+        return cleanICalString
+    }
 
+    private fun convertIsoDateTime(iCalString: String): String {
+        var cleanICalString = iCalString
         // Convert following ISO date times (2022-10-24T11:30:00.000Z)
         val isoDateRegex = Regex(":\\d{4}-\\d{2}-\\d{2}T\\d{2}[.:]\\d{2}[.:](\\d{2}[.:])?\\d{3}Z\\r?\\n")
         isoDateRegex.findAll(cleanICalString).iterator().forEach {
             var cleanDate = it.value.replace("-", "")
-            cleanDate = cleanDate.replace(Regex("[.:]"), "")
             cleanDate = cleanDate.replace(Regex("[.:]\\d{3}Z"), "Z")
+            cleanDate = cleanDate.replace(Regex("[.:]"), "")
             cleanICalString = cleanICalString.replace(
                 it.value,
                 ":$cleanDate" // Add back the first ':' since we removed it along with the others using replace
             )
         }
+        return cleanICalString
+    }
+
+    private fun fixDateOrDateTimeFormat(iCalString: String): String {
+        // DATETIME or DATE properties
+        var cleanICalString = iCalString
+
+        // The order is important here
+        cleanICalString = removeWhitespacesInProperties(cleanICalString)
+        cleanICalString = capitalizeTimeMarkers(cleanICalString)
+        cleanICalString = capitalizeZuluMarkers(cleanICalString)
+        cleanICalString = convertIsoDateTime(cleanICalString)
+        cleanICalString = addMissingSecondsToDateTimeProperties(cleanICalString)
 
         // For all day events
         // We need to check in iCal string for all day dates with bad format because Biweekly doesn't properly save VALUE parameter
@@ -590,9 +617,10 @@ object IcsSurgeryUtils {
 
         // UID: As per RFC, we require it to be present. Also, there's a BE limit of 191 characters.
         //  If we need to crop, we keep the last 191 characters of the uid.
-        if (this.uid?.value == null || this.uid.value.isEmpty()) return false
-        else if (this.uid.value.length > UID_MAX_LENGTH) {
-            this.setUid(this.uid.value.takeLast(UID_MAX_LENGTH))
+        val uid = this.uid?.value ?: return false
+        when {
+            uid.isBlank() -> return false
+            uid.length > UID_MAX_LENGTH -> this.setUid(this.uid.value.takeLast(UID_MAX_LENGTH))
         }
         return true
     }

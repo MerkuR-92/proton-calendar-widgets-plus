@@ -613,14 +613,7 @@ internal class InviteIcsSurgeryUtilsTest {
 
         val cleanIcsResult = cleanIcs(iCalString, isOpeningFromProtonMail = true)
 
-        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful).isTrue()
-
-        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
-            val iCalendar = cleanIcsResult.iCalendar!!
-            val event = iCalendar.events?.first()!!
-
-            assertThat(event.uid.value).isEqualTo("sha1-uid-40d8c83e02f014fc4a0c18a9f3432e50edc77eaf")
-        }
+        assertThat(cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.Error.MissingUid).isTrue()
     }
 
     @Test
