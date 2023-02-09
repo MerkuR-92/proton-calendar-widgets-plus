@@ -240,7 +240,7 @@ object IcsSurgeryUtils {
             // RECURRENCE-ID: If the event contains both a RECURRENCE-ID and an RRULE, it is rejected (as unsupported) unless it's an invitation with REPLY method.
             if (iCalendar.method?.isReply == false && event.recurrenceId?.value != null && event.recurrenceRule?.value != null) return HandleIcsResult.Error.Invalid.RecurrenceId
 
-            if (!event.cleanRRule(iCalendar)) return HandleIcsResult.Error.Invalid.RRule
+            if (!event.cleanRRule(iCalendar, isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.RRule
 
             if (!event.cleanExDate(iCalendar)) return HandleIcsResult.Error.Invalid.ExDate
 
@@ -733,7 +733,7 @@ object IcsSurgeryUtils {
         return this.summary?.value == null || this.summary.value.length <= SUMMARY_MAX_LENGTH
     }
 
-    fun VEvent.cleanRRule(iCalendar: ICalendar): Boolean {
+    fun VEvent.cleanRRule(iCalendar: ICalendar, isOpeningFromProtonMail: Boolean): Boolean {
 
         // If the event contains both a RECURRENCE-ID and an RRULE and the method is REPLY, simply ignore the RRULE (the external provider forgot to remove it when adding the RECURRENCE-ID).
         if (iCalendar.method?.isReply == true && this.recurrenceRule?.value != null && this.recurrenceId?.value != null) this.recurrenceRule = null
@@ -757,7 +757,7 @@ object IcsSurgeryUtils {
         }
 
         // COUNT: Because this is pretty expensive BE side, the maximum count value is set to 49 (included).
-        if (recurrenceRule.value.count != null && recurrenceRule.value.count > if (iCalendar.isInvitation()) MAX_COUNT_INVITATION else MAX_COUNT) return false
+        if (recurrenceRule.value.count != null && recurrenceRule.value.count > if (iCalendar.isInvitation() && isOpeningFromProtonMail) MAX_COUNT_INVITATION else MAX_COUNT) return false
 
         // UNTIL: The maximum value is currently 01/01/2038 @ 00:00:00 UTC (soon to become 01/01/2200 @ 12:00am (UTC)
         if (recurrenceRule.value.until != null && recurrenceRule.value.until.toInstant().isAfter(MAX_DATE.toInstant())) return false
