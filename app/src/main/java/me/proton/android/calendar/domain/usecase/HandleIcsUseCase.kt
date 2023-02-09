@@ -98,11 +98,13 @@ class HandleIcsUseCase @Inject constructor(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.email,
+                defaultCalendar.description,
                 defaultCalendar.color,
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
                 defaultCalendar.permissions,
+                defaultCalendar.defaultEventDuration,
                 defaultCalendar.defaultPartDayNotifications,
                 defaultCalendar.defaultFullDayNotifications
             ), iCalendar, Instant.now().epochSecond, notifications = notifications
