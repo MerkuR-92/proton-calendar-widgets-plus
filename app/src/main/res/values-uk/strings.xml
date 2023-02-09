@@ -606,12 +606,6 @@
         <item quantity="many">секунд</item>
         <item quantity="other">секунди</item>
     </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">Залишилася %1$s…</item>
-        <item quantity="few">Залишилося %1$s…</item>
-        <item quantity="many">Залишилося %1$s…</item>
-        <item quantity="other">Залишилося %1$s…</item>
-    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">хвилина</item>
         <item quantity="few">хвилини</item>

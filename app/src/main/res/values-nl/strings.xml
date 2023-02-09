@@ -588,10 +588,6 @@ Vink minstens %1$d agenda\'s af</item>
         <item quantity="one">seconde</item>
         <item quantity="other">seconden</item>
     </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">%1$s remaining…</item>
-        <item quantity="other">%1$s remaining…</item>
-    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuut</item>
         <item quantity="other">minuten</item>

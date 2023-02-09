@@ -596,11 +596,6 @@
         <item quantity="few">secunde</item>
         <item quantity="other">de secunde</item>
     </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">Timp rămas %1$s…</item>
-        <item quantity="few">Timp rămas %1$s…</item>
-        <item quantity="other">Timp rămas %1$s…</item>
-    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minut</item>
         <item quantity="few">minute</item>

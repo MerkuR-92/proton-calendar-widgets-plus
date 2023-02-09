@@ -606,12 +606,6 @@
         <item quantity="many">sekund</item>
         <item quantity="other">sekundy</item>
     </plurals>
-    <plurals name="plural_search_downloading_time_remaining" comment="Example: 1h 20m remaining...">
-        <item quantity="one">Pozostało %1$s…</item>
-        <item quantity="few">Pozostało %1$s…</item>
-        <item quantity="many">Pozostało %1$s…</item>
-        <item quantity="other">Pozostało %1$s…</item>
-    </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuta</item>
         <item quantity="few">minuty</item>
