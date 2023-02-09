@@ -80,13 +80,13 @@ class HandleIcsUseCase @Inject constructor(
         }
     }
 
-    private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isInvitation: Boolean): IcsSurgeryUtils.HandleIcsResult {
+    private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isOpeningFromProtonMail: Boolean): IcsSurgeryUtils.HandleIcsResult {
 
         val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.allowEditEvents }.firstOrNull()
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull { it.allowEditEvents }
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
@@ -110,7 +110,7 @@ class HandleIcsUseCase @Inject constructor(
             ), iCalendar, Instant.now().epochSecond, notifications = notifications
         ) ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
-        if (isInvitation && newEvent.iCalEvent.alarms.isNullOrEmpty()) {
+        if ((isOpeningFromProtonMail || !iCalendar.method.isPublish) && newEvent.iCalEvent.alarms.isNullOrEmpty()) {
             // We drop alarms when importing invitations as this would not be the user's. We must set the default calendar alarms instead.
             val calendarSettings = calendarsRepository.selectCalendarSettings(defaultCalendar.id)
             calendarSettings?.getDefaultAlarms(json, newEvent.isAllDay())?.let { defaultAlarms ->
