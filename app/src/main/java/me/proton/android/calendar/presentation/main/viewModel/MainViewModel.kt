@@ -223,9 +223,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    suspend fun handleIcsFile(bufferedReader: BufferedReader, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
+    suspend fun handleIcsFile(iCalString: String, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
         val userId = accountRepository.getPrimaryUserId().firstOrNull() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
-        val iCalString = bufferedReader.use { it.readText() }
         if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
     }

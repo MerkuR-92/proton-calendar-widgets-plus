@@ -124,6 +124,8 @@ import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
+import me.proton.android.calendar.common.IcsParsingValidation.ATTENDEE_PROPERTY
+import me.proton.android.calendar.common.IcsParsingValidation.ORGANIZER_PROPERTY
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
@@ -684,9 +686,28 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
+        val iCalString = bufferedReader.use { it.readText() }
+
+        if (iCalString.contains(ATTENDEE_PROPERTY, ignoreCase = false) || iCalString.contains(ORGANIZER_PROPERTY, ignoreCase = false)) {
+            MaterialAlertDialogBuilder(this@MainActivity)
+                .setTitle(R.string.import_event_disclaimer_dialog_title)
+                .setMessage(R.string.import_event_disclaimer_dialog_description)
+                .setPositiveButton(R.string.import_event_disclaimer_dialog_positive) { _, _ ->
+                    handleIcsFile(iCalString, senderEmail, recipientEmail)
+                }
+                .setNegativeButton(R.string.dialog_button_cancel) { _, _ ->
+                }
+                .show()
+        } else {
+            handleIcsFile(iCalString, senderEmail, recipientEmail)
+        }
+    }
+
+    private fun handleIcsFile(iCalString: String, senderEmail: String?, recipientEmail: String?) {
         lifecycleScope.launch {
+
             val snackBar = displaySnackBar(getString(R.string.snack_opening_ics), Snackbar.LENGTH_INDEFINITE)
-            val handleIcsImportResult = mainViewModel.handleIcsFile(bufferedReader, senderEmail, recipientEmail)
+            val handleIcsImportResult = mainViewModel.handleIcsFile(iCalString, senderEmail, recipientEmail)
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
                 snackBar.dismiss()
                 when (handleIcsImportResult.action) {
@@ -696,50 +717,152 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             .show()
                     IcsSurgeryUtils.HandleIcsAction.UPDATE_EVENT -> {
                         when (handleIcsImportResult.newAttendeeStatus?.second) {
-                            ParticipationStatus.ACCEPTED -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_accepted_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            ParticipationStatus.TENTATIVE -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_tentative_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            ParticipationStatus.DECLINED -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_attendee_declined_answer, handleIcsImportResult.newAttendeeStatus?.first), Toast.LENGTH_LONG).show()
-                            else -> Toast.makeText(this@MainActivity, getString(R.string.snack_event_updated), Toast.LENGTH_LONG).show()
+                            ParticipationStatus.ACCEPTED -> Toast.makeText(
+                                this@MainActivity,
+                                getString(
+                                    R.string.snack_event_attendee_accepted_answer,
+                                    handleIcsImportResult.newAttendeeStatus?.first
+                                ),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            ParticipationStatus.TENTATIVE -> Toast.makeText(
+                                this@MainActivity,
+                                getString(
+                                    R.string.snack_event_attendee_tentative_answer,
+                                    handleIcsImportResult.newAttendeeStatus?.first
+                                ),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            ParticipationStatus.DECLINED -> Toast.makeText(
+                                this@MainActivity,
+                                getString(
+                                    R.string.snack_event_attendee_declined_answer,
+                                    handleIcsImportResult.newAttendeeStatus?.first
+                                ),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            else -> Toast.makeText(
+                                this@MainActivity,
+                                getString(R.string.snack_event_updated),
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                     IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT -> Unit // TODO not yet implemented
                 }
 
                 val eventId = handleIcsImportResult.eventId
-                val eventDetailsDeepLink = Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
+                val eventDetailsDeepLink =
+                    Navigation.Deeplink.toEventDetails(eventId, if (handleIcsImportResult.isRecurring == true) 1 else 0)
                 safeNavigateToDialogFragment(eventDetailsDeepLink)
             } else {
                 snackBar.dismiss()
                 var navigatedToDetails = false
                 when (handleIcsImportResult) {
-                    is Error.DefaultError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
-                    is Error.EventNotFound -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_not_found_error), Snackbar.LENGTH_LONG)
-                    is Error.NetworkError -> this@MainActivity.displaySnackBar(getString(R.string.snack_network_error), Snackbar.LENGTH_LONG)
-                    is Error.EditCreateEventError -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_create_error), Snackbar.LENGTH_LONG)
-                    is Error.ParsingFailed -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_parsing_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.Method -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_method_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.Add -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_add_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.Counter -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_counter_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.Refresh -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_refresh_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.Publish -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
-                    is Error.Unsupported.SingleEditReply -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_single_edit_reply_error), Snackbar.LENGTH_LONG)
-                    is Error.PartyCrasher -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_party_crasher_error), Snackbar.LENGTH_LONG)
-                    is Error.MissingUid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_missing_uid_error), Snackbar.LENGTH_LONG)
-                    is Error.NoDefaultCalendarFound -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_active_calendar_error), Snackbar.LENGTH_LONG)
-                    is Error.DurationNotSupported -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_duration_error), Snackbar.LENGTH_LONG)
-                    is Error.TooManyEvents -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_too_many_events_error), Snackbar.LENGTH_LONG)
-                    is Error.NoEvents -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_no_events_error), Snackbar.LENGTH_LONG)
-                    is Error.EventDeleted -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_event_deleted_error), Snackbar.LENGTH_LONG)
-                    is Error.Invalid -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_invalid_error), Snackbar.LENGTH_LONG)
-                    is Error.DisabledCalendar -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_disabled_calendar_error))
-                    is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_reply_party_crasher_error))
-                    is Error.Method -> navigatedToDetails = displayErrorAndOpenDetails(handleIcsImportResult.eventId, getString(R.string.snack_ics_invalid_error))
+                    is Error.DefaultError -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_default_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.EventNotFound -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_event_not_found_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.NetworkError -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_network_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.EditCreateEventError -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_create_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.ParsingFailed -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_parsing_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.Method -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_method_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.Add -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_add_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.Counter -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_counter_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.Refresh -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_refresh_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.Publish -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_publish_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Unsupported.SingleEditReply -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_single_edit_reply_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.PartyCrasher -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_party_crasher_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.MissingUid -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_missing_uid_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.NoDefaultCalendarFound -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_no_active_calendar_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.DurationNotSupported -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_unsupported_duration_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.TooManyEvents -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_too_many_events_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.NoEvents -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_no_events_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.EventDeleted -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_event_deleted_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.Invalid -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_invalid_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    is Error.DisabledCalendar -> navigatedToDetails = displayErrorAndOpenDetails(
+                        handleIcsImportResult.eventId,
+                        getString(R.string.snack_ics_disabled_calendar_error)
+                    )
+                    is Error.ReplyPartyCrasher -> navigatedToDetails = displayErrorAndOpenDetails(
+                        handleIcsImportResult.eventId,
+                        getString(R.string.snack_ics_reply_party_crasher_error)
+                    )
+                    is Error.Method -> navigatedToDetails = displayErrorAndOpenDetails(
+                        handleIcsImportResult.eventId,
+                        getString(R.string.snack_ics_invalid_error)
+                    )
                     is Error.DecryptionFailed -> {
                         if (handleIcsImportResult.eventId != null && handleIcsImportResult.calendarId != null) {
-                            deleteFailedToDecryptEvent(handleIcsImportResult.eventId, handleIcsImportResult.calendarId, handleIcsImportResult.isRecurring)
-                        } else this@MainActivity.displaySnackBar(getString(R.string.event_decryption_error_dialog_title), Snackbar.LENGTH_LONG)
+                            deleteFailedToDecryptEvent(
+                                handleIcsImportResult.eventId,
+                                handleIcsImportResult.calendarId,
+                                handleIcsImportResult.isRecurring
+                            )
+                        } else this@MainActivity.displaySnackBar(
+                            getString(R.string.event_decryption_error_dialog_title),
+                            Snackbar.LENGTH_LONG
+                        )
                     }
-                    else -> this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
+                    else -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_default_error),
+                        Snackbar.LENGTH_LONG
+                    )
                 }
 
                 if (!navigatedToDetails) safeNavigateToMonth()

@@ -224,6 +224,8 @@ object IcsParsingValidation {
     const val X_WR_TIMEZONE = "X-WR-TIMEZONE"
     const val TZID = "TZID"
     const val TZID_PARAMETER = ";TZID="
+    const val ATTENDEE_PROPERTY = "ATTENDEE;"
+    const val ORGANIZER_PROPERTY = "ORGANIZER;"
 }
 
 object AppLinksQueryParameters {
