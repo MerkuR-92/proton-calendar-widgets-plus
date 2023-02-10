@@ -193,9 +193,6 @@ object IcsSurgeryUtils {
         iCalendar.events.forEach { event ->
 
             if (isImport) {
-                // We just drop RECURRENCE-ID for import "invitations", but we don't support RECURRENCE-ID for other imports
-                if (!isOpeningFromProtonMail && event.recurrenceId?.value != null) return HandleIcsResult.Error.Invalid.RecurrenceId
-
                 event.handleImport(iCalendar, iCalString, isOpeningFromProtonMail)
 
                 event.cleanAlarms()
