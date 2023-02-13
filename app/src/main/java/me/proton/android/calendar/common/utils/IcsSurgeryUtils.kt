@@ -19,6 +19,7 @@ import biweekly.util.DateTimeComponents
 import biweekly.util.Duration
 import biweekly.util.Frequency
 import biweekly.util.ICalDate
+import biweekly.util.Recurrence
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.FormValidation.ALARM_COUNT_MAX
 import me.proton.android.calendar.common.IcsParsingValidation.CONTACT_NAME_MAX_LENGTH
@@ -29,9 +30,9 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT_INVITATION
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DAILY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DATE
-import me.proton.android.calendar.common.IcsParsingValidation.MAX_ICALENDAR
+import me.proton.android.calendar.common.IcsParsingValidation.MAX_ICALENDAR_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_MONTHLY_INTERVAL
-import me.proton.android.calendar.common.IcsParsingValidation.MAX_VEVENT
+import me.proton.android.calendar.common.IcsParsingValidation.MAX_VEVENT_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_WEEKLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_YEARLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MIN_DATE
@@ -54,6 +55,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonUidForImport
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
+import me.proton.android.calendar.common.utils.IcsSurgeryUtils.checkCustomYearlyRRule
 import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
@@ -146,8 +148,7 @@ object IcsSurgeryUtils {
         val iCalendar = try {
             val importedICalendars = Biweekly.parse(cleanRawIcsResult.cleanICalString).all() ?: return HandleIcsResult.Error.ParsingFailed
 
-            // We only allow importing one calendar at a time for now
-            if (importedICalendars.size > MAX_ICALENDAR) return HandleIcsResult.Error.TooManyEvents
+            if (importedICalendars.size > MAX_ICALENDAR_COUNT) return HandleIcsResult.Error.TooManyEvents
 
             if (importedICalendars.isEmpty()) return HandleIcsResult.Error.NoEvents
 
@@ -163,8 +164,7 @@ object IcsSurgeryUtils {
 
         if (iCalendar.events.isEmpty()) return HandleIcsResult.Error.NoEvents
 
-        // We only allow importing one event at a time for now
-        if (iCalendar.events.size > MAX_VEVENT && !allowMultipleEvents) {
+        if (iCalendar.events.size > MAX_VEVENT_COUNT && !allowMultipleEvents) {
             // TODO If is an invitation we take first event only
             return HandleIcsResult.Error.TooManyEvents
         }
@@ -237,7 +237,7 @@ object IcsSurgeryUtils {
             // RECURRENCE-ID: If the event contains both a RECURRENCE-ID and an RRULE, it is rejected (as unsupported) unless it's an invitation with REPLY method.
             if (iCalendar.method?.isReply == false && event.recurrenceId?.value != null && event.recurrenceRule?.value != null) return HandleIcsResult.Error.Invalid.RecurrenceId
 
-            if (!event.cleanRRule(iCalendar, isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.RRule
+            if (!event.cleanRRule(iCalendar, isImport, isOpeningFromProtonMail)) return HandleIcsResult.Error.Invalid.RRule
 
             if (!event.cleanExDate(iCalendar)) return HandleIcsResult.Error.Invalid.ExDate
 
@@ -346,7 +346,7 @@ object IcsSurgeryUtils {
         var eventCount = 0
         while (multipleEventsIterator.hasNext()) {
             eventCount++
-            if (eventCount > MAX_VEVENT) return HandleIcsResult.Error.TooManyEvents
+            if (eventCount > MAX_VEVENT_COUNT) return HandleIcsResult.Error.TooManyEvents
             multipleEventsIterator.next()
         }
 
@@ -730,14 +730,30 @@ object IcsSurgeryUtils {
         return this.summary?.value == null || this.summary.value.length <= SUMMARY_MAX_LENGTH
     }
 
-    fun VEvent.cleanRRule(iCalendar: ICalendar, isOpeningFromProtonMail: Boolean): Boolean {
-
-        // If the event contains both a RECURRENCE-ID and an RRULE and the method is REPLY, simply ignore the RRULE (the external provider forgot to remove it when adding the RECURRENCE-ID).
-        if (iCalendar.method?.isReply == true && this.recurrenceRule?.value != null && this.recurrenceId?.value != null) this.recurrenceRule = null
+    fun VEvent.cleanRRule(iCalendar: ICalendar, isImport: Boolean, isOpeningFromProtonMail: Boolean): Boolean {
 
         if (recurrenceRule?.value == null) return true
 
-        // We only support certain types of RRULEs, basically the ones that can be created from ProtonCalendar
+        // If the event contains both a RECURRENCE-ID and an RRULE and the method is REPLY, simply ignore the RRULE (the external provider forgot to remove it when adding the RECURRENCE-ID).
+        if (iCalendar.method?.isReply == true && this.recurrenceRule?.value != null && this.recurrenceId?.value != null) {
+            this.recurrenceRule = null
+            return true
+        }
+
+        if (isImport || !isOpeningFromProtonMail) {
+            // We only support certain types of RRULE on Import, basically the ones that can be created from ProtonCalendar
+
+            // Frequency: DAILY, WEEKLY, MONTHLY, YEARLY
+            if (recurrenceRule.value.frequency != Frequency.DAILY &&
+                recurrenceRule.value.frequency != Frequency.WEEKLY &&
+                recurrenceRule.value.frequency != Frequency.MONTHLY &&
+                recurrenceRule.value.frequency != Frequency.YEARLY) return false
+
+            if (!recurrenceRule.value.checkCustomYearlyRRule()) return false
+            if (!recurrenceRule.value.checkCustomMonthlyRRule()) return false
+            if (!recurrenceRule.value.checkCustomWeeklyRRule()) return false
+            if (!recurrenceRule.value.checkCustomDailyRRule()) return false
+        }
 
         // We do not accept events with a rrule below daily
         if (recurrenceRule.value.frequency == Frequency.HOURLY || recurrenceRule.value.frequency == Frequency.MINUTELY || recurrenceRule.value.frequency == Frequency.SECONDLY) return false
@@ -753,7 +769,7 @@ object IcsSurgeryUtils {
             }
         }
 
-        // COUNT: Because this is pretty expensive BE side, the maximum count value is set to 49 (included).
+        // COUNT: Because this is pretty expensive BE side, the maximum count value is lower on imported events (included).
         if (recurrenceRule.value.count != null && recurrenceRule.value.count > if (iCalendar.isInvitation() && isOpeningFromProtonMail) MAX_COUNT_INVITATION else MAX_COUNT) return false
 
         // UNTIL: The maximum value is currently 01/01/2038 @ 00:00:00 UTC (soon to become 01/01/2200 @ 12:00am (UTC)
@@ -799,6 +815,73 @@ object IcsSurgeryUtils {
         if ((recurrenceRule.value.frequency == Frequency.DAILY || recurrenceRule.value.frequency == Frequency.WEEKLY || recurrenceRule.value.frequency == Frequency.MONTHLY)
             && !recurrenceRule.value.byYearDay.isNullOrEmpty()) return false
 
+        return true
+    }
+
+    private fun Recurrence.checkCustomYearlyRRule(): Boolean {
+        if (this.frequency == Frequency.YEARLY) {
+            // No selectors allowed
+            if (!this.bySecond.isNullOrEmpty() ||
+                !this.byMinute.isNullOrEmpty() ||
+                !this.byHour.isNullOrEmpty() ||
+                !this.byMonthDay.isNullOrEmpty() ||
+                !this.byYearDay.isNullOrEmpty() ||
+                !this.byWeekNo.isNullOrEmpty() ||
+                !this.byMonth.isNullOrEmpty() ||
+                !this.bySetPos.isNullOrEmpty() ||
+                !this.byDay.isNullOrEmpty()
+            ) return false
+        }
+        return true
+    }
+
+    private fun Recurrence.checkCustomMonthlyRRule(): Boolean {
+        if (this.frequency == Frequency.MONTHLY) {
+            // Allow BYDAY and BYSETPOS
+            if (!this.bySecond.isNullOrEmpty() ||
+                !this.byMinute.isNullOrEmpty() ||
+                !this.byHour.isNullOrEmpty() ||
+                !this.byMonthDay.isNullOrEmpty() ||
+                !this.byYearDay.isNullOrEmpty() ||
+                !this.byWeekNo.isNullOrEmpty() ||
+                !this.byMonth.isNullOrEmpty()
+            ) return false
+            // BYSETPOS can be first (1), second (2), third (3), forth (4) or last (-1)
+            if (!this.bySetPos.isNullOrEmpty() && this.bySetPos.any { it != 1 && it != 2 && it != 3 && it != 4 && it != -1 }) return false
+        }
+        return true
+    }
+
+    private fun Recurrence.checkCustomWeeklyRRule(): Boolean {
+        if (this.frequency == Frequency.WEEKLY) {
+            // Allow BYDAY and allow multiple days (BYDAY=MO,TU,SA,SU)
+            if (!this.bySecond.isNullOrEmpty() ||
+                !this.byMinute.isNullOrEmpty() ||
+                !this.byHour.isNullOrEmpty() ||
+                !this.byMonthDay.isNullOrEmpty() ||
+                !this.byYearDay.isNullOrEmpty() ||
+                !this.byWeekNo.isNullOrEmpty() ||
+                !this.byMonth.isNullOrEmpty() ||
+                !this.bySetPos.isNullOrEmpty()
+            ) return false
+        }
+        return true
+    }
+
+    private fun Recurrence.checkCustomDailyRRule(): Boolean {
+        if (this.frequency == Frequency.DAILY) {
+            // No selectors allowed
+            if (!this.bySecond.isNullOrEmpty() ||
+                !this.byMinute.isNullOrEmpty() ||
+                !this.byHour.isNullOrEmpty() ||
+                !this.byMonthDay.isNullOrEmpty() ||
+                !this.byYearDay.isNullOrEmpty() ||
+                !this.byWeekNo.isNullOrEmpty() ||
+                !this.byMonth.isNullOrEmpty() ||
+                !this.bySetPos.isNullOrEmpty() ||
+                !this.byDay.isNullOrEmpty()
+            ) return false
+        }
         return true
     }
 
@@ -1078,7 +1161,9 @@ object IcsSurgeryUtils {
                     TimezoneAssignment(TimeZone.getTimeZone(xWrTimezone), xWrTimezone)
                 )
                 this.localizeDateToTimezone(xWrTimezone)
-            } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() && (iCalendar.timezoneInfo.timezones.size == 1 || iCalendar.timezoneInfo.timezones.map { it.timeZone?.id }.all { it == iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id }) && !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
+            } else if (!iCalendar.timezoneInfo.timezones.isNullOrEmpty() &&
+                (iCalendar.timezoneInfo.timezones.size == 1 || iCalendar.timezoneInfo.timezones.map { it.timeZone?.id }.all { it == iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id }) &&
+                !iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id.isNullOrEmpty()) {
                 // If no x-wr-timezone is present, we check if there's a single VTIMEZONE to use in the ICS string (Exclude those with same id)
                 val fallbackTimeZoneId = fallbackTimeZone(iCalendar.timezoneInfo.timezones?.firstOrNull()?.timeZone?.id ?: return false, fallbackToDefault = false) ?: return false
                 // Remove floating timezone property and localize

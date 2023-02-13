@@ -10,6 +10,7 @@ import assertk.assertions.isNullOrEmpty
 import assertk.assertions.isTrue
 import biweekly.Biweekly
 import biweekly.property.Action
+import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
@@ -2279,5 +2280,274 @@ internal class ImportIcsSurgeryUtilsTest {
                 ZonedDateTime.of(2022, 10, 24, 11, 30, 0, 0, ZoneId.of("UTC")).toInstant()
             ))
         }
+    }
+
+    @Test
+    fun `Basic YEARLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=YEARLY;INTERVAL=1
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.YEARLY)
+        }
+    }
+
+    @Test
+    fun `Custom YEARLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=1SU;BYMONTH=11
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanICalString = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
+    }
+
+    @Test
+    fun `Basic DAILY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=DAILY;INTERVAL=1
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.DAILY)
+        }
+    }
+
+    @Test
+    fun `Custom DAILY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=DAILY;INTERVAL=1;BYDAY=1SU
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanICalString = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
+    }
+
+    @Test
+    fun `Basic WEEKLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,TH
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.WEEKLY)
+        }
+    }
+
+    @Test
+    fun `Custom WEEKLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=WEEKLY;INTERVAL=1;BYDAY=1SU;BYMONTH=1
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanICalString = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
+    }
+
+    @Test
+    fun `Basic MONTHLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=MO,FR;BYSETPOS=2
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.MONTHLY)
+        }
+    }
+
+    @Test
+    fun `BYDAY and BYSETPOS combined MONTHLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221012
+    DTEND;VALUE=DATE:20221012
+    RRULE:FREQ=MONTHLY;INTERVAL=3;BYDAY=2WE
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.MONTHLY)
+        }
+    }
+
+    @Test
+    fun `Custom MONTHLY RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=MO,FR;BYSETPOS=2;BYMONTH=1
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanICalString = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
     }
 }
