@@ -719,9 +719,7 @@ class MonthFragment : BaseFragment() {
                 else if (selectedTime != null) weekView.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
                 else if (animate) weekView.scrollToDate(selectedDate)
                 else weekView.setDate(selectedDate)
-            } else if (selectedTime != null &&
-                (selectedTime.isBefore(LocalTime.of(weekView.firstFullyVisibleHour, 0)) ||
-                        selectedTime.isAfter(LocalTime.of(weekView.lastVisibleHour - 1, 0)))) {
+            } else if (selectedTime != null) {
                 weekView.scrollToTime(selectedTime)
             }
 
