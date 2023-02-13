@@ -136,10 +136,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 requireActivity().clearFocusAndHideKeyboard(view)
 
                 // Save calendar name in VM
-                calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
+                calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString().trim().replace("\n", ""))
 
                 // Save calendar description in VM
-                calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString())
+                calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString().trim())
 
                 if (!mainViewModel.isConnectedToNetwork) {
                     view?.displaySnackBar(getString(R.string.snack_network_error))
