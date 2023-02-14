@@ -457,6 +457,13 @@
     <string name="recreate_calendar_snack_error">Error clearing calendar</string>
     <string name="recreate_calendar_snack_deleted">Calendar cleared</string>
     <string name="recreate_calendar_snack_clearing">Clearing calendar…</string>
+    <!-- Holidays calendar form -->
+    <string name="add_holidays_calendar_title">Add Holidays calendar</string>
+    <string name="holidays_calendar_title">Holidays calendar</string>
+    <string name="add_holidays_country_search_hint">Search for a country</string>
+    <string name="holidays_calendar_form_picker_title">Country</string>
+    <string name="holidays_calendar_form_change_country_disclaimer">In order to change the country, it is necessary to replace the current calendar with a new one.</string>
+    <string name="holidays_calendar_form_country_disclaimer">All holidays from every region of this country will be consolidated and displayed in a single calendar.</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>

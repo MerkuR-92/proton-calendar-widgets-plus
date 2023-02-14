@@ -110,6 +110,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
+import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
@@ -1134,15 +1135,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
             lifecycleScope.launch {
-                if (calendarViewModel.displayImport()) showCalendarsCreateOrImportDialog()
-                else onClickCreateCalendar()
+                showCalendarsOptionsDialog()
             }
         }
 
         nav_view_calendars_create.setOnSingleClickListener {
             lifecycleScope.launch {
-                if (calendarViewModel.displayImport()) showCalendarsCreateOrImportDialog()
-                else onClickCreateCalendar()
+                showCalendarsOptionsDialog()
             }
             drawer_layout.close()
         }
@@ -1186,7 +1185,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
     }
 
-    private fun onClickCreateCalendar() {
+    private fun onClickCreateCalendar(calendarType: CalendarType) {
         lifecycleScope.launch {
             // Check if calendar limit was reached
             when (calendarViewModel.isCalendarLimitReached()) {
@@ -1194,9 +1193,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displaySnackBar(this@MainActivity.getString(R.string.snack_create_calendar_error))
                 }
                 CalendarViewModel.CalendarLimit.NOT_REACHED -> {
-                    // If limit has not been reached, open create calendar form
-                    navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
-                    drawer_layout.close()
+                    // If limit has not been reached, open calendar form
+                    when (calendarType) {
+                        CalendarType.NORMAL -> {
+                            navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
+                            drawer_layout.close()
+                        }
+                        CalendarType.HOLIDAYS -> {
+                            navController.navigate(R.id.action_nav_calendar_to_nav_holidays)
+                            drawer_layout.close()
+                        }
+                        CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
+                    }
                 }
                 CalendarViewModel.CalendarLimit.FREE_REACHED -> {
                     // Display limit reached for free user dialog
@@ -1218,7 +1226,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private fun showCalendarsCreateOrImportDialog() {
+    private fun showCalendarsOptionsDialog() {
         val bottomSheetDialog = BottomSheetDialog(this)
 
         // Workaround to make sure we have the correct navigation bar color.
@@ -1236,10 +1244,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         bottomSheetDialog.setContentView(R.layout.dialog_calendars_create_import)
 
         val createCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_create_press)
+        val addHolidaysCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holidays_press)
         val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
 
         createCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar()
+            onClickCreateCalendar(CalendarType.NORMAL)
+            bottomSheetDialog.dismiss()
+        }
+
+        addHolidaysCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar(CalendarType.HOLIDAYS)
             bottomSheetDialog.dismiss()
         }
 
@@ -1254,7 +1268,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
-        bottomSheetDialog.show()
+        lifecycleScope.launch {
+
+            if (!calendarViewModel.displayImport()) {
+                val importFromGoogleLayout = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import)
+                importFromGoogleLayout?.visibleOrGone(false)
+            }
+
+            bottomSheetDialog.show()
+        }
     }
 
     fun showImportGoogleAuthDialog() {

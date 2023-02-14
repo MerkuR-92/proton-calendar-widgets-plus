@@ -207,6 +207,12 @@ enum class EventDeletionReason(val value: Int) {
     CalendarChange(1)
 }
 
+enum class CalendarType {
+    NORMAL,
+    SUBSCRIBED,
+    HOLIDAYS
+}
+
 object IcsParsingValidation {
     const val UID_MAX_LENGTH = 191
     const val CONTACT_NAME_MAX_LENGTH = 190
