@@ -1256,9 +1256,9 @@ class CalendarsRepositoryImpl @Inject constructor(
  */
 fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json): Flow<List<Calendar>> {
     return combine(
-        this,
-        database.membersDao().flowMembers(),
-        database.calendarSettingsDao().flowCalendarSettings()
+        this.distinctUntilChanged(),
+        database.membersDao().flowMembers().distinctUntilChanged(),
+        database.calendarSettingsDao().flowCalendarSettings().distinctUntilChanged()
     ) { calendars, members, calendarSettingsList ->
         if (calendars.isNotEmpty()) {
             // Get user addresses so we can find the calendar member for current user
@@ -1280,7 +1280,7 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json
                 userMember?.let { Calendar.from(calendarEntity, it, calendarSettings, json) }
             }
         } else emptyList()
-    }
+    }.distinctUntilChanged()
 }
 
 /**
