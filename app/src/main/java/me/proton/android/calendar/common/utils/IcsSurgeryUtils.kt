@@ -30,7 +30,7 @@ import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_COUNT_INVITATION
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DAILY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_DATE
-import me.proton.android.calendar.common.IcsParsingValidation.MAX_ICALENDAR_COUNT
+import me.proton.android.calendar.common.IcsParsingValidation.MAX_VCALENDAR_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_MONTHLY_INTERVAL
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_VEVENT_COUNT
 import me.proton.android.calendar.common.IcsParsingValidation.MAX_WEEKLY_INTERVAL
@@ -55,7 +55,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonUidForImport
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
-import me.proton.android.calendar.common.utils.IcsSurgeryUtils.checkCustomYearlyRRule
 import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.util.kotlin.takeIfNotBlank
@@ -148,7 +147,7 @@ object IcsSurgeryUtils {
         val iCalendar = try {
             val importedICalendars = Biweekly.parse(cleanRawIcsResult.cleanICalString).all() ?: return HandleIcsResult.Error.ParsingFailed
 
-            if (importedICalendars.size > MAX_ICALENDAR_COUNT) return HandleIcsResult.Error.TooManyEvents
+            if (importedICalendars.size > MAX_VCALENDAR_COUNT) return HandleIcsResult.Error.TooManyEvents
 
             if (importedICalendars.isEmpty()) return HandleIcsResult.Error.NoEvents
 
@@ -1015,6 +1014,14 @@ object IcsSurgeryUtils {
     }
 
     fun VEvent.cleanSequence(): Boolean {
+        // If SEQUENCE was saved as an experimental property then the value was over an Integer's limit, so we remove it and set its value to value % Int.MAX_VALUE.
+        // If value was negative, set to 0.
+        if (this.sequence?.value == null && this.getExperimentalProperty("SEQUENCE") != null) {
+            val currentSequence = this.getExperimentalProperty("SEQUENCE").value
+            this.removeExperimentalProperties("SEQUENCE")
+            if (currentSequence.toLong() < 0) this.setSequence(0)
+            else this.setSequence(currentSequence.toLong().mod(Int.MAX_VALUE.toLong() + 1).toInt())
+        }
         // SEQUENCE: If not present, assume it's zero. If present, make sure it's a non-negative integer or convert it to zero otherwise.
         if (this.sequence?.value == null || this.sequence.value < 0) this.setSequence(0)
         return true

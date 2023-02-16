@@ -2550,4 +2550,109 @@ internal class ImportIcsSurgeryUtilsTest {
 
         assertThat(cleanICalString is IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule).isTrue()
     }
+
+    @Test
+    fun `SEQUENCE with value over Int limit test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221012
+    DTEND;VALUE=DATE:20221012
+    RRULE:FREQ=MONTHLY;INTERVAL=3;BYDAY=2WE
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:2205082007
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.sequence?.value).isEqualTo((2205082007 % 2147483648).toInt())
+            assertThat(Regex("SEQUENCE").findAll(iCalendar?.printToString()!!).count()).isEqualTo(1)
+            assertThat(iCalendar.printToString().contains("SEQUENCE:57598359")).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `SEQUENCE with value negative Int limit test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221012
+    DTEND;VALUE=DATE:20221012
+    RRULE:FREQ=MONTHLY;INTERVAL=3;BYDAY=2WE
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:-2147483648
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.sequence?.value).isEqualTo(0)
+            assertThat(Regex("SEQUENCE").findAll(iCalendar?.printToString()!!).count()).isEqualTo(1)
+            assertThat(iCalendar.printToString().contains("SEQUENCE:0")).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `SEQUENCE with value positive Int limit test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221012
+    DTEND;VALUE=DATE:20221012
+    RRULE:FREQ=MONTHLY;INTERVAL=3;BYDAY=2WE
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:2147483647
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful::class)
+
+        if (cleanIcsResult is IcsSurgeryUtils.HandleIcsResult.ParsingSuccessful) {
+            val iCalendar = cleanIcsResult.iCalendar
+
+            assertThat(iCalendar).isNotNull()
+            assertThat(iCalendar?.events?.first()?.sequence?.value).isEqualTo(2147483647)
+            assertThat(Regex("SEQUENCE").findAll(iCalendar?.printToString()!!).count()).isEqualTo(1)
+            assertThat(iCalendar.printToString().contains("SEQUENCE:2147483647")).isEqualTo(true)
+        }
+    }
 }

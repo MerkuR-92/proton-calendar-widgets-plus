@@ -124,8 +124,7 @@ import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
-import me.proton.android.calendar.common.IcsParsingValidation.ATTENDEE_PROPERTY
-import me.proton.android.calendar.common.IcsParsingValidation.ORGANIZER_PROPERTY
+import me.proton.android.calendar.common.IcsParsingValidation
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
@@ -608,6 +607,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun handleIcsIntent(openIcsIntent: Intent) {
+        safeNavigateToMonth() // Workaround for blank screen on starting app through ics intent if it wasn't in background
         val uri = openIcsIntent.data
         if (uri != null) {
             val senderEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_SENDER_EMAIL)
@@ -688,7 +688,43 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
         val iCalString = bufferedReader.use { it.readText() }
 
-        if (iCalString.contains(ATTENDEE_PROPERTY, ignoreCase = false) || iCalString.contains(ORGANIZER_PROPERTY, ignoreCase = false)) {
+        val isOpeningFromFileSystem = senderEmail == null || recipientEmail == null
+
+        // Check if ics has more than MAX_VEVENT_COUNT VEvent
+        val vEventRegex = Regex("BEGIN:VEVENT\\r?\\n")
+        val vEventMatches = vEventRegex.findAll(iCalString).iterator()
+        var eventCount = 0
+        while (vEventMatches.hasNext()) {
+            eventCount++
+            if (eventCount > IcsParsingValidation.MAX_VEVENT_COUNT) {
+                this@MainActivity.displaySnackBar(
+                    getString(R.string.snack_ics_too_many_events_error),
+                    Snackbar.LENGTH_LONG
+                )
+                return
+            }
+            vEventMatches.next()
+        }
+
+        // Check if ics has more than MAX_ICALENDAR_COUNT VCalendar
+        val vCalendarRegex = Regex("BEGIN:VCALENDAR\\r?\\n")
+        val vCalendarMatches = vCalendarRegex.findAll(iCalString).iterator()
+        var calendarCount = 0
+        while (vCalendarMatches.hasNext()) {
+            calendarCount++
+            if (calendarCount > IcsParsingValidation.MAX_VCALENDAR_COUNT) {
+                this@MainActivity.displaySnackBar(
+                    getString(R.string.snack_ics_too_many_events_error),
+                    Snackbar.LENGTH_LONG
+                )
+                return
+            }
+            vCalendarMatches.next()
+        }
+
+        // If ics is an invitation and we are opening from file system, warn the user that attendees and organizers will be dropped
+        val isInvitationRegex = Regex("METHOD:(REQUEST|REPLY|CANCEL|COUNTER|ADD|REFRESH|DECLINECOUNTER)\\r?\\n")
+        if (isOpeningFromFileSystem && isInvitationRegex.containsMatchIn(iCalString)) {
             MaterialAlertDialogBuilder(this@MainActivity)
                 .setTitle(R.string.import_event_disclaimer_dialog_title)
                 .setMessage(R.string.import_event_disclaimer_dialog_description)
