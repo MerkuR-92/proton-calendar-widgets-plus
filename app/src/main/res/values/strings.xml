@@ -343,6 +343,7 @@
     <string name="snack_app_link_error">Error opening event</string>
     <string name="snack_app_link_import_error">Authentication canceled</string>
     <string name="snack_notification_already_added">The notification has already been added</string>
+    <string name="snack_opening_ics">Opening event…</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
     <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>
@@ -503,6 +504,8 @@
     <string name="spotlight_dialog_week_view_description">• Introducing the <b>3 day</b> and <b>Week</b> calendar views. Select your preferred view in the <b>menu</b>.\n\n• Adjust the height of rows in the day grid by pinching with two fingers to zoom in or out.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Search seamlessly</string>
     <string name="spotlight_dialog_search_description">You can now search your calendars for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_import_title">More ways to add events</string>
+    <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
@@ -568,6 +571,10 @@
     <string name="import_assistant_authentication_canceled">Authentication canceled</string>
     <string name="import_assistant_sign_in_in_progress">A sign in process is already in progress</string>
     <string name="import_assistant_in_progress_error_snack">There is still an import in progress</string>
+    <!-- Import events -->
+    <string name="import_event_disclaimer_dialog_title">Import as simple event?</string>
+    <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
+    <string name="import_event_disclaimer_dialog_positive">Import</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
