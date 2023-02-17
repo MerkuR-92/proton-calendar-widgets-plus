@@ -462,8 +462,7 @@
     <string name="holidays_calendar_title">Holidays calendar</string>
     <string name="add_holidays_country_search_hint">Search for a country</string>
     <string name="holidays_calendar_form_picker_title">Country</string>
-    <string name="holidays_calendar_form_change_country_disclaimer">In order to change the country, it is necessary to replace the current calendar with a new one.</string>
-    <string name="holidays_calendar_form_country_disclaimer">All holidays from every region of this country will be consolidated and displayed in a single calendar.</string>
+    <string name="holidays_calendar_location_based">Based on your location</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">There are no calendars associated with this account.</string>

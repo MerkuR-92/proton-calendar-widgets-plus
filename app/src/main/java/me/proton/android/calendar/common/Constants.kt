@@ -355,7 +355,7 @@ object FragmentArguments {
     // All day value for alarm form (show different views when part or all day)
     const val IS_ALL_DAY_ARG = "isAllDay"
     // Boolean to know whether we open the alarm form to create calendar or event alarms
-    const val IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG = "isCalendarDefaultEventNotification"
+    const val DEFAULT_NOTIFICATIONS_TYPE_ARG = "defaultNotificationsType"
 }
 
 object CustomICalPropertyParameter {

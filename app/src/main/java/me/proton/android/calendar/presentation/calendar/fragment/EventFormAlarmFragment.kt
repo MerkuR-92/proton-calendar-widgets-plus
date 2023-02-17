@@ -50,6 +50,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import org.koin.core.KoinComponent
@@ -67,9 +68,16 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private val eventViewModel: EventViewModel by activityViewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
+    private val holidaysViewModel: HolidaysViewModel by activityViewModels()
 
     private var isAllDay: Boolean = false
-    private var isCalendarDefaultEventNotification: Boolean = false
+    private var defaultNotificationsType: DefaultNotificationsType = DefaultNotificationsType.EVENT
+
+    enum class DefaultNotificationsType(val value: Int) {
+        EVENT(0),
+        NORMAL_CALENDAR(1),
+        HOLIDAYS_CALENDAR(2)
+    }
 
     private var lastSelectedRadioButtonId: Int = -1
 
@@ -124,8 +132,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             countTypeOption = if (countTypeOption == -1 && isAllDay) 4 else countTypeOption,
             isAllDay = isAllDay
         )?.let { alarm ->
-            if (isCalendarDefaultEventNotification) calendarFormViewModel.handleAlarmChange(alarm, isAllDay)
-            else eventViewModel.saveAlarm(alarm)
+            when (defaultNotificationsType) {
+                DefaultNotificationsType.EVENT -> eventViewModel.saveAlarm(alarm)
+                DefaultNotificationsType.NORMAL_CALENDAR -> calendarFormViewModel.handleAlarmChange(alarm, isAllDay)
+                DefaultNotificationsType.HOLIDAYS_CALENDAR -> holidaysViewModel.handleAlarmChange(alarm)
+            }
         }
 
         findNavController().navigateUp()
@@ -154,8 +165,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private fun resetAlarmText(selectedIndex: Int) {
         lifecycleScope.launch {
             val is24Hour =
-                if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
-                else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+                when (defaultNotificationsType) {
+                    DefaultNotificationsType.EVENT -> eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+                    DefaultNotificationsType.NORMAL_CALENDAR,
+                    DefaultNotificationsType.HOLIDAYS_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
+                }
 
             if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
                 event_form_alarm_1.text = getString(R.string.event_alarm_all_day_1, LocalTime.of(9, 0).formatTime(is24Hour))
@@ -183,7 +197,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
         toolbar.setNavigationIcon(R.drawable.ic_proton_cross)
 
         isAllDay = navigationArguments.isAllDay
-        isCalendarDefaultEventNotification = navigationArguments.isCalendarDefaultEventNotification
+        defaultNotificationsType = DefaultNotificationsType.values()[navigationArguments.defaultNotificationsType]
 
         event_form_alarm_send_by_layout.visibleOrGone(true)
 
@@ -275,8 +289,11 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             val is24Hour =
-                if (isCalendarDefaultEventNotification) calendarViewModel.timeFormatIs24Hour(requireContext())
-                else eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+                when (defaultNotificationsType) {
+                    DefaultNotificationsType.EVENT -> eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
+                    DefaultNotificationsType.NORMAL_CALENDAR,
+                    DefaultNotificationsType.HOLIDAYS_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
+                }
 
             // init
             custom_alarm_1.visibleOrGone(!isAllDay)
@@ -305,7 +322,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 requireActivity().clearFocusAndHideKeyboard(view)
 
                 AndroidUtils.displayTimePicker(requireContext(), LocalTime.now(), is24Hour) {
-                    eventViewModel.handleAlarmTime(it) // TODO Handle isCalendarDefaultEventNotification
+                    eventViewModel.handleAlarmTime(it) // TODO Handle defaultNotificationsType
                     custom_alarm_time.text = getString(R.string.event_alarm_at_time, it.formatTime(is24Hour))
                 }
             }

@@ -1,7 +1,6 @@
 package me.proton.android.calendar.presentation.settings.fragment
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -60,7 +59,6 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.presentation.utils.onTextChange
-import okhttp3.internal.toHexString
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
@@ -76,7 +74,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     override val layoutResourceId: Int
         get() = R.layout.fragment_calendar_form
 
-    override val navigateUp = true
+    override val navigateUp = false
 
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
@@ -383,7 +381,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             requireActivity().clearFocusAndHideKeyboard(view)
             val bundle = Bundle().apply {
                 putBoolean(FragmentArguments.IS_ALL_DAY_ARG, allDay)
-                putBoolean(FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, true)
+                putInt(FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG, 1)
             }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }

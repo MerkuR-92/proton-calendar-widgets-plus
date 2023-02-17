@@ -33,13 +33,13 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/holidays_close"/>
+        app:layout_constraintEnd_toStartOf="@+id/holidays_search_close"/>
 
     <include
-        android:id="@+id/holidays_close"
+        android:id="@+id/holidays_search_close"
         layout="@layout/toolbar_action_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:clickable="true"
         android:focusable="true"
         android:background="?android:selectableItemBackground"

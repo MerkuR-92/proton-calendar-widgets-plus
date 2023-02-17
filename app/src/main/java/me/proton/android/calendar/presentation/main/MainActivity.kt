@@ -1200,7 +1200,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             drawer_layout.close()
                         }
                         CalendarType.HOLIDAYS -> {
-                            navController.navigate(R.id.action_nav_calendar_to_nav_holidays)
+                            navController.navigate(R.id.action_nav_calendar_to_nav_holidays_form)
                             drawer_layout.close()
                         }
                         CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
