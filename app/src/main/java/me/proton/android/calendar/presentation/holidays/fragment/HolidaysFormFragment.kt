@@ -23,6 +23,8 @@ import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_c
 import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_icon
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_press
+import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_search_disclaimer
+import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value_press
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_icon
@@ -155,13 +157,20 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             calendarId?.let {
+                // Hide disclaimer based on location
+                holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
                 // Init form for existing calendar
                 holidaysViewModel.initUpdateHolidays(it)
             } ?: run {
+                // Display disclaimer based on location
+                holidays_calendar_form_country_search_disclaimer.visibleOrGone(true)
                 // Use random color from array as calendar color
                 val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
-                holidaysViewModel.initCreateHolidays(calendarColors[(0..calendarColors.lastIndex).random()])
+                holidaysViewModel.initCreateHolidays(
+                    calendarColors[(0..calendarColors.lastIndex).random()],
+                    ZoneId.systemDefault().id
+                )
             }
         }
 
@@ -173,6 +182,14 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun observeHolidaysFormValues() {
+
+        holidaysViewModel.country.observe(viewLifecycleOwner) { country ->
+            holidays_calendar_form_country_value.text = country
+            if (holidaysViewModel.hasBeenEdited()) {
+                // Hide disclaimer based on location
+                holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
+            }
+        }
 
         holidaysViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor == 0) {

@@ -80,6 +80,7 @@ class HolidaysViewModel @Inject constructor(
     var _calendarId: String? = null
 
     private var calendarEdited = false
+    private var countryEdited = false
 
     private var viewModelJob = Job()
 
@@ -131,7 +132,10 @@ class HolidaysViewModel @Inject constructor(
         setDefaultAlarms(calendar.defaultFullDayNotifications)
     }
 
-    suspend fun initCreateHolidays(calendarColor: Int) {
+    suspend fun initCreateHolidays(calendarColor: Int, deviceDefaultTimeZoneId: String) {
+        // TODO Set actual Country
+        _country.value = deviceDefaultTimeZoneId
+
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
 
@@ -150,6 +154,10 @@ class HolidaysViewModel @Inject constructor(
 
     fun hasBeenEdited(): Boolean {
         return calendarEdited
+    }
+
+    fun hasCountryBeenEdited(): Boolean {
+        return countryEdited
     }
 
     private fun setDefaultAlarms(defaultNotifications: List<Notification>) {
@@ -180,6 +188,7 @@ class HolidaysViewModel @Inject constructor(
     fun handleCountry(country: String) {
         if (_country.value == country) return
         calendarEdited = true
+        countryEdited = true
         _country.value = country
     }
 
