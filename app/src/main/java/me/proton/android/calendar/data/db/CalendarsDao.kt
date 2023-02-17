@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.Flow
 abstract class CalendarsDao : BaseDao<CalendarEntity> {
 
     /** All calendars */
+    @Query("SELECT COUNT(id) FROM calendars")
+    abstract suspend fun countCalendars(): Int
 
     @Query("SELECT * FROM calendars")
     abstract fun selectCalendars(): List<CalendarEntity>

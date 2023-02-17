@@ -348,6 +348,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun countCalendars(): Int {
+        return database.calendarsDao().countCalendars()
+    }
+
     override suspend fun selectCalendarEntity(calendarId: String): CalendarEntity? {
         return database.calendarsDao().selectById(calendarId)
     }

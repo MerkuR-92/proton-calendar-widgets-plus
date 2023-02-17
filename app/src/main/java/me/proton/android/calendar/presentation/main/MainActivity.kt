@@ -951,16 +951,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun onClickCreateCalendar() {
         lifecycleScope.launch {
             // Check if calendar limit was reached
-            when (calendarViewModel.isUserCalendarLimitReached()) {
-                CalendarViewModel.UserCalendarLimit.ERROR -> {
+            when (calendarViewModel.isCalendarLimitReached()) {
+                CalendarViewModel.CalendarLimit.ERROR -> {
                     this@MainActivity.displaySnackBar(this@MainActivity.getString(R.string.snack_create_calendar_error))
                 }
-                CalendarViewModel.UserCalendarLimit.NOT_REACHED -> {
+                CalendarViewModel.CalendarLimit.NOT_REACHED -> {
                     // If limit has not been reached, open create calendar form
                     navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                     drawer_layout.close()
                 }
-                CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                CalendarViewModel.CalendarLimit.FREE_REACHED -> {
                     // Display limit reached for free user dialog
                     this@MainActivity.displayFreeUserCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
@@ -968,7 +968,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         drawer_layout.close()
                     }
                 }
-                CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+                CalendarViewModel.CalendarLimit.PAID_REACHED -> {
                     // Display limit reached for paid user dialog
                     this@MainActivity.displayPaidUserCalendarLimitReached() { _, _ ->
                         // Open calendar settings view

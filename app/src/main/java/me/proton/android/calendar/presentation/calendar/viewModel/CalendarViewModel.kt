@@ -8,18 +8,50 @@ import android.text.Html
 import android.text.Spanned
 import android.text.format.DateFormat
 import android.view.LayoutInflater
-import androidx.lifecycle.*
-import androidx.work.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.android.synthetic.main.dialog_checkbox.view.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
+import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
+import me.proton.android.calendar.common.MAX_CALENDAR_FREE
+import me.proton.android.calendar.common.MAX_CALENDAR_PAID
+import me.proton.android.calendar.common.SIGNATURE_VERIFICATION_API_TIMEOUT
+import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.getTimeFormat
+import me.proton.android.calendar.common.getTimeFormatFlow
+import me.proton.android.calendar.common.getUserOrNull
+import me.proton.android.calendar.common.getWeekStart
+import me.proton.android.calendar.common.getWeekStartFlow
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
@@ -31,15 +63,21 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
-import me.proton.android.calendar.data.entity.getDefaultAlarms
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
+import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
+import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
+import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
@@ -52,12 +90,37 @@ import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.TimeZone
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.MutableList
+import kotlin.collections.MutableMap
+import kotlin.collections.MutableSet
+import kotlin.collections.arrayListOf
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.emptyMap
+import kotlin.collections.filterNot
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.getValue
+import kotlin.collections.hashMapOf
+import kotlin.collections.map
+import kotlin.collections.mapValues
+import kotlin.collections.mutableMapOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.set
+import kotlin.collections.sorted
+import kotlin.collections.take
+import kotlin.collections.toList
+import kotlin.collections.toMutableList
+import kotlin.collections.withDefault
 
 private const val MAX_CALENDAR_INDICATORS = 5
 
@@ -749,27 +812,24 @@ class CalendarViewModel @Inject constructor(
         return delinquent != null && delinquent >= Delinquent.InvoiceDelinquent.value // We consider a user delinquent on the calendar side when the state is at least 3 (InvoiceDelinquent)
     }
 
-    enum class UserCalendarLimit {
+    enum class CalendarLimit {
         ERROR,
         NOT_REACHED,
         FREE_REACHED,
         PAID_REACHED
     }
 
-    suspend fun getCalendarsCount(): Int? {
-        val userCalendarsCount = getUserCalendars()?.size
-        val subscribedCalendarsCount = getSubscribedCalendars()?.size
-        return if (userCalendarsCount != null && subscribedCalendarsCount != null) userCalendarsCount + subscribedCalendarsCount
-        else userCalendarsCount ?: subscribedCalendarsCount
+    suspend fun getCalendarsCount(): Int {
+        return calendarsRepository.countCalendars()
     }
 
-    suspend fun isUserCalendarLimitReached(): UserCalendarLimit {
-        val calendarsCount = getCalendarsCount() ?: return UserCalendarLimit.ERROR
-        val isFreeUser = isFreeUser() ?: return UserCalendarLimit.ERROR
+    suspend fun isCalendarLimitReached(): CalendarLimit {
+        val calendarsCount = getCalendarsCount()
+        val isFreeUser = isFreeUser() ?: return CalendarLimit.ERROR
 
-        if (isFreeUser && calendarsCount >= MAX_CALENDAR_FREE) return UserCalendarLimit.FREE_REACHED
-        if (!isFreeUser && calendarsCount >= MAX_CALENDAR_PAID) return UserCalendarLimit.PAID_REACHED
-        return UserCalendarLimit.NOT_REACHED
+        if (isFreeUser && calendarsCount >= MAX_CALENDAR_FREE) return CalendarLimit.FREE_REACHED
+        if (!isFreeUser && calendarsCount >= MAX_CALENDAR_PAID) return CalendarLimit.PAID_REACHED
+        return CalendarLimit.NOT_REACHED
     }
 
     /**
