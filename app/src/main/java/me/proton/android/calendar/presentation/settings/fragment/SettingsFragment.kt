@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_cale
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
@@ -50,6 +51,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
@@ -136,23 +138,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
-
-            lifecycleScope.launch {
-                when (calendarViewModel.isCalendarLimitReached()) {
-                    CalendarViewModel.CalendarLimit.NOT_REACHED -> {
-                        findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
-                    }
-                    CalendarViewModel.CalendarLimit.FREE_REACHED -> {
-                        requireContext().displayFreeUserCalendarLimitReached()
-                    }
-                    CalendarViewModel.CalendarLimit.PAID_REACHED -> {
-                        requireContext().displayPaidUserCalendarLimitReached()
-                    }
-                    CalendarViewModel.CalendarLimit.ERROR -> {
-                        view?.displaySnackBar(requireContext().getString(R.string.snack_create_calendar_error))
-                    }
-                }
-            }
+            showCalendarsOptionsDialog()
         }
 
         val settingsCalendarListView = settings_calendars_list
@@ -408,6 +394,86 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             )
 
             bottomSheetDialog.show()
+        }
+    }
+
+    private fun showCalendarsOptionsDialog() {
+        val bottomSheetDialog = BottomSheetDialog(requireContext())
+
+        // Workaround to make sure we have the correct navigation bar color.
+        // TODO update once we change splash screen and how we handle navigation bar colors
+        val window = bottomSheetDialog.window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val navigationBarBackgroundColor = R.color.background_norm
+            window?.navigationBarColor = resources.getColor(navigationBarBackgroundColor, null)
+        } else {
+            window?.navigationBarColor = requireContext().getColorFromAttr(
+                R.attr.proton_background_norm
+            )
+        }
+
+        bottomSheetDialog.setContentView(R.layout.dialog_calendars_create_import)
+
+        val createCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_create_press)
+        val addHolidaysCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holidays_press)
+        val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
+
+        createCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar(CalendarType.NORMAL)
+            bottomSheetDialog.dismiss()
+        }
+
+        addHolidaysCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar(CalendarType.HOLIDAYS)
+            bottomSheetDialog.dismiss()
+        }
+
+        importFromGooglePress?.setOnSingleClickListener {
+            if (!mainViewModel.isConnectedToNetwork) {
+                bottomSheetDialog.dismiss()
+                view?.displaySnackBar(this.getString(R.string.snack_network_error), Snackbar.LENGTH_LONG)
+                return@setOnSingleClickListener
+            }
+
+            (requireActivity() as MainActivity).showImportGoogleAuthDialog()
+            bottomSheetDialog.dismiss()
+        }
+
+        lifecycleScope.launch {
+
+            if (!calendarViewModel.displayImport()) {
+                val importFromGoogleLayout = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import)
+                importFromGoogleLayout?.visibleOrGone(false)
+            }
+
+            bottomSheetDialog.show()
+        }
+    }
+
+    private fun onClickCreateCalendar(calendarType: CalendarType) {
+        lifecycleScope.launch {
+            // Check if calendar limit was reached
+            when (calendarViewModel.isCalendarLimitReached()) {
+                CalendarViewModel.CalendarLimit.ERROR -> {
+                    view?.displaySnackBar(this@SettingsFragment.getString(R.string.snack_create_calendar_error))
+                }
+                CalendarViewModel.CalendarLimit.NOT_REACHED -> {
+                    // If limit has not been reached, open calendar form
+                    when (calendarType) {
+                        CalendarType.NORMAL -> findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
+                        CalendarType.HOLIDAYS -> findNavController().navigate(R.id.action_nav_settings_to_nav_holidays_form)
+                        CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
+                    }
+                }
+                CalendarViewModel.CalendarLimit.FREE_REACHED -> {
+                    // Display limit reached for free user dialog
+                    requireContext().displayFreeUserCalendarLimitReached()
+                }
+                CalendarViewModel.CalendarLimit.PAID_REACHED -> {
+                    // Display limit reached for paid user dialog
+                    requireContext().displayPaidUserCalendarLimitReached()
+                }
+            }
         }
     }
 }
