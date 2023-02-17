@@ -364,7 +364,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 with (MaterialAlertDialogBuilder(requireContext())) {
                     setTitle(resourceProvider.provideString(R.string.recreate_calendar_dialog_title))
                     setMessage(resourceProvider.provideString(R.string.recreate_calendar_dialog_message))
-                    setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                    setPositiveButton(R.string.action_recreate) { _, _ ->
                         lifecycleScope.launch {
                             val snackBar = view?.displaySnackBar(getString(R.string.recreate_calendar_snack_clearing), Snackbar.LENGTH_INDEFINITE)
                             when (calendarViewModel.recreateCalendar(calendar.id)) {
