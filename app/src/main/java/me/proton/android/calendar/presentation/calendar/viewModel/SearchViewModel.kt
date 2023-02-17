@@ -77,6 +77,8 @@ class SearchViewModel @Inject constructor(
                     WorkInfo.State.ENQUEUED -> {
                         if (lastWorkerState == WorkInfo.State.RUNNING) { // lost internet connection
                             _downloadingState.update { DownloadingState.PAUSED }
+                        } else if (lastWorkerState == null) { // last run failed, work is enqueued for retry when conditions are met
+                            _downloadingState.update { DownloadingState.PAUSED }
                         }
                     }
                     WorkInfo.State.RUNNING -> {
@@ -90,7 +92,18 @@ class SearchViewModel @Inject constructor(
                             //  (most likely after manually clearing search DB)
                         }
                     }
-                    WorkInfo.State.FAILED, WorkInfo.State.BLOCKED -> {
+                    WorkInfo.State.FAILED -> {
+                        coroutineScope.launch {
+                            if (isCalendarDownloadEnabled()) {
+                                // worker failed last time
+                                _downloadingState.update { DownloadingState.ERROR }
+                            } else {
+                                // worker failed but after that we also disabled search altogether
+                                _downloadingState.update { DownloadingState.NONE }
+                            }
+                        }
+                    }
+                    WorkInfo.State.BLOCKED -> {
                         _downloadingState.update { DownloadingState.ERROR }
                     }
                     WorkInfo.State.CANCELLED -> {

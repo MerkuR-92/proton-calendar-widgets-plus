@@ -228,7 +228,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                             batchOfIds = response.data.events
                             afterId = batchOfIds.lastOrNull()
 
-                            eventIdsChannel.send(batchOfIds)
+                            if (eventIdsChannel.isClosedForSend.not()) eventIdsChannel.send(batchOfIds)
                         }
                     }
 

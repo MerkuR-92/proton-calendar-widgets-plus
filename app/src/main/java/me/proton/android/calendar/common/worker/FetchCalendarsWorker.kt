@@ -6,19 +6,21 @@ import androidx.core.app.NotificationCompat
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -82,13 +84,16 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
         val userId = accountManager.getPrimaryUserId().filterNotNull().firstOrNull()
 
+        var result: Result = Result.failure()
+
         if (userId != null) {
             val userValueStore = valueStoreProvider.provideValueStore(userId.id)
 
             startInstant = Instant.now()
             val calendars = calendarsRepository.selectUserCalendars(userId.id)
 
-            calendarMetadata = calendars.mapNotNull { calendar ->
+            // determine how many Events there are in each Calendar
+            calendarMetadata = calendars.map { calendar ->
 
                 val totalEvents = calendarsApi.getEventsCount(userId, calendar.id).valueOrNullAndLogErrors(logger)?.total
 
@@ -105,26 +110,40 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
             }
 
-            calendarMetadata.forEach { calendarMetadata ->
-                fetchCalendar(userId, userValueStore, searchDatabase, calendarMetadata)
+            try {
+                coroutineScope {
+                    launch {
+                        calendarMetadata.map { calendarMetadata ->
+                            async {
+                                fetchCalendar(userId, userValueStore, searchDatabase, calendarMetadata, this)
+                            }
+                        }.awaitAll()
+
+                        result = Result.success()
+                    }
+                }
+            } catch (e: Exception) {
+                logger.e("Exception downloading calendars", e)
+                result = Result.failure()
             }
 
         } else {
             logger.e("userId == null in FetchCalendarsWorker")
-            return Result.failure()
+            result = Result.failure()
         }
 
-        return Result.success()
+        return result
     }
 
     private suspend fun fetchCalendar(
         userId: UserId,
         userValueStore: ValueStore,
         searchDatabase: SearchDatabase,
-        calendarMetadata: Metadata
+        calendarMetadata: Metadata,
+        coroutineScope: CoroutineScope
     ): Result {
 
-        try {
+        coroutineScope.async {
 
             accountManager.getPrimaryUserId().filterNotNull().first()
 
@@ -141,12 +160,11 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
             reportProgress(calendarMetadata.calendarId, allEventCount.toInt())
 
-            val coroutineScope = CoroutineScope(Dispatchers.IO)
 
-            val eventEntityBatches = fetchEventsUseCase.execute(userId, calendarMetadata.calendarId, lastEventId, coroutineScope)
+            val eventEntityBatches =
+                fetchEventsUseCase.execute(userId, calendarMetadata.calendarId, lastEventId, coroutineScope)
 
-            coroutineScope.async {
-
+            coroutineScope.launch {
                 for (eventEntityBatch in eventEntityBatches) {
 
                     allEventCount += eventEntityBatch.size
@@ -163,17 +181,11 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
                     reportProgress(calendarMetadata.calendarId, allEventCount.toInt())
                 }
-            }.await()
-
-        } catch (e: Exception) {
-            if (e !is CancellationException) {
-                logger.e("exception in fetchCalendar Worker()", e)
-                return Result.failure()
             }
-        }
+
+        }.await()
 
         return Result.success()
-
     }
 
     private suspend fun reportProgress(calendarId: String, downloaded: Int) {
@@ -215,7 +227,7 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
                 )
             }"
         } else {
-            "$seconds ${
+            if (seconds == 0) applicationContext.getString(R.string.search_downloading_time_remaining_almost_done) else "$seconds ${
                 applicationContext.resources.getQuantityString(
                     R.plurals.plural_seconds,
                     seconds,

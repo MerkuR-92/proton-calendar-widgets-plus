@@ -249,6 +249,8 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         search_input.visibleOrInvisible(false)
         search_separator.visibleOrInvisible(false)
 
+        requireActivity().clearFocusAndHideKeyboard(view)
+
         include_search_onboarding.visibleOrGone(true)
 
         tv_search_onboarding_text.movementMethod = LinkMovementMethod.getInstance()
