@@ -40,6 +40,7 @@
     <string name="action_done">Готово</string>
     <string name="action_edit">Змінити</string>
     <string name="action_delete">Видалити</string>
+    <string name="action_recreate">Очистити</string>
     <string name="action_today">Сьогодні</string>
     <string name="action_create_event">Створити подію</string>
     <string name="action_mark_default">Позначити типовим</string>
@@ -148,8 +149,8 @@
     <string name="search_empty_results_title">Результатів не знайдено</string>
     <string name="search_empty_results_subtitle">Спробуйте інший термін, наприклад, Андрій, день народження, вебінар, книжковий клуб.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Завантаження календарів (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">Залишилося %1$s…</string>
-    <string name="search_downloading_time_remaining_unknown">обчислення часу до завершення…</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Лишилося часу: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Обчислення часу до завершення…</string>
     <string name="search_downloading_pause">Призупинити завантаження</string>
     <string name="search_settings_dialog_toggle_off_title">Вилучити всі завантажені календарі?</string>
     <string name="search_settings_dialog_toggle_off_text">Вам потрібно буде завантажити календарі ще раз, якщо ви хочете здійснити пошук.</string>
@@ -221,6 +222,15 @@
     <string name="event_allow_contacts_description">Proton Calendar потребує доступу до ваших контактів для можливості автозавершення</string>
     <string name="event_allow_contacts_cancel">Заборонити</string>
     <string name="event_allow_contacts_confirm">Дозволити</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Запрошення на подію – %1$s, %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Запрошення на подію – %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Запрошення на подію – %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Запрошення на подію – %1$s, %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Запрошення на подію – %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрошення на подію – %1$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Скасування події – %1$s, %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Скасування події – %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасування події – %1$s</string>
     <string name="event_send_invite_mail_body">Вас запрошено на %1$s\nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -270,6 +280,7 @@
     <string name="snack_event_saving">Збереження події</string>
     <string name="snack_event_deleting">Видалення події</string>
     <string name="snack_event_changing_answer">Оновлення відповіді</string>
+    <string name="snack_event_part_stat_updated">Стан участі оновлено.</string>
     <string name="snack_event_updated">Подію оновлено</string>
     <string name="snack_event_updated_error_failed_mail">Не вдалося надіслати запрошення</string>
     <string name="snack_event_updated_error">Помилка оновлення події</string>
@@ -331,6 +342,7 @@
     <string name="snack_app_link_error">Помилка відкриття події</string>
     <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
+    <string name="snack_opening_ics">Відкриття події…</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
     <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
@@ -363,7 +375,7 @@
     <string name="bug_report_hint_title">Тема</string>
     <string name="bug_report_hint_description">Опишіть проблему та додайте повідомлення про помилки.</string>
     <string name="bug_report_discard_changes_title">Незбережені зміни</string>
-    <string name="bug_report_discard_changes_description">Виявлено незбереженні записи у формі. Ви дійсно хочете відхилити їх?</string>
+    <string name="bug_report_discard_changes_description">Виявлено незбережені записи у формі. Ви дійсно хочете відхилити їх?</string>
     <string name="bug_report_discard_changes_cancel">Продовжити писати</string>
     <string name="bug_report_discard_changes_confirm">Відхилити</string>
     <!-- Settings -->
@@ -408,6 +420,7 @@
     <string name="calendar_form_update_title">Редагувати календар</string>
     <string name="calendar_form_save">Зберегти</string>
     <string name="calendar_form_name">Назва</string>
+    <string name="calendar_form_description">Опис</string>
     <string name="calendar_form_color">Колір календаря</string>
     <string name="calendar_form_default_event_duration">Тривалість події</string>
     <string name="calendar_form_default_event_notifications">Сповіщення про події</string>
@@ -417,15 +430,25 @@
     <string name="calendar_form_default_email_value_error">Не вдалося завантажити типову електронну пошту</string>
     <string name="calendar_form_name_hint">Додати назву календаря</string>
     <string name="calendar_form_name_required_error">Назва обов\'язкова</string>
+    <string name="calendar_form_description_hint">Додати опис календаря</string>
     <string name="add_calendar_text">Додати календар</string>
     <string name="create_calendar_limit_reached">Ви досягли максимальної кількості календарів.</string>
+    <string name="create_calendar_limit_reached_title">Неможливо додати більше календарів</string>
+    <string name="create_calendar_limit_reached_paid_description">Ваш тарифний план дозволяє створити максимум 25 календарів.\n\nЩоб додати новий календар, спершу вилучіть один із наявних.</string>
     <string name="create_calendar_limit_reached_manage">Керувати календарями</string>
+    <string name="create_calendar_limit_reached_free_description">Ваш тарифний план дозволяє створити максимум 3 календарі.\n\nЩоб додати новий календар, спершу вилучіть один із наявних.</string>
+    <string name="create_calendar_limit_reached_error">Помилка</string>
     <string name="delete_calendar_dialog_title">Видалити календар</string>
     <string name="delete_calendar_dialog_message">Ви дійсно хочете видалити цей календар?</string>
     <string name="delete_default_calendar_dialog_message">Ви впевнені, що хочете видалити цей календар? \"%1$s\" буде встановлено типовим календарем.</string>
     <string name="delete_calendar_snack_deleted">Календар видалено</string>
     <string name="delete_calendar_snack_error">Помилка видалення календаря</string>
     <string name="delete_calendar_snack_error_password_confirmation">Не вдалося підтвердити пароль</string>
+    <string name="recreate_calendar_dialog_title">Очистити календар</string>
+    <string name="recreate_calendar_dialog_message">Ця дія вилучить усі події та запрошених користувачів.\n\nВи впевнені, що хочете очистити календар?</string>
+    <string name="recreate_calendar_snack_error">Помилка очищення календаря</string>
+    <string name="recreate_calendar_snack_deleted">Календар очищено</string>
+    <string name="recreate_calendar_snack_clearing">Очищення календаря…</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Гаразд</string>
     <string name="bootstrap_error_no_calendar_title">Немає календарів, пов’язаних із цим обліковим записом.</string>
@@ -437,7 +460,7 @@
     <string name="bootstrap_error_store_quota_reached_message">Немає вільного місця для зберігання.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Докладніше</string>
     <string name="bootstrap_error_reset_needed_title">Скинути ключі календаря</string>
-    <string name="bootstrap_error_reset_needed_message">Ви скинули свій пароль, а події, пов\'язані з цими календарями, не можуть бути розшифровані. Будь-які активні календарі, на які ви підписані знову синхронізуються через кілька хвилин.</string>
+    <string name="bootstrap_error_reset_needed_message">Ви скинули свій пароль, тому неможливо розшифрувати події, пов\'язані з цими календарями. Будь-які активні підписні календарі знову синхронізуються через кілька хвилин.</string>
     <string name="bootstrap_error_update_passphrase_title">Повторно активувати ключі календаря</string>
     <string name="bootstrap_error_update_passphrase_message">Ви повторно активували свої ключі, тому тепер можна зашифрувати події, пов\'язані з вказаними календарями.</string>
     <string name="bootstrap_error_continue_button">Продовжити</string>
@@ -478,8 +501,10 @@
     <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до Інтернету, де приватність — це стандарт. <a href="https://proton.me/news/updated-proton">Докладніше</a></string>
     <string name="spotlight_dialog_week_view_title">Більше варіантів перегляду</string>
     <string name="spotlight_dialog_week_view_description">• Представляємо перегляд календаря на <b>3 дні</b> й на <b>тиждень</b>. Виберіть потрібний вигляд у <b>меню</b>.\n\n• Налаштуйте висоту рядків у сітці дня, зводячи двома пальцями, щоб збільшити або зменшити масштаб.</string>
-    <string name="spotlight_dialog_search_title">Легкий пошук</string>
-    <string name="spotlight_dialog_search_description">Тепер ви можете здійснювати пошук подій. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Легкий пошук</string>
+    <string name="spotlight_dialog_search_description">Тепер ви можете шукати події у своїх календарях. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="spotlight_dialog_import_title">Інші шляхи додати події</string>
+    <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
@@ -545,6 +570,10 @@
     <string name="import_assistant_authentication_canceled">Автентифікацію скасовано</string>
     <string name="import_assistant_sign_in_in_progress">Наразі триває процес входу в систему</string>
     <string name="import_assistant_in_progress_error_snack">Усе ще триває імпортування</string>
+    <!-- Import events -->
+    <string name="import_event_disclaimer_dialog_title">Імпортувати як просту подію?</string>
+    <string name="import_event_disclaimer_dialog_description">\nІмпортовані запрошення Proton Calendar з\'являються як звичайні події без подробиць про <b>організатора</b> й <b>учасника</b>.\n\nЩоб отримувати оновлення подій та бачити учасників, попросіть організаторів запросити вас, за допомогою вашої адреси електронної пошти Proton.</string>
+    <string name="import_event_disclaimer_dialog_positive">Імпорт</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">календар</item>
@@ -589,10 +618,10 @@
         <item quantity="other">Об\'єднати %d календарів у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">У зв\'язку з обмеженням кількості календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календаря</item>
-        <item quantity="few">У зв\'язку з обмеженням кількості календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
-        <item quantity="many">У зв\'язку з обмеженням кількості календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
-        <item quantity="other">У зв\'язку з обмеженням кількості календарів, неможливо створити всі імпортовані календарі.\n • Приберіть вибір принаймні %1$d календарів</item>
+        <item quantity="one">Неможливо створити нові календарі для усіх імпортованих календарів у зв\'язку з обмеженням кількості календарів.\n • Приберіть вибір принаймні %1$d календаря</item>
+        <item quantity="few">Неможливо створити нові календарі для усіх імпортованих календарів у зв\'язку з обмеженням кількості календарів.\n • Приберіть вибір принаймні %1$d календарів</item>
+        <item quantity="many">Неможливо створити нові календарі для усіх імпортованих календарів у зв\'язку з обмеженням кількості календарів.\n • Приберіть вибір принаймні %1$d календарів</item>
+        <item quantity="other">Неможливо створити нові календарі для усіх імпортованих календарів у зв\'язку з обмеженням кількості календарів.\n • Приберіть вибір принаймні %1$d календарів</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020або\n • Обʼєднайте принаймні %1$d календар із наявними календарями Proton.</item>
@@ -691,6 +720,12 @@
         <item quantity="other">%s хвилини</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d символ</item>
+        <item quantity="few">%d/%d символи</item>
+        <item quantity="many">%d/%d символів</item>
+        <item quantity="other">%d/%d символів</item>
+    </plurals>
+    <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%d/%d символ</item>
         <item quantity="few">%d/%d символи</item>
         <item quantity="many">%d/%d символів</item>
