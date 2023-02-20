@@ -14,6 +14,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarAlarmEventListener
@@ -34,6 +35,7 @@ class CalendarAlarmEventListenerTest {
 
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase = mockk(relaxed = true)
     private val handleAlarmsUseCase: HandleAlarmsUseCase = mockk(relaxed = true)
     private val syncAlarmsUseCase: SyncAlarmsUseCase = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
@@ -47,6 +49,7 @@ class CalendarAlarmEventListenerTest {
         listener = CalendarAlarmEventListener(
             db,
             calendarsRepository,
+            safePersistEventAlarmUseCase,
             handleAlarmsUseCase,
             syncAlarmsUseCase,
             logger
@@ -95,7 +98,7 @@ class CalendarAlarmEventListenerTest {
 
             listener.onCreateOrUpdate(config, alarms)
 
-            coVerify(exactly = alarms.count()) { calendarsRepository.persistEventAlarm(any(), any()) }
+            coVerify(exactly = 1) { safePersistEventAlarmUseCase.invoke(any()) }
         }
     }
 

@@ -17,6 +17,7 @@ class SyncAlarmsUseCase @Inject constructor(
     private val valueStoreProvider: ValueStoreProvider,
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase
 ): UseCase {
 
@@ -121,7 +122,7 @@ class SyncAlarmsUseCase @Inject constructor(
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
                                     calendarsRepository.persistEvents(event.data.event)
-                                    calendarsRepository.persistEventAlarm(logger, alarmEntity)
+                                    safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                 is ApiResponse.Error -> {
@@ -130,7 +131,7 @@ class SyncAlarmsUseCase @Inject constructor(
                                 is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
                             }
                         } else {
-                            calendarsRepository.persistEventAlarm(logger, alarmEntity)
+                            safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
                         }
                     }
 

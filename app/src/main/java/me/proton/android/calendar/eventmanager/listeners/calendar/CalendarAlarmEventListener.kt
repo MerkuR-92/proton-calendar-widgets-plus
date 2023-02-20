@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
+import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class CalendarAlarmEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val syncAlarmsUseCase: SyncAlarmsUseCase,
     private val logger: Logger,
@@ -75,7 +77,9 @@ class CalendarAlarmEventListener @Inject constructor(
     }
 
     override suspend fun onCreateOrUpdate(config: EventManagerConfig, entities: List<EventAlarmEntity>) {
-        entities.filter { !invalidAlarmIds.contains(it.id) }.forEach { calendarsRepository.persistEventAlarm(logger, it) }
+        safePersistEventAlarmUseCase.invoke(
+            entities.filter { !invalidAlarmIds.contains(it.id) }
+        )
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
