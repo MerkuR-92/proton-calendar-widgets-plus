@@ -40,6 +40,7 @@
     <string name="action_done">Klaar</string>
     <string name="action_edit">Bewerk</string>
     <string name="action_delete">Verwijder</string>
+    <string name="action_recreate">Wissen</string>
     <string name="action_today">Vandaag</string>
     <string name="action_create_event">Creëer afspraak</string>
     <string name="action_mark_default">Markeren als standaard</string>
@@ -144,28 +145,28 @@
     <string name="event_text_calendar">Kalender</string>
     <string name="event_text_timezone_start">Tijdzone</string>
     <!-- SEARCH -->
-    <string name="search_hint_input_field">What are you looking for?</string>
+    <string name="search_hint_input_field">Wat bent u naar op zoek?</string>
     <string name="search_empty_results_title">Geen resultaten</string>
-    <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
-    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s remaining…</string>
-    <string name="search_downloading_time_remaining_unknown">calculating time remaining…</string>
+    <string name="search_empty_results_subtitle">Probeer een andere term, bv., Eric, verjaardag, webinar, boekenclub.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Agenda\'s downloaden (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tijd resterend: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Resterende tijd berekenen…</string>
     <string name="search_downloading_pause">Download pauzeren</string>
-    <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
-    <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
-    <string name="search_settings_dialog_toggle_on_title">Download calendars to this device?</string>
-    <string name="search_settings_dialog_toggle_on_text">This is required so you can search.</string>
-    <string name="search_onboarding_header">Searching for something in your calendar?</string>
-    <string name="search_onboarding_text">In order to search your calendars you first need to download a local encrypted copy of your calendars. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_settings_dialog_toggle_off_title">Alle gedownloade agenda\'s verwijderen?</string>
+    <string name="search_settings_dialog_toggle_off_text">U zult uw agenda\'s opnieuw moeten downloaden als u wilt zoeken.</string>
+    <string name="search_settings_dialog_toggle_on_title">Agenda\'s downloaden naar dit apparaat?</string>
+    <string name="search_settings_dialog_toggle_on_text">Dit is vereist zodat u kan zoeken.</string>
+    <string name="search_onboarding_header">Op zoek naar iets in uw agenda?</string>
+    <string name="search_onboarding_text">Om uw agenda\'s te kunnen doorzoeken, moet u eerst een lokaal versleutelde kopie downloaden van uw agenda\'s. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
     <string name="search_onboarding_action_download_calendars">Agenda\'s downloaden</string>
-    <string name="search_onboarding_action_pause">Pauzeer</string>
+    <string name="search_onboarding_action_pause">Onderbreken</string>
     <string name="search_onboarding_action_resume">Hervatten</string>
     <string name="search_onboarding_action_retry">Opnieuw proberen</string>
-    <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
-    <string name="search_onboarding_progress_header_completed">Downloading completed</string>
-    <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
-    <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
-    <string name="search_spotlight_activation_snack">Calendar search activated</string>
+    <string name="search_onboarding_progress_header_ongoing">Agenda\'s downloaden…</string>
+    <string name="search_onboarding_progress_header_completed">Downloaden voltooid</string>
+    <string name="search_onboarding_progress_header_paused">Agenda\'s downloaden onderbroken</string>
+    <string name="search_onboarding_progress_header_error">Fout bij het downloaden van agenda\'s</string>
+    <string name="search_spotlight_activation_snack">Agenda\'s doorzoeken geactiveerd</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Melding toevoegen</string>
     <string name="event_text_description">Beschrijving</string>
@@ -221,6 +222,15 @@
     <string name="event_allow_contacts_description">Proton Calendar heeft toegang nodig tot uw contactpersonen om u te voorzien van automatische voltooiing</string>
     <string name="event_allow_contacts_cancel">Weigeren</string>
     <string name="event_allow_contacts_confirm">Toestaan</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Uitnodiging voor een afspraak die begint op %1$s om %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Uitnodiging voor een afspraak op %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Uitnodiging voor een afspraak die begint op %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Uitnodiging voor een afspraak die begint op %1$s om %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Uitnodiging voor een afspraak op %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Uitnodiging voor een afspraak die begint op %1$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annulering van een afspraak die begint op %1$s om %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annulering van een afspraak op %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulering van een afspraak die begint op %1$s</string>
     <string name="event_send_invite_mail_body">U bent uitgenodigd voor %1$s\nWanneer: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hele dag)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -270,6 +280,7 @@
     <string name="snack_event_saving">Afspraak opslaan</string>
     <string name="snack_event_deleting">Afspraak verwijderen</string>
     <string name="snack_event_changing_answer">Antwoord bijwerken</string>
+    <string name="snack_event_part_stat_updated">Deelnamestatus bijgewerkt.</string>
     <string name="snack_event_updated">Afspraak bijgewerkt</string>
     <string name="snack_event_updated_error_failed_mail">Uitnodiging kon niet verzonden worden</string>
     <string name="snack_event_updated_error">Fout bij bijwerken afspraak</string>
@@ -331,6 +342,7 @@
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
     <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
+    <string name="snack_opening_ics">Opening event…</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -352,7 +364,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Afspraakmelding</string>
     <string name="notification_channel_sync">Agenda Synchronisatie</string>
-    <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
+    <string name="notification_channel_calendar_fetch">Agenda\'s ophalen</string>
     <string name="notification_sync">Agenda\'s synchroniseren…</string>
     <string name="notification_text_today">Vandaag</string>
     <string name="notification_text_today_part_time">Vandaag om %1$s</string>
@@ -379,8 +391,8 @@
     <string name="settings_time_format_title">Tijdnotatie</string>
     <string name="settings_week_numbers_title">Weeknummers weergeven</string>
     <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als wachtend</string>
-    <string name="settings_search_title">Search calendars</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
+    <string name="settings_search_title">Agenda\'s doorzoeken</string>
+    <string name="settings_search_subtitle">Download de inhoud van uw agenda en bewaart deze om op uw apparaat te doorzoeken. Dit uitzetten zal de gedownloade inhoud verwijderen.</string>
     <string name="settings_alternative_routing_title">Alternatieve routing toestaan</string>
     <string name="settings_alternative_routing_subtitle">In het geval dat Proton-sites worden geblokkeerd, stelt deze instelling de app in staat om alternatieve netwerkroutering te proberen om Proton te bereiken, wat nuttig kan zijn voor het omzeilen van firewalls of netwerkproblemen. We raden aan deze instelling aan te houden voor een grotere betrouwbaarheid.</string>
     <string name="settings_value_placeholder">Tik om te selecteren</string>
@@ -408,6 +420,7 @@
     <string name="calendar_form_update_title">Agenda bijwerken</string>
     <string name="calendar_form_save">Opslaan</string>
     <string name="calendar_form_name">Naam</string>
+    <string name="calendar_form_description">Beschrijving</string>
     <string name="calendar_form_color">Agendakleur</string>
     <string name="calendar_form_default_event_duration">Duur van de afspraak</string>
     <string name="calendar_form_default_event_notifications">Afspraakmeldingen</string>
@@ -417,15 +430,25 @@
     <string name="calendar_form_default_email_value_error">Kan standaard e-mail niet laden</string>
     <string name="calendar_form_name_hint">Voeg een agendanaam toe</string>
     <string name="calendar_form_name_required_error">Naam vereist</string>
+    <string name="calendar_form_description_hint">Voeg een beschrijving toe aan de agenda.</string>
     <string name="add_calendar_text">Agenda toevoegen</string>
     <string name="create_calendar_limit_reached">U hebt het maximum aantal agenda\'s bereikt.</string>
+    <string name="create_calendar_limit_reached_title">Kan niet meer agenda\'s toevoegen</string>
+    <string name="create_calendar_limit_reached_paid_description">U heeft het maximale aantal beschikbare agenda\'s in uw abonnement van 25 bereikt.\n\nOm een nieuwe agenda toe te voegen moet u een bestaande verwijderen.</string>
     <string name="create_calendar_limit_reached_manage">Agenda\'s beheren</string>
+    <string name="create_calendar_limit_reached_free_description">U heeft het maximale aantal beschikbare agenda\'s in uw abonnement van 3 bereikt.\n\nOm een nieuwe agenda toe te voegen moet u een bestaande verwijderen.</string>
+    <string name="create_calendar_limit_reached_error">Fout</string>
     <string name="delete_calendar_dialog_title">Agenda verwijderen</string>
     <string name="delete_calendar_dialog_message">Weet u zeker dat u deze agenda wilt verwijderen?</string>
     <string name="delete_default_calendar_dialog_message">Weet u zeker dat u deze agenda wilt verwijderen? \"%1$s\" zal ingesteld worden als standaardagenda.</string>
     <string name="delete_calendar_snack_deleted">Agenda verwijderd</string>
     <string name="delete_calendar_snack_error">Fout bij verwijderen agenda</string>
     <string name="delete_calendar_snack_error_password_confirmation">Wachtwoordbevestiging mislukt</string>
+    <string name="recreate_calendar_dialog_title">Agenda leegmaken</string>
+    <string name="recreate_calendar_dialog_message">Deze actie zal alle afspraken en uitgenodigde gebruikers verwijderen.\n\nWeet u zeker dat u deze agenda wilt legen?</string>
+    <string name="recreate_calendar_snack_error">Fout bij legen van agenda</string>
+    <string name="recreate_calendar_snack_deleted">Agenda geleegd</string>
+    <string name="recreate_calendar_snack_clearing">Agenda leegmaken…</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Er zijn geen agenda\'s gekoppeld aan dit account.</string>
@@ -478,8 +501,10 @@
     <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="https://proton.me/news/updated-proton">Meer leren</a></string>
     <string name="spotlight_dialog_week_view_title">Meer weergaveopties</string>
     <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b>- en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
-    <string name="spotlight_dialog_search_title">Search seamlessly</string>
-    <string name="spotlight_dialog_search_description">You can now search your for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Naadloos doorzoeken</string>
+    <string name="spotlight_dialog_search_description">U kunt nu zoeken in uw agenda naar afspraken. Hiervoor wordt een versleutelde kopie van uw agenda gedownload op uw apparaat. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
+    <string name="spotlight_dialog_import_title">More ways to add events</string>
+    <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
@@ -545,6 +570,10 @@
     <string name="import_assistant_authentication_canceled">Authenticatie geannuleerd</string>
     <string name="import_assistant_sign_in_in_progress">Er is reeds een loginproces bezig</string>
     <string name="import_assistant_in_progress_error_snack">Er is nog steeds een import in uitvoering</string>
+    <!-- Import events -->
+    <string name="import_event_disclaimer_dialog_title">Import as simple event?</string>
+    <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
+    <string name="import_event_disclaimer_dialog_positive">Import</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">agenda</item>
@@ -575,10 +604,10 @@
         <item quantity="other">Voeg %d agenda‘s samen in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor agenda.\n •
-Vink minstens %1$d agenda af</item>
-        <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet voor agenda.\n •
-Vink minstens %1$d agenda\'s af</item>
+        <item quantity="one">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet agenda\'s.\n • 
+Deselecteer minstens %1$d agenda</item>
+        <item quantity="other">Kan geen nieuwe agenda\'s maken voor alle geïmporteerde agenda\'s vanwege de limiet agenda\'s.\n • 
+Deselecteer minstens %1$d agenda\'s</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020or\n • Tenminste %1$d agenda samenvoegen met bestaande Proton agenda\'s.</item>
@@ -645,6 +674,10 @@ Vink minstens %1$d agenda\'s af</item>
         <item quantity="other">%s minuten</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d teken</item>
+        <item quantity="other">%d/%d tekens</item>
+    </plurals>
+    <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%d/%d teken</item>
         <item quantity="other">%d/%d tekens</item>
     </plurals>

@@ -40,6 +40,7 @@
     <string name="action_done">Hecho</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="action_recreate">Borrar</string>
     <string name="action_today">Hoy</string>
     <string name="action_create_event">Crear evento</string>
     <string name="action_mark_default">Marcar como predeterminado</string>
@@ -148,11 +149,11 @@
     <string name="search_empty_results_title">No se encontraron resultados</string>
     <string name="search_empty_results_subtitle">Intente con otro término, p.ej. Juan, cumpleaños, conferencia, club de lectura.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Descargando calendarios (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: 1h 20m remaining...">%1$s restante…</string>
-    <string name="search_downloading_time_remaining_unknown">calculando tiempo restante…</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tiempo restante: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculando tiempo restante…</string>
     <string name="search_downloading_pause">Pausar descarga</string>
     <string name="search_settings_dialog_toggle_off_title">¿Eliminar todos los calendarios descargados?</string>
-    <string name="search_settings_dialog_toggle_off_text">Tendrá descargar los calendarios de nuevo si quiere buscar.</string>
+    <string name="search_settings_dialog_toggle_off_text">Tendrá que descargar los calendarios de nuevo si quiere buscar.</string>
     <string name="search_settings_dialog_toggle_on_title">¿Descargar los calendarios a este dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Esto es necesario para que pueda buscar.</string>
     <string name="search_onboarding_header">¿Buscando algo en el calendario?</string>
@@ -221,6 +222,15 @@
     <string name="event_allow_contacts_description">Proton Calendar necesita acceso a sus contactos para proporcionarle el autocompletado</string>
     <string name="event_allow_contacts_cancel">Denegar</string>
     <string name="event_allow_contacts_confirm">Permitir</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invitación para un evento que comienza el %1$s a las %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invitación para un evento el %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invitación para un evento que comienza el %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitación para un evento que comienza el %1$s a las %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitación a un evento el %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitación para un evento que comienza el %1$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancelación para un evento que comienza el %1$s a las %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancelación de un evento el %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancelación de un evento que comienza el %1$s</string>
     <string name="event_send_invite_mail_body">Está invitado a %1$s\nCuándo: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (todo el día)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -270,6 +280,7 @@
     <string name="snack_event_saving">Guardando evento</string>
     <string name="snack_event_deleting">Eliminando evento</string>
     <string name="snack_event_changing_answer">Actualizando respuesta</string>
+    <string name="snack_event_part_stat_updated">Estado de la participación actualizado.</string>
     <string name="snack_event_updated">Evento actualizado</string>
     <string name="snack_event_updated_error_failed_mail">No se pudo enviar la invitación</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
@@ -331,6 +342,7 @@
     <string name="snack_app_link_error">Error al abrir evento</string>
     <string name="snack_app_link_import_error">Autenticación cancelada</string>
     <string name="snack_notification_already_added">La notificación ya fue añadida</string>
+    <string name="snack_opening_ics">Abriendo evento…</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe</string>
     <string name="error_occurrence_does_not_exist">La ocurrencia no existe</string>
@@ -408,6 +420,7 @@
     <string name="calendar_form_update_title">Editar calendario</string>
     <string name="calendar_form_save">Guardar</string>
     <string name="calendar_form_name">Nombre</string>
+    <string name="calendar_form_description">Descripción</string>
     <string name="calendar_form_color">Color del calendario</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones del evento</string>
@@ -417,15 +430,25 @@
     <string name="calendar_form_default_email_value_error">Error al cargar el correo por defecto</string>
     <string name="calendar_form_name_hint">Añadir nombre al calendario</string>
     <string name="calendar_form_name_required_error">Nombre requerido</string>
+    <string name="calendar_form_description_hint">Añadir una descripción del calendario</string>
     <string name="add_calendar_text">Añadir calendario</string>
     <string name="create_calendar_limit_reached">Ha alcanzado el número máximo de calendarios.</string>
+    <string name="create_calendar_limit_reached_title">No se pueden añadir más calendarios</string>
+    <string name="create_calendar_limit_reached_paid_description">Ha alcanzado el número máximo de 25 calendarios disponibles en su plan.\n\nPara añadir un calendario nuevo, elimine uno existente.</string>
     <string name="create_calendar_limit_reached_manage">Gestionar calendarios</string>
+    <string name="create_calendar_limit_reached_free_description">Ha alcanzado el número máximo de 3 calendarios disponibles en su plan.\n\nPara añadir un calendario nuevo, elimine uno existente.</string>
+    <string name="create_calendar_limit_reached_error">Error</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿En verdad desea eliminar este calendario?</string>
     <string name="delete_default_calendar_dialog_message">¿En verdad desea eliminar este calendario? \"%1$s\" será establecido como predeterminado.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
     <string name="delete_calendar_snack_error_password_confirmation">Error al confirmar la contraseña</string>
+    <string name="recreate_calendar_dialog_title">Borrar calendario</string>
+    <string name="recreate_calendar_dialog_message">Esta acción eliminará todos los eventos y usuarios invitados.\n\n¿En verdad desea borrar este calendario?</string>
+    <string name="recreate_calendar_snack_error">Error al borrar el calendario</string>
+    <string name="recreate_calendar_snack_deleted">Calendario borrado</string>
+    <string name="recreate_calendar_snack_clearing">Borrando calendario…</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">No hay calendarios asociados con esta cuenta.</string>
@@ -478,8 +501,10 @@
     <string name="spotlight_v5_dialog_rebranding_description">Presentamos el aspecto renovado de Proton. Muchos servicios, una misión. Bienvenido a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Seleccione su vista preferida en el <b>menú</b>.\n\n• Ajuste la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
-    <string name="spotlight_dialog_search_title">Buscar sin problemas</string>
-    <string name="spotlight_dialog_search_description">Ya puede buscar en sus eventos. Esto descarga en su dispositivo una copia cifrada de los calendarios. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Buscar sin problemas</string>
+    <string name="spotlight_dialog_search_description">Ya puede buscar en sus calendarios. Esto descarga en su dispositivo una copia cifrada de los calendarios. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
+    <string name="spotlight_dialog_import_description">• Importe eventos a su calendario desde archivos en su teléfono.\n\n• Añada reservas de viajes directamente desde Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para iniciar la importación, inicie sesión en Google Calendar y permita el acceso de Proton a sus datos.</string>
@@ -545,6 +570,10 @@
     <string name="import_assistant_authentication_canceled">Autenticación cancelada</string>
     <string name="import_assistant_sign_in_in_progress">Ya hay un proceso de inicio de sesión en curso</string>
     <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
+    <!-- Import events -->
+    <string name="import_event_disclaimer_dialog_title">¿Importar como evento simple?</string>
+    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples <b>sin organizador</b> y detalles de <b>participantes</b>.\n\nPara obtener actualizaciones de eventos y ver participantes, pregunte a los organizadores para invitarle usando su dirección de Proton.</string>
+    <string name="import_event_disclaimer_dialog_positive">Importar</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendario</item>
@@ -643,6 +672,10 @@
         <item quantity="other">%s minutos</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%d/%d caracter</item>
+        <item quantity="other">%d/%d caracteres</item>
+    </plurals>
+    <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%d/%d caracter</item>
         <item quantity="other">%d/%d caracteres</item>
     </plurals>
