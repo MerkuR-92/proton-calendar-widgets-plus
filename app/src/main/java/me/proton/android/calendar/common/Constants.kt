@@ -122,6 +122,7 @@ object FeatureFlag {
     const val WEEK_VIEW = true
     const val DRAG_AND_DROP = false
     const val EDITING_SHARED_CALENDARS = false
+    const val CLEAR_CALENDAR = false
 }
 
 object HttpResponseCode {

@@ -32,6 +32,8 @@ interface CalendarsRepository {
     suspend fun shutdown()
 
     // calendars
+    suspend fun countCalendars(): Int
+
     suspend fun selectCalendarEntity(calendarId: String): CalendarEntity?
 
     suspend fun selectCalendar(calendarId: String): Calendar?

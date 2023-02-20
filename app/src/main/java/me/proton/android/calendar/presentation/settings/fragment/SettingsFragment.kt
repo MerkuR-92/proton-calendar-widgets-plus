@@ -1,6 +1,5 @@
 package me.proton.android.calendar.presentation.settings.fragment
 
-import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -33,7 +32,9 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_cale
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars_list
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
+import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -137,17 +138,17 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         settings_calendars_list_add_layout_press.setOnSingleClickListener {
 
             lifecycleScope.launch {
-                when (calendarViewModel.isUserCalendarLimitReached()) {
-                    CalendarViewModel.UserCalendarLimit.NOT_REACHED -> {
+                when (calendarViewModel.isCalendarLimitReached()) {
+                    CalendarViewModel.CalendarLimit.NOT_REACHED -> {
                         findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
                     }
-                    CalendarViewModel.UserCalendarLimit.FREE_REACHED -> {
+                    CalendarViewModel.CalendarLimit.FREE_REACHED -> {
                         requireContext().displayFreeUserCalendarLimitReached()
                     }
-                    CalendarViewModel.UserCalendarLimit.PAID_REACHED -> {
+                    CalendarViewModel.CalendarLimit.PAID_REACHED -> {
                         requireContext().displayPaidUserCalendarLimitReached()
                     }
-                    CalendarViewModel.UserCalendarLimit.ERROR -> {
+                    CalendarViewModel.CalendarLimit.ERROR -> {
                         view?.displaySnackBar(requireContext().getString(R.string.snack_create_calendar_error))
                     }
                 }
@@ -364,7 +365,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 with (MaterialAlertDialogBuilder(requireContext())) {
                     setTitle(resourceProvider.provideString(R.string.recreate_calendar_dialog_title))
                     setMessage(resourceProvider.provideString(R.string.recreate_calendar_dialog_message))
-                    setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                    setPositiveButton(R.string.action_recreate) { _, _ ->
                         lifecycleScope.launch {
                             val snackBar = view?.displaySnackBar(getString(R.string.recreate_calendar_snack_clearing), Snackbar.LENGTH_INDEFINITE)
                             when (calendarViewModel.recreateCalendar(calendar.id)) {
@@ -381,16 +382,32 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        val userCalendarsCount = calendarViewModel.userCalendars.value?.size ?: 0
-        val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-        deleteLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not() && calendar.isSharedWithMe.not() && userCalendarsCount > 1)
+        lifecycleScope.launch {
+            val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
+            deleteLayout?.visibleOrGone(
+                DELETE_CALENDAR &&
+                        calendar.isSubscribed.not() &&
+                        calendar.isSharedWithMe.not()
+            )
 
-        val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
-        recreateLayout?.visibleOrGone(DELETE_CALENDAR && calendar.isSubscribed.not() && calendar.isSharedWithMe.not() && userCalendarsCount == 1)
+            val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
+            recreateLayout?.visibleOrGone(
+                CLEAR_CALENDAR &&
+                    calendar.isSubscribed.not() &&
+                    calendar.isSharedWithMe.not() &&
+                    calendar.isActive
+            )
 
-        val markAsDefaultLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
-        markAsDefaultLayout?.visibleOrGone(calendar.id != defaultCalendarId && calendar.isActive && calendar.isSubscribed.not() && calendar.isSharedWithMe.not())
+            val markAsDefaultLayout =
+                bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_default)
+            markAsDefaultLayout?.visibleOrGone(
+                calendar.id != defaultCalendarId &&
+                        calendar.isActive &&
+                        calendar.isSubscribed.not() &&
+                        calendar.isSharedWithMe.not()
+            )
 
-        bottomSheetDialog.show()
+            bottomSheetDialog.show()
+        }
     }
 }
