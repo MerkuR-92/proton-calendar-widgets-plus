@@ -112,14 +112,14 @@ val useCaseModule = module {
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
-    factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get()) }
+    factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
-    factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<RecreateCalendarUseCase> { RecreateCalendarUseCase(get(), get(), get(), get(), get()) }
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get()) }
-    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
@@ -136,6 +136,7 @@ val useCaseModule = module {
     factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
     factory<CalendarSettingsChangedUseCase> { CalendarSettingsChangedUseCase(get(), get(), get(), get()) }
     factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get()) }
+    factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
 }
 
 fun coreModule(

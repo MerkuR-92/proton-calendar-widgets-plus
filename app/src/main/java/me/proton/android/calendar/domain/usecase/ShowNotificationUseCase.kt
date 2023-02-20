@@ -19,6 +19,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -36,6 +37,7 @@ class ShowNotificationUseCase @Inject constructor(
     private val transformEventUseCase: TransformEventUseCase,
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val userSettingsRepository: UserSettingsRepository
 ) {
 
@@ -199,10 +201,7 @@ class ShowNotificationUseCase @Inject constructor(
                 database.eventAlarmsDao().deleteAllByEventId(nextEvent.id)
 
                 logger.v("created next alarms for occurrence ${nextEvent.occurrence}:")
-                alarmsForNextOccurrence.forEach {
-                    logger.v("${Instant.ofEpochSecond(it.occurrence)}")
-                    database.eventAlarmsDao().updateOrInsert(it)
-                }
+                safePersistEventAlarmUseCase.invoke(alarmsForNextOccurrence)
             }
 
         }

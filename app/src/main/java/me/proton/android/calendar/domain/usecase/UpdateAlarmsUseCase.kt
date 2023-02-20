@@ -6,6 +6,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
@@ -20,6 +21,7 @@ class UpdateAlarmsUseCase @Inject constructor(
     private val database: AppDatabase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val transformEventUseCase: TransformEventUseCase,
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val json: Json
 ) {
 
@@ -71,11 +73,7 @@ class UpdateAlarmsUseCase @Inject constructor(
                 database.eventAlarmsDao().deleteAllByEventId(it.id)
             }
 
-            database.eventAlarmsDao().updateOrInsert(*upcomingAlarms.toTypedArray())
-
-            upcomingAlarms.forEach {
-                logger.v("upcoming alarm: ${Instant.ofEpochSecond(it.occurrence).atZone(fromZonedDateTime.zone)}")
-            }
+            safePersistEventAlarmUseCase.invoke(upcomingAlarms)
 
         }
 
