@@ -1,5 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
@@ -19,14 +22,17 @@ class IndexEventForSearchUseCase @Inject constructor(
         val entitiesToIndex = eventEntites.filter { eventEntity ->
             !searchDatabase.searchDao().hasEventWithHigherModifyTime(userId, eventEntity.calendarId, eventEntity.id, eventEntity.modifyTime)
         }
+        coroutineScope {
+            val searchEvents = entitiesToIndex.map {
+                async {
+                    transformEventUseCase.execute(it)?.let { event ->
+                        SearchEventEntity.from(userId, event)
+                    }
+                }
+            }.awaitAll().filterNotNull()
 
-        val searchEvents = entitiesToIndex.mapNotNull {
-            transformEventUseCase.execute(it)?.let { event ->
-                SearchEventEntity.from(userId, event)
-            }
+            searchDatabase.searchDao().insertSearchEvents(searchEvents)
         }
-
-        searchDatabase.searchDao().insertSearchEvents(searchEvents)
 
         return UseCase.Result.Success<Unit>()
     }
