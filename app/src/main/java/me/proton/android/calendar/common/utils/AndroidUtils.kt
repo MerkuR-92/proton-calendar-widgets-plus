@@ -1400,4 +1400,46 @@ object AndroidUtils {
         if (this.length <= maxLength) return this
         return this.substring(0, maxLength - 1).plus("…")
     }
+
+    /**
+     * Highlights all the strings passed in [tokens] in entire text of this TextView
+     */
+    fun TextView.highlightSearchTokens(tokens: List<String>) {
+
+        val spannableStringBuilder = SpannableStringBuilder(this.text)
+
+        tokens.filter { it.isNotBlank() }.forEach { token ->
+
+            var startIndex = 0
+
+            while (startIndex < this.text.length) {
+                val start = this.text.indexOf(token, ignoreCase = true, startIndex = startIndex)
+                val end = start + token.length
+
+                if (start > -1) {
+                    startIndex = end
+
+                    // Set text bold style
+                    spannableStringBuilder.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    // Set text highlight color
+                    spannableStringBuilder.setSpan(
+                        ForegroundColorSpan(this.context.getColorFromAttr(R.attr.proton_text_accent)),
+                        start,
+                        end,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                } else {
+                    break
+                }
+            }
+        }
+
+        this.text = spannableStringBuilder
+
+    }
 }

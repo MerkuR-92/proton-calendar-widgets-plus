@@ -25,7 +25,7 @@
         android:ems="10"
         android:hint="@string/add_holidays_country_search_hint"
         android:imeOptions="actionDone"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:scrollHorizontally="false"
         android:maxLength="255"
         android:singleLine="false"
@@ -33,7 +33,18 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/holidays_search_close"/>
+        app:layout_constraintEnd_toStartOf="@+id/holidays_search_clear"/>
+
+    <include
+        android:id="@+id/holidays_search_clear"
+        layout="@layout/toolbar_action_button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintTop_toTopOf="@id/holidays_search_input"
+        app:layout_constraintBottom_toBottomOf="@id/holidays_search_input"
+        app:layout_constraintEnd_toStartOf="@id/holidays_search_close" />
 
     <include
         android:id="@+id/holidays_search_close"
@@ -45,16 +56,6 @@
         android:background="?android:selectableItemBackground"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/holidays_search_separator"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/holidays_search_clear"
-        style="@style/Icon.Form"
-        app:srcCompat="@drawable/ic_proton_cross"
-        android:layout_marginEnd="@dimen/spacing_page"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/holidays_search_input"
-        app:layout_constraintBottom_toBottomOf="@id/holidays_search_input"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <View

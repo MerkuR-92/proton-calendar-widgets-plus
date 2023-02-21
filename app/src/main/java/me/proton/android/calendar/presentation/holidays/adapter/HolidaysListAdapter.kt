@@ -8,19 +8,20 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_calendar_import_mapping.view.item_calendar_import_mapping_icon
-import kotlinx.android.synthetic.main.item_calendar_import_mapping.view.item_calendar_import_mapping_name
 import kotlinx.android.synthetic.main.item_holidays_calendar.view.item_holidays_calendar_country
 import kotlinx.android.synthetic.main.item_holidays_calendar.view.item_holidays_calendar_country_flag
 import kotlinx.android.synthetic.main.item_holidays_calendar.view.item_holidays_calendar_press
 import kotlinx.android.synthetic.main.item_holidays_calendar_header.view.item_holidays_calendar_header_text
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.domain.model.Holidays
 
 class HolidaysListAdapter(
     val listener: (Holidays) -> Unit
 ): ListAdapter<HolidaysListAdapter.HolidaysItem, HolidaysListAdapter.ViewHolder>(HolidaysDiffCallback()) {
+
+    private var searchQuery: String = ""
 
     override fun getItemViewType(position: Int): Int = currentList[position].type.ordinal
 
@@ -52,6 +53,12 @@ class HolidaysListAdapter(
         }
     }
 
+    fun setSearchQuery(searchQuery: String) {
+        val queryChanged = this.searchQuery != searchQuery
+        this.searchQuery = searchQuery
+        if (queryChanged) notifyDataSetChanged()
+    }
+
     enum class HolidaysItemType {
         Header,
         Value
@@ -73,6 +80,9 @@ class HolidaysListAdapter(
             val holidays = value.holidays
 
             holidaysCountryName.text = holidays.countryName
+            if (searchQuery.isNotBlank()) {
+                holidaysCountryName.highlightSearchTokens(searchQuery.split(" ", ignoreCase = true))
+            }
 
             holidaysFlag.setImageResource(holidays.flagDrawable)
 
