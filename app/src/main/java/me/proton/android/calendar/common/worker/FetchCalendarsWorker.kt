@@ -89,7 +89,6 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
         if (userId != null) {
             val userValueStore = valueStoreProvider.provideValueStore(userId.id)
 
-            startInstant = Instant.now()
             val calendars = calendarsRepository.selectUserCalendars(userId.id)
 
             // determine how many Events there are in each Calendar
@@ -109,6 +108,8 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
                 } else return Result.retry()
 
             }
+
+            startInstant = Instant.now()
 
             try {
                 coroutineScope {
