@@ -2,18 +2,30 @@ package me.proton.android.calendar.data.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.api.*
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 import java.time.Instant
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface CalendarsApiService : BaseRetrofitApi {
 
@@ -182,7 +194,12 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         )
     }.toApiResponse()
 
-    override suspend fun getEventsForExport(userId: UserId, calendarId: String, pageSize: Int, beginId: String?): ApiResponse<EventsExportApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+    override suspend fun getEventsForExport(
+        userId: UserId,
+        calendarId: String,
+        pageSize: Int,
+        beginId: String?
+    ): ApiResponse<EventsExportApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getEventsForExport(
             calendarId,
             pageSize,
@@ -190,11 +207,12 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         )
     }.toApiResponse()
 
-    override suspend fun getEventsCount(userId: UserId, calendarId: String): ApiResponse<EventsCountApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-        getEventsCount(
-            calendarId
-        )
-    }.toApiResponse()
+    override suspend fun getEventsCount(userId: UserId, calendarId: String): ApiResponse<EventsCountApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getEventsCount(
+                calendarId
+            )
+        }.toApiResponse()
 
     override suspend fun getEvent(
         userId: UserId,

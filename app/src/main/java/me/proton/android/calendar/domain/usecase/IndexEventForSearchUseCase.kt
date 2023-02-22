@@ -15,11 +15,11 @@ class IndexEventForSearchUseCase @Inject constructor(
     private val transformEventUseCase: TransformEventUseCase
 ) {
 
-    suspend fun execute(userId: String, eventEntites: List<EventEntity>): UseCase.Result {
+    suspend fun execute(userId: String, eventEntities: List<EventEntity>): UseCase.Result {
 
         // only index Entities that are newer than what we already have in DB
         //  this saves us unnecessary decryption
-        val entitiesToIndex = eventEntites.filter { eventEntity ->
+        val entitiesToIndex = eventEntities.filter { eventEntity ->
             !searchDatabase.searchDao().hasEventWithHigherModifyTime(userId, eventEntity.calendarId, eventEntity.id, eventEntity.modifyTime)
         }
         coroutineScope {

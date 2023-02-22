@@ -160,8 +160,6 @@ interface ICalUtils {
      */
     fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent>
 
-    fun List<Event>.filterOutEventDuplicatesInSubscribedCalendars(): List<Event>
-
     /**
      * Returns event ZonedDateTime on Date format
      * Converts it to default timezone when event is all day

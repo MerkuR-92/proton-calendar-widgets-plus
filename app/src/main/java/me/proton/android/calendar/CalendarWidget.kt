@@ -18,7 +18,6 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import biweekly.parameter.ParticipationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -284,7 +283,7 @@ internal data class WidgetEvent(
     val subheaderContent: String,
     val isCancelledOrDeclined: Boolean,
     val needsAction: Boolean,
-    val isEncrypted: Boolean,
+    val failedToDecrypt: Boolean,
     // LocalDate that this Event spans, not necessarily the same as dateStart
     val happensOn: LocalDate,
     val showDateColumn: Boolean,
@@ -375,7 +374,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             calendarColor = this.calendar.color,
             isCancelledOrDeclined = this.decryptionStatus == Event.DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            isEncrypted = this.decryptionStatus == Event.DecryptionStatus.FAILURE
+            failedToDecrypt = this.decryptionStatus == Event.DecryptionStatus.FAILURE
         )
     }
 
@@ -430,14 +429,14 @@ internal class CalendarWidgetRemoteViewsFactory(
         remoteView.setTextViewText(R.id.tv_event_subheader, event.subheaderContent)
 
         // clear summary and show views for event that failed decryption
-        if (event.isEncrypted) remoteView.setTextViewText(R.id.tv_event_header, "")
+        if (event.failedToDecrypt) remoteView.setTextViewText(R.id.tv_event_header, "")
         remoteView.setViewVisibility(
             R.id.decryption_error_view,
-            if (event.isEncrypted) View.VISIBLE else View.INVISIBLE
+            if (event.failedToDecrypt) View.VISIBLE else View.INVISIBLE
         )
         remoteView.setViewVisibility(
             R.id.decryption_error_icon,
-            if (event.isEncrypted) View.VISIBLE else View.INVISIBLE
+            if (event.failedToDecrypt) View.VISIBLE else View.INVISIBLE
         )
 
         // show or hide "no upcoming events today"
@@ -475,7 +474,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
         // combine `data` property with the Intent Template, click on Event
         remoteView.setOnClickFillInIntent(R.id.rl_event_container, Intent().apply {
-            if (event.isEncrypted) { // instead of opening event, go to day
+            if (event.failedToDecrypt) { // instead of opening event, go to day
                 data = Navigation.Deeplink.toMonth(event.happensOn)
                 action = MainViewModel.INTENT_ACTION_SHOW_DAY
             } else {

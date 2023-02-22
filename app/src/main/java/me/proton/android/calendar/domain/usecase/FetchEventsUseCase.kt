@@ -61,7 +61,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         val results = coroutineScope {
             timeWindows.map { timeWindow ->
                 async {
-                    fetchEvents(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId)
+                    fetchInDateRange(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId)
                 }
             }.awaitAll()
         }
@@ -79,7 +79,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         }
     }
 
-    private suspend fun fetchEvents(
+    private suspend fun fetchInDateRange(
         userId: UserId,
         calendarIds: List<String>,
         fromDate: LocalDate,
@@ -183,10 +183,14 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     }
 
     /**
+     * Fetch events sequentially for the purpose of exporting all Events in a Calendar. They are
+     * returned in batches always in order, so we need to supply [lastKnownEventId] to get the next
+     * batch.
+     *
      * @param lastKnownEventId in case we want to resume export starting after this Event ID
      * @return EventEntities in batches, consume with one worker to maintain the order!
      */
-    suspend fun execute(
+    suspend fun fetchForExport(
         userId: UserId,
         calendarId: String,
         lastKnownEventId: String?,

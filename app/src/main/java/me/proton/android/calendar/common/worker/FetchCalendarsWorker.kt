@@ -3,29 +3,23 @@ package me.proton.android.calendar.common.worker
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.SearchEventEntity
-import me.proton.android.calendar.data.joinToCalendars
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueSet
@@ -36,12 +30,10 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase.Companion.NOTIFICATION_ID_FETCH_CALENDARS_WORKER
-import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import org.koin.core.KoinComponent
 import org.koin.core.inject
-import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
@@ -78,7 +70,7 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
                 applicationContext.getString(
                     R.string.search_downloading_calendars,
                     applicationContext.getString(R.string.search_downloading_time_remaining_unknown)
-                ), "", 0
+                ), 0
             )
         )
 
@@ -144,14 +136,15 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
         coroutineScope: CoroutineScope
     ): Result {
 
-        coroutineScope.async {
+        // will be empty the very first time, or will contain the Event ID we should start fetching from this time
 
-            accountManager.getPrimaryUserId().filterNotNull().first()
+        // how many events were downloaded, including the ones from previous runs
+        withContext(coroutineScope.coroutineContext) {
 
             // will be empty the very first time, or will contain the Event ID we should start fetching from this time
-            var lastEventId: String? =
+            val lastEventId: String? =
                 userValueStore.getStringFromSet(ValueSet.FETCHING_CALENDAR_LAST_EVENT_ID, calendarMetadata.calendarId)
-            var totalDownloadedCount: Long? = userValueStore.getLongFromSet(
+            val totalDownloadedCount: Long? = userValueStore.getLongFromSet(
                 ValueSet.FETCHING_CALENDAR_TOTAL_DOWNLOADED_COUNT,
                 calendarMetadata.calendarId
             )
@@ -163,7 +156,7 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
 
             val eventEntityBatches =
-                fetchEventsUseCase.execute(userId, calendarMetadata.calendarId, lastEventId, coroutineScope)
+                fetchEventsUseCase.fetchForExport(userId, calendarMetadata.calendarId, lastEventId, coroutineScope)
 
             coroutineScope.launch {
                 for (eventEntityBatch in eventEntityBatches) {
@@ -173,7 +166,6 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
                     saveProgressSoFar(
                         userId.id,
                         userValueStore,
-                        searchDatabase,
                         calendarMetadata.calendarId,
                         eventEntityBatch.lastOrNull()?.id,
                         allEventCount,
@@ -184,7 +176,7 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
                 }
             }
 
-        }.await()
+        }
 
         return Result.success()
     }
@@ -250,7 +242,6 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
         setForegroundAsync(
             createForegroundInfo(
                 applicationContext.getString(R.string.search_downloading_calendars, formattedTimeRemaining),
-                progressText,
                 progressPercentage
             )
         )
@@ -271,7 +262,6 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
     private suspend fun saveProgressSoFar(
         userId: String,
         userValueStore: ValueStore,
-        searchDatabase: SearchDatabase,
         calendarId: String,
         lastEventId: String?,
         totalDownloadedCount: Long,
@@ -288,14 +278,14 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
             userValueStore.putLongInSet(
                 ValueSet.FETCHING_CALENDAR_TOTAL_DOWNLOADED_COUNT,
                 calendarId,
-                totalDownloadedCount.toLong()
+                totalDownloadedCount
             )
         }
 
         return true
     }
 
-    private fun createForegroundInfo(title: String, progressText: String, progressPercent: Int): ForegroundInfo {
+    private fun createForegroundInfo(title: String, progressPercent: Int): ForegroundInfo {
         // PendingIntent to cancel the worker
         val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(getId())
 

@@ -131,11 +131,11 @@ interface CalendarsRepository {
         searchTerm: String
     ): Flow<GetEventsResult<Event>>
 
-    suspend fun deleteSearchEvents(userId: String)
+    suspend fun deleteAllSearchEvents(userId: String)
 
-    suspend fun deleteSearchEvents(userId: String, calendarId: String)
+    suspend fun deleteAllSearchEventsInCalendar(userId: String, calendarId: String)
 
-    suspend fun deleteSearchEvents(userId: String, calendarId: String, eventIds: List<String>)
+    suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>)
 
     /**
      * @return SkeletonEvents with correct Calendar Color.

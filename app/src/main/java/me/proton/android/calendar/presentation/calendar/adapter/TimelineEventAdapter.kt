@@ -118,9 +118,9 @@ class TimelineEventAdapter(
                 }
 
                 // clear summary and show views for event that failed decryption
-                if (event.isEncrypted) tv_event_header.text = ""
-                decryption_error_view.visibleOrInvisible(event.isEncrypted)
-                decryption_error_icon.visibleOrInvisible(event.isEncrypted)
+                if (event.failedToDecrypt) tv_event_header.text = ""
+                decryption_error_view.visibleOrInvisible(event.failedToDecrypt)
+                decryption_error_icon.visibleOrInvisible(event.failedToDecrypt)
 
                 // add spacing after last event in a day
                 v_event_spacing.visibleOrGone(event.showBottomSpacing)
@@ -156,7 +156,7 @@ class TimelineEventAdapter(
         val location: String,
         val isCancelledOrDeclined: Boolean,
         val needsAction: Boolean,
-        val isEncrypted: Boolean,
+        val failedToDecrypt: Boolean,
         // LocalDate that this Event spans, not necessarily the same as dateStart
         val happensOn: LocalDate,
         val showDateColumn: Boolean,
@@ -180,12 +180,9 @@ fun List<TimelineEventAdapter.TimelineItem>.findIndexToScrollTo(zoneId: ZoneId):
     val today = LocalDate.now(zoneId)
 
     val binaryIndex = this.binarySearchBy(0) {
-        if (it is TimelineEventAdapter.TimelineItem.Event) {
-            ChronoUnit.DAYS.between(today, it.event.happensOn).toInt()
-        } else if (it is TimelineEventAdapter.TimelineItem.Header) {
-            ChronoUnit.DAYS.between(today, LocalDate.of(it.year, 1, 1)).toInt()
-        } else {
-            Int.MAX_VALUE
+        when (it) {
+            is TimelineEventAdapter.TimelineItem.Event -> ChronoUnit.DAYS.between(today, it.event.happensOn).toInt()
+            is TimelineEventAdapter.TimelineItem.Header -> ChronoUnit.DAYS.between(today, LocalDate.of(it.year, 1, 1)).toInt()
         }
     }
     val nonNegativeBinaryIndex = if (binaryIndex < 0) {

@@ -611,7 +611,7 @@ data class Event private constructor(
             calendarColor = this.calendar.color,
             isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            isEncrypted = this.decryptionStatus == DecryptionStatus.FAILURE,
+            failedToDecrypt = this.decryptionStatus == DecryptionStatus.FAILURE,
             searchTerm = searchTerm
         )
     }

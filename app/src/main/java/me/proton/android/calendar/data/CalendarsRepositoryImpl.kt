@@ -431,7 +431,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarsDao().deleteById(id)
 
         database.calendarsDao().selectCalendarUserId(id)?.let {
-            deleteSearchEvents(it, id)
+            deleteAllSearchEventsInCalendar(it, id)
         }
     }
 
@@ -743,16 +743,16 @@ class CalendarsRepositoryImpl @Inject constructor(
             emit(CalendarsRepository.GetEventsResult.Exception(it))
         }.distinctUntilChanged().cancellable()
 
-    override suspend fun deleteSearchEvents(userId: String) {
-        searchDatabase.searchDao().delete(userId)
+    override suspend fun deleteAllSearchEvents(userId: String) {
+        searchDatabase.searchDao().deleteAll(userId)
     }
 
-    override suspend fun deleteSearchEvents(userId: String, calendarId: String) {
-        searchDatabase.searchDao().delete(userId, calendarId)
+    override suspend fun deleteAllSearchEventsInCalendar(userId: String, calendarId: String) {
+        searchDatabase.searchDao().deleteAllInCalendar(userId, calendarId)
     }
 
-    override suspend fun deleteSearchEvents(userId: String, calendarId: String, eventIds: List<String>) {
-        searchDatabase.searchDao().delete(userId, calendarId, eventIds)
+    override suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>) {
+        searchDatabase.searchDao().deleteSearchEventsForEvents(userId, calendarId, eventIds)
     }
 
     private fun createSkeletonsFlow(
@@ -1112,7 +1112,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.eventsDao().deleteByIds(ids)
 
         database.calendarsDao().selectCalendarUserId(calendarId)?.let {
-            deleteSearchEvents(it, calendarId, ids)
+            deleteSearchEventsForEvents(it, calendarId, ids)
         }
     }
 
@@ -1120,7 +1120,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.eventsDao().deleteAll(calendarId)
 
         database.calendarsDao().selectCalendarUserId(calendarId)?.let {
-            deleteSearchEvents(it, calendarId)
+            deleteAllSearchEventsInCalendar(it, calendarId)
         }
     }
 

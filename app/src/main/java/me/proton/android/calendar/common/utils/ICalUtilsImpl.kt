@@ -657,10 +657,6 @@ object ICalUtilsImpl : ICalUtils {
         return result
     }
 
-    override fun List<Event>.filterOutEventDuplicatesInSubscribedCalendars(): List<Event> {
-        TODO("Not yet implemented")
-    }
-
     /**
      * Returns event ZonedDateTime on Date format
      * Converts it to default timezone when event is all day

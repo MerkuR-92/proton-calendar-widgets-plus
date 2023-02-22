@@ -26,13 +26,13 @@ abstract class SearchDao {
     abstract suspend fun deleteAllSearchEvents(): Int
 
     @Query("DELETE FROM search_events WHERE user_id = :userId")
-    abstract suspend fun delete(userId: String): Int
+    abstract suspend fun deleteAll(userId: String): Int
 
     @Query("DELETE FROM search_events WHERE user_id = :userId AND calendar_id = :calendarId")
-    abstract suspend fun delete(userId: String, calendarId: String): Int
+    abstract suspend fun deleteAllInCalendar(userId: String, calendarId: String): Int
 
     @Query("DELETE FROM search_events WHERE user_id = :userId AND calendar_id = :calendarId AND event_id IN (:eventIds)")
-    abstract suspend fun delete(userId: String, calendarId: String, eventIds: List<String>): Int
+    abstract suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>): Int
 
     @Query("SELECT EXISTS(SELECT * FROM search_events WHERE user_id = :userId AND event_id = :eventId AND calendar_id = :calendarId AND modify_time > :modifyTime)")
     abstract suspend fun hasEventWithHigherModifyTime(userId: String, calendarId: String, eventId: String, modifyTime: Long): Boolean

@@ -164,7 +164,7 @@ class SearchViewModel @Inject constructor(
                 }
 
                 // delete all data from SearchDB
-                calendarsRepository.deleteSearchEvents(it.id)
+                calendarsRepository.deleteAllSearchEvents(it.id)
             }
         }
     }

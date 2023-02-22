@@ -16,7 +16,6 @@ object Navigation {
                         else "")
         }
         fun toLogin() = Uri.parse("proton-calendar://protonmail.com/login")
-        fun toSearch() = Uri.parse("proton-calendar://protonmail.com/search")
         fun toEventDetails(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
         fun toMainActivityWithEventId(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/main?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
         fun toEventEdit(eventId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/edit?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")

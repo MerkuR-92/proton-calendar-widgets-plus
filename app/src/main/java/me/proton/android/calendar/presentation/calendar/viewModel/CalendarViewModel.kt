@@ -399,8 +399,6 @@ class CalendarViewModel @Inject constructor(
                     val timelineEvents = mutableListOf<TimelineEventAdapter.TimelineEvent>()
                     expandedEvents.explodeDayByDay(fromDate, toDate, timeZoneId).toSortedMap().forEach { entry ->
 
-                        //logger.e("expanded after explode: ${entry.key} ->  ${entry.value.map { it.occurrence?.startDateTime }}")
-
                         yield() // support coroutine cancellation
 
                         val sortedEvents = entry.value.sortedBy {
@@ -443,12 +441,6 @@ class CalendarViewModel @Inject constructor(
 
         }.flowOn(Dispatchers.IO).cancellable()
 
-    }
-
-    fun eventsLiveData(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<List<Event>?> {
-        return liveData<List<Event>?> {
-            emitSource(calendarsRepository.eventsFlow(fromDate, toDate, timeZoneId).asLiveData(Dispatchers.Default))
-        }
     }
 
     fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
