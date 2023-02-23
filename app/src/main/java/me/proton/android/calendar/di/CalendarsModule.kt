@@ -45,10 +45,10 @@ object CalendarsModule {
 
     @Provides
     fun provideIndexEventForSearchUseCase(
-        logger: Logger,
+        valueStoreProvider: ValueStoreProvider,
         searchDatabase: SearchDatabase,
         transformEventUseCase: TransformEventUseCase
-    ): IndexEventForSearchUseCase = IndexEventForSearchUseCase(logger, searchDatabase, transformEventUseCase)
+    ): IndexEventForSearchUseCase = IndexEventForSearchUseCase(valueStoreProvider, searchDatabase, transformEventUseCase)
 }
 
 @Module

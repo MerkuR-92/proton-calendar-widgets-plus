@@ -6,16 +6,20 @@ import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
-import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueKey
+import me.proton.android.calendar.domain.ValueStoreProvider
 import javax.inject.Inject
 
 class IndexEventForSearchUseCase @Inject constructor(
-    private val logger: Logger,
+    private val valueStoreProvider: ValueStoreProvider,
     private val searchDatabase: SearchDatabase,
     private val transformEventUseCase: TransformEventUseCase
 ) {
 
     suspend fun execute(userId: String, eventEntities: List<EventEntity>): UseCase.Result {
+
+        // early return if indexing is turned off
+        if ((valueStoreProvider.provideValueStore(userId).getBoolean(ValueKey.SEARCH_ENABLED) == true).not()) return UseCase.Result.Success<Unit>()
 
         // only index Entities that are newer than what we already have in DB
         //  this saves us unnecessary decryption
