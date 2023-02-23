@@ -18,32 +18,22 @@ import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvid
 import me.proton.android.calendar.common.repositoryModule
 import me.proton.android.calendar.common.useCaseModule
 import me.proton.android.calendar.common.utils.CustomLocale
-import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.common.viewModelModule
+import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.api.EmailMessageRepository
-import me.proton.android.calendar.domain.usecase.GenerateEmailPackageUseCase
-import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.domain.entity.Product
-import me.proton.core.humanverification.domain.HumanVerificationManager
-import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
-import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
-import me.proton.core.network.domain.NetworkManager
-import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
@@ -60,7 +50,10 @@ import javax.inject.Inject
 class ProtonCalendarApplication : Application() {
 
     @Inject
-    lateinit var product: Product
+    lateinit var logger: Logger
+
+    @Inject
+    lateinit var appDatabase: AppDatabase
 
     @Inject
     lateinit var apiProvider: ApiProvider
@@ -84,43 +77,10 @@ class ProtonCalendarApplication : Application() {
     lateinit var userSettingsRepository: UserSettingsRepository
 
     @Inject
-    lateinit var authOrchestrator: AuthOrchestrator
-
-    @Inject
-    lateinit var missingScopeListener: MissingScopeListener
-
-    @Inject
-    lateinit var humanVerificationManager: HumanVerificationManager
-
-    @Inject
-    lateinit var humanVerificationOrchestrator: HumanVerificationOrchestrator
-
-    @Inject
-    lateinit var keyStoreCrypto: KeyStoreCrypto
-
-    @Inject
-    lateinit var getRecipientPublicAddresses: GetRecipientPublicAddresses
-
-    @Inject
-    lateinit var publicAddressRepository: PublicAddressRepository
-
-    @Inject
     lateinit var contactEmailsRepository: ContactRepository
 
     @Inject
-    lateinit var cryptoContext: CryptoContext
-
-    @Inject
-    lateinit var generateEmailPackageUseCase: GenerateEmailPackageUseCase
-
-    @Inject
-    lateinit var emailMessageRepository: EmailMessageRepository
-
-    @Inject
-    lateinit var sendEmailDirect: SendEmailDirect
-
-    @Inject
-    lateinit var networkManager: NetworkManager
+    lateinit var getRecipientPublicAddresses: GetRecipientPublicAddresses
 
     @Inject
     lateinit var defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
@@ -129,22 +89,20 @@ class ProtonCalendarApplication : Application() {
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
     @Inject
-    lateinit var logger: Logger
-
-    @Inject
-    lateinit var appDatabase: AppDatabase
-
-    @Inject
     lateinit var calendarsRepository: CalendarsRepository
-
-    @Inject
-    lateinit var eventDecryptor: EventDecryptor
 
     @Inject
     lateinit var crypto: Crypto
 
+    @Inject
+    lateinit var cryptoContext: CryptoContext
+
+    @Inject
+    lateinit var eventDecryptor: EventDecryptor
+
     override fun onCreate() {
         super.onCreate()
+        MainInitializer.init(this)
 
         startKoin {
             androidContext(this@ProtonCalendarApplication)
@@ -155,30 +113,19 @@ class ProtonCalendarApplication : Application() {
                 networkModule,
                 useCaseModule,
                 coreModule(
-                    product,
+                    appDatabase,
                     apiProvider,
+                    crypto,
+                    cryptoContext,
+                    eventDecryptor,
                     accountManager,
-                    accountStateHandler,
-                    authOrchestrator,
-                    humanVerificationManager,
-                    humanVerificationOrchestrator,
                     userManager,
                     userRepository,
                     userAddressRepository,
-                    keyStoreCrypto,
-                    getRecipientPublicAddresses,
-                    contactEmailsRepository,
-                    cryptoContext,
-                    sendEmailDirect,
-                    publicAddressRepository,
-                    networkManager,
-                    defaultSharedPreferencesProvider,
-                    appDatabase,
                     calendarsRepository,
+                    contactEmailsRepository,
                     userSettingsRepository,
-                    missingScopeListener,
-                    eventDecryptor,
-                    crypto
+                    getRecipientPublicAddresses
                 )
             )
         }

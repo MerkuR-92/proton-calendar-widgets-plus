@@ -219,6 +219,7 @@ dependencies {
     implementation "me.proton.core:mail-message:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:mail-settings:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:network:${rootProject.ext.version.proton_core}"
+    implementation "me.proton.core:observability:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:payment:${rootProject.ext.version.proton_core}"
     // implementation "me.proton.core:payment-iap:${rootProject.ext.version.proton_core}"
     implementation "me.proton.core:plan:${rootProject.ext.version.proton_core}"

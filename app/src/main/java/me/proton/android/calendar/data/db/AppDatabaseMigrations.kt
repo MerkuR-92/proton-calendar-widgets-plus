@@ -47,6 +47,7 @@ import me.proton.core.key.data.entity.KeySaltEntity
 import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
+import me.proton.core.observability.data.db.ObservabilityDatabase
 import me.proton.core.payment.data.local.db.PaymentDatabase
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserDatabase
@@ -394,6 +395,12 @@ object AppDatabaseMigrations {
     val MIGRATION_47_48 = object : Migration(47, 48) {
         override fun migrate(database: SupportSQLiteDatabase) {
             AccountDatabase.MIGRATION_5.migrate(database)
+        }
+    }
+
+    val MIGRATION_48_49 = object : Migration(48, 49) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            ObservabilityDatabase.MIGRATION_0.migrate(database)
         }
     }
 }

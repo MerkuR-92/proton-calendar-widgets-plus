@@ -5,37 +5,86 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.logger.TimberLogger
-import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.common.provider.SharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.api.AddressesApiImpl
+import me.proton.android.calendar.data.api.AuthenticationApiImpl
+import me.proton.android.calendar.data.api.BugReportsApiImpl
+import me.proton.android.calendar.data.api.CalendarsApiImpl
+import me.proton.android.calendar.data.api.FeedbackApiImpl
+import me.proton.android.calendar.data.api.ImporterApiImpl
+import me.proton.android.calendar.data.api.KeysApiImpl
+import me.proton.android.calendar.data.api.MailSettingsApiImpl
+import me.proton.android.calendar.data.api.ServerEventsApiImpl
+import me.proton.android.calendar.data.api.SettingsApiImpl
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
-import me.proton.android.calendar.domain.*
-import me.proton.android.calendar.domain.api.*
-import me.proton.android.calendar.domain.usecase.*
-import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.EventDecryptor
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.api.AddressesApi
+import me.proton.android.calendar.domain.api.AuthenticationApi
+import me.proton.android.calendar.domain.api.BugReportsApi
+import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.FeedbackApi
+import me.proton.android.calendar.domain.api.ImporterApi
+import me.proton.android.calendar.domain.api.KeysApi
+import me.proton.android.calendar.domain.api.MailSettingsApi
+import me.proton.android.calendar.domain.api.ServerEventsApi
+import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.android.calendar.domain.usecase.BootstrapAllCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
+import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
+import me.proton.android.calendar.domain.usecase.CalendarSettingsChangedUseCase
+import me.proton.android.calendar.domain.usecase.CalendarUserSettingsChangedUseCase
+import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
+import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
+import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
+import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
+import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
+import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
+import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
+import me.proton.android.calendar.domain.usecase.KeySetupUseCase
+import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
+import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
+import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
+import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
+import me.proton.android.calendar.domain.usecase.SendBugReportUseCase
+import me.proton.android.calendar.domain.usecase.SendEmailUseCase
+import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
+import me.proton.android.calendar.domain.usecase.UpdateUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
+import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
-import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.keystore.KeyStoreCrypto
-import me.proton.core.domain.entity.Product
-import me.proton.core.humanverification.domain.HumanVerificationManager
-import me.proton.core.humanverification.presentation.HumanVerificationOrchestrator
-import me.proton.core.key.domain.repository.PublicAddressRepository
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
-import me.proton.core.network.domain.NetworkManager
-import me.proton.core.network.domain.scopes.MissingScopeListener
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -137,59 +186,36 @@ val useCaseModule = module {
     factory<CalendarSettingsChangedUseCase> { CalendarSettingsChangedUseCase(get(), get(), get(), get()) }
     factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get()) }
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
+    factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(
-    product: Product,
+    appDatabase: AppDatabase,
     apiProvider: ApiProvider,
+    crypto: Crypto,
+    cryptoContext: CryptoContext,
+    eventDecryptor: EventDecryptor,
     accountManager: AccountManager,
-    accountStateHandler: AccountStateHandler,
-    authOrchestrator: AuthOrchestrator,
-    humanVerificationManager: HumanVerificationManager,
-    humanVerificationOrchestrator: HumanVerificationOrchestrator,
     userManager: UserManager,
     userRepository: UserRepository,
     userAddressRepository: UserAddressRepository,
-    keyStoreCrypto: KeyStoreCrypto,
-    getRecipientPublicAddresses: GetRecipientPublicAddresses,
-    contactEmailsRepository: ContactRepository,
-    cryptoContext: CryptoContext,
-    sendEmailDirect: SendEmailDirect,
-    publicAddressRepository: PublicAddressRepository,
-    networkManager: NetworkManager,
-    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
-    appDatabase: AppDatabase,
     calendarsRepository: CalendarsRepository,
+    contactEmailsRepository: ContactRepository,
     userSettingsRepository: UserSettingsRepository,
-    missingScopeListener: MissingScopeListener,
-    eventDecryptor: EventDecryptor,
-    crypto: Crypto
+    getRecipientPublicAddresses: GetRecipientPublicAddresses,
 ) = module {
-    single<Product> { product }
-    // TODO: Remove when all *ApiImpl will be provided by a Dagger module.
+    single<AppDatabase> { appDatabase }
     single<ApiProvider> { apiProvider }
-    // TODO: Remove when all *ViewModel/*UseCase will be provided by a Dagger module.
+    single<Crypto> { crypto }
+    single<CryptoContext> { cryptoContext }
     single<AccountManager> { accountManager }
-    single<AccountStateHandler> { accountStateHandler }
-    // TODO: Remove when AccountViewModel will be provided by a Dagger module.
-    factory<AuthOrchestrator> { authOrchestrator }
-    single<HumanVerificationManager> { humanVerificationManager }
-    factory<HumanVerificationOrchestrator> { humanVerificationOrchestrator }
     single<UserManager> { userManager }
     single<UserRepository> { userRepository }
     single<UserAddressRepository> { userAddressRepository }
-    single<KeyStoreCrypto> { keyStoreCrypto }
-    single<CryptoContext> { cryptoContext }
-    factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), contactEmailsRepository, get(), get(), get(), getRecipientPublicAddresses) }
-    factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), contactEmailsRepository, get(), get(), getRecipientPublicAddresses) }
-    factory<SendEmailDirect> { sendEmailDirect /*SendEmailDirect(get(), get(), get(), get())*/ }
-    single<PublicAddressRepository> { publicAddressRepository }
-    single<NetworkManager> { networkManager }
-    single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
-    single<AppDatabase> { appDatabase }
     single<CalendarsRepository> { calendarsRepository }
+    single<ContactRepository> { contactEmailsRepository }
     single<UserSettingsRepository> { userSettingsRepository }
-    factory<MissingScopeListener> { missingScopeListener }
+    single<GetRecipientPublicAddresses> { getRecipientPublicAddresses }
     single<EventDecryptor> { eventDecryptor }
-    single<Crypto> { crypto }
 }

@@ -6,7 +6,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.eventmanager.CalendarEventManagerStarter
 
 class CalendarEventManagerInitializer : Initializer<Unit> {
