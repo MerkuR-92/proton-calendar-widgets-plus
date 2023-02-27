@@ -610,8 +610,8 @@ Deselecteer minstens %1$d agenda</item>
 Deselecteer minstens %1$d agenda\'s</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020or\n • Tenminste %1$d agenda samenvoegen met bestaande Proton agenda\'s.</item>
-        <item quantity="other">\u0020or\n • Tenminste %1$d agenda\'s samenvoegen met bestaande Proton agenda\'s.</item>
+        <item quantity="one">\u0020of\n • Tenminste %1$d agenda samenvoegen met bestaande Proton agenda\'s.</item>
+        <item quantity="other">\u0020of\n • Tenminste %1$d agenda\'s samenvoegen met bestaande Proton agenda\'s.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">seconde</item>

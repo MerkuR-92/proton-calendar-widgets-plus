@@ -168,7 +168,6 @@
     <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
     <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
     <string name="search_spotlight_activation_snack">Calendar search activated</string>
-
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Add notification</string>
     <string name="event_text_description">Description</string>

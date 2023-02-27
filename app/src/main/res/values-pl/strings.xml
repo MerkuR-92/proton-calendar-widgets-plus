@@ -207,7 +207,7 @@
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">do %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">po</string>
     <string name="event_recurring_edit_this">To wydarzenie</string>
-    <string name="event_recurring_edit_this_and_future">To i przyszłe wydarzenia</string>
+    <string name="event_recurring_edit_this_and_future">To i kolejne wydarzenia</string>
     <string name="event_recurring_edit_all_events">Wszystkie wydarzenia</string>
     <string name="event_discard_changes_title">Czy chcesz odrzucić zmiany?</string>
     <string name="event_discard_changes_description">Stracisz wszystkie niezapisane zmiany.</string>
