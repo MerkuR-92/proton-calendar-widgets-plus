@@ -1,10 +1,10 @@
 package me.proton.android.calendar.domain.model
 
-// TODO Temporary object for Holidays, to update / remove
+import biweekly.component.VAlarm
+import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
+
 data class Holidays(
-    val id: String,
-    val countryName: String,
-    val timeZoneIds: List<String>,
+    val country: String,
     val flagDrawable: Int
 ) {
 }

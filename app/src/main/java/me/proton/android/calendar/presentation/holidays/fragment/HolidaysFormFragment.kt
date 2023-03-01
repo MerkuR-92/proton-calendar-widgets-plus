@@ -30,6 +30,8 @@ import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_f
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_icon
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_list
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_press
+import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_language_press
+import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_language_value
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
@@ -47,9 +49,11 @@ import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewMo
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
+import me.proton.core.presentation.utils.currentLocale
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
@@ -153,6 +157,8 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        holidaysViewModel.resetValues()
+
         calendarId = navigationArguments.calendarId
 
         lifecycleScope.launch {
@@ -169,7 +175,8 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                 // Init form for new calendar
                 holidaysViewModel.initCreateHolidays(
                     calendarColors[(0..calendarColors.lastIndex).random()],
-                    ZoneId.systemDefault().id
+                    ZoneId.systemDefault().id,
+                    requireContext().resources.configuration.currentLocale().language.lowercase()
                 )
             }
         }
@@ -189,6 +196,12 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                 // Hide disclaimer based on location
                 holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
             }
+        }
+
+        holidaysViewModel.language.observe(viewLifecycleOwner) { language ->
+            if (language.isNullOrEmpty()) return@observe
+            val locale = Locale.forLanguageTag(language)
+            holidays_calendar_form_language_value.text = locale.getDisplayLanguage(locale).replaceFirstChar { it.uppercase() }
         }
 
         holidaysViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
@@ -290,6 +303,27 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
         // Country
         holidays_calendar_form_country_value_press.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_holidays_form_to_nav_holidays_search)
+        }
+
+        // Calendar language
+        holidays_calendar_form_language_press.setOnSingleClickListener {
+            val languageTags = holidaysViewModel.getLanguages()
+            val languages = arrayListOf<Pair<String, String>>()
+            // Create a list of Pair with language tags and display language
+            languageTags.forEach {
+                val locale = Locale.forLanguageTag(it)
+                languages.add(Pair(it, locale.getDisplayLanguage(locale).replaceFirstChar { it.uppercase() }))
+            }
+            AndroidUtils.displayPickerDialog(
+                requireContext(),
+                null,
+                languages.map { it.second }.toTypedArray(),
+                holidaysViewModel.language.value?.let { languageTag ->
+                    languages.indexOf(languages.find { it.first == languageTag })
+                } ?: 0
+            ) {
+                holidaysViewModel.handleLanguage(languages[it].first)
+            }
         }
 
         // Calendar color

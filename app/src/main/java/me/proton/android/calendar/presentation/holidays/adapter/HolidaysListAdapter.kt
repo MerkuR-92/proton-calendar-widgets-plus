@@ -79,7 +79,7 @@ class HolidaysListAdapter(
         fun bind(value: HolidaysItem.Value) {
             val holidays = value.holidays
 
-            holidaysCountryName.text = holidays.countryName
+            holidaysCountryName.text = holidays.country
             if (searchQuery.isNotBlank()) {
                 holidaysCountryName.highlightSearchTokens(searchQuery.split(" ", ignoreCase = true))
             }

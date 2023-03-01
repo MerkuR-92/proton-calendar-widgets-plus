@@ -86,6 +86,8 @@ interface CalendarsRepository {
 
     suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity?
 
+    suspend fun fetchHolidaysCalendars(userId: UserId): List<HolidaysCalendarEntity>?
+
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 
     suspend fun updateCalendarDisplay(calendarId: String, display: Boolean)

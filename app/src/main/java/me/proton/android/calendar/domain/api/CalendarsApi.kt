@@ -172,4 +172,9 @@ interface CalendarsApi {
      * Get calendar settings
      */
     suspend fun getCalendarSettings(userId: UserId, calendarId: String): ApiResponse<GetCalendarSettingsApiResponse>
+
+    /**
+     * Get holidays calendars
+     */
+    suspend fun getHolidaysCalendars(userId: UserId): ApiResponse<GetHolidaysCalendarsApiResponse>
 }

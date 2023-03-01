@@ -158,6 +158,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getCalendarSettings(
         @Path("calendarId") calendarId: String
     ) : GetCalendarSettingsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/directory?Type=2") // The type ensures that only holiday calendars are returned.
+    suspend fun getHolidaysCalendars() : GetHolidaysCalendarsApiResponse
 }
 
 class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -393,6 +396,12 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         calendarId: String
     ): ApiResponse<GetCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getCalendarSettings(calendarId)
+    }.toApiResponse()
+
+    override suspend fun getHolidaysCalendars(
+        userId: UserId
+    ): ApiResponse<GetHolidaysCalendarsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getHolidaysCalendars()
     }.toApiResponse()
 }
 
@@ -772,3 +781,8 @@ data class RecreateCalendarApiResponse(
     val calendar: CalendarEntity
 )
 
+@Serializable
+data class GetHolidaysCalendarsApiResponse(
+    @SerialName("Calendars")
+    val calendars: List<HolidaysCalendarEntity>
+)

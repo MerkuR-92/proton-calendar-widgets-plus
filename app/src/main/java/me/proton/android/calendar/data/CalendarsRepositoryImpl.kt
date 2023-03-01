@@ -65,6 +65,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
@@ -519,6 +520,9 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
         calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar
+
+    override suspend fun fetchHolidaysCalendars(userId: UserId): List<HolidaysCalendarEntity>? =
+        calendarsApi.getHolidaysCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
         val member = selectMembers(calendarId).firstOrNull()
