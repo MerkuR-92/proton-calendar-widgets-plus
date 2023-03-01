@@ -88,8 +88,16 @@ class SearchViewModel @Inject constructor(
                         if (lastWorkerState != null) { // just finished downloading
                             _downloadingState.update { DownloadingState.FINISHED }
                         } else {
-                            // worker finished correctly before, but we're running it again
-                            //  (most likely after manually clearing search DB)
+                            coroutineScope.launch {
+                                if (isCalendarDownloadEnabled()) {
+                                    // worker finished when SearchViewModel was outside of scope
+                                    _downloadingState.update { DownloadingState.FINISHED }
+                                } else {
+                                    // worker finished correctly before, but we're running it again
+                                    //  (most likely after manually clearing search DB)
+                                    _downloadingState.update { DownloadingState.NONE }
+                                }
+                            }
                         }
                     }
                     WorkInfo.State.FAILED -> {
