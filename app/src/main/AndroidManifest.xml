@@ -40,14 +40,17 @@
                     android:value="androidx.startup"
                     tools:node="remove" />
                 <meta-data
-                    android:name="me.proton.android.calendar.init.WorkManagerInitializer"
-                    android:value="androidx.startup" />
-                <meta-data
-                    android:name="me.proton.android.calendar.init.CalendarEventManagerInitializer"
-                    android:value="androidx.startup" />
-                <meta-data
                     android:name="me.proton.core.crypto.validator.presentation.init.CryptoValidatorInitializer"
                     android:value="androidx.startup" />
+                <!-- Disable some Initializers. See MainInitializer. -->
+                <meta-data
+                    android:name="me.proton.android.calendar.init.MainInitializer"
+                    android:value="androidx.startup"
+                    tools:node="remove"/>
+                <meta-data
+                    android:name="me.proton.core.humanverification.presentation.HumanVerificationInitializer"
+                    android:value="androidx.startup"
+                    tools:node="remove"/>
         </provider>
         <activity
             android:name=".presentation.main.MainActivity"
