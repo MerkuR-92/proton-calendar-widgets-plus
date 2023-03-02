@@ -388,9 +388,7 @@ class CalendarViewModel @Inject constructor(
 
                         // we need to get all Events sharing UID of this Event for recurrence expansion
                         // we can't just pass search results, because Single Edit might not match the same search query
-                        val eventsSharingUid = if (it.isRecurring()) {
-                            calendarsRepository.selectEventsByUid(it.uid)
-                        } else emptyList()
+                        val eventsSharingUid = calendarsRepository.selectEventsByUid(it.uid)
 
                         calendarsRepository.expandDbEvent(it, eventsSharingUid, toDate.atStartOfDay(ZoneId.of(timeZoneId))).filterOutEventsBySearchTerm(searchTerm)
                     }
