@@ -23,6 +23,7 @@ import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_c
 import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_icon
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_press
+import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_flag
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_search_disclaimer
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value
 import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value_press
@@ -202,6 +203,14 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                 // Hide disclaimer based on location
                 holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
             }
+            val countryCode = holidaysViewModel.holidaysCalendars.value?.firstOrNull { it.country == country }?.countryCode
+            holidays_calendar_form_country_flag.setImageResource(
+                resources.getIdentifier(
+                    "${requireContext().packageName}:drawable/flag_$countryCode",
+                    "drawable",
+                    requireContext().packageName
+                )
+            )
         }
 
         holidaysViewModel.language.observe(viewLifecycleOwner) { language ->
