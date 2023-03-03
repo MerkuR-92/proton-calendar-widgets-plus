@@ -600,7 +600,7 @@ data class Event private constructor(
         return TimelineEventAdapter.TimelineEvent(
             id = this.id,
             summary = this.summary?.takeIfNotBlank() ?: resourceProvider.provideString(R.string.default_event_summary),
-            dateContent = "${getOccurrenceStart(timeZoneId).dayOfWeek.formatShort()}, ${dateText}${if (locationText != null) " • " else ""}",
+            dateContent = "${happensOn.dayOfWeek.formatShort()}, ${dateText}${if (locationText != null) " • " else ""}",
             location = locationText ?: "",
             happensOn = happensOn,
             showDateColumn = showDateColumn,
