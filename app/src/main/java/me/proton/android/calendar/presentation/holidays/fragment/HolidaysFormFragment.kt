@@ -128,9 +128,10 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
                 lifecycleScope.launch {
                     if (holidaysViewModel.hasBeenEdited() || calendarId.isNullOrEmpty()) {
+                        val selectedDate = calendarViewModel.selectedDateTime.value
                         // Save new form values
                         val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
-                        if (holidaysViewModel.handleSaveHolidays(returnToSettings)) {
+                        if (holidaysViewModel.handleSaveHolidays(returnToSettings, selectedDate?.first)) {
                             view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_success))
                             findNavController().navigateUp()
                         } else {

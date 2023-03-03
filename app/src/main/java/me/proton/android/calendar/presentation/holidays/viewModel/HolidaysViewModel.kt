@@ -19,14 +19,12 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
-import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
-import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
-import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import me.proton.core.user.domain.UserManager
+import java.time.LocalDate
+import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
@@ -232,7 +230,7 @@ class HolidaysViewModel @Inject constructor(
         _calendarColor.value = calendarColor
     }
 
-    suspend fun handleSaveHolidays(returnToSettings: Boolean): Boolean {
+    suspend fun handleSaveHolidays(returnToSettings: Boolean, selectedDate: LocalDate?): Boolean {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in HolidaysViewModel getCalendar")
@@ -245,11 +243,17 @@ class HolidaysViewModel @Inject constructor(
 
         val calendarColor = _calendarColor.value ?: return false // TODO Handle
 
+        // Fetch shared calendar events
+        val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+            ?: ZoneId.systemDefault().id
+
         val joinCalendarResult = joinCalendarUseCase.joinHolidaysCalendar(
             userId,
             holidaysCalendar,
             calendarColor,
-            _defaultAllDayAlarms.value
+            _defaultAllDayAlarms.value,
+            selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
+            displayTimeZoneId
         )
         return joinCalendarResult is UseCase.Result.Success<*>
     }

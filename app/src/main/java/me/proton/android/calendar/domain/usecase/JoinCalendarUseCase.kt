@@ -2,19 +2,19 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.component.VAlarm
 import com.google.crypto.tink.subtle.Base64
-import com.proton.gopenpgp.crypto.Crypto.generateSessionKey
-import com.proton.gopenpgp.crypto.PGPMessage
-import com.proton.gopenpgp.crypto.PlainMessage
 import com.proton.gopenpgp.crypto.SessionKey
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.JoinCalendarApiRequest
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Ciphertext
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueSet
@@ -22,21 +22,12 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.Armored
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.decryptDataOrNull
-import me.proton.core.key.domain.decryptSessionKey
-import me.proton.core.key.domain.encryptData
-import me.proton.core.key.domain.encryptText
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.publicKey
-import me.proton.core.key.domain.signData
 import me.proton.core.key.domain.signText
-import me.proton.core.key.domain.useKeys
 import me.proton.core.user.domain.UserManager
-import java.nio.charset.StandardCharsets
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
@@ -63,7 +54,9 @@ class JoinCalendarUseCase @Inject constructor(
         userId: UserId,
         holidaysCalendarEntity: HolidaysCalendarEntity,
         calendarColor: Int,
-        defaultFullDayNotifications: List<VAlarm>?
+        defaultFullDayNotifications: List<VAlarm>?,
+        selectedDate: LocalDate,
+        displayTimeZoneId: String
     ): UseCase.Result {
 
         val defaultUserEmail = userManager.getUser(userId).email
@@ -99,7 +92,7 @@ class JoinCalendarUseCase @Inject constructor(
             calendarsApi.joinCalendar(userId, holidaysCalendarEntity.calendarId, address.addressId.id, joinCalendarApiRequest)
         ) {
             is ApiResponse.Success -> {
-                val calendarId = holidaysCalendarEntity.calendarId
+                val calendarId = joinCalendarResponse.data.calendar.id
                 // Save Calendar to DB
                 calendarsRepository.persistCalendar(userId.id, joinCalendarResponse.data.calendar)
                 // Save Calendar Settings
@@ -121,37 +114,64 @@ class JoinCalendarUseCase @Inject constructor(
                 return when (cachePassphraseResult) {
                     is UseCase.Result.Success<*> -> {
 
-                        // Fetch shared calendar events
-                        val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-                            ?: ZoneId.systemDefault().id
-                        val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
-                        val fetchEventsResult = fetchEventsUseCase.execute(
-                            userId,
-                            listOf(calendarId),
-                            now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
-                            now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
-                            displayTimeZoneId
-                        )
+                        coroutineScope {
+                            val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
+                            timeWindows.add(
+                                Pair( // Current month
+                                    selectedDate.with(TemporalAdjusters.firstDayOfMonth()),
+                                    selectedDate.with(TemporalAdjusters.lastDayOfMonth())
+                                )
+                            )
+                            val maxMonthsCached = 2L
+                            for (i in 1L ..maxMonthsCached) {
+                                timeWindows.add(
+                                    Pair( // Current month + i month
+                                        selectedDate.plusMonths(i).with(TemporalAdjusters.firstDayOfMonth()),
+                                        selectedDate.plusMonths(i).with(TemporalAdjusters.lastDayOfMonth()).plusWeeks(if (i == maxMonthsCached) 1 else 0) // plus one week to max to cover offset days
+                                    )
+                                )
+                                timeWindows.add(
+                                    Pair( // Current month - i month
+                                        selectedDate.minusMonths(i).with(TemporalAdjusters.firstDayOfMonth()).minusWeeks(if (i == maxMonthsCached) 1 else 0), // minus one week to min to cover offset days
+                                        selectedDate.minusMonths(i).with(TemporalAdjusters.lastDayOfMonth())
+                                    )
+                                )
+                            }
+                            val resultsEventsMap = timeWindows.map {
+                                async {
+                                    val events = mutableListOf<EventEntity>()
+                                    val fetchEventsResult = fetchEventsUseCase.execute(
+                                        userId,
+                                        listOf(calendarId),
+                                        it.first,
+                                        it.second,
+                                        displayTimeZoneId
+                                    )
+                                    val result = if (fetchEventsResult.first is UseCase.Result.Success<*>) {
+                                        if (fetchEventsResult.second == null) {
+                                            logger.e("fetchEventsResult: null event list when Success")
+                                        }
 
-                        fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
-                            if (fetchEventsResult.second == null) {
-                                logger.e("JoinCalendarUseCase: fetchEventsResult: null event list when Success")
-                            } else {
-                                fetchEventsResult.second?.let {
-                                    calendarsRepository.persistEvents(*it.toTypedArray())
-                                    updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                                    widgetRefresher.refreshEventList()
+                                        fetchEventsResult.second?.let {
+                                            events.addAll(it)
+                                        }
+                                        UseCase.Result.Success<Unit>()
+                                    } else {
+                                        UseCase.Result.Error("error fetching events")
+                                    }
+                                    Pair(result, events)
+                                }
+                            }.awaitAll()
+
+                            val events = arrayListOf<EventEntity>()
+                            resultsEventsMap.forEach {
+                                if (it.first is UseCase.Result.Success<*>) {
+                                    events.addAll(it.second)
                                 }
                             }
-                        }
-
-                        // for each bootstrapped calendar, get its latest Event ID
-                        val valueStore = valueStoreProvider.provideValueStore(userId.id)
-                        val latestEventIdResponse = serverEventsApi.getLatestServerCalendarEvent(userId, calendarId)
-                        if (latestEventIdResponse is ApiResponse.Success) {
-                            valueStore.putStringInSet(ValueSet.LAST_SERVER_CALENDAR_EVENT_ID, calendarId, latestEventIdResponse.data.calendarEventId)
-                        } else {
-                            logger.e("JoinCalendarUseCase: could not get latest calendar server event ID response in BootstrapCalendarsUseCase")
+                            calendarsRepository.persistEvents(*events.toTypedArray())
+                            updateAlarmsUseCase.execute(userId.id, events.map { it.id })
+                            widgetRefresher.refreshEventList()
                         }
 
                         UseCase.Result.Success(calendarId)
