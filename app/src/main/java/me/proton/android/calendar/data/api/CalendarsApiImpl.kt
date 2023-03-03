@@ -161,6 +161,19 @@ interface CalendarsApiService : BaseRetrofitApi {
 
     @GET("calendar/$API_VERSION_CALENDAR/directory?Type=2") // The type ensures that only holiday calendars are returned.
     suspend fun getHolidaysCalendars() : GetHolidaysCalendarsApiResponse
+
+    @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/invitations/{addressId}/join")
+    suspend fun joinCalendar(
+        @Path("calendarId") calendarId: String,
+        @Path("addressId") addressId: String,
+        @Body body: JoinCalendarApiRequest
+    ) : JoinCalendarApiResponse
+
+    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
+    suspend fun leaveCalendar(
+        @Path("calendarId") calendarId: String,
+        @Path("memberId") memberId: String
+    ) : StatusCodeApiResponse
 }
 
 class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -264,8 +277,8 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         eventId: String,
         body: UpgradeEventApiRequest
     ): ApiResponse<UpgradeEventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-            upgradeEvent(calendarId, eventId, body)
-        }.toApiResponse()
+        upgradeEvent(calendarId, eventId, body)
+    }.toApiResponse()
 
     override suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
@@ -402,6 +415,23 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         userId: UserId
     ): ApiResponse<GetHolidaysCalendarsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getHolidaysCalendars()
+    }.toApiResponse()
+
+    override suspend fun joinCalendar(
+        userId: UserId,
+        calendarId: String,
+        addressId: String,
+        body: JoinCalendarApiRequest
+    ): ApiResponse<JoinCalendarApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        joinCalendar(calendarId, addressId, body)
+    }.toApiResponse()
+
+    override suspend fun leaveCalendar(
+        userId: UserId,
+        calendarId: String,
+        memberId: String
+    ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        leaveCalendar(calendarId, memberId)
     }.toApiResponse()
 }
 
@@ -785,4 +815,30 @@ data class RecreateCalendarApiResponse(
 data class GetHolidaysCalendarsApiResponse(
     @SerialName("Calendars")
     val calendars: List<HolidaysCalendarEntity>
+)
+
+@Serializable
+data class JoinCalendarApiRequest(
+    @SerialName("Signature")
+    val signature: String,
+    @SerialName("PassphraseKeyPacket")
+    val passphraseKeyPacket: String,
+    @SerialName("Color")
+    val color: String,
+    @SerialName("DefaultFullDayNotifications")
+    val defaultFullDayNotifications: List<NotificationEntity>? = null
+)
+
+@Serializable
+data class JoinCalendarApiResponse(
+    @SerialName("Calendar")
+    val calendar: CalendarEntity,
+    @SerialName("Keys")
+    val keys: List<CalendarKeyEntity>,
+    @SerialName("Passphrase")
+    val passphrase: PassphraseEntity,
+    @SerialName("Members")
+    val members: List<MemberEntity>,
+    @SerialName("CalendarSettings")
+    val calendarSettings: CalendarSettingsEntity, // settings specific to calendar, not user
 )

@@ -20,8 +20,10 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
@@ -33,11 +35,8 @@ class HolidaysViewModel @Inject constructor(
     private val resourceProvider: ResourceProvider,
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
-    private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase,
-    private val userManager: UserManager,
     private val accountManager: AccountManager,
-    private val createCalendarUseCase: CreateCalendarUseCase
+    private val joinCalendarUseCase: JoinCalendarUseCase
 ) : AndroidViewModel(application) {
 
     sealed class HolidaysSnackState {
@@ -233,7 +232,26 @@ class HolidaysViewModel @Inject constructor(
         _calendarColor.value = calendarColor
     }
 
-    suspend fun handleSaveHolidays(returnToSettings: Boolean) {
+    suspend fun handleSaveHolidays(returnToSettings: Boolean): Boolean {
+        val userId = userId.value
+        if (userId == null) {
+            logger.e("User ID was null in HolidaysViewModel getCalendar")
+            return false
+        }
+
+        val holidaysCalendar = holidaysCalendars.value?.firstOrNull {
+            it.country == _country.value && it.language == _language.value
+        } ?: return false // TODO Handle
+
+        val calendarColor = _calendarColor.value ?: return false // TODO Handle
+
+        val joinCalendarResult = joinCalendarUseCase.joinHolidaysCalendar(
+            userId,
+            holidaysCalendar,
+            calendarColor,
+            _defaultAllDayAlarms.value
+        )
+        return joinCalendarResult is UseCase.Result.Success<*>
     }
 
     private suspend fun getCalendar(calendarId: String): Calendar? {

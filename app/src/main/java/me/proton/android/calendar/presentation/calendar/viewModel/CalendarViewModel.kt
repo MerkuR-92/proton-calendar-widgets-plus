@@ -35,6 +35,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -80,6 +82,7 @@ import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
+import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
@@ -121,6 +124,7 @@ class CalendarViewModel @Inject constructor(
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val deleteCalendarUseCase: DeleteCalendarUseCase,
     private val recreateCalendarUseCase: RecreateCalendarUseCase,
+    private val leaveCalendarUseCase: LeaveCalendarUseCase,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
@@ -154,7 +158,7 @@ class CalendarViewModel @Inject constructor(
     var activeUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var disabledUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var inactiveUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var subscribedCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var otherCalendars: LiveData<List<Calendar>> = MutableLiveData()
     var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
@@ -213,7 +217,12 @@ class CalendarViewModel @Inject constructor(
         disabledUserCalendars = calendarsRepository.flowDisabledUserCalendars(userId).asLiveData(Dispatchers.Default)
         inactiveUserCalendars = calendarsRepository.flowInactiveUserCalendars(userId).asLiveData(Dispatchers.Default)
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
-        subscribedCalendars = calendarsRepository.flowSubscribedCalendars(userId).asLiveData(Dispatchers.Default)
+        otherCalendars = combine(
+            calendarsRepository.flowSubscribedCalendars(userId).distinctUntilChanged(),
+            calendarsRepository.flowHolidaysCalendars(userId).distinctUntilChanged()
+        ) { subscribedCalendars, holidaysCalendars ->
+            subscribedCalendars + holidaysCalendars
+        }.asLiveData(Dispatchers.Default)
         calendarSubscriptions = calendarsRepository.flowCalendarSubscriptions().asLiveData(Dispatchers.Default)
     }
 
@@ -516,6 +525,15 @@ class CalendarViewModel @Inject constructor(
             return UseCase.Result.Error("userID == null in recreateCalendar")
         }
         return recreateCalendarUseCase.execute(UserId(userId), calendarId)
+    }
+
+    suspend fun leaveCalendar(calendarId: String): UseCase.Result {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel recreateCalendar")
+            return UseCase.Result.Error("userID == null in recreateCalendar")
+        }
+        return leaveCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
     fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {
@@ -941,15 +959,6 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         return inactiveUserCalendars.value ?: calendarsRepository.selectInactiveUserCalendars(userId.id)
-    }
-
-    suspend fun getSubscribedCalendars(): List<Calendar>? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getSubscribedCalendars")
-            return null
-        }
-        return subscribedCalendars.value ?: calendarsRepository.selectSubscribedCalendars(userId.id)
     }
 
     suspend fun getUserAddresses(): List<UserAddress>? {

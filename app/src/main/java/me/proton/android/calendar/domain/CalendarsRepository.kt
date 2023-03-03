@@ -65,6 +65,8 @@ interface CalendarsRepository {
 
     fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>>
 
+    fun flowHolidaysCalendars(userId: String): Flow<List<Calendar>>
+
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
     suspend fun deleteCalendarById(id: String)

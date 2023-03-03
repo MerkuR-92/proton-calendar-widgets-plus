@@ -138,6 +138,7 @@ object FeatureFlag {
     const val CLEAR_CALENDAR = false
     const val IMPORT_ICS = true
     const val SHOW_EVENT_SEARCH = true
+    const val HOLIDAYS_CALENDAR = false
 }
 
 object HttpResponseCode {

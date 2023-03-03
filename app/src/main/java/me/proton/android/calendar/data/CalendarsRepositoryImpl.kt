@@ -437,6 +437,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().flowSubscribedCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
+    override fun flowHolidaysCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowHolidaysCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
+    }
+
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         //  TODO make sure we have "flags" set!!!!!
         database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))

@@ -16,5 +16,15 @@ data class HolidaysCalendarEntity(
     @SerialName("Timezones")
     val timezones: List<String>,
     @SerialName("Passphrase")
-    val passphrase: String
+    val passphrase: String,
+    @SerialName("SessionKey")
+    val sessionKey: SessionKeyEntity
+)
+
+@Serializable
+data class SessionKeyEntity(
+    @SerialName("Key")
+    val key: String,
+    @SerialName("Algorithm")
+    val algorithm: String
 )

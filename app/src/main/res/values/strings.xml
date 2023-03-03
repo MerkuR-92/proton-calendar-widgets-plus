@@ -39,6 +39,7 @@
     <string name="action_done">Done</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
+    <string name="action_remove">Remove</string>
     <string name="action_recreate">Clear</string>
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>

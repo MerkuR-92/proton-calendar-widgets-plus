@@ -127,10 +127,15 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                 }
 
                 lifecycleScope.launch {
-                    if (holidaysViewModel.hasBeenEdited()) {
+                    if (holidaysViewModel.hasBeenEdited() || calendarId.isNullOrEmpty()) {
                         // Save new form values
                         val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
-                        holidaysViewModel.handleSaveHolidays(returnToSettings)
+                        if (holidaysViewModel.handleSaveHolidays(returnToSettings)) {
+                            view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_success))
+                            findNavController().navigateUp()
+                        } else {
+                            view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_error))
+                        }
                     } else findNavController().navigateUp()
                 }
             }

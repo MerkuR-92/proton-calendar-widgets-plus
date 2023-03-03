@@ -37,6 +37,7 @@ import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
+import me.proton.android.calendar.common.FeatureFlag.HOLIDAYS_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -51,6 +52,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -79,7 +81,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var settingsSubscribedCalendarListAdapter: SettingsCalendarListAdapter
 
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
-    private var subscribedCalendars: List<Calendar>? = null
+    private var otherCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     private var defaultCalendarId: String? = null
@@ -167,18 +169,18 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         (settingsSubscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsSubscribedCalendarListView.adapter = settingsSubscribedCalendarListAdapter
 
-        subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
-            subscribedCalendars = value
+        subscribedCalendarsMediator.addSource(calendarViewModel.otherCalendars) { value ->
+            otherCalendars = value
 
-            if (subscribedCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            if (otherCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
         subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
             calendarSubscriptions = value
 
-            if (subscribedCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            if (otherCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
         subscribedCalendarsMediator.observe(viewLifecycleOwner) {
@@ -312,26 +314,15 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
         deletePress?.setOnSingleClickListener {
             lifecycleScope.launch {
-                val prepareOption = calendarViewModel.prepareDeleteCalendar(calendar.id)
 
-                val dialogMessage = when (prepareOption) {
-                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultLastActive -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
-                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultNextActive -> resourceProvider.provideString(R.string.delete_default_calendar_dialog_message, prepareOption.nextDefaultName)
-                    is DeleteCalendarUseCase.DeleteCalendarOption.Error -> null
-                    is DeleteCalendarUseCase.DeleteCalendarOption.Delete.NonDefault -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
-                }
-
-                if (prepareOption is DeleteCalendarUseCase.DeleteCalendarOption.Error) {
-                    bottomSheetDialog.dismiss()
-                    view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
-                } else {
+                if (calendar.isHolidays) {
                     bottomSheetDialog.dismiss()
                     with (MaterialAlertDialogBuilder(requireContext())) {
                         setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
-                        setMessage(dialogMessage)
+                        setMessage(resourceProvider.provideString(R.string.delete_calendar_dialog_message))
                         setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                             lifecycleScope.launch {
-                                when (calendarViewModel.deleteCalendar(prepareOption)) {
+                                when (calendarViewModel.leaveCalendar(calendar.id)) {
                                     is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                     is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
@@ -341,6 +332,38 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                         }
                         setNegativeButton(R.string.dialog_button_cancel, null)
                     }.create().show()
+                } else {
+
+                    val prepareOption = calendarViewModel.prepareDeleteCalendar(calendar.id)
+
+                    val dialogMessage = when (prepareOption) {
+                        is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultLastActive -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
+                        is DeleteCalendarUseCase.DeleteCalendarOption.Delete.DefaultNextActive -> resourceProvider.provideString(R.string.delete_default_calendar_dialog_message, prepareOption.nextDefaultName)
+                        is DeleteCalendarUseCase.DeleteCalendarOption.Error -> null
+                        is DeleteCalendarUseCase.DeleteCalendarOption.Delete.NonDefault -> resourceProvider.provideString(R.string.delete_calendar_dialog_message)
+                    }
+
+                    if (prepareOption is DeleteCalendarUseCase.DeleteCalendarOption.Error) {
+                        bottomSheetDialog.dismiss()
+                        view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                    } else {
+                        bottomSheetDialog.dismiss()
+                        with (MaterialAlertDialogBuilder(requireContext())) {
+                            setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
+                            setMessage(dialogMessage)
+                            setPositiveButton(R.string.dialog_button_delete) { _, _ ->
+                                lifecycleScope.launch {
+                                    when (calendarViewModel.deleteCalendar(prepareOption)) {
+                                        is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                                        is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
+                                        is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
+                                    }
+                                    bottomSheetDialog.dismiss()
+                                }
+                            }
+                            setNegativeButton(R.string.dialog_button_cancel, null)
+                        }.create().show()
+                    }
                 }
             }
         }
@@ -371,17 +394,19 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
             deleteLayout?.visibleOrGone(
-                DELETE_CALENDAR &&
+                (DELETE_CALENDAR &&
                         calendar.isSubscribed.not() &&
-                        calendar.isSharedWithMe.not()
+                        calendar.isSharedWithMe.not()) ||
+                        (HOLIDAYS_CALENDAR &&
+                                calendar.isHolidays)
             )
 
             val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
             recreateLayout?.visibleOrGone(
                 CLEAR_CALENDAR &&
-                    calendar.isSubscribed.not() &&
-                    calendar.isSharedWithMe.not() &&
-                    calendar.isActive
+                        calendar.isSubscribed.not() &&
+                        calendar.isSharedWithMe.not() &&
+                        calendar.isActive
             )
 
             val markAsDefaultLayout =

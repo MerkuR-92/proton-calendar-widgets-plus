@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
-    private var subscribedCalendars: List<Calendar>? = null
+    private var otherCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
     private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
 
@@ -1604,8 +1604,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             inactiveCalendars ?: return@Observer
         })
 
-        subscribedCalendarsMediator.addSource(calendarViewModel.subscribedCalendars) { value ->
-            subscribedCalendars = value
+        subscribedCalendarsMediator.addSource(calendarViewModel.otherCalendars) { value ->
+            otherCalendars = value
 
             lifecycleScope.launch {
                 value.forEach {
@@ -1614,15 +1614,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
 
-            if (subscribedCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            if (otherCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
         subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
             calendarSubscriptions = value
 
-            if (subscribedCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(subscribedCalendars!!, calendarSubscriptions!!)
+            if (otherCalendars != null && calendarSubscriptions != null) {
+                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
         subscribedCalendarsMediator.observe(this@MainActivity, Observer {

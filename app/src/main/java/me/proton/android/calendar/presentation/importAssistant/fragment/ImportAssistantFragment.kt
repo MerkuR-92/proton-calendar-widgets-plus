@@ -128,8 +128,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             checkCalendarLimit()
         }
 
-        calendarViewModel.subscribedCalendars.observe(viewLifecycleOwner) { subscribedCalendars ->
-            subscribedCalendars ?: return@observe
+        calendarViewModel.otherCalendars.observe(viewLifecycleOwner) { otherCalendars ->
+            otherCalendars ?: return@observe
 
             checkCalendarLimit()
         }

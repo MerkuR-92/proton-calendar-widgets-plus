@@ -62,8 +62,9 @@ class CalendarEventManagerStarter @Inject constructor(
     private fun observeUserCalendars(userId: UserId): Flow<Set<Calendar>> =
         combine(
             calendarsRepository.flowUserCalendars(userId.id),
-            calendarsRepository.flowSubscribedCalendars(userId.id)
-        ) { calendars, subscriptions ->
-            (calendars + subscriptions).toSet()
+            calendarsRepository.flowSubscribedCalendars(userId.id),
+            calendarsRepository.flowHolidaysCalendars(userId.id)
+        ) { calendars, subscriptions, holidays ->
+            (calendars + subscriptions + holidays).toSet()
         }.distinctUntilChanged()
 }
