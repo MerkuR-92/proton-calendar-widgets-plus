@@ -4,11 +4,15 @@ import android.content.Context
 import android.content.DialogInterface
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.domain.utils.ProtonUtils
+import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.presentation.utils.InputValidationResult
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
 
 object ProtonUtilsImpl : ProtonUtils {
 
@@ -83,6 +87,34 @@ object ProtonUtilsImpl : ProtonUtils {
                 .setPositiveButton(R.string.create_calendar_limit_reached_manage, manageCalendarsCallback)
         }
         materialAlertDialogBuilder.show()
+    }
+
+    /**
+     * This will return a Pair of LocalDate representing the total cached month views time window, taking into account offset days.
+     */
+    override fun getCachedMonthViewsTimeWindow(selectedDate: LocalDate, weekStart: Int): Pair<LocalDate, LocalDate> {
+        val startWeekOn = AndroidUtils.getWeekStartDayOfWeek(weekStart)
+
+        val firstDayOfTheMonth = selectedDate.with(TemporalAdjusters.firstDayOfMonth())
+
+        // Calculate the offset days shown in minimum cached month view
+        val firstDayOfMinMonth = firstDayOfTheMonth.minusMonths(MonthView.MonthViewSettings.MONTH_VIEW_CACHE)
+        val minMonthFirstDayOfTheWeekNumber = firstDayOfMinMonth.dayOfWeek.value - startWeekOn.value
+        val minMonthFirstDayOfTheWeekOffset =
+            if (minMonthFirstDayOfTheWeekNumber < 0) minMonthFirstDayOfTheWeekNumber + CalendarSettings.DAYS_IN_A_WEEK
+            else minMonthFirstDayOfTheWeekNumber
+        val fromDate = firstDayOfMinMonth.minusDays(minMonthFirstDayOfTheWeekOffset.toLong())
+
+        // Calculate the offset days shown in maximum cached month view
+        val firstDayOfMaxMonth = firstDayOfTheMonth.plusMonths(MonthView.MonthViewSettings.MONTH_VIEW_CACHE)
+        val maxMonthFirstDayOfTheWeekNumber = firstDayOfMaxMonth.dayOfWeek.value - startWeekOn.value
+        val maxMonthFirstDayOfTheWeekOffset =
+            if (maxMonthFirstDayOfTheWeekNumber < 0) maxMonthFirstDayOfTheWeekNumber + CalendarSettings.DAYS_IN_A_WEEK
+            else maxMonthFirstDayOfTheWeekNumber
+        val maxMonthLastDayOfMonthOffset = MonthView.MonthViewSettings.MONTH_GRID_ITEMS_MAX - (maxMonthFirstDayOfTheWeekOffset + firstDayOfMaxMonth.lengthOfMonth())
+        val toDate = firstDayOfMaxMonth.with(TemporalAdjusters.lastDayOfMonth()).plusDays(maxMonthLastDayOfMonthOffset.toLong())
+
+        return Pair(fromDate, toDate)
     }
 }
 
