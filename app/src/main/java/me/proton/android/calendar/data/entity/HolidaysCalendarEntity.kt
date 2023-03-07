@@ -9,8 +9,10 @@ data class HolidaysCalendarEntity(
     val calendarId: String,
     @SerialName("Country")
     val country: String,
-    @SerialName("Country_Code")
+    @SerialName("CountryCode")
     val countryCode: String,
+    @SerialName("LanguageCode")
+    val languageCode: String,
     @SerialName("Language")
     val language: String,
     @SerialName("Timezones")

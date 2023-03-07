@@ -3,21 +3,19 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.component.VAlarm
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.crypto.SessionKey
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.getWeekStart
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.JoinCalendarApiRequest
-import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
@@ -27,8 +25,8 @@ import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.publicKey
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
+import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 class JoinCalendarUseCase @Inject constructor(
@@ -43,7 +41,9 @@ class JoinCalendarUseCase @Inject constructor(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val widgetRefresher: WidgetRefresher,
     private val valueStoreProvider: ValueStoreProvider,
-    private val serverEventsApi: ServerEventsApi
+    private val serverEventsApi: ServerEventsApi,
+    private val userSettingsRepository: UserSettingsRepository,
+    private val database: AppDatabase
 ): UseCase {
 
     companion object {
@@ -114,64 +114,25 @@ class JoinCalendarUseCase @Inject constructor(
                 return when (cachePassphraseResult) {
                     is UseCase.Result.Success<*> -> {
 
-                        coroutineScope {
-                            val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
-                            timeWindows.add(
-                                Pair( // Current month
-                                    selectedDate.with(TemporalAdjusters.firstDayOfMonth()),
-                                    selectedDate.with(TemporalAdjusters.lastDayOfMonth())
-                                )
-                            )
-                            val maxMonthsCached = 2L
-                            for (i in 1L ..maxMonthsCached) {
-                                timeWindows.add(
-                                    Pair( // Current month + i month
-                                        selectedDate.plusMonths(i).with(TemporalAdjusters.firstDayOfMonth()),
-                                        selectedDate.plusMonths(i).with(TemporalAdjusters.lastDayOfMonth()).plusWeeks(if (i == maxMonthsCached) 1 else 0) // plus one week to max to cover offset days
-                                    )
-                                )
-                                timeWindows.add(
-                                    Pair( // Current month - i month
-                                        selectedDate.minusMonths(i).with(TemporalAdjusters.firstDayOfMonth()).minusWeeks(if (i == maxMonthsCached) 1 else 0), // minus one week to min to cover offset days
-                                        selectedDate.minusMonths(i).with(TemporalAdjusters.lastDayOfMonth())
-                                    )
-                                )
-                            }
-                            val resultsEventsMap = timeWindows.map {
-                                async {
-                                    val events = mutableListOf<EventEntity>()
-                                    val fetchEventsResult = fetchEventsUseCase.execute(
-                                        userId,
-                                        listOf(calendarId),
-                                        it.first,
-                                        it.second,
-                                        displayTimeZoneId
-                                    )
-                                    val result = if (fetchEventsResult.first is UseCase.Result.Success<*>) {
-                                        if (fetchEventsResult.second == null) {
-                                            logger.e("fetchEventsResult: null event list when Success")
-                                        }
+                        val weekStart = userSettingsRepository.getWeekStart(userId, database)
+                        val timeWindow = ProtonUtilsImpl.getCachedMonthViewsTimeWindow(selectedDate, weekStart)
+                        val fromDate = timeWindow.first
+                        val toDate = timeWindow.second
+                        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
+                            userId,
+                            listOf(calendarId),
+                            fromDate,
+                            toDate,
+                            displayTimeZoneId
+                        )
 
-                                        fetchEventsResult.second?.let {
-                                            events.addAll(it)
-                                        }
-                                        UseCase.Result.Success<Unit>()
-                                    } else {
-                                        UseCase.Result.Error("error fetching events")
-                                    }
-                                    Pair(result, events)
-                                }
-                            }.awaitAll()
-
-                            val events = arrayListOf<EventEntity>()
-                            resultsEventsMap.forEach {
-                                if (it.first is UseCase.Result.Success<*>) {
-                                    events.addAll(it.second)
-                                }
-                            }
+                        val events = fetchEventsResult.second
+                        if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
                             calendarsRepository.persistEvents(*events.toTypedArray())
                             updateAlarmsUseCase.execute(userId.id, events.map { it.id })
                             widgetRefresher.refreshEventList()
+                        } else {
+                            logger.e("JoinCalendarUseCase fetching events failed")
                         }
 
                         UseCase.Result.Success(calendarId)

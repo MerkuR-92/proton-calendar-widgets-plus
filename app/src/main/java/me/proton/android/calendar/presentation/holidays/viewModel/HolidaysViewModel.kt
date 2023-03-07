@@ -165,15 +165,15 @@ class HolidaysViewModel @Inject constructor(
             }
             // Get the calendar matching the default language
             val matchingDefaultHolidaysCalendar = countriesMatchingTimeZone.firstOrNull {
-                it.language.equals(defaultLanguage, ignoreCase = true)
+                it.languageCode.equals(defaultLanguage, ignoreCase = true)
             } ?: countriesMatchingTimeZone.firstOrNull()
             _country.value = matchingDefaultHolidaysCalendar?.country ?: ""
-            _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
+            _language.value = matchingDefaultHolidaysCalendar?.languageCode ?: ""
         }
     }
 
     fun getLanguages(): List<String> {
-        return _holidaysCalendars.value?.filter { it.country == _country.value }?.map { it.language } ?: emptyList()
+        return _holidaysCalendars.value?.filter { it.country == _country.value }?.map { it.languageCode } ?: emptyList()
     }
 
     fun hasBeenEdited(): Boolean {
@@ -213,9 +213,9 @@ class HolidaysViewModel @Inject constructor(
         // Get the calendar matching the default language
         val matchingCountries = holidaysCalendars.value?.filter { it.country == country }
         val matchingDefaultHolidaysCalendar = matchingCountries?.firstOrNull {
-            it.language.equals(defaultLanguage, ignoreCase = true)
+            it.languageCode.equals(defaultLanguage, ignoreCase = true)
         } ?: matchingCountries?.firstOrNull()
-        _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
+        _language.value = matchingDefaultHolidaysCalendar?.languageCode ?: ""
     }
 
     fun handleLanguage(language: String) {
@@ -238,10 +238,13 @@ class HolidaysViewModel @Inject constructor(
         }
 
         val holidaysCalendar = holidaysCalendars.value?.firstOrNull {
-            it.country == _country.value && it.language == _language.value
+            it.country == _country.value && it.languageCode == _language.value
         } ?: return false // TODO Handle
 
         val calendarColor = _calendarColor.value ?: return false // TODO Handle
+
+        // Set loading state
+        holidaysState.value = HolidaysState.Processing.Saving
 
         // Fetch shared calendar events
         val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
@@ -255,6 +258,10 @@ class HolidaysViewModel @Inject constructor(
             selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
             displayTimeZoneId
         )
+
+        // Clear loading state
+        holidaysState.value = HolidaysState.Idle
+
         return joinCalendarResult is UseCase.Result.Success<*>
     }
 
