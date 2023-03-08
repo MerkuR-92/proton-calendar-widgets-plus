@@ -264,7 +264,7 @@ class CalendarsRepositoryImpl @Inject constructor(
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             // fetch from API
-            val fetchEventsResult = fetchEventsUseCase.execute(
+            val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
                 fetchWindow.userId,
                 fetchWindow.calendarIds,
                 fetchWindow.fromDate,

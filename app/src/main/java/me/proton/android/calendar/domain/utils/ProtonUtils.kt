@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import java.time.LocalDate
 
 interface ProtonUtils {
     fun validateEmail(email: CharSequence): Boolean
@@ -12,4 +13,5 @@ interface ProtonUtils {
     fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener)
     fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
+    fun getCachedMonthViewsTimeWindow(selectedDate: LocalDate, weekStart: Int): Pair<LocalDate, LocalDate>
 }

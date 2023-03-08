@@ -93,6 +93,8 @@ const val REBRANDING_VERSION_CODE = 145
 const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
 
+const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     MONTH_VIEW_VERSION_CODE, // Month view (0.30.3)
     REBRANDING_VERSION_CODE, // Rebranding (2.0.2)

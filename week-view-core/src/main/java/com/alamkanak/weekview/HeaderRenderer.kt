@@ -319,8 +319,10 @@ private class AllDayEventsUpdater(
             }
 
             // Sort events by days count and then alphabetically
-            val eventChips = eventChipsCacheProvider()?.allDayEventChipsByDate(date).orEmpty().sortedWith(
-                compareByDescending<EventChip> { it.event.daysCount }.thenBy { it.event.title.toString() })
+            var eventChips = eventChipsCacheProvider()?.allDayEventChipsByDate(date).orEmpty()
+            if (eventChips.isNotEmpty()) {
+                eventChips = eventChips.sortedWith(compareByDescending<EventChip> { it.event.daysCount }.thenBy { it.event.title.toString() })
+            }
             // Keep current date vertical index that are taken
             val currentIndexesTaken = arrayListOf<Int>()
             eventChips.forEachIndexed { index, eventChip ->

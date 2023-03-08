@@ -2,7 +2,11 @@ package me.proton.android.calendar.presentation.calendar.customView
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
@@ -14,10 +18,10 @@ import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_BRIGHTEN_COLOR_BY
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.DECRYPTION_FAILED_PAST_EVENT_BRIGHTEN_COLOR_BY
-import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.UNANSWERED_STRIPES_BRIGHTEN_COLOR_BY
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MINI_EVENTS_MAX
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MONTH_VIEW_FONT_PATH
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.ROWS_MAX
+import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.UNANSWERED_STRIPES_BRIGHTEN_COLOR_BY
 import java.time.LocalDate
 import java.time.Month
 import java.time.ZoneId
@@ -31,6 +35,7 @@ class MonthView : ViewGroup {
         const val COLUMNS_MAX = 7
         const val MINI_EVENTS_MAX = 2
         const val MONTH_GRID_ITEMS_MAX = ROWS_MAX * COLUMNS_MAX
+        const val MONTH_VIEW_CACHE = 2L // Cached views on each side of current view
 
         const val MONTH_VIEW_FONT_PATH = "fonts/Roboto-Medium.ttf"
 

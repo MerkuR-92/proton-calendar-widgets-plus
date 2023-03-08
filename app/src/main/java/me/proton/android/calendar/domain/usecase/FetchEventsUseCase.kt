@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
@@ -13,15 +14,65 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
-    private val calendarsApi: CalendarsApi,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val calendarsApi: CalendarsApi
 ) : UseCase {
 
-    suspend fun execute(
+    suspend fun splitFetchEvents(
+        userId: UserId,
+        calendarIds: List<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
+
+        val daysInTimeWindow = ChronoUnit.DAYS.between(fromDate, toDate)
+        val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
+        if (daysInTimeWindow > FETCH_EVENTS_MAX_DAYS_WINDOW) {
+            var timeWindowsCount = 0
+            while (timeWindowsCount < kotlin.math.ceil(daysInTimeWindow / FETCH_EVENTS_MAX_DAYS_WINDOW.toDouble())) {
+                val newFromDate = fromDate.plusDays(FETCH_EVENTS_MAX_DAYS_WINDOW.toLong() * timeWindowsCount)
+                val newToDate = fromDate.plusDays(FETCH_EVENTS_MAX_DAYS_WINDOW.toLong() * (timeWindowsCount + 1))
+                timeWindows.add(
+                    Pair(
+                        newFromDate,
+                        if (newToDate.isAfter(toDate)) toDate else newToDate
+                    )
+                )
+                timeWindowsCount++
+            }
+        } else {
+            timeWindows.add(
+                Pair(fromDate, toDate)
+            )
+        }
+
+        val results = coroutineScope {
+            timeWindows.map { timeWindow ->
+                async {
+                    fetchEvents(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId)
+                }
+            }.awaitAll()
+        }
+
+        return if (results.all { it.first is UseCase.Result.Success<*> }) {
+            Pair(
+                UseCase.Result.Success<Unit>(),
+                results.flatMap { it.second ?: arrayListOf() }
+            )
+        } else {
+            Pair(
+                UseCase.Result.Error("error fetching events"),
+                null
+            )
+        }
+    }
+
+    private suspend fun fetchEvents(
         userId: UserId,
         calendarIds: List<String>,
         fromDate: LocalDate,
@@ -111,13 +162,17 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
         }.awaitAll()
 
-        return if (combinedResults.all { it.first.all { it is UseCase.Result.Success<*> } }) Pair(
-            UseCase.Result.Success<Unit>(),
-            combinedResults.flatMap { it.second }) else Pair(
-            UseCase.Result.Error("error fetching events"),
-            null
-        ) // TODO which calendar?
-
+        return if (combinedResults.all { it.first.all { it is UseCase.Result.Success<*> } }) {
+            Pair(
+                UseCase.Result.Success<Unit>(),
+                combinedResults.flatMap { it.second }
+            )
+        } else {
+            Pair(
+                UseCase.Result.Error("error fetching events"),
+                null
+            )
+        } // TODO which calendar?
     }
 
 }

@@ -3,7 +3,10 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueSet
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
@@ -54,7 +57,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                     is UseCase.Result.Success<*> -> {
                         // fetch events
                         val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
-                        val fetchEventsResult = fetchEventsUseCase.execute(
+                        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
                             userId,
                             listOf(calendarEntity.id),
                             now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),

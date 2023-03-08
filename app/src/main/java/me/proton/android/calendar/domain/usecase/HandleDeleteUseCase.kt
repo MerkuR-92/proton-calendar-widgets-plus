@@ -263,7 +263,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     UseCase.Result.Success<Unit>()
                 } else {
                     val syncError = syncResponse.data.responses.firstOrNull { !it.response.isSuccessful }
-                    UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events", userErrorMessage = syncError?.response?.error)
+                    UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events ${syncError?.response?.code} ${syncError?.response?.error}", userErrorMessage = syncError?.response?.error)
                 }
             }
             is ApiResponse.Error -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.error}")

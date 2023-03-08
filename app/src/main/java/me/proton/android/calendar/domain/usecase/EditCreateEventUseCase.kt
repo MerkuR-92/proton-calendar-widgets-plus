@@ -427,7 +427,7 @@ class EditCreateEventUseCase @Inject constructor(
                 // TODO collect and handle multiple errors
                 val syncError = syncResponse.data.responses.firstOrNull { !it.response.isSuccessful }
                 if (syncError != null) {
-                    UseCase.Result.Error("EditCreateEventUseCase: TODO one of sync responses is an error", userErrorMessage = syncError.response.error)
+                    UseCase.Result.Error("EditCreateEventUseCase: one of sync responses is an error ${syncError.response.code} ${syncError.response.error}", userErrorMessage = syncError.response.error)
                 } else {
                     UseCase.Result.Success(eventsToInsertOrUpdate.map { it.id })
                 }
