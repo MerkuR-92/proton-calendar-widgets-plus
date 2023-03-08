@@ -648,7 +648,10 @@ class MonthFragment : BaseFragment() {
                             if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
                                 val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
                                 val minute = (((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60).toInt()
-                                calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(hour, minute))
+                                calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                                    if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                                    if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                                )
                             }
                             initWeekView = false
                         }
@@ -657,7 +660,10 @@ class MonthFragment : BaseFragment() {
                     if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
                         val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
                         val minute = ceil((((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60)).toInt()
-                        calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(hour, minute))
+                        calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                            if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                            if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                        )
                     }
                 }
             },
