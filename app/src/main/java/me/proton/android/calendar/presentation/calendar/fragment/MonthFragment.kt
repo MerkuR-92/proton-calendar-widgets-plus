@@ -646,8 +646,10 @@ class MonthFragment : BaseFragment() {
                         calendarViewModel.getWeekStart()?.let { weekStart ->
                             val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
                             if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
-                                val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
-                                val minute = (((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60).toInt()
+                                val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@launch
+                                val hourHeight = weekView?.hourHeight ?: return@launch
+                                val hour = (verticalScrollOffset / hourHeight).toInt()
+                                val minute = (((verticalScrollOffset / hourHeight) - hour) * 60).toInt()
                                 calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
                                     if (hour < 0) 0 else if (hour > 23) 23 else hour,
                                     if (minute < 0) 0 else if (minute > 59) 59 else minute)
@@ -658,8 +660,10 @@ class MonthFragment : BaseFragment() {
                     }
                 } else {
                     if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
-                        val hour = (weekView.verticalScrollOffset / weekView.hourHeight).toInt()
-                        val minute = ceil((((weekView.verticalScrollOffset / weekView.hourHeight) - hour) * 60)).toInt()
+                        val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@WeekViewAdapter
+                        val hourHeight = weekView?.hourHeight ?: return@WeekViewAdapter
+                        val hour = (verticalScrollOffset / hourHeight).toInt()
+                        val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
                         calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
                             if (hour < 0) 0 else if (hour > 23) 23 else hour,
                             if (minute < 0) 0 else if (minute > 59) 59 else minute)
