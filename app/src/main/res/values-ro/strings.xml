@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Calendarele se descarcă (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Timp rămas: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Se calculează timpul rămas…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">aproape gata</string>
     <string name="search_downloading_pause">Suspendare descărcare</string>
     <string name="search_settings_dialog_toggle_off_title">Eliminați toate calendarele descărcate?</string>
     <string name="search_settings_dialog_toggle_off_text">Trebuie să descărcați toate calendarele dacă doriți să căutați.</string>
@@ -476,7 +477,7 @@
     <string name="dialog_feedback_submit">Trimitere</string>
     <string name="dialog_feedback_submit_thank_you">Vă mulțumim! Informațiile trimise ne ajută să îmbunătățim Proton.</string>
     <!-- Calendar Widget -->
-    <string name="calendar_widget_description">Proton Calendar widget</string>
+    <string name="calendar_widget_description">Modul Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">Astăzi nu sunt evenimente</string>
     <string name="calendar_widget_loading_events">Se încarcă evenimentele…</string>
     <string name="calendar_widget_loading_events_error">Nu s-au putut încărca evenimentele.</string>
@@ -503,8 +504,8 @@
     <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Căutați fără probleme</string>
     <string name="spotlight_dialog_search_description">Acum puteți căuta evenimente din calendare. Se va descărca o copie criptată a calendarelor pe dispozitiv. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
-    <string name="spotlight_dialog_import_title">Alte moduri de adăugat evenimente</string>
-    <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe telefon.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
+    <string name="spotlight_dialog_import_title">Alte metode de adăugat evenimente</string>
+    <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
@@ -571,8 +572,8 @@
     <string name="import_assistant_sign_in_in_progress">Un proces de autentificare este deja în derulare.</string>
     <string name="import_assistant_in_progress_error_snack">Încă mai există o importare în derulare.</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Importare ca eveniment simplu?</string>
-    <string name="import_event_disclaimer_dialog_description">\nInvitațiile importate apar în Proton Calendar ca evenimente simple, fără detalii despre <b>organizator</b> și <b>participant</b>.\n\nPentru a primi actualizări și a vedea participanții, solicitați organizatorilor să vă invite folosindu-vă adresa de e-mail din Proton.</string>
+    <string name="import_event_disclaimer_dialog_title">Importați ca eveniment simplu?</string>
+    <string name="import_event_disclaimer_dialog_description">\nInvitațiile importate apar în Proton Calendar ca evenimente simple, fără detalii despre <b>organizator</b> și <b>participant</b>.\n\nPentru a primi actualizări ale evenimentelor și a vedea participanții, solicitați organizatorilor să vă invite folosind adresa dvs. de e-mail din Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importare</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -730,7 +731,7 @@
     <string-array name="time_formats">
         <item>Implicit din sistem</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>1:00 pm</item>
     </string-array>
     <string-array name="week_start">
         <item>Implicit din sistem</item>

@@ -125,7 +125,7 @@
     <string name="event_send_prefs_trusted_keys_invalid">vertrouwde sleutels zijn ongeldig</string>
     <string name="event_send_prefs_public_keys_invalid">publieke sleutels zijn ongeldig</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">ongeldig contact handtekening</string>
-    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s, %2$s</string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nieuwe afspraak</string>
     <string name="event_text_edit_event">Afspraak bewerken</string>
@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Agenda\'s downloaden (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tijd resterend: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Resterende tijd berekenen…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">bijna klaar</string>
     <string name="search_downloading_pause">Download pauzeren</string>
     <string name="search_settings_dialog_toggle_off_title">Alle gedownloade agenda\'s verwijderen?</string>
     <string name="search_settings_dialog_toggle_off_text">U zult uw agenda\'s opnieuw moeten downloaden als u wilt zoeken.</string>
@@ -342,7 +343,7 @@
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
     <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
-    <string name="snack_opening_ics">Opening event…</string>
+    <string name="snack_opening_ics">Afspraak wordt geopend…</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -430,7 +431,7 @@
     <string name="calendar_form_default_email_value_error">Kan standaard e-mail niet laden</string>
     <string name="calendar_form_name_hint">Voeg een agendanaam toe</string>
     <string name="calendar_form_name_required_error">Naam vereist</string>
-    <string name="calendar_form_description_hint">Voeg een beschrijving toe aan de agenda.</string>
+    <string name="calendar_form_description_hint">Voeg een beschrijving toe aan de agenda</string>
     <string name="add_calendar_text">Agenda toevoegen</string>
     <string name="create_calendar_limit_reached">U hebt het maximum aantal agenda\'s bereikt.</string>
     <string name="create_calendar_limit_reached_title">Kan niet meer agenda\'s toevoegen</string>
@@ -503,8 +504,8 @@
     <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b>- en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Naadloos doorzoeken</string>
     <string name="spotlight_dialog_search_description">U kunt nu zoeken in uw agenda naar afspraken. Hiervoor wordt een versleutelde kopie van uw agenda gedownload op uw apparaat. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
-    <string name="spotlight_dialog_import_title">More ways to add events</string>
-    <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
+    <string name="spotlight_dialog_import_title">Meer manieren om afspraken toe te voegen</string>
+    <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
@@ -571,9 +572,9 @@
     <string name="import_assistant_sign_in_in_progress">Er is reeds een loginproces bezig</string>
     <string name="import_assistant_in_progress_error_snack">Er is nog steeds een import in uitvoering</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Import as simple event?</string>
-    <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
-    <string name="import_event_disclaimer_dialog_positive">Import</string>
+    <string name="import_event_disclaimer_dialog_title">Importeren als eenvoudige afspraak?</string>
+    <string name="import_event_disclaimer_dialog_description">\nGeïmporteerde uitnodigingen verschijnen in Proton Calendar als eenvoudige afspraken zonder details over de <b>organisator</b> en <b>deelnemers</b>.\n\nOm updates van afspraken te krijgen en deelnemers te zien, vraag de organisatoren om u uit te nodigen met uw Proton e-mailadres.</string>
+    <string name="import_event_disclaimer_dialog_positive">Importeren</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">agenda</item>
@@ -706,7 +707,7 @@ Deselecteer minstens %1$d agenda\'s</item>
     <string-array name="time_formats">
         <item>Systeemstandaard</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>13:00</item>
     </string-array>
     <string-array name="week_start">
         <item>Systeemstandaard</item>

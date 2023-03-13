@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Download dei calendari (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tempo rimanente: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calcolo tempo rimanente in corso…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">quasi finito</string>
     <string name="search_downloading_pause">Sospendi il download</string>
     <string name="search_settings_dialog_toggle_off_title">Rimuovere tutti i calendari scaricati?</string>
     <string name="search_settings_dialog_toggle_off_text">Dovrai scaricare di nuovo i tuoi calendari se desideri eseguire la ricerca.</string>
@@ -503,8 +504,8 @@
     <string name="spotlight_dialog_week_view_description">• Presentazione delle visualizzazioni del calendario in modalità <b>3 giorni</b> e in modalità <b>settimana</b>. Seleziona la tua visualizzazione preferita nel <b>menu</b>.\n\n• Regola l\'altezza delle righe della griglia del giorno, pizzicando con due dita per ingrandire o ridurre.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Cerca senza problemi</string>
     <string name="spotlight_dialog_search_description">Ora puoi cercare eventi nei tuoi calendari. Questo scaricherà una copia crittografata dei tuoi calendari sul tuo dispositivo. <a href="https://proton.me/support/calendar-search">Scopri di più</a></string>
-    <string name="spotlight_dialog_import_title">More ways to add events</string>
-    <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
+    <string name="spotlight_dialog_import_title">Altri modi per aggiungere eventi</string>
+    <string name="spotlight_dialog_import_description">• Importa eventi nel tuo calendario dai file sul tuo telefono.\n\n• Aggiungi prenotazioni di viaggi direttamente da Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
@@ -571,8 +572,8 @@
     <string name="import_assistant_sign_in_in_progress">È già in corso una procedura di accesso</string>
     <string name="import_assistant_in_progress_error_snack">C\'è ancora un\'importazione in corso</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Importa come semplice evento?</string>
-    <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
+    <string name="import_event_disclaimer_dialog_title">Importare come evento semplice?</string>
+    <string name="import_event_disclaimer_dialog_description">\nGli inviti importati appariranno in Proton Calendar come eventi semplici, senza i dettagli sull\'<b>organizzatore</b> e i <b>partecipanti</b>.\n\n Per ricevere gli aggiornamenti sugli eventi e visualizzare i partecipanti, chiedi agli organizzatori di invitarti utilizzando il tuo indirizzo email Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importa</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -704,7 +705,7 @@
     <string-array name="time_formats">
         <item>Predefinito di sistema</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Predefinito di sistema</item>

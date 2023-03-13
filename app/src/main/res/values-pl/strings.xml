@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Pobieranie kalendarzy (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Pozostały czas: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Szacowanie pozostałego czasu…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">prawie gotowe</string>
     <string name="search_downloading_pause">Wstrzymaj pobieranie</string>
     <string name="search_settings_dialog_toggle_off_title">Usunąć wszystkie pobrane kalendarze?</string>
     <string name="search_settings_dialog_toggle_off_text">Musisz ponownie pobrać kalendarze, aby je przeszukiwać.</string>
@@ -436,7 +437,7 @@
     <string name="create_calendar_limit_reached_title">Nie można dodać więcej kalendarzy</string>
     <string name="create_calendar_limit_reached_paid_description">Osiągnięto maksymalną liczbę 25 kalendarzy dostępnych w Twoim planie.\n\nAby utworzyć nowy, usuń obecny kalendarz.</string>
     <string name="create_calendar_limit_reached_manage">Zarządzaj kalendarzami</string>
-    <string name="create_calendar_limit_reached_free_description">Osiągnięto maksymalną liczbę 3 kalendarzy dostępnych w Twoim planie.\n\nAby utworzyć nowy, usuń obecny kalendarz.</string>
+    <string name="create_calendar_limit_reached_free_description">Osiągnięto maksymalną liczbę 3 kalendarzy dostępnych w Twoim planie.\n\nAby utworzyć nowy kalendarz, usuń obecny.</string>
     <string name="create_calendar_limit_reached_error">Błąd</string>
     <string name="delete_calendar_dialog_title">Usuń kalendarz</string>
     <string name="delete_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz?</string>
@@ -572,7 +573,7 @@
     <string name="import_assistant_in_progress_error_snack">Proces importowania jest w toku</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Importować jako zwykłe wydarzenie?</string>
-    <string name="import_event_disclaimer_dialog_description">\nZaimportowane zaproszenia pojawiają się w Proton Calendar jako zwykłe wydarzenia <b>bez organizatora</b> i <b>uczestników</b>.\n\nAby otrzymywać aktualizacje wydarzeń i zobaczyć listę uczestników, poproś organizatorów o zaproszenie z użyciem adresu Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nZaimportowane zaproszenia pojawiają się w Proton Calendar jako zwykłe wydarzenia <b>bez szczegółów organizatora</b> i <b>uczestników</b>.\n\nAby otrzymywać aktualizacje wydarzeń i zobaczyć listę uczestników, poproś organizatorów o zaproszenie, używając swojego adresu Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importuj</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -756,7 +757,7 @@
     <string-array name="time_formats">
         <item>Domyślny systemu</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>13:00</item>
     </string-array>
     <string-array name="week_start">
         <item>Domyślny systemu</item>

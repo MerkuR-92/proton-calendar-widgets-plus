@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Descargando calendarios (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tiempo restante: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculando tiempo restante…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">casi terminado</string>
     <string name="search_downloading_pause">Pausar descarga</string>
     <string name="search_settings_dialog_toggle_off_title">¿Eliminar todos los calendarios descargados?</string>
     <string name="search_settings_dialog_toggle_off_text">Tendrá que descargar los calendarios de nuevo si quiere buscar.</string>
@@ -503,7 +504,7 @@
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Seleccione su vista preferida en el <b>menú</b>.\n\n• Ajuste la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Buscar sin problemas</string>
     <string name="spotlight_dialog_search_description">Ya puede buscar en sus calendarios. Esto descarga en su dispositivo una copia cifrada de los calendarios. <a href="https://proton.me/support/calendar-search">Más información</a></string>
-    <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
+    <string name="spotlight_dialog_import_title">Más formas de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importe eventos a su calendario desde archivos en su teléfono.\n\n• Añada reservas de viajes directamente desde Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
@@ -572,7 +573,7 @@
     <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">¿Importar como evento simple?</string>
-    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples <b>sin organizador</b> y detalles de <b>participantes</b>.\n\nPara obtener actualizaciones de eventos y ver participantes, pregunte a los organizadores para invitarle usando su dirección de Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni del <b>participante</b>.\n\nPara recibir actualizaciones del evento y ver sus participantes, pida a los organizadores que le inviten usando su dirección de correo de Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
