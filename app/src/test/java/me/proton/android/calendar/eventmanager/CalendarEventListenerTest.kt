@@ -166,12 +166,12 @@ class CalendarEventListenerTest {
     fun `onResetAll deletes all events and fetches recent events`() {
         runBlocking {
             coEvery { calendarsRepository.deleteAllEvents(any()) } returns Unit
-            coEvery { getMinimalCalendarEventsUseCase.execute(any(), any()) } returns flowOf(emptyList())
+            coEvery { getMinimalCalendarEventsUseCase.execute(any(), any()) } returns true
 
             listener.onResetAll(config)
 
             coVerify(exactly = 1) { calendarsRepository.deleteAllEvents(any()) }
-            coVerify(exactly = 1) { getMinimalCalendarEventsUseCase.execute(any(), true) }
+            coVerify(exactly = 1) { getMinimalCalendarEventsUseCase.execute(any(), any()) }
         }
     }
 }

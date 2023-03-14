@@ -72,8 +72,7 @@ class CalendarEventListener @Inject constructor(
 
     override suspend fun onResetAll(config: EventManagerConfig) {
         calendarsRepository.deleteAllEvents(config.asCalendar().calendarId)
-        val eventIds = getMinimalCalendarEventsUseCase.execute(config.userId, fetch = true).firstOrNull()?.map { it.id }
-        eventIds?.let { updateAlarmsUseCase.execute(config.userId.id, it) }
+        getMinimalCalendarEventsUseCase.execute(config.userId, config.asCalendar().calendarId)
     }
 
     override suspend fun onSuccess(config: EventManagerConfig) {
