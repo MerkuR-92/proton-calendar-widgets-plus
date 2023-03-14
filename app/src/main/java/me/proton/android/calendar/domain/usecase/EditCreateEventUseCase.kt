@@ -9,12 +9,13 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.SESSION_KEY_ALGO
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
+import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitiseForExternal
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.utils.CryptoUtilsImpl.isValidForEncryption
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.SyncEvent
 import me.proton.android.calendar.data.api.SyncEventCreateContainer
@@ -35,13 +36,11 @@ import me.proton.android.calendar.domain.model.PackageType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.encryptSessionKey
 import me.proton.core.key.domain.entity.key.PrivateKey
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
-import me.proton.core.key.domain.useKeys
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
@@ -67,19 +66,29 @@ class EditCreateEventUseCase @Inject constructor(
     /**
      * @param [sendPreferences] needed for Auto-Added Invites to encrypt SharedKeyPacket with attendee's Public Address Key
      */
-    suspend fun execute(userId: UserId, newEvent: Event, oldCalendarId: String = newEvent.calendar.id, createLinkedEventAsAttendee: Boolean = false, sendPreferences: Map<Email, SendPreferences> = emptyMap()) : UseCase.Result {
-        
-        val oldEventEntity = if (newEvent.isSyncedWithApi()) {
-            (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
+    suspend fun execute(
+        userId: UserId,
+        newEvent: Event,
+        oldCalendarId: String = newEvent.calendar.id,
+        createLinkedEventAsAttendee: Boolean = false,
+        sendPreferences: Map<Email, SendPreferences> = emptyMap(),
+        isImport: Boolean = false
+    ) : UseCase.Result {
+
+        val sanitizedNewEvent = Event.from(newEvent)
+        sanitizedNewEvent.iCalEvent.sanitiseForExternal()
+
+        val oldEventEntity = if (sanitizedNewEvent.isSyncedWithApi()) {
+            (upgradeEventUseCase.execute(userId, sanitizedNewEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
         } else null
 
         val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
 
         // 0. split Event according to the matrix
-        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(newEvent.iCalendar)
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(sanitizedNewEvent.iCalendar)
 
         // 1. get Member's AddressKey for signing
-        val newMemberKey = when (val result = getMemberKey(userAddresses, newEvent.calendar.id)) {
+        val newMemberKey = when (val result = getMemberKey(userAddresses, sanitizedNewEvent.calendar.id)) {
             is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<MemberKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newMemberKey")
             else -> return result
         }
@@ -99,11 +108,11 @@ class EditCreateEventUseCase @Inject constructor(
             }
         } else null
 
-        val isCalendarBeingChanged = oldCalendarId != newEvent.calendar.id
+        val isCalendarBeingChanged = oldCalendarId != sanitizedNewEvent.calendar.id
 
         // 4. get new CalendarKey for encrypting
         val newCalendarKey = if (isCalendarBeingChanged) {
-            when (val result = getCalendarKey(userId.id, newEvent.calendar.id)) {
+            when (val result = getCalendarKey(userId.id, sanitizedNewEvent.calendar.id)) {
                 is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<CalendarKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newCalendarKey")
                 else -> return result
             }
@@ -120,7 +129,7 @@ class EditCreateEventUseCase @Inject constructor(
 
         val encryptedSharedPartCiphertext =
             if (createLinkedEventAsAttendee) {
-                val sharedSessionKeyProperty = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, shared session key was null")
+                val sharedSessionKeyProperty = sanitizedNewEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SESSION_KEY)?.value ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, shared session key was null")
                 val sharedSessionKey = SessionKey(Base64.decode(sharedSessionKeyProperty, Base64.DEFAULT), SESSION_KEY_ALGO)
                 // TODO migrate to PublicKey.encryptSessionKey(cryptoContext, sessionKeyBytes)
                 val sharedKeyPacket = crypto.getKeyPacket(
@@ -270,36 +279,36 @@ class EditCreateEventUseCase @Inject constructor(
                 val canonicalMemberEmails = userAddresses.map { address ->
                     canonicalizeProtonEmail(address.email, forceCanonicalization = true)
                 }
-                val userAttendee = newEvent.iCalEvent.attendees.find { attendee ->
+                val userAttendee = sanitizedNewEvent.iCalEvent.attendees.find { attendee ->
                     canonicalMemberEmails.firstOrNull { userEmail ->
                         val attendeeEmail = attendee.extractEmail()
                         attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(userEmail, ignoreCase = true)
                     } != null
-                } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from newEvent")
+                } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: create linked event, could not get user attendee from sanitizedNewEvent")
                 listOf(userAttendee)
-            } else newEvent.iCalEvent.attendees
+            } else sanitizedNewEvent.iCalEvent.attendees
 
         newEventAttendees.forEach { attendee ->
             if (attendee.participationStatus == null) attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
             val status = attendee.participationStatus?.toInt() ?: ParticipationStatus.NEEDS_ACTION.toInt()
             attendee.extractEmail()?.let {
-                val xpmToken = attendee.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it), newEvent.uid) // TODO Maybe use API route ?
+                val xpmToken = attendee.getParameter(X_PM_TOKEN) ?: ICalUtilsImpl.generateXPmToken(canonicalizeProtonEmail(it), sanitizedNewEvent.uid) // TODO Maybe use API route ?
                 attendees.add(
                     Event.AttendeeStatusEvent(null, xpmToken, status, null)
                 )
             }
         }
 
-        val organizerEmail = newEvent.iCalEvent.organizer?.extractEmail()
+        val organizerEmail = sanitizedNewEvent.iCalEvent.organizer?.extractEmail()
         val isOrganizer =
             if (organizerEmail != null) {
                 val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
                 val canonicalOrganizerEmail = canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)
                 canonicalUserEmails.any { canonicalOrganizerEmail == it }.toInt()
-            } else if (newEvent.iCalEvent.attendees.isNullOrEmpty()) 1
+            } else if (sanitizedNewEvent.iCalEvent.attendees.isNullOrEmpty()) 1
             else 0
 
-        val syncRequestBody = if (newEvent.isSyncedWithApi()) {
+        val syncRequestBody = if (sanitizedNewEvent.isSyncedWithApi()) {
             if (isCalendarBeingChanged) {
                 // CREATE in new calendar
                 SyncEventsUpdateApiRequest(
@@ -314,10 +323,10 @@ class EditCreateEventUseCase @Inject constructor(
                                 calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                                 calendarEventContent = calendarEventContent,
                                 personalEventContent = personalEventContent,
-                                sharedEventId = newEvent.sharedEventId,
-                                uid = newEvent.uid,
+                                sharedEventId = sanitizedNewEvent.sharedEventId,
+                                uid = sanitizedNewEvent.uid,
                                 sourceCalendarId = oldCalendarId,
-                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -327,7 +336,7 @@ class EditCreateEventUseCase @Inject constructor(
                     memberId = newMemberKey.memberId,
                     events = listOf(
                         SyncEventUpdateContainer(
-                            id = newEvent.id,
+                            id = sanitizedNewEvent.id,
                             event = SyncEvent(
                                 permissions = 1,
                                 isOrganizer = isOrganizer,
@@ -343,7 +352,7 @@ class EditCreateEventUseCase @Inject constructor(
                                 // In both cases adding attendees happens in the "second call to /sync after the first one that created event", which is right here.
                                 // If we sent the SharedSessionKey already before, the attendee has the event auto-created in their calendar already, so we are done.
                                 addedProtonAttendees = addedProtonAttendees,
-                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -352,7 +361,7 @@ class EditCreateEventUseCase @Inject constructor(
         } else { // CREATE
             if (createLinkedEventAsAttendee) {
                 // This is a proton to proton invite
-                val sharedEventId = newEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value
+                val sharedEventId = sanitizedNewEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value
                 SyncEventsUpdateApiRequest(
                     memberId = newMemberKey.memberId,
                     events = listOf(
@@ -363,8 +372,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 personalEventContent = personalEventContent,
                                 attendees = attendees,
                                 sharedEventId = sharedEventId,
-                                uid = newEvent.uid,
-                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                uid = sanitizedNewEvent.uid,
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
                             )
                         )
                     )
@@ -383,20 +392,22 @@ class EditCreateEventUseCase @Inject constructor(
                                 calendarEventContent = calendarEventContent,
                                 personalEventContent = personalEventContent,
                                 attendeesEventContent =
-                                if (newEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
+                                if (sanitizedNewEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
                                 else null, // We first create without attendees
                                 attendees =
-                                if (newEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
+                                if (sanitizedNewEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
                                 else null, // We first create without attendees,
-                                notifications = newEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
-                            )
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                            ),
+                            overwrite = isImport.toInt() // We always overwrite for imports
                         )
-                    )
+                    ),
+                    isImport = isImport.toInt()
                 )
             }
         }
 
-        return when (val syncResponse = calendarsApi.syncEvents(userId, newEvent.calendar.id, syncRequestBody)) {
+        return when (val syncResponse = calendarsApi.syncEvents(userId, sanitizedNewEvent.calendar.id, syncRequestBody)) {
             is ApiResponse.Success -> {
                 val eventsToInsertOrUpdate = syncResponse.data.responses.mapNotNull {
                     if (it.response.isSuccessful) {

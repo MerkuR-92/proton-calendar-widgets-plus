@@ -47,6 +47,11 @@ interface ICalUtils {
     fun VEvent.sanitise(): Boolean
 
     /**
+     * Sanitise the event before sending it to BE or by email so that it matches RFC.
+     */
+    fun VEvent.sanitiseForExternal()
+
+    /**
      * This methods clones Recurrence and overwrites only parameters supplied.
      */
     fun Recurrence.clone(
@@ -90,6 +95,11 @@ interface ICalUtils {
      * Generates UID in the form of "original UID prefix + recurrenceId + original UID postfix (after @ symbol)".
      */
     fun generateProtonUid(originalUid: String, recurrenceId: String): String
+
+    /**
+     * Generates Proton UID for an imported event.
+     */
+    fun generateProtonUidForImport(originalEventUid: String?, ics: String): String
 
     /**
      * Generates Proton Product Identifier.

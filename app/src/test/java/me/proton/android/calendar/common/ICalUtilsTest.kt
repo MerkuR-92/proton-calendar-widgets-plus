@@ -1,14 +1,26 @@
 package me.proton.android.calendar.common
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNotNull
+import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import biweekly.ICalVersion
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
-import biweekly.property.*
-import biweekly.util.*
+import biweekly.property.CalendarScale
+import biweekly.property.Method
+import biweekly.property.RecurrenceRule
+import biweekly.property.Trigger
+import biweekly.util.ByDay
 import biweekly.util.DayOfWeek
+import biweekly.util.Frequency
+import biweekly.util.ICalDate
+import biweekly.util.Recurrence
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
@@ -25,6 +37,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getExceptionDates
 import me.proton.android.calendar.common.utils.EventUtilsImpl.handleDeleteThisAndFuture
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
+import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustOutgoingAllDayEvent
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustRRuleToStartDate
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustStartEndTimeZones
@@ -36,6 +49,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOccurencesByRecurrenceId
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateProtonProdId
@@ -45,7 +59,10 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isDateTimeTheSame
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
@@ -53,14 +70,9 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.filterFromTheEnd
-import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
@@ -69,8 +81,13 @@ import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.mocks.EventMocks
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import java.time.*
-import java.util.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.Date
+import java.util.TimeZone
 
 
 internal class ICalUtilsTest {

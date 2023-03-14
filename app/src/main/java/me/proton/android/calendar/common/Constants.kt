@@ -92,6 +92,7 @@ const val MONTH_VIEW_VERSION_CODE = 112
 const val REBRANDING_VERSION_CODE = 145
 const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
+const val IMPORT_VERSION_CODE = 182
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -99,7 +100,8 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     MONTH_VIEW_VERSION_CODE, // Month view (0.30.3)
     REBRANDING_VERSION_CODE, // Rebranding (2.0.2)
     EASY_SWITCH_VERSION_CODE, // Easy switch (2.2.0)
-    WEEK_VIEW_VERSION_CODE // Week view (2.3.10)
+    WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
+    IMPORT_VERSION_CODE // Import (2.6.2)
 )
 
 object FeatureFlag {
@@ -107,7 +109,7 @@ object FeatureFlag {
     const val ADD_ATTENDEES = true
     const val CHANGE_ANSWER = true
     const val OPEN_ICS = true
-    const val OPEN_ICS_FILES = false
+    const val OPEN_ICS_FILES = true
     const val APP_LINKS = true
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
@@ -212,11 +214,18 @@ object IcsParsingValidation {
     const val MAX_YEARLY_INTERVAL = 99
     const val MAX_ATTENDEES = 100
 
+    const val MAX_VCALENDAR_COUNT = 1
+    const val MAX_VEVENT_COUNT = 1
+
     val MIN_DATE = ZonedDateTime.of(1970, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
     val MAX_DATE = ZonedDateTime.of(2038, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"))
 
+    const val UTC_TIME_ZONE_ID = "UTC"
     const val X_WR_TIMEZONE = "X-WR-TIMEZONE"
     const val TZID = "TZID"
+    const val TZID_PARAMETER = ";TZID="
+    const val ATTENDEE_PROPERTY = "ATTENDEE;"
+    const val ORGANIZER_PROPERTY = "ORGANIZER;"
 }
 
 object AppLinksQueryParameters {
