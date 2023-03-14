@@ -59,11 +59,11 @@
     <string name="event_alarm_label_on_the_same_day">У той жа дзень</string>
     <string name="event_alarm_label_before">%1$s да падзеі</string>
     <string name="event_alarm_label">%1$s</string>
-    <string name="event_alarm_label_before_by_email">%1$s да падзеі праз электронную пошту</string>
+    <string name="event_alarm_label_before_by_email">%1$s да падзеі па электроннай пошце</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s а %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s а %2$s праз электронную пошту</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s а %2$s па электроннай пошце</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s да падзеі а %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s да падзеі а %2$s праз электронную пошту</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s да падзеі а %2$s па электроннай пошце</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s у %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s на %2$d чысло</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s у %2$s</string>
@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Спампоўванне календароў (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Засталося часу: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Падлік часу, які застаўся…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">амаль гатова</string>
     <string name="search_downloading_pause">Прыпыніць спампоўванне</string>
     <string name="search_settings_dialog_toggle_off_title">Выдаліць усе спампаваныя календары?</string>
     <string name="search_settings_dialog_toggle_off_text">Вам неабходна спампаваць вашы календары яшчэ раз, калі вы хочаце шукаць у іх.</string>
@@ -503,7 +504,7 @@
     <string name="spotlight_dialog_week_view_description">• Уводзіны ў прагляд календара на <b>тры дні</b> і <b>тыдзень</b>. Выберыце пажаданы спосаб прагляду ў <b>меню</b>.\n\n• Адрэгулюйце вышыню радкоў у сетцы з днямі з дапамогай двух пальцаў, павялічваючы або памяншаючы маштаб.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Плаўны пошук</string>
     <string name="spotlight_dialog_search_description">Цяпер вы можаце выконваць пошук падзей у сваіх календарах. Гэта спампаваныя на прыладу зашыфраваныя копіі вашых календароў. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
-    <string name="spotlight_dialog_import_title">Іншыя спосабы дадаць падзеі</string>
+    <string name="spotlight_dialog_import_title">Больш спосабаў дадаць падзеі</string>
     <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
@@ -594,10 +595,10 @@
         <item quantity="other">%d бягучыя імпартаванні</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d ствараны з %d у %s</item>
-        <item quantity="few">%d створаны з %d у %s</item>
-        <item quantity="many">%d створаны з %d у %s</item>
-        <item quantity="other">%d створаны з %d у %s</item>
+        <item quantity="one">%d з %d створаны ў %s</item>
+        <item quantity="few">%d з %d створаны ў %s</item>
+        <item quantity="many">%d з %d створаны ў %s</item>
+        <item quantity="other">%d з %d створаны ў %s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
         <item quantity="one">Стварыце %d новы каляндар у Proton Calendar.</item>
@@ -756,7 +757,7 @@
     <string-array name="time_formats">
         <item>Адпаведна сістэме</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>13:00</item>
     </string-array>
     <string-array name="week_start">
         <item>Адпаведна сістэме</item>

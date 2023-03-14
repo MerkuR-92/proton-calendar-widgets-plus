@@ -35,7 +35,7 @@
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Se mantendrán las ocurrencias actualizadas previamente por el organizador.</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No se ha podido notificar el organizador de que declinaste la invitación:\n\n• %1$s\n\n¿Quieres eliminar el evento de todas formas?</string>
     <string name="dialog_button_set">Configurar</string>
-    <string name="dialog_button_ok">OK</string>
+    <string name="dialog_button_ok">Aceptar</string>
     <string name="action_save">Guardar</string>
     <string name="action_done">Hecho</string>
     <string name="action_edit">Editar</string>
@@ -113,7 +113,7 @@
     <string name="event_organizer_send_prefs_message_declined_title">No se puede notificar al organizador de que has rechazado la invitación.</string>
     <string name="event_organizer_send_prefs_message_tentative_title">No se puede notificar al organizador de que has aceptado provisionalmente la invitación.</string>
     <string name="event_organizer_send_prefs_message_default_title">No se puede notificar al organizador de que has respondido a la invitación.</string>
-    <string name="event_organizer_send_prefs_button_title">OK</string>
+    <string name="event_organizer_send_prefs_button_title">Aceptar</string>
     <string name="event_attendees_send_prefs_error_title">No se puede notificar a los participantes.</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Ninguno de los participantes puede ser notificado acerca de tus cambios:\n\n• %1$s\n\n¿Quieres continuar de todos modos?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Los siguientes participantes no pueden ser notificados de tus cambios:\n\n• %1$s\n\n¿Quieres continuar de todos modos?</string>
@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Descargando calendarios (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tiempo restante: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculando tiempo restante…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">casi terminado</string>
     <string name="search_downloading_pause">Pausar descarga</string>
     <string name="search_settings_dialog_toggle_off_title">¿Eliminar todos los calendarios descargados?</string>
     <string name="search_settings_dialog_toggle_off_text">Tienes que descargar los calendarios de nuevo si quieres realizar búsquedas.</string>
@@ -374,7 +375,7 @@
     <!-- Bug report -->
     <string name="bug_report_hint_title">Asunto</string>
     <string name="bug_report_hint_description">Describe el problema e incluye cualquier mensaje de error.</string>
-    <string name="bug_report_discard_changes_title">Cambios sin guardar</string>
+    <string name="bug_report_discard_changes_title">Cambios no guardados</string>
     <string name="bug_report_discard_changes_description">Hay entradas no guardadas en el formulario. ¿Estás seguro de querer descartarlas?</string>
     <string name="bug_report_discard_changes_cancel">Seguir escribiendo</string>
     <string name="bug_report_discard_changes_confirm">Descartar</string>
@@ -450,7 +451,7 @@
     <string name="recreate_calendar_snack_deleted">Calendario limpiado</string>
     <string name="recreate_calendar_snack_clearing">Limpiando calendario…</string>
     <!-- Bootstrap errors -->
-    <string name="bootstrap_error_default_confirm">OK</string>
+    <string name="bootstrap_error_default_confirm">Aceptar</string>
     <string name="bootstrap_error_no_calendar_title">No hay ningún calendario asociado con esta cuenta.</string>
     <string name="bootstrap_error_no_calendar_message">Para configurar uno ahora, visita <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Error preparando calendarios</string>
@@ -486,7 +487,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
-    <string name="spotlight_dialog_confirmation_button">OK</string>
+    <string name="spotlight_dialog_confirmation_button">Aceptar</string>
     <string name="spotlight_dialog_month_view_title">Vista de mes</string>
     <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas usando el menú.</string>
     <string name="spotlight_dialog_easy_switch_description">Importar eventos y otros datos de Google Calendar a Proton Calendar es más fácil que nunca. Nuestro importador Easy Switch te guiará con cada paso.</string>
@@ -498,13 +499,13 @@
     <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Selecciona tu vista preferida en el <b>menú</b>.\n\n• Ajusta la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Buscar con facilidad</string>
     <string name="spotlight_dialog_search_description">Ya puedes buscar en tus eventos en tus calendarios. Esto descarga una copia cifrada de los calendarios en tu dispositivo. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
-    <string name="spotlight_dialog_import_description">• Importa eventos a tu calendario desde ficheros en tu teléfono.\n\n• Añade reservas de viajes directamente desde Proton Mail.</string>
+    <string name="spotlight_dialog_import_description">• Importar eventos a tu calenario desde ficheros en tu teléfono.\n\n• Añadir reservas de viajes directamente desde Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>
@@ -572,7 +573,7 @@
     <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">¿Importar como evento simple?</string>
-    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples <b>sin detalles del organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones de los evento y ver a los participantes, pida a los organizadores que te inviten utilizando tu dirección de correo electrónico de Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones del evento y ver los participantes, pide a los organizadores que te inviten utilizando tu dirección de correo electrónico Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
@@ -691,10 +692,10 @@
     <string-array name="ordinals_as_words_backwards">
         <item translatable="false"/>
         <item>último</item>
-        <item>second to last</item>
-        <item>third to last</item>
-        <item>fourth to last</item>
-        <item>fifth to last</item>
+        <item>penúltimo</item>
+        <item>antepenúltimo</item>
+        <item>preantepenúltimo</item>
+        <item>quinto empezando por el final</item>
     </string-array>
     <string-array name="app_themes">
         <item>Claro</item>
@@ -704,10 +705,10 @@
     <string-array name="time_formats">
         <item>Del sistema</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
-        <item>System default</item>
+        <item>Por defecto</item>
         <item>Lunes</item>
         <item>Sábado</item>
         <item>Domingo</item>

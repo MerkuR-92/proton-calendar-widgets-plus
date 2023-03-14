@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Kalender werden heruntergeladen (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Verbleibende Zeit: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Verbleibende Zeit wird berechnet…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">Fast fertig</string>
     <string name="search_downloading_pause">Download anhalten</string>
     <string name="search_settings_dialog_toggle_off_title">Alle heruntergeladenen Kalender entfernen?</string>
     <string name="search_settings_dialog_toggle_off_text">Du musst deine Kalender erneut herunterladen, wenn du eine Suche durchführen möchtest.</string>
@@ -503,7 +504,7 @@
     <string name="spotlight_dialog_week_view_description">• Einführung der <b>3-Tage</b>- und <b>Wochen</b>-Kalenderansichten. Wähle deine bevorzugte Ansicht im <b>Menü</b>.\n\n• Passe die Höhe der Zeilen im Tagesraster an, indem du mit zwei Fingern hinein- oder herauszoomst.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Nahtloses Suchen</string>
     <string name="spotlight_dialog_search_description">Du kannst jetzt in deinen Kalendern nach Terminen suchen. Dadurch wird eine verschlüsselte Kopie deiner Kalender auf dein Gerät heruntergeladen. <a href="https://proton.me/support/calendar-search">Mehr erfahren</a></string>
-    <string name="spotlight_dialog_import_title">Weitere Möglichkeiten zum Hinzufügen von Terminen</string>
+    <string name="spotlight_dialog_import_title">Weitere Möglichkeiten um Termine hinzuzufügen</string>
     <string name="spotlight_dialog_import_description">• Importiere Termine aus Dateien auf deinem Handy in deinen Kalender.\n\n• Füge Reisebuchungen direkt aus Proton Mail hinzu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
@@ -572,8 +573,8 @@
     <string name="import_assistant_in_progress_error_snack">Ein Importvorgang wird derzeit noch ausgeführt</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Als einzelnen Termin importieren?</string>
-    <string name="import_event_disclaimer_dialog_description">\nImportierte Einladungen werden in Proton Calendar als einzelne Termine <b>ohne Organisator-</b> und <b>Teilnehmerdetails</b> angezeigt.\n\nUm Aktualisierungen der Termine zu erhalten und die Teilnehmer anzuzeigen, bitte den Organisator, dich über deine Proton-E-Mail-Adresse einzuladen.</string>
-    <string name="import_event_disclaimer_dialog_positive">Import</string>
+    <string name="import_event_disclaimer_dialog_description">\nImportierte Einladungen werden in Proton Calendar als einzelne Termine <b>ohne Organisator-</b> und <b>Teilnehmerdetails</b> angezeigt.\n\n Um Aktualisierungen der Termine zu erhalten und die Teilnehmer anzuzeigen, bitte den Organisator, dich über deine Proton-E-Mail-Adresse einzuladen.</string>
+    <string name="import_event_disclaimer_dialog_positive">Importieren</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">Kalender</item>
@@ -682,7 +683,7 @@
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
         <item translatable="false"/>
-        <item>first</item>
+        <item>Erster</item>
         <item>Zweiter</item>
         <item>Dritter</item>
         <item>Vierter</item>
@@ -704,7 +705,7 @@
     <string-array name="time_formats">
         <item>Systemstandard</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Systemstandard</item>

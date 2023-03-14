@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Завантаження календарів (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Лишилося часу: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Обчислення часу до завершення…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">майже готово</string>
     <string name="search_downloading_pause">Призупинити завантаження</string>
     <string name="search_settings_dialog_toggle_off_title">Вилучити всі завантажені календарі?</string>
     <string name="search_settings_dialog_toggle_off_text">Вам потрібно буде завантажити календарі ще раз, якщо ви хочете здійснити пошук.</string>
@@ -503,7 +504,7 @@
     <string name="spotlight_dialog_week_view_description">• Представляємо перегляд календаря на <b>3 дні</b> й на <b>тиждень</b>. Виберіть потрібний вигляд у <b>меню</b>.\n\n• Налаштуйте висоту рядків у сітці дня, зводячи двома пальцями, щоб збільшити або зменшити масштаб.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Легкий пошук</string>
     <string name="spotlight_dialog_search_description">Тепер ви можете шукати події у своїх календарях. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
-    <string name="spotlight_dialog_import_title">Інші шляхи додати події</string>
+    <string name="spotlight_dialog_import_title">Інші способи додавання подій</string>
     <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
@@ -572,8 +573,8 @@
     <string name="import_assistant_in_progress_error_snack">Усе ще триває імпортування</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Імпортувати як просту подію?</string>
-    <string name="import_event_disclaimer_dialog_description">\nІмпортовані запрошення Proton Calendar з\'являються як звичайні події без подробиць про <b>організатора</b> й <b>учасника</b>.\n\nЩоб отримувати оновлення подій та бачити учасників, попросіть організаторів запросити вас, за допомогою вашої адреси електронної пошти Proton.</string>
-    <string name="import_event_disclaimer_dialog_positive">Імпорт</string>
+    <string name="import_event_disclaimer_dialog_description">\nІмпортовані запрошення з\'являються у календарі Proton як прості події <b>без інформації про організатора</b> та <b>учасників</b>.\n\nЩоб отримувати оновлення події та бачити учасників, попросіть організатора запросити вас із використанням вашої адреси електронної пошти Proton.</string>
+    <string name="import_event_disclaimer_dialog_positive">Імпортувати</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">календар</item>

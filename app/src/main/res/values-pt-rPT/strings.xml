@@ -151,6 +151,7 @@
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Time remaining: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculating time remaining…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">almost done</string>
     <string name="search_downloading_pause">Pause download</string>
     <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
     <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
@@ -379,7 +380,7 @@
     <string name="bug_report_discard_changes_cancel">Continuar a escrever</string>
     <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
-    <string name="settings_theme_title"> Tema</string>
+    <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Esta definição só afecta a aparência do Proton Calendar neste dispositivo. A aplicação será reiniciada após alterar o tema.</string>
     <string name="settings_timezone_title">Fuso horário</string>
     <string name="settings_language_title">Idioma da aplicação</string>
