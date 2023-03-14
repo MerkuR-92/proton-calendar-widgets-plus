@@ -29,12 +29,17 @@ jacoco { toolVersion = "0.8.7" }
 kapt { correctErrorTypes = true }
 
 android {
-    buildToolsVersion = "30.0.3"
-    ndkVersion = "21.3.6528147"
+    buildToolsVersion = Config.buildToolsVersion
+    ndkVersion = Config.ndkVersion
     compileSdk = Config.compileSdk
+    namespace = Config.applicationId
 
     kotlinOptions { jvmTarget = "11" }
     dataBinding { enable = true }
+
+    buildFeatures {
+        dataBinding = true
+    }
 
     defaultConfig {
         applicationId = Config.applicationId
@@ -64,6 +69,7 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = false
             isMinifyEnabled = false // TODO turn off for initial beta release
             isShrinkResources = false
             proguardFiles(
@@ -72,12 +78,13 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
 
-            val sentryDsn = System.getenv("SENTRY_DSN_NEW") ?: ""
-            buildConfigField("String", "SENTRY_DSN_NEW", "\"${sentryDsn}\"")
+            val sentryDsn = System.getenv("SENTRY_DSN_NEW")
+            buildConfigField("String", "SENTRY_DSN_NEW", sentryDsn.toBuildConfigValue())
         }
         debug {
-            buildConfigField("String", "SENTRY_DSN_NEW", "\"null\"")
+            buildConfigField("String", "SENTRY_DSN_NEW", null.toBuildConfigValue())
             enableUnitTestCoverage = true
+            isDebuggable = true
         }
     }
 
@@ -88,7 +95,9 @@ android {
     }
 
     sourceSets {
-        getByName("androidTest").java.srcDirs("src/sharedTest/java")
+        // TODO: remove after moving sharedTest to separate module
+        // https://issuetracker.google.com/issues/232420188#comment19
+        getByName("androidTest").java.srcDir("src/sharedTest/java")
         getByName("test").java.srcDirs("src/sharedTest/java")
     }
 
@@ -96,6 +105,7 @@ android {
 }
 
 dependencies {
+    androidTestImplementation(project(mapOf("path" to ":app")))
     coreLibraryDesugaring(libs.tools.desugar)
 
     // Local
@@ -214,6 +224,7 @@ dependencies {
     androidTestImplementation(libs.test.androidx.rules)
     androidTestImplementation(libs.test.androidx.arch)
     androidTestImplementation(libs.test.fusion)
+    androidTestImplementation(libs.test.androidx.ext.junit)
 }
 
 tasks.register("getArchivesName"){
@@ -248,10 +259,14 @@ tasks.withType<Test> {
     }
 }
 
+fun String?.toBuildConfigValue() = if (this != null) "\"$this\"" else "null"
+
 object Config {
     const val applicationId = "me.proton.android.calendar"
     const val compileSdk = 33
     const val minSdk = 23
+    const val ndkVersion = "21.3.6528147"
+    const val buildToolsVersion = "30.0.3"
     const val targetSdk = 33
     const val versionCode = 179
     const val testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

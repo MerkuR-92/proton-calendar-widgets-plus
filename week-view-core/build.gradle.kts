@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace = "com.alamkanak.weekview"
     defaultConfig {
         compileSdk = 32
         minSdk = 23
