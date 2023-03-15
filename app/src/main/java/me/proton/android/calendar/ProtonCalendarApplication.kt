@@ -19,19 +19,14 @@ import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvid
 import me.proton.android.calendar.common.repositoryModule
 import me.proton.android.calendar.common.useCaseModule
 import me.proton.android.calendar.common.utils.CustomLocale
-import me.proton.android.calendar.common.viewModelModule
-import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
-import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
@@ -64,9 +59,6 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var accountManager: AccountManager
-
-    @Inject
-    lateinit var accountStateHandler: AccountStateHandler
 
     @Inject
     lateinit var userManager: UserManager
@@ -104,12 +96,6 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var eventDecryptor: EventDecryptor
 
-    @Inject
-    lateinit var searchDatabase: SearchDatabase
-
-    @Inject
-    lateinit var indexEventForSearchUseCase: IndexEventForSearchUseCase
-
     override fun onCreate() {
         super.onCreate()
         MainInitializer.init(this)
@@ -118,7 +104,6 @@ class ProtonCalendarApplication : Application() {
             androidContext(this@ProtonCalendarApplication)
             modules(
                 commonModule,
-                viewModelModule,
                 repositoryModule,
                 networkModule,
                 useCaseModule,
@@ -135,9 +120,7 @@ class ProtonCalendarApplication : Application() {
                     calendarsRepository,
                     contactEmailsRepository,
                     userSettingsRepository,
-                    getRecipientPublicAddresses,
-                    searchDatabase,
-                    indexEventForSearchUseCase
+                    getRecipientPublicAddresses
                 )
             )
         }
@@ -161,15 +144,11 @@ class ProtonCalendarApplication : Application() {
 
         ShowNotificationUseCase.createNotificationChannels(this)
 
-        accountStateHandler.start()
-
         forceUpdateViewModel.forceUpdate.observe(ProcessLifecycleOwner.get()) {
             if (it.forceUpdate) {
                 startActivity(ForceUpdateActivity(this, it.apiErrorMessage))
             }
         }
-
-        PeriodicCalendarWorker.setup(this, logger)
     }
 
     override fun attachBaseContext(base: Context) {

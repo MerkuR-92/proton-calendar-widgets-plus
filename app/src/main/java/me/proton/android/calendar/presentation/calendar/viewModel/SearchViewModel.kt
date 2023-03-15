@@ -39,6 +39,7 @@ class SearchViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val calendarsRepository: CalendarsRepository,
     private val valueStoreProvider: ValueStoreProvider,
+    private val workManager: WorkManager,
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job()
@@ -63,11 +64,11 @@ class SearchViewModel @Inject constructor(
         class ONGOING(val progressPercentage: Int, val progressText: String): DownloadingState()
     }
 
-    fun startObservingWorkerState(context: Context, viewLifecycleOwner: LifecycleOwner) {
+    fun startObservingWorkerState(viewLifecycleOwner: LifecycleOwner) {
 
         var lastWorkerState: WorkInfo.State? = null
 
-        WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(FetchCalendarsWorker.UNIQUE_WORK_NAME)
+        workManager.getWorkInfosForUniqueWorkLiveData(FetchCalendarsWorker.UNIQUE_WORK_NAME)
             .map { it.firstOrNull() }.observe(viewLifecycleOwner, Observer<WorkInfo?> {
 
                 val progressPercentage = it?.progress?.getInt(FetchCalendarsWorker.PROGRESS_KEY_PROGRESS_PERCENTAGE, 0) ?: 0
@@ -138,15 +139,13 @@ class SearchViewModel @Inject constructor(
     /**
      * @return WorkRequest ID
      */
-    fun enableCalendarDownload(context: Context): java.util.UUID {
+    fun enableCalendarDownload(): java.util.UUID {
 
         coroutineScope.launch {
             accountManager.getPrimaryUserId().firstOrNull()?.let {
                 valueStoreProvider.provideValueStore(it.id).putBoolean(ValueKey.SEARCH_ENABLED, true)
             }
         }
-
-        val workManager = WorkManager.getInstance(context)
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -158,9 +157,9 @@ class SearchViewModel @Inject constructor(
         return workRequest.id
     }
 
-    fun disableCalendarDownload(context: Context) {
+    fun disableCalendarDownload() {
         // cancel Work
-        WorkManager.getInstance(context).cancelUniqueWork(FetchCalendarsWorker.UNIQUE_WORK_NAME)
+        workManager.cancelUniqueWork(FetchCalendarsWorker.UNIQUE_WORK_NAME)
 
         coroutineScope.launch {
             accountManager.getPrimaryUserId().firstOrNull()?.let {
@@ -177,28 +176,28 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun pauseCalendarDownload(context: Context) {
+    fun pauseCalendarDownload() {
         // pausing is really cancelling the Work and counting on it to be properly resumed later
-        WorkManager.getInstance(context).cancelUniqueWork(FetchCalendarsWorker.UNIQUE_WORK_NAME)
+        workManager.cancelUniqueWork(FetchCalendarsWorker.UNIQUE_WORK_NAME)
     }
 
-    fun actionButtonClicked(context: Context) {
+    fun actionButtonClicked() {
 
         when (downloadingState.value) {
             DownloadingState.NONE -> { // start downloading
-                enableCalendarDownload(context)
+                enableCalendarDownload()
             }
             is DownloadingState.ONGOING -> { // pause downloading
-                pauseCalendarDownload(context)
+                pauseCalendarDownload()
             }
             DownloadingState.PAUSED -> { // resume downloading
-                enableCalendarDownload(context)
+                enableCalendarDownload()
             }
             DownloadingState.FINISHED -> { // shouldn't really happen, button should be invisible
 
             }
             DownloadingState.ERROR -> { // retry = resume downloading
-                enableCalendarDownload(context)
+                enableCalendarDownload()
             }
         }
 

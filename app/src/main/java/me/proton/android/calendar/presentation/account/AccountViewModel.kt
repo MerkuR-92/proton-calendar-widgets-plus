@@ -66,6 +66,7 @@ class AccountViewModel @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val database: AppDatabase,
     private val userSettingsDatabase: UserSettingsDatabase,
+    private val workManager: WorkManager,
 ) : ViewModel() {
 
     sealed class State {
@@ -127,8 +128,8 @@ class AccountViewModel @Inject constructor(
         valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
-    private suspend fun cleanUser(context: Context) {
-        WorkManager.getInstance(context).cancelAllWork()
+    private suspend fun cleanUser() {
+        workManager.cancelAllWork()
         calendarsRepository.clearSearchDatabase()
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
@@ -158,7 +159,7 @@ class AccountViewModel @Inject constructor(
                 .onAccountTwoPassModeFailed { removeUser(it.userId) }
                 .onAccountCreateAddressFailed { removeUser(it.userId) }
                 .onAccountDisabled { removeUser(it.userId) }
-                .onAccountRemoved { cleanUser(context) }
+                .onAccountRemoved { cleanUser() }
         }
 
         // Check if we already have Ready account.

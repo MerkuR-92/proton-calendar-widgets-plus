@@ -3,11 +3,14 @@ package me.proton.android.calendar.common.worker
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -32,25 +35,25 @@ import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase.Companion.NOTIFICATION_ID_FETCH_CALENDARS_WORKER
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
-class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(appContext, workerParams),
-    KoinComponent {
-
-    private val logger: Logger by inject()
-    private val accountManager: AccountManager by inject()
-    private val calendarsApi: CalendarsApi by inject()
-    private val valueStoreProvider: ValueStoreProvider by inject()
-    private val calendarsRepository: CalendarsRepository by inject()
-    private val searchDatabase: SearchDatabase by inject()
-    private val fetchEventsUseCase: FetchEventsUseCase by inject()
-    private val indexEventForSearchUseCase: IndexEventForSearchUseCase by inject()
+@HiltWorker
+class FetchCalendarsWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParameters: WorkerParameters,
+    private val logger: Logger,
+    private val accountManager: AccountManager,
+    private val calendarsApi: CalendarsApi,
+    private val valueStoreProvider: ValueStoreProvider,
+    private val calendarsRepository: CalendarsRepository,
+    private val searchDatabase: SearchDatabase,
+    private val fetchEventsUseCase: FetchEventsUseCase,
+    private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
+    private val workManager: WorkManager
+) : CoroutineWorker(context, workerParameters) {
 
     private lateinit var startInstant: Instant
     private lateinit var calendarMetadata: List<Metadata>
@@ -287,7 +290,7 @@ class FetchCalendarsWorker(appContext: Context, workerParams: WorkerParameters) 
 
     private fun createForegroundInfo(title: String, progressPercent: Int): ForegroundInfo {
         // PendingIntent to cancel the worker
-        val intent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(getId())
+        val intent = workManager.createCancelPendingIntent(getId())
 
         // Create a Notification channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

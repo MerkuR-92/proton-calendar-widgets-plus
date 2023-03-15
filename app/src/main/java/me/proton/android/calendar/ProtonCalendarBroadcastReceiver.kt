@@ -30,6 +30,8 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
     lateinit var logger: Logger
     @Inject
     lateinit var accountManager: AccountManager
+    @Inject
+    lateinit var workManager: WorkManager
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -44,7 +46,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
                 if (context == null) {
                     logger.e("null Context in ProtonCalendarBroadcastReceiver ACTION_BOOT_COMPLETED")
                 } else {
-                    PeriodicCalendarWorker.setup(context, logger)
+                    PeriodicCalendarWorker.setup(workManager, logger)
 
                     try {
                         GlobalScope.launch(Dispatchers.IO) {
@@ -101,9 +103,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
             )
             .build()
 
-        return WorkManager.getInstance(context)
-            .enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.HANDLE_ALARMS, ExistingWorkPolicy.REPLACE, work).state
-
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.HANDLE_ALARMS, ExistingWorkPolicy.REPLACE, work).state
     }
 
     companion object {

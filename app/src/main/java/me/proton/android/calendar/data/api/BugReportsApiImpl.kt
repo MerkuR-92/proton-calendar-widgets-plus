@@ -8,13 +8,16 @@ import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
 import retrofit2.http.Body
 import retrofit2.http.POST
+import javax.inject.Inject
 
 interface BugReportsApiService : BaseRetrofitApi {
     @POST("reports/bug")
     suspend fun sendReport(@Body body: BugReportsApiRequest): BugReportsApiResponse
 }
 
-class BugReportsApiImpl(private val apiProvider: ApiProvider) : BugReportsApi {
+class BugReportsApiImpl @Inject constructor(
+    private val apiProvider: ApiProvider
+) : BugReportsApi {
 
     override suspend fun sendBugReport(userId: UserId, body: BugReportsApiRequest): ApiResponse<BugReportsApiResponse> =
         apiProvider.get<BugReportsApiService>(userId).invoke {

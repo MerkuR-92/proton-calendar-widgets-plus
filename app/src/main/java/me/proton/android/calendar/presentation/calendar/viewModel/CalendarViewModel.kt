@@ -140,7 +140,8 @@ class CalendarViewModel @Inject constructor(
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
     private val resourceProvider: ResourceProvider,
     private val database: AppDatabase,
-    private val json: Json
+    private val json: Json,
+    private val workManager: WorkManager,
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -553,7 +554,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone: Boolean) : LiveData<Operation.State> {
@@ -572,7 +573,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateDisplayWeekNumber(displayWeekNumber: Boolean) : LiveData<Operation.State> {
@@ -591,7 +592,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateAutoImportInvite(autoImportInvite: Boolean) : LiveData<Operation.State> {
@@ -610,7 +611,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_IMPORT_INVITE, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_IMPORT_INVITE, ExistingWorkPolicy.REPLACE, work).state
     }
 
     suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {
@@ -643,7 +644,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateWeekStart(weekStart: Int) : LiveData<Operation.State> {
@@ -662,7 +663,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
@@ -680,7 +681,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
     }
 
     fun sendBugReport(
@@ -715,7 +716,7 @@ class CalendarViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
     }
 
     suspend fun updateInactiveCalendarsPassphrase() {

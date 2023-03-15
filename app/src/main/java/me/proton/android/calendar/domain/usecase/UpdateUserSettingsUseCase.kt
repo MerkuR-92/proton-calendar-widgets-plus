@@ -6,8 +6,9 @@ import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.usersettings.domain.entity.UserSettings
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
+import javax.inject.Inject
 
-class UpdateUserSettingsUseCase(
+class UpdateUserSettingsUseCase @Inject constructor(
     private val logger: Logger,
     private val settingsApi: SettingsApi,
     private val userSettingsRepository: UserSettingsRepository

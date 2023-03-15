@@ -1,23 +1,31 @@
 package me.proton.android.calendar.common.worker
 
 import android.content.Context
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.hasKeyWithValueOfType
-import me.proton.android.calendar.common.FeatureFlag
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import me.proton.android.calendar.common.WORKER_MAX_RETRY_COUNT
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
-import org.koin.core.KoinComponent
-import org.koin.core.get
-import org.koin.core.inject
 
-class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams), KoinComponent {
-
-    private val logger: Logger by inject()
-
+@HiltWorker
+class UseCaseWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParameters: WorkerParameters,
+    private val logger: Logger,
+    private val syncAlarmsUseCase: SyncAlarmsUseCase,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val sendBugReportUseCase: SendBugReportUseCase,
+    private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
+    private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
+    private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
+    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase
+) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
      */
@@ -98,22 +106,18 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)
         val useCaseResult = when (useCaseId) {
             UseCaseId.SYNC_ALARMS -> {
-                val syncAlarmsUseCase: SyncAlarmsUseCase = get()
                 syncAlarmsUseCase.execute(userId)
             }
             UseCaseId.HANDLE_ALARMS -> {
                 val alarmEpochSeconds = if (inputData.hasKeyWithValueOfType<Long>(INPUT_ALARM_EPOCH_SECONDS)) {
                     inputData.getLong(INPUT_ALARM_EPOCH_SECONDS, 0)
                 } else null
-                val handleAlarmsUseCase: HandleAlarmsUseCase = get()
                 handleAlarmsUseCase.execute(userId, alarmEpochSeconds)
             }
             UseCaseId.UPDATE_CALENDAR_LIST -> {
-                val updateCalendarUseCase: UpdateCalendarUseCase = get()
                 updateCalendarUseCase.updateAllCalendarsDisplay(userId)
             }
             UseCaseId.SEND_BUG_REPORT -> {
-                val sendBugReportUseCase: SendBugReportUseCase = get()
                 sendBugReportUseCase.execute(
                     userId,
                     inputData.getString(INPUT_OS_NAME) ?: return Result.failure(),
@@ -126,14 +130,12 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getString(INPUT_EMAIL) ?: return Result.failure())
             }
             UseCaseId.UPDATE_PRIMARY_TIMEZONE -> {
-                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.executePrimaryTimezone(
                     userId,
                     inputData.getString(INPUT_PRIMARY_TIMEZONE) ?: return Result.failure()
                 )
             }
             UseCaseId.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE -> {
-                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.executeAutoDetectPrimaryTimezone(
                     userId,
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_AUTO_DETECT_PRIMARY_TIMEZONE))
@@ -142,7 +144,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 )
             }
             UseCaseId.UPDATE_DISPLAY_WEEK_NUMBER -> {
-                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.executeDisplayWeekNumber(
                     userId,
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_DISPLAY_WEEK_NUMBER))
@@ -151,7 +152,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 )
             }
             UseCaseId.UPDATE_AUTO_IMPORT_INVITE -> {
-                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.executeAutoImportInvite(
                     userId,
                     if (inputData.hasKeyWithValueOfType<Boolean>(INPUT_AUTO_IMPORT_INVITE))
@@ -160,14 +160,12 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 )
             }
             UseCaseId.UPDATE_DEFAULT_CALENDAR_ID -> {
-                val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase = get()
                 updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
                 )
             }
             UseCaseId.UPDATE_TIME_FORMAT -> {
-                val updateUserSettingsUseCase: UpdateUserSettingsUseCase = get()
                 updateUserSettingsUseCase.executeTimeFormat(
                     userId,
                     if (inputData.hasKeyWithValueOfType<Int>(INPUT_TIME_FORMAT))
@@ -176,7 +174,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 )
             }
             UseCaseId.UPDATE_WEEK_START -> {
-                val updateUserSettingsUseCase: UpdateUserSettingsUseCase = get()
                 updateUserSettingsUseCase.executeWeekStart(
                     userId,
                     if (inputData.hasKeyWithValueOfType<Int>(INPUT_WEEK_START))
@@ -185,7 +182,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                 )
             }
             UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT -> {
-                val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase = get()
                 updateParticipationStatusUseCase.executeClearSingleEdits(
                     userId,
                     inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure(),
@@ -194,7 +190,6 @@ class UseCaseWorker(appContext: Context, workerParams: WorkerParameters) : Corou
                     inputData.getInt(INPUT_PARTICIPATION_STATUS, 0))
             }
             UseCaseId.FETCH_PUBLIC_KEYS -> {
-                val fetchPublicKeysUseCase: FetchPublicKeysUseCase = get()
                 val emails = inputData.getStringArray(INPUT_USER_EMAILS) ?: return Result.failure()
                 fetchPublicKeysUseCase.fetchPublicKeys(userId, emails.toList())
             }

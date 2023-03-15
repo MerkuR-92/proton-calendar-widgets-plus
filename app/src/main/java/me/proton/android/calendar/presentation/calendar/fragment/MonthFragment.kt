@@ -652,7 +652,7 @@ class MonthFragment : BaseFragment() {
 
         requireActivity().showLastSpotlightDialog() {
             if (it == SEARCH_VERSION_CODE) {
-                searchViewModel.enableCalendarDownload(requireContext())
+                searchViewModel.enableCalendarDownload()
                 requireActivity().displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
             }
         }

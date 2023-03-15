@@ -6,8 +6,9 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.BugReportsApiRequest
 import me.proton.android.calendar.domain.api.BugReportsApi
 import me.proton.core.domain.entity.UserId
+import javax.inject.Inject
 
-class SendBugReportUseCase(
+class SendBugReportUseCase @Inject constructor(
     private val defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
     private val bugReportsApi: BugReportsApi
 ) {
