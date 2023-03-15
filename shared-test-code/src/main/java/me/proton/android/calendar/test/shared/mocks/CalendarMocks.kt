@@ -1,16 +1,14 @@
-package me.proton.android.calendar.mocks
+package me.proton.android.calendar.test.shared.mocks
 
 import biweekly.parameter.Related
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.core.util.kotlin.toBoolean
-import me.proton.core.util.kotlin.toInt
 
 object CalendarMocks {
 
@@ -27,8 +25,10 @@ object CalendarMocks {
             id = calendarSettingsId,
             calendarId = id,
             defaultEventDuration = defaultEventDuration,
-            defaultPartDayNotifications = listOf(Json.decodeFromString<JsonElement>("{\"Type\":1,\"Trigger\":\"-PT15M\"}")), // One alarm 15 minutes before
-            defaultFullDayNotifications = listOf(Json.decodeFromString<JsonElement>("{\"Type\":1,\"Trigger\":\"-PT15H\"}")) // One day before at 9am
+            // One alarm 15 minutes before
+            defaultPartDayNotifications = listOf(Json.decodeFromString("{\"Type\":1,\"Trigger\":\"-PT15M\"}")),
+            // One day before at 9am
+            defaultFullDayNotifications = listOf(Json.decodeFromString("{\"Type\":1,\"Trigger\":\"-PT15H\"}"))
         )
     }
 
@@ -47,7 +47,12 @@ object CalendarMocks {
         )
     }
 
-    fun provideCalendar(isDisabled: Boolean = false, isHidden: Boolean = false, id: String = calendarId, defaultPartDayNotifications: List<Notification>? = null): Calendar {
+    fun provideCalendar(
+        isDisabled: Boolean = false,
+        isHidden: Boolean = false,
+        id: String = calendarId,
+        defaultPartDayNotifications: List<Notification>? = null
+    ): Calendar {
         return Calendar(
             id,
             calendarName,
@@ -59,8 +64,21 @@ object CalendarMocks {
             calendarType,
             calendarPermissions,
             defaultEventDuration,
-            defaultPartDayNotifications = defaultPartDayNotifications ?: listOf(Notification.Display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START))),
-            defaultFullDayNotifications = listOf(Notification.Display(Trigger(Duration.builder().prior(true).hours(15).build(), Related.START)))
+            defaultPartDayNotifications = defaultPartDayNotifications ?: listOf(
+                Notification.Display(
+                    Trigger(
+                        Duration.builder().prior(true).minutes(15).build(),
+                        Related.START
+                    )
+                )
+            ),
+            defaultFullDayNotifications = listOf(
+                Notification.Display(
+                    Trigger(
+                        Duration.builder().prior(true).hours(15).build(), Related.START
+                    )
+                )
+            )
         )
     }
 

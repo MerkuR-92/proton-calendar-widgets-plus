@@ -19,7 +19,7 @@ import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerDelegate
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata

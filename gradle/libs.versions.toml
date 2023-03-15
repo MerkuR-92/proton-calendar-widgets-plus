@@ -18,9 +18,12 @@ coordinator-layout = "1.1.0"
 swiperefresh-layout = "1.1.0"
 viewpager2 = "1.1.0-alpha01"
 material = "1.5.0"
-androidx-test = "1.4.0"
+androidx-test = "1.5.0"
+androidx-test-orchestrator = "1.4.2"
+androidx-test-runner = "1.5.2"
+androidx-test-services = "1.4.2"
 androidx-activity = "1.5.1"
-androidx-ext = "1.1.1"
+androidx-ext = "1.1.5"
 androidx-appcompat = "1.4.1"
 androidx-preference = "1.1.1"
 androidx-core = "1.3.2"
@@ -33,7 +36,7 @@ assisted-inject = "0.6.0"
 hilt-android = "2.44"
 hilt-androidx = "1.0.0"
 proton_core = "9.12.0"
-android-gradle-plugin = "7.3.1"
+android-gradle-plugin = "7.4.2"
 detekt-gradle-plugin = "1.19.0"
 jacoco = "0.8.7"
 mockito = "4.5.1"
@@ -44,7 +47,7 @@ junit = "4.13.2"
 kotlin-stdlib = "1.6.21"
 desugar = "1.1.5"
 dagger = "2.44.2"
-core = "9.12.0"
+core = "10.0.0"
 fusion = "0.9.50"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
@@ -78,6 +81,7 @@ core-accountManager = { module = "me.proton.core:account-manager", version.ref =
 core-accountManager-domain = { module = "me.proton.core:account-manager-domain", version.ref = "core" }
 core-accountManager-dagger = { module = "me.proton.core:account-manager-dagger", version.ref = "core" }
 core-auth = { module = "me.proton.core:auth", version.ref = "core" }
+core-auth-test = { module = "me.proton.core:auth-test", version.ref = "core" }
 core-contact = { module = "me.proton.core:contact", version.ref = "core" }
 core-auth-domain = { module = "me.proton.core:auth-domain", version.ref = "core" }
 core-challenge = { module = "me.proton.core:challenge", version.ref = "core" }
@@ -128,10 +132,12 @@ test-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mo
 test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin"}
 test-google-truth = { module = "com.google.truth:truth", version.ref = "google-truth"}
 test-junit = { module = "junit:junit", version.ref = "junit"}
-test-androidx-testrunner = { module = "androidx.test:runner", version.ref = "androidx-test"}
+test-androidx-testrunner = { module = "androidx.test:runner", version.ref = "androidx-test-runner"}
 test-androidx-core = { module = "androidx.test:core", version.ref = "androidx-test"}
 test-androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-test"}
 test-androidx-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-ext"}
+test-androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator"}
+test-androidx-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services"}
 test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk"}
 test-mockk = { module = "io.mockk:mockk", version.ref = "mockk"}
 test-fusion = { module = "me.proton.test:fusion", version.ref = "fusion"}

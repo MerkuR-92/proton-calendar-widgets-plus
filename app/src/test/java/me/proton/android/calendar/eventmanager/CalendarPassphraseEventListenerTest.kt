@@ -12,8 +12,8 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarPassphraseEventListener
-import me.proton.android.calendar.mocks.calendarId
-import me.proton.android.calendar.mocks.userId
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action

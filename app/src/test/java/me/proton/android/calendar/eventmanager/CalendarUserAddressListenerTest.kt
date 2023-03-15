@@ -8,8 +8,8 @@ import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarUserAddressListener
-import me.proton.android.calendar.mocks.addressId
-import me.proton.android.calendar.mocks.userEmail
+import me.proton.android.calendar.test.shared.mocks.addressId
+import me.proton.android.calendar.test.shared.mocks.userEmail
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.key.data.api.response.AddressResponse

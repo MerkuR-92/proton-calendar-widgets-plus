@@ -20,8 +20,8 @@ import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
-import me.proton.android.calendar.mocks.CalendarMocks
-import me.proton.android.calendar.mocks.CalendarMocks.provideCalendarSettingsEntity
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendarSettingsEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventsResponse

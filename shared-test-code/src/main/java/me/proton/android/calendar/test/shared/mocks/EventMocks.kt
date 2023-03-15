@@ -1,4 +1,4 @@
-package me.proton.android.calendar.mocks
+package me.proton.android.calendar.test.shared.mocks
 
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
@@ -17,7 +17,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.NotificationMigration
-import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendar
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -95,7 +95,12 @@ object EventMocks {
 
         if (hasDefaultAlarms) {
             // One alarm 15 minutes before
-            iCalendar.events.first().addAlarm(VAlarm.display(Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START), null))
+            iCalendar.events.first().addAlarm(
+                VAlarm.display(
+                    Trigger(Duration.builder().prior(true).minutes(15).build(), Related.START),
+                    null
+                )
+            )
         }
 
         iCalendar.setDefaultTimeZone(defaultTimezone)

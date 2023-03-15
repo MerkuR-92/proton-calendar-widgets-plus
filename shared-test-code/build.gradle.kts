@@ -1,0 +1,45 @@
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+
+plugins {
+    id("com.android.library")
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("dagger.hilt.android.plugin")
+}
+
+android {
+    namespace = "me.proton.android.calendar.test.shared"
+    compileSdk = 33
+
+    defaultConfig {
+        compileSdk = 32
+        minSdk = 23
+        targetSdk = 32
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE*")
+    }
+}
+
+dependencies {
+    implementation(project(":app"))
+    implementation(libs.dagger.hilt.android)
+    implementation(libs.core.utilKotlin)
+    implementation(libs.core.domain)
+    implementation(libs.core.user)
+    implementation(libs.core.userSettings)
+    implementation(libs.biweekly)
+    implementation(libs.kotlinx.serialization.json)
+    kapt(libs.dagger.hilt.android.compiler)
+    coreLibraryDesugaring(libs.tools.desugar)
+}

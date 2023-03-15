@@ -11,9 +11,9 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.CalendarSettingsChangedUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarSettingsEventListener
-import me.proton.android.calendar.mocks.calendarId
-import me.proton.android.calendar.mocks.calendarSettingsId
-import me.proton.android.calendar.mocks.defaultEventDuration
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.calendarSettingsId
+import me.proton.android.calendar.test.shared.mocks.defaultEventDuration
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import org.junit.jupiter.api.BeforeEach

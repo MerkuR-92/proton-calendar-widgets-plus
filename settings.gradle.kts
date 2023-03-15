@@ -11,3 +11,4 @@ includeCoreBuild {
 
 include(":app")
 include(":week-view-core")
+include(":shared-test-code")

@@ -2,8 +2,8 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven("https://plugins.gradle.org/m2/")
     }
+
     dependencies {
         classpath(libs.gradle.plugin.android)
         classpath(libs.gradle.plugin.kotlin)

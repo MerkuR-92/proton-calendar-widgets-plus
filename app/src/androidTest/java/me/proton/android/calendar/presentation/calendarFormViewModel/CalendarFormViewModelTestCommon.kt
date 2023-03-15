@@ -12,7 +12,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.usecase.*
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.user.domain.UserManager

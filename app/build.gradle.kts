@@ -35,7 +35,6 @@ android {
     namespace = Config.applicationId
 
     kotlinOptions { jvmTarget = "11" }
-    dataBinding { enable = true }
 
     buildFeatures {
         dataBinding = true
@@ -67,6 +66,27 @@ android {
         }
     }
 
+    flavorDimensions.add("env")
+    productFlavors {
+        create("dev") {
+            dimension = "env"
+            applicationIdSuffix = ".dev"
+            buildConfigField("String", "API_HOST", "\"api.proton.black\"")
+            buildConfigField("String", "HV3_HOST", "\"verify.proton.black\"")
+            buildConfigField("String", "QUARK_HOST", "\"proton.black\"")
+            buildConfigField("String", "PROXY_TOKEN", System.getenv("PROXY_TOKEN").toBuildConfigValue())
+            buildConfigField("Boolean", "USE_DEFAULT_PINS", "false")
+        }
+        create("prod") {
+            dimension = "env"
+            buildConfigField("String", "API_HOST", "\"calendar-api.proton.me\"")
+            buildConfigField("String", "HV3_HOST", "\"verify.proton.me\"")
+            buildConfigField("String", "QUARK_HOST", "\"\"")
+            buildConfigField("String", "PROXY_TOKEN", "\"\"")
+            buildConfigField("Boolean", "USE_DEFAULT_PINS", "true")
+        }
+    }
+
     buildTypes {
         release {
             isDebuggable = false
@@ -94,14 +114,24 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    sourceSets {
-        // TODO: remove after moving sharedTest to separate module
-        // https://issuetracker.google.com/issues/232420188#comment19
-        getByName("androidTest").java.srcDir("src/sharedTest/java")
-        getByName("test").java.srcDirs("src/sharedTest/java")
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        unitTests.all {
+            it.useJUnitPlatform()
+        }
     }
 
-    flavorDimensions.add("default")
+    packagingOptions {
+        resources.excludes.add("META-INF/licenses/**")
+        resources.excludes.add("META-INF/LICENSE*")
+        resources.excludes.add("META-INF/AL2.0")
+        resources.excludes.add("META-INF/LGPL2.1")
+    }
+
+    sourceSets {
+        getByName("androidTest").java.srcDirs("src/uiTest/java")
+        getByName("androidTest").assets.srcDirs("src/uiTest/assets")
+    }
 }
 
 dependencies {
@@ -115,6 +145,7 @@ dependencies {
     // Hilt Android.
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.android.compiler)
+    kaptAndroidTest(libs.dagger.hilt.android.compiler)
 
     // Assisted Inject.
     compileOnly(libs.assistedInject)
@@ -217,6 +248,7 @@ dependencies {
 
     testImplementation(libs.test.mockk)
     testImplementation(libs.test.assertk.jvm)
+    testImplementation(project(":shared-test-code"))
 
     androidTestImplementation(libs.test.mockk.android)
     androidTestImplementation(libs.test.androidx.core)
@@ -225,6 +257,21 @@ dependencies {
     androidTestImplementation(libs.test.androidx.arch)
     androidTestImplementation(libs.test.fusion)
     androidTestImplementation(libs.test.androidx.ext.junit)
+    androidTestImplementation(libs.core.auth.test)
+    androidTestImplementation(project(":shared-test-code"))
+
+    androidTestUtil(libs.test.androidx.orchestrator)
+    androidTestUtil(libs.test.androidx.services)
+
+
+//    androidTestImplementation "com.google.dagger:hilt-android-testing:${rootProject.ext.version.hilt_android}"
+//    androidTestImplementation "org.jetbrains.kotlin:kotlin-test:${rootProject.ext.version.kotlin}"
+//
+//    androidTestImplementation "me.proton.test:fusion:${rootProject.ext.version.proton_fusion}"
+//    androidTestImplementation "me.proton.core:test-android-instrumented:${rootProject.ext.version.proton_core}"
+//    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+//    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+//    testImplementation 'junit:junit:4.13.2'
 }
 
 tasks.register("getArchivesName"){
