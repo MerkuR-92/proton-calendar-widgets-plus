@@ -139,7 +139,7 @@ class HolidaysViewModel @Inject constructor(
         setDefaultAlarms(calendar.defaultFullDayNotifications)
     }
 
-    suspend fun initCreateHolidays(calendarColor: Int, defaultTimeZoneId: String, defaultLanguage: String) {
+    suspend fun initCreateHolidays(calendarColor: Int, defaultTimeZoneId: String, defaultLanguageCode: String) {
 
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
@@ -165,15 +165,15 @@ class HolidaysViewModel @Inject constructor(
             }
             // Get the calendar matching the default language
             val matchingDefaultHolidaysCalendar = countriesMatchingTimeZone.firstOrNull {
-                it.languageCode.equals(defaultLanguage, ignoreCase = true)
+                it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
             } ?: countriesMatchingTimeZone.firstOrNull()
             _country.value = matchingDefaultHolidaysCalendar?.country ?: ""
-            _language.value = matchingDefaultHolidaysCalendar?.languageCode ?: ""
+            _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
         }
     }
 
     fun getLanguages(): List<String> {
-        return _holidaysCalendars.value?.filter { it.country == _country.value }?.map { it.languageCode } ?: emptyList()
+        return _holidaysCalendars.value?.filter { it.country == _country.value }?.map { it.language } ?: emptyList()
     }
 
     fun hasBeenEdited(): Boolean {
@@ -205,7 +205,7 @@ class HolidaysViewModel @Inject constructor(
         _defaultAllDayAlarms.value = tmpDefaultAllDayAlarms
     }
 
-    fun handleCountry(country: String, defaultLanguage: String) {
+    fun handleCountry(country: String, defaultLanguageCode: String) {
         if (_country.value == country) return
         calendarEdited = true
         _country.value = country
@@ -213,9 +213,9 @@ class HolidaysViewModel @Inject constructor(
         // Get the calendar matching the default language
         val matchingCountries = holidaysCalendars.value?.filter { it.country == country }
         val matchingDefaultHolidaysCalendar = matchingCountries?.firstOrNull {
-            it.languageCode.equals(defaultLanguage, ignoreCase = true)
+            it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
         } ?: matchingCountries?.firstOrNull()
-        _language.value = matchingDefaultHolidaysCalendar?.languageCode ?: ""
+        _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
     }
 
     fun handleLanguage(language: String) {
@@ -238,7 +238,7 @@ class HolidaysViewModel @Inject constructor(
         }
 
         val holidaysCalendar = holidaysCalendars.value?.firstOrNull {
-            it.country == _country.value && it.languageCode == _language.value
+            it.country == _country.value && it.language == _language.value
         } ?: return false // TODO Handle
 
         val calendarColor = _calendarColor.value ?: return false // TODO Handle

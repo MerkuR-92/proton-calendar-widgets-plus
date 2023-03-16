@@ -215,8 +215,7 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
         holidaysViewModel.language.observe(viewLifecycleOwner) { language ->
             if (language.isNullOrEmpty()) return@observe
-            val locale = Locale.forLanguageTag(language)
-            holidays_calendar_form_language_value.text = locale.getDisplayLanguage(locale).replaceFirstChar { it.uppercase() }
+            holidays_calendar_form_language_value.text = language
         }
 
         holidaysViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
@@ -322,22 +321,16 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
         // Calendar language
         holidays_calendar_form_language_press.setOnSingleClickListener {
-            val languageTags = holidaysViewModel.getLanguages()
-            val languages = arrayListOf<Pair<String, String>>()
-            // Create a list of Pair with language tags and display language
-            languageTags.forEach {
-                val locale = Locale.forLanguageTag(it)
-                languages.add(Pair(it, locale.getDisplayLanguage(locale).replaceFirstChar { it.uppercase() }))
-            }
+            val languages = holidaysViewModel.getLanguages()
             AndroidUtils.displayPickerDialog(
                 requireContext(),
                 null,
-                languages.map { it.second }.toTypedArray(),
-                holidaysViewModel.language.value?.let { languageTag ->
-                    languages.indexOf(languages.find { it.first == languageTag })
+                languages.toTypedArray(),
+                holidaysViewModel.language.value?.let { language ->
+                    languages.indexOf(language)
                 } ?: 0
             ) {
-                holidaysViewModel.handleLanguage(languages[it].first)
+                holidaysViewModel.handleLanguage(languages[it])
             }
         }
 
