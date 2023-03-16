@@ -31,7 +31,7 @@
         android:ems="10"
         android:hint="@string/search_hint_input_field"
         android:imeOptions="actionDone"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:scrollHorizontally="false"
         android:maxLength="255"
         android:singleLine="false"
