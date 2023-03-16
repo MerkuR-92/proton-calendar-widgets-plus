@@ -10,7 +10,7 @@ import me.proton.android.calendar.data.entity.SearchEventEntity
 @Dao
 abstract class SearchDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertSearchEvents(searchEvents: List<SearchEventEntity>)
 
     @Query("SELECT * FROM search_events")
