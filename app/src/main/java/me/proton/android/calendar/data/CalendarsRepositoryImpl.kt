@@ -47,7 +47,9 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutBySearchTe
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
@@ -81,7 +83,11 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.data.entity.AddressEntity
+import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
+import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
 import java.time.Instant
@@ -107,7 +113,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val widgetRefresher: WidgetRefresher,
     private val eventDecryptor: EventDecryptor,
     private val searchDatabase: SearchDatabase,
-    private val indexEventForSearchUseCase: IndexEventForSearchUseCase
+    private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
+    private val userManager: UserManager
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -1160,6 +1167,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.membersDao().select(calendarId)
     }
 
+    override suspend fun selectMemberById(memberId: String): MemberEntity? {
+        return database.membersDao().selectById(memberId)
+    }
+
     override suspend fun persistMember(member: MemberEntity) {
         database.membersDao().updateOrInsert(member)
     }
@@ -1304,6 +1315,28 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.eventAlarmsDao().deleteAllByEventIdAndOccurrence(eventId, occurrence)
     }
 
+    override suspend fun getAddressForMember(
+        userId: UserId,
+        member: MemberEntity,
+        addresses: List<UserAddress>?,
+        refresh: Boolean
+    ): UserAddress? {
+        val address = (addresses ?: userManager.getAddressesOrNull(userId, refresh))?.firstOrNull {
+            if (!member.addressId.isNullOrEmpty()) {
+                it.addressId.id.equalsNoCase(member.addressId)
+            } else {
+                canonicalizeProtonEmail(it.email, forceCanonicalization = true)
+                    .equalsNoCase(member.canonicalEmail)
+            }
+        }
+        if (address != null && member.addressId.isNullOrEmpty()) {
+            // Update AddressId in member if a match was found and field was not already persisted
+            database.membersDao().updateMemberAddressId(member.id, address.addressId.id)
+        }
+        return address
+    }
+
+
 }
 
 /**
@@ -1317,20 +1350,12 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json
     ) { calendars, members, calendarSettingsList ->
         if (calendars.isNotEmpty()) {
             // Get user addresses so we can find the calendar member for current user
-            val userCanonicalEmails = database.addressDao().getByUserId(UserId(calendars.first().fkUserId)).map {
-                canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-            }
+            val userAddresses = database.addressDao().getByUserId(UserId(calendars.first().fkUserId))
             calendars.mapNotNull { calendarEntity ->
                 // Find the calendar settings for that calendar
                 val calendarSettings = calendarSettingsList.firstOrNull { it.calendarId == calendarEntity.id } ?: return@mapNotNull null
                 // Find the member that belongs to the current user
-                val userMember = members.firstOrNull {
-                    // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members
-                    val canonicalMemberEmail = canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-                    it.calendarId == calendarEntity.id && userCanonicalEmails.any { it.equals(
-                        canonicalMemberEmail, ignoreCase = true
-                    ) }
-                }
+                val userMember = members.filter { it.calendarId == calendarEntity.id }.getUserMember(userAddresses)
                 // Map to Calendar
                 userMember?.let { Calendar.from(calendarEntity, it, calendarSettings, json) }
             }
@@ -1344,15 +1369,13 @@ fun Flow<List<CalendarEntity>>.joinToCalendars(database: AppDatabase, json: Json
 suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase, json: Json): List<Calendar> {
     if (this.isEmpty()) return emptyList()
     // Get user addresses so we can find the calendar member for current user
-    val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.first().fkUserId)).map {
-        canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-    }
+    val userAddresses = database.addressDao().getByUserId(UserId(this.first().fkUserId))
     return this.mapNotNull { calendarEntity ->
         val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
         // Get all members for that calendar
         val calendarMembers = database.membersDao().select(calendarEntity.id)
         // Find the member that belongs to the current user
-        val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
+        val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar
         userMember?.let { Calendar.from(calendarEntity, it, calendarSettings, json) }
     }
@@ -1366,30 +1389,30 @@ suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase, json: Json): C
         null
     } else {
         // Get user addresses so we can find the calendar member for current user
-        val userCanonicalEmails = database.addressDao().getByUserId(UserId(this.fkUserId)).map {
-            canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-        }
+        val userAddresses = database.addressDao().getByUserId(UserId(this.fkUserId))
         val calendarSettings = database.calendarSettingsDao().select(this.id) ?: return null
         // Get all members for that calendar
         val calendarMembers = database.membersDao().select(this.id)
         // Find the member that belongs to the current user
-        val userMember = calendarMembers.getMemberForEmails(userCanonicalEmails)
+        val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar
         userMember?.let { Calendar.from(this, it, calendarSettings, json) }
     }
 }
 
 /**
- * Find member for the given canonical user emails
+ * Find member that belongs to user
  */
-private fun List<MemberEntity>.getMemberForEmails(userCanonicalEmails: List<String>): MemberEntity? {
-    return this.firstOrNull {
-        // TODO Switch to comparing addressIds instead of canonical emails once we have the field in Members
-        val canonicalMemberEmail = canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-        userCanonicalEmails.any {
-            it.equals(
-                canonicalMemberEmail, ignoreCase = true
-            )
+private fun List<MemberEntity>.getUserMember(userAddresses: List<AddressEntity>): MemberEntity? {
+    return this.firstOrNull { member ->
+        userAddresses.any { userAddress ->
+            if (!member.addressId.isNullOrEmpty()) {
+                member.addressId.equalsNoCase(userAddress.addressId.id)
+            } else {
+                member.canonicalEmail.equalsNoCase(
+                    canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true)
+                )
+            }
         }
     }
 }

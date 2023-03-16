@@ -11,6 +11,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.entity.UserAddress
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -203,6 +204,8 @@ interface CalendarsRepository {
     // members
     suspend fun selectMembers(calendarId: String): List<MemberEntity>
 
+    suspend fun selectMemberById(memberId: String): MemberEntity?
+
     suspend fun persistMember(member: MemberEntity) // calendarId is already there
 
     suspend fun deleteMemberById(id: String)
@@ -285,6 +288,13 @@ interface CalendarsRepository {
     suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
     suspend fun deleteAllEventAlarms(calendarId: String)
+
+    suspend fun getAddressForMember(
+        userId: UserId,
+        member: MemberEntity,
+        addresses: List<UserAddress>? = null,
+        refresh: Boolean = false
+    ): UserAddress?
 
     val fetchingState: Flow<FetchingState>
 

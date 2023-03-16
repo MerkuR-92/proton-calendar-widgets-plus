@@ -17,6 +17,9 @@ abstract class MembersDao : BaseDao<MemberEntity> {
     @Query("SELECT * FROM members WHERE calendarId = :calendarId")
     abstract suspend fun select(calendarId: String): List<MemberEntity>
 
+    @Query("SELECT * FROM members WHERE id = :memberId")
+    abstract suspend fun selectById(memberId: String): MemberEntity?
+
     @Query("SELECT * FROM members WHERE email = :address")
     abstract suspend fun selectByAddress(address: String): List<MemberEntity>
 
@@ -32,4 +35,6 @@ abstract class MembersDao : BaseDao<MemberEntity> {
     @Query("UPDATE members SET flags = :flags WHERE id = :memberId AND calendarId = :calendarId")
     abstract suspend fun updateFlags(memberId: String, calendarId: String, flags: Int)
 
+    @Query("UPDATE members SET addressId = :addressId WHERE id = :memberId")
+    abstract suspend fun updateMemberAddressId(memberId: String, addressId: String)
 }

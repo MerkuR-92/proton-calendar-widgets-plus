@@ -1,6 +1,7 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
 import androidx.annotation.VisibleForTesting
+import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -13,6 +14,7 @@ import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
+import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.deserializeOrNull
 import javax.inject.Inject
 
@@ -20,7 +22,8 @@ class CalendarMemberEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val logger: Logger,
-    private val keySetupUseCase: KeySetupUseCase
+    private val keySetupUseCase: KeySetupUseCase,
+    private val userManager: UserManager
 ): CalendarBaseEventListener<String, MemberEntity>(db) {
     override val order: Int = 2
     override val type: Type = Type.Core
@@ -100,6 +103,19 @@ class CalendarMemberEventListener @Inject constructor(
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         super.onDelete(config, keys)
 
-        keys.forEach { calendarsRepository.deleteMemberById(it) }
+        // Get user addresses emails to compare with members email
+        val addresses = userManager.getAddressesOrNull(config.userId)
+        keys.forEach {
+            val member = calendarsRepository.selectMemberById(it)
+            // We first delete Member
+            calendarsRepository.deleteMemberById(it)
+            member?.let {
+                val memberAddress = calendarsRepository.getAddressForMember(config.userId, member, addresses)
+                if (memberAddress != null) {
+                    // If member belongs to user, delete the calendar linked to it
+                    calendarsRepository.deleteCalendarById(member.calendarId)
+                }
+            }
+        }
     }
 }

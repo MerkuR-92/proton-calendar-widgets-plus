@@ -68,13 +68,14 @@ object CalendarMocks {
         return MemberEntity(
             id = memberId,
             permissions = MemberEntity.Permission.SUPEROWNER.value,
+            addressId = addressId.id,
             email = memberEmail,
             calendarId = calendarId,
             color = calendarColor,
             display = calendarDisplay,
             flags = flags,
             name = calendarName,
-            description = calendarDescription,
+            description = calendarDescription
         )
     }
 }

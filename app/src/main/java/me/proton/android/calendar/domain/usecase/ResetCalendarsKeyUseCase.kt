@@ -8,7 +8,9 @@ import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.ResetCalendarApiRequest
 import me.proton.android.calendar.data.api.SetupKeyApiRequest
 import me.proton.android.calendar.data.entity.MemberEntity
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -16,7 +18,6 @@ import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
-import me.proton.core.util.kotlin.equalsNoCase
 import javax.inject.Inject
 
 class ResetCalendarsKeyUseCase @Inject constructor(
@@ -24,7 +25,8 @@ class ResetCalendarsKeyUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
     private val cryptoContext: CryptoContext,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     suspend fun execute(userId: UserId) : UseCase.Result {
@@ -53,9 +55,7 @@ class ResetCalendarsKeyUseCase @Inject constructor(
                         memberEntity.hasPermission(MemberEntity.Permission.ADMIN)
                     } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: no admin member")
 
-                    val address = addresses.find {
-                        it.email.equalsNoCase(adminMember.email)
-                    } ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address found")
+                    val address = calendarsRepository.getAddressForMember(userId, adminMember, addresses) ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: No address found")
 
                     val memberAddressKey = address.keys.primary() ?: return UseCase.Result.Error("ResetCalendarsKeyUseCase: memberAddressKey was null")
 

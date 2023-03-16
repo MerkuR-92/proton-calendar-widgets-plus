@@ -409,4 +409,10 @@ object AppDatabaseMigrations {
             OrganizationDatabase.MIGRATION_2.migrate(database)
         }
     }
+
+    val MIGRATION_50_51 = object : Migration(50, 51) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.addTableColumn(TABLE_MEMBERS, "addressId", "TEXT")
+        }
+    }
 }

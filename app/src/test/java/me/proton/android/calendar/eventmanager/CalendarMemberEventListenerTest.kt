@@ -15,6 +15,7 @@ import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarMemberEventListener
 import me.proton.android.calendar.mocks.CalendarMocks.provideMemberEntity
+import me.proton.android.calendar.mocks.addressId
 import me.proton.android.calendar.mocks.calendarColor
 import me.proton.android.calendar.mocks.calendarDescription
 import me.proton.android.calendar.mocks.calendarDisplay
@@ -27,6 +28,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
+import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -36,20 +38,21 @@ class CalendarMemberEventListenerTest {
     private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
     private val keySetupUseCase: KeySetupUseCase = mockk(relaxed = true)
+    private val userManager: UserManager = mockk()
     lateinit var listener: CalendarMemberEventListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarMemberEventListener(db, calendarsRepository, logger, keySetupUseCase)
+        listener = CalendarMemberEventListener(db, calendarsRepository, logger, keySetupUseCase, userManager)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
     @Test
     fun `onCreateOrUpdate persists the members if calendar is present`() {
         runBlocking {
-            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags, calendarName, calendarDescription))
+            val entities = listOf(MemberEntity(memberId, 0, addressId.id, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags, calendarName, calendarDescription))
 
             listener.onCreateOrUpdate(config, entities)
 
@@ -61,7 +64,7 @@ class CalendarMemberEventListenerTest {
     fun `onCreateOrUpdate doesn't persist the members if calendar is not present`() {
         runBlocking {
             coEvery { calendarsRepository.hasCalendar(any()) } returns false
-            val entities = listOf(MemberEntity(memberId, 0, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags, calendarName, calendarDescription))
+            val entities = listOf(MemberEntity(memberId, 0, addressId.id, userEmail, calendarId, calendarColor, calendarDisplay, calendarFlags, calendarName, calendarDescription))
 
             listener.onCreateOrUpdate(config, entities)
 

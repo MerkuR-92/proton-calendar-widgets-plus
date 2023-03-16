@@ -68,6 +68,7 @@ internal class HandleDeleteUseCaseTest {
             MemberEntity(
                 id = "id",
                 permissions = 64,
+                addressId = addressId.id,
                 email = "email@pm.me",
                 calendarId = "calendarId",
                 color = calendarColor,

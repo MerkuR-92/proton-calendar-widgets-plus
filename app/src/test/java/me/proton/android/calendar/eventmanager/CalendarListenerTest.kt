@@ -128,7 +128,7 @@ class CalendarListenerTest {
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar.from(
                 CalendarEntity("calendar_id"),
-                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "member email", "calendar_id", "fff", 1, 1,  "Name", "Description"),
+                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "address_id", "member email", "calendar_id", "fff", 1, 1,  "Name", "Description"),
                 calendarSettingsEntity,
                 json
             )

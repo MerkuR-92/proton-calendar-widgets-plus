@@ -1,29 +1,24 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.logger.TimberLogger
-import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PersonalEventContentApiRequest
 import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
-import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
-import me.proton.core.user.domain.UserManager
-import me.proton.core.util.kotlin.equalsNoCase
 import javax.inject.Inject
 
 class UpdatePersonalPartUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val cryptoContext: CryptoContext,
-    private val userManager: UserManager
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     companion object {
@@ -39,9 +34,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
 
         if (personalPartICalString.isNotEmpty()) {
 
-            val memberAddressKey = userManager.getAddressesOrNull(userId)?.find {
-                it.email.equalsNoCase(member.email)
-            }?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
+            val memberAddressKey = calendarsRepository.getAddressForMember(userId, member)?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
 
             val signatureOfPersonalPart = kotlin.runCatching {
                 memberAddressKey.privateKey.signText(cryptoContext, personalPartICalString)

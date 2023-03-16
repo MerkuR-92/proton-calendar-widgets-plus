@@ -3,9 +3,11 @@ package me.proton.android.calendar.common.utils
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.HttpResponseCode
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.util.kotlin.equalsNoCase
 import okhttp3.internal.toHexString
 
 fun ApiResponse.Error.isTimeout(): Boolean {
