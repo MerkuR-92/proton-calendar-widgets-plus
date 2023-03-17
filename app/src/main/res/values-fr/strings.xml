@@ -48,7 +48,7 @@
     <string name="agenda_no_events">Aucun événement</string>
     <string name="agenda_loading_events">Chargement des événements…</string>
     <string name="agenda_loading_events_error">Une erreur s\'est produite lors du chargement des événements.</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%d %s</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
     <string name="day_view_all_day_more">+ %d de plus</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Toute la journée</string>
