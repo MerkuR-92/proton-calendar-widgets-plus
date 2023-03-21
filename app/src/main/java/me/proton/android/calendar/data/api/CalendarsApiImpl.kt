@@ -46,6 +46,18 @@ interface CalendarsApiService : BaseRetrofitApi {
         @Query("PageSize") pageSize: Int
     ): EventsApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
+    suspend fun getEventsMetadata(
+        @Path("calendarId") calendarId: String,
+        @Query("Start") startTimestamp: Long,
+        @Query("End") endTimestamp: Long,
+        @Query("Timezone") timezone: String,
+        @Query("Type") type: Int,
+        @Query("Page") page: Int,
+        @Query("PageSize") pageSize: Int,
+        @Query("MetaDataOnly") metaDataOnly: Int = 1
+    ): EventsMetadataApiResponse
+
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/ids")
     suspend fun getEventIdsForExport(
         @Path("calendarId") calendarId: String,
@@ -171,6 +183,27 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         pageSize: Int
     ): ApiResponse<EventsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getEvents(
+            calendarId,
+            startTimestamp,
+            endTimestamp,
+            timezone,
+            type,
+            page,
+            pageSize
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventsMetadata(
+        userId: UserId,
+        calendarId: String,
+        startTimestamp: Long,
+        endTimestamp: Long,
+        timezone: String,
+        type: Int,
+        page: Int,
+        pageSize: Int
+    ): ApiResponse<EventsMetadataApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventsMetadata(
             calendarId,
             startTimestamp,
             endTimestamp,
@@ -373,6 +406,14 @@ data class CalendarsApiResponse(
 data class EventsApiResponse(
     @SerialName("Events")
     val events: List<EventEntity>,
+    @SerialName("More")
+    val more: Int
+)
+
+@Serializable
+data class EventsMetadataApiResponse(
+    @SerialName("Events")
+    val events: List<ServerEvent.EventEntityMetadata>,
     @SerialName("More")
     val more: Int
 )

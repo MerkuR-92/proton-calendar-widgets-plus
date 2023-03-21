@@ -155,7 +155,7 @@ val viewModelModule = module {
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
-    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get()) }
+    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpgradeEventUseCase> { UpgradeEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }

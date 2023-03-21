@@ -12,9 +12,10 @@ import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.utils.isNotFound
-import me.proton.android.calendar.common.utils.isTimeout
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -26,7 +27,8 @@ import javax.inject.Inject
 
 class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
-    private val calendarsApi: CalendarsApi
+    private val calendarsApi: CalendarsApi,
+    private val database: AppDatabase
 ) : UseCase {
 
     suspend fun splitFetchEvents(
@@ -58,15 +60,24 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
             )
         }
 
-        val results = coroutineScope {
-            timeWindows.map { timeWindow ->
-                async {
-                    fetchInDateRange(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId)
+        var results: List<Pair<UseCase.Result, List<EventEntity>?>> = emptyList()
+
+        try {
+            coroutineScope {
+                launch {
+                    results = timeWindows.map { timeWindow ->
+                        async {
+                            fetchEventEntitiesLocalOrRemote(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId, this)
+                        }
+                    }.awaitAll()
                 }
-            }.awaitAll()
+            }
+        } catch (e: Exception) {
+            logger.e("Exception in splitFetchEvents", e)
+            results = emptyList()
         }
 
-        return if (results.all { it.first is UseCase.Result.Success<*> }) {
+        return if (results.isNotEmpty() && results.all { it.first is UseCase.Result.Success<*> }) {
             Pair(
                 UseCase.Result.Success<Unit>(),
                 results.flatMap { it.second ?: arrayListOf() }
@@ -77,109 +88,6 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                 null
             )
         }
-    }
-
-    private suspend fun fetchInDateRange(
-        userId: UserId,
-        calendarIds: List<String>,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
-
-        logger.v("executing FetchEventsUseCase")
-
-        val combinedResults = coroutineScope {
-
-            calendarIds.map { calendarId ->
-                async {
-                    val resultsEventsPairs = (0..3).map { type -> // we need to fire off 4 requests with different types
-
-                        async {
-                            var page = 0
-                            var pageSize = 64 // initial page size has to be power of 2, because it's going to be divided by 2 if needed
-                            var shouldRetryOnTimeout = false
-                            val results = mutableListOf<UseCase.Result>()
-                            val events = mutableListOf<EventEntity>()
-
-                            do {
-
-                                shouldRetryOnTimeout = false
-
-                                val eventsResponse = calendarsApi.getEvents(
-                                    userId,
-                                    calendarId,
-                                    fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                                    toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
-                                    timeZoneId,
-                                    type,
-                                    page++,
-                                    pageSize
-                                )
-
-                                val result = if (eventsResponse is ApiResponse.Success) {
-
-                                    logger.v("more: ${eventsResponse.data.more}")
-
-                                    events.addAll(eventsResponse.data.events)
-
-                                    UseCase.Result.Success<Unit>()
-                                } else if (eventsResponse is ApiResponse.Error) {
-                                    if (eventsResponse.isNotFound()) {
-                                        logger.e("NOT_FOUND requesting events in FetchEventsUseCase")
-                                        UseCase.Result.Success<Unit>()
-                                    } else if (eventsResponse.isTimeout()) {
-
-                                        pageSize = pageSize / 2
-                                        // subtract 2 in order to go back "1 previous page" == "2 new pages"
-                                        page = page * 2 - 2
-
-                                        shouldRetryOnTimeout = pageSize > 1
-
-                                        if (shouldRetryOnTimeout) {
-                                            continue // don't add timeout error to "results" just yet
-                                        } else {
-                                            logger.e("timeout fetching events for calendar with pageSize $pageSize")
-                                            UseCase.Result.Error("timeout fetching events")
-                                        }
-
-                                    } else {
-                                        eventsResponse.logErrorIfNeeded("api error fetching events for calendar", logger)
-                                        UseCase.Result.Error("api error in FetchEventsUseCase: ${eventsResponse}")
-                                    }
-                                } else {
-                                    eventsResponse.logErrorIfNeeded("error fetching events for calendar", logger)
-                                    UseCase.Result.Error("error fetching events for calendar: $eventsResponse")
-                                }
-
-                                results.add(result)
-
-                            } while (shouldRetryOnTimeout || eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
-
-                            Pair(results, events)
-                        }
-
-                    }.awaitAll()
-
-                    //fetchPublicKeysUseCase.enqueueFetchPublicKeys(userId, resultsEventsPairs.flatMap { it.second })
-
-                    Pair(resultsEventsPairs.flatMap { it.first }, resultsEventsPairs.flatMap { it.second })
-                }
-            }
-
-        }.awaitAll()
-
-        return if (combinedResults.all { it.first.all { it is UseCase.Result.Success<*> } }) {
-            Pair(
-                UseCase.Result.Success<Unit>(),
-                combinedResults.flatMap { it.second }
-            )
-        } else {
-            Pair(
-                UseCase.Result.Error("error fetching events"),
-                null
-            )
-        } // TODO which calendar?
     }
 
     /**
@@ -289,6 +197,183 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
         return eventEntitiesChannel
 
+    }
+
+    /**
+     * Fetch [EventEntity] in given range if needed, or return from local DB.
+     */
+    private suspend fun fetchEventEntitiesLocalOrRemote(
+        userId: UserId,
+        calendarIds: List<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        coroutineScope: CoroutineScope
+    ): Pair<UseCase.Result, List<EventEntity>?> {
+
+        var result: Pair<UseCase.Result, List<EventEntity>?>
+
+        try {
+
+            coroutineScope {
+
+                val eventEntitiesChannel = fetchMetadataOnly(
+                    userId,
+                    calendarIds,
+                    fromDate,
+                    toDate,
+                    timeZoneId,
+                    coroutineScope
+                ).fetchRemoteEventEntities(
+                    userId,
+                    coroutineScope
+                )
+
+                val eventEntitiesResult = mutableListOf<EventEntity>()
+
+                result = try {
+                    for (eventEntities in eventEntitiesChannel) {
+                        eventEntitiesResult.addAll(eventEntities)
+                    }
+                    Pair(UseCase.Result.Success<Unit>(), eventEntitiesResult)
+                } catch (e: Exception) {
+                    Pair(UseCase.Result.Error("Error in fetchEventEntitiesLocalOrRemote ${e.message}"), null)
+                }
+
+            }
+
+        } catch (e: Exception) {
+            return Pair(UseCase.Result.Error("Error in fetchEventEntitiesLocalOrRemote ${e.message}"), null)
+        }
+
+        return result
+    }
+
+    /**
+     * @throws Exception
+     */
+    private suspend fun fetchMetadataOnly(
+        userId: UserId,
+        calendarIds: List<String>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        coroutineScope: CoroutineScope
+    ): ReceiveChannel<List<ServerEvent.EventEntityMetadata>> {
+
+        val eventMetadatasChannel = Channel<List<ServerEvent.EventEntityMetadata>>(8)
+
+        coroutineScope.launch {
+
+            calendarIds.map { calendarId ->
+
+                async {
+                    (0..3).map { type -> // we need to fire off 4 requests with different types
+
+                        async {
+                            var page = 0
+
+                            do {
+
+                                val eventsResponse = calendarsApi.getEventsMetadata(
+                                    userId,
+                                    calendarId,
+                                    fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                                    toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond(),
+                                    timeZoneId,
+                                    type,
+                                    page++,
+                                    pageSize = 64
+                                )
+
+                                if (eventsResponse is ApiResponse.Success) {
+
+                                    if (!eventMetadatasChannel.isClosedForSend && eventsResponse.data.events.isNotEmpty()) {
+                                        eventMetadatasChannel.send(eventsResponse.data.events) // PRODUCE
+                                    }
+
+                                } else if (eventsResponse is ApiResponse.Error) {
+                                    if (eventsResponse.isNotFound()) {
+                                        logger.i("NOT_FOUND requesting events in fetchMetadataOnly, type = $type")
+                                    } else {
+                                        eventsResponse.logErrorIfNeeded("api error fetching events for calendar in fetchMetadataOnly", logger)
+                                        eventMetadatasChannel.close(Exception("api error in fetchMetadataOnly: ${eventsResponse}"))
+                                    }
+                                } else {
+                                    eventsResponse.logErrorIfNeeded("error fetching events for calendar in ", logger)
+                                    eventMetadatasChannel.close(Exception("error fetching events for calendar in fetchMetadataOnly: $eventsResponse"))
+                                }
+
+                            } while (eventsResponse is ApiResponse.Success && eventsResponse.data.more == 1)
+
+                        }
+
+                    }.awaitAll()
+                }
+            }.awaitAll()
+
+            eventMetadatasChannel.close()
+
+        }
+
+        return eventMetadatasChannel
+    }
+
+    /**
+     * @throws Exception
+     */
+    private suspend fun ReceiveChannel<List<ServerEvent.EventEntityMetadata>>.fetchRemoteEventEntities(
+        userId: UserId,
+        coroutineScope: CoroutineScope
+    ): ReceiveChannel<List<EventEntity>> {
+
+        val eventMetadatasChannel = this
+        val eventEntitiesChannel = Channel<List<EventEntity>>(10)
+
+        coroutineScope.launch {
+            for (eventMetadatas in eventMetadatasChannel) { // CONSUME
+
+                val eventEntities = eventMetadatas.map { metaData ->
+                    async {
+
+                        val dbEventEntity = database.eventsDao().selectEvent(metaData.id, metaData.calendarId)
+
+                        // return EventEnity from DB if it's up to date, otherwise call API
+                        if (dbEventEntity != null && metaData.modifyTime <= dbEventEntity.modifyTime) {
+                            dbEventEntity
+                        } else {
+                            when (val apiEventEntity = calendarsApi.getEvent(
+                                userId,
+                                metaData.calendarId,
+                                metaData.id
+                            )) {
+                                is ApiResponse.Error -> {
+                                    if (!apiEventEntity.isNotFound()) {
+                                        eventEntitiesChannel.close(Exception("Error fetching EventEntity in fetchAndPersistEventEntities (${apiEventEntity.error})"))
+                                    }
+                                    null
+                                }
+                                is ApiResponse.Exception -> {
+                                    eventEntitiesChannel.close(Exception("Exception fetching EventEntity in fetchAndPersistEventEntities", apiEventEntity.exception))
+                                    null
+                                }
+                                is ApiResponse.Success -> {
+                                    apiEventEntity.data.event
+                                }
+                            }
+                        }
+                    }
+                }.awaitAll().filterNotNull()
+
+                if (!eventEntitiesChannel.isClosedForSend) {
+                    eventEntitiesChannel.send(eventEntities) // PRODUCE
+                }
+            }
+
+            eventEntitiesChannel.close()
+        }
+
+        return eventEntitiesChannel
     }
 
 }

@@ -31,6 +31,20 @@ interface CalendarsApi {
         pageSize: Int
     ): ApiResponse<EventsApiResponse>
 
+    /**
+     * Gets all events Metadata for given calendar, happening between timestamps in given timezone.
+     */
+    suspend fun getEventsMetadata(
+        userId: UserId,
+        calendarId: String,
+        startTimestamp: Long,
+        endTimestamp: Long,
+        timezone: String,
+        type: Int,
+        page: Int,
+        pageSize: Int
+    ): ApiResponse<EventsMetadataApiResponse>
+
     suspend fun getEventIdsForExport(
         userId: UserId,
         calendarId: String,

@@ -112,7 +112,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 186
-        versionName "2.6.6"
+        versionName "2.7.4"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resConfigs 'en', 'ca', 'es-rES', 'es-rMX', 'fr', 'fr-rCA', 'pl', 'pt-rPT', 'ro', 'de', 'it', 'nl', 'uk'
