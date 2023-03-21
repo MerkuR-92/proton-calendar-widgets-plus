@@ -48,7 +48,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/item_import_calendar_checkbox"
-        tools:text="Holidays"/>
+        tools:text="Holiday"/>
 
     <TextView
         android:id="@+id/item_import_calendar_source_email"
@@ -111,7 +111,7 @@
             app:layout_constraintTop_toBottomOf="@+id/item_import_calendar_destination_header"
             app:layout_constraintEnd_toStartOf="@+id/item_import_calendar_destination_options"
             app:layout_constraintStart_toStartOf="parent"
-            tools:text="Holidays"/>
+            tools:text="Holiday"/>
 
         <TextView
             android:id="@+id/item_import_calendar_destination_email"

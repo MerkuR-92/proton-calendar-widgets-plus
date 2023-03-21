@@ -27,12 +27,12 @@ data class CalendarEntity(
     @PrimaryKey
     val id: String,
     @SerialName("Type")
-    val type: Int = 0, // normal calendar: 0, subscribed calendar: 1, holidays calendar: 2
+    val type: Int = 0, // normal calendar: 0, subscribed calendar: 1, holiday calendar: 2
     @NonNull
     @kotlinx.serialization.Transient
     val fkUserId: String = "" // TODO Split in two classes: One RemoteEntity and one DBEntity
 ) {
 
     val isSubscribed: Boolean get() = type == 1
-    val isHolidaysCalendar: Boolean get() = type == 2
+    val isHolidayCalendar: Boolean get() = type == 2
 }

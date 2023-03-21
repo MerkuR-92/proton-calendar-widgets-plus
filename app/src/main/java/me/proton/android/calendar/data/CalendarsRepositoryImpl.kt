@@ -65,7 +65,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
@@ -437,8 +437,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().flowSubscribedCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
-    override fun flowHolidaysCalendars(userId: String): Flow<List<Calendar>> {
-        return database.calendarsDao().flowHolidaysCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
+    override fun flowHolidayCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowHolidayCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
@@ -525,8 +525,17 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
         calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar
 
-    override suspend fun fetchHolidaysCalendars(userId: UserId): List<HolidaysCalendarEntity>? =
-        calendarsApi.getHolidaysCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+    override suspend fun fetchManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
+        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+
+    override suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
+        database.managedHolidayCalendarDao().selectAll()
+
+    override suspend fun initManagedHolidayCalendars(userId: UserId) {
+        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars?.forEach {
+            database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))
+        }
+    }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
         val member = selectMembers(calendarId).firstOrNull()

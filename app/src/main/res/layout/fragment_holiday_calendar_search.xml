@@ -6,15 +6,15 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/holidays_search_icon"
+        android:id="@+id/holiday_calendar_search_icon"
         style="@style/Icon.Form"
         app:srcCompat="@drawable/ic_proton_magnifier"
-        app:layout_constraintTop_toTopOf="@id/holidays_search_input"
-        app:layout_constraintBottom_toBottomOf="@id/holidays_search_input"
+        app:layout_constraintTop_toTopOf="@id/holiday_calendar_search_input"
+        app:layout_constraintBottom_toBottomOf="@id/holiday_calendar_search_input"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
-        android:id="@+id/holidays_search_input"
+        android:id="@+id/holiday_calendar_search_input"
         style="@style/Text.Default"
         android:textColorHint="@color/text_hint"
         android:paddingStart="@dimen/default_margin_text_start"
@@ -23,7 +23,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="@string/add_holidays_country_search_hint"
+        android:hint="@string/add_holiday_calendar_country_search_hint"
         android:imeOptions="actionDone"
         android:inputType="text"
         android:scrollHorizontally="false"
@@ -33,21 +33,21 @@
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/holidays_search_clear"/>
+        app:layout_constraintEnd_toStartOf="@+id/holiday_calendar_search_clear"/>
 
     <include
-        android:id="@+id/holidays_search_clear"
+        android:id="@+id/holiday_calendar_search_clear"
         layout="@layout/toolbar_action_button"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:visibility="gone"
         tools:visibility="visible"
-        app:layout_constraintTop_toTopOf="@id/holidays_search_input"
-        app:layout_constraintBottom_toBottomOf="@id/holidays_search_input"
-        app:layout_constraintEnd_toStartOf="@id/holidays_search_close" />
+        app:layout_constraintTop_toTopOf="@id/holiday_calendar_search_input"
+        app:layout_constraintBottom_toBottomOf="@id/holiday_calendar_search_input"
+        app:layout_constraintEnd_toStartOf="@id/holiday_calendar_search_close" />
 
     <include
-        android:id="@+id/holidays_search_close"
+        android:id="@+id/holiday_calendar_search_close"
         layout="@layout/toolbar_action_text"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
@@ -55,28 +55,28 @@
         android:focusable="true"
         android:background="?android:selectableItemBackground"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/holidays_search_separator"
+        app:layout_constraintBottom_toTopOf="@id/holiday_calendar_search_separator"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <View
-        android:id="@+id/holidays_search_separator"
+        android:id="@+id/holiday_calendar_search_separator"
         style="@style/Separator"
-        app:layout_constraintTop_toBottomOf="@+id/holidays_search_input"
+        app:layout_constraintTop_toBottomOf="@+id/holiday_calendar_search_input"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/holidays_country_list"
+        android:id="@+id/holiday_calendar_country_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:nestedScrollingEnabled="false"
         android:layout_marginTop="8dp"
-        tools:listitem="@layout/item_holidays_calendar"
+        tools:listitem="@layout/item_holiday_calendar"
         tools:itemCount="3"
         android:overScrollMode="never"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/holidays_search_separator"
+        app:layout_constraintTop_toBottomOf="@+id/holiday_calendar_search_separator"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.holidays.viewModel
+package me.proton.android.calendar.presentation.holidayCalendar.viewModel
 
 import android.app.Application
 import android.graphics.Color
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
-import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -28,7 +28,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 @HiltViewModel
-class HolidaysViewModel @Inject constructor(
+class HolidayCalendarViewModel @Inject constructor(
     application: Application,
     private val resourceProvider: ResourceProvider,
     private val logger: Logger,
@@ -37,30 +37,30 @@ class HolidaysViewModel @Inject constructor(
     private val joinCalendarUseCase: JoinCalendarUseCase
 ) : AndroidViewModel(application) {
 
-    sealed class HolidaysSnackState {
+    sealed class HolidayCalendarSnackState {
 
         data class DisplaySnack(
             val message: String,
-        ): HolidaysSnackState()
+        ): HolidayCalendarSnackState()
 
         data class DisplaySnackNavigateUp(
             val message: String,
-        ): HolidaysSnackState()
+        ): HolidayCalendarSnackState()
     }
 
-    val holidaysSnackState: MutableStateFlow<HolidaysSnackState?> = MutableStateFlow(null)
-    val calendarSettingsSnackState: MutableStateFlow<HolidaysSnackState?> = MutableStateFlow(null)
+    val holidayCalendarSnackState: MutableStateFlow<HolidayCalendarSnackState?> = MutableStateFlow(null)
+    val calendarSettingsSnackState: MutableStateFlow<HolidayCalendarSnackState?> = MutableStateFlow(null)
 
-    sealed class HolidaysState {
+    sealed class HolidayCalendarState {
 
-        object Idle: HolidaysState()
+        object Idle: HolidayCalendarState()
 
-        sealed class Processing: HolidaysState() {
+        sealed class Processing: HolidayCalendarState() {
             object Saving: Processing()
         }
     }
 
-    val holidaysState: MutableStateFlow<HolidaysState> = MutableStateFlow(HolidaysState.Idle)
+    val holidayCalendarState: MutableStateFlow<HolidayCalendarState> = MutableStateFlow(HolidayCalendarState.Idle)
 
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
@@ -77,8 +77,8 @@ class HolidaysViewModel @Inject constructor(
     private val _defaultAllDayAlarms = MutableLiveData(arrayListOf<VAlarm>())
     val defaultAllDayAlarms: LiveData<ArrayList<VAlarm>> = _defaultAllDayAlarms
 
-    private val _holidaysCalendars: MutableLiveData<List<HolidaysCalendarEntity>> = MutableLiveData()
-    val holidaysCalendars: LiveData<List<HolidaysCalendarEntity>> = _holidaysCalendars
+    private val _holidayCalendars: MutableLiveData<List<ManagedHolidayCalendarEntity>> = MutableLiveData()
+    val holidayCalendars: LiveData<List<ManagedHolidayCalendarEntity>> = _holidayCalendars
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var _calendarId: String? = null
@@ -98,17 +98,17 @@ class HolidaysViewModel @Inject constructor(
         _calendarColor.value = 0
         _defaultAllDayAlarms.value = arrayListOf()
         _calendarId = null
-        holidaysSnackState.value = null
+        holidayCalendarSnackState.value = null
         calendarSettingsSnackState.value = null
         calendarEdited = false
     }
 
-    suspend fun initUpdateHolidays(calendarId: String) {
+    suspend fun initUpdateHolidayCalendar(calendarId: String) {
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
-            logger.e("UserId was null in HolidaysViewModel initUpdateHolidays")
+            logger.e("UserId was null in HolidayCalendarViewModel initUpdateHolidayCalendar")
             // Use settings snack state here to display snack in calendar settings view
-            calendarSettingsSnackState.value = HolidaysSnackState.DisplaySnackNavigateUp(
+            calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
                 resourceProvider.provideString(R.string.snack_calendar_init_error)
             )
             return
@@ -118,9 +118,9 @@ class HolidaysViewModel @Inject constructor(
         _calendarId = calendarId
 
         val calendar = getCalendar(calendarId) ?: run {
-            logger.e("Calendar was null in initUpdateHolidays")
+            logger.e("Calendar was null in initUpdateHolidayCalendar")
             // Use settings snack state here to display snack in calendar settings view
-            calendarSettingsSnackState.value = HolidaysSnackState.DisplaySnackNavigateUp(
+            calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
                 resourceProvider.provideString(R.string.snack_calendar_init_error)
             )
             return
@@ -139,7 +139,7 @@ class HolidaysViewModel @Inject constructor(
         setDefaultAlarms(calendar.defaultFullDayNotifications)
     }
 
-    suspend fun initCreateHolidays(calendarColor: Int, defaultTimeZoneId: String, defaultLanguageCode: String) {
+    suspend fun initCreateHolidayCalendar(calendarColor: Int, defaultLanguageCode: String) {
 
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
@@ -148,32 +148,34 @@ class HolidaysViewModel @Inject constructor(
         _defaultAllDayAlarms.value = arrayListOf()
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
-            logger.e("UserId was null in HolidaysViewModel initCreateHolidays")
-            holidaysSnackState.value = HolidaysSnackState.DisplaySnackNavigateUp(
+            logger.e("UserId was null in HolidayCalendarViewModel initCreateHolidayCalendar")
+            holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
                 resourceProvider.provideString(R.string.snack_calendar_init_error)
             )
             return
         }
         _userId.value = userId
 
-        fetchHolidaysCalendars()?.let { holidaysCalendars ->
-            _holidaysCalendars.value = holidaysCalendars
+        val primaryTimezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone ?: ZoneId.systemDefault().id
+
+        getManagedHolidayCalendars()?.let { holidayCalendars ->
+            _holidayCalendars.value = holidayCalendars
 
             // Get calendars matching the default time zone
-            val countriesMatchingTimeZone = holidaysCalendars.filter {
-                it.timezones.contains(defaultTimeZoneId)
+            val countriesMatchingTimeZone = holidayCalendars.filter {
+                it.timezones.contains(primaryTimezone)
             }
             // Get the calendar matching the default language
-            val matchingDefaultHolidaysCalendar = countriesMatchingTimeZone.firstOrNull {
+            val matchingDefaultHolidayCalendar = countriesMatchingTimeZone.firstOrNull {
                 it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
             } ?: countriesMatchingTimeZone.firstOrNull()
-            _country.value = matchingDefaultHolidaysCalendar?.country ?: ""
-            _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
+            _country.value = matchingDefaultHolidayCalendar?.country ?: ""
+            _language.value = matchingDefaultHolidayCalendar?.language ?: ""
         }
     }
 
     fun getLanguages(): List<String> {
-        return _holidaysCalendars.value?.filter { it.country == _country.value }?.map { it.language } ?: emptyList()
+        return _holidayCalendars.value?.filter { it.country == _country.value }?.map { it.language } ?: emptyList()
     }
 
     fun hasBeenEdited(): Boolean {
@@ -193,7 +195,7 @@ class HolidaysViewModel @Inject constructor(
         else {
             // Check if alarm already exist in the list
             if (tmpDefaultAllDayAlarms?.contains(alarm) == true || tmpDefaultAllDayAlarms?.any { it.isTheSameAs(alarm) } == true) {
-                holidaysSnackState.value = HolidaysSnackState.DisplaySnack(
+                holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_notification_already_added)
                 )
                 return
@@ -211,11 +213,11 @@ class HolidaysViewModel @Inject constructor(
         _country.value = country
 
         // Get the calendar matching the default language
-        val matchingCountries = holidaysCalendars.value?.filter { it.country == country }
-        val matchingDefaultHolidaysCalendar = matchingCountries?.firstOrNull {
+        val matchingCountries = holidayCalendars.value?.filter { it.country == country }
+        val matchingDefaultHolidayCalendar = matchingCountries?.firstOrNull {
             it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
         } ?: matchingCountries?.firstOrNull()
-        _language.value = matchingDefaultHolidaysCalendar?.language ?: ""
+        _language.value = matchingDefaultHolidayCalendar?.language ?: ""
     }
 
     fun handleLanguage(language: String) {
@@ -230,29 +232,29 @@ class HolidaysViewModel @Inject constructor(
         _calendarColor.value = calendarColor
     }
 
-    suspend fun handleSaveHolidays(returnToSettings: Boolean, selectedDate: LocalDate?): Boolean {
+    suspend fun handleSaveHolidayCalendar(returnToSettings: Boolean, selectedDate: LocalDate?): Boolean {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in HolidaysViewModel getCalendar")
+            logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return false
         }
 
-        val holidaysCalendar = holidaysCalendars.value?.firstOrNull {
+        val holidayCalendar = holidayCalendars.value?.firstOrNull {
             it.country == _country.value && it.language == _language.value
         } ?: return false // TODO Handle
 
         val calendarColor = _calendarColor.value ?: return false // TODO Handle
 
         // Set loading state
-        holidaysState.value = HolidaysState.Processing.Saving
+        holidayCalendarState.value = HolidayCalendarState.Processing.Saving
 
         // Fetch shared calendar events
         val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
             ?: ZoneId.systemDefault().id
 
-        val joinCalendarResult = joinCalendarUseCase.joinHolidaysCalendar(
+        val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
             userId,
-            holidaysCalendar,
+            holidayCalendar,
             calendarColor,
             _defaultAllDayAlarms.value,
             selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
@@ -260,7 +262,7 @@ class HolidaysViewModel @Inject constructor(
         )
 
         // Clear loading state
-        holidaysState.value = HolidaysState.Idle
+        holidayCalendarState.value = HolidayCalendarState.Idle
 
         return joinCalendarResult is UseCase.Result.Success<*>
     }
@@ -268,18 +270,18 @@ class HolidaysViewModel @Inject constructor(
     private suspend fun getCalendar(calendarId: String): Calendar? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in HolidaysViewModel getCalendar")
+            logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
         return calendarsRepository.selectCalendar(calendarId)
     }
 
-    private suspend fun fetchHolidaysCalendars(): List<HolidaysCalendarEntity>? {
+    private suspend fun getManagedHolidayCalendars(): List<ManagedHolidayCalendarEntity>? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in HolidaysViewModel getCalendar")
+            logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
-        return calendarsRepository.fetchHolidaysCalendars(userId)
+        return calendarsRepository.getManagedHolidayCalendars(userId)
     }
 }

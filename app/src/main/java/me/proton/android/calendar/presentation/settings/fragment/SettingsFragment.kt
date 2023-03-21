@@ -32,12 +32,11 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_cale
 import kotlinx.android.synthetic.main.fragment_settings.settings_subscribed_calendars_list
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
-import me.proton.android.calendar.common.FeatureFlag.HOLIDAYS_CALENDAR
+import me.proton.android.calendar.common.FeatureFlag.HOLIDAY_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -52,7 +51,6 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -315,7 +313,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         deletePress?.setOnSingleClickListener {
             lifecycleScope.launch {
 
-                if (calendar.isHolidays) {
+                if (calendar.isHolidayCalendar) {
                     bottomSheetDialog.dismiss()
                     with (MaterialAlertDialogBuilder(requireContext())) {
                         setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
@@ -397,8 +395,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 (DELETE_CALENDAR &&
                         calendar.isSubscribed.not() &&
                         calendar.isSharedWithMe.not()) ||
-                        (HOLIDAYS_CALENDAR &&
-                                calendar.isHolidays)
+                        (HOLIDAY_CALENDAR &&
+                                calendar.isHolidayCalendar)
             )
 
             val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
@@ -440,7 +438,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         bottomSheetDialog.setContentView(R.layout.dialog_calendars_create_import)
 
         val createCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_create_press)
-        val addHolidaysCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holidays_press)
+        val addHolidayCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar_press)
         val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
 
         createCalendarPress?.setOnSingleClickListener {
@@ -448,8 +446,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
-        addHolidaysCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.HOLIDAYS)
+        addHolidayCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar(CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
         }
 
@@ -486,7 +484,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     // If limit has not been reached, open calendar form
                     when (calendarType) {
                         CalendarType.NORMAL -> findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
-                        CalendarType.HOLIDAYS -> findNavController().navigate(R.id.action_nav_settings_to_nav_holidays_form)
+                        CalendarType.HOLIDAY -> findNavController().navigate(R.id.action_nav_settings_to_nav_holiday_calendar_form)
                         CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
                     }
                 }

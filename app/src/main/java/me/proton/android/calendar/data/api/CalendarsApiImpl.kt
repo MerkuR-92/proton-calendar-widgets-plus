@@ -9,7 +9,7 @@ import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
-import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -161,7 +161,7 @@ interface CalendarsApiService : BaseRetrofitApi {
     ) : GetCalendarSettingsApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/directory?Type=2") // The type ensures that only holiday calendars are returned.
-    suspend fun getHolidaysCalendars() : GetHolidaysCalendarsApiResponse
+    suspend fun getManagedHolidayCalendars() : GetHolidayCalendarsApiResponse
 
     @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/invitations/{addressId}/join")
     suspend fun joinCalendar(
@@ -412,10 +412,10 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         getCalendarSettings(calendarId)
     }.toApiResponse()
 
-    override suspend fun getHolidaysCalendars(
+    override suspend fun getManagedHolidayCalendars(
         userId: UserId
-    ): ApiResponse<GetHolidaysCalendarsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-        getHolidaysCalendars()
+    ): ApiResponse<GetHolidayCalendarsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getManagedHolidayCalendars()
     }.toApiResponse()
 
     override suspend fun joinCalendar(
@@ -813,9 +813,9 @@ data class RecreateCalendarApiResponse(
 )
 
 @Serializable
-data class GetHolidaysCalendarsApiResponse(
+data class GetHolidayCalendarsApiResponse(
     @SerialName("Calendars")
-    val calendars: List<HolidaysCalendarEntity>
+    val calendars: List<ManagedHolidayCalendarEntity>
 )
 
 @Serializable

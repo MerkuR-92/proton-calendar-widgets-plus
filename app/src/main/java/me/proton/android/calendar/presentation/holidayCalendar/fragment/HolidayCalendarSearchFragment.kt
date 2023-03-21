@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.holidays.fragment
+package me.proton.android.calendar.presentation.holidayCalendar.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -11,47 +11,47 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_appbar
-import kotlinx.android.synthetic.main.fragment_holidays_search.holidays_country_list
-import kotlinx.android.synthetic.main.fragment_holidays_search.holidays_search_clear
-import kotlinx.android.synthetic.main.fragment_holidays_search.holidays_search_close
-import kotlinx.android.synthetic.main.fragment_holidays_search.holidays_search_input
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_country_list
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_clear
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_close
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_input
 import kotlinx.android.synthetic.main.toolbar_action_button.view.imageButton
 import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.HOLIDAYS_SEARCH_MIN_QUERY_LENGTH
+import me.proton.android.calendar.common.HOLIDAY_SEARCH_MIN_QUERY_LENGTH
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
-import me.proton.android.calendar.domain.model.Holidays
-import me.proton.android.calendar.presentation.holidays.adapter.HolidaysListAdapter
-import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
+import me.proton.android.calendar.domain.model.Holiday
+import me.proton.android.calendar.presentation.holidayCalendar.adapter.HolidayCalendarListAdapter
+import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.presentation.utils.currentLocale
 import org.koin.core.KoinComponent
 import java.time.ZoneId
 
 @AndroidEntryPoint
-class HolidaysSearchFragment : BaseDialogFragment(), KoinComponent {
+class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG: String
-        get() = "HolidaysFragment"
+        get() = "HolidayCalendarSearchFragment"
     override val layoutResourceId: Int
-        get() = R.layout.fragment_holidays_search
+        get() = R.layout.fragment_holiday_calendar_search
 
     override val navigateUp = true
     override val isScrollable = false
 
-    private val holidaysViewModel: HolidaysViewModel by activityViewModels()
+    private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
 
-    private lateinit var holidaysListAdapter: HolidaysListAdapter
-    private var holidaysCalendarList = arrayListOf<HolidaysListAdapter.HolidaysItem>()
+    private lateinit var holidayCalendarListAdapter: HolidayCalendarListAdapter
+    private var holidayCalendarList = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -72,23 +72,23 @@ class HolidaysSearchFragment : BaseDialogFragment(), KoinComponent {
         // Hide app bar
         dialog_appbar.visibleOrGone(false)
 
-        holidays_search_close.toolbar_action_text.text = getString(R.string.dialog_button_close)
-        holidays_search_close.toolbar_action_text.setOnSingleClickListener {
+        holiday_calendar_search_close.toolbar_action_text.text = getString(R.string.dialog_button_close)
+        holiday_calendar_search_close.toolbar_action_text.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
 
-        with(holidays_search_clear.imageButton) {
+        with(holiday_calendar_search_clear.imageButton) {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
                 requireActivity().clearFocusAndHideKeyboard(view)
-                holidays_search_input.text.clear()
-                holidaysListAdapter.setSearchQuery("")
-                holidaysListAdapter.submitList(holidaysCalendarList)
+                holiday_calendar_search_input.text.clear()
+                holidayCalendarListAdapter.setSearchQuery("")
+                holidayCalendarListAdapter.submitList(holidayCalendarList)
             }
         }
 
-        holidays_country_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        holiday_calendar_country_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -99,39 +99,39 @@ class HolidaysSearchFragment : BaseDialogFragment(), KoinComponent {
         })
 
         val countryListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        holidays_country_list.layoutManager = countryListLayoutManager
-        holidaysListAdapter = HolidaysListAdapter {
-            holidaysViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
+        holiday_calendar_country_list.layoutManager = countryListLayoutManager
+        holidayCalendarListAdapter = HolidayCalendarListAdapter {
+            holidayCalendarViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
-        holidays_country_list.adapter = holidaysListAdapter
+        holiday_calendar_country_list.adapter = holidayCalendarListAdapter
 
         setupSearch()
 
-        holidaysViewModel.holidaysCalendars.observe(viewLifecycleOwner) { holidaysCalendars ->
-            holidaysCalendars ?: return@observe
+        holidayCalendarViewModel.holidayCalendars.observe(viewLifecycleOwner) { holidayCalendars ->
+            holidayCalendars ?: return@observe
 
-            holidaysCalendarList.clear()
-            holidaysCalendarList.addAll(holidaysCalendars.toHolidaysItems())
-            holidaysListAdapter.submitList(holidaysCalendarList)
+            holidayCalendarList.clear()
+            holidayCalendarList.addAll(holidayCalendars.toHolidayItems())
+            holidayCalendarListAdapter.submitList(holidayCalendarList)
         }
     }
 
     @SuppressLint("DiscouragedApi") // Suppress annotation due to getting flag drawables by identifier name
-    fun List<HolidaysCalendarEntity>.toHolidaysItems(): List<HolidaysListAdapter.HolidaysItem> {
-        val holidays = arrayListOf<HolidaysListAdapter.HolidaysItem>()
+    fun List<ManagedHolidayCalendarEntity>.toHolidayItems(): List<HolidayCalendarListAdapter.HolidayItem> {
+        val holidayItems = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
         this.sortedBy { it.country }.groupBy { it.country }.forEach {
-            val header = HolidaysListAdapter.HolidaysItem.Header(
+            val header = HolidayCalendarListAdapter.HolidayItem.Header(
                 it.key.first().uppercase(),
                 it.value.first().timezones.contains(ZoneId.systemDefault().id)
             )
             if (header.locationDefault) {
-                if (!holidays.contains(header)) holidays.add(0, header)
+                if (!holidayItems.contains(header)) holidayItems.add(0, header)
                 val countryCode = it.value.first().countryCode
-                holidays.add(1,
-                    HolidaysListAdapter.HolidaysItem.Value(
-                        Holidays(
+                holidayItems.add(1,
+                    HolidayCalendarListAdapter.HolidayItem.Value(
+                        Holiday(
                             it.key,
                             resources.getIdentifier(
                                 "${requireContext().packageName}:drawable/flag_$countryCode",
@@ -142,11 +142,11 @@ class HolidaysSearchFragment : BaseDialogFragment(), KoinComponent {
                     )
                 )
             } else {
-                if (!holidays.contains(header)) holidays.add(header)
+                if (!holidayItems.contains(header)) holidayItems.add(header)
                 val countryCode = it.value.first().countryCode
-                holidays.add(
-                    HolidaysListAdapter.HolidaysItem.Value(
-                        Holidays(
+                holidayItems.add(
+                    HolidayCalendarListAdapter.HolidayItem.Value(
+                        Holiday(
                             it.key,
                             resources.getIdentifier(
                                 "${requireContext().packageName}:drawable/flag_$countryCode",
@@ -158,28 +158,28 @@ class HolidaysSearchFragment : BaseDialogFragment(), KoinComponent {
                 )
             }
         }
-        return holidays
+        return holidayItems
     }
 
     private fun setupSearch() {
-        holidays_search_input.onTextChange { rawQuery ->
+        holiday_calendar_search_input.onTextChange { rawQuery ->
 
-            holidays_search_clear.visibleOrGone(rawQuery.isNotBlank())
+            holiday_calendar_search_clear.visibleOrGone(rawQuery.isNotBlank())
 
             val query = rawQuery.trim().toString()
 
-            if (query.isNotBlank() && query.length >= HOLIDAYS_SEARCH_MIN_QUERY_LENGTH) {
-                holidaysListAdapter.setSearchQuery(query)
+            if (query.isNotBlank() && query.length >= HOLIDAY_SEARCH_MIN_QUERY_LENGTH) {
+                holidayCalendarListAdapter.setSearchQuery(query)
 
-                val values = holidaysCalendarList.filter { it.type == HolidaysListAdapter.HolidaysItemType.Value }
-                val queriedValues = values.filter { (it as HolidaysListAdapter.HolidaysItem.Value).holidays.country.contains(query, ignoreCase = true) }
-                val sortedQueriedValues = queriedValues.sortedBy { (it as HolidaysListAdapter.HolidaysItem.Value).holidays.country }
-                val resultList = arrayListOf<HolidaysListAdapter.HolidaysItem>()
-                sortedQueriedValues.groupBy { (it as HolidaysListAdapter.HolidaysItem.Value).holidays.country[0] }.forEach {
-                    resultList.add(HolidaysListAdapter.HolidaysItem.Header(it.key.toString(), false))
+                val values = holidayCalendarList.filter { it.type == HolidayCalendarListAdapter.HolidayItemType.Value }
+                val queriedValues = values.filter { (it as HolidayCalendarListAdapter.HolidayItem.Value).holiday.country.contains(query, ignoreCase = true) }
+                val sortedQueriedValues = queriedValues.sortedBy { (it as HolidayCalendarListAdapter.HolidayItem.Value).holiday.country }
+                val resultList = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
+                sortedQueriedValues.groupBy { (it as HolidayCalendarListAdapter.HolidayItem.Value).holiday.country[0] }.forEach {
+                    resultList.add(HolidayCalendarListAdapter.HolidayItem.Header(it.key.toString(), false))
                     resultList.addAll(it.value)
                 }
-                holidaysListAdapter.submitList(resultList.distinct())
+                holidayCalendarListAdapter.submitList(resultList.distinct())
             } else {
             }
         }

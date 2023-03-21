@@ -219,9 +219,9 @@ class CalendarViewModel @Inject constructor(
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
         otherCalendars = combine(
             calendarsRepository.flowSubscribedCalendars(userId).distinctUntilChanged(),
-            calendarsRepository.flowHolidaysCalendars(userId).distinctUntilChanged()
-        ) { subscribedCalendars, holidaysCalendars ->
-            subscribedCalendars + holidaysCalendars
+            calendarsRepository.flowHolidayCalendars(userId).distinctUntilChanged()
+        ) { subscribedCalendars, holidayCalendars ->
+            subscribedCalendars + holidayCalendars
         }.asLiveData(Dispatchers.Default)
         calendarSubscriptions = calendarsRepository.flowCalendarSubscriptions().asLiveData(Dispatchers.Default)
     }
@@ -1157,5 +1157,9 @@ class CalendarViewModel @Inject constructor(
         }
 
         return monthViewEventsMap
+    }
+
+    suspend fun initManagedHolidayCalendar(userId: UserId) {
+        calendarsRepository.initManagedHolidayCalendars(userId)
     }
 }

@@ -28,6 +28,7 @@ import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENT_ALARMS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MANAGED_HOLIDAY_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.account.data.entity.AccountEntity
@@ -422,6 +423,13 @@ object AppDatabaseMigrations {
             AddressDatabase.MIGRATION_4.migrate(database)
             PublicAddressDatabase.MIGRATION_2.migrate(database)
             KeyTransparencyDatabase.MIGRATION_0.migrate(database)
+        }
+    }
+
+    val MIGRATION_52_53 = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_MANAGED_HOLIDAY_CALENDARS}` (`calendarId` TEXT NOT NULL, `country` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `languageCode` TEXT NOT NULL, `language` TEXT NOT NULL, `timezones` TEXT NOT NULL, `passphrase` TEXT NOT NULL, `sessionKey` TEXT NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`calendarId`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_managed_holiday_calendars_fkUserId` ON `${TABLE_MANAGED_HOLIDAY_CALENDARS}` (`fkUserId`)")
         }
     }
 }

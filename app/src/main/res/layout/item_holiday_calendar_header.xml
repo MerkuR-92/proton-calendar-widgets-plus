@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/item_holidays_calendar_header_text"
+        android:id="@+id/item_holiday_calendar_header_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         style="@style/Text.DefaultSmall.Strong"

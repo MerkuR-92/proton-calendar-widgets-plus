@@ -4,7 +4,6 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
-import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.data.entity.getDefaultNotifications
 import me.proton.core.util.kotlin.toBoolean
 
@@ -50,7 +49,7 @@ data class Calendar(
         val hasUpdatePassphrase: Boolean get() = flags and 2 == 2
 
         val isSubscribed: Boolean get() = type == 1
-        val isHolidays: Boolean get() = type == 2
+        val isHolidayCalendar: Boolean get() = type == 2
         val isSharedWithMe: Boolean get() = !isOwner
 
         val isOwner: Boolean get() = permissions and 2 == 2

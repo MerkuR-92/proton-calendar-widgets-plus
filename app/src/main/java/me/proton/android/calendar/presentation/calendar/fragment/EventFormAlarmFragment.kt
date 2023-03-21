@@ -50,7 +50,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
+import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import org.koin.core.KoinComponent
@@ -68,7 +68,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     private val eventViewModel: EventViewModel by activityViewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
-    private val holidaysViewModel: HolidaysViewModel by activityViewModels()
+    private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
 
     private var isAllDay: Boolean = false
     private var defaultNotificationsType: DefaultNotificationsType = DefaultNotificationsType.EVENT
@@ -76,7 +76,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
     enum class DefaultNotificationsType(val value: Int) {
         EVENT(0),
         NORMAL_CALENDAR(1),
-        HOLIDAYS_CALENDAR(2)
+        HOLIDAY_CALENDAR(2)
     }
 
     private var lastSelectedRadioButtonId: Int = -1
@@ -135,7 +135,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
             when (defaultNotificationsType) {
                 DefaultNotificationsType.EVENT -> eventViewModel.saveAlarm(alarm)
                 DefaultNotificationsType.NORMAL_CALENDAR -> calendarFormViewModel.handleAlarmChange(alarm, isAllDay)
-                DefaultNotificationsType.HOLIDAYS_CALENDAR -> holidaysViewModel.handleAlarmChange(alarm)
+                DefaultNotificationsType.HOLIDAY_CALENDAR -> holidayCalendarViewModel.handleAlarmChange(alarm)
             }
         }
 
@@ -168,7 +168,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 when (defaultNotificationsType) {
                     DefaultNotificationsType.EVENT -> eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
                     DefaultNotificationsType.NORMAL_CALENDAR,
-                    DefaultNotificationsType.HOLIDAYS_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
+                    DefaultNotificationsType.HOLIDAY_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
                 }
 
             if (isAllDay) { // TODO refactor and extract common formatting code to helpers -- pass timezone, locale and am/pm setting for later
@@ -292,7 +292,7 @@ class EventFormAlarmFragment() : BaseDialogFragment(), KoinComponent {
                 when (defaultNotificationsType) {
                     DefaultNotificationsType.EVENT -> eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
                     DefaultNotificationsType.NORMAL_CALENDAR,
-                    DefaultNotificationsType.HOLIDAYS_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
+                    DefaultNotificationsType.HOLIDAY_CALENDAR -> calendarViewModel.timeFormatIs24Hour(requireContext())
                 }
 
             // init

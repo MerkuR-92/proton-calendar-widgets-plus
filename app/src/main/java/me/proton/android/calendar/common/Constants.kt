@@ -80,7 +80,7 @@ const val SEARCH_MIN_QUERY_LENGTH = 2
 const val SEARCH_QUERY_DEBOUNCE_MS = 500L
 const val SEARCH_RESULTS_RANGE = 500
 
-const val HOLIDAYS_SEARCH_MIN_QUERY_LENGTH = 2
+const val HOLIDAY_SEARCH_MIN_QUERY_LENGTH = 2
 
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 
@@ -138,7 +138,7 @@ object FeatureFlag {
     const val CLEAR_CALENDAR = false
     const val IMPORT_ICS = true
     const val SHOW_EVENT_SEARCH = true
-    const val HOLIDAYS_CALENDAR = false
+    const val HOLIDAY_CALENDAR = false
 }
 
 object HttpResponseCode {
@@ -213,7 +213,7 @@ enum class EventDeletionReason(val value: Int) {
 enum class CalendarType {
     NORMAL,
     SUBSCRIBED,
-    HOLIDAYS
+    HOLIDAY
 }
 
 object IcsParsingValidation {

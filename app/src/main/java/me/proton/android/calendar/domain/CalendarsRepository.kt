@@ -65,7 +65,7 @@ interface CalendarsRepository {
 
     fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>>
 
-    fun flowHolidaysCalendars(userId: String): Flow<List<Calendar>>
+    fun flowHolidayCalendars(userId: String): Flow<List<Calendar>>
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
@@ -88,7 +88,11 @@ interface CalendarsRepository {
 
     suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity?
 
-    suspend fun fetchHolidaysCalendars(userId: UserId): List<HolidaysCalendarEntity>?
+    suspend fun fetchManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>?
+
+    suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>?
+
+    suspend fun initManagedHolidayCalendars(userId: UserId)
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
 

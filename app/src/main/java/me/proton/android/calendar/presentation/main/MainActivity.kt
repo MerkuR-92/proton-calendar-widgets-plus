@@ -631,6 +631,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         } else safeNavigateToMonth()
                     } else safeNavigateToMonth()
                 }
+
+                lifecycleScope.launch {
+                    accountViewModel.getPrimaryUserId()?.let {
+                        calendarViewModel.initManagedHolidayCalendar(it)
+                    }
+                }
             }
             AccountViewModel.State.Processing -> {
                 displaySplashScreen(
@@ -1199,8 +1205,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                             drawer_layout.close()
                         }
-                        CalendarType.HOLIDAYS -> {
-                            navController.navigate(R.id.action_nav_calendar_to_nav_holidays_form)
+                        CalendarType.HOLIDAY -> {
+                            navController.navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
                             drawer_layout.close()
                         }
                         CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
@@ -1244,7 +1250,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         bottomSheetDialog.setContentView(R.layout.dialog_calendars_create_import)
 
         val createCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_create_press)
-        val addHolidaysCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holidays_press)
+        val addHolidayCalendarPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar_press)
         val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
 
         createCalendarPress?.setOnSingleClickListener {
@@ -1252,8 +1258,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
-        addHolidaysCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.HOLIDAYS)
+        addHolidayCalendarPress?.setOnSingleClickListener {
+            onClickCreateCalendar(CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
         }
 

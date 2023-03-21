@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.holidays.fragment
+package me.proton.android.calendar.presentation.holidayCalendar.fragment
 
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -21,18 +21,18 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_calendar_color_picker_layout
 import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_icon
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_color_press
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_flag
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_search_disclaimer
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_country_value_press
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_icon
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_list
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_default_all_day_event_notifications_press
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_language_press
-import kotlinx.android.synthetic.main.fragment_holidays_form.holidays_calendar_form_language_value
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_color_icon
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_color_press
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_flag
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_search_disclaimer
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value_press
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_icon
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_list
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_press
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_press
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_value
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
@@ -46,7 +46,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.holidays.viewModel.HolidaysViewModel
+import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
@@ -54,25 +54,24 @@ import me.proton.core.presentation.utils.currentLocale
 import org.koin.core.KoinComponent
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
-class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
+class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
     override val TAG: String
-        get() = "HolidaysFormFragment"
+        get() = "HolidayCalendarFormFragment"
     override val layoutResourceId: Int
-        get() = R.layout.fragment_holidays_form
+        get() = R.layout.fragment_holiday_calendar_form
 
     override val navigateUp = false
     override val isScrollable = false
 
-    private val navigationArguments: HolidaysFormFragmentArgs by navArgs()
+    private val navigationArguments: HolidayCalendarFormFragmentArgs by navArgs()
 
     private val mainViewModel: MainViewModel by activityViewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
-    private val holidaysViewModel: HolidaysViewModel by activityViewModels()
+    private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
@@ -86,14 +85,14 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
         requireActivity().clearFocusAndHideKeyboard(view)
 
         // Display snack and return if we're saving the calendar changes
-        val processingCalendar = holidaysViewModel.holidaysState.value is HolidaysViewModel.HolidaysState.Processing
+        val processingCalendar = holidayCalendarViewModel.holidayCalendarState.value is HolidayCalendarViewModel.HolidayCalendarState.Processing
         if (processingCalendar) {
             view?.displaySnackBar(getString(R.string.snack_calendar_saving))
             return
         }
 
         // Check if we need to display discard changes dialog
-        if (holidaysViewModel.hasBeenEdited()) {
+        if (holidayCalendarViewModel.hasBeenEdited()) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.event_discard_changes_title)
                 .setMessage(R.string.event_discard_changes_description)
@@ -111,7 +110,7 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = getString(R.string.holidays_calendar_title)
+        toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = getString(R.string.holiday_calendar_title)
 
         buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
         with (buttonSave) {
@@ -128,11 +127,11 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                 }
 
                 lifecycleScope.launch {
-                    if (holidaysViewModel.hasBeenEdited() || calendarId.isNullOrEmpty()) {
+                    if (holidayCalendarViewModel.hasBeenEdited() || calendarId.isNullOrEmpty()) {
                         val selectedDate = calendarViewModel.selectedDateTime.value
                         // Save new form values
                         val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
-                        if (holidaysViewModel.handleSaveHolidays(returnToSettings, selectedDate?.first)) {
+                        if (holidayCalendarViewModel.handleSaveHolidayCalendar(returnToSettings, selectedDate?.first)) {
                             view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_success))
                             findNavController().navigateUp()
                         } else {
@@ -164,25 +163,24 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        holidaysViewModel.resetValues()
+        holidayCalendarViewModel.resetValues()
 
         calendarId = navigationArguments.calendarId
 
         lifecycleScope.launch {
             calendarId?.let {
                 // Hide disclaimer based on location
-                holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
+                holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
                 // Init form for existing calendar
-                holidaysViewModel.initUpdateHolidays(it)
+                holidayCalendarViewModel.initUpdateHolidayCalendar(it)
             } ?: run {
                 // Display disclaimer based on location
-                holidays_calendar_form_country_search_disclaimer.visibleOrGone(true)
+                holiday_calendar_form_country_search_disclaimer.visibleOrGone(true)
                 // Use random color from array as calendar color
                 val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
-                holidaysViewModel.initCreateHolidays(
+                holidayCalendarViewModel.initCreateHolidayCalendar(
                     calendarColors[(0..calendarColors.lastIndex).random()],
-                    ZoneId.systemDefault().id,
                     requireContext().resources.configuration.currentLocale().language.lowercase()
                 )
             }
@@ -190,21 +188,21 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
         initOnClickListeners()
 
-        observeHolidaysFormValues()
+        observeHolidayCalendarFormValues()
 
-        observeHolidaysSnackState(lifecycleScope.coroutineContext)
+        observeHolidayCalendarSnackState(lifecycleScope.coroutineContext)
     }
 
-    private fun observeHolidaysFormValues() {
+    private fun observeHolidayCalendarFormValues() {
 
-        holidaysViewModel.country.observe(viewLifecycleOwner) { country ->
-            holidays_calendar_form_country_value.text = country
-            if (holidaysViewModel.hasBeenEdited()) {
+        holidayCalendarViewModel.country.observe(viewLifecycleOwner) { country ->
+            holiday_calendar_form_country_value.text = country
+            if (holidayCalendarViewModel.hasBeenEdited()) {
                 // Hide disclaimer based on location
-                holidays_calendar_form_country_search_disclaimer.visibleOrGone(false)
+                holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
             }
-            val countryCode = holidaysViewModel.holidaysCalendars.value?.firstOrNull { it.country == country }?.countryCode
-            holidays_calendar_form_country_flag.setImageResource(
+            val countryCode = holidayCalendarViewModel.holidayCalendars.value?.firstOrNull { it.country == country }?.countryCode
+            holiday_calendar_form_country_flag.setImageResource(
                 resources.getIdentifier(
                     "${requireContext().packageName}:drawable/flag_$countryCode",
                     "drawable",
@@ -213,46 +211,46 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
-        holidaysViewModel.language.observe(viewLifecycleOwner) { language ->
+        holidayCalendarViewModel.language.observe(viewLifecycleOwner) { language ->
             if (language.isNullOrEmpty()) return@observe
-            holidays_calendar_form_language_value.text = language
+            holiday_calendar_form_language_value.text = language
         }
 
-        holidaysViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
+        holidayCalendarViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor == 0) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
-                holidays_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                holiday_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            holidays_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(calendarColor)
+            holiday_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(calendarColor)
         }
 
-        holidaysViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
-            holidays_calendar_form_default_all_day_event_notifications.visibleOrGone(defaultAllDayAlarms.size < CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX)
+        holidayCalendarViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
+            holiday_calendar_form_default_all_day_event_notifications.visibleOrGone(defaultAllDayAlarms.size < CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX)
             displayNotifications(
                 defaultAllDayAlarms,
-                holidays_calendar_form_default_all_day_event_notifications_list,
-                holidays_calendar_form_default_all_day_event_notifications_icon,
-                holidays_calendar_form_default_all_day_event_notifications_press
+                holiday_calendar_form_default_all_day_event_notifications_list,
+                holiday_calendar_form_default_all_day_event_notifications_icon,
+                holiday_calendar_form_default_all_day_event_notifications_press
             )
         }
 
-        holidaysViewModel.holidaysState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { eventState ->
-            val processingEvent = eventState is HolidaysViewModel.HolidaysState.Processing
+        holidayCalendarViewModel.holidayCalendarState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { eventState ->
+            val processingEvent = eventState is HolidayCalendarViewModel.HolidayCalendarState.Processing
 
             // Update action bar buttons visibility
             loadingAction.visibleOrGone(processingEvent)
             buttonSave.visibleOrGone(!processingEvent)
 
             // Disable/Enable all items linked to actions from our view
-            holidays_calendar_form_country_value_press.isEnabled = !processingEvent
-            holidays_calendar_form_color_press.isEnabled = !processingEvent
+            holiday_calendar_form_country_value_press.isEnabled = !processingEvent
+            holiday_calendar_form_color_press.isEnabled = !processingEvent
 
-            holidays_calendar_form_default_all_day_event_notifications_press.isEnabled = !processingEvent
-            for (i in 0 until holidays_calendar_form_default_all_day_event_notifications_list.childCount) {
+            holiday_calendar_form_default_all_day_event_notifications_press.isEnabled = !processingEvent
+            for (i in 0 until holiday_calendar_form_default_all_day_event_notifications_list.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                holidays_calendar_form_default_all_day_event_notifications_list.getChildAt(i)
+                holiday_calendar_form_default_all_day_event_notifications_list.getChildAt(i)
                     .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
         }
@@ -292,7 +290,7 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
                     // Remove notification listener
                     setOnSingleClickListener {
                         requireActivity().clearFocusAndHideKeyboard(view)
-                        holidaysViewModel.handleAlarmChange(alarm, isDelete = true)
+                        holidayCalendarViewModel.handleAlarmChange(alarm, isDelete = true)
                     }
                     isClickable = true
                 }
@@ -315,27 +313,27 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
     private fun initOnClickListeners() {
 
         // Country
-        holidays_calendar_form_country_value_press.setOnSingleClickListener {
-            findNavController().navigate(R.id.action_nav_holidays_form_to_nav_holidays_search)
+        holiday_calendar_form_country_value_press.setOnSingleClickListener {
+            findNavController().navigate(R.id.action_nav_holiday_calendar_form_to_nav_holiday_calendar_search)
         }
 
         // Calendar language
-        holidays_calendar_form_language_press.setOnSingleClickListener {
-            val languages = holidaysViewModel.getLanguages()
+        holiday_calendar_form_language_press.setOnSingleClickListener {
+            val languages = holidayCalendarViewModel.getLanguages()
             AndroidUtils.displayPickerDialog(
                 requireContext(),
                 null,
                 languages.toTypedArray(),
-                holidaysViewModel.language.value?.let { language ->
+                holidayCalendarViewModel.language.value?.let { language ->
                     languages.indexOf(language)
                 } ?: 0
             ) {
-                holidaysViewModel.handleLanguage(languages[it])
+                holidayCalendarViewModel.handleLanguage(languages[it])
             }
         }
 
         // Calendar color
-        holidays_calendar_form_color_press.setOnSingleClickListener {
+        holiday_calendar_form_color_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             var dialog: AlertDialog? = null
@@ -349,8 +347,8 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Set grid view with color list
             val calendarColorPickerGridView = view.dialog_calendar_color_picker_layout
-            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), holidaysViewModel.calendarColor.value) { calendarColor ->
-                holidaysViewModel.handleCalendarColor(calendarColor)
+            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), holidayCalendarViewModel.calendarColor.value) { calendarColor ->
+                holidayCalendarViewModel.handleCalendarColor(calendarColor)
                 dialog?.dismiss()
             }
 
@@ -362,20 +360,20 @@ class HolidaysFormFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun observeHolidaysSnackState(coroutineContext: CoroutineContext) {
-        holidaysViewModel.holidaysSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { holidaysSnackState ->
-            holidaysSnackState?.let {
+    private fun observeHolidayCalendarSnackState(coroutineContext: CoroutineContext) {
+        holidayCalendarViewModel.holidayCalendarSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { holidayCalendarSnackState ->
+            holidayCalendarSnackState?.let {
                 when (it) {
-                    is HolidaysViewModel.HolidaysSnackState.DisplaySnack -> {
+                    is HolidayCalendarViewModel.HolidayCalendarSnackState.DisplaySnack -> {
                         view?.displaySnackBar(it.message)
                     }
-                    is HolidaysViewModel.HolidaysSnackState.DisplaySnackNavigateUp -> {
+                    is HolidayCalendarViewModel.HolidayCalendarSnackState.DisplaySnackNavigateUp -> {
                         requireActivity().displaySnackBar(it.message)
 
                         findNavController().navigateUp()
                     }
                 }
-                holidaysViewModel.holidaysSnackState.value = null
+                holidayCalendarViewModel.holidayCalendarSnackState.value = null
             }
         }
     }

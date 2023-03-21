@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.component.VAlarm
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.crypto.SessionKey
+import kotlinx.serialization.json.Json
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.getWeekStart
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
@@ -11,8 +12,9 @@ import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.JoinCalendarApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.HolidaysCalendarEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
+import me.proton.android.calendar.data.entity.getSessionKeyEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
@@ -43,16 +45,17 @@ class JoinCalendarUseCase @Inject constructor(
     private val valueStoreProvider: ValueStoreProvider,
     private val serverEventsApi: ServerEventsApi,
     private val userSettingsRepository: UserSettingsRepository,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val json: Json
 ): UseCase {
 
     companion object {
         const val WORKER_ID = "WORKER_ID_JOIN_CALENDAR"
     }
 
-    suspend fun joinHolidaysCalendar(
+    suspend fun joinHolidayCalendar(
         userId: UserId,
-        holidaysCalendarEntity: HolidaysCalendarEntity,
+        managedHolidayCalendarEntity: ManagedHolidayCalendarEntity,
         calendarColor: Int,
         defaultFullDayNotifications: List<VAlarm>?,
         selectedDate: LocalDate,
@@ -67,14 +70,15 @@ class JoinCalendarUseCase @Inject constructor(
         val memberAddressKey = address.keys.primary() ?: return UseCase.Result.Error("JoinCalendarUseCase: No valid Primary Address Key found for Address")
 
         // Encrypt the session key with the member primary key
+        val sessionKeyEntity = managedHolidayCalendarEntity.getSessionKeyEntity(json)
         val sessionKey = SessionKey(
-            Base64.decode(holidaysCalendarEntity.sessionKey.key),
-            holidaysCalendarEntity.sessionKey.algorithm
+            Base64.decode(sessionKeyEntity.key),
+            sessionKeyEntity.algorithm
         )
         val keyPacket = crypto.getKeyPacket(sessionKey, memberAddressKey.privateKey.publicKey(cryptoContext).key)
 
         // Sign the passphrase using the primary address key
-        val tokenSignature = kotlin.runCatching { memberAddressKey.privateKey.signText(cryptoContext, holidaysCalendarEntity.passphrase) }.getOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: could not sign token")
+        val tokenSignature = kotlin.runCatching { memberAddressKey.privateKey.signText(cryptoContext, managedHolidayCalendarEntity.passphrase) }.getOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: could not sign token")
 
         val joinCalendarApiRequest = JoinCalendarApiRequest(
             signature = tokenSignature,
@@ -89,7 +93,7 @@ class JoinCalendarUseCase @Inject constructor(
         )
 
         return when (val joinCalendarResponse =
-            calendarsApi.joinCalendar(userId, holidaysCalendarEntity.calendarId, address.addressId.id, joinCalendarApiRequest)
+            calendarsApi.joinCalendar(userId, managedHolidayCalendarEntity.calendarId, address.addressId.id, joinCalendarApiRequest)
         ) {
             is ApiResponse.Success -> {
                 val calendarId = joinCalendarResponse.data.calendar.id

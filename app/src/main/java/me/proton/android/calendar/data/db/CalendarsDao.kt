@@ -1,12 +1,8 @@
 package me.proton.android.calendar.data.db
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.entity.CalendarEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -47,13 +43,13 @@ abstract class CalendarsDao : BaseDao<CalendarEntity> {
     @Query("SELECT * FROM calendars WHERE type == 1 AND fkUserId = :userId")
     abstract fun flowSubscribedCalendars(userId: String): Flow<List<CalendarEntity>>
 
-    /** Holidays calendars */
+    /** Holiday calendars */
 
     @Query("SELECT * FROM calendars WHERE type == 2 AND fkUserId = :userId")
-    abstract suspend fun selectHolidaysCalendars(userId: String): List<CalendarEntity>
+    abstract suspend fun selectHolidayCalendars(userId: String): List<CalendarEntity>
 
     @Query("SELECT * FROM calendars WHERE type == 2 AND fkUserId = :userId")
-    abstract fun flowHolidaysCalendars(userId: String): Flow<List<CalendarEntity>>
+    abstract fun flowHolidayCalendars(userId: String): Flow<List<CalendarEntity>>
 
     /** By id */
 
