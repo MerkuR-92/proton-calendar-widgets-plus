@@ -20,6 +20,7 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.IMPORT_VERSION_CODE
 import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
@@ -147,6 +148,7 @@ object SpotlightUtils {
             }
             IMPORT_VERSION_CODE -> {
                 // Import
+                if (!IMPORT_ICS) return
                 val weekViewContent = getImportDialogContent()
                 this.displaySpotlightDialog(
                     weekViewContent.first,
