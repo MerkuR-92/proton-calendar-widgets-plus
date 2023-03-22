@@ -71,6 +71,7 @@ class CalendarEventListener @Inject constructor(
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {
+        logger.i("CalendarEventListener onResetAll")
         calendarsRepository.deleteAllEvents(config.asCalendar().calendarId)
         getMinimalCalendarEventsUseCase.execute(config.userId, config.asCalendar().calendarId)
     }
