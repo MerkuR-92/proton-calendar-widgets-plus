@@ -114,8 +114,8 @@ import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
-import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
 import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
 import me.proton.android.calendar.common.FeatureFlag.THREE_DAYS_VIEW
 import me.proton.android.calendar.common.FeatureFlag.WEEK_VIEW
@@ -531,11 +531,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
-                    if (openIcsIntent != null && FeatureFlag.OPEN_ICS) {
+                    if (openIcsIntent != null && FeatureFlag.OPEN_INVITATION) {
                         handleIcsIntent(openIcsIntent)
-                    } else if (openIcsIntent == null && OPEN_ICS_FILES || APP_LINKS || IMPORT_ASSISTANT) {
+                    } else if (openIcsIntent == null && IMPORT_ICS || APP_LINKS || IMPORT_ASSISTANT) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
-                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && OPEN_ICS_FILES) {
+                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && IMPORT_ICS) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
                         } else if (actionViewIntent != null && APP_LINKS) {
@@ -676,12 +676,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun handleOpenIcsIntent(uri: Uri, senderEmail: String?, recipientEmail: String?) {
 
-        if (!OPEN_ICS_FILES) {
-            if (senderEmail == null || recipientEmail == null) {
-                this@MainActivity.displaySnackBar(getString(R.string.snack_ics_default_error), Snackbar.LENGTH_LONG)
-                safeNavigateToMonth()
-                return
-            }
+        if (!IMPORT_ICS && (senderEmail == null || recipientEmail == null)) {
+            this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
+            safeNavigateToMonth()
+            return
         }
 
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch

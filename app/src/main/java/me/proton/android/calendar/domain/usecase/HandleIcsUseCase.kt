@@ -14,7 +14,7 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.OPEN_ICS_FILES
+import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
@@ -74,7 +74,8 @@ class HandleIcsUseCase @Inject constructor(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         return if (iCalendar.method.isPublish || !isOpeningFromProtonMail) {
-            handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
+            if (IMPORT_ICS) handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
+            else IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish
         } else {
             handleInviteIcs(iCalendar, userId, senderEmail, recipientEmail)
         }
@@ -227,7 +228,7 @@ class HandleIcsUseCase @Inject constructor(
         } // TODO Remove once other methods are handled
 
         var isCurrentUserSender = false // TODO Replace by val once we remove OPEN_ICS_FILES intent
-        if (!OPEN_ICS_FILES || (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank())) {
+        if (canonicalSenderEmail.isNotBlank() && canonicalRecipientEmail.isNotBlank()) {
 
             isCurrentUserSender = canonicalUserEmails.contains(canonicalSenderEmail) == true
             val isCurrentUserRecipient = canonicalUserEmails.contains(canonicalRecipientEmail)

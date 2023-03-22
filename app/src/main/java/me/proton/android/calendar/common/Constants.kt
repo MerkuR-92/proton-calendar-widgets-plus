@@ -108,8 +108,7 @@ object FeatureFlag {
     const val SETTINGS_DRAWER = true
     const val ADD_ATTENDEES = true
     const val CHANGE_ANSWER = true
-    const val OPEN_ICS = true
-    const val OPEN_ICS_FILES = true
+    const val OPEN_INVITATION = true
     const val APP_LINKS = true
     const val DELETE_CALENDAR = true
     const val CHANGE_CALENDAR_SIMPLE_EVENT = true
@@ -127,6 +126,7 @@ object FeatureFlag {
     const val DRAG_AND_DROP = false
     const val EDITING_SHARED_CALENDARS = false
     const val CLEAR_CALENDAR = false
+    const val IMPORT_ICS = false
 }
 
 object HttpResponseCode {
