@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.common.provider.SharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
@@ -181,6 +182,7 @@ fun coreModule(
     contactEmailsRepository: ContactRepository,
     userSettingsRepository: UserSettingsRepository,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
+    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
 ) = module {
     single<AppDatabase> { appDatabase }
     single<ApiProvider> { apiProvider }
@@ -195,4 +197,5 @@ fun coreModule(
     single<UserSettingsRepository> { userSettingsRepository }
     single<GetRecipientPublicAddresses> { getRecipientPublicAddresses }
     single<EventDecryptor> { eventDecryptor }
+    single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
 }

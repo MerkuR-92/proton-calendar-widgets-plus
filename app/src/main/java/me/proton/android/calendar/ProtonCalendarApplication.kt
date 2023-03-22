@@ -120,7 +120,8 @@ class ProtonCalendarApplication : Application() {
                     calendarsRepository,
                     contactEmailsRepository,
                     userSettingsRepository,
-                    getRecipientPublicAddresses
+                    getRecipientPublicAddresses,
+                    defaultSharedPreferencesProvider
                 )
             )
         }
