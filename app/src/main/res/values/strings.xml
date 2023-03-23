@@ -317,6 +317,7 @@
     <string name="snack_update_calendar_settings_error">Error updating some calendar information, please try again later</string>
     <string name="snack_update_calendar_success">Calendar updated</string>
     <string name="snack_create_calendar_success">Calendar created</string>
+    <string name="snack_holiday_calendar_already_exists">Holiday calendar already exists</string>
     <string name="snack_calendar_saving">Saving calendar</string>
     <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
     <string name="snack_create_calendar_settings_error">The calendar was created but some information was not updated, please try again later</string>

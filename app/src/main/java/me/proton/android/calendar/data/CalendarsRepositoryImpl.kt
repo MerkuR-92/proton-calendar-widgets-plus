@@ -531,6 +531,9 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
         database.managedHolidayCalendarDao().selectAll()
 
+    override suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
+        database.managedHolidayCalendarDao().selectById(calendarId)
+
     override suspend fun initManagedHolidayCalendars(userId: UserId) {
         calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars?.forEach {
             database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))

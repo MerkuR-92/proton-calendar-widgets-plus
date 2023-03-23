@@ -129,9 +129,8 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 lifecycleScope.launch {
                     if (holidayCalendarViewModel.hasBeenEdited() || calendarId.isNullOrEmpty()) {
                         val selectedDate = calendarViewModel.selectedDateTime.value
-                        // Save new form values
                         val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
-                        holidayCalendarViewModel.handleSaveHolidayCalendar(returnToSettings, selectedDate?.first)
+                        holidayCalendarViewModel.handleSaveHolidayCalendar(returnToSettings, calendarId.isNullOrEmpty(), selectedDate?.first)
                     } else findNavController().navigateUp()
                 }
             }
@@ -315,6 +314,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         // Calendar language
         holiday_calendar_form_language_press.setOnSingleClickListener {
             val languages = holidayCalendarViewModel.getLanguages()
+            if (languages.size <= 1) return@setOnSingleClickListener
             AndroidUtils.displayPickerDialog(
                 requireContext(),
                 null,
@@ -363,7 +363,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                         view?.displaySnackBar(it.message)
                     }
                     is HolidayCalendarViewModel.HolidayCalendarSnackState.DisplaySnackNavigateUp -> {
-                        requireActivity().displaySnackBar(it.message)
+                        if (it.message.isNotEmpty()) requireActivity().displaySnackBar(it.message)
 
                         findNavController().navigateUp()
                     }

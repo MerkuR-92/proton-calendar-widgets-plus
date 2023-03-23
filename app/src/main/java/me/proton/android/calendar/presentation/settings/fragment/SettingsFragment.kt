@@ -228,7 +228,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             calendarSettingsSnackState?.let {
                 when (it) {
                     is HolidayCalendarViewModel.HolidayCalendarSnackState.DisplaySnackNavigateUp -> {
-                        view?.displaySnackBar(it.message)
+                        if (it.message.isNotEmpty()) view?.displaySnackBar(it.message)
 
                         findNavController().navigateUp()
                     }
@@ -301,7 +301,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             val bundle = Bundle().apply {
                 putString(CALENDAR_ID_ARG, calendar.id)
             }
-            findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form, bundle)
+            if (calendar.isHolidayCalendar) {
+                findNavController().navigate(R.id.action_nav_settings_to_nav_holiday_calendar_form, bundle)
+            } else {
+                findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form, bundle)
+            }
             bottomSheetDialog.dismiss()
         }
 

@@ -92,6 +92,8 @@ interface CalendarsRepository {
 
     suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>?
 
+    suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity?
+
     suspend fun initManagedHolidayCalendars(userId: UserId)
 
     suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean
