@@ -51,6 +51,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -71,6 +72,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
+    private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val resourceProvider: ResourceProvider by inject()
@@ -212,6 +214,20 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             calendarSettingsSnackState?.let {
                 when (it) {
                     is CalendarFormViewModel.CalendarFormSnackState.DisplaySnackNavigateUp -> {
+                        view?.displaySnackBar(it.message)
+
+                        findNavController().navigateUp()
+                    }
+                    else -> { } // We do not use the other values
+                }
+                calendarFormViewModel.calendarSettingsSnackState.value = null
+            }
+        }
+
+        holidayCalendarViewModel.calendarSettingsSnackState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { calendarSettingsSnackState ->
+            calendarSettingsSnackState?.let {
+                when (it) {
+                    is HolidayCalendarViewModel.HolidayCalendarSnackState.DisplaySnackNavigateUp -> {
                         view?.displaySnackBar(it.message)
 
                         findNavController().navigateUp()

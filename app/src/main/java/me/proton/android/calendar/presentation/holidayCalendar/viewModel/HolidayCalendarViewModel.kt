@@ -21,6 +21,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
@@ -264,7 +265,25 @@ class HolidayCalendarViewModel @Inject constructor(
         // Clear loading state
         holidayCalendarState.value = HolidayCalendarState.Idle
 
-        return joinCalendarResult is UseCase.Result.Success<*>
+        if (joinCalendarResult !is UseCase.Result.Success<*>) {
+            holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_create_calendar_error)
+            )
+            return false
+        }
+
+        if (returnToSettings) {
+            // Use settings snack state here to display snack in calendar settings view
+            calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_create_calendar_success)
+            )
+        } else {
+            // Use holiday calendar snack state here to display snack in month view
+            holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_create_calendar_success)
+            )
+        }
+        return true
     }
 
     private suspend fun getCalendar(calendarId: String): Calendar? {

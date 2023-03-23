@@ -131,12 +131,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                         val selectedDate = calendarViewModel.selectedDateTime.value
                         // Save new form values
                         val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings || calendarId != null
-                        if (holidayCalendarViewModel.handleSaveHolidayCalendar(returnToSettings, selectedDate?.first)) {
-                            view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_success))
-                            findNavController().navigateUp()
-                        } else {
-                            view?.displaySnackBar(resources.getString(R.string.snack_create_calendar_error))
-                        }
+                        holidayCalendarViewModel.handleSaveHolidayCalendar(returnToSettings, selectedDate?.first)
                     } else findNavController().navigateUp()
                 }
             }
