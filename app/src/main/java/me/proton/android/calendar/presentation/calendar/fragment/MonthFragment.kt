@@ -671,28 +671,42 @@ class MonthFragment : BaseFragment() {
                         calendarViewModel.getWeekStart()?.let { weekStart ->
                             val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
                             if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
-                                val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@launch
-                                val hourHeight = weekView?.hourHeight ?: return@launch
-                                val hour = (verticalScrollOffset / hourHeight).toInt()
-                                val minute = (((verticalScrollOffset / hourHeight) - hour) * 60).toInt()
-                                calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
-                                    if (hour < 0) 0 else if (hour > 23) 23 else hour,
-                                    if (minute < 0) 0 else if (minute > 59) 59 else minute)
-                                )
+                                val verticalScrollOffset = weekView?.verticalScrollOffset
+                                val hourHeight = weekView?.hourHeight
+                                if (verticalScrollOffset != null && hourHeight != null) {
+                                    val hour = (verticalScrollOffset / hourHeight).toInt()
+                                    val minute = (((verticalScrollOffset / hourHeight) - hour) * 60).toInt()
+                                    calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                                        if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                                        if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                                    )
+                                } else {
+                                    calendarViewModel.handleDaySelected(
+                                        firstVisibleDate,
+                                        calendarViewModel.selectedDateTime.value?.second
+                                    )
+                                }
                             }
                             initWeekView = false
                         }
                     }
                 } else {
                     if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
-                        val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@WeekViewAdapter
-                        val hourHeight = weekView?.hourHeight ?: return@WeekViewAdapter
-                        val hour = (verticalScrollOffset / hourHeight).toInt()
-                        val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
-                        calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
-                            if (hour < 0) 0 else if (hour > 23) 23 else hour,
-                            if (minute < 0) 0 else if (minute > 59) 59 else minute)
-                        )
+                        val verticalScrollOffset = weekView?.verticalScrollOffset
+                        val hourHeight = weekView?.hourHeight
+                        if (verticalScrollOffset != null && hourHeight != null) {
+                            val hour = (verticalScrollOffset / hourHeight).toInt()
+                            val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
+                            calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                                if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                                if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                            )
+                        } else {
+                            calendarViewModel.handleDaySelected(
+                                firstVisibleDate,
+                                calendarViewModel.selectedDateTime.value?.second
+                            )
+                        }
                     }
                 }
             },
