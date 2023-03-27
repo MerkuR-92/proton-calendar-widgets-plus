@@ -21,10 +21,12 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
+import me.proton.android.calendar.common.FeatureFlag.SHOW_EVENT_SEARCH
 import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.IMPORT_VERSION_CODE
 import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.REBRANDING_VERSION_CODE
+import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.SPOTLIGHT_VERSION_CODES
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.WEEK_VIEW_VERSION_CODE
@@ -87,7 +89,14 @@ object SpotlightUtils {
         )
     }
 
-    fun Activity.showLastSpotlightDialog() {
+    private fun getSearchDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_search_title,
+            R.string.spotlight_dialog_search_description
+        )
+    }
+
+    fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null) {
         if (!SPOTLIGHT) return
 
         val lastSpotlightShown = this.getLastSpotlightShown()
@@ -154,6 +163,19 @@ object SpotlightUtils {
                     weekViewContent.first,
                     weekViewContent.second,
                     materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
+                )
+            }
+            SEARCH_VERSION_CODE -> {
+                if (!SHOW_EVENT_SEARCH) return
+
+                val content = getSearchDialogContent()
+                this.displaySpotlightDialog(
+                    content.first,
+                    content.second,
+                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button,
+                    customPositiveButtonCallback = {
+                        positiveCallback?.invoke(lastSpotlightVersionCode)
+                    }
                 )
             }
             else -> {

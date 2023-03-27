@@ -25,9 +25,11 @@ import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
@@ -52,6 +54,8 @@ internal class CalendarRepositoryTest {
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
     private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     private val eventDecryptorMock: EventDecryptor = mockk()
+    private val searchDatabaseMock: SearchDatabase = mockk()
+    private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -357,7 +361,9 @@ internal class CalendarRepositoryTest {
             calendarsApiMock,
             json,
             calendarWidgetRefresherMock,
-            eventDecryptorMock
+            eventDecryptorMock,
+            searchDatabaseMock,
+            indexEventForSearchUseCaseMock
         )
     }
 

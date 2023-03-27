@@ -2,6 +2,7 @@ package me.proton.android.calendar.eventmanager.listeners.calendar
 
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
@@ -13,7 +14,6 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
-import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.domain.entity.UserId
@@ -67,7 +67,7 @@ class CalendarEventListener @Inject constructor(
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
-        delegate.onDelete(keys)
+        delegate.onDelete(config.asCalendar().calendarId, keys)
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {
@@ -88,7 +88,6 @@ class CalendarEventListenerDelegate @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val widgetRefresher: WidgetRefresher,
-    private val handleEventsMetadataUseCase: HandleEventsMetadataUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
 ) {
 
@@ -118,10 +117,10 @@ class CalendarEventListenerDelegate @Inject constructor(
         calendarsRepository.persistEvents(*entities.toTypedArray())
     }
 
-    suspend fun onDelete(ids: List<String>) {
+    suspend fun onDelete(calendarId: String, ids: List<String>) {
         if (ids.isEmpty()) return
 
-        calendarsRepository.deleteEventsById(ids)
+        calendarsRepository.deleteEventsById(calendarId, ids)
     }
 
     suspend fun onSuccess(config: EventManagerConfig, entityIds: List<String>) {

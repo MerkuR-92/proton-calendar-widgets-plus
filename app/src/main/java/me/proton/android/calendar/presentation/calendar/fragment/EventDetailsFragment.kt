@@ -164,7 +164,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             return
         }
 
-        jumpToMonthView()
+        // if we were searching events, go back to search, otherwise to MonthView
+        if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_search) {
+            findNavController().navigateUp()
+        } else jumpToMonthView()
     }
 
     override fun onNavigationIconClicked(): Boolean {

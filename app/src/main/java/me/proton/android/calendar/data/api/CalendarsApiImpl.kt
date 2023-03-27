@@ -2,18 +2,30 @@ package me.proton.android.calendar.data.api
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.api.*
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.NotificationEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.data.ApiProvider
 import me.proton.core.network.data.protonApi.BaseRetrofitApi
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
+import retrofit2.http.Query
 import java.time.Instant
 import javax.inject.Inject
-import javax.inject.Singleton
 
 interface CalendarsApiService : BaseRetrofitApi {
 
@@ -33,6 +45,37 @@ interface CalendarsApiService : BaseRetrofitApi {
         @Query("Page") page: Int,
         @Query("PageSize") pageSize: Int
     ): EventsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
+    suspend fun getEventsMetadata(
+        @Path("calendarId") calendarId: String,
+        @Query("Start") startTimestamp: Long,
+        @Query("End") endTimestamp: Long,
+        @Query("Timezone") timezone: String,
+        @Query("Type") type: Int,
+        @Query("Page") page: Int,
+        @Query("PageSize") pageSize: Int,
+        @Query("MetaDataOnly") metaDataOnly: Int = 1
+    ): EventsMetadataApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/ids")
+    suspend fun getEventIdsForExport(
+        @Path("calendarId") calendarId: String,
+        @Query("Limit") limit: Int,
+        @Query("AfterID") afterId: String?
+    ): EventsExportIdsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events")
+    suspend fun getEventsForExport(
+        @Path("calendarId") calendarId: String,
+        @Query("PageSize") pageSize: Int,
+        @Query("BeginID") beginId: String?
+    ): EventsExportApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/count")
+    suspend fun getEventsCount(
+        @Path("calendarId") calendarId: String
+    ): EventsCountApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : EventApiResponse
@@ -149,6 +192,60 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             pageSize
         )
     }.toApiResponse()
+
+    override suspend fun getEventsMetadata(
+        userId: UserId,
+        calendarId: String,
+        startTimestamp: Long,
+        endTimestamp: Long,
+        timezone: String,
+        type: Int,
+        page: Int,
+        pageSize: Int
+    ): ApiResponse<EventsMetadataApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventsMetadata(
+            calendarId,
+            startTimestamp,
+            endTimestamp,
+            timezone,
+            type,
+            page,
+            pageSize
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventIdsForExport(
+        userId: UserId,
+        calendarId: String,
+        limit: Int,
+        afterId: String?
+    ): ApiResponse<EventsExportIdsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventIdsForExport(
+            calendarId,
+            limit,
+            afterId
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventsForExport(
+        userId: UserId,
+        calendarId: String,
+        pageSize: Int,
+        beginId: String?
+    ): ApiResponse<EventsExportApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventsForExport(
+            calendarId,
+            pageSize,
+            beginId
+        )
+    }.toApiResponse()
+
+    override suspend fun getEventsCount(userId: UserId, calendarId: String): ApiResponse<EventsCountApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getEventsCount(
+                calendarId
+            )
+        }.toApiResponse()
 
     override suspend fun getEvent(
         userId: UserId,
@@ -311,6 +408,34 @@ data class EventsApiResponse(
     val events: List<EventEntity>,
     @SerialName("More")
     val more: Int
+)
+
+@Serializable
+data class EventsMetadataApiResponse(
+    @SerialName("Events")
+    val events: List<ServerEvent.EventEntityMetadata>,
+    @SerialName("More")
+    val more: Int
+)
+
+@Serializable
+data class EventsExportIdsApiResponse(
+    @SerialName("IDs")
+    val events: List<String>
+)
+
+@Serializable
+data class EventsExportApiResponse(
+    @SerialName("Events")
+    val events: List<EventEntity>,
+    @SerialName("Total")
+    val total: Int
+)
+
+@Serializable
+data class EventsCountApiResponse(
+    @SerialName("Total")
+    val total: Int
 )
 
 @Serializable

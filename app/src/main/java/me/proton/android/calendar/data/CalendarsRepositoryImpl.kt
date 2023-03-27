@@ -17,6 +17,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
@@ -41,6 +43,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlap
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
@@ -52,6 +55,7 @@ import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -61,6 +65,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.data.entity.SkeletonEventEntity
 import me.proton.android.calendar.data.entity.toSkeletonEvent
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -71,6 +76,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -98,7 +104,9 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val json: Json,
     private val widgetRefresher: WidgetRefresher,
-    private val eventDecryptor: EventDecryptor
+    private val eventDecryptor: EventDecryptor,
+    private val searchDatabase: SearchDatabase,
+    private val indexEventForSearchUseCase: IndexEventForSearchUseCase
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -352,6 +360,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().countCalendars()
     }
 
+    override suspend fun clearSearchDatabase() {
+        withContext(Dispatchers.IO) {
+            searchDatabase.searchDao().deleteAllSearchEvents()
+        }
+    }
+
     override suspend fun selectCalendarEntity(calendarId: String): CalendarEntity? {
         return database.calendarsDao().selectById(calendarId)
     }
@@ -366,6 +380,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun selectUserCalendars(userId: String): List<Calendar> {
         return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json)
+    }
+
+    override suspend fun selectAllCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectCalendars(userId).joinToCalendars(database, json)
     }
 
     override suspend fun selectActiveUserCalendars(userId: String): List<Calendar> {
@@ -411,6 +429,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun deleteCalendarById(id: String) {
         database.calendarsDao().deleteById(id)
+
+        database.calendarsDao().selectCalendarUserId(id)?.let {
+            deleteAllSearchEventsInCalendar(it, id)
+        }
     }
 
     override suspend fun refreshCalendars(userId: UserId): Boolean {
@@ -600,7 +622,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event? {
-        return eventDecryptor.decryptAllowingApiCall(database.eventsDao().selectEvent(eventId, calendarId))
+        return database.eventsDao().selectEvent(eventId, calendarId)?.let { eventDecryptor.decryptAllowingApiCall(it) }
     }
 
     private fun createEventsFlow(eventsWindow: CalendarsRepository.EventsWindow, allowCached: Boolean): Flow<CalendarsRepository.GetEventsResult<Event>> {
@@ -704,6 +726,33 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
         return createEventsFlow(eventsWindow, allowCached)
+    }
+
+    override fun getSearchEvents(userId: String, searchTerm: String): Flow<CalendarsRepository.GetEventsResult<Event>> =
+        searchDatabase.searchDao().flowSearchEvents(userId).distinctUntilChanged().transform<List<SearchEventEntity>, CalendarsRepository.GetEventsResult<Event>> { searchEventEntities ->
+            val containSearchTerm = searchEventEntities.filterOutBySearchTerm(searchTerm)
+
+            val deduplicated = containSearchTerm.mapNotNull { searchEventEntity ->
+                database.eventsDao().selectEvent(searchEventEntity.eventId, searchEventEntity.calendarId)?.let { eventDecryptor.decrypt(it) }
+            }.filterOutDuplicatesInSubscribedCalendars()
+
+            emit(CalendarsRepository.GetEventsResult.Success(deduplicated))
+        }.onStart {
+            emit(CalendarsRepository.GetEventsResult.InProgress)
+        }.catch {
+            emit(CalendarsRepository.GetEventsResult.Exception(it))
+        }.distinctUntilChanged().cancellable()
+
+    override suspend fun deleteAllSearchEvents(userId: String) {
+        searchDatabase.searchDao().deleteAll(userId)
+    }
+
+    override suspend fun deleteAllSearchEventsInCalendar(userId: String, calendarId: String) {
+        searchDatabase.searchDao().deleteAllInCalendar(userId, calendarId)
+    }
+
+    override suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>) {
+        searchDatabase.searchDao().deleteSearchEventsForEvents(userId, calendarId, eventIds)
     }
 
     private fun createSkeletonsFlow(
@@ -860,7 +909,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     /**
      * Calling this method requires obtained lock on 'allEvents'!
      */
-    private fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
+    override fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event> {
         return if (event.isRecurring()) {
             val expandedOccurrences = ICalUtilsImpl.expandOccurrencesWithSingleEdits(
                 event,
@@ -1018,6 +1067,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         return calendarsApi.getEventsByUid(userId, eventUid, 0, 100)
     }
 
+    override suspend fun selectEventsByUid(eventUid: String): List<Event> {
+        return database.eventsDao().selectByUid(formatUidForICal(eventUid)).mapNotNull {
+            eventDecryptor.decrypt(it)
+        }
+    }
+
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
         return calendarsApi.getEvent(userId, calendarId, eventId)
     }
@@ -1026,13 +1081,16 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsByCalendar = events.groupBy { it.calendarId }
         database.inTransaction {
             eventsByCalendar.forEach {
-                if (database.calendarsDao().hasCalendar(it.key)) {
+                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
+                if (calendarUserId != null /* Calendar exists */) {
                     try {
                         it.value.forEach {
                             // don't overwrite Event it we already have newer one in DB
                             if (!database.eventsDao().hasEventWithHigherModifyTime(it.id, it.calendarId, it.modifyTime)) {
                                 database.eventsDao().updateOrInsert(it)
                             }
+
+                            indexEventForSearchUseCase.execute(calendarUserId, listOf(it))
                         }
                     } catch (e: SQLiteConstraintException) {
                         // hack for different SQLite implementations formatting message differently
@@ -1050,13 +1108,20 @@ class CalendarsRepositoryImpl @Inject constructor(
             }
         }
     }
-
-    override suspend fun deleteEventsById(ids: List<String>) {
+    override suspend fun deleteEventsById(calendarId: String, ids: List<String>) {
         database.eventsDao().deleteByIds(ids)
+
+        database.calendarsDao().selectCalendarUserId(calendarId)?.let {
+            deleteSearchEventsForEvents(it, calendarId, ids)
+        }
     }
 
     override suspend fun deleteAllEvents(calendarId: String) {
         database.eventsDao().deleteAll(calendarId)
+
+        database.calendarsDao().selectCalendarUserId(calendarId)?.let {
+            deleteAllSearchEventsInCalendar(it, calendarId)
+        }
     }
 
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {

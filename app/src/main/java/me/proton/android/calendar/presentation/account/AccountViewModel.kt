@@ -129,6 +129,7 @@ class AccountViewModel @Inject constructor(
 
     private suspend fun cleanUser(context: Context) {
         WorkManager.getInstance(context).cancelAllWork()
+        calendarsRepository.clearSearchDatabase()
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
         widgetRefresher.refreshEventList()

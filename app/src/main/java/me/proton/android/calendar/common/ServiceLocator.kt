@@ -20,6 +20,7 @@ import me.proton.android.calendar.data.api.MailSettingsApiImpl
 import me.proton.android.calendar.data.api.ServerEventsApiImpl
 import me.proton.android.calendar.data.api.SettingsApiImpl
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
@@ -50,9 +51,9 @@ import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
-import me.proton.android.calendar.domain.usecase.HandleEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
+import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
@@ -77,6 +78,7 @@ import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
@@ -145,6 +147,7 @@ val viewModelModule = module {
         )
     }
     viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel<SearchViewModel> { SearchViewModel(get(), get(), get(), get()) }
     viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     viewModel<ImportAssistantViewModel> { ImportAssistantViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -152,7 +155,7 @@ val viewModelModule = module {
 
 val useCaseModule = module {
     factory<FetchPublicKeysUseCase> { FetchPublicKeysUseCase(get(), get(), get()) }
-    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get()) }
+    factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpgradeEventUseCase> { UpgradeEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -169,7 +172,6 @@ val useCaseModule = module {
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
     factory<ResetCalendarsKeyUseCase> { ResetCalendarsKeyUseCase(get(), get(), get(), get(), get()) }
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<HandleEventsMetadataUseCase> { HandleEventsMetadataUseCase(get(), get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
     factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
@@ -204,6 +206,8 @@ fun coreModule(
     contactEmailsRepository: ContactRepository,
     userSettingsRepository: UserSettingsRepository,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
+    searchDatabase: SearchDatabase,
+    indexEventForSearchUseCase: IndexEventForSearchUseCase
 ) = module {
     single<AppDatabase> { appDatabase }
     single<ApiProvider> { apiProvider }
@@ -218,4 +222,6 @@ fun coreModule(
     single<UserSettingsRepository> { userSettingsRepository }
     single<GetRecipientPublicAddresses> { getRecipientPublicAddresses }
     single<EventDecryptor> { eventDecryptor }
+    single<SearchDatabase> { searchDatabase }
+    factory<IndexEventForSearchUseCase> { indexEventForSearchUseCase }
 }

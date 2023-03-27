@@ -73,21 +73,16 @@ class CalendarAlarmEventListenerTest {
                 EventApiResponse(createEventEntity("event_id_1"))
             )
             val alarms = listOf(
-                // This one is 1 day in the future, its event will be fetched
                 createAlarmEntity("alarm_id_1", Instant.now()),
-                // This one is in the past, it will be fetched
                 createAlarmEntity("alarm_id_2", Instant.MIN),
-                // This one is in the 30 day limit of upcoming alarms, will be fetched
                 createAlarmEntity("alarm_id_3", Instant.now().plus(Duration.ofDays(30))),
-                // This one is too far away in the future
                 createAlarmEntity("alarm_id_4", Instant.MAX),
-                // This one is too far away in the future too
-                createAlarmEntity("alarm_id_5", Instant.now().plus(Duration.ofDays(31)))
+                createAlarmEntity("alarm_id_5", Instant.now().plus(Duration.ofDays(31))),
             )
 
             listener.onPrepare(config, alarms)
 
-            coVerify(exactly = 3) { calendarsRepository.fetchEventById(any(), any(), any()) }
+            coVerify(exactly = 5) { calendarsRepository.fetchEventById(any(), any(), any()) }
         }
     }
 

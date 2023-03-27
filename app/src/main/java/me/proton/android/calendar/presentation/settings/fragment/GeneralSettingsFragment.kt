@@ -8,7 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.work.Operation
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_switch
@@ -19,6 +19,9 @@ import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_in
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_value
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_search
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_search_press
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_search_switch
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme_value
@@ -40,6 +43,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
+import me.proton.android.calendar.common.FeatureFlag.SHOW_EVENT_SEARCH
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -52,6 +56,7 @@ import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -72,6 +77,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
@@ -254,6 +260,48 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                     }
                     calendarViewModel.updateWeekStart(weekStart)
             }
+        }
+
+        settings_search.visibleOrGone(SHOW_EVENT_SEARCH)
+
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
+            }
+        }
+
+        settings_search_press.setOnClickListener {
+            settings_search_switch.performClick()
+        }
+        settings_search_switch.setOnClickListener {
+
+            val builder = MaterialAlertDialogBuilder(requireContext())
+
+            if (settings_search_switch.isChecked) { // turning ON
+                builder.setTitle(R.string.search_settings_dialog_toggle_on_title)
+                builder.setMessage(R.string.search_settings_dialog_toggle_on_text)
+                builder.setPositiveButton(R.string.dialog_button_download) { _, _ ->
+                    searchViewModel.enableCalendarDownload(requireContext())
+                }
+            } else { // turning OFF
+                builder.setTitle(R.string.search_settings_dialog_toggle_off_title)
+                builder.setMessage(R.string.search_settings_dialog_toggle_off_text)
+                builder.setPositiveButton(R.string.dialog_button_remove) { _, _ ->
+                    searchViewModel.disableCalendarDownload(requireContext())
+                    searchViewModel.clearDownloadingState()
+                }
+            }
+
+            builder.setNegativeButton(R.string.dialog_button_cancel, null)
+            builder.setOnDismissListener {
+                // bring back the correct toggle value in case user changed their mind
+                lifecycleScope.launch {
+                    withContext(Dispatchers.Main) {
+                        settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
+                    }
+                }
+            }
+            builder.create().show()
         }
 
         val isAlternativeRoutingEnabled = mainViewModel.isAlternativeRoutingEnabled()

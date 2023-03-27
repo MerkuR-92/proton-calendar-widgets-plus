@@ -55,7 +55,9 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.DAY_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.THREE_DAYS_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.WEEK_VIEW_DATE_FORMATTER_PATTERN
@@ -97,6 +99,7 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPager
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
@@ -118,6 +121,8 @@ class MonthFragment : BaseFragment() {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
+
     @Inject
     lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
     @Inject
@@ -138,6 +143,7 @@ class MonthFragment : BaseFragment() {
     override val layoutResourceId: Int
         get() = R.layout.fragment_month
 
+    private lateinit var buttonSearch: View
     private lateinit var buttonCreate: View
     private lateinit var buttonToday: View
 
@@ -156,6 +162,10 @@ class MonthFragment : BaseFragment() {
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
 
     override fun onToolbarCreated(toolbar: Toolbar) {
+        buttonSearch = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
+        with (buttonSearch) {
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_magnifier))
+        }
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragment_toolbar_content, false)
         with (buttonCreate) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_plus))
@@ -167,6 +177,12 @@ class MonthFragment : BaseFragment() {
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
+            if (FeatureFlag.SHOW_EVENT_SEARCH) {
+                addView(buttonSearch, resources.getDimensionPixelSize(
+                    R.dimen.action_clickable_size
+                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+            }
+
             addView(
                 buttonToday, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
@@ -187,6 +203,10 @@ class MonthFragment : BaseFragment() {
     }
 
     private fun setToolbarListeners(timeZoneId: ZoneId) {
+        buttonSearch.setOnSingleClickListener {
+            requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(R.id.nav_search)
+        }
+
         buttonCreate.setOnSingleClickListener {
             lifecycleScope.launch {
                 val hasWritableActiveCalendars = calendarViewModel.getActiveUserCalendars()?.let { activeUserCalendars ->
@@ -630,7 +650,12 @@ class MonthFragment : BaseFragment() {
             }
         }
 
-        requireActivity().showLastSpotlightDialog()
+        requireActivity().showLastSpotlightDialog() {
+            if (it == SEARCH_VERSION_CODE) {
+                searchViewModel.enableCalendarDownload(requireContext())
+                requireActivity().displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+            }
+        }
 
         weekViewAdapter = WeekViewAdapter(
             dragHandler = { _, _, _ ->

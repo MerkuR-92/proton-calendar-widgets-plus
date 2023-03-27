@@ -1,9 +1,11 @@
 package me.proton.android.calendar.di
 
+import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
@@ -14,8 +16,13 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.EventDecryptorImpl
 import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
+import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import javax.inject.Singleton
 
 @Module
@@ -28,6 +35,20 @@ object CalendarsModule {
     @Provides
     fun provideICalUtilsImpl() = ICalUtilsImpl
 
+    @Provides
+    @Singleton
+    fun provideSearchDatabase(
+        @ApplicationContext context: Context,
+        valueStoreProvider: ValueStoreProvider,
+        keyStoreCrypto: KeyStoreCrypto
+    ): SearchDatabase = SearchDatabase.buildDatabase(context, valueStoreProvider, keyStoreCrypto)
+
+    @Provides
+    fun provideIndexEventForSearchUseCase(
+        valueStoreProvider: ValueStoreProvider,
+        searchDatabase: SearchDatabase,
+        transformEventUseCase: TransformEventUseCase
+    ): IndexEventForSearchUseCase = IndexEventForSearchUseCase(valueStoreProvider, searchDatabase, transformEventUseCase)
 }
 
 @Module

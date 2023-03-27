@@ -18,6 +18,7 @@ import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.utils.CalendarSplit
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -146,6 +147,9 @@ interface ICalUtils {
     fun List<Event>.filterOutOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event>
     fun List<Event.Occurrence>.filterOutEventOccurrencesByExdates(originalEvent: Event, timeZoneId: String): List<Event.Occurrence>
     fun List<EventAlarmEntity>.filterOutDuplicates(): List<EventAlarmEntity>
+
+    fun List<Event>.filterOutEventsBySearchTerm(searchTerm: String): List<Event>
+    fun List<SearchEventEntity>.filterOutBySearchTerm(searchTerm: String): List<SearchEventEntity>
 
     /**
      * TODO this is a hack for hiding duplicated Events in Subscribed Calendars

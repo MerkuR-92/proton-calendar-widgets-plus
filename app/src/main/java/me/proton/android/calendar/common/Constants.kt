@@ -76,6 +76,10 @@ const val DAY_VIEW_ALL_DAY_MAX = 3
 const val MAX_CALENDAR_PAID = 25
 const val MAX_CALENDAR_FREE = 3
 
+const val SEARCH_MIN_QUERY_LENGTH = 2
+const val SEARCH_QUERY_DEBOUNCE_MS = 500L
+const val SEARCH_RESULTS_RANGE = 500
+
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 
 const val DAY_VIEW_DAYS_COUNT = 1
@@ -93,6 +97,7 @@ const val REBRANDING_VERSION_CODE = 145
 const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
 const val IMPORT_VERSION_CODE = 186
+const val SEARCH_VERSION_CODE = 1 // TODO fix when we unhide
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -101,7 +106,8 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     REBRANDING_VERSION_CODE, // Rebranding (2.0.2)
     EASY_SWITCH_VERSION_CODE, // Easy switch (2.2.0)
     WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
-    IMPORT_VERSION_CODE // Import (2.6.6)
+    IMPORT_VERSION_CODE, // Import (2.6.6)
+    SEARCH_VERSION_CODE // Search view (2.7.3) // TODO fix when we unhide
 )
 
 object FeatureFlag {
@@ -127,6 +133,7 @@ object FeatureFlag {
     const val EDITING_SHARED_CALENDARS = false
     const val CLEAR_CALENDAR = false
     const val IMPORT_ICS = false
+    const val SHOW_EVENT_SEARCH = false
 }
 
 object HttpResponseCode {
