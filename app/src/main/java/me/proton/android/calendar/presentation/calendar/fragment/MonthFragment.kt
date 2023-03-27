@@ -761,8 +761,8 @@ class MonthFragment : BaseFragment() {
             weekStart?.let {
                 val startWeekOn = getWeekStartDayOfWeek(weekStart)
                 val weekNumber = selectedDate.weekNumber(startWeekOn)
-                if (weekNumber != weekView.weekNumber) {
-                    weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                if (weekNumber != weekView?.weekNumber) {
+                    weekView?.weekNumber = selectedDate.weekNumber(startWeekOn)
                 }
             }
         }
