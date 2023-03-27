@@ -92,6 +92,7 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
+import kotlin.math.ceil
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -164,8 +165,14 @@ class CalendarsRepositoryImpl @Inject constructor(
             .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
     private val visibleSkeletonEventsFlow =
-        database.eventsDao().selectSkeletonEventsFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
-            .combineTransform<List<SkeletonEventEntity>, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { skeletonEventEntities, calendarEntities ->
+        database.eventsDao().skeletonEventCountFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
+            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { skeletonEventCount, calendarEntities ->
+
+                // in order to prevent too large cursors, we subscribe to overall COUNT and then select data in a paginated way, manually
+                val pageSize = 100
+                val skeletonEventEntities = (0 until ceil(skeletonEventCount / pageSize.toDouble()).toInt()).flatMap { page ->
+                    database.eventsDao().selectSkeletonEventsPaginated(pageSize, pageSize * page)
+                }
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
