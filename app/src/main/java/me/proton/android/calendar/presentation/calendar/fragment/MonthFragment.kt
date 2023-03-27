@@ -777,6 +777,7 @@ class MonthFragment : BaseFragment() {
         currentFromDate = fromDate
         currentToDate = toDate
         eventsLiveData = calendarViewModel.getEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
             eventsResult?.let {
