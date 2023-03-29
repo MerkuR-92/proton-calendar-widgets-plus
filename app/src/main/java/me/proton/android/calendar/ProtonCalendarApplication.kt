@@ -2,6 +2,7 @@ package me.proton.android.calendar
 
 import android.app.Application
 import android.content.Context
+import android.database.CursorWindow
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
@@ -46,6 +47,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+import java.lang.reflect.Field
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -146,6 +148,15 @@ class ProtonCalendarApplication : Application() {
         } else {
             SentryIntegration.initSentry(this, defaultSharedPreferencesProvider.sharedPreferences)
             Timber.plant(SentryTree())
+        }
+
+        // hack for android.database.sqlite.SQLiteBlobTooBigException: Row too big to fit into CursorWindow
+        try {
+            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
+            field.isAccessible = true
+            field.set(null, 5 * 1024 * 1024) // 5 MB
+        } catch (e: Exception) {
+            logger.e("exception setting cursor window size", e)
         }
 
         ShowNotificationUseCase.createNotificationChannels(this)
