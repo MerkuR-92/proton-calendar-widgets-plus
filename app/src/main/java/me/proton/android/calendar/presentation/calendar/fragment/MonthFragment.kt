@@ -681,6 +681,9 @@ class MonthFragment : BaseFragment() {
                                         if (minute < 0) 0 else if (minute > 59) 59 else minute)
                                     )
                                 } else {
+                                    // If week view was null and we failed to get verticalScrollOffset & hourHeight
+                                    //  we still set selected day so that week view and mini calendar are in sync
+                                    //  but we ignore setting the LocalTime
                                     calendarViewModel.handleDaySelected(
                                         firstVisibleDate,
                                         calendarViewModel.selectedDateTime.value?.second
@@ -702,6 +705,9 @@ class MonthFragment : BaseFragment() {
                                 if (minute < 0) 0 else if (minute > 59) 59 else minute)
                             )
                         } else {
+                            // If week view was null and we failed to get verticalScrollOffset & hourHeight
+                            //  we still set selected day so that week view and mini calendar are in sync
+                            //  but we ignore setting the LocalTime
                             calendarViewModel.handleDaySelected(
                                 firstVisibleDate,
                                 calendarViewModel.selectedDateTime.value?.second

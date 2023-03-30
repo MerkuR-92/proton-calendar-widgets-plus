@@ -239,11 +239,10 @@ internal class EventChipDrawer(
             x = horizontalOffset,
             y = bounds.top + verticalOffset
         ) {
-            val width = bounds.width().roundToInt() - viewState.eventPaddingHorizontal
             draw(
                 ellipsizedTitle.semibold().toTextLayout(
                     textPaint = textLayout.paint,
-                    width = if (width >= 0) width else 0,
+                    width = (bounds.width().roundToInt() - viewState.eventPaddingHorizontal).coerceAtLeast(0),
                     alignment = textLayout.alignment,
                     spacingMultiplier = textLayout.spacingMultiplier,
                     spacingExtra = textLayout.spacingAdd
