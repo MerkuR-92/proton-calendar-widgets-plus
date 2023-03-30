@@ -132,7 +132,7 @@ object FeatureFlag {
     const val DRAG_AND_DROP = false
     const val EDITING_SHARED_CALENDARS = false
     const val CLEAR_CALENDAR = false
-    const val IMPORT_ICS = false
+    const val IMPORT_ICS = true
     const val SHOW_EVENT_SEARCH = false
 }
 
