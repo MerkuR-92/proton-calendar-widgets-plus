@@ -671,28 +671,48 @@ class MonthFragment : BaseFragment() {
                         calendarViewModel.getWeekStart()?.let { weekStart ->
                             val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
                             if (firstDayOfWeek != firstVisibleDate && !initWeekView) {
-                                val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@launch
-                                val hourHeight = weekView?.hourHeight ?: return@launch
-                                val hour = (verticalScrollOffset / hourHeight).toInt()
-                                val minute = (((verticalScrollOffset / hourHeight) - hour) * 60).toInt()
-                                calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
-                                    if (hour < 0) 0 else if (hour > 23) 23 else hour,
-                                    if (minute < 0) 0 else if (minute > 59) 59 else minute)
-                                )
+                                val verticalScrollOffset = weekView?.verticalScrollOffset
+                                val hourHeight = weekView?.hourHeight
+                                if (verticalScrollOffset != null && hourHeight != null) {
+                                    val hour = (verticalScrollOffset / hourHeight).toInt()
+                                    val minute = (((verticalScrollOffset / hourHeight) - hour) * 60).toInt()
+                                    calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                                        if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                                        if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                                    )
+                                } else {
+                                    // If week view was null and we failed to get verticalScrollOffset & hourHeight
+                                    //  we still set selected day so that week view and mini calendar are in sync
+                                    //  but we ignore setting the LocalTime
+                                    calendarViewModel.handleDaySelected(
+                                        firstVisibleDate,
+                                        calendarViewModel.selectedDateTime.value?.second
+                                    )
+                                }
                             }
                             initWeekView = false
                         }
                     }
                 } else {
                     if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
-                        val verticalScrollOffset = weekView?.verticalScrollOffset ?: return@WeekViewAdapter
-                        val hourHeight = weekView?.hourHeight ?: return@WeekViewAdapter
-                        val hour = (verticalScrollOffset / hourHeight).toInt()
-                        val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
-                        calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
-                            if (hour < 0) 0 else if (hour > 23) 23 else hour,
-                            if (minute < 0) 0 else if (minute > 59) 59 else minute)
-                        )
+                        val verticalScrollOffset = weekView?.verticalScrollOffset
+                        val hourHeight = weekView?.hourHeight
+                        if (verticalScrollOffset != null && hourHeight != null) {
+                            val hour = (verticalScrollOffset / hourHeight).toInt()
+                            val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
+                            calendarViewModel.handleDaySelected(firstVisibleDate, LocalTime.of(
+                                if (hour < 0) 0 else if (hour > 23) 23 else hour,
+                                if (minute < 0) 0 else if (minute > 59) 59 else minute)
+                            )
+                        } else {
+                            // If week view was null and we failed to get verticalScrollOffset & hourHeight
+                            //  we still set selected day so that week view and mini calendar are in sync
+                            //  but we ignore setting the LocalTime
+                            calendarViewModel.handleDaySelected(
+                                firstVisibleDate,
+                                calendarViewModel.selectedDateTime.value?.second
+                            )
+                        }
                     }
                 }
             },
@@ -761,8 +781,8 @@ class MonthFragment : BaseFragment() {
             weekStart?.let {
                 val startWeekOn = getWeekStartDayOfWeek(weekStart)
                 val weekNumber = selectedDate.weekNumber(startWeekOn)
-                if (weekNumber != weekView.weekNumber) {
-                    weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                if (weekNumber != weekView?.weekNumber) {
+                    weekView?.weekNumber = selectedDate.weekNumber(startWeekOn)
                 }
             }
         }
@@ -777,6 +797,7 @@ class MonthFragment : BaseFragment() {
         currentFromDate = fromDate
         currentToDate = toDate
         eventsLiveData = calendarViewModel.getEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
             eventsResult?.let {

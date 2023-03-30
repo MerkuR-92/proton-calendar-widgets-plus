@@ -26,9 +26,6 @@ object SentryIntegration {
     fun initSentry(app: Application, sharedPreferences: SharedPreferences) {
         application = app
         initSentry(getInstallationId(sharedPreferences))
-
-        val currentHandler = Thread.getDefaultUncaughtExceptionHandler()
-        Thread.setDefaultUncaughtExceptionHandler(ProtonExceptionHandler(currentHandler))
     }
 
     private fun initSentry(installationId: String) {

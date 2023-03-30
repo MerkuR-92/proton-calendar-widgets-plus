@@ -242,7 +242,7 @@ internal class EventChipDrawer(
             draw(
                 ellipsizedTitle.semibold().toTextLayout(
                     textPaint = textLayout.paint,
-                    width = bounds.width().roundToInt() - viewState.eventPaddingHorizontal,
+                    width = (bounds.width().roundToInt() - viewState.eventPaddingHorizontal).coerceAtLeast(0),
                     alignment = textLayout.alignment,
                     spacingMultiplier = textLayout.spacingMultiplier,
                     spacingExtra = textLayout.spacingAdd

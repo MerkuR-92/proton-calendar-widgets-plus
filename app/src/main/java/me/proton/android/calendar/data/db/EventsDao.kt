@@ -25,6 +25,12 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events")
     abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events ORDER BY ID ASC LIMIT :limit OFFSET :offset")
+    abstract fun selectSkeletonEventsPaginated(limit: Int, offset: Int): List<SkeletonEventEntity>
+
+    @Query("SELECT COUNT(ID) FROM events")
+    abstract fun skeletonEventCountFlow(): Flow<Int>
+
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
     abstract fun flowEvents(calendarIds: List<String>): Flow<List<EventEntity>>
 

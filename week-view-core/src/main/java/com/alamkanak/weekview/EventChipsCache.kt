@@ -19,26 +19,26 @@ internal class EventChipsCache {
     ): List<EventChip> {
         val results = mutableListOf<EventChip>()
         for (date in dateRange) {
-            results += allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
-            results += normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+            if (allDayEventChipsByDate.isNotEmpty()) results += allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+            if (normalEventChipsByDate.isNotEmpty()) results += normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
         }
         return results
     }
 
     fun normalEventChipsByDate(
         date: Calendar
-    ): List<EventChip> = normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+    ): List<EventChip> = if (normalEventChipsByDate.isNotEmpty()) normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty() else emptyList()
 
     fun allDayEventChipsByDate(
         date: Calendar
-    ): List<EventChip> = allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+    ): List<EventChip> = if (allDayEventChipsByDate.isNotEmpty()) allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty() else emptyList()
 
     fun allDayEventChipsInDateRange(
         dateRange: List<Calendar>
     ): List<EventChip> {
         val results = mutableListOf<EventChip>()
         for (date in dateRange) {
-            results += allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
+            if (allDayEventChipsByDate.isNotEmpty()) results += allDayEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty()
         }
         return results
     }
@@ -93,9 +93,9 @@ internal class EventChipsCache {
         val key = eventChip.startTime.atStartOfDay.timeInMillis
         val eventId = eventChip.eventId
 
-        if (eventChip.event.isAllDay || eventChip.event.isMultiDay) {
+        if (allDayEventChipsByDate.isNotEmpty() && (eventChip.event.isAllDay || eventChip.event.isMultiDay)) {
             allDayEventChipsByDate[key]?.removeAll { it.event.id == eventId }
-        } else {
+        } else if (normalEventChipsByDate.isNotEmpty()) {
             normalEventChipsByDate[key]?.removeAll { it.event.id == eventId }
         }
     }
@@ -114,7 +114,9 @@ internal class EventChipsCache {
         eventChip: EventChip
     ) {
         val results = getOrElse(key) { CopyOnWriteArrayList() }
-        val indexOfExisting = results.indexOfFirst { it.event.id == eventChip.event.id }
+        val indexOfExisting =
+            if (results.isEmpty()) -1
+            else results.indexOfFirst { it.event.id == eventChip.event.id }
         if (indexOfExisting != -1) {
             // If an event with the same ID already exists, replace it. The new event will likely be
             // more up-to-date.

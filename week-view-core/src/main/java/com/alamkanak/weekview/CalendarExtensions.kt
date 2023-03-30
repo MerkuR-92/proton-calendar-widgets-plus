@@ -125,7 +125,7 @@ internal val Calendar.isBeforeToday: Boolean
 internal val Calendar.isToday: Boolean
     get() = isSameDate(today())
 
-internal fun Calendar.toEpochDays(): Int = (atStartOfDay.timeInMillis / DAY_IN_MILLIS).toInt()
+internal fun Calendar.toEpochDays(): Int = toLocalDate().toEpochDay().toInt()
 
 internal infix fun Calendar.minutesUntil(other: Calendar): Int {
     val diff = (timeInMillis - other.timeInMillis) / 60_000
