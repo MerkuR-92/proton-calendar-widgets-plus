@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
     <string name="default_event_summary" comment="Event has no title">(sense títol)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(sense adreça de correu electrònic)</string>
     <string name="default_user_display_name">(sense nom)</string>
     <string name="toast_copied_to_clipboard">Copiat al porta-retalls</string>
@@ -30,12 +30,12 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">No es notificarà a l\'organitzador d\'aquesta sèrie d\'esdeveniments que rebutgeu la invitació perquè no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir tots els esdeveniments d\'aquesta sèrie de totes maneres?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Aquest esdeveniment s\'ha actualitzat. Es notificarà a l\'organitzador que refuseu la invitació. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Aquest esdeveniment s\'ha actualitzat. No es notificarà a l\'organitzador d\'aquest esdeveniment que rebutgeu la invitació perquè no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir aquest esdeveniment?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Les ocurrències actualitzades prèviament per l\'organitzador es conservaran, però es perdran les vostres respostes</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Es conservaran les ocurrències actualitzades prèviament per l’organitzador</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar a l\'organitzador que refuseu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment de totes maneres?</string>
     <string name="dialog_button_set">Aplicar</string>
-    <string name="dialog_button_ok">OK</string>
+    <string name="dialog_button_ok">D\'acord</string>
     <string name="action_save">Desa</string>
     <string name="action_done">Fet</string>
     <string name="action_edit">Editar</string>
@@ -48,8 +48,8 @@
     <string name="agenda_no_events">Cap esdeveniment</string>
     <string name="agenda_loading_events">Carregant esdeveniments…</string>
     <string name="agenda_loading_events_error">Error carregant esdeveniments</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-    <string name="day_view_all_day_more">i %d més</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ %1$d més</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Tot el dia</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -86,7 +86,7 @@
     <string name="event_attendee_is_organizer">Sou l\'organitzador</string>
     <string name="event_attendee_organizer">Organitzador</string>
     <string name="event_attendee_optional">Opcional</string>
-    <string name="event_attendee_is_current_user">Vostè</string>
+    <string name="event_attendee_is_current_user">Tu</string>
     <string name="event_answer_attending">Hi assistireu?</string>
     <string name="event_answer_yes">Sí</string>
     <string name="event_answer_no">No</string>
@@ -113,8 +113,8 @@
     <string name="event_organizer_send_prefs_message_declined_title">No es pot notificar a l\'organitzador que heu refusat la invitació.</string>
     <string name="event_organizer_send_prefs_message_tentative_title">No es pot notificar a l\'organitzador que heu acceptat provisionalment la invitació.</string>
     <string name="event_organizer_send_prefs_message_default_title">No es pot notificar a l\'organitzador que heu respost a la invitació.</string>
-    <string name="event_organizer_send_prefs_button_title">OK</string>
-    <string name="event_attendees_send_prefs_error_title">No es pot notificar als participants.</string>
+    <string name="event_organizer_send_prefs_button_title">D\'acord</string>
+    <string name="event_attendees_send_prefs_error_title">No es pot notificar als participants</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Cap dels participants pot rebre notificacions sobre els vostres canvis:\n\n• %1$s\n\nVoleu continuar de totes maneres?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Els participants següents no poden rebre notificacions sobre els vostres canvis:\n\n• %1$s\n\nVoleu continuar de totes maneres?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continua</string>
@@ -133,7 +133,7 @@
     <string name="event_hint_location">Afegeix una ubicació</string>
     <string name="event_text_add_participants">Afegeix participants</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d/%2$d)</string>
-    <string name="event_current_user_organizer">Vostè</string>
+    <string name="event_current_user_organizer">Tu</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">i %1$d més</string>
     <string name="event_text_switch_all_day">Tot el dia</string>
     <string name="event_text_date_start">Inici</string>
@@ -152,7 +152,7 @@
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Temps restant: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculant el temps restant…</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">gairebé hem acabat</string>
-    <string name="search_downloading_pause">Pausa la descàrrega</string>
+    <string name="search_downloading_pause">Pausar la baixada</string>
     <string name="search_settings_dialog_toggle_off_title">Voleu eliminar tots els calendaris descarregats?</string>
     <string name="search_settings_dialog_toggle_off_text">Necessitareu tornar a descarregar els calendaris si voleu cercar-hi.</string>
     <string name="search_settings_dialog_toggle_on_title">Voleu descarregar els calendaris a aquest dispositiu?</string>
@@ -164,16 +164,16 @@
     <string name="search_onboarding_action_resume">Continua</string>
     <string name="search_onboarding_action_retry">Reintenta</string>
     <string name="search_onboarding_progress_header_ongoing">Descarregant els calendaris…</string>
-    <string name="search_onboarding_progress_header_completed">Descàrrega completada</string>
-    <string name="search_onboarding_progress_header_paused">Descàrrega dels calendaris pausada</string>
-    <string name="search_onboarding_progress_header_error">Error descarregant els calendaris</string>
+    <string name="search_onboarding_progress_header_completed">S\'ha completat la baixada</string>
+    <string name="search_onboarding_progress_header_paused">Baixada dels calendaris pausada</string>
+    <string name="search_onboarding_progress_header_error">Error baixant els calendaris</string>
     <string name="search_spotlight_activation_snack">Cerca dels calendaris activada</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Afegeix una notificació</string>
     <string name="event_text_description">Descripció</string>
     <string name="event_hint_description">Afegeix una descripció</string>
     <string name="event_text_custom">personalitzat</string>
-    <string name="event_alert_invalid_start_end_date">La data d\'inici no pot ser després de la data final.</string>
+    <string name="event_alert_invalid_start_end_date">La data d\'inici no pot ser després de la data final</string>
     <string name="event_alarms_title">Notificacions</string>
     <string name="event_custom_alarms_field">Notificar</string>
     <string name="event_custom_alarms_title">Notificacions personalitzades</string>
@@ -215,8 +215,8 @@
     <string name="event_discard_changes_cancel">Continua editant</string>
     <string name="event_discard_changes_confirm">Descarta</string>
     <string name="event_recurring_update_this_title">Actualitza l\'esdeveniment recurrent</string>
-    <string name="event_recurring_update_this_description">Es perdran les modificacions de freqüència.</string>
-    <string name="event_recurring_update_all_description">Es perdran les modificacions prèvies d\'aquesta sèrie.</string>
+    <string name="event_recurring_update_this_description">Es perdran les modificacions de freqüència</string>
+    <string name="event_recurring_update_all_description">Es perdran les modificacions prèvies d\'aquesta sèrie</string>
     <string name="event_recurring_update_this_cancel">Cancel·la</string>
     <string name="event_recurring_update_this_confirm">Actualitza</string>
     <string name="event_allow_contacts_title">Permet a Proton Calendar accedir als vostres contactes?</string>
@@ -247,13 +247,13 @@
     <string name="event_add_participants_overwrite_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.\nEs perdran les modificacions prèvies d\'aquesta sèrie.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancel·la</string>
-    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s s\'ha cancel·lat.</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s s\'ha cancel·lat.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Els meus calendaris</string>
     <string name="nav_view_subscribed_calendars">Calendaris subscrits</string>
-    <string name="nav_view_disabled_calendars">%s (Desactivat)</string>
-    <string name="nav_view_not_synced_calendars">%s (No sincronitzat)</string>
-    <string name="nav_view_syncing_calendars">%s (Sincronitzant)</string>
+    <string name="nav_view_disabled_calendars">%1$s (Desactivat)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (No sincronitzat)</string>
+    <string name="nav_view_syncing_calendars">%1$s (Sincronitzant)</string>
     <string name="nav_view_more">Més</string>
     <string name="nav_view_switcher">Visualització</string>
     <string name="nav_view_switcher_day">Dia</string>
@@ -398,8 +398,8 @@
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
     <string name="settings_value_placeholder">Toqueu per seleccionar</string>
     <string name="settings_general_title">General</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
-    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s etc.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme">tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">fus horari</string>
@@ -533,15 +533,15 @@
     <string name="import_assistant_new_calendar_header">Crear nou</string>
     <string name="import_assistant_merge_calendar_header">Combina-ho amb un existent</string>
     <string name="import_assistant_in_progress_title">Importació en curs</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Important dades de %s a %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Important dades de %1s a %2s.</string>
     <string name="import_assistant_in_progress_redirect">Comproveu el progrés</string>
     <string name="import_assistant_in_progress_sub_description">Les importacions grans poden trigar dies.Us avisarem quan la importació hagi acabat. Podeu tancar aquesta finestra.</string>
     <string name="import_assistant_guide_subtitle">Feu el canvi a la privacitat. Fàcil i segur.</string>
     <string name="import_assistant_guide_description">Moureu els vostres esdeveniments i altres de Google a Proton. L\'importador Easy Switch us guiarà durant tot el procés i encriptarà la informació a mesura que es mou.</string>
     <string name="import_assistant_new_import">Nova importació</string>
     <string name="import_assistant_previous_import">Importacions anteriors</string>
-    <string name="import_assistant_report_details">%s • %s</string>
-    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s - %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Iniciat</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">En curs</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Completat</string>
@@ -581,28 +581,28 @@
         <item quantity="other">calendaris</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Importa %d calendari</item>
-        <item quantity="other">Importa %d calendaris</item>
+        <item quantity="one">Importa %1$d calendari</item>
+        <item quantity="other">Importar %1$d calendaris</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
-        <item quantity="one">%d importació en curs</item>
-        <item quantity="other">%d importacions en curs</item>
+        <item quantity="one">%1$d importació en curs</item>
+        <item quantity="other">%1$d importacions en curs</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">S\'ha creat %d de %d a %s</item>
-        <item quantity="other">S\'han creat %d de %d a %s</item>
+        <item quantity="one">S\'ha creat %1$d de %2$d a %3$s</item>
+        <item quantity="other">S\'han creat %1$d de %2$d a %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Crea %d calendari a Proton Calendar.</item>
-        <item quantity="other">Crea %d calendaris a Proton Calendar.</item>
+        <item quantity="one">Crea %1$d calendari a Proton Calendar.</item>
+        <item quantity="other">Crea %1$d calendaris a Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Importa %d de %d calendari des de</item>
-        <item quantity="other">Importa %d de %d calendaris des de</item>
+        <item quantity="one">Importa %1$d de %2$d calendari des de</item>
+        <item quantity="other">Importa %1$d de %2$d calendaris des de</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Combina %d calendaris a Proton Calendar.</item>
-        <item quantity="other">Combina %d calendaris a Proton Calendar.</item>
+        <item quantity="one">Combina %1$d calendaris a Proton Calendar.</item>
+        <item quantity="other">Combina %1$d calendaris a Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">No es poden importar tots els calendaris perquè heu arribat al límit de calendaris.\n
@@ -671,16 +671,16 @@
         <item quantity="other">Cada %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s minut</item>
-        <item quantity="other">%s minuts</item>
+        <item quantity="one">%1$s minut</item>
+        <item quantity="other">%1$s minuts</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d caràcter</item>
-        <item quantity="other">%d/%d caràcters</item>
+        <item quantity="one">%1$d/%2$d caràcter</item>
+        <item quantity="other">%1$d/%2$d caràcters</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%d/%d caràcter</item>
-        <item quantity="other">%d/%d caràcters</item>
+        <item quantity="one">%1$d/%2$d caràcter</item>
+        <item quantity="other">%1$d/%2$d caràcters</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

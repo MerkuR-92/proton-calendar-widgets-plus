@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
     <string name="default_event_summary" comment="Event has no title">(sem título)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(sem endereço electrónico)</string>
     <string name="default_user_display_name">(sem nome)</string>
     <string name="toast_copied_to_clipboard">Copiado para a área de transferência</string>
@@ -30,7 +30,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">O organizador desta série de eventos não será notificado de que recusou o convite por não poder enviar correio desse endereço. Deseja eliminar todos os eventos na série mesmo assim?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Este evento foi atualizado. O organizador será notificado de que recusou o convite. Deseja eliminar este evento?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Este evento foi atualizado. O organizador não será notificado de que recusou o convite por não poder enviar correio desse endereço. Deseja eliminar este evento mesmo assim?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Ocorrências previamente atualizadas pelo organizador serão mantidas, mas as suas respostas serão perdidas</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Ocorrências previamente atualizadas pelo organizador serão mantidas</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">O organizador deste evento não será notificado de que recusou o convite:\n\n• %1$s\n\nDeseja eliminar este evento mesmo assim?</string>
@@ -48,8 +48,8 @@
     <string name="agenda_no_events">Sem eventos</string>
     <string name="agenda_loading_events">A carregar eventos…</string>
     <string name="agenda_loading_events_error">Erro ao carregar eventos</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-    <string name="day_view_all_day_more">mais %d</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ %1$d more</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Dia inteiro</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -247,13 +247,13 @@
     <string name="event_add_participants_overwrite_dialog_description">Um convite será enviado para participantes adicionados para todos os eventos desta série.\nModificações anteriores nesta série serão perdidas.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
-    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s foi cancelado.</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s has been canceled.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">As minhas agendas</string>
     <string name="nav_view_subscribed_calendars">Agendas subscritas</string>
-    <string name="nav_view_disabled_calendars">%s (Desativada)</string>
-    <string name="nav_view_not_synced_calendars">%s (Não sincronizada)</string>
-    <string name="nav_view_syncing_calendars">%s (A sincronizar)</string>
+    <string name="nav_view_disabled_calendars">%1$s (Disabled)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (Not synced)</string>
+    <string name="nav_view_syncing_calendars">%1$s (Syncing)</string>
     <string name="nav_view_more">Mais</string>
     <string name="nav_view_switcher">Ver</string>
     <string name="nav_view_switcher_day">Dia</string>
@@ -398,8 +398,8 @@
     <string name="settings_alternative_routing_subtitle">Caso as páginas do Proton estejam bloqueadas, esta definição permite à aplicação tentar redireccionar o tráfego para ligar ao Proton, o que pode ser útil para contornar firewalls ou problemas de rede. Recomendamos que mantenha esta definição para maior confiança.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
     <string name="settings_general_title">Geral</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
-    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s etc.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme"> tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">fuso horário</string>
@@ -533,15 +533,15 @@
     <string name="import_assistant_new_calendar_header">Criar agenda</string>
     <string name="import_assistant_merge_calendar_header">Unir com existente</string>
     <string name="import_assistant_in_progress_title">Importação em curso</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importando dados de %s para %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %1s to %2s.</string>
     <string name="import_assistant_in_progress_redirect">Verifique o progresso</string>
     <string name="import_assistant_in_progress_sub_description">Importações grandes podem demorar vários dias. Avisaremos quando a importação for concluída. Pode fechar este ecrã.</string>
     <string name="import_assistant_guide_subtitle">Faça a mudança para a privacidade. De forma fácil e segura.</string>
     <string name="import_assistant_guide_description">Mova os seus eventos e outros dados do Google para o Proton. O importador Easy Switch irá guiá-lo em cada passo do processo e encriptará os dados à medida que são movidos.</string>
     <string name="import_assistant_new_import">Nova importação</string>
     <string name="import_assistant_previous_import">Importações anteriores</string>
-    <string name="import_assistant_report_details">%s • %s</string>
-    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Iniciada</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Em progresso</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Concluída</string>
@@ -581,28 +581,28 @@
         <item quantity="other">agendas</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Importar %d agenda</item>
-        <item quantity="other">Importar %d agendas</item>
+        <item quantity="one">Import %1$d calendar</item>
+        <item quantity="other">Import %1$d calendars</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
-        <item quantity="one">%d importação em curso</item>
-        <item quantity="other">%d importações em curso</item>
+        <item quantity="one">%1$d ongoing import</item>
+        <item quantity="other">%1$d ongoing imports</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d de %d criado em %s</item>
-        <item quantity="other">%d de %d criados em %s</item>
+        <item quantity="one">%1$d of %2$d created in %3$s</item>
+        <item quantity="other">%1$d of %2$d created in %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Criar %d agenda no Proton Calendar.</item>
-        <item quantity="other">Criar %d agendas no Proton Calendar.</item>
+        <item quantity="one">Create %1$d new calendar in Proton Calendar.</item>
+        <item quantity="other">Create %1$d new calendars in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Importar %d de %d agenda de</item>
-        <item quantity="other">Importar %d de %d agendas de</item>
+        <item quantity="one">Import %1$d of %2$d calendar from</item>
+        <item quantity="other">Import %1$d of %2$d calendars from</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Unir %d agenda no Proton Calendar.</item>
-        <item quantity="other">Unir %d agendas no Proton Calendar.</item>
+        <item quantity="one">Merge %1$d calendar in Proton Calendar.</item>
+        <item quantity="other">Merge %1$d calendars in Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Can’t create new calendars for all imported calendars due to the calendar limit.\n • Deselect at least %1$d calendar</item>
@@ -669,16 +669,16 @@
         <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s minuto</item>
-        <item quantity="other">%s minutos</item>
+        <item quantity="one">%1$s minute</item>
+        <item quantity="other">%1$s minutes</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d caractere</item>
-        <item quantity="other">%d/%d caracteres</item>
+        <item quantity="one">%1$d/%2$d character</item>
+        <item quantity="other">%1$d/%2$d characters</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%d/%d character</item>
-        <item quantity="other">%d/%d characters</item>
+        <item quantity="one">%1$d/%2$d character</item>
+        <item quantity="other">%1$d/%2$d characters</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

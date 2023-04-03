@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
     <string name="default_event_summary" comment="Event has no title">(без загалоўка)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(няма адраса электроннай пошты)</string>
     <string name="default_user_display_name">(няма назвы)</string>
     <string name="toast_copied_to_clipboard">Скапіявана ў буфер абмену</string>
@@ -30,7 +30,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Арганізатар гэтай серыі падзей не атрымае апавяшчэнне, што вы адхілілі запрашэнне, паколькі вы не можаце адпраўляць лісты з запрошанага адраса. Ці хочаце вы ўсё роўна выдаліць усе падзеі ў гэтай серыі?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Гэта падзея была абноўлена. Арганізатар атрымае апавяшчэнне, што вы адхілілі запрашэнне. Ці хочаце вы выдаліць гэту падзею?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Гэта падзея была абноўлена. Арганізатар не атрымае апавяшчэнне, што вы адхілілі запрашэнне, паколькі вы не можаце адпраўляць лісты з запрошанага адраса. Ці хочаце вы выдаліць гэту падзею?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Паўтарэнні, якія былі раней абноўлены арганізатарам будуць захаваны, але вашы адказы будуць страчаны</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Паўтарэнні, якія былі раней абноўлены арганізатарам, будуць захаваны</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Немагчыма апавясціць арганізатара, што вы адхілілі запрашэнне:\n\n• %1$s\n\nЦі хочаце вы ўсё роўна выдаліць падзею?</string>
@@ -48,8 +48,8 @@
     <string name="agenda_no_events">Няма падзей</string>
     <string name="agenda_loading_events">Загрузка падзей…</string>
     <string name="agenda_loading_events_error">Памылка загрузкі падзей</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-    <string name="day_view_all_day_more">+ яшчэ %d</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ яшчэ %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Увесь дзень</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -247,13 +247,13 @@
     <string name="event_add_participants_overwrite_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.\nПапярэднія змяненні ў гэтай серыі будуць страчаны.</string>
     <string name="event_add_participants_dialog_confirm">Адправіць</string>
     <string name="event_add_participants_dialog_cancel">Скасаваць</string>
-    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s было скасавана.</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было скасавана.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мае календары</string>
     <string name="nav_view_subscribed_calendars">Падпісаныя календары</string>
-    <string name="nav_view_disabled_calendars">%s (адключана)</string>
-    <string name="nav_view_not_synced_calendars">%s (не сінхранізавана)</string>
-    <string name="nav_view_syncing_calendars">%s (сінхранізацыя)</string>
+    <string name="nav_view_disabled_calendars">%1$s (адключаны)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (не сінхранізаваны)</string>
+    <string name="nav_view_syncing_calendars">%1$s (сінхранізацыя)</string>
     <string name="nav_view_more">Больш</string>
     <string name="nav_view_switcher">Выгляд</string>
     <string name="nav_view_switcher_day">Дзень</string>
@@ -398,8 +398,8 @@
     <string name="settings_alternative_routing_subtitle">У выпадку блакіроўкі сайтаў Proton гэта налада дазваляе праграме скарыстацца альтэрнатыўнай сеткавай маршрутызацыяй, каб атрымаць доступ да Proton, што можа быць карысным для абыходу міжсеткавых экранаў або праблем з сеткай. Для большай надзейнасці мы рэкамендуем пакінуць гэту наладу актыўнай.</string>
     <string name="settings_value_placeholder">Націсніце, каб выбраць</string>
     <string name="settings_general_title">Агульныя</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s г.д.</string>
-    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s і г.д.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme">тэма</string>
     <string name="settings_general_info_language">мова</string>
     <string name="settings_general_info_time_zone">часавы пояс</string>
@@ -533,15 +533,15 @@
     <string name="import_assistant_new_calendar_header">Стварыць новы</string>
     <string name="import_assistant_merge_calendar_header">Аб\'яднаць з існуючым</string>
     <string name="import_assistant_in_progress_title">Выконваецца імпартаванне</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Імпартаванне даных з %s у %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Імпартаванне даных з %1s у %2s.</string>
     <string name="import_assistant_in_progress_redirect">Праверыць ход выканання</string>
     <string name="import_assistant_in_progress_sub_description">Вялікае імпартаванне можа заняць некалькі дзён. Мы паведамім вам, калі імпартаванне завяршыцца. Вы можаце закрыць гэта акно.</string>
     <string name="import_assistant_guide_subtitle">Пераходзьце на бок прыватнасці. Лёгка і бяспечна.</string>
     <string name="import_assistant_guide_description">Перамясціце свае падзеі і іншыя даныя з Google у Proton. Памочнік імпартавання Easy Switch будзе накіроўваць вас на кожным кроку і шыфраваць вашы даныя падчас іх перамяшчэння.</string>
     <string name="import_assistant_new_import">Новае імпартаванне</string>
     <string name="import_assistant_previous_import">Папярэднія імпартаванні</string>
-    <string name="import_assistant_report_details">%s • %s</string>
-    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Пачата</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Выконваецца</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Завершана</string>
@@ -583,40 +583,40 @@
         <item quantity="other">календары</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Імпартаванне %d календара</item>
-        <item quantity="few">Імпартаванне %d календароў</item>
-        <item quantity="many">Імпартаванне %d календароў</item>
-        <item quantity="other">Імпартаванне %d календароў</item>
+        <item quantity="one">Імпартаванне %1$d календара</item>
+        <item quantity="few">Імпартаванне %1$d календароў</item>
+        <item quantity="many">Імпартаванне %1$d календароў</item>
+        <item quantity="other">Імпартаванне %1$d календароў</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
-        <item quantity="one">%d бягучае імпартаванне</item>
-        <item quantity="few">%d бягучыя імпартаванні</item>
-        <item quantity="many">%d бягучых імпартаванняў</item>
-        <item quantity="other">%d бягучыя імпартаванні</item>
+        <item quantity="one">%1$d бягучае імпартаванне</item>
+        <item quantity="few">%1$d бягучыя імпартаванні</item>
+        <item quantity="many">%1$d бягучых імпартаванняў</item>
+        <item quantity="other">%1$d бягучыя імпартаванні</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d з %d створаны ў %s</item>
-        <item quantity="few">%d з %d створаны ў %s</item>
-        <item quantity="many">%d з %d створаны ў %s</item>
-        <item quantity="other">%d з %d створаны ў %s</item>
+        <item quantity="one">%1$d з %2$d створаны ў %3$s</item>
+        <item quantity="few">%1$d з %2$d створаны ў %3$s</item>
+        <item quantity="many">%1$d з %2$d створаны ў %3$s</item>
+        <item quantity="other">%1$d з %2$d створаны ў %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Стварыце %d новы каляндар у Proton Calendar.</item>
-        <item quantity="few">Стварыце %d новыя каляндары ў Proton Calendar.</item>
-        <item quantity="many">Стварыце %d новых каляндароў у Proton Calendar.</item>
-        <item quantity="other">Стварыце %d новыя каляндары ў Proton Calendar.</item>
+        <item quantity="one">Стварыце %1$d новы каляндар у Proton Calendar.</item>
+        <item quantity="few">Стварыце %1$d новыя календары ў Proton Calendar.</item>
+        <item quantity="many">Стварыце %1$d новых календароў у Proton Calendar.</item>
+        <item quantity="other">Стварыце %1$d новыя календары ў Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Імпартаванне %d календара з %d з</item>
-        <item quantity="few">Імпартаванне %d календароў з %d з</item>
-        <item quantity="many">Імпартаванне %d календароў з %d з</item>
-        <item quantity="other">Імпартаванне %d календароў з %d з</item>
+        <item quantity="one">Імпартаванне %1$d календара з %2$d з</item>
+        <item quantity="few">Імпартаванне %1$d календароў з %2$d з</item>
+        <item quantity="many">Імпартаванне %1$d календароў з %2$d з</item>
+        <item quantity="other">Імпартаванне %1$d календароў з %2$d з</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Аб\'яднанне %d календара ў Proton Calendar.</item>
-        <item quantity="few">Аб\'яднанне %d календароў у Proton Calendar.</item>
-        <item quantity="many">Аб\'яднанне %d календароў у Proton Calendar.</item>
-        <item quantity="other">Аб\'яднанне %d календароў у Proton Calendar.</item>
+        <item quantity="one">Аб\'яднанне %1$d календара ў Proton Calendar.</item>
+        <item quantity="few">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
+        <item quantity="many">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
+        <item quantity="other">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календара</item>
@@ -715,22 +715,22 @@
         <item quantity="other">Кожныя %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s хвіліна</item>
-        <item quantity="few">%s хвіліны</item>
-        <item quantity="many">%s хвілін</item>
-        <item quantity="other">%s хвіліны</item>
+        <item quantity="one">%1$s хвіліна</item>
+        <item quantity="few">%1$s хвіліны</item>
+        <item quantity="many">%1$s хвілін</item>
+        <item quantity="other">%1$s хвіліны</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d сімвала</item>
-        <item quantity="few">%d/%d сімвалы</item>
-        <item quantity="many">%d/%d сімвалаў</item>
-        <item quantity="other">%d/%d сімвалы</item>
+        <item quantity="one">%1$d сімвал з %2$d</item>
+        <item quantity="few">%1$d сімвалы з %2$d</item>
+        <item quantity="many">%1$d сімвалаў з %2$d</item>
+        <item quantity="other">%1$d сімвалы з %2$d</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%d сімвал з %d</item>
-        <item quantity="few">%d сімвалы з %d</item>
-        <item quantity="many">%d сімвалаў з %d</item>
-        <item quantity="other">%d сімвалы з %d</item>
+        <item quantity="one">%1$d сімвал з %2$d</item>
+        <item quantity="few">%1$d сімвалы з %2$d</item>
+        <item quantity="many">%1$d сімвалаў з %2$d</item>
+        <item quantity="other">%1$d сімвалы з %2$d</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
