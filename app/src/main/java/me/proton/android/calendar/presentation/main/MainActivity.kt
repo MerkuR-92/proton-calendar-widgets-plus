@@ -115,6 +115,7 @@ import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
 import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
+import me.proton.android.calendar.common.FeatureFlag.HOLIDAY_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
 import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
@@ -1258,6 +1259,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
+        val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
+        addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()

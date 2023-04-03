@@ -466,6 +466,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
+        val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
+        addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
