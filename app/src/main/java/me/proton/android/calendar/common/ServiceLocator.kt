@@ -74,12 +74,6 @@ import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCas
 import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpdateUserSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
-import me.proton.android.calendar.presentation.account.AccountViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
-import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
@@ -90,7 +84,6 @@ import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.koin.android.ext.koin.androidApplication
-import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 /**
