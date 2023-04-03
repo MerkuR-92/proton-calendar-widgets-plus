@@ -243,6 +243,7 @@ class CalendarViewModel @Inject constructor(
     // TODO go back to UserId as String
     suspend fun initForUser(userId: UserId): Flow<CalendarsRepository.InitingState> {
         return flow {
+            _userId.postValue(userId)
 
             // TODO make this prettier
             val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
@@ -281,8 +282,6 @@ class CalendarViewModel @Inject constructor(
             timeFormat = userSettingsRepository.getTimeFormatFlow(userId, database).asLiveData(Dispatchers.Default)
 
             weekStart = userSettingsRepository.getWeekStartFlow(userId, database).asLiveData(Dispatchers.Default)
-
-            this@CalendarViewModel._userId.postValue(userId)
 
             calendarsRepository.initForUser(userId.id, ZoneId.of(timeZone)).collect {
                 when (it) {
