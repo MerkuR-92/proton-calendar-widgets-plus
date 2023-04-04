@@ -5,6 +5,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.common.provider.SharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ValueStoreProviderImpl
@@ -20,7 +21,6 @@ import me.proton.android.calendar.data.api.MailSettingsApiImpl
 import me.proton.android.calendar.data.api.ServerEventsApiImpl
 import me.proton.android.calendar.data.api.SettingsApiImpl
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
@@ -53,7 +53,6 @@ import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
-import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
@@ -78,7 +77,6 @@ import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
@@ -129,28 +127,6 @@ val networkModule = module {
 val repositoryModule = module {
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
-}
-
-val viewModelModule = module {
-    viewModel<CalendarViewModel> { CalendarViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<MainViewModel> {
-        MainViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get()
-        )
-    }
-    viewModel<EventViewModel> { EventViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<SearchViewModel> { SearchViewModel(get(), get(), get(), get()) }
-    viewModel<AccountViewModel> { AccountViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<CalendarFormViewModel> { CalendarFormViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    viewModel<ImportAssistantViewModel> { ImportAssistantViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -206,8 +182,7 @@ fun coreModule(
     contactEmailsRepository: ContactRepository,
     userSettingsRepository: UserSettingsRepository,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
-    searchDatabase: SearchDatabase,
-    indexEventForSearchUseCase: IndexEventForSearchUseCase
+    defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
 ) = module {
     single<AppDatabase> { appDatabase }
     single<ApiProvider> { apiProvider }
@@ -222,6 +197,5 @@ fun coreModule(
     single<UserSettingsRepository> { userSettingsRepository }
     single<GetRecipientPublicAddresses> { getRecipientPublicAddresses }
     single<EventDecryptor> { eventDecryptor }
-    single<SearchDatabase> { searchDatabase }
-    factory<IndexEventForSearchUseCase> { indexEventForSearchUseCase }
+    single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
 }

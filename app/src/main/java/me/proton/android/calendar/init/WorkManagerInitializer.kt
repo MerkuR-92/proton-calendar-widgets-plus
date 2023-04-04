@@ -25,9 +25,7 @@ class WorkManagerInitializer : Initializer<WorkManager> {
         return WorkManager.getInstance(context)
     }
 
-    override fun dependencies(): List<Class<out Initializer<*>?>> {
-        return emptyList()
-    }
+    override fun dependencies(): List<Class<out Initializer<*>?>> = emptyList()
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)

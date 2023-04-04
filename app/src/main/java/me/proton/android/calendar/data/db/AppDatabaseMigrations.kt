@@ -403,4 +403,10 @@ object AppDatabaseMigrations {
             ObservabilityDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_49_50 = object : Migration(49, 50) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            OrganizationDatabase.MIGRATION_2.migrate(database)
+        }
+    }
 }

@@ -18,6 +18,7 @@ def storeFilePath = project.hasProperty('keyStoreFilePath') ? keyStoreFilePath :
 def storeKeyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: 'proton'
 def storePass = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
 def storeKeyPass = System.getenv("KEY_STORE_KEY_PASSWORD") ?: "\"Store key password\""
+def proxyToken = System.getenv("PROXY_TOKEN") ?: ""
 
 sonarqube {
     properties {
@@ -114,7 +115,7 @@ android {
         versionCode 187
         versionName "2.7.5"
         archivesBaseName = "ProtonCalendar-" + versionName + "(" + versionCode + ")"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "me.proton.core.test.android.ProtonHiltTestRunner"
         resConfigs 'en', 'ca', 'es-rES', 'es-rMX', 'fr', 'fr-rCA', 'pl', 'pt-rPT', 'ro', 'de', 'it', 'nl', 'uk'
 
         javaCompileOptions {
@@ -122,6 +123,10 @@ android {
                 arguments += ["room.schemaLocation":"$projectDir/schemas".toString()]
             }
         }
+    }
+
+    testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
     }
 
     signingConfigs {
@@ -154,6 +159,26 @@ android {
             testCoverageEnabled true
         }
     }
+
+    flavorDimensions("env")
+    productFlavors.register("dev") {
+        dimension = "env"
+        applicationIdSuffix = ".dev"
+        buildConfigField("String", "API_HOST", "\"api.proton.black\"")
+        buildConfigField("String", "HV3_HOST", "\"verify.proton.black\"")
+        buildConfigField("String", "QUARK_HOST", "\"proton.black\"")
+        buildConfigField("String", "PROXY_TOKEN", "\"$proxyToken\"")
+        buildConfigField("Boolean", "USE_DEFAULT_PINS", "false")
+    }
+    productFlavors.register("prod") {
+        dimension = "env"
+        buildConfigField("String", "API_HOST", "\"calendar-api.proton.me\"")
+        buildConfigField("String", "HV3_HOST", "\"verify.proton.me\"")
+        buildConfigField("String", "QUARK_HOST", "\"\"")
+        buildConfigField("String", "PROXY_TOKEN", "\"\"")
+        buildConfigField("Boolean", "USE_DEFAULT_PINS", "true")
+    }
+
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_11
@@ -173,12 +198,16 @@ android {
     sourceSets {
         androidTest {
             java.srcDirs += "src/sharedTest/java"
+            java.srcDirs += "src/uiTest/java"
+            assets.srcDirs += "src/uiTest/assets"
         }
         test {
             java.srcDirs += "src/sharedTest/java"
         }
     }
-
+    packagingOptions {
+        exclude "META-INF/LICENSE*"
+    }
 }
 
 kapt {
@@ -319,13 +348,25 @@ dependencies {
     detekt 'io.gitlab.arturbosch.detekt:detekt-cli:1.9.1'
     detektPlugins 'io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1'
 
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:${rootProject.ext.version.hilt_android}")
+
+    androidTestImplementation "androidx.test:runner:1.5.2"
+    androidTestUtil "androidx.test:orchestrator:1.4.2"
+    androidTestUtil "androidx.test.services:test-services:1.4.2"
+
     androidTestImplementation "io.mockk:mockk-android:1.13.3"
     androidTestImplementation "androidx.test:core:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:runner:${rootProject.ext.version.androidx_test}"
     androidTestImplementation "androidx.test:rules:${rootProject.ext.version.androidx_test}"
-    androidTestImplementation "androidx.test.ext:junit:1.1.2"
-//    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
+    androidTestImplementation "com.google.dagger:hilt-android-testing:${rootProject.ext.version.hilt_android}"
+    androidTestImplementation "org.jetbrains.kotlin:kotlin-test:${rootProject.ext.version.kotlin}"
+    androidTestImplementation "me.proton.test:fusion:${rootProject.ext.version.proton_fusion}"
+    androidTestImplementation "me.proton.core:test-android-instrumented:${rootProject.ext.version.proton_core}"
+    androidTestImplementation "me.proton.core:auth-test:${rootProject.ext.version.proton_core}"
 
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.willowtreeapps.assertk:assertk-jvm:0.21'
     testImplementation "io.mockk:mockk:1.13.3"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.5.0'

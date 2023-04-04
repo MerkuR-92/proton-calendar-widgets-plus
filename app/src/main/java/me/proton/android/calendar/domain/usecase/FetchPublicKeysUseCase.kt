@@ -21,7 +21,7 @@ import javax.inject.Inject
 class FetchPublicKeysUseCase @Inject constructor(
     private val logger: Logger,
     private val publicAddressRepository: PublicAddressRepository,
-    @ApplicationContext private val context: Context,
+    private val workManager: WorkManager,
 ) : UseCase {
 
     private suspend fun fetchPublicKeys(userId: UserId, email: String): UseCase.Result {
@@ -72,7 +72,6 @@ class FetchPublicKeysUseCase @Inject constructor(
                 )
                 .build()
 
-            val workManager = WorkManager.getInstance(context)
             workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_PUBLIC_KEYS, ExistingWorkPolicy.APPEND, work)
         }
     }

@@ -174,10 +174,10 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         search_result_list.adapter = timelineEventAdapter
 
         pb_search_onboarding_action.setOnSingleClickListener {
-            searchViewModel.actionButtonClicked(requireContext())
+            searchViewModel.actionButtonClicked()
         }
 
-        searchViewModel.startObservingWorkerState(requireContext(), viewLifecycleOwner)
+        searchViewModel.startObservingWorkerState(viewLifecycleOwner)
 
         searchViewModel.downloadingState.asLiveData().observe(viewLifecycleOwner) {
 

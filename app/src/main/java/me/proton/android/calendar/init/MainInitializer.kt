@@ -21,7 +21,11 @@ package me.proton.android.calendar.init
 import android.content.Context
 import androidx.startup.AppInitializer
 import androidx.startup.Initializer
+import me.proton.core.auth.presentation.MissingScopeInitializer
+import me.proton.core.crypto.validator.presentation.init.CryptoValidatorInitializer
 import me.proton.core.humanverification.presentation.HumanVerificationInitializer
+import me.proton.core.network.presentation.init.UnAuthSessionFetcherInitializer
+import me.proton.core.plan.presentation.UnredeemedPurchaseInitializer
 
 class MainInitializer : Initializer<Unit> {
 
@@ -30,8 +34,14 @@ class MainInitializer : Initializer<Unit> {
     }
 
     override fun dependencies() = listOf(
+        AccountStateHandlerInitializer::class.java,
         CalendarEventManagerInitializer::class.java,
+        CryptoValidatorInitializer::class.java,
         HumanVerificationInitializer::class.java,
+        MissingScopeInitializer::class.java,
+        PeriodicWorkerInitializer::class.java,
+        UnredeemedPurchaseInitializer::class.java,
+        UnAuthSessionFetcherInitializer::class.java
     )
 
     companion object {

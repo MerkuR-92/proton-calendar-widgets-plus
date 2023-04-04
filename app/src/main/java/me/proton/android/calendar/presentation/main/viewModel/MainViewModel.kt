@@ -45,7 +45,8 @@ class MainViewModel @Inject constructor(
     private val userSettingsRepository: UserSettingsRepository,
     private val feedbackApi: FeedbackApi,
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
-    private val logger: Logger
+    private val logger: Logger,
+    private val workManager: WorkManager,
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -132,7 +133,7 @@ class MainViewModel @Inject constructor(
             .build()
 
         // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
 
     }
 

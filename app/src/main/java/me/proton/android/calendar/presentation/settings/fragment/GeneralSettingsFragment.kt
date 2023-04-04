@@ -281,13 +281,13 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 builder.setTitle(R.string.search_settings_dialog_toggle_on_title)
                 builder.setMessage(R.string.search_settings_dialog_toggle_on_text)
                 builder.setPositiveButton(R.string.dialog_button_download) { _, _ ->
-                    searchViewModel.enableCalendarDownload(requireContext())
+                    searchViewModel.enableCalendarDownload()
                 }
             } else { // turning OFF
                 builder.setTitle(R.string.search_settings_dialog_toggle_off_title)
                 builder.setMessage(R.string.search_settings_dialog_toggle_off_text)
                 builder.setPositiveButton(R.string.dialog_button_remove) { _, _ ->
-                    searchViewModel.disableCalendarDownload(requireContext())
+                    searchViewModel.disableCalendarDownload()
                     searchViewModel.clearDownloadingState()
                 }
             }

@@ -1,7 +1,15 @@
 package me.proton.android.calendar.common.worker
 
 import android.content.Context
-import androidx.work.*
+import androidx.hilt.work.HiltWorker
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
 import me.proton.android.calendar.BuildConfig
@@ -12,18 +20,17 @@ import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getAccounts
-import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.util.concurrent.TimeUnit
 
-class PeriodicCalendarWorker(appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams),
-    KoinComponent {
-
-    private val logger: Logger by inject()
-    private val accountManager: AccountManager by inject()
-    private val widgetRefresher: WidgetRefresher by inject()
-
-    private val handleAlarmsUseCase: HandleAlarmsUseCase by inject()
+@HiltWorker
+class PeriodicCalendarWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParameters: WorkerParameters,
+    private val logger: Logger,
+    private val accountManager: AccountManager,
+    private val widgetRefresher: WidgetRefresher,
+    private val handleAlarmsUseCase: HandleAlarmsUseCase
+) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {
 
@@ -55,7 +62,7 @@ class PeriodicCalendarWorker(appContext: Context, workerParams: WorkerParameters
     companion object {
         const val UNIQUE_WORK_NAME = "PERIODIC_CALENDAR_WORKER"
 
-        fun setup(context: Context, logger: Logger) {
+        fun setup(workManager: WorkManager, logger: Logger) {
 
             try {
                 val constraints = Constraints.Builder().build()
@@ -65,7 +72,7 @@ class PeriodicCalendarWorker(appContext: Context, workerParams: WorkerParameters
                     .setInitialDelay(5, TimeUnit.MINUTES)
                     .build()
 
-                WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+                workManager.enqueueUniquePeriodicWork(
                     UNIQUE_WORK_NAME,
                     if (BuildConfig.DEBUG) ExistingPeriodicWorkPolicy.REPLACE else ExistingPeriodicWorkPolicy.KEEP,
                     work

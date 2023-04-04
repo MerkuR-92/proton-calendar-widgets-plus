@@ -99,7 +99,8 @@ class EventViewModel @Inject constructor(
     private val widgetRefresher: WidgetRefresher,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val database: AppDatabase,
-    private val upgradeEventUseCase: UpgradeEventUseCase
+    private val upgradeEventUseCase: UpgradeEventUseCase,
+    private val workManager: WorkManager,
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -3047,7 +3048,7 @@ class EventViewModel @Inject constructor(
             )
             .build()
 
-        return WorkManager.getInstance(getApplication<Application>()).enqueueUniqueWork(
+        return workManager.enqueueUniqueWork(
             UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
             ExistingWorkPolicy.REPLACE,
             work

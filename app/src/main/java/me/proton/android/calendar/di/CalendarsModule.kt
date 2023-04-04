@@ -77,6 +77,10 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
+    abstract fun bindBugReportsApi(bugReportsApi: BugReportsApiImpl): BugReportsApi
+
+    @Binds
+    @Singleton
     abstract fun bindSettingsApi(settingsApi: SettingsApiImpl): SettingsApi
 
     @Binds

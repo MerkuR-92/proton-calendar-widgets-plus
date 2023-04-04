@@ -44,11 +44,6 @@ object ApplicationModule {
     ): DefaultSharedPreferencesProvider = DefaultSharedPreferencesProvider(context)
 
     @Provides
-    @Singleton
-    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
-        WorkManager.getInstance(context)
-
-    @Provides
     fun provideResourceProvider(@ApplicationContext context: Context): ResourceProvider =
         ResourceProviderImpl(context.resources)
 }
