@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Calendar Proton</string>
     <string name="default_event_summary" comment="Event has no title">(fără titlu)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(lipsă adresă de e-mail)</string>
     <string name="default_user_display_name">(fără nume)</string>
     <string name="toast_copied_to_clipboard">Copiat în memorie</string>
@@ -30,7 +30,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Organizatorul acestei serii de evenimente nu va fi notificat că refuzați invitația deoarece nu puteți trimite e-mailuri de la adresa invitată. Doriți totuși să ștergeți toate evenimentele din această serie?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Acest eveniment a fost actualizat. Organizatorul va fi notificat că refuzați invitația. Doriți să ștergeți acest eveniment?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Acest eveniment a fost actualizat. Organizatorul nu va fi notificat că refuzați invitația deoarece nu puteți trimite e-mailuri de la adresa invitată. Doriți să ștergeți acest eveniment?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Evenimentele actualizate anterior de organizator vor fi păstrate, dar răspunsurile dvs. vor fi pierdute.</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Manifestările anterioare actualizate de organizator vor fi păstrate.</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Organizatorul nu poate fi notificat că refuzați invitația: \n\n• %1$s\n\nDoriți totuși să ștergeți evenimentul?</string>
@@ -48,8 +48,8 @@
     <string name="agenda_no_events">Niciun eveniment</string>
     <string name="agenda_loading_events">Se încarcă evenimentele…</string>
     <string name="agenda_loading_events_error">Eroare la încărcarea evenimentelor</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-    <string name="day_view_all_day_more">+ încă %d</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ încă %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Toată ziua</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -247,13 +247,13 @@
     <string name="event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
     <string name="event_add_participants_dialog_confirm">Trimitere</string>
     <string name="event_add_participants_dialog_cancel">Anulare</string>
-    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s a fost anulat.</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s a fost anulat.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendarele mele</string>
     <string name="nav_view_subscribed_calendars">Calendare abonate</string>
-    <string name="nav_view_disabled_calendars">%s (Dezactivat)</string>
-    <string name="nav_view_not_synced_calendars">%s (Nesincronizat)</string>
-    <string name="nav_view_syncing_calendars">%s (se sincronizează)</string>
+    <string name="nav_view_disabled_calendars">%1$s (Dezactivat)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (Nesincronizat)</string>
+    <string name="nav_view_syncing_calendars">%1$s (se sincronizează)</string>
     <string name="nav_view_more">Mai mult</string>
     <string name="nav_view_switcher">Afișare</string>
     <string name="nav_view_switcher_day">zi</string>
@@ -398,8 +398,8 @@
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
     <string name="settings_general_title">Generale</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s etc.</string>
-    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s etc.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme">tema</string>
     <string name="settings_general_info_language">limba</string>
     <string name="settings_general_info_time_zone">fus orar</string>
@@ -533,15 +533,15 @@
     <string name="import_assistant_new_calendar_header">Creare</string>
     <string name="import_assistant_merge_calendar_header">Îmbinare cu unul existent</string>
     <string name="import_assistant_in_progress_title">Importare în derulare</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Se importă date din %s în %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Se importă date din %1s în %2s.</string>
     <string name="import_assistant_in_progress_redirect">Verificare progres</string>
     <string name="import_assistant_in_progress_sub_description">Importările mari pot dura câteva zile. Vă vom anunța când s-a finalizat importarea. Puteți închide acest ecran.</string>
     <string name="import_assistant_guide_subtitle">Faceți trecerea la confidențialitate. Ușor și sigur.</string>
     <string name="import_assistant_guide_description">Mutați evenimentele și alte date de la Google la Proton. Importatorul Easy Switch vă ghidează la fiecare pas și vă criptează datele pe măsură ce sunt mutate.</string>
     <string name="import_assistant_new_import">Importare nouă</string>
     <string name="import_assistant_previous_import">Importări anterioare</string>
-    <string name="import_assistant_report_details">%s • %s</string>
-    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Începută</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">În desfășurare</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Finalizat</string>
@@ -582,34 +582,34 @@
         <item quantity="other">de calendare</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Importare un calendar</item>
-        <item quantity="few">Importare %d calendare</item>
-        <item quantity="other">Importare %d de calendare</item>
+        <item quantity="one">Importare %1$d calendar</item>
+        <item quantity="few">Importare %1$d calendare</item>
+        <item quantity="other">Importare %1$d de calendare</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
-        <item quantity="one">%d importare în desfășurare</item>
-        <item quantity="few">%d importare în desfășurare</item>
-        <item quantity="other">%d importare în desfășurare</item>
+        <item quantity="one">%1$d importare în desfășurare</item>
+        <item quantity="few">%1$d importări în desfășurare</item>
+        <item quantity="other">%1$d importări în desfășurare</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d din %d creat în %s</item>
-        <item quantity="few">%d din %d creat în %s</item>
-        <item quantity="other">%d din %d creat în %s</item>
+        <item quantity="one">%1$d din %2$d creat în %3$s</item>
+        <item quantity="few">%1$d din %2$d create în %3$s</item>
+        <item quantity="other">%1$d din %2$d create în %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Creare un calendar în Proton Calendar.</item>
-        <item quantity="few">Creare %d calendare în Proton Calendar.</item>
-        <item quantity="other">Creare %d de calendare în Proton Calendar.</item>
+        <item quantity="one">Creare %1$d calendar în Proton Calendar.</item>
+        <item quantity="few">Creare %1$d calendare în Proton Calendar.</item>
+        <item quantity="other">Creare %1$d calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Importare un calendar din</item>
-        <item quantity="few">Importare %d din %d calendare din</item>
-        <item quantity="other">Importare %d din %d calendare din</item>
+        <item quantity="one">Importare %1$d din %2$d calendar din</item>
+        <item quantity="few">Importare %1$d din %2$d calendare din</item>
+        <item quantity="other">Importare %1$d din %2$d calendare din</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Îmbinare un calendar în Proton Calendar.</item>
-        <item quantity="few">Îmbinare %d calendare în Proton Calendar.</item>
-        <item quantity="other">Îmbinare %d de calendare în Proton Calendar.</item>
+        <item quantity="one">Îmbinare %1$d calendar în Proton Calendar.</item>
+        <item quantity="few">Îmbinare %1$d calendare în Proton Calendar.</item>
+        <item quantity="other">Îmbinare %1$d de calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Nu se pot crea calendare noi pentru toate calendarele importate din cauza limitei de calendare.\n - Deselectați cel puțin un calendar.</item>
@@ -692,19 +692,19 @@
         <item quantity="other">La fiecare %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s minut</item>
-        <item quantity="few">%s minute</item>
-        <item quantity="other">%s de minute</item>
+        <item quantity="one">%1$s minut</item>
+        <item quantity="few">%1$s minute</item>
+        <item quantity="other">%1$s de minute</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d caracter</item>
-        <item quantity="few">%d/%d caractere</item>
-        <item quantity="other">%d/%d de caractere</item>
+        <item quantity="one">%1$d/%2$d caracter</item>
+        <item quantity="few">%1$d/%2$d caractere</item>
+        <item quantity="other">%1$d/%2$d de caractere</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%d/%d caracter</item>
-        <item quantity="few">%d/%d caractere</item>
-        <item quantity="other">%d/%d de caractere</item>
+        <item quantity="one">%1$d/%2$d caracter</item>
+        <item quantity="few">%1$d/%2$d caractere</item>
+        <item quantity="other">%1$d/%2$d de caractere</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

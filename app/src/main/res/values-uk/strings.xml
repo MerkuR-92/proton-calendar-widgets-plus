@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Proton Calendar</string>
     <string name="default_event_summary" comment="Event has no title">(без назви)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%s %s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(без адреси е-пошти)</string>
     <string name="default_user_display_name">(без імені)</string>
     <string name="toast_copied_to_clipboard">Скопійовано до буфера обміну</string>
@@ -30,7 +30,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Організатор цієї серії подій отримає сповіщення про те, що ви відхиляєте запрошення, оскільки ви не можете надсилати листи з адреси запрошення. Усе одно бажаєте видалити всі події в цій серії?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Цю подію було оновлено. Організатор отримає сповіщення про те, що ви відхиляєте запрошення. Бажаєте видалити цю подію?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Ця подія була оновлена. Організатор не отримає сповіщення про те, що ви відхиляєте запрошення, оскільки ви не можете надсилати листи з адреси запрошення. Бажаєте видалити цю подію?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee">%s\n%s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Раніше оновлені організатором повторення будуть збережені, але ваші відповіді будуть втрачені</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Раніше оновлені організатором повторення будуть збережені</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Організатор не може бути повідомлений, що ви відхилили запрошення:\n\n• %1$s\n\nУсе одно бажаєте видалити подію?</string>
@@ -48,8 +48,8 @@
     <string name="agenda_no_events">Немає подій</string>
     <string name="agenda_loading_events">Завантаження подій…</string>
     <string name="agenda_loading_events_error">Помилка завантаження подій</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%s %d</string>
-    <string name="day_view_all_day_more">+ ще %d</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ ще %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Цілий день</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -247,13 +247,13 @@
     <string name="event_add_participants_overwrite_dialog_description">Запрошення буде надіслано доданим учасникам на всі події цієї серії.\nПопередні зміни в цій серії будуть втрачені.</string>
     <string name="event_add_participants_dialog_confirm">Надіслати</string>
     <string name="event_add_participants_dialog_cancel">Скасувати</string>
-    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%s було скасовано.</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s було скасовано.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мої календарі</string>
     <string name="nav_view_subscribed_calendars">Підписні календарі</string>
-    <string name="nav_view_disabled_calendars">%s (Вимкнено)</string>
-    <string name="nav_view_not_synced_calendars">%s (Не синхронізовано)</string>
-    <string name="nav_view_syncing_calendars">%s (Синхронізація)</string>
+    <string name="nav_view_disabled_calendars">%1$s (Вимкнено)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (Не синхронізується)</string>
+    <string name="nav_view_syncing_calendars">%1$s (Синхронізується)</string>
     <string name="nav_view_more">Докладніше</string>
     <string name="nav_view_switcher">Вигляд</string>
     <string name="nav_view_switcher_day">День</string>
@@ -398,8 +398,8 @@
     <string name="settings_alternative_routing_subtitle">У випадку блокування сайтів Proton, цей параметр дозволяє програмі спробувати альтернативний мережевий маршрут для доступу до Proton, що може бути корисним для обходу мережевих екранів чи мережевих проблем. Рекомендовано увімкнути цей параметр для більшої надійності.</string>
     <string name="settings_value_placeholder">Торкніться, щоб вибрати</string>
     <string name="settings_general_title">Загальні</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%s тощо.</string>
-    <string name="settings_general_info_separator">%s, %s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s тощо.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme">тема</string>
     <string name="settings_general_info_language">мова</string>
     <string name="settings_general_info_time_zone">часовий пояс</string>
@@ -452,7 +452,7 @@
     <string name="recreate_calendar_snack_clearing">Очищення календаря…</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Гаразд</string>
-    <string name="bootstrap_error_no_calendar_title">Немає календарів, пов’язаних із цим обліковим записом.</string>
+    <string name="bootstrap_error_no_calendar_title">Немає календарів, пов\'язаних із цим обліковим записом.</string>
     <string name="bootstrap_error_no_calendar_message">Щоб налаштувати його, перейдіть до <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Помилка підготовки календарів</string>
     <string name="bootstrap_error_some_calendars_failed_message">Не вдається налаштувати зазначені календарі</string>
@@ -533,15 +533,15 @@
     <string name="import_assistant_new_calendar_header">Створити новий</string>
     <string name="import_assistant_merge_calendar_header">Об\'єднати з наявним</string>
     <string name="import_assistant_in_progress_title">Виконується імпортування</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Імпортування даних з %s до %s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Імпортування даних з %1s до %2s.</string>
     <string name="import_assistant_in_progress_redirect">Переглянути поступ</string>
     <string name="import_assistant_in_progress_sub_description">Імпорт значної кількості даних може тривати кілька днів. Ми повідомимо вас, коли імпорт буде завершено. Ви можете закрити цей екран.</string>
     <string name="import_assistant_guide_subtitle">Перейдіть на бік приватності. Без зусиль і безпечно.</string>
     <string name="import_assistant_guide_description">Перенесіть свої події та інші дані з Google до Proton. Імпортер Easy Switch супроводжуватиме вас на всіх етапах і шифруватиме ваші дані під час їх переміщення.</string>
     <string name="import_assistant_new_import">Новий імпорт</string>
     <string name="import_assistant_previous_import">Попередні імпорти</string>
-    <string name="import_assistant_report_details">%s • %s</string>
-    <string name="import_assistant_report_details_date_time">%s %s</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Запущено</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Виконується</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Завершено</string>
@@ -549,7 +549,7 @@
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Скасування</string>
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Зупинено</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Невдалі</string>
-    <string name="import_assistant_status_paused_lost_connection_title">Втрачено з’єднання з Google</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Втрачено з\'єднання з Google</string>
     <string name="import_assistant_status_paused_lost_connection_description">Щоб продовжити імпорт, торкніться Повторно з\'єднатись, увійдіть в Google і знову надайте Proton доступ до ваших даних Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Повторно з\'єднатись</string>
     <string name="import_assistant_status_paused_storage_full_title">Ваше сховище заповнене</string>
@@ -583,40 +583,40 @@
         <item quantity="other">календарі</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">Імпортувати %d календар</item>
-        <item quantity="few">Імпортувати %d календарі</item>
-        <item quantity="many">Імпортувати %d календарів</item>
-        <item quantity="other">Імпортувати %d календарі</item>
+        <item quantity="one">Імпортувати %1$d календар</item>
+        <item quantity="few">Імпортувати %1$d календарі</item>
+        <item quantity="many">Імпортувати %1$d календарів</item>
+        <item quantity="other">Імпортувати %1$d календарів</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
-        <item quantity="one">%d поточний імпорт</item>
-        <item quantity="few">%d поточні імпорти</item>
-        <item quantity="many">%d поточних імпортів</item>
-        <item quantity="other">%d поточні імпорти</item>
+        <item quantity="one">%1$d поточний імпорт</item>
+        <item quantity="few">%1$d поточні імпорти</item>
+        <item quantity="many">%1$d поточних імпортів</item>
+        <item quantity="other">%1$d поточних імпортів</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%d з %d створений у %s</item>
-        <item quantity="few">%d з %d створених у %s</item>
-        <item quantity="many">%d з %d створених у %s</item>
-        <item quantity="other">%d з %d створених у %s</item>
+        <item quantity="one">%1$d з %2$d створений у %3$s</item>
+        <item quantity="few">%1$d з %2$d створені у %3$s</item>
+        <item quantity="many">%1$d з %2$d створені у %3$s</item>
+        <item quantity="other">%1$d з %2$d створені у %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Створити %d новий календар у Proton Calendar.</item>
-        <item quantity="few">Створити %d нові календарі у Proton Calendar.</item>
-        <item quantity="many">Створити %d нових календарів у Proton Calendar.</item>
-        <item quantity="other">Створити %d нові календарі у Proton Calendar.</item>
+        <item quantity="one">Створити %1$d новий календар у Proton Calendar.</item>
+        <item quantity="few">Створити %1$d нові календарі у Proton Calendar.</item>
+        <item quantity="many">Створити %1$d нових календарів у Proton Calendar.</item>
+        <item quantity="other">Створити %1$d нових календарів у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
-        <item quantity="one">Імпорт %d з %d календаря з</item>
-        <item quantity="few">Імпорт %d з %d календарів з</item>
-        <item quantity="many">Імпорт %d з %d календарів з</item>
-        <item quantity="other">Імпорт %d з %d календарів з</item>
+        <item quantity="one">Імпорт %1$d з %2$d календаря з</item>
+        <item quantity="few">Імпорт %1$d з %2$d календарів з</item>
+        <item quantity="many">Імпорт %1$d з %2$d календарів з</item>
+        <item quantity="other">Імпорт %1$d з %2$d календарів з</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Об\'єднати %d календар у Proton Calendar.</item>
-        <item quantity="few">Об\'єднати %d календарі у Proton Calendar.</item>
-        <item quantity="many">Об\'єднати %d календарів у Proton Calendar.</item>
-        <item quantity="other">Об\'єднати %d календарів у Proton Calendar.</item>
+        <item quantity="one">Об\'єднати %1$d календар у Proton Calendar.</item>
+        <item quantity="few">Об\'єднати %1$d календарі у Proton Calendar.</item>
+        <item quantity="many">Об\'єднати %1$d календарів у Proton Calendar.</item>
+        <item quantity="other">Об\'єднати %1$d календарів у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Неможливо створити нові календарі для усіх імпортованих календарів у зв\'язку з обмеженням кількості календарів.\n • Приберіть вибір принаймні %1$d календаря</item>
@@ -715,22 +715,22 @@
         <item quantity="other">Кожні %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%s хвилина</item>
-        <item quantity="few">%s хвилини</item>
-        <item quantity="many">%s хвилин</item>
-        <item quantity="other">%s хвилини</item>
+        <item quantity="one">%1$s хвилина</item>
+        <item quantity="few">%1$s хвилини</item>
+        <item quantity="many">%1$s хвилин</item>
+        <item quantity="other">%1$s хвилини</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%d/%d символ</item>
-        <item quantity="few">%d/%d символи</item>
-        <item quantity="many">%d/%d символів</item>
-        <item quantity="other">%d/%d символів</item>
+        <item quantity="one">%1$d/%2$d символ</item>
+        <item quantity="few">%1$d/%2$d символи</item>
+        <item quantity="many">%1$d/%2$d символів</item>
+        <item quantity="other">%1$d/%2$d символів</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%d/%d символ</item>
-        <item quantity="few">%d/%d символи</item>
-        <item quantity="many">%d/%d символів</item>
-        <item quantity="other">%d/%d символів</item>
+        <item quantity="one">%1$d/%2$d символ</item>
+        <item quantity="few">%1$d/%2$d символи</item>
+        <item quantity="many">%1$d/%2$d символів</item>
+        <item quantity="other">%1$d/%2$d символів</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
