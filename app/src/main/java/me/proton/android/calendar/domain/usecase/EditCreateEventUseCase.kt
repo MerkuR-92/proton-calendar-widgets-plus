@@ -44,7 +44,6 @@ import me.proton.core.key.domain.signText
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
 import javax.inject.Inject
@@ -88,7 +87,7 @@ class EditCreateEventUseCase @Inject constructor(
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(sanitizedNewEvent.iCalendar)
 
         // 1. get Member's AddressKey for signing
-        val newMemberKey = when (val result = getMemberKey(userAddresses, sanitizedNewEvent.calendar.id)) {
+        val newMemberKey = when (val result = getMemberKey(userId, userAddresses, sanitizedNewEvent.calendar.id)) {
             is UseCase.Result.Success<*> -> result.returnValue.tryCastOrNull<MemberKey>() ?: return UseCase.Result.Error("EditCreateEventUseCase: Error casting newMemberKey")
             else -> return result
         }
@@ -502,12 +501,10 @@ class EditCreateEventUseCase @Inject constructor(
         return UseCase.Result.Success(CalendarKey(calendarPrimaryPrivateKey, calendarPrivateKeys, keyPassphrase.toByteArray()))
     }
 
-    private suspend fun getMemberKey(userAddresses: List<UserAddress>, calendarId: String): UseCase.Result {
+    private suspend fun getMemberKey(userId: UserId, userAddresses: List<UserAddress>, calendarId: String): UseCase.Result {
 
         val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member")
-        val memberAddress = userAddresses.filter { it.email.equalsNoCase(member.email) }.find {
-            it.email.equalsNoCase(member.email)
-        } ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
+        val memberAddress = calendarsRepository.getAddressForMember(userId, member, userAddresses) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
 
         if (!memberAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get MemberAddress valid for encryption in EditCreateEventUseCase", UseCase.Error.Crypto.UserAddressInvalidForEncryption)

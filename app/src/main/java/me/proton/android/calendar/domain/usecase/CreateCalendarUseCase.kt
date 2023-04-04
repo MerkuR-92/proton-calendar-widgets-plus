@@ -81,9 +81,7 @@ class CreateCalendarUseCase @Inject constructor(
                 calendarsRepository.persistMember(memberEntity)
 
                 val userAddress =
-                    address ?: (userManager.getAddressesOrNull(userId)?.firstOrNull { userAddress ->
-                        memberEntity.email.let { userAddress.email == it }
-                    } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found"))
+                    address ?: (calendarsRepository.getAddressForMember(userId, memberEntity) ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found"))
 
                 val keySetupResult = keySetupUseCase.execute(
                     userId,

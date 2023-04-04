@@ -6,19 +6,16 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ReenableKeyApiRequest
 import me.proton.android.calendar.data.api.ReenableKeyApiResponse
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.EncryptedMessage
-import me.proton.core.crypto.common.pgp.decryptAndVerifyTextOrNull
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.decryptText
 import me.proton.core.key.domain.decryptTextOrNull
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.equalsNoCase
 import javax.inject.Inject
 
 class ReactivateCalendarKeyUseCase @Inject constructor(
@@ -26,7 +23,8 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val json: Json,
     private val userManager: UserManager,
-    private val cryptoContext: CryptoContext
+    private val cryptoContext: CryptoContext,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     suspend fun execute(userId: UserId, calendarId: String, addresses: List<UserAddress>? = null) : UseCase.Result {
@@ -73,9 +71,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
                     } ?: return@members
 
                     // Load Address linked to member
-                    val memberAddress = userAddresses?.find {
-                        it.email.equalsNoCase(member.email)
-                    } ?: return@members
+                    val memberAddress = calendarsRepository.getAddressForMember(userId, member, userAddresses) ?: return@members
 
                     // Try to decrypt passphrase
                     val decryptedPassphrase = memberAddress.useKeys(cryptoContext) {

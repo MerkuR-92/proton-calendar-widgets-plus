@@ -1,13 +1,16 @@
 package me.proton.android.calendar.domain.usecase
 
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueSet
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.*
-import me.proton.core.user.domain.UserManager
+import me.proton.core.key.domain.decryptTextOrNull
+import me.proton.core.key.domain.unlockOrNull
+import me.proton.core.key.domain.useKeys
 import javax.inject.Inject
 
 /**
@@ -18,9 +21,9 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
     private val database: AppDatabase,
     private val json: Json,
     private val cryptoContext: CryptoContext,
-    private val userManager: UserManager,
     private val logger: Logger,
-    private val valueStoreProvider: ValueStoreProvider
+    private val valueStoreProvider: ValueStoreProvider,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
@@ -42,9 +45,7 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
             ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address")
 
-        val memberAddress = userManager.getAddressesOrNull(userId)?.find {
-            it.email.equals(member.email, ignoreCase = true)
-        } ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
+        val memberAddress = calendarsRepository.getAddressForMember(userId, member) ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
 
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey

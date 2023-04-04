@@ -2,11 +2,13 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Random
-import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.SetupKeyApiRequest
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Ciphertext
+import me.proton.android.calendar.domain.Crypto
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -14,17 +16,15 @@ import me.proton.core.key.domain.encryptText
 import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
-import me.proton.core.user.domain.UserManager
-import javax.inject.Inject
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.equalsNoCase
+import javax.inject.Inject
 
 class KeySetupUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val crypto: Crypto,
     private val cryptoContext: CryptoContext,
-    private val userManager: UserManager,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     suspend fun execute(userId: UserId, addressId: String, memberAddressKey: KeyHolderPrivateKey, calendarId: String, memberId: String) : UseCase.Result {
@@ -79,9 +79,11 @@ class KeySetupUseCase @Inject constructor(
                     ?: return UseCase.Result.Error("KeySetupUseCase: could not fetch member")
 
                 // get Address for that Member
-                val address = (addresses ?: userManager.getAddressesOrNull(userId))?.firstOrNull {
-                    it.email.equalsNoCase(member.email) // TODO match by AddressID when we add it to Member
-                } ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
+                val address = calendarsRepository.getAddressForMember(
+                    userId,
+                    member,
+                    addresses
+                ) ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
 
                 val keySetupResult = execute(
                     userId,

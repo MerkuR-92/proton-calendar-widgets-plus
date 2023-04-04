@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.db.AppDatabase
 
 /**
@@ -26,6 +27,8 @@ data class MemberEntity(
     val id: String,
     @SerialName("Permissions")
     val permissions: Int, // bitmap
+    @SerialName("AddressID")
+    val addressId: String?,
     @SerialName("Email")
     val email: String, // plaintext email address
     @SerialName("CalendarID")
@@ -63,6 +66,8 @@ data class MemberEntity(
     }
 
     val hasIncompleteKeySetup: Boolean get() = flags and 8 == 8
+
+    val canonicalEmail: String get() = canonicalizeProtonEmail(email, forceCanonicalization = true)
 
     enum class CalendarFlags(val value: Int) {
         /** 0 - Inactive: the calendar keys are not accessible and the current user cannot fix it */
