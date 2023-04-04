@@ -170,12 +170,7 @@ class ItemCalendarAgendaFragment: Fragment() {
 
         eventsListLayoutAdapter.submitList(listOf(fakeHeaderEvent))
 
-        // TODO remove UserID livedata
-        calendarViewModel.userId.observe(viewLifecycleOwner) { userId ->
-            userId?.let {
-                getEvents(immutableDate, timeZoneId)
-            }
-        }
+        getEvents(immutableDate, timeZoneId)
 
         calendarViewModel.selectedDateTime.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDateTime ->
             val selectedDate = selectedDateTime.first
