@@ -44,7 +44,7 @@ class LoginFlowTests : BaseTest(), MinimalSignInInternalTests {
     @Inject
     lateinit var waitForPrimaryAccount: WaitForPrimaryAccount
 
-    override fun verifyAfterLoginScreenDisplayed() {
+    override fun verifyAfter() {
         waitForPrimaryAccount()
         //HomeRobot.splashAfterLoginIsDisplayed()
     }

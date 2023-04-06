@@ -8,6 +8,7 @@ import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -74,6 +75,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     val upgradeEventUseCaseMock: UpgradeEventUseCase = mockk()
+    val workManagerMock: WorkManager = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -134,7 +136,8 @@ open class EventViewModelTestCommon: KoinComponent {
             handleAlarmsUseCase = handleAlarmsUseCaseMock,
             eventDecryptor = eventDecryptorMock,
             database = appDatabaseMock,
-            upgradeEventUseCase = upgradeEventUseCaseMock
+            upgradeEventUseCase = upgradeEventUseCaseMock,
+            workManager = workManagerMock
         )
     }
 
@@ -221,5 +224,4 @@ open class EventViewModelTestCommon: KoinComponent {
             }
         }
     }
-
 }

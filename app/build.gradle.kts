@@ -129,13 +129,12 @@ android {
     }
 
     sourceSets {
-        getByName("androidTest").java.srcDirs("src/uiTest/java")
+        getByName("androidTest").java.srcDirs("src/uiTest/java", "src/androidTest/java")
         getByName("androidTest").assets.srcDirs("src/uiTest/assets")
     }
 }
 
 dependencies {
-    androidTestImplementation(project(mapOf("path" to ":app")))
     coreLibraryDesugaring(libs.tools.desugar)
 
     // Local
@@ -171,6 +170,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.tink) // it"s included in security-crypto
     implementation(libs.logging.interceptor)
+    implementation(libs.sqlCipher)
+    implementation(libs.guava)
 
     // Proton Core libraries.
     implementation(libs.core.account)
@@ -210,7 +211,6 @@ dependencies {
     implementation(libs.androidx.layout.coordinator)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.security.crypto)
-    //noinspection GradleDependency
     implementation(libs.androidx.work.runtime)
 
     // Alpha version needed for custom language selection.
@@ -219,6 +219,7 @@ dependencies {
 
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
 
     implementation(libs.androidx.navigation.ui)
     implementation(libs.androidx.navigation.fragment)
@@ -259,19 +260,10 @@ dependencies {
     androidTestImplementation(libs.test.androidx.ext.junit)
     androidTestImplementation(libs.core.auth.test)
     androidTestImplementation(project(":shared-test-code"))
+    androidTestImplementation(libs.dagger.hilt.android.testing)
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)
-
-
-//    androidTestImplementation "com.google.dagger:hilt-android-testing:${rootProject.ext.version.hilt_android}"
-//    androidTestImplementation "org.jetbrains.kotlin:kotlin-test:${rootProject.ext.version.kotlin}"
-//
-//    androidTestImplementation "me.proton.test:fusion:${rootProject.ext.version.proton_fusion}"
-//    androidTestImplementation "me.proton.core:test-android-instrumented:${rootProject.ext.version.proton_core}"
-//    androidTestImplementation "androidx.test.ext:junit:1.1.5"
-//    androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
-//    testImplementation 'junit:junit:4.13.2'
 }
 
 tasks.register("getArchivesName"){
@@ -315,9 +307,9 @@ object Config {
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "30.0.3"
     const val targetSdk = 33
-    const val versionCode = 179
-    const val testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    const val versionName = "2.5.3"
+    const val versionCode = 189
+    const val testInstrumentationRunner = "me.proton.android.calendar.uitest.HiltTestRunner"
+    const val versionName = "2.8.0"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(

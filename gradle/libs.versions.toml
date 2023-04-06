@@ -48,7 +48,7 @@ kotlin-stdlib = "1.6.21"
 desugar = "1.1.5"
 dagger = "2.44.2"
 core = "10.0.0"
-fusion = "0.9.50"
+fusion = "0.9.52"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
 detekt = "1.9.1"
@@ -60,20 +60,24 @@ tink = "1.5.0"
 retrofit-serialization-converter = "0.8.0"
 retrofit-coroutines = "0.9.2"
 logging-interceptor = "4.8.0"
+sql-cipher = "4.5.2"
+guava = "31.0.1-android"
 
 [libraries]
 jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
 assistedInject = { module = "com.squareup.inject:assisted-inject-annotations-dagger2", version.ref = "assisted-inject" }
 playServices-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "play-services-auth" }
-leakCanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref="leak-canary" }
+leakCanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leak-canary" }
 biweekly = { module = "net.sf.biweekly:biweekly", version.ref = "biweekly" }
 bcrypt = { module = "at.favre.lib:bcrypt", version.ref = "bcrypt" }
 sentry = { module = "io.sentry:sentry-android", version.ref = "sentry" }
 ezVcard = { module = "com.googlecode.ez-vcard:ez-vcard", version.ref = "ez-vcard" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
-tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink"}
-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "logging-interceptor"}
+tink = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "logging-interceptor" }
+sqlCipher = { module = "net.zetetic:android-database-sqlcipher", version.ref = "sql-cipher" }
+guava = { module = "com.google.guava:guava", version.ref = "guava"}
 
 # Core
 core-account = { module = "me.proton.core:account", version.ref = "core" }
@@ -127,66 +131,66 @@ gradle-plugin-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plu
 gradle-plugin-hilt = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt-android" }
 
 # Test
-test-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito"}
-test-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito"}
-test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin"}
-test-google-truth = { module = "com.google.truth:truth", version.ref = "google-truth"}
-test-junit = { module = "junit:junit", version.ref = "junit"}
-test-androidx-testrunner = { module = "androidx.test:runner", version.ref = "androidx-test-runner"}
-test-androidx-core = { module = "androidx.test:core", version.ref = "androidx-test"}
-test-androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-test"}
-test-androidx-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-ext"}
-test-androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator"}
-test-androidx-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services"}
-test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk"}
-test-mockk = { module = "io.mockk:mockk", version.ref = "mockk"}
-test-fusion = { module = "me.proton.test:fusion", version.ref = "fusion"}
-test-androidx-arch = { module = "androidx.arch.core:core-testing", version.ref = "arch-testing"}
-test-assertk-jvm = { module = "com.willowtreeapps.assertk:assertk-jvm", version.ref = "assertk"}
+test-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+test-mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito" }
+test-mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+test-google-truth = { module = "com.google.truth:truth", version.ref = "google-truth" }
+test-junit = { module = "junit:junit", version.ref = "junit" }
+test-androidx-testrunner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
+test-androidx-core = { module = "androidx.test:core", version.ref = "androidx-test" }
+test-androidx-rules = { module = "androidx.test:rules", version.ref = "androidx-test" }
+test-androidx-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-ext" }
+test-androidx-orchestrator = { module = "androidx.test:orchestrator", version.ref = "androidx-test-orchestrator" }
+test-androidx-services = { module = "androidx.test.services:test-services", version.ref = "androidx-test-services" }
+test-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
+test-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+test-fusion = { module = "me.proton.test:fusion", version.ref = "fusion" }
+test-androidx-arch = { module = "androidx.arch.core:core-testing", version.ref = "arch-testing" }
+test-assertk-jvm = { module = "com.willowtreeapps.assertk:assertk-jvm", version.ref = "assertk" }
 
 # AndroidX
-androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat"}
-androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity"}
-androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core"}
-androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen"}
-androidx-customview = { module = "androidx.customview:customview", version.ref = "androidx-customview"}
-androidx-emoji = { module = "androidx.emoji:emoji-bundled", version.ref = "androidx-emoji"}
-androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup"}
-androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation"}
-androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation"}
-androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx"}
-androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx"}
-androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx"}
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room"}
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room"}
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room"}
-androidx-preference = { module = "androidx.preference:preference-ktx", version.ref = "androidx-preference"}
-androidx-layout-constraint = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout"}
-androidx-layout-coordinator = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinator-layout"}
-androidx-layout-swiperefresh = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefresh-layout"}
-androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2"}
-androidx-appcompat-alpha = { module = "androidx.appcompat:appcompat", version.ref = "appcompat-alpha"}
-androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work"}
-androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security"}
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splashscreen" }
+androidx-customview = { module = "androidx.customview:customview", version.ref = "androidx-customview" }
+androidx-emoji = { module = "androidx.emoji:emoji-bundled", version.ref = "androidx-emoji" }
+androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
+androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "androidx-navigation" }
+androidx-navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "androidx-navigation" }
+androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx" }
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx" }
+androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-preference = { module = "androidx.preference:preference-ktx", version.ref = "androidx-preference" }
+androidx-layout-constraint = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout" }
+androidx-layout-coordinator = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "coordinator-layout" }
+androidx-layout-swiperefresh = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swiperefresh-layout" }
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+androidx-appcompat-alpha = { module = "androidx.appcompat:appcompat", version.ref = "appcompat-alpha" }
+androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security" }
 
 # Hilt
-androidx-hilt-lifecycleViewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hilt-androidx"}
-androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-androidx"}
-androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-androidx"}
+androidx-hilt-lifecycleViewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hilt-androidx" }
+androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-androidx" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-androidx" }
 
 # Kotlin
-kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin-stdlib"}
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref="coroutine"}
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref="coroutine"}
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref="serialization"}
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin-stdlib" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutine" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutine" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
 # Tools
-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar"}
+tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 
 # Koin
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin"}
-koin-android-viewmodel = { module = "io.insert-koin:koin-android-viewmodel", version.ref = "koin"}
-koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin"}
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-android-viewmodel = { module = "io.insert-koin:koin-android-viewmodel", version.ref = "koin" }
+koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 
 # Dagger
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
@@ -199,8 +203,8 @@ jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.re
 jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "jupiter" }
 
 # Detekt
-detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt"}
-detekt-cli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt"}
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+detekt-cli = { module = "io.gitlab.arturbosch.detekt:detekt-cli", version.ref = "detekt" }
 
 # Retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
