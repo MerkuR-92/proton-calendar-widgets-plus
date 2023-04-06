@@ -19,19 +19,7 @@
             android:importantForAccessibility="no"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/welcome_header" />
-
-        <ImageView
-            android:id="@+id/dialog_spotlight_v5_banner_logo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_logo_background_shape"
-            android:backgroundTint="@color/white"
-            android:contentDescription="@string/app_name"
-            android:elevation="24dp"
-            android:outlineProvider="background"
-            app:srcCompat="@drawable/ic_logo_calendar" />
+            app:srcCompat="@drawable/welcome_header_calendar" />
 
     </FrameLayout>
 
