@@ -19,7 +19,20 @@ object Navigation {
         fun toEventDetails(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/details?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
         fun toMainActivityWithEventId(eventId: String, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/main?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
         fun toEventEdit(eventId: String? = null, occurrenceNumber: Int? = 0) = Uri.parse("proton-calendar://protonmail.com/event/edit?eventId=$eventId&occurrenceNumber=${occurrenceNumber}")
-        fun toEventCreate(initStartDate: LocalDate, initStartTime: LocalTime? = null) = Uri.parse("proton-calendar://protonmail.com/event/create?initStartDate=${initStartDate}${if (initStartTime != null) "&initStartTime=${initStartTime}" else ""}")
+        fun toEventCreate(
+            initStartDate: LocalDate,
+            initStartTime: LocalTime? = null
+        ) = Uri.parse("proton-calendar://protonmail.com/event/create?initStartDate=${initStartDate}${if (initStartTime != null) "&initStartTime=${initStartTime}" else ""}")
+        fun toEventCreatePrefill(
+            startMillis: Long,
+            endMillis: Long,
+            timeZoneId: String,
+            allDay: Boolean,
+            title: String,
+            description: String,
+            location: String,
+            rRule: String
+        ) = Uri.parse("proton-calendar://protonmail.com/event/create?prefill=true&startMillis=$startMillis&endMillis=$endMillis&timeZoneId=$timeZoneId&allDay=$allDay&title=$title&description=$description&location=$location&rRule=$rRule")
         fun toImportAssistant(code: String) = Uri.parse("proton-calendar://protonmail.com/import?code=$code")
     }
 

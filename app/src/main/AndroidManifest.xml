@@ -109,6 +109,12 @@
                     android:host="calendar.proton.me"
                     android:path="/easy_switch" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.INSERT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/event" />
+            </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
         <receiver

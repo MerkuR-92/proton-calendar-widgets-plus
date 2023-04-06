@@ -225,9 +225,11 @@ class MainViewModel @Inject constructor(
         return intent.action == INVITE_PROTON_INTENT_ACTION ||
                 intent.action == Intent.ACTION_VIEW ||
                 intent.type == INVITE_ICS_MIME_TYPE ||
-                intent.action == MainViewModel.INTENT_ACTION_NEW_EVENT ||
-                intent.action == MainViewModel.INTENT_ACTION_SHOW_DAY ||
-                intent.action == MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS
+                intent.action == INTENT_ACTION_NEW_EVENT ||
+                intent.action == INTENT_ACTION_SHOW_DAY ||
+                intent.action == INTENT_ACTION_SHOW_EVENT_DETAILS ||
+                intent.action == Intent.ACTION_INSERT ||
+                intent.action == Intent.ACTION_EDIT
     }
 
     /**

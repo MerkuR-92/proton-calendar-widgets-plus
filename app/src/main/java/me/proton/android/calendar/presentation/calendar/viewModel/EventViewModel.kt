@@ -3,28 +3,46 @@ package me.proton.android.calendar.presentation.calendar.viewModel
 import android.app.Application
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.*
-import androidx.work.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.parameter.Related
-import biweekly.property.*
-import biweekly.util.*
+import biweekly.property.Attendee
+import biweekly.property.Organizer
+import biweekly.property.Trigger
 import biweekly.util.DayOfWeek
 import biweekly.util.Duration
+import biweekly.util.Frequency
+import biweekly.util.ICalDate
+import biweekly.util.Recurrence
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
+import me.proton.android.calendar.common.FormValidation
+import me.proton.android.calendar.common.getUserOrNull
+import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.utils.AndroidUtils.formatSendPreferencesError
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
-import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
-import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
@@ -41,6 +59,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isCalendarChangeAllowed
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
@@ -48,20 +67,37 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
+import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRRule
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.*
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SendPreferences
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
+import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
+import me.proton.android.calendar.domain.usecase.SendEmailUseCase
+import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
@@ -72,11 +108,42 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.toBoolean
-import java.time.*
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 import kotlin.collections.ArrayList
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.any
+import kotlin.collections.emptyList
+import kotlin.collections.emptyMap
+import kotlin.collections.filter
+import kotlin.collections.find
+import kotlin.collections.first
+import kotlin.collections.firstOrNull
+import kotlin.collections.flatMap
+import kotlin.collections.getOrNull
+import kotlin.collections.hashMapOf
+import kotlin.collections.indexOfFirst
+import kotlin.collections.isNotEmpty
+import kotlin.collections.isNullOrEmpty
+import kotlin.collections.lastIndex
+import kotlin.collections.listOf
+import kotlin.collections.listOfNotNull
+import kotlin.collections.map
+import kotlin.collections.mapNotNull
+import kotlin.collections.mapOf
+import kotlin.collections.mapValues
+import kotlin.collections.mutableListOf
+import kotlin.collections.set
+import kotlin.collections.toList
+import kotlin.collections.toTypedArray
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -251,7 +318,15 @@ class EventViewModel @Inject constructor(
         eventId: String?,
         occurrenceNumber: Int?,
         initStartDate: String?,
-        initStartTime: String?
+        initStartTime: String?,
+        initEndDate: String? = null,
+        initEndTime: String? = null,
+        isAllDay: Boolean? = null,
+        timeZoneId: String? = null,
+        title: String? = null,
+        description: String? = null,
+        location: String? = null,
+        rRule: String? = null
     ): InitResult {
 
         resetEventViewModelValues(editMode)
@@ -288,7 +363,19 @@ class EventViewModel @Inject constructor(
 
         event = if (eventId == null) {
 
-            val initialiseCreateEventResult = initialiseNewEvent(defaultCalendar!!, initStartDate, initStartTime)
+            val initialiseCreateEventResult = initialiseNewEvent(
+                defaultCalendar!!,
+                initStartDate,
+                initStartTime,
+                initEndDate,
+                initEndTime,
+                isAllDay,
+                timeZoneId,
+                title,
+                description,
+                location,
+                rRule
+            )
             if (initialiseCreateEventResult !is InitResult.InitEventSuccess) {
                 // Handle initialisation error
                 return initialiseCreateEventResult
@@ -348,12 +435,33 @@ class EventViewModel @Inject constructor(
     private fun initialiseNewEvent(
         defaultCalendar: Calendar,
         initStartDate: String?,
-        initStartTime: String?
+        initStartTime: String?,
+        initEndDate: String?,
+        initEndTime: String?,
+        isAllDay: Boolean?,
+        timeZoneId: String?,
+        title: String?,
+        description: String?,
+        location: String?,
+        rRule: String?
     ): InitResult {
 
-        eventTimeZoneId = displayTimeZoneId
+        eventTimeZoneId = timeZoneId ?: displayTimeZoneId
 
-        val newICalendar = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+        val newICalendar =
+        if (!rRule.isNullOrEmpty()) {
+            val newEventToPrefill = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+            // Create a temporary RRULE to replace
+            newEventToPrefill.events.first().setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).build())
+            val newEventIcs = newEventToPrefill.printToString()
+            // Replace temporary RRULE with the one provided in args
+            val rRuleRegex = Regex("RRULE:.*\\r?\\n")
+            val prefilledNewEventIcs = newEventIcs.replace(rRuleRegex, "RRULE:$rRule\r\n")
+            // Parse prefilled event ics
+            parseICalString(prefilledNewEventIcs) ?: return InitResult.Error.Default("could not parse Event using parseICalString method")
+        } else {
+            ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+        }
         val newVEvent = newICalendar.events.first()
 
         // If there is no requested start date, we take today
@@ -369,17 +477,15 @@ class EventViewModel @Inject constructor(
                 .truncatedTo(ChronoUnit.HOURS)
                 .toLocalTime()
 
-        // End Zoned Date Time according to default event duration
-        val endZonedDateTime = ZonedDateTime.of(
-            startDate,
-            startTime,
-            ZoneId.of(eventTimeZoneId)
-        ).plusMinutes(
-            this.calendarSettings.defaultEventDuration.toLong()
-        )
+        val endDate =
+            if (initEndDate != null) LocalDate.parse(initEndDate)
+            else startDate
+        val endTime =
+            if (initEndTime != null) LocalTime.parse(initEndTime)
+            else startTime.plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
 
         timeStartBackup = startTime
-        timeEndBackup = endZonedDateTime.toLocalTime() // this time can be before timeStartBackup at this point
+        timeEndBackup = endTime // this time can be before timeStartBackup at this point
 
         // TODO GUI takes timezone from iCalendar's "default timezone", maybe this should be moved to "Event" model?
         newICalendar.setDefaultTimeZone(eventTimeZoneId)
@@ -389,18 +495,26 @@ class EventViewModel @Inject constructor(
             newVEvent.setStart(startDate)
 
             // event end time goes over midnight
-            if (endZonedDateTime.dayOfYear != startDate.dayOfYear) {
-                newVEvent.setEnd(endZonedDateTime.toLocalDate().minusDays(1))
+            if (endDate.dayOfYear != startDate.dayOfYear) {
+                newVEvent.setEnd(endDate.minusDays(1))
                 timeEndBackup = timeStartBackup // workaround TODO we could force-change date-end to next-day
             } else {
-                newVEvent.setEnd(endZonedDateTime.toLocalDate())
+                newVEvent.setEnd(endDate)
             }
 
+        } else if (isAllDay == true) {
+            // create new all-day event
+            newVEvent.setStart(startDate)
+            newVEvent.setEnd(endDate)
         } else { // create new part-day event
             newVEvent.setStart(startDate, startTime, eventTimeZoneId)
-            newVEvent.setEnd(endZonedDateTime.toLocalDate(), endZonedDateTime.toLocalTime(), eventTimeZoneId)
+            newVEvent.setEnd(endDate, endTime, eventTimeZoneId)
             newICalendar.setStartTimeZone(eventTimeZoneId)
             newICalendar.setEndTimeZone(eventTimeZoneId)
+        }
+
+        if (!newVEvent.cleanRRule(newICalendar, isImport = true, isOpeningFromProtonMail = false)) {
+            return InitResult.Error.Default("invalid RRULE in prefilled event")
         }
 
         val newEvent = Event.from(
@@ -421,6 +535,12 @@ class EventViewModel @Inject constructor(
         ) ?: return InitResult.Error.Default("could not create Event using factory method")
 
         newEvent.setDefaultAlarms()
+
+        // Prefill
+        title?.let { newEvent.iCalEvent.setSummary(title) }
+        description?.let { newEvent.iCalEvent.setDescription(description) }
+        location?.let { newEvent.iCalEvent.setLocation(location) }
+
         return InitResult.InitEventSuccess(newEvent)
     }
 
