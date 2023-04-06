@@ -19,8 +19,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
-import me.proton.android.calendar.mocks.CalendarMocks.provideCalendar
-import me.proton.android.calendar.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendar
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
 import org.junit.jupiter.api.Test
 import java.sql.Date
 import java.time.LocalDate

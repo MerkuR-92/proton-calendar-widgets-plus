@@ -18,7 +18,7 @@ import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent

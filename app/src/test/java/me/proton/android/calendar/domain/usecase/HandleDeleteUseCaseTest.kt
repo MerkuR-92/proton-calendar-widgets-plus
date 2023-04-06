@@ -14,10 +14,10 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.CalendarMocks.provideCalendarUserSettingsEntity
-import me.proton.android.calendar.mocks.EventMocks.provideEvent
-import me.proton.android.calendar.mocks.EventMocks.provideEventEntity
+import me.proton.android.calendar.test.shared.mocks.*
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendarUserSettingsEntity
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

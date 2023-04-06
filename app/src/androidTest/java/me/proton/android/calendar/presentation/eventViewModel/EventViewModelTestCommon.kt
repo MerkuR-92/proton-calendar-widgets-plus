@@ -8,6 +8,7 @@ import androidx.lifecycle.asFlow
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.WorkManager
 import io.mockk.Runs
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -34,17 +35,16 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
-import me.proton.android.calendar.mocks.CalendarMocks
-import me.proton.android.calendar.mocks.EventMocks
-import me.proton.android.calendar.mocks.UserMocks
-import me.proton.android.calendar.mocks.calendarId
-import me.proton.android.calendar.mocks.eventId
-import me.proton.android.calendar.mocks.singleEditEventId
-import me.proton.android.calendar.mocks.userId
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks
+import me.proton.android.calendar.test.shared.mocks.EventMocks
+import me.proton.android.calendar.test.shared.mocks.UserMocks
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.eventId
+import me.proton.android.calendar.test.shared.mocks.singleEditEventId
+import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.user.domain.UserManager
-import me.proton.core.usersettings.data.db.UserSettingsDatabase
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.Before
 import org.junit.Rule
@@ -75,6 +75,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val handleAlarmsUseCaseMock: HandleAlarmsUseCase = mockk()
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     val upgradeEventUseCaseMock: UpgradeEventUseCase = mockk()
+    val workManagerMock: WorkManager = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -135,7 +136,8 @@ open class EventViewModelTestCommon: KoinComponent {
             handleAlarmsUseCase = handleAlarmsUseCaseMock,
             eventDecryptor = eventDecryptorMock,
             database = appDatabaseMock,
-            upgradeEventUseCase = upgradeEventUseCaseMock
+            upgradeEventUseCase = upgradeEventUseCaseMock,
+            workManager = workManagerMock
         )
     }
 
@@ -222,5 +224,4 @@ open class EventViewModelTestCommon: KoinComponent {
             }
         }
     }
-
 }

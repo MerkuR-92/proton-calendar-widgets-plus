@@ -23,7 +23,7 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
 import org.junit.Test
@@ -138,7 +138,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.ACCEPTED.toInt(),
                 personalPartICalString = personalPartICalString,
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             assert(eventViewModel.eventLiveData.value?.getParticipationStatus(listOf(userEmail)) == ParticipationStatus.ACCEPTED)
@@ -426,7 +427,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.ACCEPTED.toInt(),
                 personalPartICalString = personalPartICalString,
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             // Update calendar display
@@ -552,7 +554,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.ACCEPTED.toInt(),
                 personalPartICalString = personalPartICalString,
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             // Update calendar display
@@ -686,7 +689,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.ACCEPTED.toInt(),
                 personalPartICalString = personalPartICalString,
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             // Update calendar display
@@ -819,7 +823,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.DECLINED.toInt(),
                 personalPartICalString = "",
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             // Update calendar display
@@ -944,7 +949,8 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 attendeeId = attendeeId,
                 status = ParticipationStatus.DECLINED.toInt(),
                 personalPartICalString = "",
-                updateTime = any() // updateTime = Instant.now()
+                updateTime = any(), // updateTime = Instant.now()
+                notifications = null
             ) }
 
             // Update calendar display

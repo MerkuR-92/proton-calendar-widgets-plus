@@ -25,7 +25,6 @@ import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.uitest.rule.HiltInjectRule
 import me.proton.android.calendar.uitest.rule.MainInitializerRule
 import me.proton.core.auth.domain.testing.LoginTestHelper
-import me.proton.core.test.android.instrumented.utils.Shell
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
 import org.junit.After
@@ -52,7 +51,6 @@ open class BaseTest {
 
     @Before
     open fun setup() {
-        Shell.setupDeviceForAutomation(true)
         loginTestHelper.logoutAll()
     }
 

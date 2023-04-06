@@ -78,7 +78,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
-import me.proton.android.calendar.mocks.EventMocks
+import me.proton.android.calendar.test.shared.mocks.EventMocks
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.Instant

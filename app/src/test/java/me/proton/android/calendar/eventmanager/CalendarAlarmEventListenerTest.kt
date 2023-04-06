@@ -18,10 +18,10 @@ import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarAlarmEventListener
-import me.proton.android.calendar.mocks.calendarId
-import me.proton.android.calendar.mocks.eventId
-import me.proton.android.calendar.mocks.memberId
-import me.proton.android.calendar.mocks.userId
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.eventId
+import me.proton.android.calendar.test.shared.mocks.memberId
+import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata

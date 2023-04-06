@@ -132,7 +132,8 @@
             android:name="me.proton.core.auth.presentation.ui.AddAccountActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ProtonTheme.Calendar.AddAccount"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            tools:replace="android:theme" />
         <activity
             android:name="me.proton.core.auth.presentation.ui.LoginActivity"
             android:screenOrientation="portrait"

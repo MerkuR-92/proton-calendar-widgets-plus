@@ -7,7 +7,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent

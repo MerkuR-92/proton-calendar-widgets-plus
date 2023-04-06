@@ -1,4 +1,4 @@
-package me.proton.android.calendar.mocks
+package me.proton.android.calendar.test.shared.mocks
 
 import me.proton.android.calendar.domain.model.PackageType
 import me.proton.core.domain.entity.UserId

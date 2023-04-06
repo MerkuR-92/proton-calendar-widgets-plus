@@ -28,10 +28,10 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
-import me.proton.android.calendar.mocks.CalendarMocks
-import me.proton.android.calendar.mocks.UserMocks
-import me.proton.android.calendar.mocks.calendarColor
-import me.proton.android.calendar.mocks.calendarDisplay
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks
+import me.proton.android.calendar.test.shared.mocks.UserMocks
+import me.proton.android.calendar.test.shared.mocks.calendarColor
+import me.proton.android.calendar.test.shared.mocks.calendarDisplay
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager

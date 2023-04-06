@@ -7,10 +7,10 @@ import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
-import me.proton.android.calendar.mocks.*
-import me.proton.android.calendar.mocks.EventMocks.provideEvent
-import me.proton.android.calendar.mocks.EventMocks.provideEventEntity
-import me.proton.android.calendar.mocks.UserMocks.provideUserSettingsEntity
+import me.proton.android.calendar.test.shared.mocks.*
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
+import me.proton.android.calendar.test.shared.mocks.UserMocks.provideUserSettingsEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

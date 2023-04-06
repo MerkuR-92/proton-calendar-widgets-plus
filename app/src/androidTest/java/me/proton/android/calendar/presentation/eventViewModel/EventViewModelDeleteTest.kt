@@ -14,11 +14,10 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.mocks.*
+import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
 import org.junit.Test
@@ -47,7 +46,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns EventMocks.provideEvent()
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(
@@ -80,7 +79,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.THIS_EVENT, 0) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
@@ -113,7 +112,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns EventMocks.provideEvent()
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Error("error message")
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Error("error message")
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(
@@ -146,7 +145,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, 0) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.THIS_EVENT, 0) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
@@ -182,7 +181,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns event
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_event) } returns protonCalendarApplication.getString(
@@ -215,7 +214,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.ALL_EVENTS, null) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_event) }
@@ -249,7 +248,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns event
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(
@@ -285,7 +284,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT, occurrenceNumber) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.THIS_EVENT, occurrenceNumber) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
@@ -321,7 +320,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns event
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(
@@ -359,7 +358,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.THIS_EVENT_AND_FUTURE, occurrenceNumber) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.THIS_EVENT_AND_FUTURE, occurrenceNumber) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
@@ -395,7 +394,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             } } returns event
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(
@@ -433,7 +432,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.ALL_EVENTS, null) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
@@ -471,7 +470,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             )
 
             // Handle delete use case
-            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
+            coEvery { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             // Delete confirmation dialog
             coEvery { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) } returns protonCalendarApplication.getString(
@@ -502,7 +501,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             }
 
             // Handle delete use case
-            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, EventEditDeleteOption.ALL_EVENTS, null) }
+            coVerify(exactly = 1) { handleDeleteUseCaseMock.handleDelete(userId, eventId, calendarId, EventEditDeleteOption.ALL_EVENTS, null) }
 
             // Delete confirmation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.dialog_title_delete_recurring_event) }
@@ -555,7 +554,7 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             verify(exactly = 0) { resourceProviderMock.provideString(R.string.snack_event_deleted) }
 
             // Handle delete use case
-            coVerify(exactly = 0) { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any()) }
+            coVerify(exactly = 0) { handleDeleteUseCaseMock.handleDelete(any(), any(), any(), any(), any()) }
 
             assert(eventViewModel.eventDetailsState.value == EventViewModel.EventState.Idle)
         }
