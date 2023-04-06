@@ -29,7 +29,7 @@ object SentryIntegration {
     }
 
     private fun initSentry(installationId: String) {
-        val sentryDsn = BuildConfig.SENTRY_DSN_NEW
+        val sentryDsn = BuildConfig.SENTRY_DSN_NEW ?: ""
         SentryAndroid.init(application) { options ->
             options.dsn = sentryDsn
             options.release = BuildConfig.VERSION_NAME
