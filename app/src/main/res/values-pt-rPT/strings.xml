@@ -55,7 +55,7 @@
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
     <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
     <string name="event_alarm_label_at_event_time">À hora do evento</string>
-    <string name="event_alarm_label_at_event_time_by_email">À hora do evento por email</string>
+    <string name="event_alarm_label_at_event_time_by_email">À hora do evento por correio electrónico</string>
     <string name="event_alarm_label_on_the_same_day">No mesmo dia</string>
     <string name="event_alarm_label_before">%1$s antes</string>
     <string name="event_alarm_label">%1$s</string>
@@ -142,7 +142,7 @@
     <string name="event_text_date_repeat_never">Não se repete</string>
     <string name="event_text_attendees">Participantes</string>
     <string name="event_text_attendees_none">Nenhum</string>
-    <string name="event_text_calendar">Agenda</string>
+    <string name="event_text_calendar">Calendário</string>
     <string name="event_text_timezone_start">Fuso horário</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">What are you looking for?</string>
@@ -249,8 +249,8 @@
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s has been canceled.</string>
     <!-- NAVIGATION VIEW   -->
-    <string name="nav_view_calendars">As minhas agendas</string>
-    <string name="nav_view_subscribed_calendars">Agendas subscritas</string>
+    <string name="nav_view_calendars">Os meus calendários</string>
+    <string name="nav_view_subscribed_calendars">Calendários subscritos</string>
     <string name="nav_view_disabled_calendars">%1$s (Disabled)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Not synced)</string>
     <string name="nav_view_syncing_calendars">%1$s (Syncing)</string>
@@ -290,14 +290,14 @@
     <string name="snack_event_created_error">Erro ao criar o evento</string>
     <string name="snack_event_opening_edit_error">Erro ao abrir evento para edição</string>
     <string name="snack_event_edit_with_attendees_error">Ainda não é possível editar eventos com participantes</string>
-    <string name="snack_event_edit_calendar_with_attendees_error">Não é possível adicionar participantes e alterar em simultâneo a agenda</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">Não é possível adicionar participantes e alterar em simultâneo o calendário</string>
     <string name="snack_event_init_error">Erro ao inicializar novo evento</string>
-    <string name="snack_event_calendar_error">Erro ao trocar a agenda</string>
+    <string name="snack_event_calendar_error">Erro ao trocar o calendário</string>
     <string name="snack_event_maximum_alarm_reached_error">Atingiu o número máximo de notificações</string>
     <string name="snack_send_bug_report_success">Relatório enviado, obrigado pelos comentários</string>
     <string name="snack_send_bug_report_error">Erro ao enviar o relatório, por favor tente mais tarde</string>
     <string name="snack_send_bug_report_description_empty">Forneça uma descrição do seu relatório</string>
-    <string name="snack_create_event_no_active_personal_calendar">Precisa de uma agenda pessoal activa para criar eventos</string>
+    <string name="snack_create_event_no_active_personal_calendar">Precisa de um calendário pessoal activo para criar eventos.</string>
     <string name="snack_add_self_as_participant">Impossível convidar-se a si próprio</string>
     <string name="snack_maximum_participants_reached">O número máximo de participantes foi atingido.</string>
     <string name="snack_add_participant_error">Erro ao adicionar o participante</string>
@@ -306,36 +306,36 @@
     <string name="snack_network_error">Erro de rede, por favor tente mais tarde</string>
     <string name="snack_import_event_signed_out">Tem de iniciar sessão para importar eventos</string>
     <string name="snack_app_link_signed_out">Tem de iniciar sessão para ver o evento</string>
-    <string name="snack_update_default_calendar">Agenda predefinida atualizada</string>
-    <string name="snack_update_default_calendar_error">Erro ao atualizar a agenda predefinida, por favor tente mais tarde</string>
-    <string name="snack_calendar_init_error">Erro ao carregar informação da agenda</string>
-    <string name="snack_update_calendar_error">Erro ao atualizar informação da agenda, por favor tente mais tarde</string>
-    <string name="snack_update_calendar_settings_error">Erro ao atualizar alguma informação da agenda, por favor tente mais tarde</string>
-    <string name="snack_update_calendar_success">Agenda atualizada</string>
-    <string name="snack_create_calendar_success">Agenda criada</string>
-    <string name="snack_calendar_saving">Guardando agenda</string>
-    <string name="snack_create_calendar_error">Erro ao criar agenda, por favor tente mais tarde</string>
-    <string name="snack_create_calendar_settings_error">A agenda foi criada mas algumas informações não foram atualizadas, por favor tente mais tarde</string>
-    <string name="snack_ics_default_error">Erro ao abrir a agenda</string>
+    <string name="snack_update_default_calendar">Calendário predefinido atualizado</string>
+    <string name="snack_update_default_calendar_error">Erro ao atualizar o calendário predefinido. Tente mais tarde.</string>
+    <string name="snack_calendar_init_error">Erro ao carregar informação do calendário</string>
+    <string name="snack_update_calendar_error">Erro ao atualizar informação do calendário. Tente mais tarde.</string>
+    <string name="snack_update_calendar_settings_error">Erro ao atualizar alguma informação do calendário. Tente mais tarde.</string>
+    <string name="snack_update_calendar_success">Calendário atualizado</string>
+    <string name="snack_create_calendar_success">Calendário criado</string>
+    <string name="snack_calendar_saving">Salvar o calendário</string>
+    <string name="snack_create_calendar_error">Erro ao criar o calendário. Tente novamente mais tarde.</string>
+    <string name="snack_create_calendar_settings_error">O calendário foi criado mas algumas informações não foram atualizadas. Tente mais tarde</string>
+    <string name="snack_ics_default_error">Erro ao abrir o calendário</string>
     <string name="snack_ics_event_not_found_error">Evento não encontrado</string>
     <string name="snack_ics_create_error">Erro ao criar o evento</string>
-    <string name="snack_ics_parsing_error">Erro ao ler a agenda</string>
+    <string name="snack_ics_parsing_error">Erro ao ler o calendário</string>
     <string name="snack_ics_unsupported_method_error">Este tipo de evento ainda não é suportado</string>
     <string name="snack_ics_unsupported_add_error">A adição de ocorrências a um evento não é suportada no momento</string>
-    <string name="snack_ics_unsupported_counter_error">O reagendamento do evento não é suportado no momento</string>
+    <string name="snack_ics_unsupported_counter_error">O reagendamento do evento não é suportado no momento.</string>
     <string name="snack_ics_unsupported_refresh_error">A actualização do evento não é suportada no momento</string>
     <string name="snack_ics_unsupported_publish_error">A importação de eventos não é suportada no momento</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">De momento, só suportamos respostas a todos os eventos de uma série</string>
     <string name="snack_ics_party_crasher_error">O seu endereço não está na lista de participantes</string>
     <string name="snack_ics_reply_party_crasher_error">Não é possível adicionar participantes que não foram convidados pelo organizador</string>
     <string name="snack_ics_missing_uid_error">UID do evento em falta</string>
-    <string name="snack_ics_no_active_calendar_error">Não há uma agenda pessoal ativa associada a esta conta.</string>
+    <string name="snack_ics_no_active_calendar_error">Não há um calendário pessoal activo associado a esta conta.</string>
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é suportada</string>
     <string name="snack_ics_too_many_events_error">Múltiplos eventos ainda não são suportados</string>
-    <string name="snack_ics_no_events_error">Esta agenda não contém nenhum evento</string>
+    <string name="snack_ics_no_events_error">Este calendário não contém nenhum evento.</string>
     <string name="snack_ics_invalid_error">Este convite é inválido</string>
-    <string name="snack_ics_disabled_calendar_error">Reactive o endereço vinculado a esta agenda para actualizar o evento</string>
-    <string name="snack_ics_event_deleted_error">O evento já não existe na sua agenda</string>
+    <string name="snack_ics_disabled_calendar_error">Reactive o endereço vinculado a este calendários para actualizar o evento.</string>
+    <string name="snack_ics_event_deleted_error">O evento já não existe no seu calendário.</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s aceitou o seu convite</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s aceitou provisoriamente o seu convite</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s recusou seu convite</string>
@@ -356,7 +356,7 @@
     <string name="contacts_permission_dialog_allow">Permitir</string>
     <string name="contacts_permission_dialog_open_settings">Abrir definições</string>
     <string name="contacts_permission_dialog_cancel">Recusar</string>
-    <string name="dialog_title_calendar_picker">Agenda</string>
+    <string name="dialog_title_calendar_picker">Calendário</string>
     <string name="import_from_google_title">Importar do Google</string>
     <string name="notifications_permission_dialog_title">Allow Proton Calendar to display notifications?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar needs permission to show you upcoming event notifications.</string>
@@ -364,9 +364,9 @@
     <string name="notifications_permission_dialog_cancel">Recusar</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificações de eventos</string>
-    <string name="notification_channel_sync">Sincronização da agenda</string>
+    <string name="notification_channel_sync">Sincronização do calendário</string>
     <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
-    <string name="notification_sync">A sincronizar agendas…</string>
+    <string name="notification_sync">Sincronização de calendários…</string>
     <string name="notification_text_today">Hoje</string>
     <string name="notification_text_today_part_time">Hoje ás %1$s</string>
     <string name="notification_text_tomorrow">Amanhã</string>
@@ -391,7 +391,7 @@
     <string name="settings_week_start_title">Início da semana</string>
     <string name="settings_time_format_title">Formato da hora</string>
     <string name="settings_week_numbers_title">Mostrar número da semana</string>
-    <string name="settings_auto_invites_title">Adicione convites à agenda e marque-os como pendentes</string>
+    <string name="settings_auto_invites_title">Adicione convites ao calendário e marque-os como pendentes</string>
     <string name="settings_search_title">Search calendars</string>
     <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
     <string name="settings_alternative_routing_title">Permitir redirecionamento alternativo</string>
@@ -403,71 +403,71 @@
     <string name="settings_general_info_theme"> tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">fuso horário</string>
-    <string name="settings_general_info_calendar_layout">disposição da agenda</string>
-    <string name="settings_calendars">As minhas agendas</string>
-    <string name="settings_subscribed_calendars">Agendas subscritas</string>
+    <string name="settings_general_info_calendar_layout">disposição do calendário</string>
+    <string name="settings_calendars">Os meus calendários</string>
+    <string name="settings_subscribed_calendars">Calendários subscritos</string>
     <string name="settings_calendar_default" comment="Default calendar">Predefinição</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Desativado</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Não sincronizado</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">A sincronizar</string>
-    <string name="settings_calendar_subscribed_invalid_ics">Formato de agenda não suportado</string>
-    <string name="settings_calendar_subscribed_too_big">A agenda é demasiado grande</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Formato de calendário não suportado</string>
+    <string name="settings_calendar_subscribed_too_big">O calendários é demasiado grande.</string>
     <string name="settings_calendar_subscribed_not_accessible">Ligação ao evento inacessível</string>
     <string name="settings_calendar_subscribed_tmp_not_accessible">Ligação ao evento temporariamente inacessível</string>
     <string name="settings_calendar_subscribed_last_sync_old">Mais de 12 horas passaram desde a última atualização</string>
-    <string name="settings_calendar_subscribed_not_decrypted">A agenda não pôde ser desencriptada</string>
+    <string name="settings_calendar_subscribed_not_decrypted">O calendário não pôde ser decifrado.</string>
     <!-- Calendar form -->
-    <string name="calendar_form_create_title">Criar agenda</string>
-    <string name="calendar_form_update_title">Editar agenda</string>
+    <string name="calendar_form_create_title">Criar um calendário</string>
+    <string name="calendar_form_update_title">Editar o calendário</string>
     <string name="calendar_form_save">Guardar</string>
     <string name="calendar_form_name">Nome</string>
     <string name="calendar_form_description">Descrição</string>
-    <string name="calendar_form_color">Cor da agenda</string>
+    <string name="calendar_form_color">Cor do calendário</string>
     <string name="calendar_form_default_event_duration">Duração do evento</string>
     <string name="calendar_form_default_event_notifications">Notificação de eventos</string>
     <string name="calendar_form_default_all_day_event_notifications">Notificação de eventos de dia inteiro</string>
     <string name="calendar_form_add_notification">Adicionar notificação</string>
     <string name="calendar_form_default_email">Endereço eletrónico</string>
     <string name="calendar_form_default_email_value_error">Falha ao carregar endereço eletrónico predefinido</string>
-    <string name="calendar_form_name_hint">Adicionar nome à agenda</string>
+    <string name="calendar_form_name_hint">Adicionar um nom ao calendário</string>
     <string name="calendar_form_name_required_error">Nome obrigatório</string>
-    <string name="calendar_form_description_hint">Adicionar descrição à agenda</string>
-    <string name="add_calendar_text">Adicionar agenda</string>
-    <string name="create_calendar_limit_reached">Atingiu o número máximo de agendas.</string>
+    <string name="calendar_form_description_hint">Adicionar uma descrição ao calendário</string>
+    <string name="add_calendar_text">Adicionar um calendário</string>
+    <string name="create_calendar_limit_reached">Atingiu o número máximo de calendários.</string>
     <string name="create_calendar_limit_reached_title">Cannot add more calendars</string>
     <string name="create_calendar_limit_reached_paid_description">You’ve reached the maximum number of 25 calendars available in your plan.\n\nTo add a new calendar, remove an existing one.</string>
-    <string name="create_calendar_limit_reached_manage">Gerir agendas</string>
+    <string name="create_calendar_limit_reached_manage">Gerir os calendários</string>
     <string name="create_calendar_limit_reached_free_description">You’ve reached the maximum number of 3 calendars available in your plan.\n\nTo add a new calendar, remove an existing one.</string>
     <string name="create_calendar_limit_reached_error">Erro</string>
-    <string name="delete_calendar_dialog_title">Eliminar agenda</string>
-    <string name="delete_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda?</string>
-    <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar esta agenda? \"%1$s\" será definida como agenda predefinida.</string>
-    <string name="delete_calendar_snack_deleted">Agenda eliminada</string>
-    <string name="delete_calendar_snack_error">Erro ao eliminar agenda</string>
-    <string name="delete_calendar_snack_error_password_confirmation">A confirmação da senha falhou</string>
-    <string name="recreate_calendar_dialog_title">Limpar agenda</string>
+    <string name="delete_calendar_dialog_title">Eliminar um calendário</string>
+    <string name="delete_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário?</string>
+    <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário? \"%1$s\" será definido como calendário predefinido.</string>
+    <string name="delete_calendar_snack_deleted">Calendário eliminado</string>
+    <string name="delete_calendar_snack_error">Erro ao eliminar o calendário</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Falha na confirmação da palavra-passe</string>
+    <string name="recreate_calendar_dialog_title">Limpar o calendário</string>
     <string name="recreate_calendar_dialog_message">This action will remove all events and invited users.\n\nAre you sure you want to clear this calendar?</string>
     <string name="recreate_calendar_snack_error">Error clearing calendar</string>
     <string name="recreate_calendar_snack_deleted">Calendar cleared</string>
     <string name="recreate_calendar_snack_clearing">Clearing calendar…</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Aceitar</string>
-    <string name="bootstrap_error_no_calendar_title">Não há agendas associadas a esta conta.</string>
+    <string name="bootstrap_error_no_calendar_title">Não há calendários associados a esta conta.</string>
     <string name="bootstrap_error_no_calendar_message">Para configurar uma agora, visite <a href="https://calendar.proton.me">calendar.proton.me</a></string>
-    <string name="bootstrap_error_some_calendars_failed_title">Erro ao preparar agendas</string>
-    <string name="bootstrap_error_some_calendars_failed_message">As agendas seguintes não puderam ser configuradas</string>
-    <string name="bootstrap_error_no_active_calendar_title">Não há uma agenda pessoal ativa associada a esta conta.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Para saber como ativar uma agenda, consulte a nossa <a href="https://proton.me/support">base de conhecimento</a></string>
+    <string name="bootstrap_error_some_calendars_failed_title">Erro ao preparar o calendário</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Os calendário seguintes não puderam ser configurados.</string>
+    <string name="bootstrap_error_no_active_calendar_title">Não há um calendário pessoal ativo associado a esta conta.</string>
+    <string name="bootstrap_error_no_active_calendar_message">Para saber como ativar um calendário, consulte a nossa <a href="https://proton.me/support">base de conhecimento</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Sem espaço de armazenamento disponível.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Saiba mais</string>
-    <string name="bootstrap_error_reset_needed_title">Repor chaves da agenda</string>
-    <string name="bootstrap_error_reset_needed_message">Repôs a sua senha e os eventos ligados às seguintes agendas não puderam ser desencriptados. As agendas subscritas activas serão sincronizadas após alguns minutos.</string>
-    <string name="bootstrap_error_update_passphrase_title">Reactivar chaves da agenda</string>
-    <string name="bootstrap_error_update_passphrase_message">Reactivou as suas chaves e os eventos ligados às seguintes agendas podem agora ser desencriptados.</string>
+    <string name="bootstrap_error_reset_needed_title">Reinicializar as chaves do calendário</string>
+    <string name="bootstrap_error_reset_needed_message">Redefiniu a sua palavra-passe e os eventos ligados aos seguintes calendários não puderam ser desencriptados. Os calendários subscritos activos serão sincronizados após alguns minutos.</string>
+    <string name="bootstrap_error_update_passphrase_title">Reactivar chaves do calendário</string>
+    <string name="bootstrap_error_update_passphrase_message">Reactivou as suas chaves e os eventos ligados aos seguintes calendários podem agora ser desencriptados.</string>
     <string name="bootstrap_error_continue_button">Continuar</string>
-    <string name="splash_after_login_init">A preparar as agendas</string>
+    <string name="splash_after_login_init">Preparação de calendários</string>
     <string name="splash_init">A desencriptar eventos</string>
-    <string name="default_calendar_name">Minha agenda</string>
+    <string name="default_calendar_name">O meu calendário</string>
     <!-- FEEDBACK DIALOG -->
     <string name="dialog_feedback_header">Enviar comentários</string>
     <string name="dialog_feedback_text">Como descreve a sua experiência com o Proton Calendar?</string>
@@ -494,7 +494,7 @@
     <string name="spotlight_dialog_easy_switch_positive_button">Iniciar a importação</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Agora não</string>
     <string name="spotlight_dialog_auto_invites_title">Aceite convites facilmente</string>
-    <string name="spotlight_dialog_auto_invites_description">Os convites para eventos aparecem agora na sua agenda como eventos pendentes. Desta forma, para responder basta abrir o evento.\n\nPara gerir a funcionalidade, aceda às configurações.</string>
+    <string name="spotlight_dialog_auto_invites_description">Os convites para eventos aparecem agora no seu calendários como eventos pendentes. Desta forma, para responder basta abrir o evento.\n\nPara gerir a funcionalidade, aceda às configurações.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Seguinte</string>
     <string name="spotlight_v5_dialog_got_it_button">Entendi</string>
     <string name="spotlight_v5_dialog_learn_more_button">Saiba mais</string>
@@ -517,20 +517,20 @@
     <string name="import_assistant_error">Erro ao carregar dados</string>
     <string name="import_assistant_data_gathering_error">A recolha de dados falhou</string>
     <string name="import_assistant_update_import_error">Falha ao atualizar importação, por favor, tente novamente mais tarde.</string>
-    <string name="import_assistant_update_import_wrong_account_error">Conta errada. Por favor, inicie sessão na conta usada para a importação da agenda.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Conta errada. Inicie sessão na conta usada para a importação do calendário.</string>
     <string name="import_assistant_start_import_error">Falha ao iniciar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_delete_import_success">Registo de importação eliminado</string>
     <string name="import_assistant_delete_import_error">Falha ao eliminar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_cancel_import_error">Falha ao cancelar importação, por favor, tente novamente mais tarde.</string>
     <string name="import_assistant_resume_import_error">Falha ao retomar importação, por favor, tente novamente mais tarde.</string>
-    <string name="import_assistant_create_calendar_error">A criação de uma ou mais agendas falhou</string>
-    <string name="import_assistant_start_import_empty_error">Falha ao iniciar importação, não existem agendas para importar</string>
+    <string name="import_assistant_create_calendar_error">Falha na criação de um ou mais calendários</string>
+    <string name="import_assistant_start_import_empty_error">Falha ao iniciar importação. Não existem calendários para importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>
     <string name="import_assistant_new_calendar_badge">Nova</string>
     <string name="import_assistant_merge_calendar_badge">Unir</string>
-    <string name="import_assistant_creating_calendars">A criar as novas agendas</string>
+    <string name="import_assistant_creating_calendars">Criação de calendários</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">A terminar…</string>
-    <string name="import_assistant_new_calendar_header">Criar agenda</string>
+    <string name="import_assistant_new_calendar_header">Criar um novo</string>
     <string name="import_assistant_merge_calendar_header">Unir com existente</string>
     <string name="import_assistant_in_progress_title">Importação em curso</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %1s to %2s.</string>
@@ -553,7 +553,7 @@
     <string name="import_assistant_status_paused_lost_connection_description">Para continuar a importação, toque em Religar, inicie sessão no Google, e autorize o Proton a aceder novamente aos seus dados Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Religar</string>
     <string name="import_assistant_status_paused_storage_full_title">Armazenamento cheio</string>
-    <string name="import_assistant_status_paused_storage_full_description">A sua conta Proton não possui espaço suficiente para terminar a importação da agenda. Liberte espaço ou adicione mais capacidade de armazenamento, depois volte aqui para Retomar.</string>
+    <string name="import_assistant_status_paused_storage_full_description">A sua conta Proton não possui espaço suficiente para terminar a importação do calendário. Liberte espaço ou adicione mais capacidade de armazenamento, depois volte aqui para Retomar.</string>
     <string name="import_assistant_status_paused_storage_full_button">Retomar</string>
     <string name="import_assistant_delete_report_title">Remover da lista?</string>
     <string name="import_assistant_delete_report_message">Não voltará a ver este registo de importação na lista.</string>
@@ -577,8 +577,8 @@
     <string name="import_event_disclaimer_dialog_positive">Import</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
-        <item quantity="one">agenda</item>
-        <item quantity="other">agendas</item>
+        <item quantity="one">calendário</item>
+        <item quantity="other">calendários</item>
     </plurals>
     <plurals name="import_assistant_import_button">
         <item quantity="one">Import %1$d calendar</item>
@@ -609,8 +609,8 @@
         <item quantity="other">Can’t create new calendars for all imported calendars due to the calendar limit.\n • Deselect at least %1$d calendars</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020ou\n • Una pelo menos %1$d agenda com agendas Proton existentes.</item>
-        <item quantity="other">\u0020ou\n • Una pelo menos %1$d agendas com agendas Proton existentes.</item>
+        <item quantity="one">\u0020ou\n • Una pelo menos %1$d calendário com os calendários Proton existentes.</item>
+        <item quantity="other">\u0020ou\n • Una pelo menos %1$d calendários com os calendários Proton existentes.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">second</item>
