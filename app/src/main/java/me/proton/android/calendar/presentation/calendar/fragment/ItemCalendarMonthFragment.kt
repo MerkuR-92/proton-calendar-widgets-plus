@@ -306,7 +306,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                             // Set the selected date value and switch to day view
                             calendarViewModel.handleDaySelected(date)
                             calendarViewModel.viewMode.postValue(ViewMode.DAY)
-                            mainViewModel.setViewMode(ViewMode.DAY)
+                            mainViewModel.setLastViewMode(ViewMode.DAY)
                         }
                     }
 

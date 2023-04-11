@@ -23,14 +23,12 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.FeedbackApi
-import me.proton.android.calendar.domain.api.ImporterApi
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
-import java.io.BufferedReader
 import java.time.Duration
 import java.util.*
 import javax.inject.Inject
@@ -95,7 +93,33 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun setUseDefaultViewMode(useDefaultViewMode: Boolean) {
+        val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
+        editor.putBoolean(SharedPreferencesKeys.USE_DEFAULT_VIEW_MODE, useDefaultViewMode)
+        editor.apply()
+    }
+
+    fun useDefaultViewMode(): Boolean {
+        return defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
+            SharedPreferencesKeys.USE_DEFAULT_VIEW_MODE,
+            false
+        )
+    }
+
+    /**
+     * Set view mode in shared preferences
+     */
     fun setViewMode(viewMode: ViewMode) {
+        val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
+        editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
+        editor.apply()
+    }
+
+    /**
+     * Set view mode in shared preferences if user enabled resuming on last view mode
+     */
+    fun setLastViewMode(viewMode: ViewMode) {
+        if (useDefaultViewMode()) return
         val editor = defaultSharedPreferencesProvider.sharedPreferences.edit()
         editor.putInt(SharedPreferencesKeys.VIEW_MODE, viewMode.value)
         editor.apply()
@@ -103,7 +127,10 @@ class MainViewModel @Inject constructor(
 
     fun getLastViewMode(): ViewMode {
         // By default we display the month view
-        val lastViewMode = ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(SharedPreferencesKeys.VIEW_MODE, ViewMode.MONTH.value)]
+        val lastViewMode = ViewMode.values()[defaultSharedPreferencesProvider.sharedPreferences.getInt(
+            SharedPreferencesKeys.VIEW_MODE,
+            ViewMode.MONTH.value
+        )]
         return if (!MONTH_VIEW && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 

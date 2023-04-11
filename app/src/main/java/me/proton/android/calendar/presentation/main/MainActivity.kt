@@ -272,6 +272,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     override fun onResume() {
         super.onResume()
+        if (mainViewModel.useDefaultViewMode()) {
+            // If user selected a default view mode, force the app to resume on that view
+            calendarViewModel.viewMode.value = mainViewModel.getLastViewMode()
+        }
         with(accountViewModel) {
             val state = state.value
             if (mainViewModel.containsIntentToHandle()) {
@@ -1024,34 +1028,34 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         nav_view_switcher_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
-            mainViewModel.setViewMode(ViewMode.DAY)
+            mainViewModel.setLastViewMode(ViewMode.DAY)
             drawer_layout.close()
         }
 
         nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(FeatureFlag.THREE_DAYS_VIEW)
         nav_view_switcher_three_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
-            mainViewModel.setViewMode(ViewMode.THREE_DAY)
+            mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
             drawer_layout.close()
         }
 
         nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(FeatureFlag.WEEK_VIEW)
         nav_view_switcher_week_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
-            mainViewModel.setViewMode(ViewMode.WEEK)
+            mainViewModel.setLastViewMode(ViewMode.WEEK)
             drawer_layout.close()
         }
 
         nav_view_switcher_agenda_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
-            mainViewModel.setViewMode(ViewMode.AGENDA)
+            mainViewModel.setLastViewMode(ViewMode.AGENDA)
             drawer_layout.close()
         }
 
         nav_view_switcher_month_layout.visibleOrGone(MONTH_VIEW)
         nav_view_switcher_month_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
-            mainViewModel.setViewMode(ViewMode.MONTH)
+            mainViewModel.setLastViewMode(ViewMode.MONTH)
             drawer_layout.close()
         }
 
@@ -1593,15 +1597,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.handleDaySelected(it)
             }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
-            mainViewModel.setViewMode(ViewMode.MONTH)
+            mainViewModel.setLastViewMode(ViewMode.MONTH)
         } else if (returnToView == ViewMode.WEEK && WEEK_VIEW) {
             // Navigate back to week view
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
-            mainViewModel.setViewMode(ViewMode.WEEK)
+            mainViewModel.setLastViewMode(ViewMode.WEEK)
         } else if (returnToView == ViewMode.THREE_DAY && THREE_DAYS_VIEW) {
             // Navigate back to 3 days view
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
-            mainViewModel.setViewMode(ViewMode.THREE_DAY)
+            mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
             moveTaskToBack(true)
         } else {

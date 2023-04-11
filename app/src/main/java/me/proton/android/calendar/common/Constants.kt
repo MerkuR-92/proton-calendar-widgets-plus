@@ -149,6 +149,7 @@ object SharedPreferencesKeys {
     const val THEME = "theme"
     const val ALTERNATIVE_ROUTING = "alternative_routing"
     const val VIEW_MODE = "view_mode"
+    const val USE_DEFAULT_VIEW_MODE = "use_default_view_mode"
     const val SHOW_CONTACTS_PERMISSIONS_DIALOG = "show_contacts_permissions_dialog"
     const val SHOW_NOTIFICATIONS_PERMISSIONS_DIALOG = "show_notifications_permissions_dialog"
     const val HACK_USER_ADDRESS_INVALID_FOR_SENDING = "hack_user_address_invalid_for_sending"
