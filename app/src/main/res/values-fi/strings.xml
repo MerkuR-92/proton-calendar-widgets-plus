@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Proton Calendar</string>
     <string name="default_event_summary" comment="Event has no title">(ei otsikkoa)</string>
     <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(ei sähköpostiosoitetta)</string>

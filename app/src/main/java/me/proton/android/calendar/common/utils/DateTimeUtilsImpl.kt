@@ -402,24 +402,41 @@ object DateTimeUtilsImpl : DateTimeUtils {
     private fun getSupportedLocaleOrNull(locale: Locale): Locale? {
         return when (locale.toLanguageTag().lowercase()) {
             // Check for supported country specific language tags first
-            "fr-ca",
-            "es-es",
-            "es-mx",
-            "pt-pt" -> locale
+            "es-es", // Spanish (Spain)
+            "es-419", // Spanish (Latin America)
+            "es-mx", // Spanish (Mexico)
+            "pt-br", // Portuguese (Brazil)
+            "pt-pt", // Portuguese (Portugal)
+            "sv-se", // Swedish
+            "zh-tw", // Chinese Traditional (Taiwan)
+            "zh-hant-tw" // Chinese Traditional (Taiwan)
+            -> locale
             else -> {
                 when (locale.language.lowercase()) {
                     // Check for supported languages
-                    "fr",
-                    "es",
-                    "ca",
-                    "pl",
-                    "ro",
-                    "pt",
-                    "de",
-                    "it",
-                    "nl",
-                    "uk",
-                    "en" -> locale
+                    "en", // English
+                    "ca", // Catalan
+                    "cs", // Czech
+                    "da", // Danish
+                    "de", // German
+                    "es", // Spanish
+                    "fr", // French
+                    "fi", // Finnish
+                    "hu", // Hungarian
+                    "it", // Italian
+                    "in", // Indonesian
+                    "nl", // Dutch
+                    "pl", // Polish
+                    "pt", // Portuguese
+                    "ro", // Romanian
+                    "sv", // Swedish
+                    "tr", // Turkish
+                    "be", // Belarusian
+                    "ru", // Russian
+                    "uk", // Ukrainian
+                    "ka", // Georgian
+                    "zh" // Chinese
+                    -> locale
                     else -> {
                         null
                     }

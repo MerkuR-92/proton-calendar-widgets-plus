@@ -62,6 +62,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewMode
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.core.util.kotlin.equalsNoCase
 import org.koin.core.KoinComponent
 import java.time.DayOfWeek
 import java.time.Instant
@@ -229,8 +230,13 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
 
         val appLanguagesLabels = resources.getStringArray(R.array.custom_language_labels)
         val appLanguagesValues = resources.getStringArray(R.array.custom_language_values)
+        val selectedLanguageTagValue = CustomLocale.getSelectedLocale()?.toLanguageTag()
         val selectedLanguageValue = CustomLocale.getSelectedLocale()?.language
-        val selectedLanguageIndex = appLanguagesValues.indexOfFirst { it == selectedLanguageValue }
+        val selectedLanguageIndex = run {
+            val indexOfTag = appLanguagesValues.indexOfFirst { it.equalsNoCase(selectedLanguageTagValue) }
+            if (indexOfTag == -1) appLanguagesValues.indexOfFirst { it.equalsNoCase(selectedLanguageValue) }
+            else indexOfTag
+        }
         val systemDefaultLabel = resources.getString(R.string.settings_language_default)
         settings_language_value.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
 
@@ -244,8 +250,13 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 getString(R.string.settings_language_title),
                 appLanguageDialogLabels.toTypedArray(),
                 run {
+                    val selectedLanguageTag = CustomLocale.getSelectedLocale()?.toLanguageTag()
                     val selectedLanguage = CustomLocale.getSelectedLocale()?.language
-                    val selectedLanguageDialogIndex = appLanguagesValues.indexOf(selectedLanguage)
+                    val selectedLanguageDialogIndex = run {
+                        val indexOfTag = appLanguagesValues.indexOfFirst { it.equalsNoCase(selectedLanguageTag) }
+                        if (indexOfTag == -1) appLanguagesValues.indexOfFirst { it.equalsNoCase(selectedLanguage) }
+                        else indexOfTag
+                    }
                     if (selectedLanguageDialogIndex == -1) 0 else selectedLanguageDialogIndex + 1
                 }
             ) { index ->
