@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import me.proton.android.calendar.di.HumanVerificationModule
-import me.proton.android.calendar.uitest.rule.DynamicEnvironmentRule.Companion.testHost
 import me.proton.core.humanverification.presentation.HumanVerificationApiHost
 import me.proton.core.humanverification.presentation.utils.HumanVerificationVersion
 
@@ -14,12 +13,12 @@ import me.proton.core.humanverification.presentation.utils.HumanVerificationVers
     components = [SingletonComponent::class],
     replaces = [HumanVerificationModule::class]
 )
-class MockHumanVerificationModule {
+object MockHumanVerificationModule {
 
     @Provides
     fun provideHumanVerificationVersion() = HumanVerificationVersion.HV3
 
     @Provides
     @HumanVerificationApiHost
-    fun provideHumanVerificationApiHost(): String = "https://verify.${testHost.get()}"
+    fun provideHumanVerificationApiHost(): String = "https://verify.${MockNetworkModule.provideHost()}/"
 }

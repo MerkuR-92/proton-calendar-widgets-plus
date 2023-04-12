@@ -1,12 +1,11 @@
 package me.proton.android.calendar.uitest.di
 
+import androidx.test.platform.app.InstrumentationRegistry
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import me.proton.android.calendar.di.NetworkModule
-import me.proton.android.calendar.uitest.rule.DynamicEnvironmentRule.Companion.proxyToken
-import me.proton.android.calendar.uitest.rule.DynamicEnvironmentRule.Companion.testHost
 import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.data.di.AlternativeApiPins
 import me.proton.core.network.data.di.BaseProtonApiUrl
@@ -15,9 +14,11 @@ import me.proton.core.network.data.di.Constants
 import me.proton.core.network.data.di.DohProviderUrls
 import me.proton.core.network.domain.client.ExtraHeaderProvider
 import me.proton.core.network.domain.serverconnection.DohAlternativesListener
+import me.proton.core.util.kotlin.EMPTY_STRING
 import me.proton.core.util.kotlin.takeIfNotBlank
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Singleton
 
 @Module
@@ -27,9 +28,12 @@ import javax.inject.Singleton
 )
 object MockNetworkModule {
 
+    val host = AtomicReference("proton.black")
+    val proxyToken = AtomicReference(EMPTY_STRING)
+
     @Provides
     @BaseProtonApiUrl
-    fun provideProtonApiUrl(): HttpUrl = "https://api.${testHost.get()}/".toHttpUrl()
+    fun provideProtonApiUrl(): HttpUrl = "https://api.${provideHost()}/".toHttpUrl()
 
     @DohProviderUrls
     @Provides
@@ -50,6 +54,17 @@ object MockNetworkModule {
     @Provides
     @Singleton
     fun provideExtraHeaderProvider(): ExtraHeaderProvider = ExtraHeaderProviderImpl().apply {
-        proxyToken.get()?.takeIfNotBlank()?.let { addHeaders("X-atlas-secret" to it) }
+        InstrumentationRegistry
+            .getArguments()
+            .getString("proxyToken", proxyToken.get())
+            .takeIfNotBlank()
+            ?.let {
+                addHeaders("X-atlas-secret" to it)
+            }
     }
+
+    fun provideHost(): String =
+        InstrumentationRegistry
+            .getArguments()
+            .getString("host", host.get())
 }

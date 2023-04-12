@@ -1,31 +1,18 @@
 package me.proton.android.calendar.uitest.rule
 
-import androidx.test.platform.app.InstrumentationRegistry
-import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.uitest.BaseTest.Companion.testTag
+import me.proton.android.calendar.uitest.di.MockNetworkModule
 import me.proton.core.test.quark.Quark
-import me.proton.core.util.kotlin.CoreLogger
 import me.proton.core.util.kotlin.EMPTY_STRING
 import org.junit.rules.ExternalResource
-import java.util.concurrent.atomic.AtomicReference
 
-class DynamicEnvironmentRule(host: String = "proton.black") : ExternalResource() {
+class DynamicEnvironmentRule(host: String = "proton.black", proxyToken: String = EMPTY_STRING) : ExternalResource() {
 
     val quark: Quark
 
     init {
-        val args = InstrumentationRegistry .getArguments()
+        MockNetworkModule.host.set(host)
+        MockNetworkModule.proxyToken.set(proxyToken)
 
-        testHost.set(args.getString("host") ?: host)
-        proxyToken.set(args.getString("proxyToken") ?: EMPTY_STRING)
-
-        CoreLogger.i(testTag, "Overriding host: ${testHost.get()}")
-
-        quark = Quark.fromDefaultResources(testHost.get(), proxyToken.get())
-    }
-
-    companion object {
-        val testHost = AtomicReference("proton.black")
-        val proxyToken = AtomicReference(BuildConfig.PROXY_TOKEN)
+        quark = Quark.fromDefaultResources(MockNetworkModule.host.get(), MockNetworkModule.proxyToken.get())
     }
 }

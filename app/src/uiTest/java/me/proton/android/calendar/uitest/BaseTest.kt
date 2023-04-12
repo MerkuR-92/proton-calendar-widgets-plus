@@ -75,6 +75,5 @@ open class BaseTest {
         const val RuleOrder_30_ActivityLaunch = 30
         const val RuleOrder_31_ActivityLaunched = 31
         const val RuleOrder_99_Last = 99
-        const val testTag = "uitest"
     }
 }
