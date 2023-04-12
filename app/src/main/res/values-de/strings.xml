@@ -58,7 +58,7 @@
     <string name="event_alarm_label_at_event_time_by_email">Zum Zeitpunkt des Termins per E-Mail</string>
     <string name="event_alarm_label_on_the_same_day">Am selben Tag</string>
     <string name="event_alarm_label_before">%1$s vorher</string>
-    <string name="event_alarm_label">%1$s </string>
+    <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s vorher per E-Mail</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s um %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s um %2$s per E-Mail</string>

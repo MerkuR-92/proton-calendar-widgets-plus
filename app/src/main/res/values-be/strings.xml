@@ -550,10 +550,10 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Прыпынена</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Збой</string>
     <string name="import_assistant_status_paused_lost_connection_title">Злучэнне з Google згублена</string>
-    <string name="import_assistant_status_paused_lost_connection_description">Для працягу імпартавання, націсніце кнопку \"Перападлучыцца\", увайдзіце ў Google і зноў дайце Proton доступ да вашых даных Google.</string>
-    <string name="import_assistant_status_paused_lost_connection_button">Перападлучыцца</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Для працягу імпартавання, націсніце кнопку \"Перападключыцца\", увайдзіце ў Google і зноў дайце Proton доступ да вашых даных Google.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Перападключыцца</string>
     <string name="import_assistant_status_paused_storage_full_title">Ваша сховішча запоўнена</string>
-    <string name="import_assistant_status_paused_storage_full_description">У вашага ўліковага запісу Proton не дастаткова сховішча для завяршэння імпартавання календара. Вызваліце месца або дадайце больш сховішча, а потым вярніцеся сюды і ўзнавіце аперацыю.</string>
+    <string name="import_assistant_status_paused_storage_full_description">У вашага ўліковага запісу Proton недастаткова сховішча для завяршэння імпартавання календара. Вызваліце месца або дадайце больш сховішча, а потым вярніцеся сюды і ўзнавіце аперацыю.</string>
     <string name="import_assistant_status_paused_storage_full_button">Узнавіць</string>
     <string name="import_assistant_delete_report_title">Выдаліць са спіса?</string>
     <string name="import_assistant_delete_report_message">Вы больш не ўбачыце ў спісе гэты запіс імпартавання.</string>
@@ -613,7 +613,7 @@
         <item quantity="other">Імпартаванне %1$d календароў з %2$d з</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Аб\'яднанне %1$d календара ў Proton Calendar.</item>
+        <item quantity="one">Аб\'яднаць %1$d каляндар у Proton Calendar.</item>
         <item quantity="few">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
         <item quantity="many">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
         <item quantity="other">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
