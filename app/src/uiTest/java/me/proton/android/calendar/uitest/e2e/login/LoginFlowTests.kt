@@ -24,17 +24,11 @@ import me.proton.core.auth.test.MinimalSignInInternalTests
 import me.proton.core.auth.test.rule.AcceptExternalRule
 import me.proton.core.auth.test.usecase.WaitForPrimaryAccount
 import me.proton.core.network.domain.client.ExtraHeaderProvider
-import me.proton.core.test.quark.Quark
-import me.proton.core.test.quark.data.User
 import org.junit.Rule
 import javax.inject.Inject
 
 @HiltAndroidTest
 class LoginFlowTests : BaseTest(), MinimalSignInInternalTests {
-
-    override val quark: Quark = BaseTest.quark
-    override val users: User.Users = BaseTest.users
-
     @get:Rule(order = RuleOrder_21_Injected)
     val acceptExternalRule = AcceptExternalRule { extraHeaderProvider }
 
