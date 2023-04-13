@@ -170,6 +170,10 @@
             android:id="@+id/deepLink3"
             android:autoVerify="true"
             app:uri="proton-calendar://protonmail.com/event/create?eventId={eventId}&amp;initStartDate={initStartDate}&amp;initStartTime={initStartTime}&amp;occurrenceNumber={occurrenceNumber}" />
+        <deepLink
+            android:id="@+id/deepLink4"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/event/create?prefill={prefill}&amp;startMillis={startMillis}&amp;endMillis={endMillis}&amp;timeZoneId={timeZoneId}&amp;allDay={allDay}&amp;title={title}&amp;description={description}&amp;location={location}&amp;rRule={rRule}" />
         <argument
             android:name="eventId"
             app:argType="string"
@@ -189,6 +193,42 @@
             android:name="occurrenceNumber"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="prefill"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="startMillis"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="endMillis"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="timeZoneId"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="allDay"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="title"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="description"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="location"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="rRule"
+            app:argType="string"
+            android:defaultValue="" />
         <action
             android:id="@+id/action_nav_event_form_to_nav_event_form_attendees"
             app:destination="@id/nav_event_form_attendees" />

@@ -106,6 +106,7 @@ import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.presentation.utils.clearText
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
+import java.time.Instant
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
@@ -309,17 +310,60 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
+            val prefill: Boolean = navigationArguments.prefill
+
             val userId = accountViewModel.getPrimaryUserId()
             val viewModeInitStatus = withContext(Dispatchers.Main) {
                 if (userId == null) EventViewModel.InitResult.Error.Default("user ID is null in EventDetailsFragment onViewCreated")
-                else eventViewModel.initialise(
-                    userId,
-                    editMode = true,
-                    navigationArguments.eventId,
-                    if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
-                    navigationArguments.initStartDate,
-                    navigationArguments.initStartTime
-                )
+                else if (prefill) {
+                    // Use arguments provided to prefill event form fields
+                    val startMillis: Long = navigationArguments.startMillis
+                    val endMillis: Long = navigationArguments.endMillis
+                    val timeZoneId: String = Uri.decode(navigationArguments.timeZoneId)
+                    val allDay: Boolean = navigationArguments.allDay
+                    val title: String = Uri.decode(navigationArguments.title)
+                    val description: String = Uri.decode(navigationArguments.description)
+                    val location: String = Uri.decode(navigationArguments.location)
+                    val rRule: String = Uri.decode(navigationArguments.rRule)
+
+                    val startZonedDateTime =
+                        if (startMillis == 0L) {
+                            Instant.now().atZone(ZoneId.of(timeZoneId))
+                        } else {
+                            Instant.ofEpochMilli(startMillis).atZone(ZoneId.of(timeZoneId))
+                        }
+                    val endZonedDateTime =
+                        if (endMillis == 0L) {
+                            null // We use null here and let EventVM handle the end time with calendar default event duration
+                        } else {
+                            Instant.ofEpochMilli(endMillis).atZone(ZoneId.of(timeZoneId))
+                        }
+                    eventViewModel.initialise(
+                        userId,
+                        editMode = true,
+                        null,
+                        null,
+                        startZonedDateTime.toLocalDate().toString(),
+                        startZonedDateTime.toLocalTime().toString(),
+                        endZonedDateTime?.toLocalDate()?.toString(),
+                        endZonedDateTime?.toLocalTime()?.toString(),
+                        allDay,
+                        timeZoneId,
+                        title,
+                        description,
+                        location,
+                        rRule
+                    )
+                } else {
+                    eventViewModel.initialise(
+                        userId,
+                        editMode = true,
+                        navigationArguments.eventId,
+                        if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
+                        navigationArguments.initStartDate,
+                        navigationArguments.initStartTime
+                    )
+                }
             }
 
             if (viewModeInitStatus == EventViewModel.InitResult.Success) {

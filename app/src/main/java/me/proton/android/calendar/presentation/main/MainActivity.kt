@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.provider.Settings
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -137,6 +138,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CustomLocale
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
@@ -160,6 +162,7 @@ import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
+import me.proton.core.util.kotlin.toBooleanOrFalse
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -539,6 +542,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         handleIcsIntent(openIcsIntent)
                     } else if (openIcsIntent == null && IMPORT_ICS || APP_LINKS || IMPORT_ASSISTANT) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
+                        val actionEditOrInsertIntent =
+                            mainViewModel.consumeIntent(Intent.ACTION_INSERT) ?:
+                            mainViewModel.consumeIntent(Intent.ACTION_EDIT)
                         if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && IMPORT_ICS) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
@@ -556,6 +562,49 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
                             } else {
                                 this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                                safeNavigateToMonth()
+                            }
+                        } else if (actionEditOrInsertIntent != null) {
+                            // Handle extras
+                            actionEditOrInsertIntent.extras?.let { intentExtras ->
+                                val startMillis = run {
+                                    val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
+                                    if (dtStart == 0L) {
+                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_BEGIN_TIME)
+                                    } else dtStart
+                                }
+                                val endMillis = run {
+                                    val dtEnd = intentExtras.getLong(CalendarContract.Events.DTEND)
+                                    if (dtEnd == 0L) {
+                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_END_TIME)
+                                    } else dtEnd
+                                }
+                                val timeZoneId = fallbackTimeZone(
+                                    intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE) ?: ZoneId.systemDefault().id,
+                                    fallbackToDefault = true
+                                )
+                                val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
+                                val title = intentExtras.getString(CalendarContract.Events.TITLE) ?: "" // We open event form so no need to provide title placeholder
+                                val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION) ?: ""
+                                val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION) ?: ""
+                                val rRule = intentExtras.getString(CalendarContract.Events.RRULE) ?: ""
+                                safeNavigateToDialogFragment(
+                                    Navigation.Deeplink.toEventCreatePrefill(
+                                        startMillis,
+                                        endMillis,
+                                        Uri.encode(timeZoneId),
+                                        allDay,
+                                        Uri.encode(title),
+                                        Uri.encode(description),
+                                        Uri.encode(location),
+                                        Uri.encode(rRule),
+                                    )
+                                )
+                            } ?: run {
+                                this@MainActivity.displaySnackBar(
+                                    getString(R.string.snack_ics_create_error),
+                                    Snackbar.LENGTH_LONG
+                                )
                                 safeNavigateToMonth()
                             }
                         } else safeNavigateToMonth()
