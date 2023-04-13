@@ -53,6 +53,6 @@ data class Calendar(
         val isSharedWithMe: Boolean get() = !isOwner
 
         val isOwner: Boolean get() = permissions and 2 == 2
-        val allowEditEvents: Boolean get() = permissions and 2 == 2 // TODO Change to 16 so that we check actual write permissions
+        val allowEditEvents: Boolean get() = permissions and 16 == 16
 }
     // TODO fields need to be duplicated here, plus local metadata added
