@@ -729,7 +729,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_form_participant_press.setOnSingleClickListener {
-            navigateToAttendees()
+            if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
+                navigateToAttendees()
+            } else {
+                view?.displaySnackBar(getString(R.string.snack_invite_in_shared_calendar_error))
+            }
         }
     }
 

@@ -416,9 +416,18 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
                 loadingAction.visibleOrGone(deletingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
-                buttonEdit.visibleOrGone(event.calendar.isActive && !event.isAnInvitation && !deletingEvent && !event.calendar.isSubscribed && event.calendar.allowEditEvents)
+                buttonEdit.visibleOrGone(
+                    event.calendar.isActive &&
+                            !event.isAnInvitation &&
+                            !deletingEvent &&
+                            !event.calendar.isSubscribed &&
+                            event.calendar.allowEditEvents
+                )
 
-                val enableDeleteEvents = !deletingEvent && !event.calendar.isSubscribed && event.calendar.allowEditEvents
+                val enableDeleteEvents = !deletingEvent &&
+                        !event.calendar.isSubscribed &&
+                        event.calendar.allowEditEvents &&
+                        !(event.isAnInvitation && !event.calendar.isOwner)
                 buttonDelete.visibleOrGone(enableDeleteEvents)
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
@@ -650,7 +659,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
             val event = eventViewModel.eventLiveData.value
             val userEmails = userAddresses.map { it.email } // Emails are canonicalized in getParticipationStatus
-            if (event != null && !event.calendar.isSubscribed && event.calendar.allowEditEvents) {
+            if (event != null && !event.calendar.isSubscribed && event.calendar.allowEditEvents && event.calendar.isOwner) {
                 val isActive = event.calendar.isActive
                 val isUserAddressAllowedSend = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
