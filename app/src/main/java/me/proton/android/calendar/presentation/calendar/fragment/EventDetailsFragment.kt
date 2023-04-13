@@ -424,7 +424,10 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                             event.calendar.allowEditEvents
                 )
 
-                val enableDeleteEvents = !deletingEvent && !event.calendar.isSubscribed && event.calendar.allowEditEvents
+                val enableDeleteEvents = !deletingEvent &&
+                        !event.calendar.isSubscribed &&
+                        event.calendar.allowEditEvents &&
+                        !(event.isAnInvitation && !event.calendar.isOwner)
                 buttonDelete.visibleOrGone(enableDeleteEvents)
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
