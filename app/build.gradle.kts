@@ -315,18 +315,30 @@ object Config {
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(
-            "en",
-            "ca",
-            "es-rES",
-            "es-rMX",
-            "fr",
-            "fr-rCA",
-            "pl",
-            "pt-rPT",
-            "ro",
-            "de",
-            "it",
-            "nl",
-            "uk"
+            "en", // English
+            "ca", // Catalan
+            "cs", // Czech
+            "da", // Danish
+            "de", // German
+            "es-rES", // Spanish (Spain)
+            "b+es+419", // Spanish (Latin America)
+            "es-rMX", // Spanish (Mexico)
+            "fr", // French
+            "fi", // Finnish
+            "hu", // Hungarian
+            "it", // Italian
+            "in", // Indonesian
+            "nl", // Dutch
+            "pl", // Polish
+            "pt-rBR", // Portuguese (Brazil)
+            "pt-rPT", // Portuguese (Portugal)
+            "ro", // Romanian
+            "sv-rSE", // Swedish
+            "tr", // Turkish
+            "be", // Belarusian
+            "ru", // Russian
+            "uk", // Ukrainian
+            "ka", // Georgian
+            "zh-rTW", // Chinese Traditional (Taiwan)
         )
 }
