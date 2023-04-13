@@ -76,6 +76,7 @@ android {
             buildConfigField("String", "QUARK_HOST", "\"proton.black\"")
             buildConfigField("String", "PROXY_TOKEN", System.getenv("PROXY_TOKEN").toBuildConfigValue())
             buildConfigField("Boolean", "USE_DEFAULT_PINS", "false")
+            resValue("string", "app_name", "Atlas Proton Calendar")
         }
         create("prod") {
             dimension = "env"
@@ -84,6 +85,7 @@ android {
             buildConfigField("String", "QUARK_HOST", "\"\"")
             buildConfigField("String", "PROXY_TOKEN", "\"\"")
             buildConfigField("Boolean", "USE_DEFAULT_PINS", "true")
+            resValue("string", "app_name", "Proton Calendar")
         }
     }
 
