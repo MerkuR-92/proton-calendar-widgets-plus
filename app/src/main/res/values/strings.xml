@@ -385,6 +385,8 @@
     <string name="settings_timezone_title">Time zone</string>
     <string name="settings_language_title">App language</string>
     <string name="settings_language_default">Auto-detect</string>
+    <string name="settings_default_view_title">Default view</string>
+    <string name="settings_default_view_default">Last view</string>
     <string name="settings_update_timezone_title">Ask to update time zone setting</string>
     <string name="settings_update_timezone_subtitle">If the system time zone does not match the current time zone setting, you will be asked to update it.</string>
     <string name="settings_update_timezone_checkbox">Don\'t ask me again</string>

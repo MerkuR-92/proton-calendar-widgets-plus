@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_in
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_separator
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_switch
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_default_view_press
+import kotlinx.android.synthetic.main.fragment_general_settings.settings_default_view_value
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_press
 import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_value
@@ -44,8 +46,8 @@ import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.SHOW_EVENT_SEARCH
+import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.allowedTimezoneIds
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToId
@@ -193,6 +195,38 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
+        val viewModes = arrayOf(
+            getString(R.string.settings_default_view_default),
+            getString(R.string.nav_view_switcher_agenda),
+            getString(R.string.nav_view_switcher_month),
+            getString(R.string.nav_view_switcher_day),
+            getString(R.string.nav_view_switcher_three_day),
+            getString(R.string.nav_view_switcher_week)
+        )
+        settings_default_view_value.text =
+            if (mainViewModel.useDefaultViewMode()) viewModes[mainViewModel.getLastViewMode().value + 1]
+            else viewModes[0]
+
+        settings_default_view_press.setOnSingleClickListener {
+            AndroidUtils.displaySingleChoicePicker(
+                requireContext(),
+                getString(R.string.settings_default_view_title),
+                viewModes,
+                if (!mainViewModel.useDefaultViewMode()) 0
+                else mainViewModel.getLastViewMode().value + 1
+            ) { index ->
+                settings_default_view_value.text = viewModes[index]
+                mainViewModel.setUseDefaultViewMode(index != 0)
+                if (index != 0) {
+                    mainViewModel.setViewMode(ViewMode.values()[index - 1])
+                } else {
+                    calendarViewModel.viewMode.value?.let {
+                        mainViewModel.setViewMode(it)
+                    }
+                }
+            }
+        }
+
         val appLanguagesLabels = resources.getStringArray(R.array.custom_language_labels)
         val appLanguagesValues = resources.getStringArray(R.array.custom_language_values)
         val selectedLanguageValue = CustomLocale.getSelectedLocale()?.language
@@ -253,12 +287,12 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                     displayNetworkError()
                     return@displaySingleChoicePicker
                 }
-                    val weekStart = when (index) {
-                        2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
-                        3 -> DayOfWeek.SUNDAY.value // 7 is value for Sunday and index 3 in available days string array
-                        else -> index
-                    }
-                    calendarViewModel.updateWeekStart(weekStart)
+                val weekStart = when (index) {
+                    2 -> DayOfWeek.SATURDAY.value // 6 is value for Saturday and index 2 in available days string array
+                    3 -> DayOfWeek.SUNDAY.value // 7 is value for Sunday and index 3 in available days string array
+                    else -> index
+                }
+                calendarViewModel.updateWeekStart(weekStart)
             }
         }
 
