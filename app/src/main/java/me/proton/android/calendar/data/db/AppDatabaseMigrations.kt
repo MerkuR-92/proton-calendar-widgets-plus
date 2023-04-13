@@ -46,6 +46,7 @@ import me.proton.core.key.data.db.PublicAddressDatabase
 import me.proton.core.key.data.entity.KeySaltEntity
 import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
+import me.proton.core.keytransparency.data.local.KeyTransparencyDatabase
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.observability.data.db.ObservabilityDatabase
 import me.proton.core.payment.data.local.db.PaymentDatabase
@@ -413,6 +414,14 @@ object AppDatabaseMigrations {
     val MIGRATION_50_51 = object : Migration(50, 51) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.addTableColumn(TABLE_MEMBERS, "addressId", "TEXT")
+        }
+    }
+
+    val MIGRATION_51_52 = object : Migration(51, 52) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            AddressDatabase.MIGRATION_4.migrate(database)
+            PublicAddressDatabase.MIGRATION_2.migrate(database)
+            KeyTransparencyDatabase.MIGRATION_0.migrate(database)
         }
     }
 }

@@ -40,6 +40,9 @@ import me.proton.core.key.data.db.PublicAddressDatabase
 import me.proton.core.key.data.entity.KeySaltEntity
 import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
+import me.proton.core.keytransparency.data.local.KeyTransparencyDatabase
+import me.proton.core.keytransparency.data.local.entity.AddressChangeEntity
+import me.proton.core.keytransparency.data.local.entity.SelfAuditResultEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.mailsettings.data.entity.MailSettingsEntity
 import me.proton.core.observability.data.db.ObservabilityDatabase
@@ -87,6 +90,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         ChallengeFrameEntity::class,
         GooglePurchaseEntity::class,
         ObservabilityEventEntity::class,
+        AddressChangeEntity::class,
+        SelfAuditResultEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -132,7 +137,8 @@ abstract class AppDatabase :
     FeatureFlagDatabase,
     ChallengeDatabase,
     PaymentDatabase,
-    ObservabilityDatabase {
+    ObservabilityDatabase,
+    KeyTransparencyDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -163,7 +169,7 @@ abstract class AppDatabase :
         const val TABLE_MEMBERS = "members"
 
         const val name = "proton.calendar.db"
-        const val version = 51
+        const val version = 52
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -196,7 +202,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_47_48,
             AppDatabaseMigrations.MIGRATION_48_49,
             AppDatabaseMigrations.MIGRATION_49_50,
-            AppDatabaseMigrations.MIGRATION_50_51
+            AppDatabaseMigrations.MIGRATION_50_51,
+            AppDatabaseMigrations.MIGRATION_51_52,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

@@ -9,7 +9,7 @@
         android:id="@+id/root_splash_logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/logo_calendar_daylight"
+        app:srcCompat="@drawable/logo_calendar_light"
         android:visibility="invisible"
         tools:visibility="visible"
         app:layout_constraintTop_toTopOf="parent"

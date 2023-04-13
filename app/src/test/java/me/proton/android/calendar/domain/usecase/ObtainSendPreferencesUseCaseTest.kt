@@ -309,7 +309,8 @@ internal class ObtainSendPreferencesUseCaseTest {
             PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
             PublicAddressKey("unknown_external_with_keys@email.com", 3, PublicKey("armored key", isPrimary = true, true, true, true))
         ),
-        null
+        null,
+        ignoreKT=0
     )
 
     private val unknownExternalRecipientNoKeysPublicAddress = PublicAddress(
@@ -317,7 +318,8 @@ internal class ObtainSendPreferencesUseCaseTest {
         recipientType = Recipient.External.value,
         "text/html",
         emptyList(),
-        null
+        null,
+        ignoreKT=0
     )
 
     private val unknownInternalRecipientWithKeysPublicAddress = PublicAddress(
@@ -328,7 +330,8 @@ internal class ObtainSendPreferencesUseCaseTest {
             PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = false, true, true, true)),
             PublicAddressKey("unknown_internal@pm.me", 3, PublicKey("armored key", isPrimary = true, true, true, true))
         ),
-        null
+        null,
+        ignoreKT=0
     )
 
     private val unknownInternalRecipientNoKeysPublicAddress = PublicAddress(
@@ -336,7 +339,8 @@ internal class ObtainSendPreferencesUseCaseTest {
         recipientType = Recipient.Internal.value,
         "text/html",
         emptyList(),
-        null
+        null,
+        ignoreKT=0
     )
 
     private val contactExternalPinnedKeyPublicAddress = PublicAddress(
@@ -352,7 +356,8 @@ internal class ObtainSendPreferencesUseCaseTest {
                 )
             ),
         ),
-        null
+        null,
+        ignoreKT=0
     )
 
     private val externalContactWithPinnedKeyBrokenSignature: ContactWithCards =
@@ -373,7 +378,7 @@ internal class ObtainSendPreferencesUseCaseTest {
                         canonicalEmail = null,
                         labelIds = emptyList()
                     ) /* this is deliberately null here, API doesn't return it */
-                )
+                ),
             ),
             contactCards = listOf(
                 ContactCard.Encrypted("encrypted and signed data", "signature"),
