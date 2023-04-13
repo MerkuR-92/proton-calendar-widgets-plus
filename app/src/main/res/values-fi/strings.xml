@@ -1,0 +1,716 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Proton Calendar</string>
+    <string name="default_event_summary" comment="Event has no title">(ei otsikkoa)</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
+    <string name="default_user_email">(ei sähköpostiosoitetta)</string>
+    <string name="default_user_display_name">(ei nimeä)</string>
+    <string name="toast_copied_to_clipboard">Kopioitu leikepöydälle</string>
+    <!-- DELETE EVENT DIALOG -->
+    <string name="dialog_title_delete_event">Poista tapahtuma</string>
+    <string name="dialog_title_delete_recurring_event">Poista toistuva tapahtuma</string>
+    <string name="dialog_description_delete_event">Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_recurring_event">Haluatko poistaa tapahtumaketjun kaikki tapahtumat?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">Järjestäjä on päivittänyt tapahtumaa. Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_button_delete">Poista</string>
+    <string name="dialog_button_cancel">Peruuta</string>
+    <string name="dialog_button_continue">Jatka</string>
+    <string name="dialog_button_close">Sulje</string>
+    <string name="dialog_button_remove">Poista</string>
+    <string name="dialog_button_download">Lataa</string>
+    <!-- Delete as an organizer -->
+    <string name="dialog_description_delete_event_as_organizer">Peruutusilmoitus lähetetään kaikille osallistujille sähköpostitse. Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Osoitteesi on poistettu käytöstä. Peruutusviestin lähetys osallistujille ei onnistu. Haluatko silti poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">Peruutusilmoitus lähetetään tapahtuman osallistujille sähköpostitse. Haluatko poistaa tapahtumaketjun kaikki tapahtumat?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Osoitteesi on poistettu käytöstä, eikä peruutusviestiä voida lähettää osallistujille. Haluatko silti poistaa tapahtumaketjun kaikki tapahtumat?</string>
+    <!-- Delete as an attendee -->
+    <string name="dialog_description_delete_single_event_as_attendee">Tapahtuman järjestäjälle ilmoitetaan, että kieltäydyit kutsusta. Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">Tapahtuman järjestäjälle ei ilmoiteta, että kieltäydyit kutsusta, koska et voi lähettää sähköposteja kutsutusta osoitteesta. Haluatko silti poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">Tapahtumaketjun järjestäjälle ilmoitetaan, että kieltäydyit kutsusta. Haluatko poistaa kaikki nämä tapahtumat?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Tapahtumaketjun järjestäjälle ei ilmoiteta, että kieltäydyit kutsusta, koska et voi lähettää sähköposteja kutsutusta osoitteesta. Haluatko silti poistaa kaikki nämä tapahtumat?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Tapahtuma on päivitetty. Järjestäjälle ilmoitetaan, että kieltäydyit kutsusta. Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Tapahtuma on päivitetty. Järjestäjälle ei ilmoiteta, että kieltäydyit kutsusta, koska et voi lähettää sähköposteja kutsutusta osoitteesta. Haluatko poistaa tapahtuman?</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Järjestäjän aiemmin päivittämät esiintymät säilytetään, mutta vastauksesi menetetään</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Järjestäjän aiemmin päivittämät esiintymät säilytetään</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Järjestäjälle ei voida ilmoittaa, että kieltäydyt kutsusta:\n\n• %1$s\n\nHaluatko silti poistaa tapahtuman?</string>
+    <string name="dialog_button_set">Aseta</string>
+    <string name="dialog_button_ok">OK</string>
+    <string name="action_save">Tallenna</string>
+    <string name="action_done">Valmis</string>
+    <string name="action_edit">Muokkaa</string>
+    <string name="action_delete">Poista</string>
+    <string name="action_recreate">Tyhjennä</string>
+    <string name="action_today">Tänään</string>
+    <string name="action_create_event">Luo tapahtuma</string>
+    <string name="action_mark_default">Merkitse oletukseksi</string>
+    <!-- MONTH VIEW -->
+    <string name="agenda_no_events">Ei tapahtumia</string>
+    <string name="agenda_loading_events">Ladataan tapahtumia…</string>
+    <string name="agenda_loading_events_error">Virhe ladattaessa tapahtumia</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ %1$d lisää</string>
+    <!-- EVENT DETAILS   -->
+    <string name="event_all_day">Koko päivä</string>
+    <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
+    <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
+    <string name="event_alarm_label_at_event_time">Tapahtumahetkellä</string>
+    <string name="event_alarm_label_at_event_time_by_email">Sähköpostitse tapahtumahetkellä</string>
+    <string name="event_alarm_label_on_the_same_day">Samana päivänä</string>
+    <string name="event_alarm_label_before">%1$s aiemmin</string>
+    <string name="event_alarm_label">%1$s</string>
+    <string name="event_alarm_label_before_by_email">Sähköpostitse %1$s aiemmin</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s klo %2$s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">Sähköpostitse %1$s klo %2$s</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s aiemmin klo %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">Sähköpostitse %1$s klo %2$s aiemmin</string>
+    <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s klo %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d. päivänä</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s klo %2$s</string>
+    <string name="event_recurrence_none">Ei toistu</string>
+    <string name="event_recurrence_daily">Päivittäin</string>
+    <string name="event_recurrence_weekly">Viikottain</string>
+    <string name="event_recurrence_monthly">Kuukausittain</string>
+    <string name="event_recurrence_yearly">Vuosittain</string>
+    <string name="event_recurrence_weekly_on_all_days">kaikkina päivinä</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">%1$s asti</string>
+    <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">%1$s (%2$s) asti</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
+    <string name="event_status_canceled">Peruttu</string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(ei käytössä)</i>]]></string>
+    <string name="event_attendee_status_separator">%1$s, %2$s</string>
+    <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d kyllä</string>
+    <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d mahdollisesti</string>
+    <string name="event_attendee_no" comment="How many attendees answered no">%1$d ei</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d odottaa</string>
+    <string name="event_attendee_is_organizer">Olet järjestäjä</string>
+    <string name="event_attendee_organizer">Järjestäjä</string>
+    <string name="event_attendee_optional">Valinnainen</string>
+    <string name="event_attendee_is_current_user">Sinä</string>
+    <string name="event_answer_attending">Osallistutko?</string>
+    <string name="event_answer_yes">Kyllä</string>
+    <string name="event_answer_no">En</string>
+    <string name="event_answer_maybe">Mahdollisesti</string>
+    <string name="event_decryption_error_dialog_title">Tapahtuman salauksen purku epäonistui</string>
+    <string name="event_decryption_error_dialog_message">Tapahtuman sisällön salauksen purku epäonnistui.</string>
+    <string name="event_decryption_error_dialog_confirmation">Poista tapahtuma</string>
+    <string name="event_decryption_error_dialog_confirmation_recurring">Poista tapahtumat</string>
+    <string name="event_decryption_error_dialog_close">Sulje</string>
+    <string name="event_signature_verification_failure">Tapahtuman allekirjoituksen todennus epäonnistui. <a href="https://proton.me/support/what-is-a-digital-signature">Lue lisää</a></string>
+    <string name="event_signature_verification_in_progress">Tapahtuman allekirjoituksen vahvistus on käynnissä.</string>
+    <string name="event_signature_verification_network_error">Tapahtuman allekirjoituksen vahvistus keskeytyi virheen vuoksi. <a href="">Yritä uudelleen</a></string>
+    <string name="event_change_answer_recurring_title">Päivitä toistuva tapahtuma</string>
+    <string name="event_change_answer_recurring_description">Haluatko muuttaa vastaustasi tapahtumaketjun kaikille tapahtumille?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Haluatko muuttaa vastaustasi kaikille tämän tapahtumaketjun tapahtumille?\nOsa vastauksistasi tapahtuman järjestäjän aiemmin päivittämiin tapahtumiin menetetään.</string>
+    <string name="event_change_answer_recurring_single_edit_description">Järjestäjä on päivittänyt tapahtumaa. Haluatko muuttaa vastaustasi vain tapahtumaketjun tälle tapahtumalle?</string>
+    <string name="event_change_answer_recurring_cancel">Peruuta</string>
+    <string name="event_change_answer_recurring_confirm">Päivitä</string>
+    <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s hyväksyi kutsusi tapahtumaan %2$s</string>
+    <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s kieltäytyi kutsustasi tapahtumaan %2$s</string>
+    <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s hyväksyi kutsusi tapahtumaan alustavasti %2$s</string>
+    <string name="event_organizer_send_prefs_error_title">Järjestäjälle ei voida ilmoittaa</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">Järjestäjälle ei voida ilmoittaa, että hyväksyit kutsun</string>
+    <string name="event_organizer_send_prefs_message_declined_title">Järjestäjälle ei voida ilmoittaa, että kieltäydyit kutsusta</string>
+    <string name="event_organizer_send_prefs_message_tentative_title">Järjestäjälle ei voida ilmoittaa, että hyväksyit kutsun alustavasti</string>
+    <string name="event_organizer_send_prefs_message_default_title">Järjestäjälle ei voida ilmoittaa, että vastasit kutsuun</string>
+    <string name="event_organizer_send_prefs_button_title">OK</string>
+    <string name="event_attendees_send_prefs_error_title">Osallistujille ei voida ilmoittaa</string>
+    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Yhdellekään osallistujalle ei voida ilmoittaa muutoksistasi:\n\n• %1$s\n\nHaluatko silti jatkaa?</string>
+    <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Seuraaville osallistujille ei voida ilmoittaa muutoksistasi:\n\n• %1$s\n\nHaluatko silti jatkaa?</string>
+    <string name="event_attendees_send_prefs_error_confirm">Jatka</string>
+    <string name="event_attendees_send_prefs_error_cancel">Peru</string>
+    <string name="event_send_prefs_error_address_disabled">tätä osoitetta ei ole olemassa</string>
+    <string name="event_send_prefs_error_getting_contact">yhteystietoja ei saatu</string>
+    <string name="event_send_prefs_error_network">verkkovirhe</string>
+    <string name="event_send_prefs_trusted_keys_invalid">luotetut avaimet ovat virheellisiä</string>
+    <string name="event_send_prefs_public_keys_invalid">julkiset avaimet ovat virheellisiä</string>
+    <string name="event_send_prefs_trusted_keys_signature_invalid">yhteystiedon allekirjoitus on virheellinen</string>
+    <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <!-- CREATE / EDIT EVENT   -->
+    <string name="title_create_event">Uusi tapahtuma</string>
+    <string name="event_text_edit_event">Muokkaa tapahtumaa</string>
+    <string name="event_hint_title">Lisää otsikko</string>
+    <string name="event_hint_location">Lisää sijainti</string>
+    <string name="event_text_add_participants">Lisää osallistujia</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Osallistujia (%1$d/%2$d)</string>
+    <string name="event_current_user_organizer">Sinä</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d lisää</string>
+    <string name="event_text_switch_all_day">Koko päivä</string>
+    <string name="event_text_date_start">Alkaa</string>
+    <string name="event_text_date_end">Päättyy</string>
+    <string name="event_text_date_repeat">Toistuu</string>
+    <string name="event_text_date_repeat_never">Ei toistu</string>
+    <string name="event_text_attendees">Osallistujat</string>
+    <string name="event_text_attendees_none">Ei mitään</string>
+    <string name="event_text_calendar">Kalenteri</string>
+    <string name="event_text_timezone_start">Aikavyöhyke</string>
+    <!-- SEARCH -->
+    <string name="search_hint_input_field">Mitä etsit?</string>
+    <string name="search_empty_results_title">Ei tuloksia</string>
+    <string name="search_empty_results_subtitle">Kokeile eri termiä, kuten Matti, syntymäpäivä, webinaari tai kirjakerho.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Kalentereita ladataan (%1$s)</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Jäljellä oleva aika: %1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Arvioidaan jäljellä olevaa aikaa…</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">melkein valmista</string>
+    <string name="search_downloading_pause">Tauota lataus</string>
+    <string name="search_settings_dialog_toggle_off_title">Poistetaanko kaikki ladatut kalenterit?</string>
+    <string name="search_settings_dialog_toggle_off_text">Kalenterit on ladattava uudelleen, jos haluat etsiä niiden sisältöä.</string>
+    <string name="search_settings_dialog_toggle_on_title">Ladataanko kalenterit tälle laitteelle?</string>
+    <string name="search_settings_dialog_toggle_on_text">Tämä on tarpeellista hakua varten.</string>
+    <string name="search_onboarding_header">Etsitkö kalenteristasi jotakin?</string>
+    <string name="search_onboarding_text">Etsiäksesi kalentereidesi sisältöä, on laitteelle ensin ladattava kalenteriesi salatut kopiot. <a href="https://proton.me/support/calendar-search">Lue lisää</a></string>
+    <string name="search_onboarding_action_download_calendars">Lataa kalenterit</string>
+    <string name="search_onboarding_action_pause">Tauota</string>
+    <string name="search_onboarding_action_resume">Jatka</string>
+    <string name="search_onboarding_action_retry">Yritä uudelleen</string>
+    <string name="search_onboarding_progress_header_ongoing">Kalentereita ladataan…</string>
+    <string name="search_onboarding_progress_header_completed">Lataus on valmis</string>
+    <string name="search_onboarding_progress_header_paused">Kalenterien lataus on tauotettu</string>
+    <string name="search_onboarding_progress_header_error">Virhe ladattaessa kalentereita</string>
+    <string name="search_spotlight_activation_snack">Kalenterihaku on aktivointu</string>
+    <!-- TODO Start Timezone / End Timezone? -->
+    <string name="event_text_add_alarm">Lisää ilmoitus</string>
+    <string name="event_text_description">Kuvaus</string>
+    <string name="event_hint_description">Lisää kuvaus</string>
+    <string name="event_text_custom">oma</string>
+    <string name="event_alert_invalid_start_end_date">Tapahtuman aloituspäivä ei voi olla päättymispäivän jälkeen</string>
+    <string name="event_alarms_title">Ilmoitukset</string>
+    <string name="event_custom_alarms_field">Ilmoita</string>
+    <string name="event_custom_alarms_title">Omat ilmoitukset</string>
+    <string name="event_alarm_partial_day_1">tapahtuma-aikaan</string>
+    <string name="event_alarm_partial_day_2">10 minuuttia</string>
+    <string name="event_alarm_partial_day_3">30 minuuttia</string>
+    <string name="event_alarm_partial_day_4">1 tunti</string>
+    <string name="event_alarm_partial_day_5">1 viikko</string>
+    <string name="event_alarm_all_day_1">samana päivänä klo %1$s</string>
+    <string name="event_alarm_all_day_2">1 päivä aiemmin klo %1$s</string>
+    <string name="event_alarm_all_day_3">1 viikko aiemmin klo %1$s</string>
+    <string name="event_alarm_all_day_4">3 viikkoa aiemmin klo %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">klo %1$s</string>
+    <string name="event_alarm_action">Lähettänyt</string>
+    <string name="event_alarm_action_notification">ilmoitus</string>
+    <string name="event_alarm_action_email">sähköposti</string>
+    <string name="event_alarm_same_day">päivänä</string>
+    <string name="event_recurrence_1">älä toistu</string>
+    <string name="event_recurrence_2">joka päivä</string>
+    <string name="event_recurrence_3">joka viikko</string>
+    <string name="event_recurrence_4">joka kuukausi</string>
+    <string name="event_recurrence_5">joka vuosi</string>
+    <string name="event_recurrence_title">Tiheys</string>
+    <string name="event_recurrence_custom_title">Oma toistuvuus</string>
+    <string name="event_recurrence_occurs_every">Toistuu joka</string>
+    <string name="event_recurrence_occurs_on">Toistuu</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d. päivä</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
+    <string name="event_recurrence_ends_on">Päättyy</string>
+    <string name="event_recurrence_ends_never">ei koskaan</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">päivänä</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
+    <string name="event_recurrence_ends_after_count_prefix">jälkeen</string>
+    <string name="event_recurring_edit_this">Tämä tapahtuma</string>
+    <string name="event_recurring_edit_this_and_future">Tämä ja tulevat tapahtumat</string>
+    <string name="event_recurring_edit_all_events">Kaikki tapahtumat</string>
+    <string name="event_discard_changes_title">Hylätäänkö muutokset?</string>
+    <string name="event_discard_changes_description">Menetät kaikki tallentamattomat muutokset.</string>
+    <string name="event_discard_changes_cancel">Jatka muokkausta</string>
+    <string name="event_discard_changes_confirm">Hylää</string>
+    <string name="event_recurring_update_this_title">Päivitä toistuva tapahtuma</string>
+    <string name="event_recurring_update_this_description">Toistotiheyden muutokset menetetään</string>
+    <string name="event_recurring_update_all_description">Tapahtumaketjun aiemmat muutokset menetetään</string>
+    <string name="event_recurring_update_this_cancel">Peruuta</string>
+    <string name="event_recurring_update_this_confirm">Päivitä</string>
+    <string name="event_allow_contacts_title">Myönnetäänkö Proton Calendarille yhteystietojen käyttöoikeus?</string>
+    <string name="event_allow_contacts_description">Proton Calendar tarvitsee yhteystietojesi käyttöoikeuden niiden automaattista täyttöä varten</string>
+    <string name="event_allow_contacts_cancel">Kiellä</string>
+    <string name="event_allow_contacts_confirm">Salli</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Vastaus: Kutsu tapahtumaan, joka alkaa %1$s klo %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Vastaus: Kutsu tapahtumaan %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Vastaus: Kutsu tapahtumaan, joka alkaa %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Kutsu tapahtumaan, joka alka %1$s-päivänä klo %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Kutsu %1$s-päivän tapahtumaan</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Kutsu tapahtumaan, joka alkaa %1$s-päivänä</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Perutaan %1$s-päivälle klo %2$s %3$s ajoitettu tapahtuma</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s tapahtuma perutaan</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Perutaan %1$s-päivälle ajoitettu tapahtuma</string>
+    <string name="event_send_invite_mail_body">Sinut on kutsuttu tapahtumaan %1$s\nAikaan: %2$s</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (koko päivä)</string>
+    <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s klo %2$s %3$s - %4$s klo %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nSijainti: %1$s</string>
+    <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nKuvaus: %1$s</string>
+    <string name="event_send_invite_dialog_title">Lähetä kutsu</string>
+    <string name="event_send_invite_dialog_description">Lähetetään kutsu lisätyille osallistujille.</string>
+    <string name="event_send_invite_dialog_confirm">Lähetä</string>
+    <string name="event_send_invite_dialog_cancel">Peru</string>
+    <string name="event_add_participants_dialog_title">Lisää osallistujia</string>
+    <string name="event_add_participants_dialog_description">Lisätyille osallistujille lähetetään kutsu tämän tapahtumaketjun kaikkiin tapahtumiin.</string>
+    <string name="event_add_participants_overwrite_dialog_description">Lisätyille osallistujille lähetetään kutsu tämän tapahtumaketjun kaikkiin tapahtumiin.\nKetjun aiemmat muutokset menetetään.</string>
+    <string name="event_add_participants_dialog_confirm">Lähetä</string>
+    <string name="event_add_participants_dialog_cancel">Peru</string>
+    <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s on peruttu.</string>
+    <!-- NAVIGATION VIEW   -->
+    <string name="nav_view_calendars">Omat kalenterit</string>
+    <string name="nav_view_subscribed_calendars">Tilatut kalenterit</string>
+    <string name="nav_view_disabled_calendars">%1$s (ei käytössä)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (ei synkronoitu)</string>
+    <string name="nav_view_syncing_calendars">%1$s (synkronoidaan)</string>
+    <string name="nav_view_more">Lisää</string>
+    <string name="nav_view_switcher">Näkymä</string>
+    <string name="nav_view_switcher_day">Päivä</string>
+    <string name="nav_view_switcher_three_day">3 päivää</string>
+    <string name="nav_view_switcher_week">Viikko</string>
+    <string name="nav_view_switcher_agenda">Agenda</string>
+    <string name="nav_view_switcher_month">Kuukausi</string>
+    <string name="nav_view_timezone">Aikavyöhyke</string>
+    <string name="nav_view_settings">Asetukset</string>
+    <string name="nav_view_feedback">Anna palautetta</string>
+    <string name="nav_view_more_general_settings" comment="General Settings">Yleiset</string>
+    <string name="nav_view_more_bug">Ilmoita ongelmasta</string>
+    <string name="nav_view_more_subscription">Tilaus</string>
+    <string name="nav_view_more_logout">Kirjaudu ulos</string>
+    <string name="nav_view_more_login">Kirjaudu sisään</string>
+    <string name="nav_view_version_name">Proton Calendar %1$s</string>
+    <!-- SnackBar messages -->
+    <string name="snack_feature_coming_soon">Tämä ominaisuus on tulossa pian</string>
+    <string name="snack_event_deleted">Tapahtuma poistettiin</string>
+    <string name="snack_event_deleted_as_organizer">Peruutus lähetettiin ja tapahtuma poistettiin</string>
+    <string name="snack_event_deleted_as_attendee">Vastaus on lähetetty tai tapahtuma on poistettu</string>
+    <string name="snack_event_deleted_error">Virhe poistettaessa tapahtumaa</string>
+    <string name="snack_event_deleted_as_organizer_error">Peruutussähköpostin lähetys ei onnistunut, yritä uudelleen</string>
+    <string name="snack_event_opening_error">Virhe avattaessa tapahtumaa</string>
+    <string name="snack_event_saving">Tallennetaan tapahtumaa</string>
+    <string name="snack_event_deleting">Poistetaan tapahtuma</string>
+    <string name="snack_event_changing_answer">Päivitetään vastausta</string>
+    <string name="snack_event_part_stat_updated">Osallistumistila päivitettiin.</string>
+    <string name="snack_event_updated">Tapahtuma päivitettiin</string>
+    <string name="snack_event_updated_error_failed_mail">Kutsun lähetys eöäonnistui</string>
+    <string name="snack_event_updated_error">Virhe päivitettäessä tapahtumaa</string>
+    <string name="snack_event_created">Tapahtuma luotiin</string>
+    <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
+    <string name="snack_event_created_error">Virhe luotaessa tapahtumaa</string>
+    <string name="snack_event_opening_edit_error">Virhe avattaessa tapahtumaa muokattavaksi</string>
+    <string name="snack_event_edit_with_attendees_error">Osallistujia sisältävien tapahtumien muokkausta ei vielä tueta</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">Osallistujia ei ole mahdollista lisätä ja kalenteria vaihtaa samanaikaisesti</string>
+    <string name="snack_event_init_error">Virhe alustettaessa uutta tapahtumaa</string>
+    <string name="snack_event_calendar_error">Virhe vaihdettaessa kalenteria</string>
+    <string name="snack_event_maximum_alarm_reached_error">Ilmoitusten enimmäismäärä on saavutettu</string>
+    <string name="snack_send_bug_report_success">Raportti lähetettiin, kiitos palautteestasi</string>
+    <string name="snack_send_bug_report_error">Virhe lähetettäessä raporttia, yritä myöhemmin uudelleen</string>
+    <string name="snack_send_bug_report_description_empty">Syötä raporttisi kuvaus</string>
+    <string name="snack_create_event_no_active_personal_calendar">Tarvitset aktiivisen henkilökohtaisen kalenterin luodaksesi tapahtumia</string>
+    <string name="snack_add_self_as_participant">Et voi kutsua itseäsi</string>
+    <string name="snack_maximum_participants_reached">Osallistujien enimmäismäärä on saavutettu.</string>
+    <string name="snack_add_participant_error">Virhe lisättäessä osallistujaa</string>
+    <string name="snack_add_participant_invalid_email">Virheellinen sähköpostiosoite</string>
+    <string name="snack_change_attendee_answer_error">Virhe lähetettäessä vastausta, yritä myöhemmin uudelleen</string>
+    <string name="snack_network_error">Verkkovirhe, yritä myöhemmin uudelleen</string>
+    <string name="snack_import_event_signed_out">Sinun on kirjauduttava tuodaksesi tapahtumia</string>
+    <string name="snack_app_link_signed_out">Sinun on kirjauduttava nähdäksesi tapahtumasi</string>
+    <string name="snack_update_default_calendar">Oletuskalenteri vaihdettiin</string>
+    <string name="snack_update_default_calendar_error">Virhe oletuskalenterin vaihdossa, yritä uudelleen myöhemmin</string>
+    <string name="snack_calendar_init_error">Virhe ladattaessa kalenterin tietoja</string>
+    <string name="snack_update_calendar_error">Virhe päivitettäessä kalenterin tietoja, yritä uudelleen myöhemmin</string>
+    <string name="snack_update_calendar_settings_error">Virhe päivitettäessä joitakin kalenterin tietoja, yritä uudelleen myöhemmin</string>
+    <string name="snack_update_calendar_success">Kalenteri päivitettiin</string>
+    <string name="snack_create_calendar_success">Kalenteri luotiin</string>
+    <string name="snack_calendar_saving">Tallennetaan kalenteria</string>
+    <string name="snack_create_calendar_error">Virhe oletuskalenterin luonnissa, yritä uudelleen myöhemmin</string>
+    <string name="snack_create_calendar_settings_error">Kalenteri luotiin, mutta joitakin tietoja ei päivitetty. Yritä myöhemmin uudelleen</string>
+    <string name="snack_ics_default_error">Virhe avattaessa kalenteria</string>
+    <string name="snack_ics_event_not_found_error">Tapahtumaa ei löytynyt</string>
+    <string name="snack_ics_create_error">Virhe luotaessa tapahtumaa</string>
+    <string name="snack_ics_parsing_error">Virhe luettaessa kalenteria</string>
+    <string name="snack_ics_unsupported_method_error">Tapahtumatyyppiä ei tueta vielä</string>
+    <string name="snack_ics_unsupported_add_error">Esiintymän lisäystä tapahtumaan ei vielä tueta</string>
+    <string name="snack_ics_unsupported_counter_error">Tapahtuman uudelleenajoitusta ei vielä tueta</string>
+    <string name="snack_ics_unsupported_refresh_error">Tapahtuman päivitystä ei vielä tueta</string>
+    <string name="snack_ics_unsupported_publish_error">Tapahtuman tuontia ei vielä tueta</string>
+    <string name="snack_ics_unsupported_single_edit_reply_error">Toistaiseksi tuetaan vastaamista vain tapahtumaketjun kaikkiin tapahtumiin</string>
+    <string name="snack_ics_party_crasher_error">Sähköpostiasi ei ole osallistujalistalla</string>
+    <string name="snack_ics_reply_party_crasher_error">Ei voida lisätä osallistujia, joita järjestäjä ei kutsunut</string>
+    <string name="snack_ics_missing_uid_error">Tapahtumalta puuttuu UID</string>
+    <string name="snack_ics_no_active_calendar_error">Tähän tiliin liitettyä aktiivista henkilökohtaista kalenteria ei ole</string>
+    <string name="snack_ics_unsupported_duration_error">Kesto-ominaisuutta ei tueta</string>
+    <string name="snack_ics_too_many_events_error">Useita tapahtumia ei vielä tueta</string>
+    <string name="snack_ics_no_events_error">Kalenteri ei sisällä tapahtumia</string>
+    <string name="snack_ics_invalid_error">Kutsu on virheellinen</string>
+    <string name="snack_ics_disabled_calendar_error">Ota kalenteriin liitetty osoite uudelleen käyttöön päivittääksesi tapahtuman</string>
+    <string name="snack_ics_event_deleted_error">Tapahtumaa ei enää ole kalenterissasi</string>
+    <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s hyväksyi kutsusi</string>
+    <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s hyväksyi kutsusi alustavasti</string>
+    <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s kieltäytyi kutsustasi</string>
+    <string name="snack_app_link_invalid">Virheellinen linkki tapahtumaan</string>
+    <string name="snack_app_link_error">Virhe avattaessa tapahtumaa</string>
+    <string name="snack_app_link_import_error">Todennus peruttiin</string>
+    <string name="snack_notification_already_added">Ilmoitus on jo lisätty</string>
+    <string name="snack_opening_ics">Avataan tapahtumaa…</string>
+    <!-- Dialogs -->
+    <string name="error_event_does_not_exist">Tapahtumaa ei ole olemassa</string>
+    <string name="error_occurrence_does_not_exist">Tapahtumaa ei ole olemassa</string>
+    <string name="update_timezone_dialog_title">Aikavyöhyke on muuttunut</string>
+    <string name="update_timezone_dialog_message">Järjestelmäsi aikavyöhyke näyttää vaihtuneen vyöhykkeeseen %1$s. Haluatko päivittää aikavyöhykeasetuksesi?</string>
+    <string name="update_timezone_dialog_confirmation">Päivitä</string>
+    <string name="update_timezone_dialog_cancel">Peruuta</string>
+    <string name="contacts_permission_dialog_title">Myönnetäänkö Proton Calendarille yhteystietojen käyttöoikeus?</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar tarvitsee käyttöoikeuden laitteesi yhteystietoihin helpottaakseen niiden lisäystä tapahtumiin.</string>
+    <string name="contacts_permission_dialog_allow">Salli</string>
+    <string name="contacts_permission_dialog_open_settings">Avaa asetukset</string>
+    <string name="contacts_permission_dialog_cancel">Kiellä</string>
+    <string name="dialog_title_calendar_picker">Kalenteri</string>
+    <string name="import_from_google_title">Tuo Googlesta</string>
+    <string name="notifications_permission_dialog_title">Sallitko että Proton Calendar näyttää ilmoituksia?</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar tarvitsee luvan näyttää ilmoituksia tulevista tapahtumista.</string>
+    <string name="notifications_permission_dialog_open_settings">Avaa asetukset</string>
+    <string name="notifications_permission_dialog_cancel">Kiellä</string>
+    <!-- NOTIFICATIONS -->
+    <string name="notification_channel_alarms">Tapahtumailmoitukset</string>
+    <string name="notification_channel_sync">Kalenterin synkronointi</string>
+    <string name="notification_channel_calendar_fetch">Kalentereita noudetaan</string>
+    <string name="notification_sync">Synkronoidaan kalentereita…</string>
+    <string name="notification_text_today">Tänään</string>
+    <string name="notification_text_today_part_time">Tänään klo %1$s</string>
+    <string name="notification_text_tomorrow">Huomenna</string>
+    <string name="notification_text_tomorrow_part_time">Huomenna klo %1$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s klo %2$s</string>
+    <!-- Bug report -->
+    <string name="bug_report_hint_title">Aihe</string>
+    <string name="bug_report_hint_description">Kuvaile ongelmaa ja sisällytä mahdolliset virheviestit.</string>
+    <string name="bug_report_discard_changes_title">Tallentamattomia muutoksia</string>
+    <string name="bug_report_discard_changes_description">Lomakkeessa on tallentamattomia muutoksia. Haluatko varmasti hylätä ne?</string>
+    <string name="bug_report_discard_changes_cancel">Jatka kirjoittamista</string>
+    <string name="bug_report_discard_changes_confirm">Hylkää</string>
+    <!-- Settings -->
+    <string name="settings_theme_title">Teema</string>
+    <string name="settings_theme_info">Asetus vaikuttaa ainoastaan Proton Calendar -sovelluksen ulklasuun tässä laitteessa. Teeman vaihto vaatii sovelluksen uudelleenkäynnistyksen.</string>
+    <string name="settings_timezone_title">Aikavyöhyke</string>
+    <string name="settings_language_title">Sovelluksen kieli</string>
+    <string name="settings_language_default">Tunnista automaattisesti</string>
+    <string name="settings_update_timezone_title">Pyydä aikavyöhykeasetuksen päivitystä</string>
+    <string name="settings_update_timezone_subtitle">Jos järjestelmän aikavyöhyke ei vastaa nykyistä aikavyöhykeasetustasi, sinua pyydetään päivittämään se.</string>
+    <string name="settings_update_timezone_checkbox">Älä kysy uudelleen</string>
+    <string name="settings_week_start_title">Viikon aloitus</string>
+    <string name="settings_time_format_title">Ajan muoto</string>
+    <string name="settings_week_numbers_title">Näytä viikkonumerot</string>
+    <string name="settings_auto_invites_title">Lisää kutsut kalenteriin ja merkitse ne odottaviksi</string>
+    <string name="settings_search_title">Etsi kalentereista</string>
+    <string name="settings_search_subtitle">Lataa ja tallentaa kalenterien sisällön laitteellesi hakua varten. Tämän käytöstä poisto poistaa ladatun sisällön.</string>
+    <string name="settings_alternative_routing_title">Salli vaihtoehtoinen reititys</string>
+    <string name="settings_alternative_routing_subtitle">Mikäli Proton-sivustoja ei tavoiteta, sallii tämä asetus verkkoyhteyden vaihtoehtoisen reitityksen Protonin tavoittamiseksi ja tämä voi auttaa palomuurien tai yhteysongelmien kierrossa. Suosittelemme asetuksen käyttöä parempaa luotettavuutta varten.</string>
+    <string name="settings_value_placeholder">Valitse napauttamalla</string>
+    <string name="settings_general_title">Yleiset</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s yms.</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
+    <string name="settings_general_info_theme">teema</string>
+    <string name="settings_general_info_language">kieli</string>
+    <string name="settings_general_info_time_zone">aikavyöhyke</string>
+    <string name="settings_general_info_calendar_layout">kalenterien asettelu</string>
+    <string name="settings_calendars">Omat kalenterit</string>
+    <string name="settings_subscribed_calendars">Tilatut kalenterit</string>
+    <string name="settings_calendar_default" comment="Default calendar">Oletus</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Ei käytössä</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Synkronoimaton</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">Synkronoidaan</string>
+    <string name="settings_calendar_subscribed_invalid_ics">Kalenterin muotoa ei tueta</string>
+    <string name="settings_calendar_subscribed_too_big">Kalenteri on liian suuri</string>
+    <string name="settings_calendar_subscribed_not_accessible">Kalenterin linkki ei ole tavoitettavissa</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Kalenterilinkki on tilapäisesti tavoittamattomissa</string>
+    <string name="settings_calendar_subscribed_last_sync_old">Edellisestä päivityksestä on yli 12 tuntia</string>
+    <string name="settings_calendar_subscribed_not_decrypted">Kalenterin salausta ei voitu purkaa</string>
+    <!-- Calendar form -->
+    <string name="calendar_form_create_title">Luo kalenteri</string>
+    <string name="calendar_form_update_title">Muokkaa kalenteria</string>
+    <string name="calendar_form_save">Tallenna</string>
+    <string name="calendar_form_name">Nimi</string>
+    <string name="calendar_form_description">Kuvaus</string>
+    <string name="calendar_form_color">Kalenterin väri</string>
+    <string name="calendar_form_default_event_duration">Tapahtuman kesto</string>
+    <string name="calendar_form_default_event_notifications">Tapahtuman ilmoitukset</string>
+    <string name="calendar_form_default_all_day_event_notifications">Koko päivän tapahtuman ilmoitukset</string>
+    <string name="calendar_form_add_notification">Lisää ilmoitus</string>
+    <string name="calendar_form_default_email">Sähköpostiosoite</string>
+    <string name="calendar_form_default_email_value_error">Oletussähköpostin lataus epäonnistui</string>
+    <string name="calendar_form_name_hint">Nimeä kalenteri</string>
+    <string name="calendar_form_name_required_error">Nimi vaaditaan</string>
+    <string name="calendar_form_description_hint">Kuvaile kalenteria</string>
+    <string name="add_calendar_text">Lisää kalenteri</string>
+    <string name="create_calendar_limit_reached">Olet saavuttanut kalenterien enimmäismäärän.</string>
+    <string name="create_calendar_limit_reached_title">Enempää kalentereita ei voida lisätä</string>
+    <string name="create_calendar_limit_reached_paid_description">Olet saavuttanut tilaukseesi sisältyvän 25 kalenterin enimmäismäärän.\n\nLisätäksesi uuden kalenterin, poista nykyisiä kalentereita.</string>
+    <string name="create_calendar_limit_reached_manage">Hallitse kalentereita</string>
+    <string name="create_calendar_limit_reached_free_description">Olet saavuttanut tilaukseesi sisältyvän 3 kalenterin enimmäismäärän.\n\nLisätäksesi uuden kalenterin, poista nykyisiä kalentereita.</string>
+    <string name="create_calendar_limit_reached_error">Virhe</string>
+    <string name="delete_calendar_dialog_title">Poista kalenteri</string>
+    <string name="delete_calendar_dialog_message">Haluatko varmasti poistaa kalenterin?</string>
+    <string name="delete_default_calendar_dialog_message">Haluatko varmasti poistaa kalenterin? \"%1$s\" asetetaan oletuskalenteriksi.</string>
+    <string name="delete_calendar_snack_deleted">Kalenteri poistettiin</string>
+    <string name="delete_calendar_snack_error">Virhe poistettaessa kalenteria</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Salasanan vahvistus epäonnistui</string>
+    <string name="recreate_calendar_dialog_title">Tyhjennä kalenteri</string>
+    <string name="recreate_calendar_dialog_message">Toiminto poistaa kaikki tapahtumat ja käyttäjien kutsuntatiedot.\n\nHaluatko varmasti tyhjentää tämän kalenterin?</string>
+    <string name="recreate_calendar_snack_error">Virhe tyhjennettäesä kalenteria</string>
+    <string name="recreate_calendar_snack_deleted">Kalenteri tyhjennettiin</string>
+    <string name="recreate_calendar_snack_clearing">Tyhjennetään kalenteria…</string>
+    <!-- Bootstrap errors -->
+    <string name="bootstrap_error_default_confirm">OK</string>
+    <string name="bootstrap_error_no_calendar_title">Tiliin liitettyjä aktiivisia kalentereita ei ole.</string>
+    <string name="bootstrap_error_no_calendar_message">Määritä nyt yksi ositteessa <a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_some_calendars_failed_title">Virhe kalenterien valmistelussa</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Seuraavia kalentereita ei voitu määrittää</string>
+    <string name="bootstrap_error_no_active_calendar_title">Tähän tiliin liitettyä aktiivista henkilökohtaista kalenteria ei ole.</string>
+    <string name="bootstrap_error_no_active_calendar_message">Lue <a href="https://proton.me/support">tietopankistamme</a> miten aktivoit kalenterin</string>
+    <string name="bootstrap_error_store_quota_reached_message">Enempää tallennustilaa ei ole käytettävissä.</string>
+    <string name="bootstrap_error_store_quota_reached_learn_more">Lue lisää</string>
+    <string name="bootstrap_error_reset_needed_title">Tyhjennä kalenterin avaimet</string>
+    <string name="bootstrap_error_reset_needed_message">Olet vaihtanut salasanasi, eikä seuraaviin kalentereihin liitettyjen tapahtumien salausta voitu purkaa. Kaikki aktiiviset kalenteritilaukset synkronoidaan uudelleen muutaman minuutin kuluessa.</string>
+    <string name="bootstrap_error_update_passphrase_title">Aktivoi kalenterin avaimet uudelleen</string>
+    <string name="bootstrap_error_update_passphrase_message">Olet aktivoinut avaimesi uudelleen ja seuraaviin kalentereihin liitetyttyjen tapahtumien salaukset voidaan nyt purkaa.</string>
+    <string name="bootstrap_error_continue_button">Jatka</string>
+    <string name="splash_after_login_init">Valmistellaan kalentereita</string>
+    <string name="splash_init">Puretaan tapahtumien salauksia</string>
+    <string name="default_calendar_name">Oma kalenteri</string>
+    <!-- FEEDBACK DIALOG -->
+    <string name="dialog_feedback_header">Anna palautetta</string>
+    <string name="dialog_feedback_text">Miten kuvailisit kokemustasi uuden Proton Calendarin parissa?</string>
+    <string name="dialog_feedback_rating_worst">Kamalaa</string>
+    <string name="dialog_feedback_rating_best">Ihanaa</string>
+    <string name="dialog_feedback_hint">Kerro lisää kokemuksestasi (valinnainen)</string>
+    <string name="dialog_feedback_submit">Lähetä</string>
+    <string name="dialog_feedback_submit_thank_you">Kiitos! Palautteesi auttaa meitä Protonin kehityksessä.</string>
+    <!-- Calendar Widget -->
+    <string name="calendar_widget_description">Proton Calendar -pienoisohjelma</string>
+    <string name="calendar_widget_no_upcoming_events_today">Ei tulevia tapahtumia tänään</string>
+    <string name="calendar_widget_loading_events">Ladataan tapahtumia…</string>
+    <string name="calendar_widget_loading_events_error">Tapahtumia ei voitu ladata</string>
+    <string name="calendar_widget_no_upcoming_events">Ei tulevia tapahtumia</string>
+    <string name="calendar_widget_please_log_in">Kirjaudu nähdäksesi tapahtumasi</string>
+    <string name="calendar_widget_part_day_event_starts_at">Alkaa klo %1$s</string>
+    <string name="calendar_widget_part_day_event_ends_at">Päätty klo %1$s</string>
+    <!-- Spotlight Dialogs -->
+    <string name="spotlight_dialog_header">Mitä uutta</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
+    <string name="spotlight_dialog_month_view_title">Kuukausinäkymä</string>
+    <string name="spotlight_dialog_month_view_description">Näe yleiskatsaus tapahtumistasi uudesta kuukausinäkymästämme. Vaihda näkymää valikosta.</string>
+    <string name="spotlight_dialog_easy_switch_description">Tapahtumien ja muun datan tuonti Googlen kalenterista Proton kalenteriin on helpompaa kuin koskaan. Easy Switch -tuonti opastaa askel askeleelta.</string>
+    <string name="spotlight_dialog_easy_switch_positive_button">Aloita tuonti</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Ei nyt</string>
+    <string name="spotlight_dialog_auto_invites_title">Hyväksy kutsut helposti</string>
+    <string name="spotlight_dialog_auto_invites_description">Nyt kutsut ilmestyvät kalenteriisi odottavina tapahtumina. Avaa vain tapahtuma vastataksesi.\n\nHallitse toimintoa asetuksista.</string>
+    <string name="spotlight_dialog_auto_invites_positive_button">Seuraava</string>
+    <string name="spotlight_v5_dialog_got_it_button">Selvä</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Lue lisää</string>
+    <string name="spotlight_v5_dialog_rebranding_title">Päivitetty Proton, yhtenäinen suojaus</string>
+    <string name="spotlight_v5_dialog_rebranding_description">Esittelyssä Protonin uusi ilme. Useita palveluita, yhteinen tehtävä. Tervetuloa Internetiin, jossa yksityisyys on oletusarvoista. <a href="https://proton.me/news/updated-proton">Lue lisää</a></string>
+    <string name="spotlight_dialog_week_view_title">Lisää näyttövalintoja</string>
+    <string name="spotlight_dialog_week_view_description">• Esittelyssä kalenterin <b>3 päivää</b> ja <b>Viikko</b> -näkymät. Valitse haluamasi näkymä <b>valikosta</b>.\n\n• Säädä päiväruudukon rivien korkeutta zoomamalla niitä kahden sormen nipistyseleellä.</string>
+    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Etsi saumattomasti</string>
+    <string name="spotlight_dialog_search_description">Voit nyt etsiä kalentereistasi tapahtumia. Tämä lataa laitteellesi salatut kopiot kalentereistasi. <a href="https://proton.me/support/calendar-search">Lue lisää</a></string>
+    <string name="spotlight_dialog_import_title">Muita tapoja lisätä tapahtumia</string>
+    <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia mobiililaitteesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
+    <!-- Import -->
+    <string name="dialog_google_auth_title">Salli pääsy</string>
+    <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Googlen kalenteriin ja salli Protonille pääsy tietoihisi.</string>
+    <string name="import_assistant_prepare_import_error">Virhe valmistellessa raporttia, yritä myöhemmin uudelleen</string>
+    <string name="import_assistant_prepare_import">Valmistellaan tuontia</string>
+    <string name="import_assistant_gathering_data_loader_title">Tietojasi kerätään</string>
+    <string name="import_assistant_summary_title">Tuo yhteenveto</string>
+    <string name="import_assistant_summary_customize_import">Mukauta tuontia</string>
+    <string name="import_assistant_error">Virhe tietoa noudettaessa</string>
+    <string name="import_assistant_data_gathering_error">Tiedon keruu epäonnistui</string>
+    <string name="import_assistant_update_import_error">Tuonnin päivitys epäonnistui, yritä myöhemmin uudelleen.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Väärä tili. Kirjaudu tilillä, jota käytit kalenterin tuonnissa.</string>
+    <string name="import_assistant_start_import_error">Tuonnin aloitus epäonnistui, yritä myöhemmin uudelleen.</string>
+    <string name="import_assistant_delete_import_success">Tuontitapahtuma poistettiin</string>
+    <string name="import_assistant_delete_import_error">Tuonnin poisto epäonnistui, yritä myöhemmin uudelleen.</string>
+    <string name="import_assistant_cancel_import_error">Tuonnin peruutus epäonnistui, yritä myöhemmin uudelleen.</string>
+    <string name="import_assistant_resume_import_error">Tuonnin jatko epäonnistui, yritä myöhemmin uudelleen.</string>
+    <string name="import_assistant_create_calendar_error">Yhden tai useamman kalenterin luonti epäonnistui</string>
+    <string name="import_assistant_start_import_empty_error">Tuonnin aloitus epäonnistui, koska tuotavia kalentereita ei ole</string>
+    <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Tuo nimellä</string>
+    <string name="import_assistant_new_calendar_badge">Uusi</string>
+    <string name="import_assistant_merge_calendar_badge">Yhdistetty</string>
+    <string name="import_assistant_creating_calendars">Luodaan uusia kalentereita</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Melkein valmis…</string>
+    <string name="import_assistant_new_calendar_header">Luo uusi</string>
+    <string name="import_assistant_merge_calendar_header">Yhdistä olemassaolevaan</string>
+    <string name="import_assistant_in_progress_title">Tuonti on käynnissä</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Siirretään tietoa kohteesta %1s kohteeseen %2s.</string>
+    <string name="import_assistant_in_progress_redirect">Tarkista edistyminen</string>
+    <string name="import_assistant_in_progress_sub_description">Suuret tuonnit voi viedä useita päiviä. Ilmoitamme tuonnin valmistuttua. Voit sulkea tämän ruudun.</string>
+    <string name="import_assistant_guide_subtitle">Vaihda yksityisyyteen. Helposti ja turvallisesti.</string>
+    <string name="import_assistant_guide_description">Siirrä tapahtumat ja muut tiedot Googlesta Protoniin. The Easy Switch -työkalu opastaa jokaisessa kohdassa ja salaa tietosi siirrettäessä.</string>
+    <string name="import_assistant_new_import">Uusi tuonti</string>
+    <string name="import_assistant_previous_import">Edelliset tuonnit</string>
+    <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
+    <string name="import_assistant_status_queued" comment="Context: The import has been started">Alkoi</string>
+    <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Käynnissä</string>
+    <string name="import_assistant_status_completed" comment="Context: The import has been completed">Valmis</string>
+    <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Peruttu</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Perutaan</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Pysäytetty</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Epäonnistui</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Yhteys Googleen katosi</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Jatkaaksesi tuontia, napauta Yhdistä uudelleen, kirjaudu Googleen ja salli Protonin pääsy Google tietoihisi uudelleen.</string>
+    <string name="import_assistant_status_paused_lost_connection_button">Yhdistä uudelleen</string>
+    <string name="import_assistant_status_paused_storage_full_title">Tallennustilasi on täynnä</string>
+    <string name="import_assistant_status_paused_storage_full_description">Proton-tililläsi ei ole riittävästi tallennustilaa, jotta kalenterin tuonti voitaisiin suorittaa loppuun. Vapauta tai hanki lisää talennustilaa. Palaa sen jälkeen takaisin jatkaaksesi.</string>
+    <string name="import_assistant_status_paused_storage_full_button">Jatka</string>
+    <string name="import_assistant_delete_report_title">Poistetaanko listalta?</string>
+    <string name="import_assistant_delete_report_message">Et enää näe tätä tuontitapahtumaa listalla.</string>
+    <string name="import_assistant_delete_report_positive_button">Poista</string>
+    <string name="import_assistant_delete_report_negative_button">Säilytä</string>
+    <string name="import_assistant_cancel_import_title">Tuonti on kesken!</string>
+    <string name="import_assistant_cancel_import_message">Jos perut tuonnin, et voi jatkaa sitä. Proton tallensi edistymisen tilillesi. Perutaanko silti?</string>
+    <string name="import_assistant_cancel_import_positive_button">Peru tuonti</string>
+    <string name="import_assistant_cancel_import_negative_button">Jatka tuontia</string>
+    <string name="import_assistant_in_progress_snack">Tuonti on käynnissä</string>
+    <string name="import_assistant_discard_import_title">Perutaanko tuonti?</string>
+    <string name="import_assistant_discard_import_message">Tuonti ei ole valmis eikä sitä voida jatkaa, jos perut sen.</string>
+    <string name="import_assistant_discard_import_positive">Peru tuonti</string>
+    <string name="import_assistant_discard_import_negative">Jatka tuontia</string>
+    <string name="import_assistant_authentication_canceled">Todennus peruttiin</string>
+    <string name="import_assistant_sign_in_in_progress">Kirjautumistapahtuma on jo käynnissä</string>
+    <string name="import_assistant_in_progress_error_snack">Tuonti on vielä kesken</string>
+    <!-- Import events -->
+    <string name="import_event_disclaimer_dialog_title">Tuodaanko yksinkertaisena tapahtumana?</string>
+    <string name="import_event_disclaimer_dialog_description">\nTuodut kutsut näkyvät Proton Calendarissa yksinkertaisina tapahtumina, ilman tietoa <b>järjestäjistä</b> ja <b>osallistujista</b>.\n\nVastaanottaaksesi tapahtumapäivityksiä ja nähdäksesi osallistujat, pyydä järjestäjiä kutsumaan sinut Proton-sähköpostiosoitteellasi.</string>
+    <string name="import_event_disclaimer_dialog_positive">Tuo</string>
+    <!--  STRING PLURALS  -->
+    <plurals name="calendar">
+        <item quantity="one">kalenteri</item>
+        <item quantity="other">kalenterit</item>
+    </plurals>
+    <plurals name="import_assistant_import_button">
+        <item quantity="one">Tuo %1$d kalenteri</item>
+        <item quantity="other">Tuo %1$d kalenteria</item>
+    </plurals>
+    <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
+        <item quantity="one">%1$d tuonti käynnissä</item>
+        <item quantity="other">%1$d tuontia käynnissä</item>
+    </plurals>
+    <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
+        <item quantity="one">%1$d/%2$d luotiin tilille %3$s</item>
+        <item quantity="other">%1$d/%2$d luotiin tilille %3$s</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
+        <item quantity="one">Luo Proton Calendariin %1$d uusi kalenteri.</item>
+        <item quantity="other">Luo Proton Calendariin %1$d uutta kalenteria.</item>
+    </plurals>
+    <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
+        <item quantity="one">Tuo %1$d/%2$d kalenteri lähteestä</item>
+        <item quantity="other">Tuo %1$d/%2$d kalenteria lähteestä</item>
+    </plurals>
+    <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
+        <item quantity="one">Yhdistä %1$d kalenteri Proton Calendarissa.</item>
+        <item quantity="other">Yhdistä %1$d kalenteria Proton Calendarissa.</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
+        <item quantity="one">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenteri</item>
+        <item quantity="other">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenteria</item>
+    </plurals>
+    <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
+        <item quantity="one">\u0020tai\n • Yhdistä ainakin %1$d kalenteri olemassa oleviin Proton-kalentereihin.</item>
+        <item quantity="other">\u0020tai\n • Yhdistä ainakin %1$d kalenteria olemassa oleviin Proton-kalentereihin.</item>
+    </plurals>
+    <plurals name="plural_seconds">
+        <item quantity="one">sekunti</item>
+        <item quantity="other">sekuntia</item>
+    </plurals>
+    <plurals name="plural_minute">
+        <item quantity="one">minuutti</item>
+        <item quantity="other">minuuttia</item>
+    </plurals>
+    <plurals name="plural_hour">
+        <item quantity="one">tunti</item>
+        <item quantity="other">tuntia</item>
+    </plurals>
+    <plurals name="plural_day">
+        <item quantity="one">päivä</item>
+        <item quantity="other">päivää</item>
+    </plurals>
+    <plurals name="plural_week">
+        <item quantity="one">viikko</item>
+        <item quantity="other">viikkoa</item>
+    </plurals>
+    <plurals name="plural_month">
+        <item quantity="one">kuukausi</item>
+        <item quantity="other">kuukautta</item>
+    </plurals>
+    <plurals name="plural_year">
+        <item quantity="one">vuosi</item>
+        <item quantity="other">vuotta</item>
+    </plurals>
+    <plurals name="plural_recurrence_count">
+        <item quantity="one">kerran</item>
+        <item quantity="other">kertaa</item>
+    </plurals>
+    <plurals name="plural_occurrence">
+        <item quantity="one">tapahtuma</item>
+        <item quantity="other">tapahtumat</item>
+    </plurals>
+    <plurals name="plural_participant_uppercase">
+        <item quantity="one">osallistuja</item>
+        <item quantity="other">osallistujaa</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
+        <item quantity="one">Joka %1$d %2$s</item>
+        <item quantity="other">Joka %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
+        <item quantity="one">Joka %1$d %2$s</item>
+        <item quantity="other">Joka %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
+        <item quantity="one">Joka %1$d %2$s</item>
+        <item quantity="other">Joka %1$d %2$s</item>
+    </plurals>
+    <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
+        <item quantity="one">Joka %1$d %2$s</item>
+        <item quantity="other">Joka %1$d %2$s</item>
+    </plurals>
+    <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
+        <item quantity="one">%1$s minuutti</item>
+        <item quantity="other">%1$s minuuttia</item>
+    </plurals>
+    <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
+        <item quantity="one">%1$d/%2$d merkki</item>
+        <item quantity="other">%1$d/%2$d merkkiä</item>
+    </plurals>
+    <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
+        <item quantity="one">%1$d/%2$d merkki</item>
+        <item quantity="other">%1$d/%2$d merkkiä</item>
+    </plurals>
+    <!--  STRING ARRAYS  -->
+    <string-array name="ordinals_as_words">
+        <item translatable="false"/>
+        <item>ensimmäinen</item>
+        <item>toinen</item>
+        <item>kolmas</item>
+        <item>neljäs</item>
+        <item>viides</item>
+    </string-array>
+    <string-array name="ordinals_as_words_backwards">
+        <item translatable="false"/>
+        <item>viimeinen</item>
+        <item>toiseksi viimeinen</item>
+        <item>kolmanneksi viimeinen</item>
+        <item>neljänneksi viimeinen</item>
+        <item>viidenneksi viimeinen</item>
+    </string-array>
+    <string-array name="app_themes">
+        <item>Vaalea</item>
+        <item>Tumma</item>
+        <item>Järjestelmän oletus</item>
+    </string-array>
+    <string-array name="time_formats">
+        <item>Järjestelmän oletus</item>
+        <item>13:00</item>
+        <item>1:00 PM</item>
+    </string-array>
+    <string-array name="week_start">
+        <item>Järjestelmän oletus</item>
+        <item>Maanantai</item>
+        <item>Lauantai</item>
+        <item>Sunnuntai</item>
+    </string-array>
+</resources>

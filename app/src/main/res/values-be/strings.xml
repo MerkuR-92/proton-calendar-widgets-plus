@@ -613,9 +613,9 @@
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
         <item quantity="one">Аб\'яднаць %1$d каляндар у Proton Calendar.</item>
-        <item quantity="few">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
-        <item quantity="many">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
-        <item quantity="other">Аб\'яднанне %1$d календароў у Proton Calendar.</item>
+        <item quantity="few">Аб\'яднаць %1$d календары ў Proton Calendar.</item>
+        <item quantity="many">Аб\'яднаць %1$d календароў у Proton Calendar.</item>
+        <item quantity="other">Аб\'яднаць %1$d календароў у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календара</item>
