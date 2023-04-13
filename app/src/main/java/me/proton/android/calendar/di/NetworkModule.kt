@@ -6,8 +6,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.common.BASE_URL
 import me.proton.android.calendar.data.api.CalendarApiClient
+import me.proton.android.calendar.domain.EnvironmentConfiguration
 import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.data.di.AlternativeApiPins
 import me.proton.core.network.data.di.BaseProtonApiUrl
@@ -27,7 +27,7 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @BaseProtonApiUrl
-    fun provideProtonApiUrl(): HttpUrl = BASE_URL.toHttpUrl()
+    fun provideProtonApiUrl(envConfiguration: EnvironmentConfiguration): HttpUrl = envConfiguration.apiHost.toHttpUrl()
 
     @DohProviderUrls
     @Provides
@@ -55,9 +55,11 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideExtraHeaderProvider(): ExtraHeaderProvider = ExtraHeaderProviderImpl().apply {
-        BuildConfig.PROXY_TOKEN?.takeIfNotBlank()?.let { addHeaders("X-atlas-secret" to it) }
-    }
+    fun provideExtraHeaderProvider(envConfiguration: EnvironmentConfiguration): ExtraHeaderProvider =
+        ExtraHeaderProviderImpl().apply {
+            envConfiguration.proxyToken?.takeIfNotBlank()
+                ?.let { addHeaders("X-atlas-secret" to it) }
+        }
 }
 
 @Module
