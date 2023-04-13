@@ -659,7 +659,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
             val event = eventViewModel.eventLiveData.value
             val userEmails = userAddresses.map { it.email } // Emails are canonicalized in getParticipationStatus
-            if (event != null && !event.calendar.isSubscribed && event.calendar.allowEditEvents) {
+            if (event != null && !event.calendar.isSubscribed && event.calendar.allowEditEvents && event.calendar.isOwner) {
                 val isActive = event.calendar.isActive
                 val isUserAddressAllowedSend = event.isUserAddressAllowedSend(userAddresses, isFreeUser)
                 val participationStatus = event.getParticipationStatus(userEmails)
