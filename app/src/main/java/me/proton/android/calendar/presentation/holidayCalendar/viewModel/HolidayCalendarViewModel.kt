@@ -62,6 +62,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
         object Idle: HolidayCalendarState()
         object AlreadyExists: HolidayCalendarState()
+        object PickBasedOnLocation: HolidayCalendarState()
 
         sealed class Processing: HolidayCalendarState() {
             object Saving: Processing()
@@ -186,9 +187,19 @@ class HolidayCalendarViewModel @Inject constructor(
             val matchingDefaultHolidayCalendar = countriesMatchingTimeZone.firstOrNull {
                 it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
             } ?: countriesMatchingTimeZone.firstOrNull()
+            // If holiday calendar already exists, leave the fields empty
+            matchingDefaultHolidayCalendar?.let {
+                val holidayCalendarAlreadyExists = calendarsRepository.selectCalendars(userId.id).firstOrNull {
+                    it.id == matchingDefaultHolidayCalendar.calendarId
+                } != null
+                if (holidayCalendarAlreadyExists) return
+            }
+            if (countriesMatchingTimeZone.isNotEmpty()) {
+                // Change state so we display based on location disclaimer
+                holidayCalendarState.value = HolidayCalendarState.PickBasedOnLocation
+            }
             _country.value = matchingDefaultHolidayCalendar?.country ?: ""
             _language.value = matchingDefaultHolidayCalendar?.language ?: ""
-            checkExistingHolidayCalendar()
         } ?: run {
             logger.e("ManagedHolidayCalendars were null in HolidayCalendarViewModel initCreateHolidayCalendar")
             displayInitErrorSnack()
@@ -242,12 +253,18 @@ class HolidayCalendarViewModel @Inject constructor(
         calendarEdited = true
         _country.value = country
 
+        if (holidayCalendarState.value == HolidayCalendarState.PickBasedOnLocation) {
+            // Clear based on location state
+            holidayCalendarState.value = HolidayCalendarState.Idle
+        }
+
         // Get the calendar matching the default language
         val matchingCountries = holidayCalendars.value?.filter { it.country == country }
         val matchingDefaultHolidayCalendar = matchingCountries?.firstOrNull {
             it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
         } ?: matchingCountries?.firstOrNull()
         _language.value = matchingDefaultHolidayCalendar?.language ?: ""
+
         checkExistingHolidayCalendar()
     }
 
@@ -269,8 +286,10 @@ class HolidayCalendarViewModel @Inject constructor(
             it.country == _country.value && it.language == _language.value
         }?.calendarId
         if (_calendar?.id == holidayCalendarId) {
-            // Clear already exists state
-            holidayCalendarState.value = HolidayCalendarState.Idle
+            if (holidayCalendarState.value == HolidayCalendarState.AlreadyExists) {
+                // Clear already exists state if needed
+                holidayCalendarState.value = HolidayCalendarState.Idle
+            }
             return
         }
         val holidayCalendarAlreadyExists =
@@ -279,11 +298,10 @@ class HolidayCalendarViewModel @Inject constructor(
                     it.id == holidayCalendarId
                 } != null
             } ?: false
-
         if (holidayCalendarAlreadyExists) {
             // Set already exists state
             holidayCalendarState.value = HolidayCalendarState.AlreadyExists
-        } else {
+        } else if (holidayCalendarState.value == HolidayCalendarState.AlreadyExists) {
             // Clear already exists state
             holidayCalendarState.value = HolidayCalendarState.Idle
         }
@@ -438,7 +456,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
             // Use holiday calendar snack state here to display snack in month view
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
-                resourceProvider.provideString(R.string.snack_holiday_calendar_already_exists)
+                resourceProvider.provideString(R.string.holiday_calendar_already_exists)
             )
             return true
         }
