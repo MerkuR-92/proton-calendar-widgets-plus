@@ -169,7 +169,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         lifecycleScope.launch {
             calendarId?.let {
-                // Hide disclaimer based on location
+                // Hide disclaimer based on time zone
                 holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
                 // Init form for existing calendar
                 holidayCalendarViewModel.initUpdateHolidayCalendar(it)
@@ -236,10 +236,10 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         holidayCalendarViewModel.holidayCalendarState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { holidayCalendarState ->
             val processingEvent = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.Processing
             val alreadyExists = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.AlreadyExists
-            val pickBasedOnLocation = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.PickBasedOnLocation
+            val pickBasedOnTimeZone = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.PickBasedOnTimeZone
 
-            // Display disclaimer based on location
-            holiday_calendar_form_country_search_disclaimer.visibleOrGone(pickBasedOnLocation)
+            // Display disclaimer based on time zone
+            holiday_calendar_form_country_search_disclaimer.visibleOrGone(pickBasedOnTimeZone)
 
             // Update action bar buttons visibility
             loadingAction.visibleOrGone(processingEvent)
@@ -265,7 +265,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 )
             )
 
-            // Hide location disclaimer if we show error
+            // Hide time zone disclaimer if we show error
             if (alreadyExists) holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
             // Display error subtext when calendar already exists
             holiday_calendar_form_country_search_error.visibleOrGone(alreadyExists)

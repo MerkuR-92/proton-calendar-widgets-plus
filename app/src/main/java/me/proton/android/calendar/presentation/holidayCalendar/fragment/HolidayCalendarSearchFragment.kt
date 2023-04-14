@@ -135,7 +135,7 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
                 it.key.first().uppercase(),
                 it.value.first().timezones.contains(primaryTimeZoneId)
             )
-            if (header.locationDefault) {
+            if (header.basedOnTimeZone) {
                 if (!holidayItems.contains(header)) holidayItems.add(0, header)
                 val countryCode = it.value.first().countryCode
                 holidayItems.add(1,

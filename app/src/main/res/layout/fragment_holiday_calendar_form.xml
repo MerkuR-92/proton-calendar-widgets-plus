@@ -98,7 +98,7 @@
             android:id="@+id/holiday_calendar_form_country_search_disclaimer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/holiday_calendar_location_based"
+            android:text="@string/holiday_calendar_time_zone_based"
             android:visibility="gone"
             tools:visibility="visible"
             style="@style/Text.Caption.Weak"

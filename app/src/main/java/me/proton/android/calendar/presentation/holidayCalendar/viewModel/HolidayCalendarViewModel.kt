@@ -62,7 +62,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
         object Idle: HolidayCalendarState()
         object AlreadyExists: HolidayCalendarState()
-        object PickBasedOnLocation: HolidayCalendarState()
+        object PickBasedOnTimeZone: HolidayCalendarState()
 
         sealed class Processing: HolidayCalendarState() {
             object Saving: Processing()
@@ -195,8 +195,8 @@ class HolidayCalendarViewModel @Inject constructor(
                 if (holidayCalendarAlreadyExists) return
             }
             if (countriesMatchingTimeZone.isNotEmpty()) {
-                // Change state so we display based on location disclaimer
-                holidayCalendarState.value = HolidayCalendarState.PickBasedOnLocation
+                // Change state so we display based on time zone disclaimer
+                holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
             }
             _country.value = matchingDefaultHolidayCalendar?.country ?: ""
             _language.value = matchingDefaultHolidayCalendar?.language ?: ""
@@ -253,8 +253,8 @@ class HolidayCalendarViewModel @Inject constructor(
         calendarEdited = true
         _country.value = country
 
-        if (holidayCalendarState.value == HolidayCalendarState.PickBasedOnLocation) {
-            // Clear based on location state
+        if (holidayCalendarState.value == HolidayCalendarState.PickBasedOnTimeZone) {
+            // Clear based on time zone state
             holidayCalendarState.value = HolidayCalendarState.Idle
         }
 

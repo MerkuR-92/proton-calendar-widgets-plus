@@ -65,7 +65,7 @@ class HolidayCalendarListAdapter(
     }
 
     sealed class HolidayItem(val type: HolidayItemType) {
-        data class Header(val letter: String, val locationDefault: Boolean): HolidayItem(HolidayItemType.Header)
+        data class Header(val letter: String, val basedOnTimeZone: Boolean): HolidayItem(HolidayItemType.Header)
         data class Value(val holiday: Holiday): HolidayItem(HolidayItemType.Value)
     }
 
@@ -95,7 +95,7 @@ class HolidayCalendarListAdapter(
     inner class HeaderViewHolder(private val headerView: View): ViewHolder(headerView){
         fun bind(headerItem: HolidayItem.Header) {
             headerView.item_holiday_calendar_header_text.text =
-                if (headerItem.locationDefault) headerView.context.getString(R.string.holiday_calendar_location_based)
+                if (headerItem.basedOnTimeZone) headerView.context.getString(R.string.holiday_calendar_time_zone_based)
                 else headerItem.letter
         }
     }
