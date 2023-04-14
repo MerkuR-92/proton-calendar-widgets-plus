@@ -29,6 +29,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Holiday
+import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.holidayCalendar.adapter.HolidayCalendarListAdapter
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -48,6 +49,7 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
     override val isScrollable = false
 
     private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
+    private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
@@ -116,19 +118,22 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
         holidayCalendarViewModel.holidayCalendars.observe(viewLifecycleOwner) { holidayCalendars ->
             holidayCalendars ?: return@observe
 
-            holidayCalendarList.clear()
-            holidayCalendarList.addAll(holidayCalendars.toHolidayItems())
-            holidayCalendarListAdapter.submitList(holidayCalendarList)
+            lifecycleScope.launch {
+                val primaryTimeZoneId = calendarViewModel.getCalendarUserSettingsPrimaryTimezone() ?: ZoneId.systemDefault().id
+                holidayCalendarList.clear()
+                holidayCalendarList.addAll(holidayCalendars.toHolidayItems(primaryTimeZoneId))
+                holidayCalendarListAdapter.submitList(holidayCalendarList)
+            }
         }
     }
 
-    @SuppressLint("DiscouragedApi") // Suppress annotation due to getting flag drawables by identifier name
-    fun List<ManagedHolidayCalendarEntity>.toHolidayItems(): List<HolidayCalendarListAdapter.HolidayItem> {
+    @SuppressLint("DiscouragedApi") // Suppress annotation caused by getIdentifier to get flag drawables
+    fun List<ManagedHolidayCalendarEntity>.toHolidayItems(primaryTimeZoneId: String): List<HolidayCalendarListAdapter.HolidayItem> {
         val holidayItems = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
         this.sortedBy { it.country }.groupBy { it.country }.forEach {
             val header = HolidayCalendarListAdapter.HolidayItem.Header(
                 it.key.first().uppercase(),
-                it.value.first().timezones.contains(ZoneId.systemDefault().id)
+                it.value.first().timezones.contains(primaryTimeZoneId)
             )
             if (header.locationDefault) {
                 if (!holidayItems.contains(header)) holidayItems.add(0, header)

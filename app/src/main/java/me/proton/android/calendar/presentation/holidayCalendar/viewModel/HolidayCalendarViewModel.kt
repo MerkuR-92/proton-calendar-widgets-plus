@@ -173,7 +173,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
         _userId.value = userId
 
-        val primaryTimezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone ?: ZoneId.systemDefault().id
+        val primaryTimezone = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id) ?: ZoneId.systemDefault().id
 
         // Init managed holiday calendars with DB data
         getManagedHolidayCalendars()?.let { holidayCalendars ->
@@ -370,7 +370,7 @@ class HolidayCalendarViewModel @Inject constructor(
                 return
             }
 
-            val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+            val displayTimeZoneId = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
                 ?: ZoneId.systemDefault().id
 
             // Join new holiday calendar
@@ -473,7 +473,7 @@ class HolidayCalendarViewModel @Inject constructor(
         // Check that holiday calendar doesn't already exist
         if (handleExistingHolidayCalendar(userId, holidayCalendar)) return
 
-        val displayTimeZoneId = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+        val displayTimeZoneId = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
             ?: ZoneId.systemDefault().id
 
         val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
