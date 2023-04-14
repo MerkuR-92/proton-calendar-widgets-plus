@@ -24,7 +24,7 @@ class LeaveCalendarUseCase @Inject constructor(
         calendarId: String
     ): UseCase.Result {
 
-        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("LeaveCalendarUseCase: Member was null")
+        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Success<Unit>() // If member was not in DB then user already left that calendar
 
         return when (val leaveCalendarResponse =
             calendarsApi.leaveCalendar(userId, calendarId, member.id)

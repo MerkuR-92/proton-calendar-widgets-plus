@@ -61,6 +61,7 @@ class HolidayCalendarViewModel @Inject constructor(
     sealed class HolidayCalendarState {
 
         object Idle: HolidayCalendarState()
+        object AlreadyExists: HolidayCalendarState()
 
         sealed class Processing: HolidayCalendarState() {
             object Saving: Processing()
@@ -105,9 +106,10 @@ class HolidayCalendarViewModel @Inject constructor(
         _calendarColor.value = 0
         _defaultAllDayAlarms.value = arrayListOf()
         _calendar = null
+        calendarEdited = false
         holidayCalendarSnackState.value = null
         calendarSettingsSnackState.value = null
-        calendarEdited = false
+        holidayCalendarState.value = HolidayCalendarState.Idle
     }
 
     suspend fun initUpdateHolidayCalendar(calendarId: String) {
@@ -186,6 +188,7 @@ class HolidayCalendarViewModel @Inject constructor(
             } ?: countriesMatchingTimeZone.firstOrNull()
             _country.value = matchingDefaultHolidayCalendar?.country ?: ""
             _language.value = matchingDefaultHolidayCalendar?.language ?: ""
+            checkExistingHolidayCalendar()
         } ?: run {
             logger.e("ManagedHolidayCalendars were null in HolidayCalendarViewModel initCreateHolidayCalendar")
             displayInitErrorSnack()
@@ -234,7 +237,7 @@ class HolidayCalendarViewModel @Inject constructor(
         _defaultAllDayAlarms.value = tmpDefaultAllDayAlarms
     }
 
-    fun handleCountry(country: String, defaultLanguageCode: String) {
+    suspend fun handleCountry(country: String, defaultLanguageCode: String) {
         if (_country.value == country) return
         calendarEdited = true
         _country.value = country
@@ -245,18 +248,45 @@ class HolidayCalendarViewModel @Inject constructor(
             it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
         } ?: matchingCountries?.firstOrNull()
         _language.value = matchingDefaultHolidayCalendar?.language ?: ""
+        checkExistingHolidayCalendar()
     }
 
-    fun handleLanguage(language: String) {
+    suspend fun handleLanguage(language: String) {
         if (_language.value == language) return
         calendarEdited = true
         _language.value = language
+        checkExistingHolidayCalendar()
     }
 
     fun handleCalendarColor(calendarColor: Int) {
         if (_calendarColor.value == calendarColor) return
         calendarEdited = true
         _calendarColor.value = calendarColor
+    }
+
+    private suspend fun checkExistingHolidayCalendar() {
+        val holidayCalendarId = holidayCalendars.value?.firstOrNull {
+            it.country == _country.value && it.language == _language.value
+        }?.calendarId
+        if (_calendar?.id == holidayCalendarId) {
+            // Clear already exists state
+            holidayCalendarState.value = HolidayCalendarState.Idle
+            return
+        }
+        val holidayCalendarAlreadyExists =
+            userId.value?.id?.let { userId ->
+                calendarsRepository.selectCalendars(userId).firstOrNull {
+                    it.id == holidayCalendarId
+                } != null
+            } ?: false
+
+        if (holidayCalendarAlreadyExists) {
+            // Set already exists state
+            holidayCalendarState.value = HolidayCalendarState.AlreadyExists
+        } else {
+            // Clear already exists state
+            holidayCalendarState.value = HolidayCalendarState.Idle
+        }
     }
 
     suspend fun handleSaveHolidayCalendar(returnToSettings: Boolean, isCreate: Boolean, selectedDate: LocalDate?) {

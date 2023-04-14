@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_cal
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_color_press
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_flag
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_search_disclaimer
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_search_error
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value_press
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications
@@ -33,6 +34,7 @@ import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_cal
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_press
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_press
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_value
+import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
@@ -41,6 +43,7 @@ import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
@@ -230,8 +233,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
-        holidayCalendarViewModel.holidayCalendarState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { eventState ->
-            val processingEvent = eventState is HolidayCalendarViewModel.HolidayCalendarState.Processing
+        holidayCalendarViewModel.holidayCalendarState.asLiveData(lifecycleScope.coroutineContext).observe(viewLifecycleOwner) { holidayCalendarState ->
+            val processingEvent = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.Processing
+            val alreadyExists = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.AlreadyExists
 
             // Update action bar buttons visibility
             loadingAction.visibleOrGone(processingEvent)
@@ -247,6 +251,21 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 holiday_calendar_form_default_all_day_event_notifications_list.getChildAt(i)
                     .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
+
+            // Disable save when calendar already exists
+            buttonSave.isEnabled = !alreadyExists
+            buttonSave.toolbar_action_text.setTextColor(
+                if (alreadyExists) ContextCompat.getColor(requireContext(), R.color.text_disabled)
+                else requireContext().getColorFromAttr(R.attr.proton_text_accent)
+            )
+
+            // Hide location disclaimer if we show error
+            if (alreadyExists) holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
+            // Display error subtext when calendar already exists
+            holiday_calendar_form_country_search_error.visibleOrGone(alreadyExists)
+            holiday_calendar_form_country_search_error.text =
+                if (alreadyExists) getString(R.string.snack_holiday_calendar_already_exists)
+                else ""
         }
     }
 
@@ -323,7 +342,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     languages.indexOf(language)
                 } ?: 0
             ) {
-                holidayCalendarViewModel.handleLanguage(languages[it])
+                lifecycleScope.launch {
+                    holidayCalendarViewModel.handleLanguage(languages[it])
+                }
             }
         }
 

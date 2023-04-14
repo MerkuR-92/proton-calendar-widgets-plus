@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,7 @@ import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_c
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_input
 import kotlinx.android.synthetic.main.toolbar_action_button.view.imageButton
 import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.HOLIDAY_SEARCH_MIN_QUERY_LENGTH
@@ -101,7 +103,9 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
         val countryListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         holiday_calendar_country_list.layoutManager = countryListLayoutManager
         holidayCalendarListAdapter = HolidayCalendarListAdapter {
-            holidayCalendarViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
+            lifecycleScope.launch {
+                holidayCalendarViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
+            }
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
