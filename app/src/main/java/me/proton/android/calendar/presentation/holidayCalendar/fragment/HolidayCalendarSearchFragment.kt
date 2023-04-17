@@ -16,6 +16,7 @@ import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_c
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_clear
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_close
 import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_input
+import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_no_result
 import kotlinx.android.synthetic.main.toolbar_action_button.view.imageButton
 import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
@@ -86,6 +87,7 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
                 requireActivity().clearFocusAndHideKeyboard(view)
+                holiday_calendar_search_no_result.visibleOrGone(false)
                 holiday_calendar_search_input.text.clear()
                 holidayCalendarListAdapter.setSearchQuery("")
                 holidayCalendarListAdapter.submitList(holidayCalendarList)
@@ -180,8 +182,12 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
                     resultList.add(HolidayCalendarListAdapter.HolidayItem.Header(it.key.toString(), false))
                     resultList.addAll(it.value)
                 }
+                holiday_calendar_search_no_result.visibleOrGone(resultList.isEmpty())
                 holidayCalendarListAdapter.submitList(resultList.distinct())
             } else {
+                holidayCalendarListAdapter.setSearchQuery("")
+                holiday_calendar_search_no_result.visibleOrGone(false)
+                holidayCalendarListAdapter.submitList(holidayCalendarList)
             }
         }
     }

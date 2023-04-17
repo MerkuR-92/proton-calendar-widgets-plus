@@ -79,4 +79,36 @@
         app:layout_constraintTop_toBottomOf="@+id/holiday_calendar_search_separator"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <LinearLayout
+        android:id="@+id/holiday_calendar_search_no_result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:visibility="visible"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/holiday_calendar_search_separator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/search_no_results_illustration"
+            android:paddingBottom="8dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/search_empty_results_title"
+            style="@style/Text.Headline"
+            android:paddingBottom="8dp"
+            />
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

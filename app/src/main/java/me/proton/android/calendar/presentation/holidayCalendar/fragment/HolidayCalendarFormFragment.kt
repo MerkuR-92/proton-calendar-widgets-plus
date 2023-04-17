@@ -209,9 +209,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     requireContext().packageName
                 )
             )
-            // Hide the language field if there is only one option available
+            // Disable the language field if there is only one option available
             val languages = holidayCalendarViewModel.getLanguages()
-            holiday_calendar_form_language_layout.visibleOrGone(languages.size > 1)
+            holiday_calendar_form_language_press.isEnabled = languages.size > 1
         }
 
         holidayCalendarViewModel.language.observe(viewLifecycleOwner) { language ->
