@@ -210,7 +210,7 @@ class HolidayCalendarViewModel @Inject constructor(
     private fun displayInitErrorSnack() {
         // Use settings snack state here to display snack in calendar settings view
         calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
-            resourceProvider.provideString(R.string.snack_calendar_init_error)
+            resourceProvider.provideString(R.string.snack_holiday_calendar_init_error)
         )
     }
 
@@ -514,6 +514,9 @@ class HolidayCalendarViewModel @Inject constructor(
             logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
-        return calendarsRepository.getManagedHolidayCalendars(userId)
+        val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)
+        return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
+            calendarsRepository.fetchManagedHolidayCalendars(userId)
+        } else dbManagedHolidayCalendars
     }
 }
