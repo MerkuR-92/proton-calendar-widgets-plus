@@ -502,7 +502,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private fun onClickCreateCalendar(calendarType: CalendarType) {
         lifecycleScope.launch {
             // Check if calendar limit was reached
-            when (calendarViewModel.isCalendarLimitReached()) {
+            when (calendarViewModel.isCalendarLimitReached(calendarType)) {
                 CalendarViewModel.CalendarLimit.ERROR -> {
                     view?.displaySnackBar(this@SettingsFragment.getString(R.string.snack_create_calendar_error))
                 }

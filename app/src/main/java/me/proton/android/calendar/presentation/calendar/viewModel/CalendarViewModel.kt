@@ -48,6 +48,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
@@ -909,15 +910,29 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun getPersonalCalendarsCount(): Int {
-        return userCalendars.value?.count { it.isOwner } ?: 0
+        return getUserCalendars()?.count { it.isOwner } ?: 0
     }
 
-    suspend fun isCalendarLimitReached(): CalendarLimit {
+    suspend fun isCalendarLimitReached(calendarType: CalendarType): CalendarLimit {
         val calendarsCount = getCalendarsCount()
+        val personalCalendarsCounts = getPersonalCalendarsCount()
+
         val isFreeUser = isFreeUser() ?: return CalendarLimit.ERROR
 
-        if (isFreeUser && calendarsCount >= MAX_CALENDAR_FREE) return CalendarLimit.FREE_REACHED
-        if (!isFreeUser && calendarsCount >= MAX_CALENDAR_PAID) return CalendarLimit.PAID_REACHED
+        // User can't have only subscribed / shared / holiday calendars.
+        val blockForMandatoryPersonalCalendar =
+            personalCalendarsCounts == 0 &&
+                    calendarType == CalendarType.HOLIDAY &&
+                    calendarsCount >= (if (isFreeUser) MAX_CALENDAR_FREE else MAX_CALENDAR_PAID) - 1
+
+        // Check free user limit
+        if (isFreeUser && (calendarsCount >= MAX_CALENDAR_FREE || blockForMandatoryPersonalCalendar)) {
+            return CalendarLimit.FREE_REACHED
+        }
+        // Check paid user limit
+        if (!isFreeUser && (calendarsCount >= MAX_CALENDAR_PAID || blockForMandatoryPersonalCalendar)) {
+            return CalendarLimit.PAID_REACHED
+        }
         return CalendarLimit.NOT_REACHED
     }
 
@@ -926,39 +941,47 @@ class CalendarViewModel @Inject constructor(
      */
 
     suspend fun getUserCalendars(): List<Calendar>? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getUserCalendars")
-            return null
+        return userCalendars.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getUserCalendars")
+                return null
+            }
+            calendarsRepository.selectUserCalendars(userId.id)
         }
-        return userCalendars.value ?: calendarsRepository.selectUserCalendars(userId.id)
     }
 
     suspend fun getActiveUserCalendars(): List<Calendar>? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getActiveUserCalendars")
-            return null
+        return activeUserCalendars.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getActiveUserCalendars")
+                return null
+            }
+            calendarsRepository.selectActiveUserCalendars(userId.id)
         }
-        return activeUserCalendars.value ?: calendarsRepository.selectActiveUserCalendars(userId.id)
     }
 
     suspend fun getDisabledUserCalendars(): List<Calendar>? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getDisabledUserCalendars")
-            return null
+        return disabledUserCalendars.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getDisabledUserCalendars")
+                return null
+            }
+            calendarsRepository.selectDisabledUserCalendars(userId.id)
         }
-        return disabledUserCalendars.value ?: calendarsRepository.selectDisabledUserCalendars(userId.id)
     }
 
     suspend fun getInactiveUserCalendars(): List<Calendar>? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getInactiveUserCalendars")
-            return null
+        return inactiveUserCalendars.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getInactiveUserCalendars")
+                return null
+            }
+            calendarsRepository.selectInactiveUserCalendars(userId.id)
         }
-        return inactiveUserCalendars.value ?: calendarsRepository.selectInactiveUserCalendars(userId.id)
     }
 
     suspend fun getUserAddresses(): List<UserAddress>? {
@@ -985,12 +1008,12 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun getTimeZoneId(): ZoneId? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getTimeZoneId")
-            return null
-        }
         return timeZoneId.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getTimeZoneId")
+                return null
+            }
             calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)?.let {
                 ZoneId.of(it)
             }
@@ -998,48 +1021,58 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun getTimeFormat(): Int? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getTimeFormat")
-            return null
+        return timeFormat.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getTimeFormat")
+                return null
+            }
+            userSettingsRepository.getTimeFormat(userId, database)
         }
-        return timeFormat.value ?: userSettingsRepository.getTimeFormat(userId, database)
     }
 
     suspend fun getDefaultCalendarId(): String? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
-            return null
+        return defaultCalendarId.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
+                return null
+            }
+            calendarsRepository.getDefaultCalendarId(userId.id)
         }
-        return defaultCalendarId.value ?: calendarsRepository.getDefaultCalendarId(userId.id)
     }
 
     suspend fun getAutoDetectPrimaryTimezone(): Boolean? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getAutoDetectPrimaryTimezone")
-            return null
+        return autoDetectPrimaryTimezone.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getAutoDetectPrimaryTimezone")
+                return null
+            }
+            calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId.id)?.toBoolean()
         }
-        return autoDetectPrimaryTimezone.value ?: calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId.id)?.toBoolean()
     }
 
     suspend fun getDisplayWeekNumber(): Boolean? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getDisplayWeekNumber")
-            return null
+        return displayWeekNumber.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getDisplayWeekNumber")
+                return null
+            }
+            calendarsRepository.selectCalendarUserSettingsDisplayWeekNumber(userId.id)?.toBoolean()
         }
-        return displayWeekNumber.value ?: calendarsRepository.selectCalendarUserSettingsDisplayWeekNumber(userId.id)?.toBoolean()
     }
 
     suspend fun getWeekStart(): Int? {
-        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getWeekStart")
-            return null
+        return weekStart.value ?: run {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getWeekStart")
+                return null
+            }
+            userSettingsRepository.getWeekStart(userId, database)
         }
-        return weekStart.value ?: userSettingsRepository.getWeekStart(userId, database)
     }
 
     suspend fun getMonthViewEventsMap(

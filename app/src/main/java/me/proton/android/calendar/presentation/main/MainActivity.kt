@@ -1195,7 +1195,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private fun onClickCreateCalendar(calendarType: CalendarType) {
         lifecycleScope.launch {
             // Check if calendar limit was reached
-            when (calendarViewModel.isCalendarLimitReached()) {
+            when (calendarViewModel.isCalendarLimitReached(calendarType)) {
                 CalendarViewModel.CalendarLimit.ERROR -> {
                     this@MainActivity.displaySnackBar(this@MainActivity.getString(R.string.snack_create_calendar_error))
                 }
