@@ -194,10 +194,13 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun observeHolidayCalendarFormValues() {
 
         holidayCalendarViewModel.country.observe(viewLifecycleOwner) { country ->
+            // Hide the language field if country field is empty
             holiday_calendar_form_language_layout.visibleOrGone(country.isNotEmpty())
+            // Display placeholder if country field is empty
             holiday_calendar_form_country_value.visibleOrInvisible(country.isNotEmpty())
             holiday_calendar_form_country_value_placeholder.visibleOrGone(country.isEmpty())
             holiday_calendar_form_country_value.text = country
+            // Set the country flag
             val countryCode = holidayCalendarViewModel.holidayCalendars.value?.firstOrNull { it.country == country }?.countryCode
             holiday_calendar_form_country_flag.setImageResource(
                 resources.getIdentifier(
@@ -206,6 +209,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     requireContext().packageName
                 )
             )
+            // Hide the language field if there is only one option available
+            val languages = holidayCalendarViewModel.getLanguages()
+            holiday_calendar_form_language_layout.visibleOrGone(languages.size > 1)
         }
 
         holidayCalendarViewModel.language.observe(viewLifecycleOwner) { language ->
