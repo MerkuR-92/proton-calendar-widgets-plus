@@ -130,41 +130,33 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
     @SuppressLint("DiscouragedApi") // Suppress annotation caused by getIdentifier to get flag drawables
     fun List<ManagedHolidayCalendarEntity>.toHolidayItems(primaryTimeZoneId: String): List<HolidayCalendarListAdapter.HolidayItem> {
         val holidayItems = arrayListOf<HolidayCalendarListAdapter.HolidayItem>()
+        var basedOnTimeZoneHeaderAdded = false
         this.sortedBy { it.country }.groupBy { it.country }.forEach {
             val header = HolidayCalendarListAdapter.HolidayItem.Header(
                 it.key.first().uppercase(),
-                it.value.first().timezones.contains(primaryTimeZoneId)
+                false
             )
-            if (header.basedOnTimeZone) {
-                if (!holidayItems.contains(header)) holidayItems.add(0, header)
-                val countryCode = it.value.first().countryCode
-                holidayItems.add(1,
-                    HolidayCalendarListAdapter.HolidayItem.Value(
-                        Holiday(
-                            it.key,
-                            resources.getIdentifier(
-                                "${requireContext().packageName}:drawable/flag_$countryCode",
-                                "drawable",
-                                requireContext().packageName
-                            )
-                        )
+            // Add first letter header
+            if (!holidayItems.contains(header)) holidayItems.add(header)
+            val countryCode = it.value.first().countryCode
+            val countryFlagDrawable = resources.getIdentifier(
+                "${requireContext().packageName}:drawable/flag_$countryCode",
+                "drawable",
+                requireContext().packageName
+            )
+            holidayItems.add(HolidayCalendarListAdapter.HolidayItem.Value(Holiday(it.key, countryFlagDrawable)))
+
+            if (it.value.first().timezones.contains(primaryTimeZoneId)) {
+                // Add based on time zone item
+                if (!basedOnTimeZoneHeaderAdded) {
+                    val basedOnTimeZoneHeaderHeader = HolidayCalendarListAdapter.HolidayItem.Header(
+                        it.key.first().uppercase(),
+                        it.value.first().timezones.contains(primaryTimeZoneId)
                     )
-                )
-            } else {
-                if (!holidayItems.contains(header)) holidayItems.add(header)
-                val countryCode = it.value.first().countryCode
-                holidayItems.add(
-                    HolidayCalendarListAdapter.HolidayItem.Value(
-                        Holiday(
-                            it.key,
-                            resources.getIdentifier(
-                                "${requireContext().packageName}:drawable/flag_$countryCode",
-                                "drawable",
-                                requireContext().packageName
-                            )
-                        )
-                    )
-                )
+                    holidayItems.add(0, basedOnTimeZoneHeaderHeader)
+                    basedOnTimeZoneHeaderAdded = true
+                }
+                holidayItems.add(1, HolidayCalendarListAdapter.HolidayItem.Value(Holiday(it.key, countryFlagDrawable)))
             }
         }
         return holidayItems
