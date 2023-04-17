@@ -254,6 +254,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
+    <string name="nav_view_other_calendars">Other calendars</string>
     <string name="nav_view_disabled_calendars">%1$s (Disabled)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Not synced)</string>
     <string name="nav_view_syncing_calendars">%1$s (Syncing)</string>

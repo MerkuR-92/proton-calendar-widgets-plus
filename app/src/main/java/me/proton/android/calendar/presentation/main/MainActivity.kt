@@ -81,8 +81,8 @@ import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_press
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_subscribed_calendars
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_subscribed_calendars_list
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_other_calendars
+import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_other_calendars_list
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_icon
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_icon
@@ -199,11 +199,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val plansViewModel: PlansViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
-    private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
+    private lateinit var otherCalendarListAdapter: CalendarListAdapter
 
     private var otherCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
-    private val subscribedCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
+    private val otherCalendarsMediator = MediatorLiveData<Pair<List<Calendar>, List<CalendarSubscriptionEntity>>>()
 
     // Save the current view mode so that we know if we are navigating to day view from the month view
     private var currentViewMode: ViewMode? = null
@@ -1547,18 +1547,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         (userCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         userCalendarListView.adapter = userCalendarListAdapter
 
-        val subscribedCalendarListView = nav_view_main_content.nav_view_subscribed_calendars_list
-        val subscribedCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        subscribedCalendarListView.layoutManager = subscribedCalendarLayoutManager
-        subscribedCalendarListAdapter = CalendarListAdapter { calendar ->
+        val otherCalendarListView = nav_view_main_content.nav_view_other_calendars_list
+        val otherCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        otherCalendarListView.layoutManager = otherCalendarLayoutManager
+        otherCalendarListAdapter = CalendarListAdapter { calendar ->
             //On Calendar click event
             lifecycleScope.launch {
                 calendarViewModel.updateCalendarVisibility(calendar.id, calendar.display)
                 updateCalendarsDelayed()
             }
         }
-        (subscribedCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        subscribedCalendarListView.adapter = subscribedCalendarListAdapter
+        (otherCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        otherCalendarListView.adapter = otherCalendarListAdapter
     }
 
     private lateinit var updateCalendarsJob: Job
@@ -1613,7 +1613,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             inactiveCalendars ?: return@Observer
         })
 
-        subscribedCalendarsMediator.addSource(calendarViewModel.otherCalendars) { value ->
+        otherCalendarsMediator.addSource(calendarViewModel.otherCalendars) { value ->
             otherCalendars = value
 
             lifecycleScope.launch {
@@ -1624,24 +1624,24 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
 
             if (otherCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
+                otherCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
-        subscribedCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
+        otherCalendarsMediator.addSource(calendarViewModel.calendarSubscriptions) { value ->
             calendarSubscriptions = value
 
             if (otherCalendars != null && calendarSubscriptions != null) {
-                subscribedCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
+                otherCalendarsMediator.value = Pair(otherCalendars!!, calendarSubscriptions!!)
             }
         }
-        subscribedCalendarsMediator.observe(this@MainActivity, Observer {
+        otherCalendarsMediator.observe(this@MainActivity, Observer {
             it?.let {
-                val subscribedCalendars = it.first
+                val otherCalendars = it.first
                 val calendarSubscriptions = it.second
-                val dataSetChanged = subscribedCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
-                subscribedCalendarListAdapter.submitList(subscribedCalendars)
-                if (dataSetChanged) subscribedCalendarListAdapter.notifyDataSetChanged()
-                nav_view_main_content.nav_view_subscribed_calendars.visibleOrGone(subscribedCalendars.isNotEmpty())
+                val dataSetChanged = otherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
+                otherCalendarListAdapter.submitList(otherCalendars)
+                if (dataSetChanged) otherCalendarListAdapter.notifyDataSetChanged()
+                nav_view_main_content.nav_view_other_calendars.visibleOrGone(otherCalendars.isNotEmpty())
             }
         })
     }
