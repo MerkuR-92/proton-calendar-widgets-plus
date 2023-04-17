@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Hitelesítés megszakítva</string>
     <string name="snack_notification_already_added">Az emlékeztető már hozzá van adva</string>
     <string name="snack_opening_ics">Esemény megnyitása…</string>
+    <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Időzóna</string>
     <string name="settings_language_title">Alkalmazás nyelve</string>
     <string name="settings_language_default">Automatikus-észlelés</string>
+    <string name="settings_default_view_title">Alapértelmezett nézet</string>
+    <string name="settings_default_view_default">Legutóbbi nézet</string>
     <string name="settings_update_timezone_title">Kérdezzen rá az időzóna frissítésére</string>
     <string name="settings_update_timezone_subtitle">Amikor a rendszer időzónája eltér az aktuális időzóna beállításától, rákérdez, hogy frissítse-e a beállítást.</string>
     <string name="settings_update_timezone_checkbox">Nem kérem ezt a kérdést többé</string>

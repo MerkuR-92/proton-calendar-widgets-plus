@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autentificare anulată</string>
     <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
     <string name="snack_opening_ics">Se deschide evenimentul…</string>
+    <string name="snack_invite_in_shared_calendar_error">Crearea de invitații la un calendar partajat nu este permisă.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
     <string name="error_occurrence_does_not_exist">Căutarea nu există.</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Fus orar</string>
     <string name="settings_language_title">Limbă aplicație</string>
     <string name="settings_language_default">Autodetectare</string>
+    <string name="settings_default_view_title">Afișare implicită</string>
+    <string name="settings_default_view_default">Ultima afișare</string>
     <string name="settings_update_timezone_title">Setare solicitare actualizare fus orar</string>
     <string name="settings_update_timezone_subtitle">Dacă fusul orar al sistemului nu se potrivește cu cel din setări, vi se va solicita să-l actualizați.</string>
     <string name="settings_update_timezone_checkbox">Nu mă mai întreba</string>

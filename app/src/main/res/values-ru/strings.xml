@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Аутентификация отменена</string>
     <string name="snack_notification_already_added">Уведомление уже было добавлено</string>
     <string name="snack_opening_ics">Открытие события…</string>
+    <string name="snack_invite_in_shared_calendar_error">Создание приглашений в общем календаре не разрешается</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">События не существует</string>
     <string name="error_occurrence_does_not_exist">Повтор не существует</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Часовой пояс</string>
     <string name="settings_language_title">Язык приложения</string>
     <string name="settings_language_default">Автоопределение</string>
+    <string name="settings_default_view_title">Вид по умолчанию</string>
+    <string name="settings_default_view_default">Последний вид</string>
     <string name="settings_update_timezone_title">Попросите обновить настройки часового пояса</string>
     <string name="settings_update_timezone_subtitle">Если системный часовой пояс не соответствует текущей настройке часового пояса, вам будет предложено обновить ее.</string>
     <string name="settings_update_timezone_checkbox">Не спрашивать меня снова</string>

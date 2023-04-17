@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
     <string name="snack_opening_ics">Відкриття події…</string>
+    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
     <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Часовий пояс</string>
     <string name="settings_language_title">Мова програми</string>
     <string name="settings_language_default">Автовизначення</string>
+    <string name="settings_default_view_title">Default view</string>
+    <string name="settings_default_view_default">Last view</string>
     <string name="settings_update_timezone_title">Запит оновлення часового поясу</string>
     <string name="settings_update_timezone_subtitle">Якщо часовий пояс системи відрізняється від налаштування поточного часового поясу, вам буде запропоновано його оновити.</string>
     <string name="settings_update_timezone_checkbox">Надалі не запитувати</string>

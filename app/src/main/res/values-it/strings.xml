@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autenticazione annullata</string>
     <string name="snack_notification_already_added">La notifica è già stata aggiunta</string>
     <string name="snack_opening_ics">Apertura evento…</string>
+    <string name="snack_invite_in_shared_calendar_error">Non è consentito invitare partecipanti in un calendario condiviso</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'evento non esiste</string>
     <string name="error_occurrence_does_not_exist">L\'occorrenza non esiste</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Fuso orario</string>
     <string name="settings_language_title">Lingua dell\'app</string>
     <string name="settings_language_default">Riconoscimento automatico</string>
+    <string name="settings_default_view_title">Vista predefinita</string>
+    <string name="settings_default_view_default">Ultima visualizzazione</string>
     <string name="settings_update_timezone_title">Richiedi di aggiornare l\'impostazione del fuso orario</string>
     <string name="settings_update_timezone_subtitle">Se il fuso orario di sistema non corrisponde all\'impostazione corrente del fuso orario, ti verrà chiesto di aggiornarlo.</string>
     <string name="settings_update_timezone_checkbox">Non chiedermelo più</string>

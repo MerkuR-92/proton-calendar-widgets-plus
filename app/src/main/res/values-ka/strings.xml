@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">ავთენტიკაცია გაუქმებულია</string>
     <string name="snack_notification_already_added">გაფრთხილება უკვე დამატებული</string>
     <string name="snack_opening_ics">მოვლენის გახსნა…</string>
+    <string name="snack_invite_in_shared_calendar_error">გაზიარებულ კალენდარში მოსაწვევების შექმნა აკრძალულია</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">დროის სარტყელი</string>
     <string name="settings_language_title">აპის ენა</string>
     <string name="settings_language_default">ავტო-ძებნა</string>
+    <string name="settings_default_view_title">ნაგულისხმები ხედი</string>
+    <string name="settings_default_view_default">ბოლო ნახვა</string>
     <string name="settings_update_timezone_title">დროის სარტყლის განახლების მოთხოვნა</string>
     <string name="settings_update_timezone_subtitle">თუ სისტემის დროის სარტყელი არ ემთხვევა მის მიმდინარე მნიშვნელობას, თქვენ გთხოვენ, რომ განაახლოთ ის.</string>
     <string name="settings_update_timezone_checkbox">აღარ მკითხო</string>

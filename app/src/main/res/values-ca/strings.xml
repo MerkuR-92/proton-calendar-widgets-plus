@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autenticació cancel·lada</string>
     <string name="snack_notification_already_added">La notificació ja ha estat afegida.</string>
     <string name="snack_opening_ics">Obertura de l\'esdeveniment…</string>
+    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Fus horari</string>
     <string name="settings_language_title">Llengua de l\'aplicació</string>
     <string name="settings_language_default">Detecta automàticament</string>
+    <string name="settings_default_view_title">Default view</string>
+    <string name="settings_default_view_default">Last view</string>
     <string name="settings_update_timezone_title">Demana actualitzar la configuració de fus horari</string>
     <string name="settings_update_timezone_subtitle">Si el fus horari del sistema no coincideix amb la vostra configuració actual, es preguntarà si cal actualitzar-lo.</string>
     <string name="settings_update_timezone_checkbox">No m\'ho torneu a preguntar</string>

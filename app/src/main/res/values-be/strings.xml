@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Аўтэнтыфікацыя скасавана</string>
     <string name="snack_notification_already_added">Апавяшчэнне ўжо было дададзена</string>
     <string name="snack_opening_ics">Адкрыццё падзеі…</string>
+    <string name="snack_invite_in_shared_calendar_error">Стварэнне запрашэнняў у абагуленым календары забаронена</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Падзея не існуе</string>
     <string name="error_occurrence_does_not_exist">Паўтарэння не існуе</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Часавы пояс</string>
     <string name="settings_language_title">Мова праграмы</string>
     <string name="settings_language_default">Аўтаматычнае вызначэнне</string>
+    <string name="settings_default_view_title">Прадвызначаны выгляд</string>
+    <string name="settings_default_view_default">Апошні выгляд</string>
     <string name="settings_update_timezone_title">Пытацца пра змену часавага пояса</string>
     <string name="settings_update_timezone_subtitle">Калі часавы пояс сістэмы не супадае з наладамі бягучага часавага пояса, вам будзе прапанавана абнавіць яго.</string>
     <string name="settings_update_timezone_checkbox">Больш не пытаць</string>
@@ -548,7 +551,7 @@
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Скасаванне</string>
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Прыпынена</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Збой</string>
-    <string name="import_assistant_status_paused_lost_connection_title">Злучэнне з Google згублена</string>
+    <string name="import_assistant_status_paused_lost_connection_title">Падключэнне да Google страчана</string>
     <string name="import_assistant_status_paused_lost_connection_description">Для працягу імпартавання, націсніце кнопку \"Перападключыцца\", увайдзіце ў Google і зноў дайце Proton доступ да вашых даных Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Перападключыцца</string>
     <string name="import_assistant_status_paused_storage_full_title">Ваша сховішча запоўнена</string>

@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autenticação cancelada</string>
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Opening event…</string>
+    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Fuso horário</string>
     <string name="settings_language_title">Idioma da aplicação</string>
     <string name="settings_language_default">Detetar automaticamente</string>
+    <string name="settings_default_view_title">Default view</string>
+    <string name="settings_default_view_default">Last view</string>
     <string name="settings_update_timezone_title">Pedir para atualizar a definição de fuso horário</string>
     <string name="settings_update_timezone_subtitle">Se o fuso horário do sistema não coincidir com a definição de fuso horário atual, ser-lhe-á pedido que o atualize.</string>
     <string name="settings_update_timezone_checkbox">Não perguntar novamente</string>

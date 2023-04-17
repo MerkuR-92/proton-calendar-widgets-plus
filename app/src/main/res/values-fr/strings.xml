@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">L\'authentification est annulée.</string>
     <string name="snack_notification_already_added">La notification est déjà ajoutée.</string>
     <string name="snack_opening_ics">Ouverture de l\'événement…</string>
+    <string name="snack_invite_in_shared_calendar_error">La création d\'invitations pour un calendrier partagé est interdite.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas.</string>
     <string name="error_occurrence_does_not_exist">L\'occurrence n\'existe pas.</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Fuseau horaire</string>
     <string name="settings_language_title">Langue de l\'application</string>
     <string name="settings_language_default">Détection automatique</string>
+    <string name="settings_default_view_title">Affichage par défaut</string>
+    <string name="settings_default_view_default">Dernier affichage</string>
     <string name="settings_update_timezone_title">Demande de mise à jour du réglage du fuseau horaire</string>
     <string name="settings_update_timezone_subtitle">Si le fuseau horaire du système ne correspond pas au paramètre de fuseau horaire actuel, un message vous demandera de le mettre à jour.</string>
     <string name="settings_update_timezone_checkbox">Ne plus me demander</string>

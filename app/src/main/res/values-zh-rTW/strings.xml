@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">驗證已取消</string>
     <string name="snack_notification_already_added">通知已加入</string>
     <string name="snack_opening_ics">開啟事件……</string>
+    <string name="snack_invite_in_shared_calendar_error">不允許在分享的行事曆中建立邀請</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">此活動不存在</string>
     <string name="error_occurrence_does_not_exist">行程不存在</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">時區</string>
     <string name="settings_language_title">應用程式語言</string>
     <string name="settings_language_default">自動偵測</string>
+    <string name="settings_default_view_title">預設檢視</string>
+    <string name="settings_default_view_default">最後查看</string>
     <string name="settings_update_timezone_title">詢問是否更新時區設定</string>
     <string name="settings_update_timezone_subtitle">若系統時區與目前時區設定不符，將詢問您是否更新。</string>
     <string name="settings_update_timezone_checkbox">下次無需再詢問</string>
