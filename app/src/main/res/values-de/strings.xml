@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Authentifizierung abgebrochen</string>
     <string name="snack_notification_already_added">Die Benachrichtigung wurde bereits hinzugefügt</string>
     <string name="snack_opening_ics">Termin wird geöffnet…</string>
+    <string name="snack_invite_in_shared_calendar_error">Das Erstellen von Einladungen in einem geteilten Kalender ist nicht erlaubt.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Termin existiert nicht</string>
     <string name="error_occurrence_does_not_exist">Wiederholung existiert nicht</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Zeitzone</string>
     <string name="settings_language_title">App-Sprache</string>
     <string name="settings_language_default">Automatisch erkennen</string>
+    <string name="settings_default_view_title">Standardansicht</string>
+    <string name="settings_default_view_default">Letzte Ansicht</string>
     <string name="settings_update_timezone_title">Nachfragen zur Aktualisierung der Zeitzoneneinstellung</string>
     <string name="settings_update_timezone_subtitle">Wenn die Systemzeitzone nicht mit der aktuellen Zeitzoneneinstellung übereinstimmt, wirst du aufgefordert, diese zu aktualisieren.</string>
     <string name="settings_update_timezone_checkbox">Nicht erneut nachfragen</string>

@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autentisering avbröts</string>
     <string name="snack_notification_already_added">Aviseringen har redan lagts till</string>
     <string name="snack_opening_ics">Öppnar händelse…</string>
+    <string name="snack_invite_in_shared_calendar_error">Det är inte tillåtet att skapa inbjudningar i en delad kalender</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Händelsen finns inte</string>
     <string name="error_occurrence_does_not_exist">Förekomsten finns inte</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Tidszon</string>
     <string name="settings_language_title">App-språk</string>
     <string name="settings_language_default">Automatisk upptäckt</string>
+    <string name="settings_default_view_title">Standardvy</string>
+    <string name="settings_default_view_default">Senaste vy</string>
     <string name="settings_update_timezone_title">Be att uppdatera tidszonsinställning</string>
     <string name="settings_update_timezone_subtitle">Om systemets tidszon inte matchar den nuvarande tidszonsinställningen kommer du att bli ombedd att uppdatera den.</string>
     <string name="settings_update_timezone_checkbox">Fråga mig inte igen</string>

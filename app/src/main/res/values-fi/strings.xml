@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Todennus peruttiin</string>
     <string name="snack_notification_already_added">Ilmoitus on jo lisätty</string>
     <string name="snack_opening_ics">Avataan tapahtumaa…</string>
+    <string name="snack_invite_in_shared_calendar_error">Kutsujen luontia ei sallita jaetussa kalenterissa</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Tapahtumaa ei ole olemassa</string>
     <string name="error_occurrence_does_not_exist">Tapahtumaa ei ole olemassa</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Aikavyöhyke</string>
     <string name="settings_language_title">Sovelluksen kieli</string>
     <string name="settings_language_default">Tunnista automaattisesti</string>
+    <string name="settings_default_view_title">Oletusnäkymä</string>
+    <string name="settings_default_view_default">Edellinen näkymä</string>
     <string name="settings_update_timezone_title">Pyydä aikavyöhykeasetuksen päivitystä</string>
     <string name="settings_update_timezone_subtitle">Jos järjestelmän aikavyöhyke ei vastaa nykyistä aikavyöhykeasetustasi, sinua pyydetään päivittämään se.</string>
     <string name="settings_update_timezone_checkbox">Älä kysy uudelleen</string>

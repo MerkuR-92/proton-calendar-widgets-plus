@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autentikasi dibatalkan</string>
     <string name="snack_notification_already_added">Pemberitahuan sudah ditambahkan</string>
     <string name="snack_opening_ics">Membuka acara…</string>
+    <string name="snack_invite_in_shared_calendar_error">Pembuatan alamat pada kalender bersama tidak diperkenankan</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
     <string name="error_occurrence_does_not_exist">Peristiwa ini tidak ada</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Zona waktu</string>
     <string name="settings_language_title">Bahasa aplikasi</string>
     <string name="settings_language_default">Deteksi otomatis</string>
+    <string name="settings_default_view_title">Tampilan default</string>
+    <string name="settings_default_view_default">Tampilan terkini</string>
     <string name="settings_update_timezone_title">Minta agar pengaturan zona waktu diperbarui</string>
     <string name="settings_update_timezone_subtitle">Apabila zona waktu sistem tidak sesuai dengan pengaturan zona waktu saat ini, Anda akan diminta untuk memperbaruinya.</string>
     <string name="settings_update_timezone_checkbox">Jangan tanya lagi</string>

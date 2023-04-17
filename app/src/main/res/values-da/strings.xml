@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autentificering annulleret</string>
     <string name="snack_notification_already_added">Påmindelsen er allerede blevet tilføjet</string>
     <string name="snack_opening_ics">Åbner begivenhed…</string>
+    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Tidszone</string>
     <string name="settings_language_title">App-sprog</string>
     <string name="settings_language_default">Autoregistrér</string>
+    <string name="settings_default_view_title">Default view</string>
+    <string name="settings_default_view_default">Last view</string>
     <string name="settings_update_timezone_title">Bed om at opdatere tidszoneindstilling</string>
     <string name="settings_update_timezone_subtitle">Hvis systemets tidszone ikke matcher den aktuelle indstilling af tidszone, vil du blive bedt om at opdatere den.</string>
     <string name="settings_update_timezone_checkbox">Spørg mig ikke igen</string>

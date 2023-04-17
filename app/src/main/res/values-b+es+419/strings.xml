@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Autenticación cancelada</string>
     <string name="snack_notification_already_added">La notificación ya fue añadida</string>
     <string name="snack_opening_ics">Abriendo evento…</string>
+    <string name="snack_invite_in_shared_calendar_error">No se permite crear invitaciones en un calendario compartido</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe</string>
     <string name="error_occurrence_does_not_exist">La ocurrencia no existe</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Zona horaria</string>
     <string name="settings_language_title">Idioma de la app</string>
     <string name="settings_language_default">Auto detectar</string>
+    <string name="settings_default_view_title">Vista por defecto</string>
+    <string name="settings_default_view_default">Última vista</string>
     <string name="settings_update_timezone_title">Solicitar actualizar la configuración de zona horaria</string>
     <string name="settings_update_timezone_subtitle">Si la zona horaria del sistema no coincide con la configuración actual de zona horaria, se le pedirá actualizarla.</string>
     <string name="settings_update_timezone_checkbox">No volver a preguntarme</string>

@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Ověřování bylo zrušeno</string>
     <string name="snack_notification_already_added">Upozornění již bylo přidáno</string>
     <string name="snack_opening_ics">Otevírání události…</string>
+    <string name="snack_invite_in_shared_calendar_error">Vytváření pozvánek ve sdíleném kalendáři není povoleno</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Událost neexistuje</string>
     <string name="error_occurrence_does_not_exist">Výskyt události neexistuje</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Časové pásmo</string>
     <string name="settings_language_title">Jazyk aplikace</string>
     <string name="settings_language_default">Automatická detekce</string>
+    <string name="settings_default_view_title">Výchozí zobrazení</string>
+    <string name="settings_default_view_default">Poslední zobrazení</string>
     <string name="settings_update_timezone_title">Požádat o nastavení časového pásma</string>
     <string name="settings_update_timezone_subtitle">Pokud časové pásmo systému neodpovídá vámi nastavenému časovému pásmu, budete vyzváni k aktualizaci.</string>
     <string name="settings_update_timezone_checkbox">Příště se neptat</string>

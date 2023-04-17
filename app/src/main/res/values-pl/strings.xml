@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Uwierzytelnianie zostało anulowane</string>
     <string name="snack_notification_already_added">Powiadomienia zostały już dodane</string>
     <string name="snack_opening_ics">Otwieranie wydarzenia…</string>
+    <string name="snack_invite_in_shared_calendar_error">Tworzenie zaproszeń w udostępnionym kalendarzu nie jest dozwolone</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Wydarzenie nie istnieje</string>
     <string name="error_occurrence_does_not_exist">Powtórzenie nie istnieje</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Strefa czasowa</string>
     <string name="settings_language_title">Język aplikacji</string>
     <string name="settings_language_default">Automatyczne wykrywanie</string>
+    <string name="settings_default_view_title">Domyślny widok</string>
+    <string name="settings_default_view_default">Ostatni widok</string>
     <string name="settings_update_timezone_title">Zapytaj o aktualizację strefy czasowej</string>
     <string name="settings_update_timezone_subtitle">Zostaniesz poproszony o aktualizację strefy czasowej, jeśli nie będzie odpowiadać strefie czasowej systemu.</string>
     <string name="settings_update_timezone_checkbox">Nie pytaj ponownie</string>

@@ -343,6 +343,7 @@
     <string name="snack_app_link_import_error">Kimlik doğrulaması iptal edildi</string>
     <string name="snack_notification_already_added">Bildirim zaten eklenmiş</string>
     <string name="snack_opening_ics">Etkinlik açılıyor…</string>
+    <string name="snack_invite_in_shared_calendar_error">Paylaşılmış bir takvim için davet oluşturulmasına izin verilmiyor</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
@@ -384,6 +385,8 @@
     <string name="settings_timezone_title">Saat dilimi</string>
     <string name="settings_language_title">Uygulama dili</string>
     <string name="settings_language_default">Otomatik algılansın</string>
+    <string name="settings_default_view_title">Varsayılan görünüm</string>
+    <string name="settings_default_view_default">Son görünüm</string>
     <string name="settings_update_timezone_title">Saat dilimi ayarının güncellenmesi istensin</string>
     <string name="settings_update_timezone_subtitle">Sistemin saat dilimi geçerli saat dilimi ayarından farklıysa, güncellemeniz istenir.</string>
     <string name="settings_update_timezone_checkbox">Bana bir daha sorma</string>
