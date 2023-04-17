@@ -292,6 +292,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val calendarName = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_settings_calendar_title)
         calendarName?.text = calendar.name
 
+        val deleteTitle = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_settings_delete_title)
+        if (calendar.isHolidayCalendar) deleteTitle?.text = getString(R.string.action_remove)
+        else deleteTitle?.text = getString(R.string.action_delete)
+
         val editPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_edit_press)
         val markDefaultPress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_default_press)
         val deletePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_settings_delete_press)
@@ -336,14 +340,14 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 if (calendar.isHolidayCalendar) {
                     bottomSheetDialog.dismiss()
                     with (MaterialAlertDialogBuilder(requireContext())) {
-                        setTitle(resourceProvider.provideString(R.string.delete_calendar_dialog_title))
-                        setMessage(resourceProvider.provideString(R.string.delete_calendar_dialog_message))
+                        setTitle(resourceProvider.provideString(R.string.remove_calendar_dialog_title))
+                        setMessage(resourceProvider.provideString(R.string.remove_calendar_dialog_message))
                         setPositiveButton(R.string.dialog_button_delete) { _, _ ->
                             lifecycleScope.launch {
                                 when (calendarViewModel.leaveCalendar(calendar.id)) {
-                                    is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error))
+                                    is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
-                                    is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))
+                                    is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_removed))
                                 }
                                 bottomSheetDialog.dismiss()
                             }

@@ -351,6 +351,8 @@ class HolidayCalendarViewModel @Inject constructor(
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                 resourceProvider.provideString(R.string.snack_update_calendar_error)
             )
+            // Clear loading state
+            holidayCalendarState.value = HolidayCalendarState.Idle
             return
         }
         val currentDefaultAllDayNotifications = calendar.defaultFullDayNotifications.map { it.toVAlarm() }
@@ -359,7 +361,11 @@ class HolidayCalendarViewModel @Inject constructor(
         val calendarChanged = calendar.id != holidayCalendar.calendarId
         if (calendarChanged) {
             // Check that holiday calendar doesn't already exist
-            if (handleExistingHolidayCalendar(userId, holidayCalendar)) return
+            if (handleExistingHolidayCalendar(userId, holidayCalendar)) {
+                // Clear loading state
+                holidayCalendarState.value = HolidayCalendarState.Idle
+                return
+            }
 
             // Leave current holiday calendar
             val leaveCalendarUseCaseResult = leaveCalendarUseCase.execute(userId, calendar.id)
@@ -367,6 +373,8 @@ class HolidayCalendarViewModel @Inject constructor(
                 holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_update_calendar_error)
                 )
+                // Clear loading state
+                holidayCalendarState.value = HolidayCalendarState.Idle
                 return
             }
 
@@ -471,7 +479,11 @@ class HolidayCalendarViewModel @Inject constructor(
         selectedDate: LocalDate?
     ) {
         // Check that holiday calendar doesn't already exist
-        if (handleExistingHolidayCalendar(userId, holidayCalendar)) return
+        if (handleExistingHolidayCalendar(userId, holidayCalendar)) {
+            // Clear loading state
+            holidayCalendarState.value = HolidayCalendarState.Idle
+            return
+        }
 
         val displayTimeZoneId = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
             ?: ZoneId.systemDefault().id
