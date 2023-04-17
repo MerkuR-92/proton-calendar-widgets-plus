@@ -210,8 +210,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 )
             )
             // Disable the language field if there is only one option available
-            val languages = holidayCalendarViewModel.getLanguages()
-            holiday_calendar_form_language_press.isEnabled = languages.size > 1
+            holiday_calendar_form_language_press.isEnabled = holidayCalendarViewModel.getLanguages().size > 1
         }
 
         holidayCalendarViewModel.language.observe(viewLifecycleOwner) { language ->
@@ -344,7 +343,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         // Calendar language
         holiday_calendar_form_language_press.setOnSingleClickListener {
-            val languages = holidayCalendarViewModel.getLanguages()
+            val languages = holidayCalendarViewModel.getLanguages().sorted()
             if (languages.size <= 1) return@setOnSingleClickListener
             AndroidUtils.displayPickerDialog(
                 requireContext(),

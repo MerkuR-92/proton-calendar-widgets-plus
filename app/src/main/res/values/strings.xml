@@ -318,8 +318,10 @@
     <string name="snack_update_calendar_settings_error">Error updating some calendar information, please try again later</string>
     <string name="snack_update_calendar_success">Calendar updated</string>
     <string name="snack_create_calendar_success">Calendar created</string>
+    <string name="snack_add_calendar_success">Calendar added</string>
     <string name="snack_calendar_saving">Saving calendar</string>
     <string name="snack_create_calendar_error">Error creating calendar, please try again later</string>
+    <string name="snack_add_calendar_error">Error adding calendar, please try again later</string>
     <string name="snack_create_calendar_settings_error">The calendar was created but some information was not updated, please try again later</string>
     <string name="snack_ics_default_error">Error opening calendar</string>
     <string name="snack_ics_event_not_found_error">Event not found</string>

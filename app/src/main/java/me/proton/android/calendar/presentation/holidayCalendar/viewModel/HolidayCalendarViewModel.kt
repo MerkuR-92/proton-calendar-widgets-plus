@@ -322,7 +322,7 @@ class HolidayCalendarViewModel @Inject constructor(
             calendarColor ?: logger.e("Calendar color was null in HolidayCalendarViewModel handleSaveHolidayCalendar")
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                 resourceProvider.provideString(
-                    if (isCreate) R.string.snack_create_calendar_error
+                    if (isCreate) R.string.snack_add_calendar_error
                     else R.string.snack_update_calendar_error
                 )
             )
@@ -490,7 +490,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
         if (joinCalendarResult !is UseCase.Result.Success<*>) {
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
-                resourceProvider.provideString(R.string.snack_create_calendar_error)
+                resourceProvider.provideString(R.string.snack_add_calendar_error)
             )
             return
         }
@@ -498,12 +498,12 @@ class HolidayCalendarViewModel @Inject constructor(
         if (returnToSettings) {
             // Use settings snack state here to display snack in calendar settings view
             calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
-                resourceProvider.provideString(R.string.snack_create_calendar_success)
+                resourceProvider.provideString(R.string.snack_add_calendar_success)
             )
         } else {
             // Use holiday calendar snack state here to display snack in month view
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
-                resourceProvider.provideString(R.string.snack_create_calendar_success)
+                resourceProvider.provideString(R.string.snack_add_calendar_success)
             )
         }
     }
