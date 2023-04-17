@@ -418,6 +418,7 @@
     <string name="settings_general_info_calendar_layout">calendar layout</string>
     <string name="settings_calendars">My calendars</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
+    <string name="settings_other_calendars">Other calendars</string>
     <string name="settings_calendar_default" comment="Default calendar">Default</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Disabled</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Not synced</string>
