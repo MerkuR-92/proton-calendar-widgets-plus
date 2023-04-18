@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">O seu endereço não está na lista de participantes</string>
     <string name="snack_ics_reply_party_crasher_error">Não é possível adicionar participantes que não foram convidados pelo organizador</string>
     <string name="snack_ics_missing_uid_error">UID do evento em falta</string>
-    <string name="snack_ics_no_active_calendar_error">Não há um calendário pessoal ativo associado a esta conta.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Não há um calendário pessoal ativo associado a esta conta.</string>
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é suportada</string>
     <string name="snack_ics_too_many_events_error">Múltiplos eventos ainda não são suportados</string>
     <string name="snack_ics_no_events_error">Este calendário não contém nenhum evento.</string>

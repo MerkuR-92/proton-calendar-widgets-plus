@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">Alamat email Anda tidak ada dalam daftar peserta</string>
     <string name="snack_ics_reply_party_crasher_error">Peserta yang tidak diundang oleh penyelenggara tidak bisa ditambahkan</string>
     <string name="snack_ics_missing_uid_error">UID acara ini hilang</string>
-    <string name="snack_ics_no_active_calendar_error">Tidak ada kalender personal aktif yang terhubung dengan akun ini</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Tidak ada kalender personal aktif yang terhubung dengan akun ini</string>
     <string name="snack_ics_unsupported_duration_error">Properti durasi tidak didukung</string>
     <string name="snack_ics_too_many_events_error">Acara jamak saat ini belum didukung</string>
     <string name="snack_ics_no_events_error">Kalender ini tidak memiliki acara</string>

@@ -903,6 +903,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         getString(R.string.snack_ics_no_active_calendar_error),
                         Snackbar.LENGTH_LONG
                     )
+                    is Error.NoDefaultPersonalCalendarFound -> this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_no_active_personal_calendar_error),
+                        Snackbar.LENGTH_LONG
+                    )
                     is Error.DurationNotSupported -> this@MainActivity.displaySnackBar(
                         getString(R.string.snack_ics_unsupported_duration_error),
                         Snackbar.LENGTH_LONG

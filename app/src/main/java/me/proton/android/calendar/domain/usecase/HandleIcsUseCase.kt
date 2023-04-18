@@ -270,11 +270,11 @@ class HandleIcsUseCase @Inject constructor(
 
         // Use the default calendar to create the event
         val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
             defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }.firstOrNull()
-                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
         }
 
         // Fetch all events sharing UID from BE

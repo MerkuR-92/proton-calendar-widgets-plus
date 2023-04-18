@@ -395,7 +395,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
-                            else if (viewModeInitStatus is EventViewModel.InitResult.Error.InitDefaultCalendarError) getString(R.string.snack_create_event_no_active_personal_calendar)
+                            else if (viewModeInitStatus is EventViewModel.InitResult.Error.InitDefaultCalendarError) getString(R.string.snack_create_event_no_active_calendar)
                             else getString(R.string.snack_event_init_error)
                         )
                     }

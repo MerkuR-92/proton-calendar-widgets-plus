@@ -231,7 +231,7 @@ class MonthFragment : BaseFragment() {
                             )
                     }
                 } else {
-                    requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                    requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
                 }
             }
         }
@@ -840,7 +840,7 @@ class MonthFragment : BaseFragment() {
                         )
                     )
             } else {
-                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
             }
         }
     }

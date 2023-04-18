@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">E-posta adresiniz katılımcı listesinde yok</string>
     <string name="snack_ics_reply_party_crasher_error">Düzenleyici tarafından davet edilmemiş katılımcılar eklenemez</string>
     <string name="snack_ics_missing_uid_error">Etkinliğin UID değeri eksik</string>
-    <string name="snack_ics_no_active_calendar_error">Bu hesap ile ilişkilendirilmiş etkin bir kişisel takvim bulunamadı</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Bu hesap ile ilişkilendirilmiş etkin bir kişisel takvim bulunamadı</string>
     <string name="snack_ics_unsupported_duration_error">Süre özelliği desteklenmiyor</string>
     <string name="snack_ics_too_many_events_error">Henüz birden çok etkinlik desteklenmiyor</string>
     <string name="snack_ics_no_events_error">Bu takvimde herhangi bir etkinlik yok</string>
