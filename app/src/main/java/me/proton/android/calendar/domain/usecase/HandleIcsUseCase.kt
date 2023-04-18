@@ -272,8 +272,8 @@ class HandleIcsUseCase @Inject constructor(
         val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
-        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.allowEditEvents }.firstOrNull()
+        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }.firstOrNull()
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
