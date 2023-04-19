@@ -23,7 +23,7 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.uitest.rule.HiltInjectRule
 import me.proton.android.calendar.uitest.rule.MainInitializerRule
-import me.proton.android.calendar.uitest.rule.DynamicEnvironmentRule
+import me.proton.android.calendar.uitest.rule.AtlasEnvironmentRule
 import me.proton.core.auth.domain.testing.LoginTestHelper
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
@@ -38,7 +38,7 @@ open class BaseTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule(order = RuleOrder_00_First)
-    val dynamicEnvironmentRule = DynamicEnvironmentRule()
+    val atlasEnvironmentRule = AtlasEnvironmentRule()
 
     @get:Rule(order = RuleOrder_10_Initialization)
     val mainInitializerRule = MainInitializerRule()
@@ -54,7 +54,7 @@ open class BaseTest {
 
     val users = Users.fromDefaultResources()
 
-    val quark: Quark get() = dynamicEnvironmentRule.quark
+    val quark: Quark get() = atlasEnvironmentRule.quark
 
     @Before
     open fun setup() {

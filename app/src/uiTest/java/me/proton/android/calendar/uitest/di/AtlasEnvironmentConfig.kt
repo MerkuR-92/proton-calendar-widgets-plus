@@ -15,16 +15,16 @@ import javax.inject.Singleton
     components = [SingletonComponent::class],
     replaces = [EnvironmentConfig::class]
 )
-object MockEnvironmentConfig {
+object AtlasEnvironmentConfig {
 
-    val host = AtomicReference("proton.black")
-    val token = AtomicReference(EMPTY_STRING)
+    val atlasHost = AtomicReference("proton.black")
+    val atlasProxyToken = AtomicReference(EMPTY_STRING)
 
     @Provides
     @Singleton
     fun provideEnvironmentConfig(): EnvironmentConfiguration = object : EnvironmentConfiguration {
-        override val apiHost: String = "https://api.${host.get()}"
-        override val hvHost: String = "https://verify.${host.get()}"
-        override val proxyToken: String? = token.get()
+        override val apiHost: String = "https://api.${atlasHost.get()}"
+        override val hvHost: String = "https://verify.${atlasHost.get()}"
+        override val proxyToken: String? = atlasProxyToken.get()
     }
 }
