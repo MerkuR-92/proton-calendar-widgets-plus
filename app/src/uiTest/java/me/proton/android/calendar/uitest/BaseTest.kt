@@ -20,10 +20,10 @@ package me.proton.android.calendar.uitest
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import dagger.hilt.android.testing.HiltAndroidRule
-import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.uitest.rule.HiltInjectRule
 import me.proton.android.calendar.uitest.rule.MainInitializerRule
+import me.proton.android.calendar.uitest.rule.AtlasEnvironmentRule
 import me.proton.core.auth.domain.testing.LoginTestHelper
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
@@ -37,6 +37,9 @@ open class BaseTest {
     @get:Rule(order = RuleOrder_00_First)
     val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule(order = RuleOrder_00_First)
+    val atlasEnvironmentRule = AtlasEnvironmentRule()
+
     @get:Rule(order = RuleOrder_10_Initialization)
     val mainInitializerRule = MainInitializerRule()
 
@@ -48,6 +51,10 @@ open class BaseTest {
 
     @Inject
     lateinit var loginTestHelper: LoginTestHelper
+
+    val users = Users.fromDefaultResources()
+
+    val quark: Quark get() = atlasEnvironmentRule.quark
 
     @Before
     open fun setup() {
@@ -68,8 +75,5 @@ open class BaseTest {
         const val RuleOrder_30_ActivityLaunch = 30
         const val RuleOrder_31_ActivityLaunched = 31
         const val RuleOrder_99_Last = 99
-
-        val users = Users.fromDefaultResources()
-        val quark = Quark.fromDefaultResources(BuildConfig.QUARK_HOST, BuildConfig.PROXY_TOKEN)
     }
 }
