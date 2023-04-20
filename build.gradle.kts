@@ -9,7 +9,6 @@ buildscript {
         classpath(libs.gradle.plugin.android)
         classpath(libs.gradle.plugin.kotlin)
         classpath(libs.gradle.plugin.navigation)
-        classpath(libs.gradle.plugin.detekt)
         classpath(libs.gradle.plugin.hilt)
         classpath(libs.jacoco)
         // NOTE: Do not place your application dependencies here; they belong
@@ -27,4 +26,8 @@ allprojects {
 
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
+}
+
+plugins {
+    alias(libs.plugins.proton.detekt)
 }

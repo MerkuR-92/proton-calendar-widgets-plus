@@ -3,6 +3,7 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
+import studio.forface.easygradle.dsl.exclude
 
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
@@ -151,10 +152,6 @@ dependencies {
     // Assisted Inject.
     compileOnly(libs.assistedInject)
     kapt(libs.assistedInject)
-
-    detekt(libs.detekt.formatting)
-    detekt(libs.detekt.cli)
-    detektPlugins(libs.detekt.formatting)
 
     // Retrofit
     implementation(libs.retrofit)

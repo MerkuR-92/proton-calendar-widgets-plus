@@ -2,6 +2,7 @@
 local.properties
 .DS_Store
 build
+config
 captures
 .externalNativeBuild
 .cxx
