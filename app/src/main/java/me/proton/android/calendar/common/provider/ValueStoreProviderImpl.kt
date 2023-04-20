@@ -71,6 +71,8 @@ class ValueStoreProviderImpl @Inject constructor(
             sharedPreferences.all.filter { it.key.startsWith("$setName~") }.forEach { editor.remove(it.key) }
             editor.apply()
         }
+
+        override fun removeKeyFromSet(setName: String, key: String) = sharedPreferences.edit().remove("$setName~$key").apply()
     }
 
     @Synchronized
