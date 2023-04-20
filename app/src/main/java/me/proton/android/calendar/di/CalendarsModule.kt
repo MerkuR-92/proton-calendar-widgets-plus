@@ -69,10 +69,6 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
-    abstract fun bindKeysApi(keysApiImpl: KeysApiImpl): KeysApi
-
-    @Binds
-    @Singleton
     abstract fun bindMailSettingsApi(mailSettingsApiImpl: MailSettingsApiImpl): MailSettingsApi
 
     @Binds
