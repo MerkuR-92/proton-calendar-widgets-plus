@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">You can now search your calendars for events. This downloads an encrypted copy of your calendars to your device. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">More ways to add events</string>
     <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>

@@ -18,6 +18,7 @@ import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_
 import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.CALENDAR_PROVIDER_VERSION_CODE
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
@@ -96,6 +97,13 @@ object SpotlightUtils {
         )
     }
 
+    private fun getCalendarProviderDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_calendar_provider_title,
+            R.string.spotlight_dialog_calendar_provider_description
+        )
+    }
+
     fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null) {
         if (!SPOTLIGHT) return
 
@@ -162,6 +170,15 @@ object SpotlightUtils {
                 this.displaySpotlightDialog(
                     weekViewContent.first,
                     weekViewContent.second,
+                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
+                )
+            }
+            CALENDAR_PROVIDER_VERSION_CODE -> {
+                // Calendar provider, default view setting, shared calendar write permissions, shared calendar edit setting, new languages
+                val content = getCalendarProviderDialogContent()
+                this.displaySpotlightDialog(
+                    content.first,
+                    content.second,
                     materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
                 )
             }

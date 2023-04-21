@@ -97,6 +97,7 @@ const val REBRANDING_VERSION_CODE = 145
 const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
 const val IMPORT_VERSION_CODE = 186
+const val CALENDAR_PROVIDER_VERSION_CODE = 190
 const val SEARCH_VERSION_CODE = 1 // TODO fix when we unhide
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
@@ -107,7 +108,8 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     EASY_SWITCH_VERSION_CODE, // Easy switch (2.2.0)
     WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
     IMPORT_VERSION_CODE, // Import (2.6.6)
-    SEARCH_VERSION_CODE // Search view (2.7.3) // TODO fix when we unhide
+    CALENDAR_PROVIDER_VERSION_CODE, // Calendar provider (2.9.0)
+    SEARCH_VERSION_CODE // Search view (2.x.x) // TODO fix when we unhide
 )
 
 object FeatureFlag {
