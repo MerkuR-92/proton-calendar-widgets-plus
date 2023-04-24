@@ -343,7 +343,7 @@
     <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
     <string name="snack_opening_ics">Відкриття події…</string>
-    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
+    <string name="snack_invite_in_shared_calendar_error">Створення запрошень у спільному календарі не дозволено</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
     <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
@@ -385,8 +385,8 @@
     <string name="settings_timezone_title">Часовий пояс</string>
     <string name="settings_language_title">Мова програми</string>
     <string name="settings_language_default">Автовизначення</string>
-    <string name="settings_default_view_title">Default view</string>
-    <string name="settings_default_view_default">Last view</string>
+    <string name="settings_default_view_title">Типовий вигляд</string>
+    <string name="settings_default_view_default">Нещодавно переглянуте</string>
     <string name="settings_update_timezone_title">Запит оновлення часового поясу</string>
     <string name="settings_update_timezone_subtitle">Якщо часовий пояс системи відрізняється від налаштування поточного часового поясу, вам буде запропоновано його оновити.</string>
     <string name="settings_update_timezone_checkbox">Надалі не запитувати</string>
@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Тепер ви можете шукати події у своїх календарях. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
     <string name="spotlight_dialog_import_title">Інші способи додавання подій</string>
     <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Функції календаря</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Додавайте події безпосередньо до Proton Calendar з інших програм.\n\n• Створюйте події та керуйте ними в календарях, до яких вам надано спільний доступ.\n\n• Налаштуйте типовий вигляд після відкриття програми.\n\n• Доступно 13 нових мов.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>

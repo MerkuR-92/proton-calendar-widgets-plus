@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Ara podeu buscar esdeveniments dels vostres calendaris. Això descarrega una còpia xifrada dels vostres calendaris al dispositiu. <a href="https://proton.me/support/calendar-search">Més informació</a></string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
     <string name="spotlight_dialog_import_description">• Importa esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>

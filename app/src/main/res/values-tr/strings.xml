@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Artık takvimlerinizde etkinlikleri arayabilirsiniz. Bu işlem, takvimlerinizin şifrelenmiş bir kopyasını aygıtınıza indirir. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
     <string name="spotlight_dialog_import_title">Etkinlik eklemenin diğer yolları</string>
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Takvim özellikleri</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Diğer uygulamalardaki etkinlikleri doğrudan Proton Calendar içine ekleyin.\n\n• Sizinle paylaşılan takvimlerde etkinlikler oluşturun ve yönetin.\n\n• Uygulamayı açarken karşılaşmak istediğiniz varsayılan görünümü ayarlayın.\n\ n• 13 yeni dilde daha kullanılabilir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>

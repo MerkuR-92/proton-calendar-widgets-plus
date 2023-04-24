@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">您現在可以在行事曆中搜尋事件。這會下載一份行事曆的加密副本到您的裝置中。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
     <string name="spotlight_dialog_import_title">更多新增事件的方式</string>
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
+    <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>
+    <string name="spotlight_dialog_calendar_provider_description">• 從其他應用程式直接在 Proton 行事曆新增活動\n\n• 建立並管理行事曆上共享的活動\n\n• 設定開啟此應用程式想要的預設畫面\n\n• 新增 13 種語言.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>

@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Теперь вы можете искать события в своих календарях. В этом случае на устройство скачивается зашифрованная копия календарей. <a href="https://proton.me/support/calendar-search">Подробнее</a></string>
     <string name="spotlight_dialog_import_title">Больше способов добавления событий</string>
     <string name="spotlight_dialog_import_description">• Импортируйте события в календарь из файлов на вашем телефоне.\n\n• Добавляйте бронирования поездок прямо из Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Функции календаря</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>

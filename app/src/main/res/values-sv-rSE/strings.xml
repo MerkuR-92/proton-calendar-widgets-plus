@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Du kan nu söka i dina kalendrar efter händelser. Detta laddar ner en krypterad kopia av dina kalendrar till din enhet. <a href="https://proton.me/support/calendar-search">Lär dig mer</a></string>
     <string name="spotlight_dialog_import_title">Fler sätt att lägga till händelser</string>
     <string name="spotlight_dialog_import_description">• Importera händelser till din kalender från filer på din telefon.\n\n• Lägg till resebokningar direkt från Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillåt åtkomst</string>
     <string name="dialog_google_auth_description">För att starta importen, logga in på Google Kalender och tillåt Proton att komma åt dina data.</string>

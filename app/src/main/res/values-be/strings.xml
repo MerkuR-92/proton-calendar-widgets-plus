@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Цяпер вы можаце выконваць пошук падзей у сваіх календарах. Гэта спампаваныя на прыладу зашыфраваныя копіі вашых календароў. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
     <string name="spotlight_dialog_import_title">Больш спосабаў дадаць падзеі</string>
     <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Функцыі календара</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Дадавайце падзеі непасрэдна ў Proton Calendar з іншых праграм.\n\n• Стварайце і кіруйце падзеямі ў календарах, якія абагулілі з вамі.\n\n• Задавайце менавіта той прадвызначаны выгляд, які вы хочаце бачыць пры адкрыцці праграмы.\n\n• Даступна 13 новых моў.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
     <string name="dialog_google_auth_description">Для пачатку імпартавання, увайдзіце ў Google Calendar і дазвольце Proton атрымаць доступ да вашых даных.</string>
