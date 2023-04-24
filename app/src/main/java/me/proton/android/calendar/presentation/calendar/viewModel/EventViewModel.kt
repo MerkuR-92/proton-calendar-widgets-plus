@@ -36,6 +36,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventEditDeleteOption
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.getUserOrNull
@@ -449,19 +450,19 @@ class EventViewModel @Inject constructor(
         eventTimeZoneId = timeZoneId ?: displayTimeZoneId
 
         val newICalendar =
-        if (!rRule.isNullOrEmpty()) {
-            val newEventToPrefill = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
-            // Create a temporary RRULE to replace
-            newEventToPrefill.events.first().setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).build())
-            val newEventIcs = newEventToPrefill.printToString()
-            // Replace temporary RRULE with the one provided in args
-            val rRuleRegex = Regex("RRULE:.*\\r?\\n")
-            val prefilledNewEventIcs = newEventIcs.replace(rRuleRegex, "RRULE:$rRule\r\n")
-            // Parse prefilled event ics
-            parseICalString(prefilledNewEventIcs) ?: return InitResult.Error.Default("could not parse Event using parseICalString method")
-        } else {
-            ICalUtilsImpl.createNewVEvent().wrapInICalendar()
-        }
+            if (!rRule.isNullOrEmpty()) {
+                val newEventToPrefill = ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+                // Create a temporary RRULE to replace
+                newEventToPrefill.events.first().setRecurrenceRule(Recurrence.Builder(Frequency.DAILY).build())
+                val newEventIcs = newEventToPrefill.printToString()
+                // Replace temporary RRULE with the one provided in args
+                val rRuleRegex = Regex("RRULE:.*\\r?\\n")
+                val prefilledNewEventIcs = newEventIcs.replace(rRuleRegex, "RRULE:$rRule\r\n")
+                // Parse prefilled event ics
+                parseICalString(prefilledNewEventIcs) ?: return InitResult.Error.Default("could not parse Event using parseICalString method")
+            } else {
+                ICalUtilsImpl.createNewVEvent().wrapInICalendar()
+            }
         val newVEvent = newICalendar.events.first()
 
         // If there is no requested start date, we take today
@@ -777,6 +778,23 @@ class EventViewModel @Inject constructor(
         return dbEvent?.let {
             isCalendarChangeAllowed(it, this.event)
         } ?: true
+    }
+
+    fun isOriginalEventRecurring(): Boolean {
+        return dbEvent?.isPartOfChain() == true
+    }
+
+    fun isEventAnInvitation(): Boolean {
+        return dbEvent?.let { fromEvent ->
+            val toEvent = this.event
+            val isFromEventAnInvitation =
+                fromEvent.iCalEvent.attendees?.isNotEmpty() == true || fromEvent.iCalEvent.organizer != null
+
+            val isCurrentEventAnInvitation =
+                toEvent.iCalEvent.attendees?.isNotEmpty() == true || toEvent.iCalEvent.organizer != null
+
+            return isFromEventAnInvitation || isCurrentEventAnInvitation
+        } ?: false
     }
 
     fun hasCalendarBeenChanged() = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != event.calendar.id
