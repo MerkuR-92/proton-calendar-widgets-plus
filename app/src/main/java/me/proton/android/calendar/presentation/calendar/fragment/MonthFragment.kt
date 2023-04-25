@@ -827,8 +827,8 @@ class MonthFragment : BaseFragment() {
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalDateTime) {
         lifecycleScope.launch {
-            val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
-            if (hasActiveCalendars) {
+            val hasActiveCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
+            if (hasActiveCalendars == true) {
                 val truncatedStartTime =
                     if (!isAllDay) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
                     else null
