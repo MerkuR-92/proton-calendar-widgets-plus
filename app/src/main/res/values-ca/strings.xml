@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">El vostre correu electrònic no es troba a la llista de participants</string>
     <string name="snack_ics_reply_party_crasher_error">No es poden afegir participants que no han estat convidats per l\'organitzador</string>
     <string name="snack_ics_missing_uid_error">A l\'esdeveniment li manca UID</string>
-    <string name="snack_ics_no_active_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte.</string>
     <string name="snack_ics_unsupported_duration_error">No s\'admet la propietat de durada</string>
     <string name="snack_ics_too_many_events_error">Encara no s\'admeten esdeveniments múltiples</string>
     <string name="snack_ics_no_events_error">Aquest calendari no conté cap esdeveniment</string>

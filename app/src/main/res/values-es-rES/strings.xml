@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">Tu correo electrónico no está en la lista de participantes.</string>
     <string name="snack_ics_reply_party_crasher_error">No se pueden añadir participantes que no hayan sido invitados por el organizador.</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento.</string>
-    <string name="snack_ics_no_active_calendar_error">No hay ningún calendario personal activo asociado a esta cuenta.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">No hay ningún calendario personal activo asociado a esta cuenta.</string>
     <string name="snack_ics_unsupported_duration_error">No se reconoce esta duración.</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles.</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento.</string>

@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">ელფოსტის თქვენი მისამართი მონაწილეთა სიაში არაა</string>
     <string name="snack_ics_reply_party_crasher_error">მონაწილეები, რომლებიც ორგანიზატორმა არ მიიწვია, არ შეიძლება დაემატოს</string>
     <string name="snack_ics_missing_uid_error">მოვლენას UID-ი აკლია</string>
-    <string name="snack_ics_no_active_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური პირადი კალენდრები არ არსებობს</string>
+    <string name="snack_ics_no_active_personal_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური პირადი კალენდრები არ არსებობს</string>
     <string name="snack_ics_unsupported_duration_error">ხანგრძლივობის თვისება მხარდაუჭერელია</string>
     <string name="snack_ics_too_many_events_error">მრავალმოვლენიანობა ჯერ მხარდაჭერილი არაა</string>
     <string name="snack_ics_no_events_error">ეს კალენდარი არც ერთ მოვლენა არ შეიცავს</string>

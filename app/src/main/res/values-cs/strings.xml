@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">Vaše e-mailová adresa není v seznamu účastníků</string>
     <string name="snack_ics_reply_party_crasher_error">Účastníci kteří nebyli pozváni organizátorem, nemohou být přidáni</string>
     <string name="snack_ics_missing_uid_error">Události chybí UID</string>
-    <string name="snack_ics_no_active_calendar_error">K tomuto účtu nepatří žádný aktivní osobní kalendář</string>
+    <string name="snack_ics_no_active_personal_calendar_error">K tomuto účtu nepatří žádný aktivní osobní kalendář</string>
     <string name="snack_ics_unsupported_duration_error">Doba trvání není podporována</string>
     <string name="snack_ics_too_many_events_error">Mnohočetné události nejsou zatím podporovány</string>
     <string name="snack_ics_no_events_error">Tento kalendář neobsahuje žádnou událost</string>

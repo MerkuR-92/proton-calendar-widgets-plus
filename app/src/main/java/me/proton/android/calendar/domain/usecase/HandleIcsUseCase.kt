@@ -270,11 +270,12 @@ class HandleIcsUseCase @Inject constructor(
 
         // Use the default calendar to create the event
         val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
-        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.allowEditEvents }.firstOrNull()
-                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+        // Calendar needs to be active and user needs to be owner (we don't allow members to add invites in shared cals even with write permissions)
+        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
+            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }.firstOrNull()
+                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
         }
 
         // Fetch all events sharing UID from BE

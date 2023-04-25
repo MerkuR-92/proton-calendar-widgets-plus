@@ -231,7 +231,7 @@ class MonthFragment : BaseFragment() {
                             )
                     }
                 } else {
-                    requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                    requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
                 }
             }
         }
@@ -762,20 +762,20 @@ class MonthFragment : BaseFragment() {
                 lifecycleScope.launch {
                     weekStart?.let { weekStart ->
                         selectedDate.firstDayOfWeek(weekStart)?.let {
-                            if (selectedTime != null && animate) weekView.scrollToDateTime(it.atTime(selectedTime))
-                            else if (selectedTime != null) weekView.setDateTime(it.atTime(selectedTime))
-                            else if (animate) weekView.scrollToDate(it)
-                            else weekView.setDate(it)
+                            if (selectedTime != null && animate) weekView?.scrollToDateTime(it.atTime(selectedTime))
+                            else if (selectedTime != null) weekView?.setDateTime(it.atTime(selectedTime))
+                            else if (animate) weekView?.scrollToDate(it)
+                            else weekView?.setDate(it)
                         }
                     }
                 }
-            } else if (weekView.firstVisibleDateAsLocalDate != selectedDate) {
-                if (selectedTime != null && animate) weekView.scrollToDateTime(LocalDateTime.of(selectedDate, selectedTime))
-                else if (selectedTime != null) weekView.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
-                else if (animate) weekView.scrollToDate(selectedDate)
-                else weekView.setDate(selectedDate)
+            } else if (weekView?.firstVisibleDateAsLocalDate != selectedDate) {
+                if (selectedTime != null && animate) weekView?.scrollToDateTime(LocalDateTime.of(selectedDate, selectedTime))
+                else if (selectedTime != null) weekView?.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
+                else if (animate) weekView?.scrollToDate(selectedDate)
+                else weekView?.setDate(selectedDate)
             } else if (selectedTime != null) {
-                weekView.scrollToTime(selectedTime)
+                weekView?.scrollToTime(selectedTime)
             }
 
             weekStart?.let {
@@ -827,8 +827,8 @@ class MonthFragment : BaseFragment() {
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalDateTime) {
         lifecycleScope.launch {
-            val hasActiveCalendars = !calendarViewModel.getActiveUserCalendars().isNullOrEmpty()
-            if (hasActiveCalendars) {
+            val hasActiveCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
+            if (hasActiveCalendars == true) {
                 val truncatedStartTime =
                     if (!isAllDay) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)
                     else null
@@ -840,7 +840,7 @@ class MonthFragment : BaseFragment() {
                         )
                     )
             } else {
-                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_personal_calendar))
+                requireActivity().displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
             }
         }
     }

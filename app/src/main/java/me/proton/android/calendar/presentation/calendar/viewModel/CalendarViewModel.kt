@@ -895,6 +895,10 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.countCalendars()
     }
 
+    suspend fun getPersonalCalendarsCount(): Int {
+        return userCalendars.value?.count { it.isOwner } ?: 0
+    }
+
     suspend fun isCalendarLimitReached(): CalendarLimit {
         val calendarsCount = getCalendarsCount()
         val isFreeUser = isFreeUser() ?: return CalendarLimit.ERROR

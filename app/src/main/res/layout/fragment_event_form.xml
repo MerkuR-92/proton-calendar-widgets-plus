@@ -346,11 +346,73 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/event_form_calendar_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <include
+                android:id="@+id/event_form_calendar_press"
+                layout="@layout/view_press_overlay"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/event_form_calendar_separator"/>
+
+            <ImageView
+                android:id="@+id/event_form_calendar_icon"
+                style="@style/ColoredDot"
+                app:srcCompat="@drawable/ic_dot"
+                android:layout_marginStart="19dp"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
+                app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/event_form_calendar"
+                style="@style/Text.Default.Form"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="Work"
+                android:layout_marginEnd="@dimen/default_inner_padding_end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/event_form_calendar_disclaimer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="Sending invitations is available only within personal calendars."
+                style="@style/Text.Caption.Weak"
+                android:layout_marginEnd="@dimen/default_inner_padding_end"
+                android:layout_marginTop="2dp"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_calendar"
+                app:layout_constraintStart_toStartOf="@+id/event_form_calendar"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <View
+                android:id="@+id/event_form_calendar_separator"
+                style="@style/Separator"
+                android:layout_marginTop="@dimen/default_separator_margin_top"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_calendar_disclaimer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/event_form_participant_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_calendar_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -384,6 +446,22 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
+            <TextView
+                android:id="@+id/event_form_participant_disclaimer"
+                style="@style/Text.Caption.Weak"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:textColor="@color/text_hint"
+                android:layout_marginStart="@dimen/default_margin_text_start"
+                android:layout_marginEnd="@dimen/default_margin_text_end"
+                android:layout_marginTop="@dimen/default_margin_text_vertical_large"
+                android:layout_marginBottom="@dimen/default_margin_text_vertical_large"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/event_form_participant_chip_group"
                 android:layout_width="0dp"
@@ -409,58 +487,13 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_form_calendar_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_participant_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <include
-                android:id="@+id/event_form_calendar_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/event_form_calendar_separator"/>
-
-            <ImageView
-                android:id="@+id/event_form_calendar_icon"
-                style="@style/ColoredDot"
-                app:srcCompat="@drawable/ic_dot"
-                android:layout_marginStart="19dp"
-                app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
-                app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/event_form_calendar"
-                style="@style/Text.Default.Form"
-                tools:text="Work"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/event_form_calendar_separator"
-                style="@style/Separator"
-                android:layout_marginTop="@dimen/default_separator_margin_top"
-                app:layout_constraintTop_toBottomOf="@+id/event_form_calendar"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
         <LinearLayout
             android:id="@+id/event_form_alarm_list"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_calendar_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_participant_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 

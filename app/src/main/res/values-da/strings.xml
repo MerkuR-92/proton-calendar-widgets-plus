@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">Din e-mail er ikke på deltagerlisten</string>
     <string name="snack_ics_reply_party_crasher_error">Deltagere, der ikke er inviteret af arrangøren, kan ikke tilføjes</string>
     <string name="snack_ics_missing_uid_error">Begivenheden mangler UID</string>
-    <string name="snack_ics_no_active_calendar_error">Der er ingen aktiv personlig kalender tilknyttet denne konto</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Der er ingen aktiv personlig kalender tilknyttet denne konto</string>
     <string name="snack_ics_unsupported_duration_error">Angivelse af varighed er ikke understøttet</string>
     <string name="snack_ics_too_many_events_error">Fler-begivenheder er endnu ikke understøttet</string>
     <string name="snack_ics_no_events_error">Denne kalender indeholder ikke nogen begivenhed</string>

@@ -328,7 +328,7 @@
     <string name="snack_ics_party_crasher_error">Votre e-mail n\'est pas dans la liste des participants.</string>
     <string name="snack_ics_reply_party_crasher_error">Les participants qui n\'ont pas été invités par l\'organisateur ne peuvent pas être ajoutés.</string>
     <string name="snack_ics_missing_uid_error">L\'événement n\'a pas d\'identifiant unique.</string>
-    <string name="snack_ics_no_active_calendar_error">Aucun calendrier personnel actif n\'est associé à ce compte.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Aucun calendrier personnel actif n\'est associé à ce compte.</string>
     <string name="snack_ics_unsupported_duration_error">Cette durée n\'est pas reconnue.</string>
     <string name="snack_ics_too_many_events_error">Les événements multiples ne sont pas encore disponibles.</string>
     <string name="snack_ics_no_events_error">Ce calendrier ne contient aucun événement.</string>

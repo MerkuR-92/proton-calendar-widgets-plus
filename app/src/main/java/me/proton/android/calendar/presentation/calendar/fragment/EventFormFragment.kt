@@ -41,6 +41,7 @@ import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_press
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_press
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_switch
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_disclaimer
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_icon
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_press
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_description
@@ -55,6 +56,7 @@ import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day_start
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_chip_group
+import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_disclaimer
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_icon
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_layout
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_press
@@ -395,8 +397,12 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
-                            else if (viewModeInitStatus is EventViewModel.InitResult.Error.InitDefaultCalendarError) getString(R.string.snack_create_event_no_active_personal_calendar)
-                            else getString(R.string.snack_event_init_error)
+                            else {
+                                when (viewModeInitStatus) {
+                                    is EventViewModel.InitResult.Error.InitDefaultCalendarError -> getString(R.string.snack_create_event_no_active_calendar)
+                                    is EventViewModel.InitResult.Error.Default -> getString(R.string.snack_event_init_error)
+                                }
+                            }
                         )
                     }
                     else -> Unit // TODO refactor and use one `when` expression
@@ -572,12 +578,40 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             lifecycleScope.launch {
                 event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && eventViewModel.allowSendForCalendarAddress() && event.hasProtonUid) // TODO Remove feature flag
+
+                event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
+
+                val isCreateEvent = navigationArguments.eventId.isNullOrEmpty()
+                event_form_calendar_disclaimer.text =
+                    if (eventViewModel.isOriginalEventPartOfChain()) getString(R.string.change_calendar_recurring_disclaimer)
+                    else if (eventViewModel.isEventAnInvitation() && !isCreateEvent) getString(R.string.invite_change_calendar_disclaimer)
+                    else ""
+                event_form_calendar_disclaimer.visibleOrGone(event_form_calendar_disclaimer.text.isNotEmpty())
+                event_form_calendar_press.isEnabled = event_form_calendar_disclaimer.text.isEmpty()
+                if (calendarViewModel.getPersonalCalendarsCount() <= 1 && (event.iCalEvent.attendees?.isNotEmpty() == true || event.iCalEvent.organizer != null)) {
+                    event_form_calendar_press.isEnabled = false
+                }
+
+                if (!event.calendar.isOwner) {
+                    // Editing a shared calendar event
+                    event_form_participant.visibleOrGone(false)
+                    event_form_participant_disclaimer.visibleOrGone(true)
+                    event_form_participant_disclaimer.text = getString(R.string.invite_in_shared_calendar_disclaimer)
+                    event_form_participant_press.visibleOrGone(false)
+                } else if (eventViewModel.hasCalendarBeenChanged()) {
+                    // Changing calendar
+                    event_form_participant.visibleOrGone(false)
+                    event_form_participant_disclaimer.visibleOrGone(true)
+                    event_form_participant_disclaimer.text = getString(R.string.snack_event_edit_calendar_with_attendees_error)
+                    event_form_participant_press.visibleOrGone(false)
+                } else {
+                    // Default state
+                    event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
+                    event_form_participant_disclaimer.visibleOrGone(false)
+                    event_form_participant_disclaimer.text = ""
+                    event_form_participant_press.visibleOrGone(true)
+                }
             }
-
-            event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
-            event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
-
-            event_form_calendar_press.visibleOrGone(eventViewModel.isCalendarChangeAllowed())
         })
     }
 
@@ -741,13 +775,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         event_form_calendar_press.setOnSingleClickListener {
-            if (!eventViewModel.isCalendarChangeAllowed()) {
-                view?.displaySnackBar(getString(R.string.snack_feature_coming_soon))
-                return@setOnSingleClickListener
-            }
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-                val calendars = calendarViewModel.getUserCalendars()?.filter { it.isActive && it.allowEditEvents }
+                val calendars = calendarViewModel.getUserCalendars()?.filter {
+                    if (eventViewModel.eventLiveData.value!!.iCalEvent.attendees.isNullOrEmpty()) {
+                        it.isActive && it.allowEditEvents
+                    } else {
+                        it.isActive && it.isOwner
+                    }
+                }
 
                 // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
                 if (calendars == null || calendars.size <= 1) return@launch
@@ -775,8 +811,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_participant_press.setOnSingleClickListener {
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
                 navigateToAttendees()
-            } else {
-                view?.displaySnackBar(getString(R.string.snack_invite_in_shared_calendar_error))
             }
         }
     }

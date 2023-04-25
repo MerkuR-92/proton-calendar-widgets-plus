@@ -425,7 +425,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "hu", // Hungarian
                     "it", // Italian
                     "in", // Indonesian
-                    "nl", // Dutch
+                    "nl", // Nederlands
                     "pl", // Polish
                     "pt", // Portuguese
                     "ro", // Romanian
