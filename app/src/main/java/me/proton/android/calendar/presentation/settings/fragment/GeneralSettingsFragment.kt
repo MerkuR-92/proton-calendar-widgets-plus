@@ -199,10 +199,10 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         val viewModes = arrayOf(
             getString(R.string.settings_default_view_default),
             getString(R.string.nav_view_switcher_agenda),
-            getString(R.string.nav_view_switcher_month),
             getString(R.string.nav_view_switcher_day),
             getString(R.string.nav_view_switcher_three_day),
-            getString(R.string.nav_view_switcher_week)
+            getString(R.string.nav_view_switcher_week),
+            getString(R.string.nav_view_switcher_month)
         )
         settings_default_view_value.text =
             if (mainViewModel.useDefaultViewMode()) viewModes[mainViewModel.getLastViewMode().value + 1]

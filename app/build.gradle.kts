@@ -328,7 +328,7 @@ object Config {
             "hu", // Hungarian
             "it", // Italian
             "in", // Indonesian
-            "nl", // Dutch
+            "nl", // Nederlands
             "pl", // Polish
             "pt-rBR", // Portuguese (Brazil)
             "pt-rPT", // Portuguese (Portugal)
