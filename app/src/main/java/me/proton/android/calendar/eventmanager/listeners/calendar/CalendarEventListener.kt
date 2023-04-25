@@ -1,8 +1,6 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
@@ -14,6 +12,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
+import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.domain.entity.UserId
@@ -30,7 +29,7 @@ class CalendarEventListener @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val delegate: CalendarEventListenerDelegate,
     private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase,
     private val logger: Logger,
 ): CalendarBaseEventListener<String, ServerEvent.EventEntityMetadata>(db) {
     override val order: Int = 3
@@ -74,6 +73,7 @@ class CalendarEventListener @Inject constructor(
         logger.i("CalendarEventListener onResetAll")
         calendarsRepository.deleteAllEvents(config.asCalendar().calendarId)
         getMinimalCalendarEventsUseCase.execute(config.userId, config.asCalendar().calendarId)
+        resetCalendarSearchUseCase.execute(config.userId, listOf(config.asCalendar().calendarId))
     }
 
     override suspend fun onSuccess(config: EventManagerConfig) {

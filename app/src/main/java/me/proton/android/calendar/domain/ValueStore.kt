@@ -19,6 +19,7 @@ interface ValueStore {
     fun clearAll()
     fun removeKey(key: String)
     fun removeKeySet(setName: String)
+    fun removeKeyFromSet(setName: String, key: String)
 }
 
 interface ValueStoreProvider {

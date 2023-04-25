@@ -16,7 +16,6 @@ import me.proton.android.calendar.data.api.BugReportsApiImpl
 import me.proton.android.calendar.data.api.CalendarsApiImpl
 import me.proton.android.calendar.data.api.FeedbackApiImpl
 import me.proton.android.calendar.data.api.ImporterApiImpl
-import me.proton.android.calendar.data.api.KeysApiImpl
 import me.proton.android.calendar.data.api.MailSettingsApiImpl
 import me.proton.android.calendar.data.api.ServerEventsApiImpl
 import me.proton.android.calendar.data.api.SettingsApiImpl
@@ -34,7 +33,6 @@ import me.proton.android.calendar.domain.api.BugReportsApi
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.FeedbackApi
 import me.proton.android.calendar.domain.api.ImporterApi
-import me.proton.android.calendar.domain.api.KeysApi
 import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
@@ -106,7 +104,6 @@ val commonModule = module {
 
 val networkModule = module {
     single<CalendarsApi> { CalendarsApiImpl(get()) }
-    single<KeysApi> { KeysApiImpl(get()) }
     single<AddressesApi> { AddressesApiImpl(get()) }
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
     single<ServerEventsApi> { ServerEventsApiImpl(get()) }
