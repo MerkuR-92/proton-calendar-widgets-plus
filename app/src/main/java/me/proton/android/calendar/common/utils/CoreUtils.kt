@@ -2,6 +2,7 @@ package me.proton.android.calendar.common.utils
 
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.HttpResponseCode
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.core.domain.entity.UserId
@@ -25,7 +26,10 @@ fun ApiResponse.Error.isNotFound(): Boolean {
 }
 
 suspend fun UserManager.getAddressesOrNull(userId: UserId, refresh: Boolean = false): List<UserAddress>? {
-    return kotlin.runCatching { getAddresses(userId, refresh) }.getOrNull()
+    return kotlin.runCatching { getAddresses(userId, refresh) }.getOrElse {
+        TimberLogger.i("UserManager.getAddressesOrNull error", it)
+        null
+    }
 }
 
 /** Create an hex color in the '#FFFFFF' format. */
