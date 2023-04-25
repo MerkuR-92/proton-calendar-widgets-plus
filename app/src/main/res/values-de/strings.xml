@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Du kannst jetzt in deinen Kalendern nach Terminen suchen. Dadurch wird eine verschlüsselte Kopie deiner Kalender auf dein Gerät heruntergeladen. <a href="https://proton.me/support/calendar-search">Mehr erfahren</a></string>
     <string name="spotlight_dialog_import_title">Weitere Möglichkeiten um Termine hinzuzufügen</string>
     <string name="spotlight_dialog_import_description">• Importiere Termine aus Dateien auf deinem Handy in deinen Kalender.\n\n• Füge Reisebuchungen direkt aus Proton Mail hinzu.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktionen</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Füge Ereignisse aus anderen Apps direkt in Proton Calendar ein.\n\n• Erstelle und verwalte Ereignisse in Kalendern, die für dich freigegeben wurden.\n\n• Lege die Standardansicht fest, die du beim Öffnen der App sehen möchtest.\n\n• 13 neue Sprachen sind verfügbar.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>

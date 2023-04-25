@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Nyní můžete v kalendáři vyhledávat události. Tím se do zařízení stáhne šifrovaná kopie vašich kalendářů. <a href="https://proton.me/support/calendar-search">Další informace</a></string>
     <string name="spotlight_dialog_import_title">Více způsobů přidávání událostí</string>
     <string name="spotlight_dialog_import_description">Importovat události do vašeho kalendáře ze souborů na vašem teleofnu.\n\n• Přidat rezervace výletů přímo z Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Funkce kalendáře</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Přidejte události přímo do Proton Calendar z jiných aplikací.\n\n• Vytvořte a spravujte události v kalendářích, které byly sdíleny s vámi.\n\n• Nastavte výchozí zobrazení, které chcete vidět po otevření aplikace\n\n• K dispozici je 13 nových jazyků.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>

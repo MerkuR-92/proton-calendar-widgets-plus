@@ -343,7 +343,7 @@
     <string name="snack_app_link_import_error">Autenticação cancelada</string>
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Abrindo evento…</string>
-    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
+    <string name="snack_invite_in_shared_calendar_error">A criação de convites em um calendário compartilhado não é permitida</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -385,8 +385,8 @@
     <string name="settings_timezone_title">Fuso horário</string>
     <string name="settings_language_title">Idioma do aplicativo</string>
     <string name="settings_language_default">Detectar automaticamente</string>
-    <string name="settings_default_view_title">Default view</string>
-    <string name="settings_default_view_default">Last view</string>
+    <string name="settings_default_view_title">Visualização padrão</string>
+    <string name="settings_default_view_default">Última exibição</string>
     <string name="settings_update_timezone_title">Peça para atualizar a configuração de fuso horário</string>
     <string name="settings_update_timezone_subtitle">Se o fuso horário do sistema não corresponder à preferência de fuso horário atual, você será solicitado a atualizá-la.</string>
     <string name="settings_update_timezone_checkbox">Não perguntar novamente</string>
@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Agora você pode pesquisar por seus eventos em seus calendários. Isso baixa uma cópia criptografada de seus calendários no seu dispositivo. <a href="https://proton.me/support/calendar-search">Saiba mais</a></string>
     <string name="spotlight_dialog_import_title">Mais formas de adicionar eventos</string>
     <string name="spotlight_dialog_import_description">• Importe eventos para seu calendário a partir de arquivos do seu telefone.\n\n• Adicione reserva de viagens diretamente do Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Recursos do calendário</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Adicione eventos diretamente ao Proton Calendar a partir de outros aplicativos.\n\n• Crie e gerencie eventos em calendários compartilhados com você.\n\n• Defina a visualização padrão que deseja observar ao abrir o aplicativo.\n\n• 13 novos idiomas disponíveis.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Agenda e permita que o Proton acesse seus dados.</string>

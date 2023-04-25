@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Voit nyt etsiä kalentereistasi tapahtumia. Tämä lataa laitteellesi salatut kopiot kalentereistasi. <a href="https://proton.me/support/calendar-search">Lue lisää</a></string>
     <string name="spotlight_dialog_import_title">Muita tapoja lisätä tapahtumia</string>
     <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia mobiililaitteesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Kalenterin ominaisuudet</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Salli pääsy</string>
     <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Googlen kalenteriin ja salli Protonille pääsy tietoihisi.</string>

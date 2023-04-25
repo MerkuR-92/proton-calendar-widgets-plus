@@ -501,13 +501,15 @@
     <string name="spotlight_v5_dialog_got_it_button">Ho capito</string>
     <string name="spotlight_v5_dialog_learn_more_button">Per saperne di più</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton Aggiornato, protezione unificata</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentazione del nuovo look di Proton. Benvenuti in un Internet in cui la privacy è l\'impostazione predefinita. <a href="https://proton.me/news/updated-proton">Per saperne di più</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Presentazione del nuovo look di Proton. Ti diamo il benvenuto in un Internet in cui la privacy è l\'impostazione predefinita. <a href="https://proton.me/news/updated-proton">Per saperne di più</a></string>
     <string name="spotlight_dialog_week_view_title">Più opzioni di visualizzazione</string>
     <string name="spotlight_dialog_week_view_description">• Presentazione delle visualizzazioni del calendario in modalità <b>3 giorni</b> e in modalità <b>settimana</b>. Seleziona la tua visualizzazione preferita nel <b>menu</b>.\n\n• Regola l\'altezza delle righe della griglia del giorno, pizzicando con due dita per ingrandire o ridurre.</string>
     <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Cerca senza problemi</string>
     <string name="spotlight_dialog_search_description">Ora puoi cercare eventi nei tuoi calendari. Questo scaricherà una copia crittografata dei tuoi calendari sul tuo dispositivo. <a href="https://proton.me/support/calendar-search">Scopri di più</a></string>
     <string name="spotlight_dialog_import_title">Altri modi per aggiungere eventi</string>
     <string name="spotlight_dialog_import_description">• Importa eventi nel tuo calendario dai file sul tuo telefono.\n\n• Aggiungi prenotazioni di viaggi direttamente da Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>

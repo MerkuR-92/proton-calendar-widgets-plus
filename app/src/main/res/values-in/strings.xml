@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Anda kini dapat mencari acara yang terdapat pada kalender Anda. Dengan ini, salinan terenkripsi kalender Anda akan diunduh pada perangkat Anda. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>

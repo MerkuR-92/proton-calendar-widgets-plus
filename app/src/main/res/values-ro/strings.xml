@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Acum puteți căuta evenimente din calendare. Se va descărca o copie criptată a calendarelor pe dispozitiv. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
     <string name="spotlight_dialog_import_title">Alte metode de adăugat evenimente</string>
     <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Caracteristici calendar</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Adăugați evenimente direct în Proton Calendar din alte aplicații.\n\n• Creați și gestionați evenimente în calendarele care v-au fost partajate.\n\n• Setați afișarea implicită pe care doriți să o vedeți când deschideți aplicația.\n\n• 13 limbi noi disponibile.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>

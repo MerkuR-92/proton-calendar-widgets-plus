@@ -508,6 +508,8 @@
     <string name="spotlight_dialog_search_description">Możesz wyszukiwać wydarzenia w kalendarzu. Ta opcja pobierze zaszyfrowane dane kalendarzy na urządzenie. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
     <string name="spotlight_dialog_import_title">Więcej sposobów na dodanie wydarzenia</string>
     <string name="spotlight_dialog_import_description">• Importuj wydarzenia do kalendarza z plików na telefonie.\n\n• Dodaj rezerwacje wycieczek bezpośrednio z Proton Mail.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Funkcje kalendarza</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Dodawaj wydarzenia do Proton Calendar z innych aplikacji.\n\n• Twórz i zarządzaj wydarzeniami w udostępnionych kalendarzach.\n\n• Wybierz domyślny widok aplikacji.\n\n• 13 nowych języków aplikacji.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Przyznaj dostęp</string>
     <string name="dialog_google_auth_description">Aby rozpocząć proces importowania, zaloguj się do Kalendarza Google i zezwól usłudze Proton na dostęp do danych.</string>
