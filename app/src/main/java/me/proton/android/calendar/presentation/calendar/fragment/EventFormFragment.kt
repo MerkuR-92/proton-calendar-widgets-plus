@@ -397,8 +397,12 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                         logger.e(viewModeInitStatus.message)
                         requireActivity().displaySnackBar(
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
-                            else if (viewModeInitStatus is EventViewModel.InitResult.Error.InitDefaultCalendarError) getString(R.string.snack_create_event_no_active_calendar)
-                            else getString(R.string.snack_event_init_error)
+                            else {
+                                when (viewModeInitStatus) {
+                                    is EventViewModel.InitResult.Error.InitDefaultCalendarError -> getString(R.string.snack_create_event_no_active_calendar)
+                                    is EventViewModel.InitResult.Error.Default -> getString(R.string.snack_event_init_error)
+                                }
+                            }
                         )
                     }
                     else -> Unit // TODO refactor and use one `when` expression
@@ -579,7 +583,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
                 val isCreateEvent = navigationArguments.eventId.isNullOrEmpty()
                 event_form_calendar_disclaimer.text =
-                    if (eventViewModel.isOriginalEventRecurring()) getString(R.string.change_calendar_recurring_disclaimer)
+                    if (eventViewModel.isOriginalEventPartOfChain()) getString(R.string.change_calendar_recurring_disclaimer)
                     else if (eventViewModel.isEventAnInvitation() && !isCreateEvent) getString(R.string.invite_change_calendar_disclaimer)
                     else ""
                 event_form_calendar_disclaimer.visibleOrGone(event_form_calendar_disclaimer.text.isNotEmpty())

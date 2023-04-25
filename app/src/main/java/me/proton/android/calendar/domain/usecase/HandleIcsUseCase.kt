@@ -272,6 +272,7 @@ class HandleIcsUseCase @Inject constructor(
         val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
             ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
         var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+        // Calendar needs to be active and user needs to be owner (we don't allow members to add invites in shared cals even with write permissions)
         if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
             defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }.firstOrNull()
                 ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound

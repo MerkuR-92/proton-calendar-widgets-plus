@@ -36,7 +36,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.getUserOrNull
@@ -780,7 +779,7 @@ class EventViewModel @Inject constructor(
         } ?: true
     }
 
-    fun isOriginalEventRecurring(): Boolean {
+    fun isOriginalEventPartOfChain(): Boolean {
         return dbEvent?.isPartOfChain() == true
     }
 
