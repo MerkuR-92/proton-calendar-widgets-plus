@@ -54,5 +54,4 @@
         <item>ka</item>
         <item>zh-TW</item>
     </array>
-    <bool name="core_feature_key_transparency_enabled">false</bool>
 </resources>

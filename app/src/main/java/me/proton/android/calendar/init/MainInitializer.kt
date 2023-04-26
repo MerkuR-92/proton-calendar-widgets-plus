@@ -24,6 +24,7 @@ import androidx.startup.Initializer
 import me.proton.core.auth.presentation.MissingScopeInitializer
 import me.proton.core.crypto.validator.presentation.init.CryptoValidatorInitializer
 import me.proton.core.humanverification.presentation.HumanVerificationInitializer
+import me.proton.core.keytransparency.presentation.init.KeyTransparencyInitializer
 import me.proton.core.network.presentation.init.UnAuthSessionFetcherInitializer
 import me.proton.core.plan.presentation.UnredeemedPurchaseInitializer
 
@@ -41,7 +42,8 @@ class MainInitializer : Initializer<Unit> {
         MissingScopeInitializer::class.java,
         PeriodicWorkerInitializer::class.java,
         UnredeemedPurchaseInitializer::class.java,
-        UnAuthSessionFetcherInitializer::class.java
+        UnAuthSessionFetcherInitializer::class.java,
+        KeyTransparencyInitializer::class.java
     )
 
     companion object {
