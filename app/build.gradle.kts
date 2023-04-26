@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import io.gitlab.arturbosch.detekt.Detekt
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
@@ -12,7 +11,6 @@ plugins {
     id("kotlin-android")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
-    id("io.gitlab.arturbosch.detekt")
     id("dagger.hilt.android.plugin")
     id("jacoco")
 }
@@ -24,7 +22,6 @@ sonarqube {
     }
 }
 
-detekt { config = files("$projectDir/config/detekt/detekt.yml") }
 jacoco { toolVersion = "0.8.7" }
 kapt { correctErrorTypes = true }
 
@@ -152,10 +149,6 @@ dependencies {
     compileOnly(libs.assistedInject)
     kapt(libs.assistedInject)
 
-    detekt(libs.detekt.formatting)
-    detekt(libs.detekt.cli)
-    detektPlugins(libs.detekt.formatting)
-
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.retrofit.coroutines)
@@ -277,19 +270,6 @@ tasks.register("getArchivesName"){
 tasks.withType(Test::class) {
     testLogging {
         events.addAll(listOf(TestLogEvent.PASSED, TestLogEvent.FAILED, TestLogEvent.SKIPPED))
-    }
-}
-
-tasks.named("detekt", Detekt::class).configure {
-    jvmTarget = "1.8"
-    reports {
-        xml.required.set(false)
-        html.required.set(true)
-        txt.required.set(false)
-        custom {
-            reportId = "DetektQualityOutputReport"
-            outputLocation.set(file("build/reports/detekt.json"))
-        }
     }
 }
 
