@@ -408,18 +408,19 @@ class EventViewModel @Inject constructor(
      * @returns Default calendar (and load calendar settings to be stored in calendarSettings) or InitResult error.
      */
     private suspend fun initializeDefaultCalendar(): InitResult {
-        // Try to get default calendar id if it exists
-        var defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: could not get default calendar ID")
-
         // Try to get default calendar if it exists
-        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+        var defaultCalendar = calendarsRepository.getDefaultCalendarId(userId.id)?.let { defaultCalendarId ->
+            calendarsRepository.selectCalendar(defaultCalendarId)
+        }
+        var defaultCalendarId = defaultCalendar?.id
 
-        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            // Fallback to first active user calendar
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull {
-                it.allowEditEvents
-            } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
+        if (defaultCalendarId == null || defaultCalendar?.isActive != true || !defaultCalendar.allowEditEvents) {
+            // Fallback if no default calendar was set
+            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
+            defaultCalendar =
+                activeUserCalendars.firstOrNull { it.isOwner} // First try to get a personal active calendar
+                    ?: activeUserCalendars.firstOrNull { it.allowEditEvents } // Fallback to any active writable calendar
+                            ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
             defaultCalendarId = defaultCalendar.id
         }
 
