@@ -25,6 +25,7 @@ import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
+import me.proton.android.calendar.init.KoinInitializer
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.accountmanager.domain.AccountManager
@@ -52,79 +53,14 @@ class ProtonCalendarApplication : Application() {
     lateinit var logger: Logger
 
     @Inject
-    lateinit var appDatabase: AppDatabase
-
-    @Inject
-    lateinit var apiProvider: ApiProvider
-
-    @Inject
-    lateinit var accountManager: AccountManager
-
-    @Inject
-    lateinit var userManager: UserManager
-
-    @Inject
-    lateinit var userRepository: UserRepository
-
-    @Inject
-    lateinit var userAddressRepository: UserAddressRepository
-
-    @Inject
-    lateinit var userSettingsRepository: UserSettingsRepository
-
-    @Inject
-    lateinit var contactEmailsRepository: ContactRepository
-
-    @Inject
-    lateinit var getRecipientPublicAddresses: GetRecipientPublicAddresses
-
-    @Inject
     lateinit var defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider
 
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
 
-    @Inject
-    lateinit var calendarsRepository: CalendarsRepository
-
-    @Inject
-    lateinit var crypto: Crypto
-
-    @Inject
-    lateinit var cryptoContext: CryptoContext
-
-    @Inject
-    lateinit var eventDecryptor: EventDecryptor
-
     override fun onCreate() {
         super.onCreate()
         MainInitializer.init(this)
-
-        startKoin {
-            androidContext(this@ProtonCalendarApplication)
-            modules(
-                commonModule,
-                repositoryModule,
-                networkModule,
-                useCaseModule,
-                coreModule(
-                    appDatabase,
-                    apiProvider,
-                    crypto,
-                    cryptoContext,
-                    eventDecryptor,
-                    accountManager,
-                    userManager,
-                    userRepository,
-                    userAddressRepository,
-                    calendarsRepository,
-                    contactEmailsRepository,
-                    userSettingsRepository,
-                    getRecipientPublicAddresses,
-                    defaultSharedPreferencesProvider
-                )
-            )
-        }
 
         CoreLogger.set(LoggerImpl)
         if (BuildConfig.DEBUG) {
