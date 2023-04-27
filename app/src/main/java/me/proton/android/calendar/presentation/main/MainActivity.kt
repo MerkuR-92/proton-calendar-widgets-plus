@@ -569,7 +569,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             actionEditOrInsertIntent.extras?.let { intentExtras ->
                                 lifecycleScope.launch {
                                     val hasActiveWritableCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
-                                    if (hasActiveWritableCalendars != true) this@MainActivity.displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
+                                    if (hasActiveWritableCalendars != true) {
+                                        this@MainActivity.displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
+                                        safeNavigateToMonth()
+                                        return@launch
+                                    }
                                     val startMillis = run {
                                         val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
                                         if (dtStart == 0L) {
