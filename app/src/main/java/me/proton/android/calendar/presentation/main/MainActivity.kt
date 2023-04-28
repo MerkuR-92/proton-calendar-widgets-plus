@@ -567,39 +567,47 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         } else if (actionEditOrInsertIntent != null) {
                             // Handle extras
                             actionEditOrInsertIntent.extras?.let { intentExtras ->
-                                val startMillis = run {
-                                    val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
-                                    if (dtStart == 0L) {
-                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_BEGIN_TIME)
-                                    } else dtStart
-                                }
-                                val endMillis = run {
-                                    val dtEnd = intentExtras.getLong(CalendarContract.Events.DTEND)
-                                    if (dtEnd == 0L) {
-                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_END_TIME)
-                                    } else dtEnd
-                                }
-                                val timeZoneId = fallbackTimeZone(
-                                    intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE) ?: ZoneId.systemDefault().id,
-                                    fallbackToDefault = true
-                                )
-                                val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
-                                val title = intentExtras.getString(CalendarContract.Events.TITLE) ?: "" // We open event form so no need to provide title placeholder
-                                val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION) ?: ""
-                                val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION) ?: ""
-                                val rRule = intentExtras.getString(CalendarContract.Events.RRULE) ?: ""
-                                safeNavigateToDialogFragment(
-                                    Navigation.Deeplink.toEventCreatePrefill(
-                                        startMillis,
-                                        endMillis,
-                                        Uri.encode(timeZoneId),
-                                        allDay,
-                                        Uri.encode(title),
-                                        Uri.encode(description),
-                                        Uri.encode(location),
-                                        Uri.encode(rRule),
+                                lifecycleScope.launch {
+                                    val hasActiveWritableCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
+                                    if (hasActiveWritableCalendars != true) {
+                                        this@MainActivity.displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
+                                        safeNavigateToMonth()
+                                        return@launch
+                                    }
+                                    val startMillis = run {
+                                        val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
+                                        if (dtStart == 0L) {
+                                            intentExtras.getLong(CalendarContract.EXTRA_EVENT_BEGIN_TIME)
+                                        } else dtStart
+                                    }
+                                    val endMillis = run {
+                                        val dtEnd = intentExtras.getLong(CalendarContract.Events.DTEND)
+                                        if (dtEnd == 0L) {
+                                            intentExtras.getLong(CalendarContract.EXTRA_EVENT_END_TIME)
+                                        } else dtEnd
+                                    }
+                                    val timeZoneId = fallbackTimeZone(
+                                        intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE) ?: ZoneId.systemDefault().id,
+                                        fallbackToDefault = true
                                     )
-                                )
+                                    val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
+                                    val title = intentExtras.getString(CalendarContract.Events.TITLE) ?: "" // We open event form so no need to provide title placeholder
+                                    val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION) ?: ""
+                                    val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION) ?: ""
+                                    val rRule = intentExtras.getString(CalendarContract.Events.RRULE) ?: ""
+                                    safeNavigateToDialogFragment(
+                                        Navigation.Deeplink.toEventCreatePrefill(
+                                            startMillis,
+                                            endMillis,
+                                            Uri.encode(timeZoneId),
+                                            allDay,
+                                            Uri.encode(title),
+                                            Uri.encode(description),
+                                            Uri.encode(location),
+                                            Uri.encode(rRule),
+                                        )
+                                    )
+                                }
                             } ?: run {
                                 this@MainActivity.displaySnackBar(
                                     getString(R.string.snack_ics_create_error),

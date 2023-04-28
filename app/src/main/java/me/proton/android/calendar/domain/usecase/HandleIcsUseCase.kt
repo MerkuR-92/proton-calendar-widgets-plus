@@ -2,7 +2,6 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.ICalendar
 import biweekly.parameter.ParticipationStatus
-import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Method
 import biweekly.property.Status
@@ -83,12 +82,17 @@ class HandleIcsUseCase @Inject constructor(
 
     private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isOpeningFromProtonMail: Boolean): IcsSurgeryUtils.HandleIcsResult {
 
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
-        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
+        // Try to get default calendar if it exists
+        var defaultCalendar = calendarsRepository.getDefaultCalendarId(userId.id)?.let { defaultCalendarId ->
+            calendarsRepository.selectCalendar(defaultCalendarId)
+        }
         if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).firstOrNull { it.allowEditEvents }
-                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
+            // Fallback if no default calendar was set
+            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
+            defaultCalendar =
+                activeUserCalendars.firstOrNull { it.isOwner} // First try to get a personal active calendar
+                    ?: activeUserCalendars.firstOrNull { it.allowEditEvents } // Fallback to any active writable calendar
+                            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
         }
 
         // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones

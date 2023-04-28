@@ -100,6 +100,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -582,10 +583,14 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
                 val isCreateEvent = navigationArguments.eventId.isNullOrEmpty()
+                // We do not display any disclaimer if there is only one selectable calendar
+                val selectableCalendarsCount = getSelectableCalendars()?.size ?: 0
                 event_form_calendar_disclaimer.text =
-                    if (eventViewModel.isOriginalEventPartOfChain()) getString(R.string.change_calendar_recurring_disclaimer)
-                    else if (eventViewModel.isEventAnInvitation() && !isCreateEvent) getString(R.string.invite_change_calendar_disclaimer)
-                    else ""
+                    if (selectableCalendarsCount > 1 && eventViewModel.isOriginalEventPartOfChain()) {
+                        getString(R.string.change_calendar_recurring_disclaimer)
+                    } else if (selectableCalendarsCount > 1 && eventViewModel.isEventAnInvitation() && !isCreateEvent) {
+                        getString(R.string.invite_change_calendar_disclaimer)
+                    } else ""
                 event_form_calendar_disclaimer.visibleOrGone(event_form_calendar_disclaimer.text.isNotEmpty())
                 event_form_calendar_press.isEnabled = event_form_calendar_disclaimer.text.isEmpty()
                 if (calendarViewModel.getPersonalCalendarsCount() <= 1 && (event.iCalEvent.attendees?.isNotEmpty() == true || event.iCalEvent.organizer != null)) {
@@ -678,6 +683,18 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             navigateToAttendees()
         }
         event_form_participant_chip_group.addView(chip)
+    }
+
+    private suspend fun getSelectableCalendars(): List<Calendar>? {
+        // Return the calendars that can be selected by the user for that event
+        return calendarViewModel.getUserCalendars()?.filter {
+            if (eventViewModel.eventLiveData.value!!.iCalEvent.attendees.isNullOrEmpty()) {
+                it.isActive && it.allowEditEvents
+            } else {
+                // We do not allow invitations to be saved in shared calendar as a member
+                it.isActive && it.isOwner
+            }
+        }
     }
 
     private fun attachActionHandlers() {
@@ -777,13 +794,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         event_form_calendar_press.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-                val calendars = calendarViewModel.getUserCalendars()?.filter {
-                    if (eventViewModel.eventLiveData.value!!.iCalEvent.attendees.isNullOrEmpty()) {
-                        it.isActive && it.allowEditEvents
-                    } else {
-                        it.isActive && it.isOwner
-                    }
-                }
+                val calendars = getSelectableCalendars()
 
                 // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
                 if (calendars == null || calendars.size <= 1) return@launch

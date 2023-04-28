@@ -452,7 +452,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:textColor="@color/text_hint"
                 android:layout_marginStart="@dimen/default_margin_text_start"
                 android:layout_marginEnd="@dimen/default_margin_text_end"
                 android:layout_marginTop="@dimen/default_margin_text_vertical_large"
