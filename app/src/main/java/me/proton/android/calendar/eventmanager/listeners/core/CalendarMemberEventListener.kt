@@ -50,9 +50,9 @@ class CalendarMemberEventListener @Inject constructor(
 
             // incomplete key setup flag is set, should only happen when newly created calendar wasn't setup properly
             // by another frontend client
-            println("flags = ${entity.flags}")
+            logger.d("handleIncompleteKeys member flags = ${entity.flags}")
             val updatedCalendar = if (entity.hasIncompleteKeySetup) {
-                when (val result = keySetupUseCase.execute(config.userId, entity.id)) {
+                when (val result = keySetupUseCase.execute(config.userId, entity.calendarId)) {
                     is UseCase.Result.Success<*> -> {
                         val fetchedMember = calendarsRepository.fetchMembers(config.userId, entity.calendarId)?.firstOrNull()
                         if (fetchedMember == null) {
