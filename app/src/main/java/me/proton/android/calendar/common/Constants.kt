@@ -98,7 +98,7 @@ const val EASY_SWITCH_VERSION_CODE = 150
 const val WEEK_VIEW_VERSION_CODE = 164
 const val IMPORT_VERSION_CODE = 186
 const val CALENDAR_PROVIDER_VERSION_CODE = 191
-const val SEARCH_VERSION_CODE = 192
+const val SEARCH_VERSION_CODE = 193
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -109,7 +109,7 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
     IMPORT_VERSION_CODE, // Import (2.6.6)
     CALENDAR_PROVIDER_VERSION_CODE, // Calendar provider (2.9.1)
-    SEARCH_VERSION_CODE // Search view (2.10.0)
+    SEARCH_VERSION_CODE // Search view (2.10.1)
 )
 
 object FeatureFlag {
