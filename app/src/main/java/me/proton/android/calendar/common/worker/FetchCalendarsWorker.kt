@@ -84,7 +84,7 @@ class FetchCalendarsWorker @AssistedInject constructor(
         if (userId != null) {
             val userValueStore = valueStoreProvider.provideValueStore(userId.id)
 
-            val calendars = calendarsRepository.selectUserCalendars(userId.id)
+            val calendars = calendarsRepository.selectAllCalendars(userId.id)
 
             // determine how many Events there are in each Calendar
             calendarMetadata = calendars.map { calendar ->

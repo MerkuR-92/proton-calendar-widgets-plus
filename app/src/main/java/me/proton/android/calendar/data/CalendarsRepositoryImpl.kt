@@ -899,27 +899,6 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun hasCalendar(calendarId: String, ): Boolean = database.calendarsDao().hasCalendar(calendarId)
 
-    private suspend fun expandDbEventsUntil(toDateTime: ZonedDateTime) {
-
-        logger.v("expandDbEventsUntil ${toDateTime.toLocalDate()}")
-
-        fetchingState.value = CalendarsRepository.FetchingState.Fetching
-
-        eventsMutex.withLock {
-
-            allEvents.value = dbEvents.flatMap { expandDbEvent(it, dbEvents, toDateTime) }
-
-            logger.v("expanded total count: ${allEvents.value.size}")
-
-            if (dbEvents.isNotEmpty()) {
-                eventsExpandedUntil = toDateTime
-            }
-
-        }
-
-        fetchingState.value = CalendarsRepository.FetchingState.Finished
-    }
-
     /**
      * Calling this method requires obtained lock on 'allEvents'!
      */
