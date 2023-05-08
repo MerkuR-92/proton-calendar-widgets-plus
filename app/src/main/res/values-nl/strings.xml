@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Geen</string>
     <string name="event_text_calendar">Kalender</string>
     <string name="event_text_timezone_start">Tijdzone</string>
+    <string name="invite_in_shared_calendar_disclaimer">Uitnodigingen versturen is alleen mogelijk in persoonlijk agenda\'s.</string>
+    <string name="invite_change_calendar_disclaimer">Het is niet mogelijk de agenda te wijzigen die gekoppeld zijn met uitnodigingen.</string>
+    <string name="change_calendar_recurring_disclaimer">Agenda\'s wijzigen voor terugkerende afspraken is nog niet mogelijk.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Wat bent u naar op zoek?</string>
     <string name="search_empty_results_title">Geen resultaten</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Fout bij verzenden rapport, probeer het later opnieuw</string>
     <string name="snack_send_bug_report_description_empty">Geef een beschrijving van uw rapport</string>
     <string name="snack_create_event_no_active_personal_calendar">U hebt een persoonlijke actieve agenda nodig om afspraken te maken</string>
+    <string name="snack_create_event_no_active_calendar">U heeft een actieve agenda nodig om afspraken te maken</string>
     <string name="snack_add_self_as_participant">Zelf uitnodiging niet toegestaan</string>
     <string name="snack_maximum_participants_reached">Het maximale aantal deelnemers is bereikt.</string>
     <string name="snack_add_participant_error">Fout bij het toevoegen van de deelnemer</string>
@@ -329,6 +333,7 @@
     <string name="snack_ics_reply_party_crasher_error">Deelnemers die niet zijn uitgenodigd door de organisator kunnen niet worden toegevoegd</string>
     <string name="snack_ics_missing_uid_error">De afspraak mist UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Er is geen actieve persoonlijke agenda gekoppeld aan dit account</string>
+    <string name="snack_ics_no_active_calendar_error">Er is geen actieve agenda gekoppeld aan dit account</string>
     <string name="snack_ics_unsupported_duration_error">Tijdsduur wordt niet ondersteund</string>
     <string name="snack_ics_too_many_events_error">Meerdere afspraken worden nog niet ondersteund</string>
     <string name="snack_ics_no_events_error">Deze agenda bevat geen enkele afspraak</string>
@@ -508,8 +513,8 @@
     <string name="spotlight_dialog_search_description">U kunt nu zoeken in uw agenda naar afspraken. Hiervoor wordt een versleutelde kopie van uw agenda gedownload op uw apparaat. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
     <string name="spotlight_dialog_import_title">Meer manieren om afspraken toe te voegen</string>
     <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>

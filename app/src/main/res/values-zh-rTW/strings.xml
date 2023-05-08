@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">無</string>
     <string name="event_text_calendar">行事曆</string>
     <string name="event_text_timezone_start">時區</string>
+    <string name="invite_in_shared_calendar_disclaimer">傳送邀請函僅適用於個人行事曆。</string>
+    <string name="invite_change_calendar_disclaimer">無法修改與邀請函相關的行事曆。</string>
+    <string name="change_calendar_recurring_disclaimer">尚無法變更定期行程的行事曆。</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">您在找什麼？</string>
     <string name="search_empty_results_title">查無結果</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">傳送意見時發生錯誤，請稍後再試</string>
     <string name="snack_send_bug_report_description_empty">請提供您回報的描述</string>
     <string name="snack_create_event_no_active_personal_calendar">您需要一個使用中的個人行事曆來創建活動</string>
+    <string name="snack_create_event_no_active_calendar">您需要一個作用中的行事曆以建立事件</string>
     <string name="snack_add_self_as_participant">不允許自我邀請</string>
     <string name="snack_maximum_participants_reached">已達到參與者人數上限。</string>
     <string name="snack_add_participant_error">加入參與者時發生錯誤</string>
@@ -328,7 +332,8 @@
     <string name="snack_ics_party_crasher_error">您的電郵不在參與者清單中</string>
     <string name="snack_ics_reply_party_crasher_error">無法加入召集人未有邀請的參與者</string>
     <string name="snack_ics_missing_uid_error">此活動遺失 UID</string>
-    <string name="snack_ics_no_active_personal_calendar_error">無任何與此帳號關聯的使用中個人行事曆</string>
+    <string name="snack_ics_no_active_personal_calendar_error">無任何與此帳號關聯的作用中個人行事曆</string>
+    <string name="snack_ics_no_active_calendar_error">無任何與此帳號關聯的作用中行事曆</string>
     <string name="snack_ics_unsupported_duration_error">不支援持續時間屬性</string>
     <string name="snack_ics_too_many_events_error">尚未支援多重活動</string>
     <string name="snack_ics_no_events_error">此行事曆不包含任何活動</string>

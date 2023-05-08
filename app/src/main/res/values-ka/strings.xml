@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">არცერთი</string>
     <string name="event_text_calendar">კალენდარი</string>
     <string name="event_text_timezone_start">დროის სარტყელი</string>
+    <string name="invite_in_shared_calendar_disclaimer">მოსაწვევების გაგზავნა მხოლოდ პირადი კალენდარების შიგნითაა შესაძლებელი.</string>
+    <string name="invite_change_calendar_disclaimer">მოსაწვევებზე მიმაგრებული კალენდარის ჩასწორება შეუძლებელია.</string>
+    <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდარის შეცვლა ჯერჯერობით შეუძლებელია.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">ანგარიშის გაგზავნის შეცდომა. მოგვიანებით სცადეთ</string>
     <string name="snack_send_bug_report_description_empty">შეიყვანეთ თქვენი ანგარიშის აღწერა</string>
     <string name="snack_create_event_no_active_personal_calendar">მოვლენების შესაქმნელად თქვენ გჭირდებათ პირადი აქტიური კალენდარი</string>
+    <string name="snack_create_event_no_active_calendar">მოვლენების შესაქმნელად აქტიური კალენდარი გჭირდებათ</string>
     <string name="snack_add_self_as_participant">თვითმოწვევა აკრძალულია</string>
     <string name="snack_maximum_participants_reached">მიღწეულია მონაწილეთა მაქსიმალური რაოდენობა.</string>
     <string name="snack_add_participant_error">მონაწილის დამატების შეცდომა</string>
@@ -328,7 +332,8 @@
     <string name="snack_ics_party_crasher_error">ელფოსტის თქვენი მისამართი მონაწილეთა სიაში არაა</string>
     <string name="snack_ics_reply_party_crasher_error">მონაწილეები, რომლებიც ორგანიზატორმა არ მიიწვია, არ შეიძლება დაემატოს</string>
     <string name="snack_ics_missing_uid_error">მოვლენას UID-ი აკლია</string>
-    <string name="snack_ics_no_active_personal_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური პირადი კალენდრები არ არსებობს</string>
+    <string name="snack_ics_no_active_personal_calendar_error">ამ ანგარიშთან აქტიური პირადი კალენდარი არ არსებობს</string>
+    <string name="snack_ics_no_active_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური კალენდარები არ არსებობს</string>
     <string name="snack_ics_unsupported_duration_error">ხანგრძლივობის თვისება მხარდაუჭერელია</string>
     <string name="snack_ics_too_many_events_error">მრავალმოვლენიანობა ჯერ მხარდაჭერილი არაა</string>
     <string name="snack_ics_no_events_error">ეს კალენდარი არც ერთ მოვლენა არ შეიცავს</string>
@@ -508,8 +513,8 @@
     <string name="spotlight_dialog_search_description">ახლა კალენდარებში მოვლენების ძებნა შეგიძლიათ. ეს თქვენი კალენდარების დაშიფრულ ასლს გადმოიწერს თქვენს მოწყობილობაზე. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
     <string name="spotlight_dialog_import_title">მოვლენების დამატების მეტი გზა</string>
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
+    <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდარებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>

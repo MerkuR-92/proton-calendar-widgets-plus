@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Nenhum</string>
     <string name="event_text_calendar">Calendário</string>
     <string name="event_text_timezone_start">Fuso horário</string>
+    <string name="invite_in_shared_calendar_disclaimer">O envio de convites é disponível apenas entre calendários pessoais.</string>
+    <string name="invite_change_calendar_disclaimer">Não é possível modificar o calendário associado com convites.</string>
+    <string name="change_calendar_recurring_disclaimer">Mudar o calendário para evento recorrente ainda não é possível.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">O que você está procurando?</string>
     <string name="search_empty_results_title">Nenhum resultado encontrado</string>
@@ -262,7 +265,7 @@
     <string name="nav_view_switcher_month">Mês</string>
     <string name="nav_view_timezone">Fuso horário</string>
     <string name="nav_view_settings">Configurações</string>
-    <string name="nav_view_feedback">Dê-nos feedback</string>
+    <string name="nav_view_feedback">Envie comentários</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Geral</string>
     <string name="nav_view_more_bug">Relatar um problema</string>
     <string name="nav_view_more_subscription">Assinatura</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Erro ao enviar relatório. Por favor, tente novamente mais tarde</string>
     <string name="snack_send_bug_report_description_empty">Forneça uma descrição do seu relatório</string>
     <string name="snack_create_event_no_active_personal_calendar">Você precisa de um calendário pessoal ativo para criar eventos</string>
+    <string name="snack_create_event_no_active_calendar">Você precisa de um calendário ativo para criar eventos.</string>
     <string name="snack_add_self_as_participant">Auto convite não permitido</string>
     <string name="snack_maximum_participants_reached">O número máximo de participantes foi atingido.</string>
     <string name="snack_add_participant_error">Erro ao adicionar o participante</string>
@@ -329,6 +333,7 @@
     <string name="snack_ics_reply_party_crasher_error">Participantes que não foram convidados pelo organizador não podem ser adicionados</string>
     <string name="snack_ics_missing_uid_error">O evento não possui UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Não há calendário pessoal ativo associado a esta conta</string>
+    <string name="snack_ics_no_active_calendar_error">Não há calendário pessoal associado a esta conta</string>
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é compatível</string>
     <string name="snack_ics_too_many_events_error">Vários eventos ainda não são suportados</string>
     <string name="snack_ics_no_events_error">Este calendário não contém nenhum evento</string>
@@ -471,7 +476,7 @@
     <string name="splash_init">Descriptografando conteúdo</string>
     <string name="default_calendar_name">Meu calendário</string>
     <!-- FEEDBACK DIALOG -->
-    <string name="dialog_feedback_header">Dê-nos feedback</string>
+    <string name="dialog_feedback_header">Envie comentários</string>
     <string name="dialog_feedback_text">Como você descreveria sua experiência com o Proton Calendar?</string>
     <string name="dialog_feedback_rating_worst">Horrível</string>
     <string name="dialog_feedback_rating_best">Maravilhoso</string>

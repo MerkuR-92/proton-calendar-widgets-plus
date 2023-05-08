@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Никого</string>
     <string name="event_text_calendar">Календарь</string>
     <string name="event_text_timezone_start">Часовой пояс</string>
+    <string name="invite_in_shared_calendar_disclaimer">Отправка приглашений доступна только в личных календарях.</string>
+    <string name="invite_change_calendar_disclaimer">Невозможно изменить календарь, связанный с приглашениями.</string>
+    <string name="change_calendar_recurring_disclaimer">Изменение календаря для повторяющегося события пока невозможно.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Что вы ищете?</string>
     <string name="search_empty_results_title">Результатов не найдено</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Ошибка при отправке отчета, повторите попытку позже</string>
     <string name="snack_send_bug_report_description_empty">Пожалуйста, предоставьте описание вашего отчета</string>
     <string name="snack_create_event_no_active_personal_calendar">Для создания событий необходим личный активный календарь</string>
+    <string name="snack_create_event_no_active_calendar">Для создания событий необходим активный календарь</string>
     <string name="snack_add_self_as_participant">Себя пригласить нельзя</string>
     <string name="snack_maximum_participants_reached">Достигнуто максимальное количество участников.</string>
     <string name="snack_add_participant_error">Ошибка добавления участника</string>
@@ -329,6 +333,7 @@
     <string name="snack_ics_reply_party_crasher_error">Участники, которые не были приглашены организатором, не могут быть добавлены</string>
     <string name="snack_ics_missing_uid_error">Событие не имеет UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Нет активного личного календаря, связанного с этим аккаунтом</string>
+    <string name="snack_ics_no_active_calendar_error">Нет активного календаря, связанного с этим аккаунтом</string>
     <string name="snack_ics_unsupported_duration_error">Свойство длительности не поддерживается</string>
     <string name="snack_ics_too_many_events_error">Множественные события пока не поддерживаются</string>
     <string name="snack_ics_no_events_error">Этот календарь не содержит никаких событий</string>
@@ -509,7 +514,7 @@
     <string name="spotlight_dialog_import_title">Больше способов добавления событий</string>
     <string name="spotlight_dialog_import_description">• Импортируйте события в календарь из файлов на вашем телефоне.\n\n• Добавляйте бронирования поездок прямо из Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функции календаря</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Добавляйте события напрямую в Proton Calendar из других приложений.\n\n• Создавайте и управляйте событиями в календарях, которыми с вами поделились.\n\n• Устанавливайте вид по умолчанию, который вы хотите видеть при открытии приложения\n\n• Доступно 13 новых языков.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>

@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Ninguno</string>
     <string name="event_text_calendar">Calendario</string>
     <string name="event_text_timezone_start">Zona horaria</string>
+    <string name="invite_in_shared_calendar_disclaimer">El envío de invitaciones solo está disponible dentro de calendarios personales.</string>
+    <string name="invite_change_calendar_disclaimer">No es posible modificar el calendario asociado a invitaciones.</string>
+    <string name="change_calendar_recurring_disclaimer">Cambiar de calendario un evento recurrente aún no es posible.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">¿Qué está buscando?</string>
     <string name="search_empty_results_title">No se encontraron resultados</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Error al enviar el reporte, intente de nuevo más tarde</string>
     <string name="snack_send_bug_report_description_empty">Proporcione una descripción de su reporte</string>
     <string name="snack_create_event_no_active_personal_calendar">Necesita un calendario personal activo para crear eventos</string>
+    <string name="snack_create_event_no_active_calendar">Necesita un calendario activo para crear eventos</string>
     <string name="snack_add_self_as_participant">Autoinvitación no permitida</string>
     <string name="snack_maximum_participants_reached">Se ha alcanzado el número máximo de participantes.</string>
     <string name="snack_add_participant_error">Error al añadir al participante</string>
@@ -329,6 +333,7 @@
     <string name="snack_ics_reply_party_crasher_error">Los participantes que no fueron invitados por el organizador no pueden ser añadidos</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento</string>
     <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta</string>
+    <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta</string>
     <string name="snack_ics_unsupported_duration_error">La propiedad de duración no es compatible</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento</string>
