@@ -10,9 +10,9 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        compileSdk = 32
+        compileSdk = 33
         minSdk = 23
-        targetSdk = 32
+        multiDexEnabled = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

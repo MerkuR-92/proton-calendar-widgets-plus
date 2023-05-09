@@ -19,14 +19,16 @@
 package me.proton.android.calendar.uitest
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.platform.app.InstrumentationRegistry
 import dagger.hilt.android.testing.HiltAndroidRule
 import me.proton.android.calendar.presentation.main.MainActivity
+import me.proton.android.calendar.uitest.rule.AtlasEnvironmentRule
 import me.proton.android.calendar.uitest.rule.HiltInjectRule
 import me.proton.android.calendar.uitest.rule.MainInitializerRule
-import me.proton.android.calendar.uitest.rule.AtlasEnvironmentRule
 import me.proton.core.auth.domain.testing.LoginTestHelper
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
+import me.proton.core.util.kotlin.deserializeList
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -52,7 +54,13 @@ open class BaseTest {
     @Inject
     lateinit var loginTestHelper: LoginTestHelper
 
-    val users = Users.fromDefaultResources()
+    val users = Users(
+        InstrumentationRegistry.getInstrumentation().context
+            .assets
+            .open("users.json")
+            .bufferedReader()
+            .use { it.readText() }
+            .deserializeList())
 
     val quark: Quark get() = atlasEnvironmentRule.quark
 

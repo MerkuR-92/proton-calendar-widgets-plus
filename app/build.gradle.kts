@@ -37,6 +37,15 @@ android {
         dataBinding = true
     }
 
+    signingConfigs {
+        create("default") {
+            storeFile = file(project.properties["keyStoreFilePath"] ?: "protonkey.jks")
+            storePassword = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
+            keyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: "proton"
+            keyPassword = System.getenv("KEY_STORE_KEY_PASSWORD") ?: "\"Store key password\""
+        }
+    }
+
     defaultConfig {
         applicationId = Config.applicationId
         minSdk = Config.minSdk
@@ -51,15 +60,6 @@ android {
             annotationProcessorOptions {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
             }
-        }
-    }
-
-    signingConfigs {
-        create("release") {
-            storeFile = file(project.properties["keyStoreFilePath"] ?: "protonkey.jks")
-            storePassword = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
-            keyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: "proton"
-            keyPassword = System.getenv("KEY_STORE_KEY_PASSWORD") ?: "\"Store key password\""
         }
     }
 
@@ -95,7 +95,7 @@ android {
                 getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("default")
 
             val sentryDsn = System.getenv("SENTRY_DSN_NEW")
             buildConfigField("String", "SENTRY_DSN_NEW", sentryDsn.toBuildConfigValue())
@@ -104,6 +104,10 @@ android {
             buildConfigField("String", "SENTRY_DSN_NEW", null.toBuildConfigValue())
             enableUnitTestCoverage = true
             isDebuggable = true
+
+            if (isGitlabCI) {
+                signingConfig = signingConfigs.getByName("default")
+            }
         }
     }
 
@@ -261,9 +265,10 @@ dependencies {
     androidTestUtil(libs.test.androidx.services)
 }
 
-tasks.register("getArchivesName"){
+tasks.register("getConfig") {
     doLast {
-        println(Config.archivesBaseName)
+        println("ARCHIVES_BASE_NAME=\"${Config.archivesBaseName}\"\n")
+        println("ARCHIVES_VERSION=${Config.versionName}")
     }
 }
 
@@ -281,6 +286,8 @@ tasks.withType<Test> {
 }
 
 fun String?.toBuildConfigValue() = if (this != null) "\"$this\"" else "null"
+
+val isGitlabCI: Boolean get() = !System.getenv("CI_SERVER_NAME").isNullOrEmpty()
 
 object Config {
     const val applicationId = "me.proton.android.calendar"
