@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Cap</string>
     <string name="event_text_calendar">Calendari</string>
     <string name="event_text_timezone_start">Fus horari</string>
+    <string name="invite_in_shared_calendar_disclaimer">La funcionalitat de convidar només està disponible per a calendaris personals.</string>
+    <string name="invite_change_calendar_disclaimer">No és possible modificar el calendari associat amb invitacions.</string>
+    <string name="change_calendar_recurring_disclaimer">La funcionalitat de moure de calendari un esdeveniment recurrent encara no està disponible.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Què esteu buscant?</string>
     <string name="search_empty_results_title">No s\'han trobat resultats.</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Error enviant l\'informe. Proveu de nou més tard.</string>
     <string name="snack_send_bug_report_description_empty">Proporcioneu una descripció del vostre informe.</string>
     <string name="snack_create_event_no_active_personal_calendar">Necessiteu un calendari personal actiu per poder crear esdeveniments.</string>
+    <string name="snack_create_event_no_active_calendar">Necessiteu un calendari actiu per poder crear esdeveniments</string>
     <string name="snack_add_self_as_participant">No es pot convidar a si mateix.</string>
     <string name="snack_maximum_participants_reached">S\'ha assolit el nombre màxim de participants.</string>
     <string name="snack_add_participant_error">Error afegint el participant</string>
@@ -328,7 +332,8 @@
     <string name="snack_ics_party_crasher_error">El vostre correu electrònic no es troba a la llista de participants</string>
     <string name="snack_ics_reply_party_crasher_error">No es poden afegir participants que no han estat convidats per l\'organitzador</string>
     <string name="snack_ics_missing_uid_error">A l\'esdeveniment li manca UID</string>
-    <string name="snack_ics_no_active_personal_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte</string>
+    <string name="snack_ics_no_active_calendar_error">No hi ha cap calendari actiu associat amb aquest compte</string>
     <string name="snack_ics_unsupported_duration_error">No s\'admet la propietat de durada</string>
     <string name="snack_ics_too_many_events_error">Encara no s\'admeten esdeveniments múltiples</string>
     <string name="snack_ics_no_events_error">Aquest calendari no conté cap esdeveniment</string>
@@ -343,7 +348,7 @@
     <string name="snack_app_link_import_error">Autenticació cancel·lada</string>
     <string name="snack_notification_already_added">La notificació ja ha estat afegida.</string>
     <string name="snack_opening_ics">Obertura de l\'esdeveniment…</string>
-    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
+    <string name="snack_invite_in_shared_calendar_error">No es permet crear invitacions en un calendari compartit.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
@@ -385,8 +390,8 @@
     <string name="settings_timezone_title">Fus horari</string>
     <string name="settings_language_title">Llengua de l\'aplicació</string>
     <string name="settings_language_default">Detecta automàticament</string>
-    <string name="settings_default_view_title">Default view</string>
-    <string name="settings_default_view_default">Last view</string>
+    <string name="settings_default_view_title">Vista per defecte</string>
+    <string name="settings_default_view_default">Última vista</string>
     <string name="settings_update_timezone_title">Demana actualitzar la configuració de fus horari</string>
     <string name="settings_update_timezone_subtitle">Si el fus horari del sistema no coincideix amb la vostra configuració actual, es preguntarà si cal actualitzar-lo.</string>
     <string name="settings_update_timezone_checkbox">No m\'ho torneu a preguntar</string>
@@ -508,8 +513,8 @@
     <string name="spotlight_dialog_search_description">Ara podeu buscar esdeveniments dels vostres calendaris. Això descarrega una còpia xifrada dels vostres calendaris al dispositiu. <a href="https://proton.me/support/calendar-search">Més informació</a></string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
     <string name="spotlight_dialog_import_description">• Importa esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Afegiu directament esdeveniments a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments a calendaris que us han compartit.\n\n• Definiu la pantalla per defecte que voleu veure en obrir l\'app.\n\n• 13 nous idiomes disponibles.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>

@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Ninguno</string>
     <string name="event_text_calendar">Calendario</string>
     <string name="event_text_timezone_start">Zona horaria</string>
+    <string name="invite_in_shared_calendar_disclaimer">El envío de invitaciones solo está disponible dentro de calendarios personales.</string>
+    <string name="invite_change_calendar_disclaimer">No es posible modificar el calendario asociado a invitaciones.</string>
+    <string name="change_calendar_recurring_disclaimer">Cambiar de calendario un evento periódico no es posible aún.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">¿Qué estás buscando?</string>
     <string name="search_empty_results_title">No se han encontrado resultados.</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Error al enviar el informe. Inténtalo de nuevo más tarde.</string>
     <string name="snack_send_bug_report_description_empty">Indica una descripción de tu informe.</string>
     <string name="snack_create_event_no_active_personal_calendar">Necesitas un calendario personal activo para crear eventos</string>
+    <string name="snack_create_event_no_active_calendar">Necesitas un calendario activo para crear eventos.</string>
     <string name="snack_add_self_as_participant">No puedes invitarte a ti mismo.</string>
     <string name="snack_maximum_participants_reached">Se ha alcanzado el número máximo de participantes.</string>
     <string name="snack_add_participant_error">Error al añadir el participante</string>
@@ -328,7 +332,8 @@
     <string name="snack_ics_party_crasher_error">Tu correo electrónico no está en la lista de participantes.</string>
     <string name="snack_ics_reply_party_crasher_error">No se pueden añadir participantes que no hayan sido invitados por el organizador.</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento.</string>
-    <string name="snack_ics_no_active_personal_calendar_error">No hay ningún calendario personal activo asociado a esta cuenta.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta.</string>
+    <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta.</string>
     <string name="snack_ics_unsupported_duration_error">No se reconoce esta duración.</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles.</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento.</string>
@@ -508,8 +513,8 @@
     <string name="spotlight_dialog_search_description">Ya puedes buscar en tus eventos en tus calendarios. Esto descarga una copia cifrada de los calendarios en tu dispositivo. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importar eventos a tu calenario desde ficheros en tu teléfono.\n\n• Añadir reservas de viajes directamente desde Proton Mail.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Características del calendario</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Añade eventos directamente a Proton Calendar desde otras apps.\n\n• Crea y gestiona eventos en calendarios que han sido compartidos contigo.\n\n• Define la vista por defecto que quieres ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>

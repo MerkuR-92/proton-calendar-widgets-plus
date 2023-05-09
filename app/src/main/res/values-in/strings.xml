@@ -54,7 +54,7 @@
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
     <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
     <string name="event_alarm_label_at_event_time">Pada saat acara</string>
-    <string name="event_alarm_label_at_event_time_by_email">Saat acara berlangsung melalui email</string>
+    <string name="event_alarm_label_at_event_time_by_email">Pada saat acara melalui email</string>
     <string name="event_alarm_label_on_the_same_day">Pada hari yang sama</string>
     <string name="event_alarm_label_before">%1$s sebelumnya</string>
     <string name="event_alarm_label">%1$s</string>
@@ -143,6 +143,9 @@
     <string name="event_text_attendees_none">Tidak ada</string>
     <string name="event_text_calendar">Kalender</string>
     <string name="event_text_timezone_start">Zona waktu</string>
+    <string name="invite_in_shared_calendar_disclaimer">Pengiriman undangan hanya tersedia di dalam kalender personal.</string>
+    <string name="invite_change_calendar_disclaimer">Kalender yang terhubung dengan undangan tidak dapat dimodifikasi.</string>
+    <string name="change_calendar_recurring_disclaimer">Mengubah kalender untuk acara yang berulang saat ini tidak didukung.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Apa yang Anda tunggu?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>
@@ -297,6 +300,7 @@
     <string name="snack_send_bug_report_error">Pengiriman laporan gagal, mohon coba kembali</string>
     <string name="snack_send_bug_report_description_empty">Mohon beri keterangan pada laporan Anda</string>
     <string name="snack_create_event_no_active_personal_calendar">Anda perlu kalender pribadi untuk membuat acara</string>
+    <string name="snack_create_event_no_active_calendar">Anda perlu memiliki kalender yang aktif untuk dapat membuat acara</string>
     <string name="snack_add_self_as_participant">Tidak bisa mengundang diri sendiri</string>
     <string name="snack_maximum_participants_reached">Jumlah peserta telah mencapai batas maksimal.</string>
     <string name="snack_add_participant_error">Terjadi masalah saat menambah peserta</string>
@@ -329,6 +333,7 @@
     <string name="snack_ics_reply_party_crasher_error">Peserta yang tidak diundang oleh penyelenggara tidak bisa ditambahkan</string>
     <string name="snack_ics_missing_uid_error">UID acara ini hilang</string>
     <string name="snack_ics_no_active_personal_calendar_error">Tidak ada kalender personal aktif yang terhubung dengan akun ini</string>
+    <string name="snack_ics_no_active_calendar_error">Tidak ada kalender aktif yang terhubung dengan akun ini</string>
     <string name="snack_ics_unsupported_duration_error">Properti durasi tidak didukung</string>
     <string name="snack_ics_too_many_events_error">Acara jamak saat ini belum didukung</string>
     <string name="snack_ics_no_events_error">Kalender ini tidak memiliki acara</string>
