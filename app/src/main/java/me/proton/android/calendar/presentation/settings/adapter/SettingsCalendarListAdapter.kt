@@ -82,7 +82,14 @@ class SettingsCalendarListAdapter(
 
             // Calendar email
             calendarItemSubtitle.visibleOrGone(calendar.email.isNotEmpty())
-            calendarItemSubtitle.text = calendar.email
+            calendarItemSubtitle.text =
+                if (!calendar.allowEditEvents) {
+                    itemView.context.getString(
+                        R.string.settings_other_calendars_subtitle,
+                        itemView.context.getString(R.string.settings_other_calendars_read_only),
+                        calendar.email
+                    )
+                } else calendar.email
 
             // Set colored calendar dot tint
             calendarItemIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
@@ -118,7 +125,7 @@ class SettingsCalendarListAdapter(
                         itemView.context.getString(
                             if (calendarSubscription.lastUpdateTime == 0 ||
                                 (calendarSubscription.status == CalendarSubscriptionStatus.SYNCING.value && calendarSubscription.isLastSyncOld.not()))
-                                    R.string.settings_calendar_syncing
+                                R.string.settings_calendar_syncing
                             else R.string.settings_calendar_not_synced
                         ),
                         itemView.context.getColor(R.color.notification_warning)

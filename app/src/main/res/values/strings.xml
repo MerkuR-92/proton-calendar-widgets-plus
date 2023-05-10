@@ -429,6 +429,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Calendar link is temporarily inaccessible</string>
     <string name="settings_calendar_subscribed_last_sync_old">More than 12 hours passed since last update</string>
     <string name="settings_calendar_subscribed_not_decrypted">Calendar could not be decrypted</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">View-only</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Create calendar</string>
     <string name="calendar_form_update_title">Edit calendar</string>
