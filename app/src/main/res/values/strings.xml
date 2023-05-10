@@ -40,6 +40,7 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_remove">Remove</string>
+    <string name="action_leave">Leave</string>
     <string name="action_recreate">Clear</string>
     <string name="action_today">Today</string>
     <string name="action_create_event">Create event</string>
@@ -460,11 +461,14 @@
     <string name="delete_calendar_dialog_message">Are you sure you want to delete this calendar?</string>
     <string name="remove_calendar_dialog_title">Remove calendar</string>
     <string name="remove_calendar_dialog_message">Are you sure you want to remove this calendar?</string>
+    <string name="leave_calendar_dialog_title">Leave calendar</string>
+    <string name="leave_calendar_dialog_message">If you leave this calendar, you\'ll have to ask the owner to join again.</string>
     <string name="delete_default_calendar_dialog_message">Are you sure you want to delete this calendar? \"%1$s\" will be set as default calendar.</string>
     <string name="delete_calendar_snack_deleted">Calendar deleted</string>
     <string name="remove_calendar_snack_removed">Calendar removed</string>
     <string name="delete_calendar_snack_error">Error deleting calendar</string>
     <string name="remove_calendar_snack_error">Error removing calendar</string>
+    <string name="leave_calendar_snack_error">Error leaving calendar</string>
     <string name="delete_calendar_snack_error_password_confirmation">Password confirmation failed</string>
     <string name="recreate_calendar_dialog_title">Clear calendar</string>
     <string name="recreate_calendar_dialog_message">This action will remove all events and invited users.\n\nAre you sure you want to clear this calendar?</string>
