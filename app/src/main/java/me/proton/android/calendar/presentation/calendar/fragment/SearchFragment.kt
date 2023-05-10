@@ -158,7 +158,6 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         with(search_clear.imageButton) {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
-                requireActivity().clearFocusAndHideKeyboard(view)
                 search_input.text.clear()
                 timelineEventAdapter.submitList(emptyList())
             }
@@ -182,6 +181,9 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         searchViewModel.downloadingState.asLiveData().observe(viewLifecycleOwner) {
 
             when (it) {
+                SearchViewModel.DownloadingState.INIT -> {
+                    // don't do anything, other state should come next
+                }
                 SearchViewModel.DownloadingState.NONE -> {
                     lifecycleScope.launchWhenResumed {
                         if (searchViewModel.isCalendarDownloadEnabled()) {

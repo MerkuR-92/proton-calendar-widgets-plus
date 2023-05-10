@@ -238,8 +238,7 @@ class FetchCalendarsWorker @AssistedInject constructor(
             applicationContext.resources.getString(R.string.search_downloading_time_remaining, timeRemaining)
         }
 
-        val progressPercentage = (sumOfDownloaded / sumOfTotal.toFloat() * 100).roundToInt()
-        val progressText = "${progressPercentage}%"
+        val progressPercentage = if (sumOfTotal == 0) 100 else (sumOfDownloaded / sumOfTotal.toFloat() * 100).roundToInt()
 
         // update notification
         setForegroundAsync(

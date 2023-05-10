@@ -128,6 +128,7 @@ import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.IcsParsingValidation
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
+import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
@@ -145,6 +146,7 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.E
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -154,6 +156,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
+import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
@@ -192,6 +195,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val accountViewModel: AccountViewModel by viewModels()
     private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
     private val plansViewModel: PlansViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var subscribedCalendarListAdapter: CalendarListAdapter
 
@@ -505,6 +509,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
             AccountViewModel.State.Ready -> {
+
+                showLastSpotlightDialog {
+                    if (it == SEARCH_VERSION_CODE) {
+                        searchViewModel.enableCalendarDownload()
+                        displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+                    }
+                }
+
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 

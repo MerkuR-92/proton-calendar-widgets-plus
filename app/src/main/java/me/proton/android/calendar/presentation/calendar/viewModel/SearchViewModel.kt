@@ -52,10 +52,11 @@ class SearchViewModel @Inject constructor(
     lateinit var userSettings: UserSettingsEntity
     lateinit var user: User
 
-    private val _downloadingState = MutableStateFlow<DownloadingState>(DownloadingState.NONE)
+    private val _downloadingState = MutableStateFlow<DownloadingState>(DownloadingState.INIT)
     val downloadingState = _downloadingState.asStateFlow()
 
     sealed class DownloadingState {
+        object INIT: DownloadingState()
         object NONE: DownloadingState()
         object PAUSED: DownloadingState()
         object FINISHED: DownloadingState()
@@ -128,7 +129,10 @@ class SearchViewModel @Inject constructor(
                         }
 
                     }
-                    null -> {}
+                    null -> {
+                        // worker has never been started before
+                        _downloadingState.update { DownloadingState.NONE }
+                    }
                 }
 
                 it?.let { lastWorkerState = it.state }
@@ -184,6 +188,7 @@ class SearchViewModel @Inject constructor(
     fun actionButtonClicked() {
 
         when (downloadingState.value) {
+            DownloadingState.INIT -> { } // shouldn't happen
             DownloadingState.NONE -> { // start downloading
                 enableCalendarDownload()
             }
@@ -193,9 +198,7 @@ class SearchViewModel @Inject constructor(
             DownloadingState.PAUSED -> { // resume downloading
                 enableCalendarDownload()
             }
-            DownloadingState.FINISHED -> { // shouldn't really happen, button should be invisible
-
-            }
+            DownloadingState.FINISHED -> { } // shouldn't really happen, button should be invisible
             DownloadingState.ERROR -> { // retry = resume downloading
                 enableCalendarDownload()
             }

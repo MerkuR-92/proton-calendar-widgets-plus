@@ -48,6 +48,8 @@ class MonthView : ViewGroup {
     // Map of grid index and list of events for each index
     private var monthViewEventsMap: HashMap<Int, List<MonthViewEvent>> = hashMapOf()
 
+    private var maxEventCount = 0
+
     private var gridItemWidth = 0F
     private var gridItemHeight = 0F
     private var parentWidth = 0F
@@ -348,8 +350,9 @@ class MonthView : ViewGroup {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         // Width will change when showing / hiding week numbers. Check if view needs to be refreshed so that event blobs have the correct width.
-        val refreshView = (parentWidth != 0F && parentWidth != measuredWidth.toFloat()) &&
-                this.monthViewEventsMap.isNotEmpty()
+        val heightChanged = (parentWidth != 0F && parentWidth != measuredWidth.toFloat()) ||
+                (parentHeight != 0F && parentHeight != measuredHeight.toFloat())
+        val refreshView = heightChanged && this.monthViewEventsMap.isNotEmpty()
 
         // Save the view's width and height
         parentWidth = measuredWidth.toFloat()
@@ -362,7 +365,9 @@ class MonthView : ViewGroup {
         setMeasuredDimension(widthMeasureSpec, heightMeasureSpec)
 
         // Calculate the event blobs width, height, positions and trigger view's onDraw
-        if (refreshView) prepareAndDrawMonthViewEvents()
+        if (refreshView) {
+            prepareAndDrawMonthViewEvents()
+        }
     }
 
     /**
@@ -376,7 +381,7 @@ class MonthView : ViewGroup {
     /**
      * Calculate how many events can fit in a grid item.
      */
-    fun getMaxEventCount(): Int {
+    fun calculateMaxEventCount(): Int {
         val headerHeight = res.getDimension(R.dimen.month_view_day_header_height)
         val eventHeight = res.getDimension(R.dimen.month_view_event_height) +
                 res.getDimension(R.dimen.month_view_event_top_margin)
@@ -390,9 +395,12 @@ class MonthView : ViewGroup {
     /**
      * Store the events to display.
      */
-    fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>, showWeekNumbers: Boolean) {
+    fun setMonthViewEvents(monthViewEventsMap: Map<Int, List<MonthViewEvent>>, showWeekNumbers: Boolean, maxEventCount: Int) {
 
         this.showWeekNumbers = showWeekNumbers
+
+        // We set max event count here so that it matches the value used to calculate monthViewEventsMap
+        this.maxEventCount = maxEventCount
 
         this.monthViewEventsMap.clear()
 
@@ -421,7 +429,6 @@ class MonthView : ViewGroup {
      * Iterate through the event list and prepare the elements to draw onto the view.
      */
     private fun prepareAndDrawMonthViewEvents() {
-        val maxEventCount = getMaxEventCount()
         this.monthViewEventsMap.forEach {
 
             val dayIndex = it.key

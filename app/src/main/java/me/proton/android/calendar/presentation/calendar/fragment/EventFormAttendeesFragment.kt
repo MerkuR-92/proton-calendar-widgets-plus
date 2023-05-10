@@ -165,7 +165,6 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         }
 
         nav_event_form_attendees_search_clear.setOnSingleClickListener {
-            requireActivity().clearFocusAndHideKeyboard(view)
             nav_event_form_attendees_search_input.text.clear()
         }
 

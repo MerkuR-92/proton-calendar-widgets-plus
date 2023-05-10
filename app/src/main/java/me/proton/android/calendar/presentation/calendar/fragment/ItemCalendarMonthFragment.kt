@@ -70,6 +70,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     private var loading = true
 
     private lateinit var monthView: MonthView
+    private var monthViewMaxEventCount = 0
 
     private lateinit var skeletonEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>>
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
@@ -214,6 +215,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Save the skeleton list in the month view so that it can be drawn along with the events
         monthView.setTimeZoneId(timeZoneId)
         monthView.prepareMonthGrid(skeletonList, forDate.month)
+        monthViewMaxEventCount = monthView.calculateMaxEventCount()
 
         if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
             skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
@@ -408,18 +410,16 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     }
 
     private fun displayMonthViewEvents(events: List<Event>, fromDate:LocalDate, timeZoneId: String, isSkeletonEvent: Boolean) {
-        val maxEventCount = monthView.getMaxEventCount()
-
-        // Clear keyboard to make sure it doesn't affect MonthView usable height
-        requireActivity().clearFocusAndHideKeyboard(view)
+        val newMaxEventCount = monthView.calculateMaxEventCount()
+        if (newMaxEventCount > monthViewMaxEventCount) monthViewMaxEventCount = newMaxEventCount
 
         lifecycleScope.launch {
 
             // Get the map of MonthViewEvent indexed by day
-            val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(events, fromDate, maxEventCount, timeZoneId, isSkeletonEvent)
+            val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(events, fromDate, monthViewMaxEventCount, timeZoneId, isSkeletonEvent)
 
             // Set the month view events so that they can be drawn
-            monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false)
+            monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false, monthViewMaxEventCount)
         }
     }
 
