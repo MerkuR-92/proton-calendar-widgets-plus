@@ -158,7 +158,6 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         with(search_clear.imageButton) {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
-                requireActivity().clearFocusAndHideKeyboard(view)
                 search_input.text.clear()
                 timelineEventAdapter.submitList(emptyList())
             }
