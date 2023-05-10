@@ -181,6 +181,9 @@ class SearchFragment() : BaseDialogFragment(), KoinComponent {
         searchViewModel.downloadingState.asLiveData().observe(viewLifecycleOwner) {
 
             when (it) {
+                SearchViewModel.DownloadingState.INIT -> {
+                    // don't do anything, other state should come next
+                }
                 SearchViewModel.DownloadingState.NONE -> {
                     lifecycleScope.launchWhenResumed {
                         if (searchViewModel.isCalendarDownloadEnabled()) {
