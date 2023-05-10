@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -397,6 +398,18 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json)
     }
 
+    override suspend fun selectUserPersonalCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter {
+            it.isOwner
+        }
+    }
+
+    override suspend fun selectOtherCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectCalendars(userId).joinToCalendars(database, json).filter {
+            !it.isOwner
+        }
+    }
+
     override suspend fun selectAllCalendars(userId: String): List<Calendar> {
         return database.calendarsDao().selectCalendars(userId).joinToCalendars(database, json)
     }
@@ -431,6 +444,18 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override fun flowUserCalendars(userId: String): Flow<List<Calendar>> {
         return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
+    }
+
+    override fun flowUserPersonalCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).map { userCalendars ->
+            userCalendars.filter { it.isOwner }
+        }.distinctUntilChanged()
+    }
+
+    override fun flowSharedCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).map { userCalendars ->
+            userCalendars.filter { !it.isOwner }
+        }.distinctUntilChanged()
     }
 
     override fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>> {

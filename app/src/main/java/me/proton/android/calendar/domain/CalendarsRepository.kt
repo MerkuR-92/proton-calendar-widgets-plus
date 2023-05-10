@@ -45,6 +45,10 @@ interface CalendarsRepository {
 
     suspend fun selectUserCalendars(userId: String): List<Calendar>
 
+    suspend fun selectUserPersonalCalendars(userId: String): List<Calendar>
+
+    suspend fun selectOtherCalendars(userId: String): List<Calendar>
+
     suspend fun selectAllCalendars(userId: String): List<Calendar>
 
     suspend fun selectActiveUserCalendars(userId: String): List<Calendar>
@@ -62,6 +66,10 @@ interface CalendarsRepository {
     fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowUserCalendars(userId: String): Flow<List<Calendar>>
+
+    fun flowUserPersonalCalendars(userId: String): Flow<List<Calendar>>
+
+    fun flowSharedCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>>
 

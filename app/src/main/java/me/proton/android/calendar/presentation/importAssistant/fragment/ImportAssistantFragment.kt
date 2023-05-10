@@ -209,8 +209,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             optionsListener = { importCalendarMapping ->
                 // On options click
                 lifecycleScope.launch {
-                    val writableUserCalendars = calendarViewModel.getActiveUserCalendars()?.filter { it.allowEditEvents }
-                    showBottomSheetDialog(importCalendarMapping, writableUserCalendars)
+                    val activeWritableUserCalendars = calendarViewModel.getUserCalendars()?.filter { it.isActive && it.allowEditEvents }
+                    showBottomSheetDialog(importCalendarMapping, activeWritableUserCalendars)
                 }
             }
         )
@@ -508,7 +508,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         )
     }
 
-    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, activeUserCalendars: List<Calendar>?) {
+    private fun showBottomSheetDialog(calendarToImport: ImportCalendarMapping, activeWritableCalendars: List<Calendar>?) {
         val bottomSheetDialog = BottomSheetDialog(requireContext())
 
         // Workaround to make sure we have the correct navigation bar color.
@@ -551,8 +551,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val mergeCalendarLayout = bottomSheetDialog.findViewById<View>(R.id.dialog_calendar_import_mapping_merge_layout)
-        mergeCalendarLayout?.visibleOrGone(!activeUserCalendars.isNullOrEmpty())
-        if (!activeUserCalendars.isNullOrEmpty()) {
+        mergeCalendarLayout?.visibleOrGone(!activeWritableCalendars.isNullOrEmpty())
+        if (!activeWritableCalendars.isNullOrEmpty()) {
             val mergeCalendarListView = bottomSheetDialog.findViewById<RecyclerView>(R.id.dialog_calendar_import_mapping_merge_list)
             val mergeCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             mergeCalendarListView?.layoutManager = mergeCalendarLayoutManager
@@ -562,7 +562,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                 bottomSheetDialog.dismiss()
             }
             mergeCalendarListView?.adapter = mergeCalendarListAdapter
-            mergeCalendarListAdapter.submitList(activeUserCalendars)
+            mergeCalendarListAdapter.submitList(activeWritableCalendars)
         }
 
         bottomSheetDialog.show()

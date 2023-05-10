@@ -50,7 +50,7 @@ data class Calendar(
 
         val isSubscribed: Boolean get() = type == 1
         val isHolidayCalendar: Boolean get() = type == 2
-        val isSharedWithMe: Boolean get() = !isOwner
+        val isSharedWithMe: Boolean get() = !isOwner && type == 0
 
         val isOwner: Boolean get() = permissions and 2 == 2
         val allowEditEvents: Boolean get() = permissions and 16 == 16

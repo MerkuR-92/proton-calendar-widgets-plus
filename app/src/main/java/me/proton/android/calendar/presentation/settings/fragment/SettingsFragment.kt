@@ -21,8 +21,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_settings.settings_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list
-import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list_add_layout_press
+import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_title_add
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_info
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_press
 import kotlinx.android.synthetic.main.fragment_settings.settings_import
@@ -30,6 +31,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_import_press
 import kotlinx.android.synthetic.main.fragment_settings.settings_import_separator
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_list
+import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarType
@@ -139,7 +141,11 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             it.titlecase(DateTimeUtilsImpl.getLocaleForFormatting())
         }
 
-        settings_calendars_list_add_layout_press.setOnSingleClickListener {
+        settings_calendars_title_add.setOnSingleClickListener {
+            showCalendarsOptionsDialog()
+        }
+
+        settings_other_calendars_title_add.setOnSingleClickListener {
             showCalendarsOptionsDialog()
         }
 
@@ -153,10 +159,10 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         (settingsCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         settingsCalendarListView.adapter = settingsUserCalendarListAdapter
 
-        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
-            userCalendars ?: return@observe
+        calendarViewModel.userPersonalCalendars.observe(viewLifecycleOwner) { userPersonalCalendars ->
+            userPersonalCalendars ?: return@observe
 
-            refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+            refreshUserPersonalCalendarList(userPersonalCalendars.filter { it.isActive || it.isDisabled })
         }
 
         val settingsOtherCalendarListView = settings_other_calendars_list
@@ -186,7 +192,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         otherCalendarsMediator.observe(viewLifecycleOwner) {
             it?.let {
                 lifecycleScope.launch {
-                    val otherCalendars = it.first
+                    val otherCalendars = it.first.sortedBy {
+                        it.isDisabled // Disabled will appear last
+                    }
                     val calendarSubscriptions = it.second
 
                     val dataSetChanged =
@@ -203,8 +211,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
             if (this@SettingsFragment.defaultCalendarId != defaultCalendarId) {
                 lifecycleScope.launch {
-                    calendarViewModel.getUserCalendars()?.let { userCalendars ->
-                        refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                    calendarViewModel.getUserPersonalCalendars()?.let { userPersonalCalendars ->
+                        refreshUserPersonalCalendarList(userPersonalCalendars.filter { it.isActive || it.isDisabled })
                     }
                 }
             }
@@ -240,27 +248,32 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     }
 
     /**
-     * @param userCalendars updated user calendar list
-     * Refreshes the user calendar list with the new set of data. Get the emails linked to each calendar and
+     * @param userCalendars updated user personal calendar list
+     * Refreshes the user personal calendar list with the new set of data. Get the emails linked to each calendar and
      * get the current default calendar id. Sort the list by following order: default / active / disabled.
      */
-    private fun refreshUserCalendarList(userCalendars: List<Calendar>) {
+    private fun refreshUserPersonalCalendarList(userPersonalCalendars: List<Calendar>) {
         lifecycleScope.launch {
-            var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-            val defaultCalendar = userCalendars.firstOrNull { it.id == defaultCalendarId }
-            if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
-                defaultCalendarId = userCalendars.firstOrNull { it.isActive && it.isOwner }?.id
-            }
-            this@SettingsFragment.defaultCalendarId = defaultCalendarId
-            val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-            settingsUserCalendarListAdapter.submitList(
-                userCalendars.sortedBy {
-                    it.isDisabled // Disabled will appear last
-                }.sortedByDescending {
-                    it.id == defaultCalendarId // Default will appear first
+            val otherCalendars = calendarViewModel.getOtherCalendars() ?: emptyList()
+            settings_calendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+            settings_other_calendars_title_add.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+            lifecycleScope.launch {
+                var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
+                val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == defaultCalendarId }
+                if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
+                    defaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive && it.isOwner }?.id
                 }
-            )
-            if (dataSetChanged) settingsUserCalendarListAdapter.notifyDataSetChanged()
+                this@SettingsFragment.defaultCalendarId = defaultCalendarId
+                val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
+                settingsUserCalendarListAdapter.submitList(
+                    userPersonalCalendars.sortedBy {
+                        it.isDisabled // Disabled will appear last
+                    }.sortedByDescending {
+                        it.id == defaultCalendarId // Default will appear first
+                    }
+                )
+                if (dataSetChanged) settingsUserCalendarListAdapter.notifyDataSetChanged()
+            }
         }
     }
 
@@ -323,8 +336,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             lifecycleScope.launch {
                 val updateDefaultCalendarId = calendarViewModel.updateDefaultCalendarId(calendar.id)
                 if (updateDefaultCalendarId) {
-                    calendarViewModel.getUserCalendars()?.let { userCalendars ->
-                        refreshUserCalendarList(userCalendars.filter { it.isActive || it.isDisabled })
+                    calendarViewModel.getUserPersonalCalendars()?.let { userPersonalCalendars ->
+                        refreshUserPersonalCalendarList(userPersonalCalendars.filter { it.isActive || it.isDisabled })
                     }
                     view?.displaySnackBar(requireContext().getString(R.string.snack_update_default_calendar))
                 } else {

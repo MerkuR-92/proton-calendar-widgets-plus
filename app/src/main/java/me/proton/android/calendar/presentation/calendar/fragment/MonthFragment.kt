@@ -209,10 +209,8 @@ class MonthFragment : BaseFragment() {
 
         buttonCreate.setOnSingleClickListener {
             lifecycleScope.launch {
-                val hasWritableActiveCalendars = calendarViewModel.getActiveUserCalendars()?.let { activeUserCalendars ->
-                    activeUserCalendars.any { it.allowEditEvents }
-                } ?: false
-                if (hasWritableActiveCalendars) {
+                val hasWritableActiveCalendars = calendarViewModel.getUserCalendars()?.any { it.isActive && it.allowEditEvents }
+                if (hasWritableActiveCalendars == true) {
                     // Each item in the adapter is one day
                     calendarViewModel.selectedDateTime.value?.let { currentDateTime ->
                         val currentDate = currentDateTime.first
@@ -639,9 +637,9 @@ class MonthFragment : BaseFragment() {
                     calendarViewModel.viewMode.value == ViewMode.MONTH
         }
 
-        calendarViewModel.activeUserCalendars.observe(viewLifecycleOwner) { activeCalendars ->
-            val hasActiveCalendars = !activeCalendars.isNullOrEmpty()
-            if (hasActiveCalendars) {
+        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+            val hasActiveWritableCalendars = userCalendars.any { it.isActive && it.allowEditEvents }
+            if (hasActiveWritableCalendars) {
                 buttonCreate.imageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm))
                 buttonCreate.imageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_button_oval)
             } else {
@@ -820,7 +818,7 @@ class MonthFragment : BaseFragment() {
 
     private fun openCreateEventForm(isAllDay: Boolean, startTime: LocalDateTime) {
         lifecycleScope.launch {
-            val hasActiveWritableCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
+            val hasActiveWritableCalendars = calendarViewModel.getUserCalendars()?.any { it.isActive && it.allowEditEvents }
             if (hasActiveWritableCalendars == true) {
                 val truncatedStartTime =
                     if (!isAllDay) LocalTime.of(startTime.hour, if (startTime.minute >= 30) 30 else 0)

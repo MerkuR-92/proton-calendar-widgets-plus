@@ -155,11 +155,9 @@ class CalendarViewModel @Inject constructor(
     val selectedDateTime: LiveData<Pair<LocalDate, LocalTime?>> = _selectedDateTime
 
     // userCalendars contains all non-subscribed calendars regardless of their flags
-    var userCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var activeUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var disabledUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var inactiveUserCalendars: LiveData<List<Calendar>> = MutableLiveData()
-    var otherCalendars: LiveData<List<Calendar>> = MutableLiveData()
+    var userCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0
+    var userPersonalCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0 where user is owner
+    var otherCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0 where user is member, type 1 and type 2
     var calendarSubscriptions: LiveData<List<CalendarSubscriptionEntity>> = MutableLiveData()
 
     var timeZoneId: LiveData<ZoneId> = MutableLiveData()
@@ -214,15 +212,14 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
-        activeUserCalendars = calendarsRepository.flowActiveUserCalendars(userId).asLiveData(Dispatchers.Default)
-        disabledUserCalendars = calendarsRepository.flowDisabledUserCalendars(userId).asLiveData(Dispatchers.Default)
-        inactiveUserCalendars = calendarsRepository.flowInactiveUserCalendars(userId).asLiveData(Dispatchers.Default)
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
+        userPersonalCalendars = calendarsRepository.flowUserPersonalCalendars(userId).asLiveData(Dispatchers.Default)
         otherCalendars = combine(
+            calendarsRepository.flowSharedCalendars(userId).distinctUntilChanged(),
             calendarsRepository.flowSubscribedCalendars(userId).distinctUntilChanged(),
             calendarsRepository.flowHolidayCalendars(userId).distinctUntilChanged()
-        ) { subscribedCalendars, holidayCalendars ->
-            subscribedCalendars + holidayCalendars
+        ) { sharedCalendars, subscribedCalendars, holidayCalendars ->
+            sharedCalendars + subscribedCalendars + holidayCalendars
         }.asLiveData(Dispatchers.Default)
         calendarSubscriptions = calendarsRepository.flowCalendarSubscriptions().asLiveData(Dispatchers.Default)
     }
@@ -726,7 +723,7 @@ class CalendarViewModel @Inject constructor(
             return
         }
 
-        getInactiveUserCalendars()?.forEach { calendar ->
+        calendarsRepository.selectInactiveUserCalendars(userId.id).forEach { calendar ->
             if (calendar.hasUpdatePassphrase) {
                 // Handle flag UPDATE_PASSPHRASE
                 val reactivateCalendarKeyResult = reactivateCalendarKeyUseCase.execute(userId, calendar.id)
@@ -910,7 +907,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun getPersonalCalendarsCount(): Int {
-        return getUserCalendars()?.count { it.isOwner } ?: 0
+        return getUserPersonalCalendars()?.count() ?: 0
     }
 
     suspend fun isCalendarLimitReached(calendarType: CalendarType): CalendarLimit {
@@ -951,36 +948,25 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getActiveUserCalendars(): List<Calendar>? {
-        return activeUserCalendars.value ?: run {
+    suspend fun getUserPersonalCalendars(): List<Calendar>? {
+        return userPersonalCalendars.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getActiveUserCalendars")
+                logger.e("User ID was null in CalendarViewModel getUserCalendars")
                 return null
             }
-            calendarsRepository.selectActiveUserCalendars(userId.id)
+            calendarsRepository.selectUserPersonalCalendars(userId.id)
         }
     }
 
-    suspend fun getDisabledUserCalendars(): List<Calendar>? {
-        return disabledUserCalendars.value ?: run {
+    suspend fun getOtherCalendars(): List<Calendar>? {
+        return otherCalendars.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getDisabledUserCalendars")
+                logger.e("User ID was null in CalendarViewModel getUserCalendars")
                 return null
             }
-            calendarsRepository.selectDisabledUserCalendars(userId.id)
-        }
-    }
-
-    suspend fun getInactiveUserCalendars(): List<Calendar>? {
-        return inactiveUserCalendars.value ?: run {
-            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-            if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getInactiveUserCalendars")
-                return null
-            }
-            calendarsRepository.selectInactiveUserCalendars(userId.id)
+            calendarsRepository.selectOtherCalendars(userId.id)
         }
     }
 

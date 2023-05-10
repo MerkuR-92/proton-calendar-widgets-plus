@@ -58,9 +58,11 @@ import kotlinx.android.synthetic.main.activity_main.nav_view_main_content
 import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
 import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
 import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_create
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout_press
+import kotlinx.android.synthetic.main.nav_view_main.nav_view_other_calendars_create
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_agenda_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_day_press
 import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_layout
@@ -133,7 +135,6 @@ import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.UPDATE_PASSPHRASE_CALENDARS_DELAY
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -582,7 +583,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             // Handle extras
                             actionEditOrInsertIntent.extras?.let { intentExtras ->
                                 lifecycleScope.launch {
-                                    val hasActiveWritableCalendars = calendarViewModel.getActiveUserCalendars()?.any { it.allowEditEvents }
+                                    val hasActiveWritableCalendars = calendarViewModel.getUserCalendars()?.any { it.isActive && it.allowEditEvents }
                                     if (hasActiveWritableCalendars != true) {
                                         this@MainActivity.displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
                                         safeNavigateToMonth()
@@ -1153,6 +1154,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
+        nav_view_other_calendars_create.setOnSingleClickListener {
+            lifecycleScope.launch {
+                showCalendarsOptionsDialog()
+            }
+            drawer_layout.close()
+        }
+
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
             viewMode ?: return@Observer
 
@@ -1577,14 +1585,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.selectCalendars()
         }
 
-        calendarViewModel.userCalendars.observe(this@MainActivity, Observer { userCalendars ->
-            userCalendars ?: return@Observer
-            setUserCalendarsList(userCalendars)
+        calendarViewModel.userPersonalCalendars.observe(this@MainActivity, Observer { userPersonalCalendars ->
+            userPersonalCalendars ?: return@Observer
+            setUserPersonalCalendarsList(userPersonalCalendars)
 
-            if (userCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
-                // TODO Uncomment once calendar key reactivation has been fixed
-                // handleUpdatePassphrase()
-
+            if (userPersonalCalendars.firstOrNull { it.hasUpdatePassphrase } != null && !calendarViewModel.updatingCalendarPassphrase) {
                 lifecycleScope.launch {
                     // TODO Temporary workaround: Force logout user if we get key reactivation
                     accountViewModel.logoutPrimary()
@@ -1593,7 +1598,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
 
             lifecycleScope.launch {
-                userCalendars.forEach {
+                userPersonalCalendars.forEach {
                     // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
                     if (it.description == "0") calendarViewModel.refreshMember(calendarId = it.id)
                 }
@@ -1603,14 +1608,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->
 
             lifecycleScope.launch {
-                calendarViewModel.getUserCalendars()?.let { userCalendars ->
-                    setUserCalendarsList(userCalendars, defaultCalendarId)
+                calendarViewModel.getUserPersonalCalendars()?.let { userPersonalCalendars ->
+                    setUserPersonalCalendarsList(userPersonalCalendars, defaultCalendarId)
                 }
             }
-        })
-
-        calendarViewModel.inactiveUserCalendars.observe(this@MainActivity, Observer { inactiveCalendars ->
-            inactiveCalendars ?: return@Observer
         })
 
         otherCalendarsMediator.addSource(calendarViewModel.otherCalendars) { value ->
@@ -1636,7 +1637,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         otherCalendarsMediator.observe(this@MainActivity, Observer {
             it?.let {
-                val otherCalendars = it.first
+                val otherCalendars = it.first.sortedBy {
+                    it.isDisabled // Disabled will appear last
+                }
                 val calendarSubscriptions = it.second
                 val dataSetChanged = otherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
                 otherCalendarListAdapter.submitList(otherCalendars)
@@ -1646,42 +1649,26 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
     }
 
-    private fun setUserCalendarsList(userCalendars: List<Calendar>, defaultCalendarId: String? = null) {
-        // We only keep active and disabled calendars for the navigation drawer calendar list
-        val filteredUserCalendars = userCalendars.filter { it.isActive || it.isDisabled }
-        nav_view_calendars_list_add_layout.visibleOrGone(filteredUserCalendars.isEmpty())
-        nav_view_calendars_create.visibleOrGone(filteredUserCalendars.isNotEmpty())
+    private fun setUserPersonalCalendarsList(userPersonalCalendars: List<Calendar>, defaultCalendarId: String? = null) {
         lifecycleScope.launch {
-            var tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
-            val defaultCalendar = userCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
-            if (defaultCalendar?.isActive == false) tmpDefaultCalendarId = userCalendars.firstOrNull { it.isActive }?.id
-            userCalendarListAdapter.submitList(
-                filteredUserCalendars.sortedBy {
-                    it.isDisabled // Disabled will appear last
-                }.sortedByDescending {
-                    it.id == tmpDefaultCalendarId // Default will appear first
-                }
-            )
-        }
-    }
-
-    private lateinit var inactiveCalendarsJob: Job
-    private fun handleUpdatePassphrase() {
-        if (this::inactiveCalendarsJob.isInitialized && inactiveCalendarsJob.isActive) {
-            inactiveCalendarsJob.cancel()
-        }
-        inactiveCalendarsJob = lifecycleScope.launch {
-            delay(UPDATE_PASSPHRASE_CALENDARS_DELAY.toMillis())
-            val calendarsToUpdate = calendarViewModel.getInactiveUserCalendars()?.filter { it.hasUpdatePassphrase } ?: return@launch
-            calendarViewModel.updatingCalendarPassphrase = true
-            this@MainActivity.displayCalendarListMaterialDialog(
-                R.string.bootstrap_error_update_passphrase_title,
-                R.string.bootstrap_error_update_passphrase_message,
-                false,
-                calendarsToUpdate) { _, _ ->
-                lifecycleScope.launch {
-                    calendarViewModel.updateInactiveCalendarsPassphrase()
-                }
+            // We only keep active and disabled calendars for the navigation drawer calendar list
+            val filteredUserPersonalCalendars = userPersonalCalendars.filter { it.isActive || it.isDisabled }
+            val otherCalendars = calendarViewModel.getOtherCalendars() ?: emptyList()
+            nav_view_calendars.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty() || (filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+            nav_view_calendars_list_add_layout.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
+            nav_view_calendars_create.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty())
+            nav_view_other_calendars_create.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+            lifecycleScope.launch {
+                var tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
+                val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
+                if (defaultCalendar?.isActive == false) tmpDefaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive }?.id
+                userCalendarListAdapter.submitList(
+                    filteredUserPersonalCalendars.sortedBy {
+                        it.isDisabled // Disabled will appear last
+                    }.sortedByDescending {
+                        it.id == tmpDefaultCalendarId // Default will appear first
+                    }
+                )
             }
         }
     }

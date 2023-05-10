@@ -449,6 +449,7 @@
     <string name="calendar_form_name_required_error">Name required</string>
     <string name="calendar_form_description_hint">Add a calendar description</string>
     <string name="add_calendar_text">Add calendar</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Add</string>
     <string name="create_calendar_limit_reached">You have reached the maximum number of calendars.</string>
     <string name="create_calendar_limit_reached_title">Cannot add more calendars</string>
     <string name="create_calendar_limit_reached_paid_description">You’ve reached the maximum number of 25 calendars available in your plan.\n\nTo add a new calendar, remove an existing one.</string>

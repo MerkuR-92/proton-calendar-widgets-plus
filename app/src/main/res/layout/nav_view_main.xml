@@ -440,7 +440,7 @@
                 android:layout_height="wrap_content">
 
                 <View
-                    android:id="@+id/nav_view_disabled_calendars_divider_top"
+                    android:id="@+id/nav_view_other_calendars_divider_top"
                     style="@style/Separator"
                     android:background="@color/sidebar_separator"
                     android:layout_marginTop="15dp"
@@ -459,6 +459,22 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/nav_view_other_calendars_create"
+                    android:layout_width="40dp"
+                    android:layout_height="0dp"
+                    android:scaleType="center"
+                    app:srcCompat="@drawable/ic_proton_plus"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    style="@style/Icon"
+                    app:tint="@color/sidebar_icon_weak"
+                    android:layout_marginEnd="@dimen/spacing_element_small"
+                    android:background="@drawable/ripple_nav_items"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/nav_view_other_calendars_divider_top"
+                    app:layout_constraintBottom_toTopOf="@+id/nav_view_other_calendars_separator"/>
 
                 <View
                     android:id="@+id/nav_view_other_calendars_separator"
