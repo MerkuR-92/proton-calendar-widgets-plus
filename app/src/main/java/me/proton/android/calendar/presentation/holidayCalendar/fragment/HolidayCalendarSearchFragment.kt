@@ -86,7 +86,6 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
         with(holiday_calendar_search_clear.imageButton) {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
-                requireActivity().clearFocusAndHideKeyboard(view)
                 holiday_calendar_search_no_result.visibleOrGone(false)
                 holiday_calendar_search_input.text.clear()
                 holidayCalendarListAdapter.setSearchQuery("")
