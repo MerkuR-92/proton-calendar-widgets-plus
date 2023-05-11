@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.calendarFormViewModel
+package me.proton.android.calendar.test.presentation.calendarFormViewModel
 
 import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4

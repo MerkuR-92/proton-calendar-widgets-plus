@@ -18,7 +18,7 @@
 
 package me.proton.android.calendar.uitest.suite
 
-import me.proton.android.calendar.uitest.e2e.login.LoginFlowTests
+import me.proton.android.calendar.uitest.e2e.core.login.LoginFlowTests
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 

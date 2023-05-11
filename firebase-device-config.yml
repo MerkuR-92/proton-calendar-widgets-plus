@@ -1,0 +1,27 @@
+fullTest:
+  device:
+    - model: walleye
+      version: 28
+    - model: walleye
+      version: 27
+    - model: flame
+      version: 29
+    - model: G8142
+      version: 25
+    - model: Nexus5X
+      version: 23
+quickTest:
+  timeout: 30m
+  device:
+    - model: Pixel2
+      version: 28
+    - model: Nexus5X
+      version: 26
+quickPhysicalTest:
+  timeout: 30m
+  device:
+    - model: walleye # aka Google Pixel 2
+      version: 27
+    - model: sailfish # aka Google Pixel
+      version: 25
+

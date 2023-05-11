@@ -1,7 +1,8 @@
-package me.proton.android.calendar.common
+package me.proton.android.calendar.test.common
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import me.proton.android.calendar.common.CryptoImpl
 import me.proton.android.calendar.common.logger.TestsLogger
 import org.junit.Assert.*
 import org.junit.Test

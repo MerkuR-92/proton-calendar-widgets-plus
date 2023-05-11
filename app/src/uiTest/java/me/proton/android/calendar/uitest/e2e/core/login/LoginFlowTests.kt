@@ -16,7 +16,7 @@
  * along with Proton Mail. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package me.proton.android.calendar.uitest.e2e.login
+package me.proton.android.calendar.uitest.e2e.core.login
 
 import dagger.hilt.android.testing.HiltAndroidTest
 import me.proton.android.calendar.uitest.BaseTest

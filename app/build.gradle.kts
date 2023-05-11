@@ -265,10 +265,17 @@ dependencies {
     androidTestUtil(libs.test.androidx.services)
 }
 
-tasks.register("getConfig") {
-    doLast {
-        println("ARCHIVES_BASE_NAME=\"${Config.archivesBaseName}\"\n")
-        println("ARCHIVES_VERSION=${Config.versionName}")
+tasks.register("createBuildEnv") {
+    fun String.toEnvVar() = replace("-", "_").toUpperCase()
+
+    File(projectDir, "build.env").apply {
+        writeText("")
+        arrayOf("dev-debug", "dev-debug-androidTest", "prod-debug").forEach {
+            project.buildOutputs.getByName(it).let { variant ->
+                appendText("APK_PATH_${it.toEnvVar()}=\"${variant.outputFile.path}\"\n")
+                appendText("APK_NAME_${it.toEnvVar()}=\"${variant.outputFile.name}\"\n")
+            }
+        }
     }
 }
 
