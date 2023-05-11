@@ -1,4 +1,4 @@
-package me.proton.android.calendar.domain.usecase
+package me.proton.android.calendar.test.domain.usecase
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -13,6 +13,7 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.MailSettingsApiResponse
 import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.model.PackageType
+import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.core.contact.domain.entity.ContactCard
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext

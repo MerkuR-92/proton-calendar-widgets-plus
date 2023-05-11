@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.eventViewModel
+package me.proton.android.calendar.test.presentation.eventViewModel
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest

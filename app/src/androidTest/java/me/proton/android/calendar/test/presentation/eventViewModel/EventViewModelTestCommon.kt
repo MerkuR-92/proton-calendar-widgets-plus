@@ -1,4 +1,4 @@
-package me.proton.android.calendar.presentation.eventViewModel
+package me.proton.android.calendar.test.presentation.eventViewModel
 
 import android.app.Application
 import android.content.Context
