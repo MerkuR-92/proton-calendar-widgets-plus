@@ -23,6 +23,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list
+import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_subtitle
 import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_title_add
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_info
 import kotlinx.android.synthetic.main.fragment_settings.settings_general_press
@@ -257,6 +258,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             val otherCalendars = calendarViewModel.getOtherCalendars() ?: emptyList()
             settings_calendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
             settings_other_calendars_title_add.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+            settings_calendars_subtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
             lifecycleScope.launch {
                 var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
                 val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == defaultCalendarId }

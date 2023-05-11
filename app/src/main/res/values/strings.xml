@@ -418,6 +418,7 @@
     <string name="settings_general_info_time_zone">time zone</string>
     <string name="settings_general_info_calendar_layout">calendar layout</string>
     <string name="settings_calendars">My calendars</string>
+    <string name="settings_calendars_empty">No calendars found</string>
     <string name="settings_subscribed_calendars">Subscribed calendars</string>
     <string name="settings_other_calendars">Other calendars</string>
     <string name="settings_calendar_default" comment="Default calendar">Default</string>
