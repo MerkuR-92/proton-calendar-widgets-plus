@@ -97,18 +97,19 @@ class JoinCalendarUseCase @Inject constructor(
         ) {
             is ApiResponse.Success -> {
                 val calendarId = joinCalendarResponse.data.calendar.id
+                val memberEntity = joinCalendarResponse.data.members.firstOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: memberEntity was null")
+                val calendarKeyEntity = joinCalendarResponse.data.keys.firstOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: calendarKeyEntity was null")
+                val passphraseEntity = joinCalendarResponse.data.passphrase
+
                 // Save Calendar to DB
                 calendarsRepository.persistCalendar(userId.id, joinCalendarResponse.data.calendar)
                 // Save Calendar Settings
                 calendarsRepository.persistCalendarSettings(joinCalendarResponse.data.calendarSettings)
                 // Save Member
-                val memberEntity = joinCalendarResponse.data.members.firstOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: memberEntity was null")
                 calendarsRepository.persistMember(memberEntity)
                 // Save Calendar Key
-                val calendarKeyEntity = joinCalendarResponse.data.keys.firstOrNull() ?: return UseCase.Result.Error("JoinCalendarUseCase: calendarKeyEntity was null")
                 calendarsRepository.persistCalendarKey(calendarKeyEntity)
                 // Save passphrase
-                val passphraseEntity = joinCalendarResponse.data.passphrase
                 calendarsRepository.persistPassphrase(passphraseEntity)
 
                 // cache Passphrase
