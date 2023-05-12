@@ -6,20 +6,30 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import biweekly.component.VAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.toHexColor
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
+import me.proton.android.calendar.domain.usecase.FetchCachedViewsEventsUseCase
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
@@ -41,8 +51,9 @@ class HolidayCalendarViewModel @Inject constructor(
     private val joinCalendarUseCase: JoinCalendarUseCase,
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
     private val leaveCalendarUseCase: LeaveCalendarUseCase,
-    private val updateCalendarUseCase: UpdateCalendarUseCase
-) : AndroidViewModel(application) {
+    private val updateCalendarUseCase: UpdateCalendarUseCase,
+    private val workManager: WorkManager
+    ) : AndroidViewModel(application) {
 
     sealed class HolidayCalendarSnackState {
 
@@ -398,9 +409,7 @@ class HolidayCalendarViewModel @Inject constructor(
                 userId,
                 holidayCalendar,
                 calendarColor,
-                _defaultAllDayAlarms.value,
-                selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
-                displayTimeZoneId
+                _defaultAllDayAlarms.value
             )
 
             // Clear loading state
@@ -413,6 +422,15 @@ class HolidayCalendarViewModel @Inject constructor(
                 )
                 return
             } else {
+                joinCalendarResult.returnValue.tryCast<String> {
+                    val calendarId = this
+                    fetchCachedViewsEvents(
+                        userId,
+                        calendarId,
+                        selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
+                        displayTimeZoneId
+                    )
+                }
                 // Use settings snack state here to display snack in calendar settings view
                 calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
                     resourceProvider.provideString(R.string.snack_update_calendar_success)
@@ -504,9 +522,7 @@ class HolidayCalendarViewModel @Inject constructor(
             userId,
             holidayCalendar,
             calendarColor,
-            _defaultAllDayAlarms.value,
-            selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
-            displayTimeZoneId
+            _defaultAllDayAlarms.value
         )
 
         // Clear loading state
@@ -517,6 +533,16 @@ class HolidayCalendarViewModel @Inject constructor(
                 resourceProvider.provideString(R.string.snack_add_calendar_error)
             )
             return
+        }
+
+        joinCalendarResult.returnValue.tryCast<String> {
+            val calendarId = this
+            fetchCachedViewsEvents(
+                userId,
+                calendarId,
+                selectedDate ?: LocalDate.now(ZoneId.of(displayTimeZoneId)),
+                displayTimeZoneId
+            )
         }
 
         if (returnToSettings) {
@@ -542,5 +568,32 @@ class HolidayCalendarViewModel @Inject constructor(
         return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
             calendarsRepository.fetchManagedHolidayCalendars(userId)
         } else dbManagedHolidayCalendars
+    }
+
+
+    private fun fetchCachedViewsEvents(
+        userId: UserId,
+        calendarId: String,
+        selectedDate: LocalDate,
+        displayTimeZoneId: String
+    ) : LiveData<Operation.State> {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_CACHED_VIEWS_EVENTS,
+                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
+                    UseCaseWorker.INPUT_DATE to selectedDate.toEpochDay(),
+                    UseCaseWorker.INPUT_TIME_ZONE_ID to displayTimeZoneId
+                )
+            )
+            .build()
+
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_CACHED_VIEWS_EVENTS, ExistingWorkPolicy.REPLACE, work).state
     }
 }

@@ -44,6 +44,7 @@ import me.proton.android.calendar.domain.usecase.CalendarUserSettingsChangedUseC
 import me.proton.android.calendar.domain.usecase.CreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
+import me.proton.android.calendar.domain.usecase.FetchCachedViewsEventsUseCase
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
@@ -158,8 +159,9 @@ val useCaseModule = module {
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
-    factory<JoinCalendarUseCase> { JoinCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<JoinCalendarUseCase> { JoinCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<LeaveCalendarUseCase> { LeaveCalendarUseCase(get(), get(), get(), get()) }
+    factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(

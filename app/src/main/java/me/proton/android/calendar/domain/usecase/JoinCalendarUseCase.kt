@@ -4,30 +4,23 @@ import biweekly.component.VAlarm
 import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.getWeekStart
-import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.JoinCalendarApiRequest
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.data.entity.getSessionKeyEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.publicKey
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserManager
-import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -39,13 +32,6 @@ class JoinCalendarUseCase @Inject constructor(
     private val cryptoContext: CryptoContext,
     private val crypto: Crypto,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
-    private val fetchEventsUseCase: FetchEventsUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val widgetRefresher: WidgetRefresher,
-    private val valueStoreProvider: ValueStoreProvider,
-    private val serverEventsApi: ServerEventsApi,
-    private val userSettingsRepository: UserSettingsRepository,
-    private val database: AppDatabase,
     private val json: Json
 ): UseCase {
 
@@ -57,9 +43,7 @@ class JoinCalendarUseCase @Inject constructor(
         userId: UserId,
         managedHolidayCalendarEntity: ManagedHolidayCalendarEntity,
         calendarColor: Int,
-        defaultFullDayNotifications: List<VAlarm>?,
-        selectedDate: LocalDate,
-        displayTimeZoneId: String
+        defaultFullDayNotifications: List<VAlarm>?
     ): UseCase.Result {
 
         val defaultUserEmail = userManager.getUser(userId).email
@@ -118,28 +102,6 @@ class JoinCalendarUseCase @Inject constructor(
 
                 return when (cachePassphraseResult) {
                     is UseCase.Result.Success<*> -> {
-
-                        val weekStart = userSettingsRepository.getWeekStart(userId, database)
-                        val timeWindow = ProtonUtilsImpl.getCachedMonthViewsTimeWindow(selectedDate, weekStart)
-                        val fromDate = timeWindow.first
-                        val toDate = timeWindow.second
-                        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
-                            userId,
-                            listOf(calendarId),
-                            fromDate,
-                            toDate,
-                            displayTimeZoneId
-                        )
-
-                        val events = fetchEventsResult.second
-                        if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
-                            calendarsRepository.persistEvents(*events.toTypedArray())
-                            updateAlarmsUseCase.execute(userId.id, events.map { it.id })
-                            widgetRefresher.refreshEventList()
-                        } else {
-                            logger.e("JoinCalendarUseCase fetching events failed")
-                        }
-
                         UseCase.Result.Success(calendarId)
                     }
                     is UseCase.Result.Error -> {

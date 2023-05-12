@@ -11,6 +11,7 @@ import me.proton.android.calendar.common.WORKER_MAX_RETRY_COUNT
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.core.domain.entity.UserId
+import java.time.LocalDate
 
 @HiltWorker
 class UseCaseWorker @AssistedInject constructor(
@@ -24,7 +25,8 @@ class UseCaseWorker @AssistedInject constructor(
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
     private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase
+    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
+    private val fetchCachedViewsEventsUseCase: FetchCachedViewsEventsUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -45,6 +47,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_WEEK_START = UpdateUserSettingsUseCase.WORKER_ID_WEEK_START
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
             const val FETCH_PUBLIC_KEYS = FetchPublicKeysUseCase.WORKER_ID
+            const val FETCH_CACHED_VIEWS_EVENTS = FetchCachedViewsEventsUseCase.WORKER_ID
         }
     }
 
@@ -65,6 +68,8 @@ class UseCaseWorker @AssistedInject constructor(
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
         const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
         const val INPUT_USER_EMAILS = "INPUT_USER_EMAILS"
+        const val INPUT_DATE = "INPUT_DATE"
+        const val INPUT_TIME_ZONE_ID = "INPUT_TIME_ZONE_ID"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -95,6 +100,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_WEEK_START = "UPDATE_WEEK_START"
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
             const val FETCH_PUBLIC_KEYS = "FETCH_PUBLIC_KEYS"
+            const val FETCH_CACHED_VIEWS_EVENTS = "FETCH_CACHED_VIEWS_EVENTS"
         }
     }
 
@@ -192,6 +198,17 @@ class UseCaseWorker @AssistedInject constructor(
             UseCaseId.FETCH_PUBLIC_KEYS -> {
                 val emails = inputData.getStringArray(INPUT_USER_EMAILS) ?: return Result.failure()
                 fetchPublicKeysUseCase.fetchPublicKeys(userId, emails.toList())
+            }
+            UseCaseId.FETCH_CACHED_VIEWS_EVENTS -> {
+                val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
+                val selectedDateEpochDay = inputData.getLong(INPUT_DATE, LocalDate.now().toEpochDay())
+                val timeZoneId = inputData.getString(INPUT_TIME_ZONE_ID) ?: return Result.failure()
+                fetchCachedViewsEventsUseCase.execute(
+                    userId,
+                    calendarId,
+                    LocalDate.ofEpochDay(selectedDateEpochDay),
+                    timeZoneId
+                )
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")
