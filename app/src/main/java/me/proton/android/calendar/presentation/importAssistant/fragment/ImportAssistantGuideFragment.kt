@@ -45,9 +45,6 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val importAssistantViewModel: ImportAssistantViewModel by activityViewModels()
-    private val application: ProtonCalendarApplication by lazy {
-        requireContext().applicationContext as ProtonCalendarApplication
-    }
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()

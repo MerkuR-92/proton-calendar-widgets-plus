@@ -74,9 +74,6 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val importAssistantViewModel: ImportAssistantViewModel by activityViewModels()
-    private val application: ProtonCalendarApplication by lazy {
-        requireContext().applicationContext as ProtonCalendarApplication
-    }
 
     private val navigationArguments: ImportAssistantFragmentArgs by navArgs()
 

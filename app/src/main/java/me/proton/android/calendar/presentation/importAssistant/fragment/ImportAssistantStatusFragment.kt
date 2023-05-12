@@ -66,9 +66,6 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val importAssistantViewModel: ImportAssistantViewModel by activityViewModels()
-    private val application: ProtonCalendarApplication by lazy {
-        requireContext().applicationContext as ProtonCalendarApplication
-    }
 
     private lateinit var importStatusListAdapter: ImportStatusListAdapter
 

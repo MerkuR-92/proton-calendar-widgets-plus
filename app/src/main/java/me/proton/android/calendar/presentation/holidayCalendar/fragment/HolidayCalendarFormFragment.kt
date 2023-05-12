@@ -78,9 +78,6 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
-    private val application: ProtonCalendarApplication by lazy {
-        requireContext().applicationContext as ProtonCalendarApplication
-    }
 
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View
