@@ -937,7 +937,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             eventViewModel.initialiseForAlarm()
             val bundle = Bundle().apply {
                 putBoolean(IS_ALL_DAY_ARG, eventViewModel.eventLiveData.value!!.isAllDay())
-                putInt(DEFAULT_NOTIFICATIONS_TYPE_ARG, 0)
+                putInt(DEFAULT_NOTIFICATIONS_TYPE_ARG, EventFormAlarmFragment.DefaultNotificationsType.EVENT.value)
             }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }

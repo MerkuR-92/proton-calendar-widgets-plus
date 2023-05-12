@@ -51,6 +51,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -327,7 +328,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             requireActivity().clearFocusAndHideKeyboard(view)
             val bundle = Bundle().apply {
                 putBoolean(FragmentArguments.IS_ALL_DAY_ARG, true)
-                putInt(FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG, 2)
+                putInt(FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG, EventFormAlarmFragment.DefaultNotificationsType.HOLIDAY_CALENDAR.value)
             }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }
