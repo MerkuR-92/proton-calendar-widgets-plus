@@ -145,22 +145,22 @@
     <string name="event_text_timezone_start">Fuseau horaire</string>
     <string name="invite_in_shared_calendar_disclaimer">Envoyer des invitations n\'est possible que dans les calendriers personnels.</string>
     <string name="invite_change_calendar_disclaimer">Il n\'est pas possible de modifier le calendrier associé aux invitations.</string>
-    <string name="change_calendar_recurring_disclaimer">La modification du calendrier pour un événement récurrent n\'est pas encore possible.</string>
+    <string name="change_calendar_recurring_disclaimer">Il n\'est pas encore possible de déplacer un événement récurrent dans un autre calendrier.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Que recherchez-vous ?</string>
     <string name="search_empty_results_title">Aucun résultat n\'a été trouvé.</string>
     <string name="search_empty_results_subtitle">Essayez un autre terme, comme Eric, anniversaire, webinaire ou club de lecture par exemple.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Téléchargement des calendriers (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Temps restant : %1$s</string>
-    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Estimation du temps restant...</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Estimation du temps restant en cours</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">presque terminé</string>
     <string name="search_downloading_pause">Suspendre le téléchargement</string>
     <string name="search_settings_dialog_toggle_off_title">Supprimer tous les calendriers téléchargés ?</string>
     <string name="search_settings_dialog_toggle_off_text">Vous devrez à nouveau télécharger vos calendriers si vous voulez faire des recherches.</string>
     <string name="search_settings_dialog_toggle_on_title">Télécharger les calendriers sur cet appareil ?</string>
     <string name="search_settings_dialog_toggle_on_text">Ceci est nécessaire pour que vous puissiez faire des recherches.</string>
-    <string name="search_onboarding_header">Vous cherchez quelque chose dans votre calendrier ?</string>
-    <string name="search_onboarding_text">Pour pouvoir faire des recherches dans vos calendriers, vous devez d\'abord télécharger une copie locale chiffrée de vos calendriers. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
+    <string name="search_onboarding_header">Besoin de faire une recherche dans votre calendrier ?</string>
+    <string name="search_onboarding_text">Pour commencer, vous devez télécharger une copie chiffrée de vos calendriers. Cela ne prendra que quelques instants et vous pourrez continuer à utiliser l\'application. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
     <string name="search_onboarding_action_download_calendars">Télécharger les calendriers</string>
     <string name="search_onboarding_action_pause">Suspendre</string>
     <string name="search_onboarding_action_resume">Reprendre</string>
@@ -304,7 +304,7 @@
     <string name="snack_add_self_as_participant">Vous ne pouvez pas vous inviter vous-même.</string>
     <string name="snack_maximum_participants_reached">Le nombre maximum de participants est atteint.</string>
     <string name="snack_add_participant_error">Une erreur s\'est produite lors de l\'ajout du participant.</string>
-    <string name="snack_add_participant_invalid_email">L\'e-mail n\'est pas valide.</string>
+    <string name="snack_add_participant_invalid_email">L\'adresse e-mail n\'est pas valide.</string>
     <string name="snack_change_attendee_answer_error">Une erreur s\'est produite lors de l\'envoi de la réponse, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_network_error">Une erreur de réseau s\'est produite, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_import_event_signed_out">Vous devez vous connecter pour importer les événements.</string>
@@ -329,7 +329,7 @@
     <string name="snack_ics_unsupported_refresh_error">L\'actualisation d\'événements n\'est pas possible pour le moment.</string>
     <string name="snack_ics_unsupported_publish_error">L\'importation d\'événements n\'est pas possible pour le moment.</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Seules les réponses à tous les événements d\'une série sont possibles pour le moment.</string>
-    <string name="snack_ics_party_crasher_error">Votre e-mail n\'est pas dans la liste des participants.</string>
+    <string name="snack_ics_party_crasher_error">Votre adresse e-mail n\'est pas dans la liste des participants.</string>
     <string name="snack_ics_reply_party_crasher_error">Les participants qui n\'ont pas été invités par l\'organisateur ne peuvent pas être ajoutés.</string>
     <string name="snack_ics_missing_uid_error">L\'événement n\'a pas d\'identifiant unique.</string>
     <string name="snack_ics_no_active_personal_calendar_error">Aucun calendrier personnel actif n\'est associé à ce compte.</string>
@@ -405,7 +405,7 @@
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un autre routage réseau pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de garder ce paramètre activé pour plus de fiabilité.</string>
     <string name="settings_value_placeholder">Tapotez pour sélectionner</string>
     <string name="settings_general_title">Général</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s...</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s…</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
     <string name="settings_general_info_theme">thème</string>
     <string name="settings_general_info_language">langue</string>
@@ -435,7 +435,7 @@
     <string name="calendar_form_default_all_day_event_notifications">Notifications pour les événements d\'une journée entière</string>
     <string name="calendar_form_add_notification">Ajouter une notification</string>
     <string name="calendar_form_default_email">Adresse e-mail</string>
-    <string name="calendar_form_default_email_value_error">L\'e-mail par défaut n\'a pas pu être chargé.</string>
+    <string name="calendar_form_default_email_value_error">L\'adresse e-mail par défaut n\'a pas pu être chargée.</string>
     <string name="calendar_form_name_hint">Ajouter un nom de calendrier</string>
     <string name="calendar_form_name_required_error">Le nom est nécessaire.</string>
     <string name="calendar_form_description_hint">Ajouter une description au calendrier</string>
@@ -469,7 +469,7 @@
     <string name="bootstrap_error_store_quota_reached_learn_more">En savoir plus</string>
     <string name="bootstrap_error_reset_needed_title">Réinitialiser les clés des calendriers</string>
     <string name="bootstrap_error_reset_needed_message">Vous avez réinitialisé votre mot de passe et les événements liés aux calendriers suivants n\'ont pas pu être déchiffrés. Tous les calendriers actifs souscrits se synchroniseront à nouveau après quelques minutes.</string>
-    <string name="bootstrap_error_update_passphrase_title">Réactiver les clés de calendrier</string>
+    <string name="bootstrap_error_update_passphrase_title">Réactiver les clés du calendrier</string>
     <string name="bootstrap_error_update_passphrase_message">Vous avez réactivé vos clés et les événements liés aux calendriers suivants peuvent maintenant être déchiffrés.</string>
     <string name="bootstrap_error_continue_button">Continuer</string>
     <string name="splash_after_login_init">Les calendriers sont en cours de préparation.</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Voici le nouveau Proton : plusieurs services, une seule mission. Bienvenue sur un internet où la vie privée est la règle absolue. <a href="https://proton.me/news/updated-proton">En savoir plus</a></string>
     <string name="spotlight_dialog_week_view_title">Plus d\'options d\'affichage</string>
     <string name="spotlight_dialog_week_view_description">• Voici les vues de calendrier <b>3 jours</b> et <b>Semaine</b>. Sélectionnez votre vue préférée dans le <b>menu</b>.\n\n• Ajustez la hauteur des lignes de la grille des jours en pinçant avec deux doigts pour faire un zoom avant ou arrière.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Recherche facile</string>
-    <string name="spotlight_dialog_search_description">Vous pouvez désormais rechercher des événements dans vos calendriers. Cette fonction télécharge une copie chiffrée de vos calendriers sur votre appareil. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
+    <string name="spotlight_dialog_search_title">Rechercher des événements</string>
+    <string name="spotlight_dialog_search_description">Trouvez facilement l\'événement que vous recherchez avec notre nouvelle fonction de recherche. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
     <string name="spotlight_dialog_import_title">Plus de façons d\'ajouter des évènements</string>
     <string name="spotlight_dialog_import_description">• Importez des évènements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fonctionnalités du calendrier</string>
@@ -538,7 +538,7 @@
     <string name="import_assistant_new_calendar_badge">Nouveau</string>
     <string name="import_assistant_merge_calendar_badge">Fusionné</string>
     <string name="import_assistant_creating_calendars">Création de nouveaux calendriers</string>
-    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">C\'est presque terminé...</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">C\'est presque terminé…</string>
     <string name="import_assistant_new_calendar_header">Créer un nouveau</string>
     <string name="import_assistant_merge_calendar_header">Fusionner avec l\'existant</string>
     <string name="import_assistant_in_progress_title">L\'importation est en cours.</string>

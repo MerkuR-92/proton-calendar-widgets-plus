@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Вам потрібно буде завантажити календарі ще раз, якщо ви хочете здійснити пошук.</string>
     <string name="search_settings_dialog_toggle_on_title">Завантажити календарі на цей пристрій?</string>
     <string name="search_settings_dialog_toggle_on_text">Це необхідно, щоб ви могли здійснювати пошук.</string>
-    <string name="search_onboarding_header">Шукаєте щось у своєму календарі?</string>
-    <string name="search_onboarding_text">Для пошуку календарів спочатку необхідно завантажити локальну зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="search_onboarding_header">Хочете виконати пошук у календарі?</string>
+    <string name="search_onboarding_text">Спочатку вам потрібно завантажити зашифровану копію ваших календарів. Це забере лише мить, і ви зможете продовжувати користуватися застосунком. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
     <string name="search_onboarding_action_download_calendars">Завантажити календарі</string>
     <string name="search_onboarding_action_pause">Призупинити</string>
     <string name="search_onboarding_action_resume">Продовжити</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Представляємо оновлений вигляд Proton. Багато служб, одна місія. Ласкаво просимо до Інтернету, де приватність — це стандарт. <a href="https://proton.me/news/updated-proton">Докладніше</a></string>
     <string name="spotlight_dialog_week_view_title">Більше варіантів перегляду</string>
     <string name="spotlight_dialog_week_view_description">• Представляємо перегляд календаря на <b>3 дні</b> й на <b>тиждень</b>. Виберіть потрібний вигляд у <b>меню</b>.\n\n• Налаштуйте висоту рядків у сітці дня, зводячи двома пальцями, щоб збільшити або зменшити масштаб.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Легкий пошук</string>
-    <string name="spotlight_dialog_search_description">Тепер ви можете шукати події у своїх календарях. При цьому на пристрій буде завантажено зашифровану копію календарів. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="spotlight_dialog_search_title">Пошук подій</string>
+    <string name="spotlight_dialog_search_description">Легко знаходьте потрібні події за допомогою нашої нової функції пошуку. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
     <string name="spotlight_dialog_import_title">Інші способи додавання подій</string>
     <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функції календаря</string>

@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Arama yapmak isterseniz tüm takvimlerinizi yeniden indirmeniz gerekecek.</string>
     <string name="search_settings_dialog_toggle_on_title">Takvimler bu aygıta indirilsin mi?</string>
     <string name="search_settings_dialog_toggle_on_text">Arama yapabilmek için bu işlem gereklidir.</string>
-    <string name="search_onboarding_header">Takviminizde bir şey mi arıyorsunuz?</string>
-    <string name="search_onboarding_text">Takvimlerinizde arama yapabilmek için önce takvimlerinizin şifrelenmiş bir yerel kopyasını indirmeniz gerekir. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
+    <string name="search_onboarding_header">Takviminizde arama yapmak ister misiniz?</string>
+    <string name="search_onboarding_text">Öncelikle takvimlerinizin şifrelenmiş bir kopyasını indirmeniz gerekir. Bu yalnızca bir dakikanızı alır ve uygulamayı kullanmayı sürdürebilirsiniz. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
     <string name="search_onboarding_action_download_calendars">Takvimleri indir</string>
     <string name="search_onboarding_action_pause">Duraklat</string>
     <string name="search_onboarding_action_resume">Sürdür</string>
@@ -245,8 +245,8 @@
     <string name="event_send_invite_dialog_confirm">Gönder</string>
     <string name="event_send_invite_dialog_cancel">İptal</string>
     <string name="event_add_participants_dialog_title">Katılımcı ekle</string>
-    <string name="event_add_participants_dialog_description">Eklenen katılımcılara bu dizideki tüm etkinlikler için bir davetiye gönderilecek.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Eklenen tüm katılımcılara bu dizideki tüm etkinlikler için bir davetiye gönderilecek.\nBu dizide daha önce yapılmış değişiklikler kaybolacak.</string>
+    <string name="event_add_participants_dialog_description">Eklenen katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.</string>
+    <string name="event_add_participants_overwrite_dialog_description">Eklenen tüm katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.\nBu dizide daha önce yapılmış değişiklikler kaybolacak.</string>
     <string name="event_add_participants_dialog_confirm">Gönder</string>
     <string name="event_add_participants_dialog_cancel">İptal</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s iptal edildi.</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Yenilenmiş Proton böyle görünüyor. Bir çok hizmet, tek amaç. Gizliliğin doğal sayıldığı bir internet fikrine hoş geldiniz. <a href="https://proton.me/news/updated-proton">Ayrıntılı bilgi alın</a></string>
     <string name="spotlight_dialog_week_view_title">Diğer görüntüleme seçenekleri</string>
     <string name="spotlight_dialog_week_view_description">• <b>3 günlük</b> ve <b>Haftalık</b> takvim görünümleriyle tanışın. <b>Menüden</b> kullanmak istediğiniz görünümü seçin.\n\n• Yakınlaştırmak ya da uzaklaştırmak için iki parmağınızı sıkıştırarak gün tablosundaki satırların yüksekliğini ayarlayın.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Eksiksiz arama yapın</string>
-    <string name="spotlight_dialog_search_description">Artık takvimlerinizde etkinlikleri arayabilirsiniz. Bu işlem, takvimlerinizin şifrelenmiş bir kopyasını aygıtınıza indirir. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
+    <string name="spotlight_dialog_search_title">Etkinlikleri arayın</string>
+    <string name="spotlight_dialog_search_description">Yeni arama özelliği ile aradığınız etkinliği kolayca bulun. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
     <string name="spotlight_dialog_import_title">Etkinlik eklemenin diğer yolları</string>
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
     <string name="spotlight_dialog_calendar_provider_title">Takvim özellikleri</string>

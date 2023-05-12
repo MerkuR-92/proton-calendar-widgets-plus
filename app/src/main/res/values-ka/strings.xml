@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">ძებნისთვის კალენდარების თავიდან გადმოწერა მოგიწევთ.</string>
     <string name="search_settings_dialog_toggle_on_title">გადმოვწერო კალენდარები ამ მოწყობილობაზე?</string>
     <string name="search_settings_dialog_toggle_on_text">ეს ძებნისთვის აუცილებელია.</string>
-    <string name="search_onboarding_header">კალენდარში ეძებთ რამეს?</string>
-    <string name="search_onboarding_text">იმისათვის, რომ კალენდარებში მოძებნოთ, ჯერ მათი ლოკალური ასლი უნდა გადმოწეროთ.<a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
+    <string name="search_onboarding_header">გნებავთ, კალენდარში მოძებნოთ?</string>
+    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">კალენდარების გადმოწერა</string>
     <string name="search_onboarding_action_pause">შეჩერება</string>
     <string name="search_onboarding_action_resume">გაგრძელება</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">წარმოგიდგენთ Proton-ის განახლებულ იერს. ბევრი სერვისი, ერთი მისია. მოგესალმებით ინტერნეტში, სადაც კონფიდენციალობა ნაგულისხმებია. <a href="https://proton.me/news/updated-proton">გაიგეთ მეტი</a></string>
     <string name="spotlight_dialog_week_view_title">მეტი ნახვის პარამეტრი</string>
     <string name="spotlight_dialog_week_view_description">• წარმოგიდგენთ კალენდარების <b>3 დღიან</b> და <b> ერთკვირიან</b> ხედებს. აირჩიეთ თქვენთვის სასურველი ხედი <b>მენიუში</b>.\n\n• დღის ბადეში მწკრივების სიმაღლის გასწორება ორი თითის გასმით შეგიძლიათ.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">შეუფერხებელი ძებნა</string>
-    <string name="spotlight_dialog_search_description">ახლა კალენდარებში მოვლენების ძებნა შეგიძლიათ. ეს თქვენი კალენდარების დაშიფრულ ასლს გადმოიწერს თქვენს მოწყობილობაზე. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
+    <string name="spotlight_dialog_search_title">მოვლენების ძებნა</string>
+    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">მოვლენების დამატების მეტი გზა</string>
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>

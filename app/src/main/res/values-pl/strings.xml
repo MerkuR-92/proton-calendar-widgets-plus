@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Musisz ponownie pobrać kalendarze, aby je przeszukiwać.</string>
     <string name="search_settings_dialog_toggle_on_title">Pobrać kalendarze na urządzenie?</string>
     <string name="search_settings_dialog_toggle_on_text">Pobranie kalendarzy jest wymagane.</string>
-    <string name="search_onboarding_header">Szukasz czegoś w kalendarzu?</string>
-    <string name="search_onboarding_text">Aby przeszukiwać kalendarze, musisz pobrać zaszyfrowane dane kalendarzy. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
+    <string name="search_onboarding_header">Chcesz przeszukać kalendarz?</string>
+    <string name="search_onboarding_text">Pobierz zaszyfrowaną kopię kalendarzy. Zajmie to chwilę, a Ty możesz dalej korzystać z aplikacji. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
     <string name="search_onboarding_action_download_calendars">Pobierz kalendarze</string>
     <string name="search_onboarding_action_pause">Wstrzymaj</string>
     <string name="search_onboarding_action_resume">Wznów</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Przedstawiamy odświeżony wygląd usługi Proton. Wiele usług, jedna misja. Witaj w Internecie, w którym prywatność jest standardem. <a href="https://proton.me/news/updated-proton">Dowiedz się więcej</a></string>
     <string name="spotlight_dialog_week_view_title">Więcej opcji widoku</string>
     <string name="spotlight_dialog_week_view_description">• Przedstawiamy widok kalendarza <b>3-dniowy</b> i <b>tygodniowy</b>. Wybierz preferowany widok w <b>menu</b>.\n\n• Dostosuj wysokość rzędów za pomocą dwóch palców, powiększając i pomniejszając siatkę dni.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Szukaj wydarzeń</string>
-    <string name="spotlight_dialog_search_description">Możesz wyszukiwać wydarzenia w kalendarzu. Ta opcja pobierze zaszyfrowane dane kalendarzy na urządzenie. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
+    <string name="spotlight_dialog_search_title">Szukaj wydarzeń</string>
+    <string name="spotlight_dialog_search_description">Znajdź w wyszukiwarce wydarzenie, które chcesz znaleźć. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
     <string name="spotlight_dialog_import_title">Więcej sposobów na dodanie wydarzenia</string>
     <string name="spotlight_dialog_import_description">• Importuj wydarzenia do kalendarza z plików na telefonie.\n\n• Dodaj rezerwacje wycieczek bezpośrednio z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcje kalendarza</string>

@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Trebuie să descărcați toate calendarele dacă doriți să căutați.</string>
     <string name="search_settings_dialog_toggle_on_title">Descărcați calendarele pe acest dispozitiv?</string>
     <string name="search_settings_dialog_toggle_on_text">Este necesar pentru a putea căuta.</string>
-    <string name="search_onboarding_header">Căutați ceva în calendar?</string>
-    <string name="search_onboarding_text">Pentru a căuta în calendare mai întâi trebuie descărcată o copie locală criptată a acestora. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
+    <string name="search_onboarding_header">Doriți să căutați în calendar?</string>
+    <string name="search_onboarding_text">Mai întâi trebuie să descărcați o copie criptată a calendarelor personale. Aceasta va dura puțin și puteți continua să utilizați aplicația. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
     <string name="search_onboarding_action_download_calendars">Descărcare calendare</string>
     <string name="search_onboarding_action_pause">Suspendare</string>
     <string name="search_onboarding_action_resume">Reluare</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Vă prezentăm noua față împrospătată a lui Proton. Multe servicii, o singură misiune. Bun venit la un Internet unde intimitatea este implicită. <a href="https://proton.me/news/updated-proton">Detalii</a></string>
     <string name="spotlight_dialog_week_view_title">Mai multe opțiuni de afișare</string>
     <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Căutați fără probleme</string>
-    <string name="spotlight_dialog_search_description">Acum puteți căuta evenimente din calendare. Se va descărca o copie criptată a calendarelor pe dispozitiv. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
+    <string name="spotlight_dialog_search_title">Căutare evenimente</string>
+    <string name="spotlight_dialog_search_description">Găsiți cu ușurință evenimentul pe care îl căutați cu noua funcție de căutare. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
     <string name="spotlight_dialog_import_title">Alte metode de adăugat evenimente</string>
     <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Caracteristici calendar</string>

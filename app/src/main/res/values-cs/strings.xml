@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Pokud chcete vyhledávat v kalendářích, musíte si je znovu stáhnout.</string>
     <string name="search_settings_dialog_toggle_on_title">Stáhnout kalendář do tohoto zařízení?</string>
     <string name="search_settings_dialog_toggle_on_text">To je nutné, abyste mohli vyhledávat.</string>
-    <string name="search_onboarding_header">Hledáte něco v kalendáři?</string>
-    <string name="search_onboarding_text">Abyste mohli v kalendářích vyhledávat, musíte si nejprve stáhnout místní šifrovanou kopii kalendářů. <a href="https://proton.me/support/calendar-search">Další informace</a></string>
+    <string name="search_onboarding_header">Chcete vyhledávat v kalendáři?</string>
+    <string name="search_onboarding_text">Nejprve si musíte stáhnout šifrovanou kopii svých kalendářů. Zabere to jen chvilku a aplikaci můžete používat dál. <a href="https://proton.me/support/calendar-search">Více informací</a></string>
     <string name="search_onboarding_action_download_calendars">Stáhnout kalendáře</string>
     <string name="search_onboarding_action_pause">Pozastavit</string>
     <string name="search_onboarding_action_resume">Pokračovat</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Představujeme nový vzhled Protonu. Mnoho služeb, jedno poslání. Vítejte na internetu, kde je soukromí samozřejmostí. <a href="https://proton.me/news/updated-proton">Další informace</a></string>
     <string name="spotlight_dialog_week_view_title">Více možností zobrazení</string>
     <string name="spotlight_dialog_week_view_description">• Představujeme zobrazení kalendáře na <b>3 dny</b> a <b>týden</b>. V <b>menu</b> vyberte požadované zobrazení.\n\n• Výšku řádků v mřížce dnů upravíte přiblížením nebo oddálením dvou prstů.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Bezproblémové vyhledávání</string>
-    <string name="spotlight_dialog_search_description">Nyní můžete v kalendáři vyhledávat události. Tím se do zařízení stáhne šifrovaná kopie vašich kalendářů. <a href="https://proton.me/support/calendar-search">Další informace</a></string>
+    <string name="spotlight_dialog_search_title">Vyhledat události</string>
+    <string name="spotlight_dialog_search_description">Pomocí naší nové funkce vyhledávání snadno najdete událost, kterou hledáte. <a href="https://proton.me/support/calendar-search">Více informací</a></string>
     <string name="spotlight_dialog_import_title">Více způsobů přidávání událostí</string>
     <string name="spotlight_dialog_import_description">Importovat události do vašeho kalendáře ze souborů na vašem teleofnu.\n\n• Přidat rezervace výletů přímo z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkce kalendáře</string>
