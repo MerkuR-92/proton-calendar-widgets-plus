@@ -188,6 +188,7 @@ dependencies {
     implementation(libs.core.featureFlag)
     implementation(libs.core.humanVerification)
     implementation(libs.core.key)
+    implementation(libs.core.keyTransparency)
     implementation(libs.core.mailMessage)
     implementation(libs.core.mailSettings)
     implementation(libs.core.network)
