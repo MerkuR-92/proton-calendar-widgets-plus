@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Du skal downloade dine kalendere igen, hvis du vil søge.</string>
     <string name="search_settings_dialog_toggle_on_title">Download kalendere til denne enhed?</string>
     <string name="search_settings_dialog_toggle_on_text">Dette er nødvendigt for at kunne søge.</string>
-    <string name="search_onboarding_header">Leder du efter noget i din kalender?</string>
-    <string name="search_onboarding_text">For at kunne søge i dine kalendere skal du først downloade en lokal krypteret kopi af dine kalendere. <a href="https://proton.me/support/calendar-search">Få mere at vide</a></string>
+    <string name="search_onboarding_header">Want to search your calendar?</string>
+    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">Download kalendere</string>
     <string name="search_onboarding_action_pause">Sæt på pause</string>
     <string name="search_onboarding_action_resume">Genoptag</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Vi præsenterer Proton\'s nye udseende. Mange tjenester, én mission. Velkommen til et internet, hvor privatlivsbeskyttelse er standard. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
     <string name="spotlight_dialog_week_view_title">Flere visningsmuligheder</string>
     <string name="spotlight_dialog_week_view_description">• Nu kan du vælge kalendervisninger med <b>3 dage</b> og en <b>uge</b>. Vælg din foretrukne visning i <b>menuen</b>.\n\n• Juster højden af rækkerne i dagsgitteret ved at knibe med to fingre for at zoome ind eller ud.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Søg så let som ingenting</string>
-    <string name="spotlight_dialog_search_description">Du kan nu søge i dine kalendere efter begivenheder. Dette downloader en krypteret kopi af dine kalendere til din enhed. <a href="https://proton.me/support/calendar-search">Få mere at vide</a></string>
+    <string name="spotlight_dialog_search_title">Search for events</string>
+    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">Flere måder at tilføje begivenheder</string>
     <string name="spotlight_dialog_import_description">• Importer begivenheder til din kalender fra filer på din telefon.\n\n• Tilføj rejsebookinger direkte fra Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>

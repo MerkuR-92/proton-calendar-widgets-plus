@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Ismételten le kell majd töltenie a naptárakat, ha keresni szeretne.</string>
     <string name="search_settings_dialog_toggle_on_title">Naptárak letöltése erre az eszközre?</string>
     <string name="search_settings_dialog_toggle_on_text">Ez szükséges a kereséshez.</string>
-    <string name="search_onboarding_header">Keres valamit a naptárában?</string>
-    <string name="search_onboarding_text">A naptárakban való kereséshez, előbb le kell tölteni a naptárak egy helyi titkosított másolatát. <a href="https://proton.me/support/calendar-search">További információk</a></string>
+    <string name="search_onboarding_header">Want to search your calendar?</string>
+    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">Naptárak letöltése</string>
     <string name="search_onboarding_action_pause">Szünet</string>
     <string name="search_onboarding_action_resume">Folytatás</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">A Proton új megjelenésének bemutatása. Sok szolgáltatás, egy küldetés. Üdvözli az az internet, amelyen az adatvédelem alapértelmezett. <a href="https://proton.me/news/updated-proton">További információk</a></string>
     <string name="spotlight_dialog_week_view_title">További megtekintési lehetőségek</string>
     <string name="spotlight_dialog_week_view_description">Bemutatjuk a <b>3 napos</b> és <b>Heti</b> naptár nézetet. Válassza ki az önnek tetsző nézetet a <b>menüben</b>.\n\n• Állítsa be az oszlopok magasságát a napi rácson úgy, hogy két ujjával rácsíp a be- vagy kinagyításhoz.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Egyszerű keresés</string>
-    <string name="spotlight_dialog_search_description">Ezentúl kereshet is a naptáraiban lévő események közt. Ez titkosított formában letölti az eseményeket az eszközre. <a href="https://proton.me/support/calendar-search">További információk</a></string>
+    <string name="spotlight_dialog_search_title">Search for events</string>
+    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>

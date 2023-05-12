@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Kalenterit on ladattava uudelleen, jos haluat etsiä niiden sisältöä.</string>
     <string name="search_settings_dialog_toggle_on_title">Ladataanko kalenterit tälle laitteelle?</string>
     <string name="search_settings_dialog_toggle_on_text">Tämä on tarpeellista hakua varten.</string>
-    <string name="search_onboarding_header">Etsitkö kalenteristasi jotakin?</string>
-    <string name="search_onboarding_text">Etsiäksesi kalentereidesi sisältöä, on laitteelle ensin ladattava kalenteriesi salatut kopiot. <a href="https://proton.me/support/calendar-search">Lue lisää</a></string>
+    <string name="search_onboarding_header">Haluatko etsiä kalenteristasi?</string>
+    <string name="search_onboarding_text">Ensin sinun on ladattava salattu kopio kalentereistasi. Tämä kestää vain hetken, ja voit jatkaa sovelluksen käyttöä. <a href="https://proton.me/support/calendar-search">Lisätietoja</a></string>
     <string name="search_onboarding_action_download_calendars">Lataa kalenterit</string>
     <string name="search_onboarding_action_pause">Tauota</string>
     <string name="search_onboarding_action_resume">Jatka</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Esittelyssä Protonin uusi ilme. Useita palveluita, yhteinen tehtävä. Tervetuloa Internetiin, jossa yksityisyys on oletusarvoista. <a href="https://proton.me/news/updated-proton">Lue lisää</a></string>
     <string name="spotlight_dialog_week_view_title">Lisää näyttövalintoja</string>
     <string name="spotlight_dialog_week_view_description">• Esittelyssä kalenterin <b>3 päivää</b> ja <b>Viikko</b> -näkymät. Valitse haluamasi näkymä <b>valikosta</b>.\n\n• Säädä päiväruudukon rivien korkeutta zoomamalla niitä kahden sormen nipistyseleellä.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Etsi saumattomasti</string>
-    <string name="spotlight_dialog_search_description">Voit nyt etsiä kalentereistasi tapahtumia. Tämä lataa laitteellesi salatut kopiot kalentereistasi. <a href="https://proton.me/support/calendar-search">Lue lisää</a></string>
+    <string name="spotlight_dialog_search_title">Hae tapahtumia</string>
+    <string name="spotlight_dialog_search_description">Löydä etsimäsi tapahtuma helposti uudella hakutoiminnollamme. <a href="https://proton.me/support/calendar-search">Lisätietoja</a></string>
     <string name="spotlight_dialog_import_title">Muita tapoja lisätä tapahtumia</string>
     <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia mobiililaitteesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenterin ominaisuudet</string>

@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Du måste ladda ner dina kalendrar igen om du vill söka.</string>
     <string name="search_settings_dialog_toggle_on_title">Ladda ner kalendrar till denna enhet?</string>
     <string name="search_settings_dialog_toggle_on_text">Detta är obligatoriskt så att du kan söka.</string>
-    <string name="search_onboarding_header">Söker du efter något i din kalender?</string>
-    <string name="search_onboarding_text">För att söka i dina kalendrar måste du först ladda ner en lokal krypterad kopia av dina kalendrar. <a href="https://proton.me/support/calendar-search">Lär dig mer</a></string>
+    <string name="search_onboarding_header">Vill du söka i din kalender?</string>
+    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">Ladda ner kalendrar</string>
     <string name="search_onboarding_action_pause">Pausa</string>
     <string name="search_onboarding_action_resume">Återuppta</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Vi introducerar Protons uppdaterade utseende. Många tjänster, ett uppdrag. Välkommen till ett Internet där integritet är standard. <a href="https://proton.me/news/updated-proton">Lär dig mer</a></string>
     <string name="spotlight_dialog_week_view_title">Fler visningsalternativ</string>
     <string name="spotlight_dialog_week_view_description">• Nu finns <b>3-dagars</b>- och <b>vecko</b>vyer i kalendern. Välj din favoritvy i <b>menyn</b>.\n\n• Justera radhöjden i daglayouten genom att använda två fingrar för att zooma in eller ut.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Sök sömlöst</string>
-    <string name="spotlight_dialog_search_description">Du kan nu söka i dina kalendrar efter händelser. Detta laddar ner en krypterad kopia av dina kalendrar till din enhet. <a href="https://proton.me/support/calendar-search">Lär dig mer</a></string>
+    <string name="spotlight_dialog_search_title">Sök efter händelser</string>
+    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">Fler sätt att lägga till händelser</string>
     <string name="spotlight_dialog_import_description">• Importera händelser till din kalender från filer på din telefon.\n\n• Lägg till resebokningar direkt från Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>

@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Tendrá que descargar los calendarios de nuevo si quiere buscar.</string>
     <string name="search_settings_dialog_toggle_on_title">¿Descargar los calendarios a este dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Esto es necesario para que pueda buscar.</string>
-    <string name="search_onboarding_header">¿Buscando algo en el calendario?</string>
-    <string name="search_onboarding_text">Para poder buscar en los calendarios, primero necesita descargar una copia local cifrada de los calendarios. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="search_onboarding_header">¿Desea buscar en su calendario?</string>
+    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto tomará un momento y podrá usar seguir usando la app. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="search_onboarding_action_download_calendars">Descargar calendarios</string>
     <string name="search_onboarding_action_pause">Pausar</string>
     <string name="search_onboarding_action_resume">Reanudar</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Presentamos el aspecto renovado de Proton. Muchos servicios, una misión. Bienvenido a una Internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Seleccione su vista preferida en el <b>menú</b>.\n\n• Ajuste la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Buscar sin problemas</string>
-    <string name="spotlight_dialog_search_description">Ya puede buscar en sus calendarios. Esto descarga en su dispositivo una copia cifrada de los calendarios. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="spotlight_dialog_search_title">Buscar por eventos</string>
+    <string name="spotlight_dialog_search_description">Encuentre fácilmente el evento que está buscando con nuestra función de búsqueda nueva. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_import_title">Más formas de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importe eventos a su calendario desde archivos en su teléfono.\n\n• Añada reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funciones del calendario</string>

@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">若您想要搜尋，您必須再次下載您的行事曆。</string>
     <string name="search_settings_dialog_toggle_on_title">下載行事曆至此裝置？</string>
     <string name="search_settings_dialog_toggle_on_text">若您要搜尋，這是必要的。</string>
-    <string name="search_onboarding_header">在行事曆中搜尋某些內容？</string>
-    <string name="search_onboarding_text">為了搜尋您的行事曆，您必須先下載行事曆的本機加密副本。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
+    <string name="search_onboarding_header">想要搜尋您的行事曆？</string>
+    <string name="search_onboarding_text">您必須先下載您行事曆的加密副本。這只需要一點時間，您可以繼續使用該應用程式。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
     <string name="search_onboarding_action_download_calendars">下載行事曆</string>
     <string name="search_onboarding_action_pause">暫停</string>
     <string name="search_onboarding_action_resume">繼續</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">介紹 Proton 煥然一新的外觀。多個服務，一項使命。歡迎來到以隱私為預設的網際網路。<a href="https://proton.me/news/updated-proton">取得更多資訊</a></string>
     <string name="spotlight_dialog_week_view_title">更多檢視選項</string>
     <string name="spotlight_dialog_week_view_description">• 引入<b>三天</b>與<b>週</b>行事曆檢視。在<b>選單</b>中選取您的偏好檢視方式。\n\n• 使用兩根手指合攏來放大或縮小以調整日期網格中的列高度。</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">無縫搜尋</string>
-    <string name="spotlight_dialog_search_description">您現在可以在行事曆中搜尋事件。這會下載一份行事曆的加密副本到您的裝置中。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
+    <string name="spotlight_dialog_search_title">搜尋行程</string>
+    <string name="spotlight_dialog_search_description">使用我們的新搜尋功能輕鬆找到您正在尋找的行程。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
     <string name="spotlight_dialog_import_title">更多新增事件的方式</string>
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
     <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>

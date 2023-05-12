@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Anda akan perlu untuk mengunduh ulang kalender Anda apabila Anda ingin melakukan pencarian.</string>
     <string name="search_settings_dialog_toggle_on_title">Unduh kalender ke perangkat ini?</string>
     <string name="search_settings_dialog_toggle_on_text">Hal ini dibutuhkan agar kamu dapat melakukan pencarian.</string>
-    <string name="search_onboarding_header">Mencari sesuatu pada kalender Anda?</string>
-    <string name="search_onboarding_text">Untuk dapat mencari isi kalender yang Anda miliki, Anda harus terlebih dahulu mengunduh salinan terenkripsi kalender Anda secara lokal. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="search_onboarding_header">Want to search your calendar?</string>
+    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="search_onboarding_action_download_calendars">Unduh kalender</string>
     <string name="search_onboarding_action_pause">Jeda</string>
     <string name="search_onboarding_action_resume">Lanjutkan</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Memperkenalkan tampilan baru Proton. Beragam layanan, satu misi. Selamat datang di Internet yang menjunjung privasi sebagai hal yang baku. <a href="https://proton.me/news/updated-proton">Pelajari lebih lanjut</a></string>
     <string name="spotlight_dialog_week_view_title">Pilihan tampilan lainnya</string>
     <string name="spotlight_dialog_week_view_description">• Memperkenalkan mode tampilan kalender per <b>3 hari</b> dan per <b>Pekan</b>. Pilih mode tampilan yang Anda kehendaki pada <b>menu</b>.\n\n• Sesuaikan tinggi masing-masing baris dengan menggunakan dua jari untuk memperbesar atau memperkecil layar.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Cari tanpa repot</string>
-    <string name="spotlight_dialog_search_description">Anda kini dapat mencari acara yang terdapat pada kalender Anda. Dengan ini, salinan terenkripsi kalender Anda akan diunduh pada perangkat Anda. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="spotlight_dialog_search_title">Search for events</string>
+    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>

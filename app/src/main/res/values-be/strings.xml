@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Вам неабходна спампаваць вашы календары яшчэ раз, калі вы хочаце шукаць у іх.</string>
     <string name="search_settings_dialog_toggle_on_title">Спампаваць календары на гэту прыладу?</string>
     <string name="search_settings_dialog_toggle_on_text">Гэта патрабуецца для пошуку.</string>
-    <string name="search_onboarding_header">Шукаеце нешта ў сваім календары?</string>
-    <string name="search_onboarding_text">Для таго, каб шукаць у сваіх календарах, вам неабходна спампаваць іх зашыфраваную лакальную копію. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
+    <string name="search_onboarding_header">Хочаце пашукаць у календары?</string>
+    <string name="search_onboarding_text">Па-першае, неабходна спампаваць зашыфраваную копію вашага календара. Гэта зойме ўсяго некалькі хвілін, а вы зможаце працягваць карыстацца праграмай.<a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
     <string name="search_onboarding_action_download_calendars">Спампаваць календары</string>
     <string name="search_onboarding_action_pause">Прыпыніць</string>
     <string name="search_onboarding_action_resume">Узнавіць</string>
@@ -397,8 +397,8 @@
     <string name="settings_update_timezone_checkbox">Больш не пытаць</string>
     <string name="settings_week_start_title">Пачатак тыдня</string>
     <string name="settings_time_format_title">Фармат часу</string>
-    <string name="settings_week_numbers_title">Паказаць нумары тыдняў</string>
-    <string name="settings_auto_invites_title">Дадавайце запрашэнні ў каляндар і пазначайце іх у якасці адкладзеных</string>
+    <string name="settings_week_numbers_title">Паказваць нумары тыдняў</string>
+    <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнне, што чакае разгляду</string>
     <string name="settings_search_title">Пошук календароў</string>
     <string name="settings_search_subtitle">Спампоўвае і захоўвае змесціва календара на вашай прыладзе для пошуку. Адключэнне гэтага параметра прывядзе да выдалення спампаванага змесціва.</string>
     <string name="settings_alternative_routing_title">Дазваляць альтэрнатыўную маршрутызацыю</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Уводзіны ў абноўлены выгляд Proton. Шмат сэрвісаў, адна місія. Вітаем у інтэрнэце, дзе прыватнасць з\'яўляецца паўсядзённасцю. <a href="https://proton.me/news/updated-proton">Даведацца больш</a></string>
     <string name="spotlight_dialog_week_view_title">Больш параметраў прагляду</string>
     <string name="spotlight_dialog_week_view_description">• Уводзіны ў прагляд календара на <b>тры дні</b> і <b>тыдзень</b>. Выберыце пажаданы спосаб прагляду ў <b>меню</b>.\n\n• Адрэгулюйце вышыню радкоў у сетцы з днямі з дапамогай двух пальцаў, павялічваючы або памяншаючы маштаб.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Плаўны пошук</string>
-    <string name="spotlight_dialog_search_description">Цяпер вы можаце выконваць пошук падзей у сваіх календарах. Гэта спампаваныя на прыладу зашыфраваныя копіі вашых календароў. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
+    <string name="spotlight_dialog_search_title">Пошук падзей</string>
+    <string name="spotlight_dialog_search_description">Лёгка знаходзьце падзеі, якія вы шукаеце з нашай новай функцыяй пошуку. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
     <string name="spotlight_dialog_import_title">Больш спосабаў дадаць падзеі</string>
     <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функцыі календара</string>

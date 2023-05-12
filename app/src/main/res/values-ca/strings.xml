@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">Necessitareu tornar a descarregar els calendaris si voleu cercar-hi.</string>
     <string name="search_settings_dialog_toggle_on_title">Voleu descarregar els calendaris a aquest dispositiu?</string>
     <string name="search_settings_dialog_toggle_on_text">És necessari per a poder cercar.</string>
-    <string name="search_onboarding_header">Busqueu alguna cosa al vostre calendari?</string>
-    <string name="search_onboarding_text">Per a poder cercar els vostres calendaris primer necessiteu descarregar una còpia local xifrada dels vostres calendaris. <a href="https://proton.me/support/calendar-search">Més informació</a></string>
+    <string name="search_onboarding_header">Voleu cercar al vostre calendari?</string>
+    <string name="search_onboarding_text">Primer heu de descarregar una còpia xifrada dels vostres calendaris. Això només trigarà un moment i podeu seguir utilitzant l\'aplicació. <a href="https://proton.me/support/calendar-search">Saber-ne més</a></string>
     <string name="search_onboarding_action_download_calendars">Descarrega els calendaris</string>
     <string name="search_onboarding_action_pause">Pausa</string>
     <string name="search_onboarding_action_resume">Continua</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
     <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
     <string name="spotlight_dialog_week_view_description">• Presentem la vista de calendari de <b>3 dies</b> i <b>Setmanal</b>. Seleccioneu la vostra vista preferida del <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Busqueu fàcilment</string>
-    <string name="spotlight_dialog_search_description">Ara podeu buscar esdeveniments dels vostres calendaris. Això descarrega una còpia xifrada dels vostres calendaris al dispositiu. <a href="https://proton.me/support/calendar-search">Més informació</a></string>
+    <string name="spotlight_dialog_search_title">Cerca esdeveniments</string>
+    <string name="spotlight_dialog_search_description">Trobeu fàcilment l\'esdeveniment que busqueu amb la nostra nova funció de cerca. <a href="https://proton.me/support/calendar-search">Saber-ne més</a></string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
     <string name="spotlight_dialog_import_description">• Importa esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>

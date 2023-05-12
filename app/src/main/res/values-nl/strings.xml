@@ -159,8 +159,8 @@
     <string name="search_settings_dialog_toggle_off_text">U zult uw agenda\'s opnieuw moeten downloaden als u wilt zoeken.</string>
     <string name="search_settings_dialog_toggle_on_title">Agenda\'s downloaden naar dit apparaat?</string>
     <string name="search_settings_dialog_toggle_on_text">Dit is vereist zodat u kan zoeken.</string>
-    <string name="search_onboarding_header">Op zoek naar iets in uw agenda?</string>
-    <string name="search_onboarding_text">Om uw agenda\'s te kunnen doorzoeken, moet u eerst een lokaal versleutelde kopie downloaden van uw agenda\'s. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
+    <string name="search_onboarding_header">Wilt u uw agenda doorzoeken?</string>
+    <string name="search_onboarding_text">Eerst moet u een versleutelde kopie van uw agenda\'s downloaden. Dit duurt maar even en u kunt de app blijven gebruiken. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
     <string name="search_onboarding_action_download_calendars">Agenda\'s downloaden</string>
     <string name="search_onboarding_action_pause">Onderbreken</string>
     <string name="search_onboarding_action_resume">Hervatten</string>
@@ -509,8 +509,8 @@
     <string name="spotlight_v5_dialog_rebranding_description">Maak kennis met Proton\'s vernieuwde look. Veel diensten, één missie. Welkom op een internet waar privacy de standaard is. <a href="https://proton.me/news/updated-proton">Meer leren</a></string>
     <string name="spotlight_dialog_week_view_title">Meer weergaveopties</string>
     <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b>- en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
-    <string name="spotlight_dialog_search_title" comment="It implies that user will be able to search seamlessly through his calendars for events. This is the title of the dialog containing the following description: spotlight_dialog_search_description">Naadloos doorzoeken</string>
-    <string name="spotlight_dialog_search_description">U kunt nu zoeken in uw agenda naar afspraken. Hiervoor wordt een versleutelde kopie van uw agenda gedownload op uw apparaat. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
+    <string name="spotlight_dialog_search_title">Zoek naar afspraken</string>
+    <string name="spotlight_dialog_search_description">Vind eenvoudig de afspraak waar u naar opzoek bent met onze nieuwe zoekfunctie/ <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
     <string name="spotlight_dialog_import_title">Meer manieren om afspraken toe te voegen</string>
     <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
