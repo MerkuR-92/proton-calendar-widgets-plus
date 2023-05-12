@@ -177,9 +177,11 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 // Use random color from array as calendar color
                 val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
+                val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings
                 holidayCalendarViewModel.initCreateHolidayCalendar(
                     calendarColors[(0..calendarColors.lastIndex).random()],
-                    requireContext().resources.configuration.currentLocale().language.lowercase()
+                    requireContext().resources.configuration.currentLocale().language.lowercase(),
+                    returnToSettings
                 )
             }
         }
@@ -338,7 +340,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         // Country
         holiday_calendar_form_country_value_press.setOnSingleClickListener {
-            findNavController().navigate(R.id.action_nav_holiday_calendar_form_to_nav_holiday_calendar_search)
+            if (!holidayCalendarViewModel.holidayCalendars.value.isNullOrEmpty()) {
+                findNavController().navigate(R.id.action_nav_holiday_calendar_form_to_nav_holiday_calendar_search)
+            }
         }
 
         // Calendar language

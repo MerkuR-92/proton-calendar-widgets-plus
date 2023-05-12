@@ -117,14 +117,14 @@ class HolidayCalendarViewModel @Inject constructor(
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in HolidayCalendarViewModel initUpdateHolidayCalendar")
-            displayInitErrorSnack()
+            displayInitErrorSnack(true)
             return
         }
         _userId.value = userId
 
         val calendar = calendarsRepository.selectCalendar(calendarId) ?: run {
             logger.e("Calendar was null in initUpdateHolidayCalendar")
-            displayInitErrorSnack()
+            displayInitErrorSnack(true)
             return
         }
 
@@ -136,7 +136,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
             val managedHolidayCalendar = holidayCalendars.firstOrNull { it.calendarId == calendarId } ?: run {
                 logger.e("ManagedHolidayCalendar was null in initUpdateHolidayCalendar")
-                displayInitErrorSnack()
+                displayInitErrorSnack(true)
                 return
             }
 
@@ -153,12 +153,12 @@ class HolidayCalendarViewModel @Inject constructor(
             setDefaultAlarms(calendar.defaultFullDayNotifications)
         } ?: run {
             logger.e("ManagedHolidayCalendars were null in initUpdateHolidayCalendar")
-            displayInitErrorSnack()
+            displayInitErrorSnack(true)
             return
         }
     }
 
-    suspend fun initCreateHolidayCalendar(calendarColor: Int, defaultLanguageCode: String) {
+    suspend fun initCreateHolidayCalendar(calendarColor: Int, defaultLanguageCode: String, returnToSettings: Boolean) {
 
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
@@ -168,7 +168,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
         val userId = accountManager.getPrimaryUserId().firstOrNull() ?: run {
             logger.e("UserId was null in HolidayCalendarViewModel initCreateHolidayCalendar")
-            displayInitErrorSnack()
+            displayInitErrorSnack(returnToSettings)
             return
         }
         _userId.value = userId
@@ -177,6 +177,12 @@ class HolidayCalendarViewModel @Inject constructor(
 
         // Init managed holiday calendars with DB data
         getManagedHolidayCalendars()?.let { holidayCalendars ->
+            if (holidayCalendars.isEmpty()) {
+                logger.e("ManagedHolidayCalendars were empty in HolidayCalendarViewModel initCreateHolidayCalendar")
+                displayInitErrorSnack(returnToSettings)
+                return
+            }
+
             _holidayCalendars.value = holidayCalendars
 
             // Get calendars matching the default time zone
@@ -202,16 +208,22 @@ class HolidayCalendarViewModel @Inject constructor(
             _language.value = matchingDefaultHolidayCalendar?.language ?: ""
         } ?: run {
             logger.e("ManagedHolidayCalendars were null in HolidayCalendarViewModel initCreateHolidayCalendar")
-            displayInitErrorSnack()
+            displayInitErrorSnack(returnToSettings)
             return
         }
     }
 
-    private fun displayInitErrorSnack() {
-        // Use settings snack state here to display snack in calendar settings view
-        calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
-            resourceProvider.provideString(R.string.snack_holiday_calendar_init_error)
-        )
+    private fun displayInitErrorSnack(returnToSettings: Boolean) {
+        if (returnToSettings) {
+            // Use settings snack state here to display snack in calendar settings view
+            calendarSettingsSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_holiday_calendar_init_error)
+            )
+        } else {
+            holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnackNavigateUp(
+                resourceProvider.provideString(R.string.snack_holiday_calendar_init_error)
+            )
+        }
     }
 
     fun getLanguages(): List<String> {
