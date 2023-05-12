@@ -462,6 +462,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 CLEAR_CALENDAR &&
                         calendar.isSubscribed.not() &&
                         calendar.isSharedWithMe.not() &&
+                        calendar.isHolidayCalendar.not() &&
                         calendar.isActive
             )
 
@@ -471,7 +472,8 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 calendar.id != defaultCalendarId &&
                         calendar.isActive &&
                         calendar.isSubscribed.not() &&
-                        calendar.isSharedWithMe.not()
+                        calendar.isSharedWithMe.not() &&
+                        calendar.isHolidayCalendar.not()
             )
 
             bottomSheetDialog.show()
