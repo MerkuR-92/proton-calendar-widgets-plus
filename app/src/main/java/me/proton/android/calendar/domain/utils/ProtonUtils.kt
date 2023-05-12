@@ -12,6 +12,8 @@ interface ProtonUtils {
     fun isShortDomainAddress(email: String): Boolean
     fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener)
     fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
+    fun Context.displayFreeUserMandatoryPersonalCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
+    fun Context.displayPaidUserMandatoryPersonalCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun getCachedMonthViewsTimeWindow(selectedDate: LocalDate, weekStart: Int): Pair<LocalDate, LocalDate>
 }

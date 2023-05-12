@@ -148,7 +148,9 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.HandleIcsResult.Error
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -1229,9 +1231,25 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         drawer_layout.close()
                     }
                 }
+                CalendarViewModel.CalendarLimit.FREE_MANDATORY_PERSONAL_REACHED -> {
+                    // Display mandatory personal calendar limit reached for free user dialog
+                    this@MainActivity.displayFreeUserMandatoryPersonalCalendarLimitReached() { _, _ ->
+                        // Open calendar settings view
+                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                        drawer_layout.close()
+                    }
+                }
                 CalendarViewModel.CalendarLimit.PAID_REACHED -> {
                     // Display limit reached for paid user dialog
                     this@MainActivity.displayPaidUserCalendarLimitReached() { _, _ ->
+                        // Open calendar settings view
+                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                        drawer_layout.close()
+                    }
+                }
+                CalendarViewModel.CalendarLimit.PAID_MANDATORY_PERSONAL_REACHED -> {
+                    // Display mandatory personal calendar limit reached for paid user dialog
+                    this@MainActivity.displayPaidUserMandatoryPersonalCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
                         navController.navigate(R.id.action_nav_calendar_to_nav_settings)
                         drawer_layout.close()

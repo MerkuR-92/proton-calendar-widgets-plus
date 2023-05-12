@@ -899,7 +899,9 @@ class CalendarViewModel @Inject constructor(
         ERROR,
         NOT_REACHED,
         FREE_REACHED,
-        PAID_REACHED
+        FREE_MANDATORY_PERSONAL_REACHED,
+        PAID_REACHED,
+        PAID_MANDATORY_PERSONAL_REACHED
     }
 
     suspend fun getCalendarsCount(): Int {
@@ -923,12 +925,16 @@ class CalendarViewModel @Inject constructor(
                     calendarsCount >= (if (isFreeUser) MAX_CALENDAR_FREE else MAX_CALENDAR_PAID) - 1
 
         // Check free user limit
-        if (isFreeUser && (calendarsCount >= MAX_CALENDAR_FREE || blockForMandatoryPersonalCalendar)) {
+        if (isFreeUser && calendarsCount >= MAX_CALENDAR_FREE) {
             return CalendarLimit.FREE_REACHED
+        } else if (isFreeUser && blockForMandatoryPersonalCalendar) {
+            return CalendarLimit.FREE_MANDATORY_PERSONAL_REACHED
         }
         // Check paid user limit
-        if (!isFreeUser && (calendarsCount >= MAX_CALENDAR_PAID || blockForMandatoryPersonalCalendar)) {
+        if (!isFreeUser && calendarsCount >= MAX_CALENDAR_PAID) {
             return CalendarLimit.PAID_REACHED
+        } else if (!isFreeUser && blockForMandatoryPersonalCalendar) {
+            return CalendarLimit.PAID_MANDATORY_PERSONAL_REACHED
         }
         return CalendarLimit.NOT_REACHED
     }

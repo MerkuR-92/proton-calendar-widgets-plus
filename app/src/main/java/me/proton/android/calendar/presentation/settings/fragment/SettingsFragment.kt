@@ -47,7 +47,9 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
@@ -554,9 +556,17 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                     // Display limit reached for free user dialog
                     requireContext().displayFreeUserCalendarLimitReached()
                 }
+                CalendarViewModel.CalendarLimit.FREE_MANDATORY_PERSONAL_REACHED -> {
+                    // Display mandatory personal calendar limit reached for free user dialog
+                    requireContext().displayFreeUserMandatoryPersonalCalendarLimitReached()
+                }
                 CalendarViewModel.CalendarLimit.PAID_REACHED -> {
                     // Display limit reached for paid user dialog
                     requireContext().displayPaidUserCalendarLimitReached()
+                }
+                CalendarViewModel.CalendarLimit.PAID_MANDATORY_PERSONAL_REACHED -> {
+                    // Display mandatory personal calendar limit reached for paid user dialog
+                    requireContext().displayPaidUserMandatoryPersonalCalendarLimitReached()
                 }
             }
         }
