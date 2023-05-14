@@ -143,9 +143,9 @@
     <string name="event_text_attendees_none">Ingen</string>
     <string name="event_text_calendar">Kalender</string>
     <string name="event_text_timezone_start">Tidszon</string>
-    <string name="invite_in_shared_calendar_disclaimer">Sending invitations is available only within personal calendars.</string>
-    <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
-    <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
+    <string name="invite_in_shared_calendar_disclaimer">Att skicka inbjudningar är endast tillgängligt inom personliga kalendrar.</string>
+    <string name="invite_change_calendar_disclaimer">Det är inte möjligt att ändra kalendern associerad med inbjudningar.</string>
+    <string name="change_calendar_recurring_disclaimer">Ändra kalender för återkommande händelse är ännu inte möjligt.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Vad letar du efter?</string>
     <string name="search_empty_results_title">Inga resultat hittades</string>
@@ -160,7 +160,7 @@
     <string name="search_settings_dialog_toggle_on_title">Ladda ner kalendrar till denna enhet?</string>
     <string name="search_settings_dialog_toggle_on_text">Detta är obligatoriskt så att du kan söka.</string>
     <string name="search_onboarding_header">Vill du söka i din kalender?</string>
-    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_onboarding_text">Först måste du ladda ner en krypterad kopia av dina kalendrar. Detta tar bara ett ögonblick och du kan fortsätta använda appen. <a href="https://proton.me/support/calendar-search">Lär dig mer</a></string>
     <string name="search_onboarding_action_download_calendars">Ladda ner kalendrar</string>
     <string name="search_onboarding_action_pause">Pausa</string>
     <string name="search_onboarding_action_resume">Återuppta</string>

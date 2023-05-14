@@ -398,7 +398,7 @@
     <string name="settings_week_start_title">Пачатак тыдня</string>
     <string name="settings_time_format_title">Фармат часу</string>
     <string name="settings_week_numbers_title">Паказваць нумары тыдняў</string>
-    <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнне, што чакае разгляду</string>
+    <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнні, што чакаюць разгляду</string>
     <string name="settings_search_title">Пошук календароў</string>
     <string name="settings_search_subtitle">Спампоўвае і захоўвае змесціва календара на вашай прыладзе для пошуку. Адключэнне гэтага параметра прывядзе да выдалення спампаванага змесціва.</string>
     <string name="settings_alternative_routing_title">Дазваляць альтэрнатыўную маршрутызацыю</string>
