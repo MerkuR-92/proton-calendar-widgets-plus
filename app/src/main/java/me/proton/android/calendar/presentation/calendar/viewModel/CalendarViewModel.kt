@@ -48,7 +48,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
@@ -912,7 +911,7 @@ class CalendarViewModel @Inject constructor(
         return getUserPersonalCalendars()?.count() ?: 0
     }
 
-    suspend fun isCalendarLimitReached(calendarType: CalendarType): CalendarLimit {
+    suspend fun isCalendarLimitReached(calendarType: Calendar.CalendarType): CalendarLimit {
         val calendarsCount = getCalendarsCount()
         val personalCalendarsCounts = getPersonalCalendarsCount()
 
@@ -921,7 +920,7 @@ class CalendarViewModel @Inject constructor(
         // User can't have only subscribed / shared / holiday calendars.
         val blockForMandatoryPersonalCalendar =
             personalCalendarsCounts == 0 &&
-                    calendarType == CalendarType.HOLIDAY &&
+                    calendarType == Calendar.CalendarType.HOLIDAY &&
                     calendarsCount >= (if (isFreeUser) MAX_CALENDAR_FREE else MAX_CALENDAR_PAID) - 1
 
         // Check free user limit

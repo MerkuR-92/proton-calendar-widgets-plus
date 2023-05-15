@@ -39,7 +39,7 @@ data class Calendar(
                 )
         }
 
-        //Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
+        // Functions to check all three states because it can be disabled but not inactive, or inactive but not disabled
         val isActive: Boolean get() = !isDisabled && !isInactive && (flags and 1 == 1)
         val isInactive: Boolean get() = (flags and (0 + 2 + 4 + 8 + 16) >= 1)
         val isDisabled: Boolean get() = !isInactive && (flags and (32 + 64) >= 1)
@@ -54,5 +54,12 @@ data class Calendar(
 
         val isOwner: Boolean get() = permissions and 2 == 2
         val allowEditEvents: Boolean get() = permissions and 16 == 16
+
+        enum class CalendarType(val value: Int) {
+            NORMAL(0),
+            SUBSCRIBED(1),
+            HOLIDAY(2)
+        }
+
 }
-    // TODO fields need to be duplicated here, plus local metadata added
+// TODO fields need to be duplicated here, plus local metadata added

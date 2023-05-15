@@ -112,7 +112,6 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.ACTION
 import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
-import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
@@ -1202,7 +1201,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
     }
 
-    private fun onClickCreateCalendar(calendarType: CalendarType) {
+    private fun onClickCreateCalendar(calendarType: Calendar.CalendarType) {
         lifecycleScope.launch {
             // Check if calendar limit was reached
             when (calendarViewModel.isCalendarLimitReached(calendarType)) {
@@ -1212,15 +1211,15 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 CalendarViewModel.CalendarLimit.NOT_REACHED -> {
                     // If limit has not been reached, open calendar form
                     when (calendarType) {
-                        CalendarType.NORMAL -> {
+                        Calendar.CalendarType.NORMAL -> {
                             navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
                             drawer_layout.close()
                         }
-                        CalendarType.HOLIDAY -> {
+                        Calendar.CalendarType.HOLIDAY -> {
                             navController.navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
                             drawer_layout.close()
                         }
-                        CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
+                        Calendar.CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
                     }
                 }
                 CalendarViewModel.CalendarLimit.FREE_REACHED -> {
@@ -1281,14 +1280,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
 
         createCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.NORMAL)
+            onClickCreateCalendar(Calendar.CalendarType.NORMAL)
             bottomSheetDialog.dismiss()
         }
 
         val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
         addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
         addHolidayCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.HOLIDAY)
+            onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
         }
 

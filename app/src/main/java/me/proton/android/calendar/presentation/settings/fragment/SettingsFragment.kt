@@ -35,7 +35,6 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.CalendarType
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
@@ -504,14 +503,14 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         val importFromGooglePress = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_import_press)
 
         createCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.NORMAL)
+            onClickCreateCalendar(Calendar.CalendarType.NORMAL)
             bottomSheetDialog.dismiss()
         }
 
         val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
         addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
         addHolidayCalendarPress?.setOnSingleClickListener {
-            onClickCreateCalendar(CalendarType.HOLIDAY)
+            onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
         }
 
@@ -537,7 +536,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
-    private fun onClickCreateCalendar(calendarType: CalendarType) {
+    private fun onClickCreateCalendar(calendarType: Calendar.CalendarType) {
         lifecycleScope.launch {
             // Check if calendar limit was reached
             when (calendarViewModel.isCalendarLimitReached(calendarType)) {
@@ -547,9 +546,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 CalendarViewModel.CalendarLimit.NOT_REACHED -> {
                     // If limit has not been reached, open calendar form
                     when (calendarType) {
-                        CalendarType.NORMAL -> findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
-                        CalendarType.HOLIDAY -> findNavController().navigate(R.id.action_nav_settings_to_nav_holiday_calendar_form)
-                        CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
+                        Calendar.CalendarType.NORMAL -> findNavController().navigate(R.id.action_nav_settings_to_nav_calendar_form)
+                        Calendar.CalendarType.HOLIDAY -> findNavController().navigate(R.id.action_nav_settings_to_nav_holiday_calendar_form)
+                        Calendar.CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
                     }
                 }
                 CalendarViewModel.CalendarLimit.FREE_REACHED -> {
