@@ -594,6 +594,6 @@ class HolidayCalendarViewModel @Inject constructor(
             )
             .build()
 
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_CACHED_VIEWS_EVENTS, ExistingWorkPolicy.REPLACE, work).state
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_CACHED_VIEWS_EVENTS, ExistingWorkPolicy.APPEND, work).state
     }
 }
