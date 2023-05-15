@@ -82,7 +82,14 @@ class SettingsCalendarListAdapter(
 
             // Calendar email
             calendarItemSubtitle.visibleOrGone(calendar.email.isNotEmpty())
-            calendarItemSubtitle.text = calendar.email
+            calendarItemSubtitle.text =
+                if (!calendar.allowEditEvents) {
+                    itemView.context.getString(
+                        R.string.settings_other_calendars_subtitle,
+                        itemView.context.getString(R.string.settings_other_calendars_read_only),
+                        calendar.email
+                    )
+                } else calendar.email
 
             // Set colored calendar dot tint
             calendarItemIcon.imageTintList = ColorStateList.valueOf(Color.parseColor(calendar.color))
@@ -118,7 +125,7 @@ class SettingsCalendarListAdapter(
                         itemView.context.getString(
                             if (calendarSubscription.lastUpdateTime == 0 ||
                                 (calendarSubscription.status == CalendarSubscriptionStatus.SYNCING.value && calendarSubscription.isLastSyncOld.not()))
-                                    R.string.settings_calendar_syncing
+                                R.string.settings_calendar_syncing
                             else R.string.settings_calendar_not_synced
                         ),
                         itemView.context.getColor(R.color.notification_warning)
@@ -162,7 +169,8 @@ class SettingsCalendarListAdapter(
 
             val calendarSettingsCanBeEdited = (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
                     calendar.isSubscribed || // subscribed calendar
-                    (calendar.isSharedWithMe && FeatureFlag.EDITING_SHARED_CALENDARS) // shared calendar
+                    (calendar.isSharedWithMe && FeatureFlag.EDITING_SHARED_CALENDARS) || // shared calendar
+                    (calendar.isHolidayCalendar && FeatureFlag.HOLIDAY_CALENDAR)
 
             // Only show menu icon when calendar can be edited
             calendarItemMenuIcon.visibleOrGone(calendarSettingsCanBeEdited)

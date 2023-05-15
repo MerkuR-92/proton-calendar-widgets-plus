@@ -122,6 +122,36 @@
             android:layout_marginStart="16dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/settings_calendars_title_add"/>
+
+        <TextView
+            android:id="@+id/settings_calendars_subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:text="@string/settings_calendars_empty"
+            style="@style/Text.Caption.Weak"
+            app:layout_constraintTop_toBottomOf="@+id/settings_calendars_title"
+            app:layout_constraintStart_toStartOf="@+id/settings_calendars_title"
+            app:layout_constraintEnd_toEndOf="@+id/settings_calendars_title"/>
+
+        <TextView
+            android:id="@+id/settings_calendars_title_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_calendar_button"
+            style="@style/Text.Caption"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/ripple_background_add_calendar"
+            app:layout_constraintTop_toTopOf="@+id/settings_calendars_title"
+            app:layout_constraintBottom_toBottomOf="@+id/settings_calendars_subtitle"
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -135,80 +165,29 @@
             android:overScrollMode="never"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings_calendars_title"/>
+            app:layout_constraintTop_toBottomOf="@+id/settings_calendars_subtitle"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/settings_calendars_list_add_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:visibility="visible"
+        <View
+            android:id="@+id/settings_calendars_separator"
+            style="@style/Separator"
+            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@+id/settings_calendars_list"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <include
-                android:id="@+id/settings_calendars_list_add_layout_press"
-                layout="@layout/view_press_overlay"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/settings_calendars_list_add_layout_separator"/>
-
-            <ImageView
-                android:id="@+id/settings_calendars_list_add_layout_icon"
-                style="@style/Icon.Form"
-                app:srcCompat="@drawable/ic_proton_plus"
-                app:layout_constraintBottom_toBottomOf="@+id/settings_calendars_list_add_layout_title"
-                app:layout_constraintTop_toTopOf="@+id/settings_calendars_list_add_layout_title"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <TextView
-                android:id="@+id/settings_calendars_list_add_layout_title"
-                style="@style/Text.Default"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/default_margin_text_start"
-                android:layout_marginEnd="@dimen/spacing_page"
-                android:layout_marginTop="@dimen/spacing_page"
-                android:text="@string/add_calendar_text"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/settings_calendars_list_add_layout_separator"
-                style="@style/Separator"
-                android:visibility="invisible"
-                android:layout_marginTop="@dimen/spacing_page"
-                app:layout_constraintTop_toBottomOf="@+id/settings_calendars_list_add_layout_title"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintEnd_toEndOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/settings_calendars_separator"
-        style="@style/Separator"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/settings_calendars"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/settings_subscribed_calendars"
+        android:id="@+id/settings_other_calendars"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/settings_calendars_separator">
+        app:layout_constraintTop_toBottomOf="@+id/settings_calendars">
 
         <TextView
-            android:id="@+id/settings_subscribed_calendars_title"
+            android:id="@+id/settings_other_calendars_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/settings_subscribed_calendars"
+            android:text="@string/settings_other_calendars"
             style="@style/Text.DefaultSmall.Strong.Brand"
             android:layout_marginTop="24dp"
             android:layout_marginStart="16dp"
@@ -216,18 +195,38 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <TextView
+            android:id="@+id/settings_other_calendars_title_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_calendar_button"
+            android:visibility="gone"
+            tools:visibility="visible"
+            style="@style/Text.Caption"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/ripple_background_add_calendar"
+            app:layout_constraintTop_toTopOf="@+id/settings_other_calendars_title"
+            app:layout_constraintBottom_toBottomOf="@+id/settings_other_calendars_title"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/settings_subscribed_calendars_list"
+            android:id="@+id/settings_other_calendars_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false"
             android:layout_marginTop="8dp"
-            tools:listitem="@layout/item_settings_calendar"
-            tools:itemCount="3"
+            android:nestedScrollingEnabled="false"
             android:overScrollMode="never"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/settings_subscribed_calendars_title"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/settings_other_calendars_title"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_settings_calendar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -65,6 +66,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
@@ -396,6 +398,18 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json)
     }
 
+    override suspend fun selectUserPersonalCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectUserCalendars(userId).joinToCalendars(database, json).filter {
+            it.isOwner
+        }
+    }
+
+    override suspend fun selectOtherCalendars(userId: String): List<Calendar> {
+        return database.calendarsDao().selectCalendars(userId).joinToCalendars(database, json).filter {
+            !it.isOwner
+        }
+    }
+
     override suspend fun selectAllCalendars(userId: String): List<Calendar> {
         return database.calendarsDao().selectCalendars(userId).joinToCalendars(database, json)
     }
@@ -432,8 +446,24 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
+    override fun flowUserPersonalCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).map { userCalendars ->
+            userCalendars.filter { it.isOwner }
+        }.distinctUntilChanged()
+    }
+
+    override fun flowSharedCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).map { userCalendars ->
+            userCalendars.filter { !it.isOwner }
+        }.distinctUntilChanged()
+    }
+
     override fun flowSubscribedCalendars(userId: String): Flow<List<Calendar>> {
         return database.calendarsDao().flowSubscribedCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
+    }
+
+    override fun flowHolidayCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowHolidayCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }
 
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
@@ -519,6 +549,21 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
         calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar
+
+    override suspend fun fetchManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
+        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+
+    override suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
+        database.managedHolidayCalendarDao().selectAll()
+
+    override suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
+        database.managedHolidayCalendarDao().selectById(calendarId)
+
+    override suspend fun initManagedHolidayCalendars(userId: UserId) {
+        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars?.forEach {
+            database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))
+        }
+    }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
         val member = selectMembers(calendarId).firstOrNull()

@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -158,6 +159,22 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getCalendarSettings(
         @Path("calendarId") calendarId: String
     ) : GetCalendarSettingsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/directory?Type=2") // The type ensures that only holiday calendars are returned.
+    suspend fun getManagedHolidayCalendars() : GetHolidayCalendarsApiResponse
+
+    @POST("calendar/$API_VERSION_CALENDAR/{calendarId}/invitations/{addressId}/join")
+    suspend fun joinCalendar(
+        @Path("calendarId") calendarId: String,
+        @Path("addressId") addressId: String,
+        @Body body: JoinCalendarApiRequest
+    ) : JoinCalendarApiResponse
+
+    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
+    suspend fun leaveCalendar(
+        @Path("calendarId") calendarId: String,
+        @Path("memberId") memberId: String
+    ) : StatusCodeApiResponse
 }
 
 class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider) : CalendarsApi {
@@ -261,8 +278,8 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         eventId: String,
         body: UpgradeEventApiRequest
     ): ApiResponse<UpgradeEventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-            upgradeEvent(calendarId, eventId, body)
-        }.toApiResponse()
+        upgradeEvent(calendarId, eventId, body)
+    }.toApiResponse()
 
     override suspend fun getBootstrap(userId: UserId, calendarId: String): ApiResponse<BootstrapApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
@@ -393,6 +410,29 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         calendarId: String
     ): ApiResponse<GetCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getCalendarSettings(calendarId)
+    }.toApiResponse()
+
+    override suspend fun getManagedHolidayCalendars(
+        userId: UserId
+    ): ApiResponse<GetHolidayCalendarsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getManagedHolidayCalendars()
+    }.toApiResponse()
+
+    override suspend fun joinCalendar(
+        userId: UserId,
+        calendarId: String,
+        addressId: String,
+        body: JoinCalendarApiRequest
+    ): ApiResponse<JoinCalendarApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        joinCalendar(calendarId, addressId, body)
+    }.toApiResponse()
+
+    override suspend fun leaveCalendar(
+        userId: UserId,
+        calendarId: String,
+        memberId: String
+    ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        leaveCalendar(calendarId, memberId)
     }.toApiResponse()
 }
 
@@ -772,3 +812,34 @@ data class RecreateCalendarApiResponse(
     val calendar: CalendarEntity
 )
 
+@Serializable
+data class GetHolidayCalendarsApiResponse(
+    @SerialName("Calendars")
+    val calendars: List<ManagedHolidayCalendarEntity>
+)
+
+@Serializable
+data class JoinCalendarApiRequest(
+    @SerialName("Signature")
+    val signature: String,
+    @SerialName("PassphraseKeyPacket")
+    val passphraseKeyPacket: String,
+    @SerialName("Color")
+    val color: String,
+    @SerialName("DefaultFullDayNotifications")
+    val defaultFullDayNotifications: List<NotificationEntity>? = null
+)
+
+@Serializable
+data class JoinCalendarApiResponse(
+    @SerialName("Calendar")
+    val calendar: CalendarEntity,
+    @SerialName("Keys")
+    val keys: List<CalendarKeyEntity>,
+    @SerialName("Passphrase")
+    val passphrase: PassphraseEntity,
+    @SerialName("Members")
+    val members: List<MemberEntity>,
+    @SerialName("CalendarSettings")
+    val calendarSettings: CalendarSettingsEntity, // settings specific to calendar, not user
+)

@@ -80,6 +80,8 @@ const val SEARCH_MIN_QUERY_LENGTH = 2
 const val SEARCH_QUERY_DEBOUNCE_MS = 500L
 const val SEARCH_RESULTS_RANGE = 500
 
+const val HOLIDAY_SEARCH_MIN_QUERY_LENGTH = 2
+
 const val RC_CREATE_IMPORT_SIGN_IN = 11
 
 const val DAY_VIEW_DAYS_COUNT = 1
@@ -136,6 +138,7 @@ object FeatureFlag {
     const val CLEAR_CALENDAR = false
     const val IMPORT_ICS = true
     const val SHOW_EVENT_SEARCH = true
+    const val HOLIDAY_CALENDAR = false
 }
 
 object HttpResponseCode {
@@ -349,7 +352,7 @@ object FragmentArguments {
     // All day value for alarm form (show different views when part or all day)
     const val IS_ALL_DAY_ARG = "isAllDay"
     // Boolean to know whether we open the alarm form to create calendar or event alarms
-    const val IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG = "isCalendarDefaultEventNotification"
+    const val DEFAULT_NOTIFICATIONS_TYPE_ARG = "defaultNotificationsType"
 }
 
 object CustomICalPropertyParameter {

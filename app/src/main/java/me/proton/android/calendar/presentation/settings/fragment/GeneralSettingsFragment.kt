@@ -392,9 +392,6 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             settings_update_timezone_switch.isChecked = autoDetectPrimaryTimezone
             settings_update_timezone_switch.jumpDrawablesToCurrentState()
         }
-
-        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
-        }
     }
 
     private fun displayNetworkError() {

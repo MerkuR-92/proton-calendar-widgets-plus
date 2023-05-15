@@ -26,6 +26,9 @@
             android:id="@+id/action_nav_calendar_to_nav_calendar_form"
             app:destination="@id/nav_calendar_form" />
         <action
+            android:id="@+id/action_nav_calendar_to_nav_holiday_calendar_form"
+            app:destination="@id/nav_holiday_calendar_form" />
+        <action
             android:id="@+id/action_nav_calendar_to_nav_import_assistant"
             app:destination="@id/nav_import_assistant" />
         <action
@@ -58,6 +61,9 @@
         <action
             android:id="@+id/action_nav_settings_to_nav_calendar_form"
             app:destination="@id/nav_calendar_form" />
+        <action
+            android:id="@+id/action_nav_settings_to_nav_holiday_calendar_form"
+            app:destination="@id/nav_holiday_calendar_form" />
         <action
             android:id="@+id/action_nav_settings_to_nav_import_assistant_guide"
             app:destination="@id/nav_import_assistant_guide" />
@@ -128,6 +134,34 @@
         <action
             android:id="@+id/action_nav_calendar_form_to_nav_settings"
             app:destination="@id/nav_settings" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_holiday_calendar_search"
+        android:name="me.proton.android.calendar.presentation.holidayCalendar.fragment.HolidayCalendarSearchFragment"
+        android:label=""
+        tools:layout="@layout/fragment_holiday_calendar_search">
+        <action
+            android:id="@+id/action_nav_holiday_calendar_search_to_nav_holiday_calendar_form"
+            app:destination="@id/nav_holiday_calendar_form" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_holiday_calendar_form"
+        android:name="me.proton.android.calendar.presentation.holidayCalendar.fragment.HolidayCalendarFormFragment"
+        android:label=""
+        tools:layout="@layout/fragment_holiday_calendar_form">
+        <argument
+            android:name="calendarId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_nav_holiday_calendar_form_to_nav_settings"
+            app:destination="@id/nav_settings" />
+        <action
+            android:id="@+id/action_nav_holiday_calendar_form_to_nav_holiday_calendar_search"
+            app:destination="@id/nav_holiday_calendar_search" />
     </dialog>
 
     <dialog
@@ -252,9 +286,9 @@
             app:argType="boolean"
             android:defaultValue="false" />
         <argument
-            android:name="isCalendarDefaultEventNotification"
-            app:argType="boolean"
-            android:defaultValue="false" />
+            android:name="defaultNotificationsType"
+            app:argType="integer"
+            android:defaultValue="0" />
     </dialog>
     <dialog
         android:id="@+id/nav_event_form_recurrence"

@@ -63,7 +63,9 @@ object ProtonUtilsImpl : ProtonUtils {
             .show()
     }
 
-    override fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener?) {
+    override fun Context.displayFreeUserCalendarLimitReached(
+        manageCalendarsCallback: DialogInterface.OnClickListener?
+    ) {
         // Display limit reached for free user dialog
         val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.create_calendar_limit_reached_title)
@@ -76,11 +78,43 @@ object ProtonUtilsImpl : ProtonUtils {
         materialAlertDialogBuilder.show()
     }
 
-    override fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener?) {
+    override fun Context.displayFreeUserMandatoryPersonalCalendarLimitReached(
+        manageCalendarsCallback: DialogInterface.OnClickListener?
+    ) {
+        // Display limit reached for free user dialog
+        val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_calendar_limit_reached_title)
+            .setMessage(R.string.create_mandatory_personal_calendar_limit_reached_free_description)
+            .setNegativeButton(R.string.dialog_button_cancel) { _, _ -> }
+        if (manageCalendarsCallback != null) {
+            materialAlertDialogBuilder
+                .setPositiveButton(R.string.create_calendar_limit_reached_manage, manageCalendarsCallback)
+        }
+        materialAlertDialogBuilder.show()
+    }
+
+    override fun Context.displayPaidUserCalendarLimitReached(
+        manageCalendarsCallback: DialogInterface.OnClickListener?
+    ) {
         // Display limit reached for paid user dialog
         val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.create_calendar_limit_reached_title)
             .setMessage(R.string.create_calendar_limit_reached_paid_description)
+            .setNegativeButton(R.string.dialog_button_cancel) { _, _ -> }
+        if (manageCalendarsCallback != null) {
+            materialAlertDialogBuilder
+                .setPositiveButton(R.string.create_calendar_limit_reached_manage, manageCalendarsCallback)
+        }
+        materialAlertDialogBuilder.show()
+    }
+
+    override fun Context.displayPaidUserMandatoryPersonalCalendarLimitReached(
+        manageCalendarsCallback: DialogInterface.OnClickListener?
+    ) {
+        // Display limit reached for paid user dialog
+        val materialAlertDialogBuilder = MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.create_calendar_limit_reached_title)
+            .setMessage(R.string.create_mandatory_personal_calendar_limit_reached_paid_description)
             .setNegativeButton(R.string.dialog_button_cancel) { _, _ -> }
         if (manageCalendarsCallback != null) {
             materialAlertDialogBuilder

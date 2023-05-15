@@ -77,8 +77,8 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
+import me.proton.android.calendar.common.FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG
 import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
-import me.proton.android.calendar.common.FragmentArguments.IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
@@ -937,7 +937,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             eventViewModel.initialiseForAlarm()
             val bundle = Bundle().apply {
                 putBoolean(IS_ALL_DAY_ARG, eventViewModel.eventLiveData.value!!.isAllDay())
-                putBoolean(IS_CALENDAR_DEFAULT_EVENT_NOTIFICATION_ARG, false)
+                putInt(DEFAULT_NOTIFICATIONS_TYPE_ARG, EventFormAlarmFragment.DefaultNotificationsType.EVENT.value)
             }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }

@@ -25,9 +25,9 @@ class UpdateCalendarSettingsUseCase @Inject constructor(
     suspend fun updateCalendarSettings(
         userId: UserId,
         calendarId: String,
-        defaultEventDuration: Int?,
-        defaultPartDayNotifications: List<VAlarm>?,
-        defaultFullDayNotifications: List<VAlarm>?
+        defaultEventDuration: Int? = null,
+        defaultPartDayNotifications: List<VAlarm>? = null,
+        defaultFullDayNotifications: List<VAlarm>? = null
     ): UseCase.Result {
         val updateCalendarSettingsApiRequest = UpdateCalendarSettingsApiRequest(
             defaultEventDuration = defaultEventDuration,

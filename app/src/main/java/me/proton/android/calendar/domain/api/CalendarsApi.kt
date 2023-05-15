@@ -172,4 +172,28 @@ interface CalendarsApi {
      * Get calendar settings
      */
     suspend fun getCalendarSettings(userId: UserId, calendarId: String): ApiResponse<GetCalendarSettingsApiResponse>
+
+    /**
+     * Get holiday calendars
+     */
+    suspend fun getManagedHolidayCalendars(userId: UserId): ApiResponse<GetHolidayCalendarsApiResponse>
+
+    /**
+     * Join a shared calendar
+     */
+    suspend fun joinCalendar(
+        userId: UserId,
+        calendarId: String,
+        addressId: String,
+        body: JoinCalendarApiRequest
+    ): ApiResponse<JoinCalendarApiResponse>
+
+    /**
+     * Leave a shared calendar
+     */
+    suspend fun leaveCalendar(
+        userId: UserId,
+        calendarId: String,
+        memberId: String
+    ): ApiResponse<StatusCodeApiResponse>
 }
