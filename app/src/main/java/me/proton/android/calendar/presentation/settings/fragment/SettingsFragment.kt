@@ -35,9 +35,11 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
 import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
+import me.proton.android.calendar.common.FeatureFlag.EDITING_SHARED_CALENDARS
 import me.proton.android.calendar.common.FeatureFlag.HOLIDAY_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -450,13 +452,16 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         lifecycleScope.launch {
-            val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-            deleteLayout?.visibleOrGone(
-                (DELETE_CALENDAR &&
-                        calendar.isSubscribed.not()) ||
-                        (HOLIDAY_CALENDAR &&
-                                calendar.isHolidayCalendar)
+            val editLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_edit)
+            editLayout?.visibleOrGone(
+                (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
+                        calendar.isSubscribed || // subscribed calendar
+                        (calendar.isSharedWithMe && EDITING_SHARED_CALENDARS) || // shared calendar
+                        (calendar.isHolidayCalendar && HOLIDAY_CALENDAR) // holiday calendar
             )
+
+            val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
+            deleteLayout?.visibleOrGone(DELETE_CALENDAR)
 
             val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
             recreateLayout?.visibleOrGone(
