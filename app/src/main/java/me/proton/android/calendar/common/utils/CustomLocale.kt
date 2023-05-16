@@ -2,14 +2,11 @@ package me.proton.android.calendar.common.utils
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.preference.PreferenceManager
 import me.proton.android.calendar.common.AppTheme
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.logger.TimberLogger
 import java.util.Locale
 
 object CustomLocale {
@@ -49,7 +46,7 @@ object CustomLocale {
 
     fun apply(context: Context, localeCode: String?) {
         val localesToSet: LocaleListCompat = when {
-            !CHANGE_LANGUAGE -> LocaleListCompat.create(Locale("en", "US"))
+            !CalendarFeatureFlag.ChangeLanguage.defaultLocalValue -> LocaleListCompat.create(Locale("en", "US"))
             localeCode.isNullOrBlank() -> {
                 // If settings are in Auto Detect, use System language if supported, or fallback to en-US
                 PreferenceManager.getDefaultSharedPreferences(context).edit()

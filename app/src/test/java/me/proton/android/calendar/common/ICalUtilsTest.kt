@@ -22,6 +22,7 @@ import biweekly.util.Frequency
 import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
@@ -5148,10 +5149,10 @@ internal class ICalUtilsTest {
         val recurringEvent = EventMocks.provideEvent(isRecurring = true)
         val recurringInvitation = EventMocks.provideEvent(isRecurring = true, isAttendee = true, isOrganizer = true)
 
-        assertThat(isCalendarChangeAllowed(simpleEvent, simpleEvent)).isEqualTo(FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT)
+        assertThat(isCalendarChangeAllowed(simpleEvent, simpleEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.defaultLocalValue)
         assertThat(isCalendarChangeAllowed(simpleEvent, simpleInvitation)).isEqualTo(false)
 
-        assertThat(isCalendarChangeAllowed(simpleEvent, recurringEvent)).isEqualTo(FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT)
+        assertThat(isCalendarChangeAllowed(simpleEvent, recurringEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.defaultLocalValue)
         assertThat(isCalendarChangeAllowed(simpleEvent, recurringInvitation)).isEqualTo(false)
 
     }

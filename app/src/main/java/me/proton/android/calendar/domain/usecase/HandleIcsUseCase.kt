@@ -12,10 +12,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
@@ -73,7 +72,7 @@ class HandleIcsUseCase @Inject constructor(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         return if (iCalendar.method.isPublish || !isOpeningFromProtonMail) {
-            if (IMPORT_ICS) handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
+            if (CalendarFeatureFlag.ImportIcs.defaultLocalValue) handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
             else IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish
         } else {
             handleInviteIcs(iCalendar, userId, senderEmail, recipientEmail)
@@ -133,7 +132,7 @@ class HandleIcsUseCase @Inject constructor(
         var existingEvent: Event? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
-                val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)
@@ -300,7 +299,7 @@ class HandleIcsUseCase @Inject constructor(
             }
         }
         val parentEvent = if (parentEventEntity != null) {
-            if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptor.decrypt(parentEventEntity)
             } else {
                 transformEventUseCase.execute(parentEventEntity)
@@ -318,7 +317,7 @@ class HandleIcsUseCase @Inject constructor(
         var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
-                val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)

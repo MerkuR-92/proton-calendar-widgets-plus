@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.common.*
-import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
@@ -131,7 +131,7 @@ class MainViewModel @Inject constructor(
             SharedPreferencesKeys.VIEW_MODE,
             ViewMode.MONTH.value
         )]
-        return if (!MONTH_VIEW && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
+        return if (!CalendarFeatureFlag.MonthView.defaultLocalValue && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 
     fun setWeekViewHourHeight(newHourHeight: Float) {

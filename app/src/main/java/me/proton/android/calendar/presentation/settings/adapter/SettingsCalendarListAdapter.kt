@@ -20,10 +20,10 @@ import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_
 import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_subtitle
 import kotlinx.android.synthetic.main.item_settings_calendar.view.item_settings_calendar_title
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionStatus
 import me.proton.android.calendar.domain.model.Calendar
@@ -169,7 +169,7 @@ class SettingsCalendarListAdapter(
 
             val calendarSettingsCanBeEdited = (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
                     calendar.isSubscribed || // subscribed calendar
-                    (calendar.isSharedWithMe && FeatureFlag.EDITING_SHARED_CALENDARS) || // shared calendar
+                    (calendar.isSharedWithMe && CalendarFeatureFlag.EditingSharedCalendars.defaultLocalValue) || // shared calendar
                     calendar.isHolidayCalendar
 
             // Only show menu icon when calendar can be edited

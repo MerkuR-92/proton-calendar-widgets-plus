@@ -153,7 +153,7 @@ internal class HandleDeleteUseCaseTest {
 
         val event = provideEvent(isRecurring = isRecurring)
 
-        coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+        coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
             eventDecryptorMock.decrypt(any())
         } else {
             transformEventUseCaseMock.execute(any())
@@ -181,7 +181,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -217,7 +217,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -253,7 +253,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())

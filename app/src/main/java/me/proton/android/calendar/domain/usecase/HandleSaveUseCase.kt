@@ -5,8 +5,8 @@ import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
 import me.proton.android.calendar.common.EventDeletionReason
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.setRecurrenceId
@@ -32,7 +32,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class HandleSaveUseCase @Inject constructor(
@@ -76,7 +76,7 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id)
-        val dbEvent = eventEntity?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+        val dbEvent = eventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
             eventDecryptor.decrypt(it)
         } else {
             transformEventUseCase.execute(it)

@@ -120,7 +120,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
     fun editInviteErrorTest() { // TODO To remove once editing invite is allowed
         runBlocking {
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -174,7 +174,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event with hidden calendar
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -290,7 +290,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -411,7 +411,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -532,7 +532,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -765,7 +765,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -885,7 +885,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())

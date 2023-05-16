@@ -79,7 +79,6 @@ import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_lay
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_press
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_press
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_layout
 import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_press
@@ -113,16 +112,6 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.CALENDAR_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.APP_LINKS
-import me.proton.android.calendar.common.FeatureFlag.FEEDBACK
-import me.proton.android.calendar.common.FeatureFlag.HOLIDAY_CALENDAR
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
-import me.proton.android.calendar.common.FeatureFlag.MONTH_VIEW
-import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
-import me.proton.android.calendar.common.FeatureFlag.THREE_DAYS_VIEW
-import me.proton.android.calendar.common.FeatureFlag.WEEK_VIEW
 import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
@@ -140,6 +129,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -164,6 +154,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewMode
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
 import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
@@ -200,6 +191,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val accountSwitcherViewModel: AccountSwitcherViewModel by viewModels()
     private val plansViewModel: PlansViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by viewModels()
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var otherCalendarListAdapter: CalendarListAdapter
 
@@ -225,6 +217,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 calendarViewModel.shutdown()
 
             } else {
+                featureFlagViewModel.initRemoteFeatureFlagsToObserve(userId)
                 calendarViewModel.initForUser(userId).collect {
                     when (it) {
                         CalendarsRepository.InitingState.Initing -> {
@@ -530,6 +523,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val newEventIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_NEW_EVENT)
 
+                featureFlagViewModel.prefetchForCurrent()
+
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
                     logger.v("converting deeplink and navigating manually")
 
@@ -554,17 +549,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
-                    if (openIcsIntent != null && FeatureFlag.OPEN_INVITATION) {
+                    if (openIcsIntent != null && CalendarFeatureFlag.OpenInvitation.defaultLocalValue) {
                         handleIcsIntent(openIcsIntent)
-                    } else if (openIcsIntent == null && IMPORT_ICS || APP_LINKS || IMPORT_ASSISTANT) {
+                    } else if (openIcsIntent == null && CalendarFeatureFlag.ImportIcs.defaultLocalValue ||
+                        CalendarFeatureFlag.AppLinks.defaultLocalValue ||
+                        CalendarFeatureFlag.ImportAssistant.defaultLocalValue) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                         val actionEditOrInsertIntent =
                             mainViewModel.consumeIntent(Intent.ACTION_INSERT) ?:
                             mainViewModel.consumeIntent(Intent.ACTION_EDIT)
-                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && IMPORT_ICS) {
+                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.defaultLocalValue) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
-                        } else if (actionViewIntent != null && APP_LINKS) {
+                        } else if (actionViewIntent != null &&
+                            CalendarFeatureFlag.AppLinks.defaultLocalValue) {
                             // Handle app link
                             val appLinkData: Uri? = actionViewIntent.data
 
@@ -762,7 +760,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun handleOpenIcsIntent(uri: Uri, senderEmail: String?, recipientEmail: String?) {
 
-        if (!IMPORT_ICS && (senderEmail == null || recipientEmail == null)) {
+        if (!CalendarFeatureFlag.ImportIcs.defaultLocalValue &&
+            (senderEmail == null || recipientEmail == null)) {
             this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
             safeNavigateToMonth()
             return
@@ -827,7 +826,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         lifecycleScope.launch {
 
             val snackBar = displaySnackBar(getString(R.string.snack_opening_ics), Snackbar.LENGTH_INDEFINITE)
-            val handleIcsImportResult = mainViewModel.handleIcsFile(iCalString, senderEmail, recipientEmail)
+            val handleIcsImportResult = mainViewModel.handleIcsFile(
+                iCalString,
+                senderEmail,
+                recipientEmail
+            )
             if (handleIcsImportResult is IcsSurgeryUtils.HandleIcsResult.Success) {
                 snackBar.dismiss()
                 when (handleIcsImportResult.action) {
@@ -1069,20 +1072,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(FEEDBACK)
+        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(CalendarFeatureFlag.Feedback.defaultLocalValue)
         nav_view_main_content.nav_view_more_feedback_press.setOnSingleClickListener {
             showFeedbackDialog()
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(SUBSCRIPTION)
+        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(CalendarFeatureFlag.Subscription.defaultLocalValue)
         nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
             drawer_layout.close()
         }
 
-        // TODO Remove feature flag
-        nav_view_main_content.nav_view_more_settings_layout.visibleOrGone(FeatureFlag.SETTINGS_DRAWER)
         nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
             navController.navigate(R.id.action_nav_calendar_to_nav_settings)
             drawer_layout.close()
@@ -1117,14 +1118,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(FeatureFlag.THREE_DAYS_VIEW)
+        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(CalendarFeatureFlag.ThreeDaysView.defaultLocalValue)
         nav_view_switcher_three_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(FeatureFlag.WEEK_VIEW)
+        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(CalendarFeatureFlag.WeekView.defaultLocalValue)
         nav_view_switcher_week_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setLastViewMode(ViewMode.WEEK)
@@ -1137,7 +1138,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_switcher_month_layout.visibleOrGone(MONTH_VIEW)
+        nav_view_switcher_month_layout.visibleOrGone(CalendarFeatureFlag.MonthView.defaultLocalValue)
         nav_view_switcher_month_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setLastViewMode(ViewMode.MONTH)
@@ -1287,7 +1288,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
-        addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
+        addHolidayCalendar?.visibleOrGone(
+            featureFlagViewModel.isHolidayCalendarEnabled()
+        )
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
@@ -1666,6 +1669,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 nav_view_main_content.nav_view_other_calendars.visibleOrGone(otherCalendars.isNotEmpty())
             }
         })
+
+        featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
+            holidayCalendarFeatureFlag ?: return@Observer
+        })
     }
 
     private fun setUserPersonalCalendarsList(userPersonalCalendars: List<Calendar>, defaultCalendarId: String? = null) {
@@ -1701,18 +1708,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if (returnToView == ViewMode.MONTH && MONTH_VIEW) {
+        } else if (returnToView == ViewMode.MONTH && CalendarFeatureFlag.MonthView.defaultLocalValue) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)
             }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setLastViewMode(ViewMode.MONTH)
-        } else if (returnToView == ViewMode.WEEK && WEEK_VIEW) {
+        } else if (returnToView == ViewMode.WEEK && CalendarFeatureFlag.WeekView.defaultLocalValue) {
             // Navigate back to week view
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setLastViewMode(ViewMode.WEEK)
-        } else if (returnToView == ViewMode.THREE_DAY && THREE_DAYS_VIEW) {
+        } else if (returnToView == ViewMode.THREE_DAY && CalendarFeatureFlag.ThreeDaysView.defaultLocalValue) {
             // Navigate back to 3 days view
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)

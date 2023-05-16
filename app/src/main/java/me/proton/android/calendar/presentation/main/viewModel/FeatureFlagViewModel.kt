@@ -1,0 +1,88 @@
+package me.proton.android.calendar.presentation.main.viewModel
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
+import me.proton.android.calendar.domain.Logger
+import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
+import me.proton.core.presentation.viewmodel.ViewModelResult
+import javax.inject.Inject
+
+@HiltViewModel
+class FeatureFlagViewModel @Inject constructor(
+    private val accountManager: AccountManager,
+    private val featureFlagManager: FeatureFlagManager,
+    private val logger: Logger
+) : ViewModel() {
+
+    private val mutableState = MutableStateFlow<ViewModelResult<FeatureFlag>>(ViewModelResult.Processing)
+    val state = mutableState.asStateFlow()
+
+    var holidayCalendarFeatureFlag: LiveData<Boolean> = MutableLiveData()
+
+    fun prefetchGlobal() {
+        val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
+        featureFlagManager.prefetch(null, featureIds)
+    }
+
+    fun prefetchForCurrent() = accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
+        val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
+        featureFlagManager.prefetch(userId, featureIds)
+    }.launchIn(viewModelScope)
+
+    /**
+     * Use this init method to initialize the remote feature flags we want to observe.
+     */
+    fun initRemoteFeatureFlagsToObserve(userId: UserId) {
+        // Holiday calendar feature flag
+        holidayCalendarFeatureFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.CalendarAndroidHoliday.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.defaultLocalValue
+        }.asLiveData(Dispatchers.Default)
+    }
+
+    private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
+        val userId = requireNotNull(accountManager.getPrimaryUserId().first())
+        val featureFlagValue = featureFlagManager.get(userId, calendarFeatureFlag.featureId)?.value
+        return featureFlagValue ?: calendarFeatureFlag.defaultLocalValue
+    }
+
+    private suspend fun getFeatureFlag(calendarFeatureFlag: CalendarFeatureFlag): FeatureFlag {
+        val userId = requireNotNull(accountManager.getPrimaryUserId().first())
+        return featureFlagManager.getOrDefault(
+            userId,
+            calendarFeatureFlag.featureId,
+            FeatureFlag.default(
+                calendarFeatureFlag.featureId.id,
+                calendarFeatureFlag.defaultLocalValue
+            )
+        )
+    }
+
+    suspend fun updateFeatureFlag(calendarFeatureFlag: CalendarFeatureFlag, value: Boolean) {
+        val featureFlag = getFeatureFlag(calendarFeatureFlag)
+        val updatedFeatureFlag = featureFlag.copy(defaultValue = featureFlag.defaultValue, value = value)
+        featureFlagManager.update(updatedFeatureFlag)
+    }
+
+    fun isHolidayCalendarEnabled(): Boolean {
+        return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.defaultLocalValue
+    }
+}

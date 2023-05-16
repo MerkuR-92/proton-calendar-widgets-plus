@@ -36,7 +36,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag.USE_EVENT_DECRYPTOR
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.getUserSettingsEntity
@@ -44,6 +43,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.formatSendPreference
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isLastDayOfWeekInMonth
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
@@ -555,7 +555,7 @@ class EventViewModel @Inject constructor(
 
         val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
         dbEvent = if (dbEventEntity != null) {
-            if (USE_EVENT_DECRYPTOR) {
+            if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptor.decrypt(dbEventEntity)
             } else {
                 transformEventUseCase.execute(dbEventEntity)
@@ -621,7 +621,7 @@ class EventViewModel @Inject constructor(
                     if (dbEvent?.isSingleEdit() == true && eventUid != null) {
                         // We store reference to originalDbEvent for later use
                         originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
-                            ?.let { if (USE_EVENT_DECRYPTOR) {
+                            ?.let { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                                 eventDecryptor.decrypt(it)
                             } else {
                                 transformEventUseCase.execute(it)
@@ -2028,7 +2028,7 @@ class EventViewModel @Inject constructor(
                 if (originalDbEvent == null && eventUid != null) {
                     // We only set originalDbEvent in editMode, but we do delete from details so we need to get it here
                     originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)?.let {
-                        if (USE_EVENT_DECRYPTOR) eventDecryptor.decrypt(it)
+                        if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) eventDecryptor.decrypt(it)
                         else transformEventUseCase.execute(it)
                     }
                 }
@@ -3208,7 +3208,7 @@ class EventViewModel @Inject constructor(
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
                 ?: return EventLinkResult.EventDoesNotExist
         }
-        val event = (if (USE_EVENT_DECRYPTOR) {
+        val event = (if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
             eventDecryptor.decrypt(eventEntity)
         } else {
             transformEventUseCase.execute(eventEntity)
