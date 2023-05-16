@@ -162,6 +162,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
         recipientType = Recipient.External.value,
         "text/html",
         emptyList(),
+        null,
         null
     )
 
@@ -182,7 +183,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
                 )
             ),
         ),
-        null // TODO
+        null, null // TODO
     )
 
     private val contactExternalPinnedKeyPublicAddressCompromised = PublicAddress(
@@ -201,7 +202,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
                 )
             ),
         ),
-        null // TODO
+        null, null // TODO
     )
 
     private val contactExternalPinnedKeyPublicAddressObsolete = PublicAddress(
@@ -221,7 +222,7 @@ internal class ObtainSendPreferencesUseCaseInstrumentalTest {
                 )
             ),
         ),
-        null // TODO
+        null, null, // TODO
     )
 
     private val externalContactWithPinnedKeyEncryptTrueCards =
