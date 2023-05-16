@@ -636,8 +636,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
 
                 lifecycleScope.launch {
-                    accountViewModel.getPrimaryUserId()?.let {
-                        calendarViewModel.initManagedHolidayCalendar(it)
+                    if (!calendarViewModel.hasHolidayCalendar()) {
+                        accountViewModel.getPrimaryUserId()?.let {
+                            calendarViewModel.initManagedHolidayCalendar(it)
+                        }
                     }
                 }
             }

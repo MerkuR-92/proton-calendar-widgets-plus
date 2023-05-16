@@ -100,6 +100,8 @@ class HolidayCalendarViewModel @Inject constructor(
     private val _holidayCalendars: MutableLiveData<List<ManagedHolidayCalendarEntity>> = MutableLiveData()
     val holidayCalendars: LiveData<List<ManagedHolidayCalendarEntity>> = _holidayCalendars
 
+    var fetchedHolidayCalendars = false
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var _calendar: Calendar? = null
 
@@ -121,6 +123,7 @@ class HolidayCalendarViewModel @Inject constructor(
         calendarEdited = false
         holidayCalendarSnackState.value = null
         calendarSettingsSnackState.value = null
+        fetchedHolidayCalendars = false
         holidayCalendarState.value = HolidayCalendarState.Idle
     }
 
@@ -146,6 +149,14 @@ class HolidayCalendarViewModel @Inject constructor(
             _holidayCalendars.value = holidayCalendars
 
             val managedHolidayCalendar = holidayCalendars.firstOrNull { it.calendarId == calendarId } ?: run {
+                // If we failed to find a match with the DB list, refresh the list from remote and retry
+                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                    _holidayCalendars.value = it
+                    fetchedHolidayCalendars = true
+                    it.firstOrNull { holidayCalendar -> holidayCalendar.calendarId == calendarId }
+                }
+            } ?: run {
+                // If we still failed to find a match, display error and close the view
                 logger.e("ManagedHolidayCalendar was null in initUpdateHolidayCalendar")
                 displayInitErrorSnack(true)
                 return
@@ -166,6 +177,13 @@ class HolidayCalendarViewModel @Inject constructor(
             logger.e("ManagedHolidayCalendars were null in initUpdateHolidayCalendar")
             displayInitErrorSnack(true)
             return
+        }
+
+        if (!fetchedHolidayCalendars) {
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                _holidayCalendars.value = it
+                fetchedHolidayCalendars = true
+            }
         }
     }
 
@@ -221,6 +239,13 @@ class HolidayCalendarViewModel @Inject constructor(
             logger.e("ManagedHolidayCalendars were null in HolidayCalendarViewModel initCreateHolidayCalendar")
             displayInitErrorSnack(returnToSettings)
             return
+        }
+
+        if (!fetchedHolidayCalendars) {
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                _holidayCalendars.value = it
+                fetchedHolidayCalendars = true
+            }
         }
     }
 
@@ -566,6 +591,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
         val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)
         return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
+            fetchedHolidayCalendars = true
             calendarsRepository.fetchManagedHolidayCalendars(userId)
         } else dbManagedHolidayCalendars
     }
