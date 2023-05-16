@@ -176,9 +176,12 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
                 val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings
+                val languageTag = requireContext().resources.configuration.currentLocale().toLanguageTag().lowercase()
+                val countryCode = languageTag.substringAfter("-", "")
                 holidayCalendarViewModel.initCreateHolidayCalendar(
                     calendarColors[(0..calendarColors.lastIndex).random()],
                     requireContext().resources.configuration.currentLocale().language.lowercase(),
+                    countryCode,
                     returnToSettings
                 )
             }
