@@ -557,6 +557,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
         database.managedHolidayCalendarDao().selectById(calendarId)
 
+    /**
+     * Fetches the managed holiday calendar list from BE, persists it in DB if non null.
+     * @return the fetched list of managed holiday calendar.
+     */
     override suspend fun refreshManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? {
         val managedHolidayCalendars = calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
         managedHolidayCalendars?.forEach {
