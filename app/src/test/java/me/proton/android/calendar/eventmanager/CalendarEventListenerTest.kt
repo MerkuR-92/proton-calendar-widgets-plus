@@ -16,6 +16,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
+import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerDelegate
@@ -35,7 +36,7 @@ class CalendarEventListenerTest {
     private val calendarsRepository: CalendarsRepository = mockk()
     private val delegate: CalendarEventListenerDelegate = mockk(relaxed = true)
     private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase = mockk(relaxed = true)
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase = mockk(relaxed = true)
+    private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
 
     private lateinit var listener: CalendarEventListener
@@ -49,7 +50,7 @@ class CalendarEventListenerTest {
             calendarsRepository,
             delegate,
             getMinimalCalendarEventsUseCase,
-            updateAlarmsUseCase,
+            resetCalendarSearchUseCase,
             logger,
         )
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
