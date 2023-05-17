@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -48,7 +47,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutBySearchTe
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicatesInSubscribedCalendars
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
-import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
@@ -559,10 +557,16 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
         database.managedHolidayCalendarDao().selectById(calendarId)
 
-    override suspend fun initManagedHolidayCalendars(userId: UserId) {
-        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars?.forEach {
+    /**
+     * Fetches the managed holiday calendar list from BE, persists it in DB if non null.
+     * @return the fetched list of managed holiday calendar.
+     */
+    override suspend fun refreshManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? {
+        val managedHolidayCalendars = calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+        managedHolidayCalendars?.forEach {
             database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))
         }
+        return managedHolidayCalendars
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {

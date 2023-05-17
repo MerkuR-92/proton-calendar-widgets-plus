@@ -1184,6 +1184,10 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun initManagedHolidayCalendar(userId: UserId) {
-        calendarsRepository.initManagedHolidayCalendars(userId)
+        calendarsRepository.refreshManagedHolidayCalendars(userId)
+    }
+
+    suspend fun hasHolidayCalendar(): Boolean {
+        return database.managedHolidayCalendarDao().hasCalendar()
     }
 }

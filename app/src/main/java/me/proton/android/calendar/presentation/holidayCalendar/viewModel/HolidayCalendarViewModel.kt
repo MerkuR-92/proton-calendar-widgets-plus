@@ -29,7 +29,6 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
-import me.proton.android.calendar.domain.usecase.FetchCachedViewsEventsUseCase
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
@@ -37,6 +36,7 @@ import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.util.kotlin.equalsNoCase
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -100,6 +100,8 @@ class HolidayCalendarViewModel @Inject constructor(
     private val _holidayCalendars: MutableLiveData<List<ManagedHolidayCalendarEntity>> = MutableLiveData()
     val holidayCalendars: LiveData<List<ManagedHolidayCalendarEntity>> = _holidayCalendars
 
+    var fetchedHolidayCalendars = false
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var _calendar: Calendar? = null
 
@@ -121,6 +123,7 @@ class HolidayCalendarViewModel @Inject constructor(
         calendarEdited = false
         holidayCalendarSnackState.value = null
         calendarSettingsSnackState.value = null
+        fetchedHolidayCalendars = false
         holidayCalendarState.value = HolidayCalendarState.Idle
     }
 
@@ -146,6 +149,14 @@ class HolidayCalendarViewModel @Inject constructor(
             _holidayCalendars.value = holidayCalendars
 
             val managedHolidayCalendar = holidayCalendars.firstOrNull { it.calendarId == calendarId } ?: run {
+                // If we failed to find a match with the DB list, refresh the list from remote and retry
+                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                    _holidayCalendars.value = it
+                    fetchedHolidayCalendars = true
+                    it.firstOrNull { holidayCalendar -> holidayCalendar.calendarId == calendarId }
+                }
+            } ?: run {
+                // If we still failed to find a match, display error and close the view
                 logger.e("ManagedHolidayCalendar was null in initUpdateHolidayCalendar")
                 displayInitErrorSnack(true)
                 return
@@ -167,9 +178,21 @@ class HolidayCalendarViewModel @Inject constructor(
             displayInitErrorSnack(true)
             return
         }
+
+        if (!fetchedHolidayCalendars) {
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                _holidayCalendars.value = it
+                fetchedHolidayCalendars = true
+            }
+        }
     }
 
-    suspend fun initCreateHolidayCalendar(calendarColor: Int, defaultLanguageCode: String, returnToSettings: Boolean) {
+    suspend fun initCreateHolidayCalendar(
+        calendarColor: Int,
+        defaultLanguageCode: String,
+        defaultCountryCode: String,
+        returnToSettings: Boolean
+    ) {
 
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
@@ -196,32 +219,75 @@ class HolidayCalendarViewModel @Inject constructor(
 
             _holidayCalendars.value = holidayCalendars
 
-            // Get calendars matching the default time zone
-            val countriesMatchingTimeZone = holidayCalendars.filter {
-                it.timezones.contains(primaryTimezone)
+            if (!autoDetectHolidayCalendar(userId, holidayCalendars, primaryTimezone, defaultLanguageCode, defaultCountryCode)) {
+                // If we failed to find a match with the DB list, refresh the list from remote and retry
+                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                    _holidayCalendars.value = it
+                    fetchedHolidayCalendars = true
+                    autoDetectHolidayCalendar(userId, it, primaryTimezone, defaultLanguageCode, defaultCountryCode)
+                    // If we still fail to find a match, leave holiday calendar form in its default state.
+                }
             }
-            // Get the calendar matching the default language
-            val matchingDefaultHolidayCalendar = countriesMatchingTimeZone.firstOrNull {
-                it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
-            } ?: countriesMatchingTimeZone.firstOrNull()
-            // If holiday calendar already exists, leave the fields empty
-            matchingDefaultHolidayCalendar?.let {
-                val holidayCalendarAlreadyExists = calendarsRepository.selectCalendars(userId.id).firstOrNull {
-                    it.id == matchingDefaultHolidayCalendar.calendarId
-                } != null
-                if (holidayCalendarAlreadyExists) return
-            }
-            if (countriesMatchingTimeZone.isNotEmpty()) {
-                // Change state so we display based on time zone disclaimer
-                holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
-            }
-            _country.value = matchingDefaultHolidayCalendar?.country ?: ""
-            _language.value = matchingDefaultHolidayCalendar?.language ?: ""
         } ?: run {
             logger.e("ManagedHolidayCalendars were null in HolidayCalendarViewModel initCreateHolidayCalendar")
             displayInitErrorSnack(returnToSettings)
             return
         }
+
+        if (!fetchedHolidayCalendars) {
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                _holidayCalendars.value = it
+                fetchedHolidayCalendars = true
+            }
+        }
+    }
+
+    private suspend fun autoDetectHolidayCalendar(
+        userId: UserId,
+        holidayCalendars: List<ManagedHolidayCalendarEntity>,
+        primaryTimezone: String,
+        defaultLanguageCode: String,
+        defaultCountryCode: String
+    ): Boolean {
+        // Get calendars matching the default time zone
+        val calendarsMatchingTimeZone = holidayCalendars.filter {
+            it.timezones.contains(primaryTimezone)
+        }
+
+        val calendarsMatchingCode =
+            if (calendarsMatchingTimeZone.size > 1) {
+                // If there are more than one match, use the Locale country tag.
+                if (defaultCountryCode.isNotEmpty()) {
+                    calendarsMatchingTimeZone.filter {
+                        it.countryCode.equalsNoCase(defaultCountryCode)
+                    }
+                } else {
+                    // If we don't have a country tag, use the Locale language tag.
+                    calendarsMatchingTimeZone.filter {
+                        it.languageCode.equalsNoCase(defaultLanguageCode)
+                    }
+                }
+            } else calendarsMatchingTimeZone
+
+        // Get the calendar matching the default language
+        val matchingDefaultHolidayCalendar = calendarsMatchingCode.firstOrNull {
+            it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
+        } ?: calendarsMatchingCode.firstOrNull()
+
+        // If holiday calendar already exists, leave the fields empty
+        matchingDefaultHolidayCalendar?.let {
+            val holidayCalendarAlreadyExists = calendarsRepository.selectCalendars(userId.id).firstOrNull {
+                it.id == matchingDefaultHolidayCalendar.calendarId
+            } != null
+            if (holidayCalendarAlreadyExists) return true
+        } ?: return false
+        if (calendarsMatchingTimeZone.isNotEmpty()) {
+            // Change state so we display based on time zone disclaimer
+            holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
+        }
+        _country.value = matchingDefaultHolidayCalendar.country
+        _language.value = matchingDefaultHolidayCalendar.language
+        return true
     }
 
     private fun displayInitErrorSnack(returnToSettings: Boolean) {
@@ -566,6 +632,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
         val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)
         return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
+            fetchedHolidayCalendars = true
             calendarsRepository.fetchManagedHolidayCalendars(userId)
         } else dbManagedHolidayCalendars
     }
