@@ -173,12 +173,16 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private val visibleSkeletonEventsFlow =
         database.eventsDao().skeletonEventCountFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
-            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { skeletonEventCount, calendarEntities ->
+            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { _, calendarEntities ->
 
                 // in order to prevent too large cursors, we subscribe to overall COUNT and then select data in a paginated way, manually
                 val pageSize = 100
-                val skeletonEventEntities = (0 until ceil(skeletonEventCount / pageSize.toDouble()).toInt()).flatMap { page ->
-                    database.eventsDao().selectSkeletonEventsPaginated(pageSize, pageSize * page)
+                val skeletonEventEntities = calendarEntities.flatMap { calendarEntity ->
+                    val allEventsInCalendarCount = database.eventsDao().count(calendarEntity.id)
+
+                    (0 until ceil(allEventsInCalendarCount / pageSize.toDouble()).toInt()).flatMap { page ->
+                        database.eventsDao().selectSkeletonEventsInCalendarPaginated(calendarEntity.id, pageSize, pageSize * page)
+                    }
                 }
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
@@ -699,7 +703,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars")
             }
 
-            logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
+            logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
             coroutineScope {
 
