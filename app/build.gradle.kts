@@ -277,6 +277,7 @@ tasks.register("createBuildEnv") {
                 appendText("APK_NAME_${it.toEnvVar()}=\"${variant.outputFile.name}\"\n")
             }
         }
+        appendText("APK_VERSION=\"${Config.versionName}\"")
     }
 }
 
