@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
     id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
@@ -30,7 +30,7 @@ android {
     compileSdk = Config.compileSdk
     namespace = Config.applicationId
 
-    kotlinOptions { jvmTarget = "11" }
+    kotlinOptions { jvmTarget = JavaVersion.VERSION_17.toString() }
 
     buildFeatures {
         dataBinding = true
@@ -114,8 +114,8 @@ android {
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     testOptions {
@@ -197,6 +197,7 @@ dependencies {
     implementation(libs.core.observability)
     implementation(libs.core.payment)
     implementation(libs.core.plan)
+    implementation(libs.core.proguard.rules)
     implementation(libs.core.presentation)
     implementation(libs.core.push)
     implementation(libs.core.user)
