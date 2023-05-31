@@ -549,20 +549,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     safeNavigateToMonth(dayToShow)
                 } else {
                     val openIcsIntent = mainViewModel.consumeIntent(INVITE_PROTON_INTENT_ACTION)
-                    if (openIcsIntent != null && CalendarFeatureFlag.OpenInvitation.defaultLocalValue) {
+                    if (openIcsIntent != null && CalendarFeatureFlag.OpenInvitation.fallbackValue) {
                         handleIcsIntent(openIcsIntent)
-                    } else if (openIcsIntent == null && CalendarFeatureFlag.ImportIcs.defaultLocalValue ||
-                        CalendarFeatureFlag.AppLinks.defaultLocalValue ||
-                        CalendarFeatureFlag.ImportAssistant.defaultLocalValue) {
+                    } else if (openIcsIntent == null && CalendarFeatureFlag.ImportIcs.fallbackValue ||
+                        CalendarFeatureFlag.AppLinks.fallbackValue ||
+                        CalendarFeatureFlag.ImportAssistant.fallbackValue) {
                         val actionViewIntent = mainViewModel.consumeIntent(Intent.ACTION_VIEW)
                         val actionEditOrInsertIntent =
                             mainViewModel.consumeIntent(Intent.ACTION_INSERT) ?:
                             mainViewModel.consumeIntent(Intent.ACTION_EDIT)
-                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.defaultLocalValue) {
+                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.fallbackValue) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
                         } else if (actionViewIntent != null &&
-                            CalendarFeatureFlag.AppLinks.defaultLocalValue) {
+                            CalendarFeatureFlag.AppLinks.fallbackValue) {
                             // Handle app link
                             val appLinkData: Uri? = actionViewIntent.data
 
@@ -760,7 +760,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun handleOpenIcsIntent(uri: Uri, senderEmail: String?, recipientEmail: String?) {
 
-        if (!CalendarFeatureFlag.ImportIcs.defaultLocalValue &&
+        if (!CalendarFeatureFlag.ImportIcs.fallbackValue &&
             (senderEmail == null || recipientEmail == null)) {
             this@MainActivity.displaySnackBar(getString(R.string.snack_ics_unsupported_publish_error), Snackbar.LENGTH_LONG)
             safeNavigateToMonth()
@@ -1072,13 +1072,13 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(CalendarFeatureFlag.Feedback.defaultLocalValue)
+        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(CalendarFeatureFlag.Feedback.fallbackValue)
         nav_view_main_content.nav_view_more_feedback_press.setOnSingleClickListener {
             showFeedbackDialog()
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(CalendarFeatureFlag.Subscription.defaultLocalValue)
+        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(CalendarFeatureFlag.Subscription.fallbackValue)
         nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
             drawer_layout.close()
@@ -1118,14 +1118,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(CalendarFeatureFlag.ThreeDaysView.defaultLocalValue)
+        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(CalendarFeatureFlag.ThreeDaysView.fallbackValue)
         nav_view_switcher_three_day_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
             drawer_layout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(CalendarFeatureFlag.WeekView.defaultLocalValue)
+        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(CalendarFeatureFlag.WeekView.fallbackValue)
         nav_view_switcher_week_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setLastViewMode(ViewMode.WEEK)
@@ -1138,7 +1138,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             drawer_layout.close()
         }
 
-        nav_view_switcher_month_layout.visibleOrGone(CalendarFeatureFlag.MonthView.defaultLocalValue)
+        nav_view_switcher_month_layout.visibleOrGone(CalendarFeatureFlag.MonthView.fallbackValue)
         nav_view_switcher_month_press.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setLastViewMode(ViewMode.MONTH)
@@ -1708,18 +1708,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if (returnToView == ViewMode.MONTH && CalendarFeatureFlag.MonthView.defaultLocalValue) {
+        } else if (returnToView == ViewMode.MONTH && CalendarFeatureFlag.MonthView.fallbackValue) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
                 calendarViewModel.handleDaySelected(it)
             }
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setLastViewMode(ViewMode.MONTH)
-        } else if (returnToView == ViewMode.WEEK && CalendarFeatureFlag.WeekView.defaultLocalValue) {
+        } else if (returnToView == ViewMode.WEEK && CalendarFeatureFlag.WeekView.fallbackValue) {
             // Navigate back to week view
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setLastViewMode(ViewMode.WEEK)
-        } else if (returnToView == ViewMode.THREE_DAY && CalendarFeatureFlag.ThreeDaysView.defaultLocalValue) {
+        } else if (returnToView == ViewMode.THREE_DAY && CalendarFeatureFlag.ThreeDaysView.fallbackValue) {
             // Navigate back to 3 days view
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)

@@ -124,7 +124,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             getString(R.string.settings_general_info_time_zone),
             getString(R.string.settings_general_info_calendar_layout)
         )
-        if (CalendarFeatureFlag.ChangeLanguage.defaultLocalValue) {
+        if (CalendarFeatureFlag.ChangeLanguage.fallbackValue) {
             generalSettingsDescription = getString(
                 R.string.settings_general_info_separator,
                 getString(R.string.settings_general_info_language),
@@ -453,16 +453,16 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             editLayout?.visibleOrGone(
                 (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
                         calendar.isSubscribed || // subscribed calendar
-                        (calendar.isSharedWithMe && CalendarFeatureFlag.EditingSharedCalendars.defaultLocalValue) || // shared calendar
+                        (calendar.isSharedWithMe && CalendarFeatureFlag.EditingSharedCalendars.fallbackValue) || // shared calendar
                         (calendar.isHolidayCalendar && featureFlagViewModel.isHolidayCalendarEnabled()) // holiday calendar
             )
 
             val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-            deleteLayout?.visibleOrGone(CalendarFeatureFlag.DeleteCalendar.defaultLocalValue)
+            deleteLayout?.visibleOrGone(CalendarFeatureFlag.DeleteCalendar.fallbackValue)
 
             val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
             recreateLayout?.visibleOrGone(
-                CalendarFeatureFlag.ClearCalendar.defaultLocalValue &&
+                CalendarFeatureFlag.ClearCalendar.fallbackValue &&
                         calendar.isSubscribed.not() &&
                         calendar.isSharedWithMe.not() &&
                         calendar.isHolidayCalendar.not() &&

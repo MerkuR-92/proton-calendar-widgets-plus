@@ -555,7 +555,7 @@ class EventViewModel @Inject constructor(
 
         val dbEventEntity = calendarsRepository.selectEventEntity(eventId)
         dbEvent = if (dbEventEntity != null) {
-            if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(dbEventEntity)
             } else {
                 transformEventUseCase.execute(dbEventEntity)
@@ -621,7 +621,7 @@ class EventViewModel @Inject constructor(
                     if (dbEvent?.isSingleEdit() == true && eventUid != null) {
                         // We store reference to originalDbEvent for later use
                         originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)
-                            ?.let { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                            ?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                                 eventDecryptor.decrypt(it)
                             } else {
                                 transformEventUseCase.execute(it)
@@ -2028,7 +2028,7 @@ class EventViewModel @Inject constructor(
                 if (originalDbEvent == null && eventUid != null) {
                     // We only set originalDbEvent in editMode, but we do delete from details so we need to get it here
                     originalDbEvent = calendarsRepository.selectRootEventEntity(eventUid)?.let {
-                        if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) eventDecryptor.decrypt(it)
+                        if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) eventDecryptor.decrypt(it)
                         else transformEventUseCase.execute(it)
                     }
                 }
@@ -3208,7 +3208,7 @@ class EventViewModel @Inject constructor(
             eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
                 ?: return EventLinkResult.EventDoesNotExist
         }
-        val event = (if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+        val event = (if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(eventEntity)
         } else {
             transformEventUseCase.execute(eventEntity)

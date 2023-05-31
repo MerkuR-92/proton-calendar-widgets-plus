@@ -75,7 +75,7 @@ class ShowNotificationUseCase @Inject constructor(
             if (eventEntity == null) {
                 logger.e("could not find EventEntity to show notification")
             } else {
-                val dbEvent = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                val dbEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)

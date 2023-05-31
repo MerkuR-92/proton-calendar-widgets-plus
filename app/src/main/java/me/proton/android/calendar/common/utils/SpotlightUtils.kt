@@ -175,7 +175,7 @@ object SpotlightUtils {
                 )
             }
             SEARCH_VERSION_CODE -> {
-                if (!CalendarFeatureFlag.ShowEventSearch.defaultLocalValue) return
+                if (!CalendarFeatureFlag.ShowEventSearch.fallbackValue) return
                 val content = getSearchDialogContent()
                 this.displaySpotlightDialog(
                     content.first,

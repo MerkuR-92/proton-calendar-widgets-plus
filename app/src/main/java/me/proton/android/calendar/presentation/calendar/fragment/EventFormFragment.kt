@@ -578,7 +578,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             )
 
             lifecycleScope.launch {
-                event_form_participant_layout.visibleOrGone(CalendarFeatureFlag.AddAttendees.defaultLocalValue &&
+                event_form_participant_layout.visibleOrGone(CalendarFeatureFlag.AddAttendees.fallbackValue &&
                         eventViewModel.allowSendForCalendarAddress() &&
                         event.hasProtonUid
                 )

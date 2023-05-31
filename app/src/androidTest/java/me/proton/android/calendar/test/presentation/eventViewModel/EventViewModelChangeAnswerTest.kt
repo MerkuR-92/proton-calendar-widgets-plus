@@ -45,7 +45,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -156,7 +156,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -258,7 +258,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -332,7 +332,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -449,7 +449,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -582,7 +582,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock event with user as attendee
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -718,7 +718,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock single edit event with user as attendee
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity(isSingleEdit = true))
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true))
@@ -852,7 +852,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock single edit event with user as attendee
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventEntity(isSingleEdit = true)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity(isSingleEdit = true))
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity(isSingleEdit = true))

@@ -76,7 +76,7 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id)
-        val dbEvent = eventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+        val dbEvent = eventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(it)
         } else {
             transformEventUseCase.execute(it)

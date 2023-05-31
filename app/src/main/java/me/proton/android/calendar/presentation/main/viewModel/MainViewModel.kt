@@ -131,7 +131,7 @@ class MainViewModel @Inject constructor(
             SharedPreferencesKeys.VIEW_MODE,
             ViewMode.MONTH.value
         )]
-        return if (!CalendarFeatureFlag.MonthView.defaultLocalValue && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
+        return if (!CalendarFeatureFlag.MonthView.fallbackValue && lastViewMode == ViewMode.MONTH) ViewMode.AGENDA else lastViewMode
     }
 
     fun setWeekViewHourHeight(newHourHeight: Float) {

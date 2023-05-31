@@ -714,7 +714,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 val transformedEvents = eventEntities.map { eventEntity ->
                     async {
-                        val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                        val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                             eventDecryptor.decrypt(eventEntity)
                         } else {
                             transformEventUseCase.execute(eventEntity)
@@ -1029,7 +1029,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             eventsSharingUidResponse.data.events.forEach {
-                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(it)
                 } else {
                     transformEventUseCase.execute(it)
@@ -1046,7 +1046,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             val events = arrayListOf<Event>()
             eventsSharingUidResponse.data.events.forEach {
-                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(it)
                 } else {
                     transformEventUseCase.execute(it)

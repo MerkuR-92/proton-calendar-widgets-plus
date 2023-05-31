@@ -35,7 +35,7 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         val eventChains = eventIds.mapNotNull {
             val dbOriginalEvent = database.eventsDao().selectById(it)
-            val originalEvent = dbOriginalEvent?.let { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            val originalEvent = dbOriginalEvent?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(it)
             } else {
                 transformEventUseCase.execute(it)
@@ -54,7 +54,7 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         eventChains.forEach {
 
-            val transformedChain = it.second.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            val transformedChain = it.second.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(it)
             } else {
                 transformEventUseCase.execute(it)

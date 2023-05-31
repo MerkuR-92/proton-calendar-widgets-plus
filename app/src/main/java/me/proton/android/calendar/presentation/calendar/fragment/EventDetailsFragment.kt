@@ -561,7 +561,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            if (CalendarFeatureFlag.ShowSignatureVerificationBadges.defaultLocalValue) {
+            if (CalendarFeatureFlag.ShowSignatureVerificationBadges.fallbackValue) {
                 when (event.verificationStatus) {
                     Event.SignatureVerification.SUCCESS, Event.SignatureVerification.NOT_SIGNED, Event.SignatureVerification.SIGNED_BUT_NO_KEYS -> {
                         section_verification_badge.visibleOrGone(false)
@@ -648,7 +648,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
      *  without updating the participation status value
      **/
     private fun handleAttendeeAnswerViewVisibility(userAddresses: List<UserAddress>) {
-        if (!CalendarFeatureFlag.ChangeAnswer.defaultLocalValue) {
+        if (!CalendarFeatureFlag.ChangeAnswer.fallbackValue) {
             // TODO Remove feature flag
             section_answer.visibleOrGone(false)
             return

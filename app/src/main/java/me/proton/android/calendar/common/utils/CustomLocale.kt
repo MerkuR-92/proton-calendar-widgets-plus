@@ -46,7 +46,7 @@ object CustomLocale {
 
     fun apply(context: Context, localeCode: String?) {
         val localesToSet: LocaleListCompat = when {
-            !CalendarFeatureFlag.ChangeLanguage.defaultLocalValue -> LocaleListCompat.create(Locale("en", "US"))
+            !CalendarFeatureFlag.ChangeLanguage.fallbackValue -> LocaleListCompat.create(Locale("en", "US"))
             localeCode.isNullOrBlank() -> {
                 // If settings are in Auto Detect, use System language if supported, or fallback to en-US
                 PreferenceManager.getDefaultSharedPreferences(context).edit()

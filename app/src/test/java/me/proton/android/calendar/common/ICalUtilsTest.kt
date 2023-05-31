@@ -5149,10 +5149,10 @@ internal class ICalUtilsTest {
         val recurringEvent = EventMocks.provideEvent(isRecurring = true)
         val recurringInvitation = EventMocks.provideEvent(isRecurring = true, isAttendee = true, isOrganizer = true)
 
-        assertThat(isCalendarChangeAllowed(simpleEvent, simpleEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.defaultLocalValue)
+        assertThat(isCalendarChangeAllowed(simpleEvent, simpleEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.fallbackValue)
         assertThat(isCalendarChangeAllowed(simpleEvent, simpleInvitation)).isEqualTo(false)
 
-        assertThat(isCalendarChangeAllowed(simpleEvent, recurringEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.defaultLocalValue)
+        assertThat(isCalendarChangeAllowed(simpleEvent, recurringEvent)).isEqualTo(CalendarFeatureFlag.ChangeCalendarSimpleEvent.fallbackValue)
         assertThat(isCalendarChangeAllowed(simpleEvent, recurringInvitation)).isEqualTo(false)
 
     }

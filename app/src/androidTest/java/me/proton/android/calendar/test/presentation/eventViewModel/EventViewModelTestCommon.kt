@@ -175,13 +175,13 @@ open class EventViewModelTestCommon: KoinComponent {
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
             if (editMode) {
                 coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
-                coVerify(exactly = 2) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                coVerify(exactly = 2) { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptorMock.decrypt(any())
                 } else {
                     transformEventUseCaseMock.execute(any())
                 } }
             } else {
-                coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptorMock.decrypt(any())
                 } else {
                     transformEventUseCaseMock.execute(any())
@@ -190,7 +190,7 @@ open class EventViewModelTestCommon: KoinComponent {
         } else if (eventId != null) {
             // If we edit existing event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())

@@ -880,7 +880,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun displayImport(): Boolean {
-        return CalendarFeatureFlag.ImportAssistant.defaultLocalValue && isDelinquentUser() == false
+        return CalendarFeatureFlag.ImportAssistant.fallbackValue && isDelinquentUser() == false
     }
 
     suspend fun isDelinquentUser(): Boolean? {

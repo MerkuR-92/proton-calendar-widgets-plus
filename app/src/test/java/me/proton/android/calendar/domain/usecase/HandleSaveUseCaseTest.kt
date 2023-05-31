@@ -55,7 +55,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -90,7 +90,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -125,7 +125,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false, isOrganizer = true)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -164,7 +164,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true, isOrganizer = true)
-            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())

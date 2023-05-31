@@ -72,7 +72,7 @@ class HandleIcsUseCase @Inject constructor(
         val iCalendar = cleanIcsResult.iCalendar ?: return IcsSurgeryUtils.HandleIcsResult.Error.ParsingFailed
 
         return if (iCalendar.method.isPublish || !isOpeningFromProtonMail) {
-            if (CalendarFeatureFlag.ImportIcs.defaultLocalValue) handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
+            if (CalendarFeatureFlag.ImportIcs.fallbackValue) handleImportIcs(iCalendar, userId, isOpeningFromProtonMail)
             else IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.Publish
         } else {
             handleInviteIcs(iCalendar, userId, senderEmail, recipientEmail)
@@ -132,7 +132,7 @@ class HandleIcsUseCase @Inject constructor(
         var existingEvent: Event? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
-                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)
@@ -299,7 +299,7 @@ class HandleIcsUseCase @Inject constructor(
             }
         }
         val parentEvent = if (parentEventEntity != null) {
-            if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+            if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(parentEventEntity)
             } else {
                 transformEventUseCase.execute(parentEventEntity)
@@ -317,7 +317,7 @@ class HandleIcsUseCase @Inject constructor(
         var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse.let {
             for (eventEntity in eventsSharingUidResponse) {
-                val event = if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
+                val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)

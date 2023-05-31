@@ -97,7 +97,6 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPager
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
@@ -174,7 +173,7 @@ class MonthFragment : BaseFragment() {
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
-            if (CalendarFeatureFlag.ShowEventSearch.defaultLocalValue) {
+            if (CalendarFeatureFlag.ShowEventSearch.fallbackValue) {
                 addView(buttonSearch, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))

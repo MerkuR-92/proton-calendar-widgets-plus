@@ -381,7 +381,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     override fun getLocaleForFormatting(): Locale {
-        if (!CalendarFeatureFlag.ChangeLanguage.defaultLocalValue) return Locale.US
+        if (!CalendarFeatureFlag.ChangeLanguage.fallbackValue) return Locale.US
         val appDefaultLocale = Locale.getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getSupportedLocaleOrNull(

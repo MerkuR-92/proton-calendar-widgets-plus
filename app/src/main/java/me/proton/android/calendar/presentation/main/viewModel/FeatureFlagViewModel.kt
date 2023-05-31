@@ -54,14 +54,14 @@ class FeatureFlagViewModel @Inject constructor(
             userId,
             CalendarFeatureFlag.CalendarAndroidHoliday.featureId
         ).map {
-            it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.defaultLocalValue
+            it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
         }.asLiveData(Dispatchers.Default)
     }
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
         val userId = requireNotNull(accountManager.getPrimaryUserId().first())
         val featureFlagValue = featureFlagManager.get(userId, calendarFeatureFlag.featureId)?.value
-        return featureFlagValue ?: calendarFeatureFlag.defaultLocalValue
+        return featureFlagValue ?: calendarFeatureFlag.fallbackValue
     }
 
     private suspend fun getFeatureFlag(calendarFeatureFlag: CalendarFeatureFlag): FeatureFlag {
@@ -71,7 +71,7 @@ class FeatureFlagViewModel @Inject constructor(
             calendarFeatureFlag.featureId,
             FeatureFlag.default(
                 calendarFeatureFlag.featureId.id,
-                calendarFeatureFlag.defaultLocalValue
+                calendarFeatureFlag.fallbackValue
             )
         )
     }
@@ -83,6 +83,6 @@ class FeatureFlagViewModel @Inject constructor(
     }
 
     fun isHolidayCalendarEnabled(): Boolean {
-        return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.defaultLocalValue
+        return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
     }
 }

@@ -122,8 +122,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        settings_auto_invites_separator.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.defaultLocalValue)
-        settings_auto_invites.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.defaultLocalValue)
+        settings_auto_invites_separator.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
+        settings_auto_invites.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
 
         settings_auto_invites_press.setOnClickListener {
             settings_auto_invites_switch.performClick()
@@ -241,7 +241,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         val appLanguageDialogLabels = appLanguagesLabels.toMutableList()
         appLanguageDialogLabels.add(0, systemDefaultLabel)
 
-        settings_language.visibleOrGone(CalendarFeatureFlag.ChangeLanguage.defaultLocalValue)
+        settings_language.visibleOrGone(CalendarFeatureFlag.ChangeLanguage.fallbackValue)
         settings_language_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
@@ -306,7 +306,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         settings_search.visibleOrGone(
-            CalendarFeatureFlag.ShowEventSearch.defaultLocalValue
+            CalendarFeatureFlag.ShowEventSearch.fallbackValue
         )
 
         lifecycleScope.launch {

@@ -742,7 +742,7 @@ object ICalUtilsImpl : ICalUtils {
 
         if (isCurrentEventAnInvitation) return false
 
-        if (fromEvent.isPartOfChain() || !CalendarFeatureFlag.ChangeCalendarSimpleEvent.defaultLocalValue) return false
+        if (fromEvent.isPartOfChain() || !CalendarFeatureFlag.ChangeCalendarSimpleEvent.fallbackValue) return false
 
         return true
     }

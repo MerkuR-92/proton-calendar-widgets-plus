@@ -2,7 +2,7 @@ package me.proton.android.calendar.common.utils
 
 import me.proton.core.featureflag.domain.entity.FeatureId
 
-enum class CalendarFeatureFlag(val featureId: FeatureId, val defaultLocalValue: Boolean, val isLocalFlag: Boolean) {
+enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Boolean, val isLocalFlag: Boolean) {
 
     // Naming convention for remote feature flags:
     //  - Features shared among different products: {FeatureName}{Platform}{Product} (ex: RatingAndroidCalendar)

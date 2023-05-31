@@ -65,7 +65,7 @@ class WeekViewAdapter(
     }
 
     override fun onEventLongClick(data: WeekViewCalendarEntity, bounds: RectF): Boolean {
-        return !CalendarFeatureFlag.DragAndDrop.defaultLocalValue // Return true to disable drag and drop
+        return !CalendarFeatureFlag.DragAndDrop.fallbackValue // Return true to disable drag and drop
     }
 
     private fun yearMonthsBetween(startDate: LocalDate, endDate: LocalDate): List<YearMonth> {
