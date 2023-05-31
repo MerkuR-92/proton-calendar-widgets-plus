@@ -30,5 +30,5 @@ object KeyTransparencyModule {
 
     @Provides
     @KeyTransparencyEnabled
-    fun provideKeyTransparencyEnabled(): Boolean = true
+    fun provideKeyTransparencyEnabled(): Boolean = false
 }
