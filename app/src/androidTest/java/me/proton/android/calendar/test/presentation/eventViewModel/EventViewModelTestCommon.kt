@@ -17,10 +17,10 @@ import io.mockk.just
 import io.mockk.mockk
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.getUserSettingsEntityFlow
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -175,13 +175,13 @@ open class EventViewModelTestCommon: KoinComponent {
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
             if (editMode) {
                 coVerify(exactly = 1) { calendarsRepositoryMock.selectRootEventEntity(any()) }
-                coVerify(exactly = 2) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+                coVerify(exactly = 2) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                     eventDecryptorMock.decrypt(any())
                 } else {
                     transformEventUseCaseMock.execute(any())
                 } }
             } else {
-                coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+                coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                     eventDecryptorMock.decrypt(any())
                 } else {
                     transformEventUseCaseMock.execute(any())
@@ -190,7 +190,7 @@ open class EventViewModelTestCommon: KoinComponent {
         } else if (eventId != null) {
             // If we edit existing event
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())

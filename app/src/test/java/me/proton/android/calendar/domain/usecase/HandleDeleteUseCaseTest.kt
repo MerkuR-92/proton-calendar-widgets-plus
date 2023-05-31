@@ -5,8 +5,8 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.api.*
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -153,7 +153,7 @@ internal class HandleDeleteUseCaseTest {
 
         val event = provideEvent(isRecurring = isRecurring)
 
-        coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+        coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
             eventDecryptorMock.decrypt(any())
         } else {
             transformEventUseCaseMock.execute(any())
@@ -181,7 +181,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -217,7 +217,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -253,7 +253,7 @@ internal class HandleDeleteUseCaseTest {
             )
 
             coVerify(exactly = 1) { calendarsRepositoryMock.selectEventEntity(any()) }
-            coVerify(exactly = 1) { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coVerify(exactly = 1) { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())

@@ -3,8 +3,8 @@ package me.proton.android.calendar.domain.usecase
 import android.util.Log
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.test.shared.mocks.*
@@ -55,7 +55,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false)
-            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -90,7 +90,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true)
-            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -125,7 +125,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false, isOrganizer = true)
-            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
@@ -164,7 +164,7 @@ internal class HandleSaveUseCaseTest {
 
             coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true, isOrganizer = true)
-            coEvery { if (CalendarFeatureFlags.UseEventDecryptor.defaultLocalValue) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.defaultLocalValue) {
                 eventDecryptorMock.decrypt(any())
             } else {
                 transformEventUseCaseMock.execute(any())
