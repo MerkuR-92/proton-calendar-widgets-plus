@@ -700,7 +700,15 @@ class CalendarsRepositoryImpl @Inject constructor(
             val deduplicatedEventSkeletons = eventSkeletons.filterOutDuplicatesInSubscribedCalendars()
 
             if (eventSkeletons.size != deduplicatedEventSkeletons.size) {
-                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars")
+                // (all skeletons) - (the ones not being duplicated) = duplicated
+                val duplicatedSubscribedEventIds = eventSkeletons.filterNot { skeleton -> deduplicatedEventSkeletons.find { it.id == skeleton.id } != null }.map { it.id }
+
+                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars, deleting / 100: ${duplicatedSubscribedEventIds.size / 100}")
+
+                // delete duplicated subscribed events from local DB
+                duplicatedSubscribedEventIds.chunked(50).forEach {
+                    database.eventsDao().deleteByIds(it)
+                }
             }
 
             logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")

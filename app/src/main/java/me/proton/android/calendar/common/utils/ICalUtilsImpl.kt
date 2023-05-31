@@ -629,7 +629,7 @@ object ICalUtilsImpl : ICalUtils {
 
     override fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent> {
 
-        val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.occurrence?.occurrenceNumber}, ${it.iCalEvent.dateStart?.value?.time}" }
+        val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.getRecurrenceId("UTC")}, ${it.occurrence?.occurrenceNumber}, ${it.iCalEvent.dateStart?.value?.time}" }
 
         val result = mutableListOf<SkeletonEvent>()
         grouped.forEach {

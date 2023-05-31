@@ -308,6 +308,10 @@ data class Event private constructor(
         }
     }
 
+    fun getRecurrenceId(timeZoneId: String): ZonedDateTime? {
+        return iCalEvent.recurrenceId?.value?.toInstant()?.atZone(ZoneId.of(timeZoneId))
+    }
+
     fun isInThePast(timeZoneId: String): Boolean {
         return this.getOccurrenceEnd(timeZoneId).isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId))) == true
     }
