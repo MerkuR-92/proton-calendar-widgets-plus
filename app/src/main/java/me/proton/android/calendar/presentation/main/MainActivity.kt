@@ -119,6 +119,7 @@ import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.IcsParsingValidation
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.RATE_APP_DELAY
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
@@ -514,6 +515,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     }
                 }
 
+                lifecycleScope.launch {
+                    delay(RATE_APP_DELAY.toMillis())
+                    handleRateAppFlow()
+                }
+
+                mainViewModel.shouldTryRateApp.observe(this@MainActivity, Observer { shouldTryRateApp ->
+                    if (!shouldTryRateApp) return@Observer
+                    lifecycleScope.launch {
+                        handleRateAppFlow()
+                    }
+                })
+
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
 
@@ -649,6 +662,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Initial -> Unit
             AccountViewModel.State.StepNeeded -> Unit // handled by core
+        }
+    }
+
+    private suspend fun handleRateAppFlow() {
+        // Make sure user is in one of the main views
+        val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
+        if (!currentViewIsCalendar) return
+        // Make sure we're connected to network
+        val isConnectedToNetwork = mainViewModel.isConnectedToNetwork
+        if (!isConnectedToNetwork) return
+        // Check that rating BE feature flag is on
+        val isRatingEnabled = featureFlagViewModel.isRatingEnabled()
+        if (isRatingEnabled) {
+            // Start rating flow
+            mainViewModel.startRateApp(this)
+            // Set rating BE feature flag to off
+            featureFlagViewModel.recordReviewFlowStarted()
         }
     }
 

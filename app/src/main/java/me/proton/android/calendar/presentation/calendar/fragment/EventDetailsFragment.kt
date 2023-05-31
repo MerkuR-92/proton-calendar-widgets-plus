@@ -146,6 +146,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         } else {
             findNavController().navigateUp()
         }
+        mainViewModel.shouldTryRateApp()
     }
 
     override fun onBackPressedCustom() {

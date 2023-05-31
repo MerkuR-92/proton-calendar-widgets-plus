@@ -106,6 +106,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.presentation.utils.clearText
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
@@ -120,6 +121,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val eventViewModel: EventViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -222,6 +224,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             //  to navigate manually
             findNavController().navigate(Navigation.Deeplink.toMonth())
         }
+        mainViewModel.shouldTryRateApp()
     }
 
     private fun displayDiscardChangesConfirmationDialog(callback: DialogInterface.OnClickListener) {

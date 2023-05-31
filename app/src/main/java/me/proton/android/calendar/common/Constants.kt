@@ -35,6 +35,7 @@ val PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD: Duration = Duration.ofHours(1)
 
 val SYNC_CALENDARS_DELAY: Duration = Duration.ofSeconds(3)
 val UPDATE_PASSPHRASE_CALENDARS_DELAY: Duration = Duration.ofSeconds(5)
+val RATE_APP_DELAY: Duration = Duration.ofSeconds(3)
 
 val REFRESH_CURRENT_TIME_INDICATOR = Duration.ofMinutes(1).toMillis()
 

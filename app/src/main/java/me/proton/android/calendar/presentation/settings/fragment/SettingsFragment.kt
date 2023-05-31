@@ -91,6 +91,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
+        mainViewModel.shouldTryRateApp()
     }
 
     override fun onNavigationIconClicked(): Boolean {

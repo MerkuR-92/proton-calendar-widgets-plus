@@ -1,7 +1,8 @@
 package me.proton.android.calendar.di
 
 import android.content.Context
-import androidx.work.WorkManager
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,12 @@ object ApplicationModule {
     @Provides
     @Singleton
     fun provideAppStore() = AppStore.GooglePlay
+
+    @Provides
+    @Singleton
+    fun provideReviewManager(
+        @ApplicationContext context: Context
+    ): ReviewManager = ReviewManagerFactory.create(context)
 
     @Provides
     @Singleton

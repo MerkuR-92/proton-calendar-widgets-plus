@@ -61,6 +61,7 @@ logging-interceptor = "4.8.0"
 sql-cipher = "4.5.2"
 guava = "31.0.1-android"
 proton-detekt-plugin = "1.1.2"
+review = "2.0.1"
 
 [libraries]
 jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
@@ -205,6 +206,10 @@ jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "j
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-coroutines = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit-coroutines" }
 retrofit-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit-serialization-converter" }
+
+# Google play review
+google-play-review = { module = "com.google.android.play:review", version.ref = "review" }
+google-play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "review" }
 
 [plugins]
 proton-detekt = { id = "me.proton.core.gradle-plugins.detekt", version.ref = "proton-detekt-plugin" }
