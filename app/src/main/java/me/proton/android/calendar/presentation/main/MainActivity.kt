@@ -508,16 +508,17 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Ready -> {
 
-                showLastSpotlightDialog {
+                if (!showLastSpotlightDialog {
                     if (it == SEARCH_VERSION_CODE) {
                         searchViewModel.enableCalendarDownload()
                         displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
                     }
-                }
-
-                lifecycleScope.launch {
-                    delay(RATE_APP_DELAY.toMillis())
-                    handleRateAppFlow()
+                }) {
+                    // Make sure we don't overlap spotlight and rate app dialogs
+                    lifecycleScope.launch {
+                        delay(RATE_APP_DELAY.toMillis())
+                        handleRateAppFlow()
+                    }
                 }
 
                 mainViewModel.shouldTryRateApp.observe(this@MainActivity, Observer { shouldTryRateApp ->
