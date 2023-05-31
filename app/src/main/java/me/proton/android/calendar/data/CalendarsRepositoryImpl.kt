@@ -783,6 +783,74 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun getEvents(userId: String, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Event> {
+
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
+
+        val visibleCalendars = selectAllCalendars(userId).filterVisibleCalendars()
+
+        val visibleSkeletons = visibleCalendars.map { calendar ->
+            database.eventsDao().selectSkeletonEvents(calendar.id).mapNotNull { skeletonEventEntity ->
+                if ((skeletonEventEntity.addressId != null) && (database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) == null)) {
+                    // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
+                    null
+                } else calendar.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
+            }.filterOutDuplicatesInSubscribedCalendars()
+        }
+
+        val skeletonsInWindow = visibleSkeletons.map { skeletons ->
+            skeletons.map {
+                    skeletonEvent ->
+                    expandSkeletonEventsAndFilterInWindow(
+                    skeletonEvent,
+                    skeletons,
+                    eventsWindow
+                )
+            }.flatten()
+        }.flatten()
+
+        logger.v("getEvents [List<Event>] for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+
+        return coroutineScope {
+
+            // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
+            // all we need to do is decrypt EventEntity and return full Events with correct occurrences
+
+            val eventIds = skeletonsInWindow.map { it.id }.distinct()
+            val chunkedEventIds = eventIds.chunked(20)
+            val eventEntities = chunkedEventIds.flatMap {
+                database.eventsDao().selectAllById(it)
+            }
+
+            val transformedEvents = eventEntities.map { eventEntity ->
+                async {
+                    val transformedEvent = if (USE_EVENT_DECRYPTOR) {
+                        eventDecryptor.decrypt(eventEntity)
+                    } else {
+                        transformEventUseCase.execute(eventEntity)
+                    }
+
+                    val skeletons = skeletonsInWindow.filter { it.id == eventEntity.id }
+
+                    if (transformedEvent != null) {
+                        skeletons.map {
+                            if (it.occurrence == null) { // non-recurring event
+                                transformedEvent
+                            } else if (it.isSingleEdit()) { // single edits, copy occurrence it replaces
+                                transformedEvent.occurrence = it.occurrence
+                                transformedEvent
+                            } else { // recurring event, apply occurrence
+                                Event.withOccurrence(transformedEvent, it.occurrence!!)
+                            }
+                        }
+                    } else null
+                }
+            }.awaitAll().filterNotNull().flatten()
+
+            transformedEvents
+        }
+    }
+
     override fun getEvents(
         fromDate: LocalDate,
         toDate: LocalDate,

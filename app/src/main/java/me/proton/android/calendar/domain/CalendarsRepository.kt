@@ -145,6 +145,13 @@ interface CalendarsRepository {
         allowCached: Boolean
     ): Flow<GetEventsResult<Event>>
 
+    suspend fun getEvents(
+        userId: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): List<Event>
+
     fun getSearchEvents(
         userId: String,
         searchTerm: String
