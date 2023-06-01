@@ -40,7 +40,7 @@ class FeatureFlagViewModel @Inject constructor(
         featureFlagManager.prefetch(null, featureIds)
     }
 
-    fun prefetchForCurrent() = accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
+    fun prefetchForCurrentUser() = accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
         val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
         featureFlagManager.prefetch(userId, featureIds)
     }.launchIn(viewModelScope)

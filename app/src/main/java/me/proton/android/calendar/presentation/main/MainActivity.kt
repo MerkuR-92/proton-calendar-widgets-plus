@@ -523,7 +523,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val newEventIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_NEW_EVENT)
 
-                featureFlagViewModel.prefetchForCurrent()
+                featureFlagViewModel.prefetchForCurrentUser()
 
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
                     logger.v("converting deeplink and navigating manually")
