@@ -71,6 +71,7 @@ import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_la
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_press
 import kotlinx.android.synthetic.main.fragment_event_form.event_form_title
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -224,7 +225,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             //  to navigate manually
             findNavController().navigate(Navigation.Deeplink.toMonth())
         }
-        mainViewModel.shouldTryRateApp()
+        mainViewModel.triggerPlayStoreRatingFlow.update { true }
     }
 
     private fun displayDiscardChangesConfirmationDialog(callback: DialogInterface.OnClickListener) {

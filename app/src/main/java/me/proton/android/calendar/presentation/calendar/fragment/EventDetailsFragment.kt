@@ -65,6 +65,7 @@ import kotlinx.android.synthetic.main.item_form_section.view.image_dot_icon
 import kotlinx.android.synthetic.main.item_form_section.view.image_icon
 import kotlinx.android.synthetic.main.item_form_section.view.text_header
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -146,7 +147,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         } else {
             findNavController().navigateUp()
         }
-        mainViewModel.shouldTryRateApp()
+        mainViewModel.triggerPlayStoreRatingFlow.update { true }
     }
 
     override fun onBackPressedCustom() {

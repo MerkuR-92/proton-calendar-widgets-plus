@@ -6,13 +6,13 @@ import android.content.*
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.google.android.play.core.review.ReviewManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -55,7 +55,7 @@ class MainViewModel @Inject constructor(
 
     val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
 
-    val shouldTryRateApp: MutableLiveData<Boolean> = MutableLiveData(false)
+    val triggerPlayStoreRatingFlow = MutableStateFlow(false)
 
     /**
      * Try to open maps with event location.
@@ -265,7 +265,7 @@ class MainViewModel @Inject constructor(
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
     }
 
-    fun startRateApp(activity: Activity) {
+    fun startPlayStoreRating(activity: Activity) {
         val request = reviewManager.requestReviewFlow()
         request.addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -283,9 +283,5 @@ class MainViewModel @Inject constructor(
                 logger.d("Rate app request failed $reviewError")
             }
         }
-    }
-
-    fun shouldTryRateApp() {
-        shouldTryRateApp.value = true
     }
 }

@@ -119,7 +119,7 @@ import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.IcsParsingValidation
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.RATE_APP_DELAY
+import me.proton.android.calendar.common.PLAY_STORE_RATING_DELAY
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
@@ -508,25 +508,23 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Ready -> {
 
-                if (!showLastSpotlightDialog {
+                // Display spotlight dialog if needed
+                val spotlightShown = showLastSpotlightDialog {
                     if (it == SEARCH_VERSION_CODE) {
                         searchViewModel.enableCalendarDownload()
                         displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
                     }
-                }) {
-                    // Make sure we don't overlap spotlight and rate app dialogs
-                    lifecycleScope.launch {
-                        delay(RATE_APP_DELAY.toMillis())
-                        handleRateAppFlow()
-                    }
                 }
 
-                mainViewModel.shouldTryRateApp.observe(this@MainActivity, Observer { shouldTryRateApp ->
-                    if (!shouldTryRateApp) return@Observer
+                // Make sure we don't overlap spotlight and play store rating dialogs
+                if (!spotlightShown) {
                     lifecycleScope.launch {
-                        handleRateAppFlow()
+                        // We need to wait a few seconds before displaying the dialog
+                        delay(PLAY_STORE_RATING_DELAY.toMillis())
+                        // Check if we need to display play store rating dialog
+                        handlePlayStoreRatingFlow()
                     }
-                })
+                }
 
                 val eventDetailsIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_SHOW_EVENT_DETAILS)
@@ -653,6 +651,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             calendarViewModel.initManagedHolidayCalendar(it)
                         }
                     }
+
+                    mainViewModel.triggerPlayStoreRatingFlow.collect { triggerPlayStoreRatingFlow ->
+                        if (!triggerPlayStoreRatingFlow) return@collect
+                        handlePlayStoreRatingFlow()
+                    }
                 }
             }
             AccountViewModel.State.Processing -> {
@@ -666,7 +669,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
     }
 
-    private suspend fun handleRateAppFlow() {
+    private suspend fun handlePlayStoreRatingFlow() {
         // Make sure user is in one of the main views
         val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
         if (!currentViewIsCalendar) return
@@ -674,12 +677,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         val isConnectedToNetwork = mainViewModel.isConnectedToNetwork
         if (!isConnectedToNetwork) return
         // Check that rating BE feature flag is on
-        val isRatingEnabled = featureFlagViewModel.isRatingEnabled()
+        val isRatingEnabled = featureFlagViewModel.isPlayStoreRatingEnabled()
         if (isRatingEnabled) {
             // Start rating flow
-            mainViewModel.startRateApp(this)
+            mainViewModel.startPlayStoreRating(this)
             // Set rating BE feature flag to off
-            featureFlagViewModel.recordReviewFlowStarted()
+            featureFlagViewModel.reportPlayStoreRatingFlowStarted()
         }
     }
 

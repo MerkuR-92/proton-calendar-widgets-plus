@@ -86,11 +86,11 @@ class FeatureFlagViewModel @Inject constructor(
         return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
     }
 
-    suspend fun isRatingEnabled(): Boolean {
+    suspend fun isPlayStoreRatingEnabled(): Boolean {
         return isFeatureEnabled(CalendarFeatureFlag.RatingAndroidCalendar)
     }
 
-    suspend fun recordReviewFlowStarted() {
+    suspend fun reportPlayStoreRatingFlowStarted() {
         updateFeatureFlag(CalendarFeatureFlag.RatingAndroidCalendar, false)
     }
 }
