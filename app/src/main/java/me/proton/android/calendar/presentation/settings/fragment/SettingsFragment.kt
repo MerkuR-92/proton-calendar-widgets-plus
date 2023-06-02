@@ -33,6 +33,7 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_import_separato
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_list
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
@@ -91,6 +92,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
+        mainViewModel.triggerPlayStoreRatingFlow.update { true }
     }
 
     override fun onNavigationIconClicked(): Boolean {

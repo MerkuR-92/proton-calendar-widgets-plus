@@ -99,14 +99,14 @@ object SpotlightUtils {
         )
     }
 
-    fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null) {
+    fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null): Boolean {
         val lastSpotlightShown = this.getLastSpotlightShown()
         val lastSpotlightVersionCode = SPOTLIGHT_VERSION_CODES.maxOrNull() ?: 0 // Should never be null
 
         // Return if we have already shown the last spotlight dialog
-        if (lastSpotlightShown >= lastSpotlightVersionCode) return
+        if (lastSpotlightShown >= lastSpotlightVersionCode) return false
 
-        when (lastSpotlightVersionCode) {
+        return when (lastSpotlightVersionCode) {
             MONTH_VIEW_VERSION_CODE -> {
                 // Month view
                 val monthViewContent = getMonthViewDialogContent()
@@ -114,6 +114,7 @@ object SpotlightUtils {
                     monthViewContent.first,
                     monthViewContent.second
                 )
+                true
             }
             REBRANDING_VERSION_CODE -> {
                 // Rebranding
@@ -122,6 +123,7 @@ object SpotlightUtils {
                     rebrandingContent.first,
                     rebrandingContent.second
                 )
+                true
             }
             EASY_SWITCH_VERSION_CODE -> {
                 // Display auto added invites dialog, followed by easy switch dialog
@@ -146,6 +148,7 @@ object SpotlightUtils {
                         )
                     }
                 )
+                true
             }
             WEEK_VIEW_VERSION_CODE -> {
                 // Week view
@@ -155,6 +158,7 @@ object SpotlightUtils {
                     weekViewContent.second,
                     materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
                 )
+                true
             }
             IMPORT_VERSION_CODE -> {
                 // Import
@@ -164,6 +168,7 @@ object SpotlightUtils {
                     weekViewContent.second,
                     materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
                 )
+                true
             }
             CALENDAR_PROVIDER_VERSION_CODE -> {
                 // Calendar provider, default view setting, shared calendar write permissions, shared calendar edit setting, new languages
@@ -173,9 +178,10 @@ object SpotlightUtils {
                     content.second,
                     materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button
                 )
+                true
             }
             SEARCH_VERSION_CODE -> {
-                if (!CalendarFeatureFlag.ShowEventSearch.fallbackValue) return
+                if (!CalendarFeatureFlag.ShowEventSearch.fallbackValue) return false
                 val content = getSearchDialogContent()
                 this.displaySpotlightDialog(
                     content.first,
@@ -185,9 +191,11 @@ object SpotlightUtils {
                         positiveCallback?.invoke(lastSpotlightVersionCode)
                     }
                 )
+                true
             }
             else -> {
                 // Do nothing if we don't have any dialog to show for that version code
+                false
             }
         }
     }

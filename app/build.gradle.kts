@@ -213,6 +213,10 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.work.runtime)
 
+    // Google play review
+    implementation(libs.google.play.review)
+    implementation(libs.google.play.review.ktx)
+
     // Alpha version needed for custom language selection.
     // This should be replaced as soon as a stable version is available
     implementation(libs.androidx.appcompat.alpha)
@@ -305,9 +309,9 @@ object Config {
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "30.0.3"
     const val targetSdk = 33
-    const val versionCode = 197
+    const val versionCode = 198
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.HiltTestRunner"
-    const val versionName = "2.10.5"
+    const val versionName = "2.11.0"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(

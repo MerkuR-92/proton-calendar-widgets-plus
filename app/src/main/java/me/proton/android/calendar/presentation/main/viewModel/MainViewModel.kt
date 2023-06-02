@@ -1,15 +1,18 @@
 package me.proton.android.calendar.presentation.main.viewModel
 
+import android.app.Activity
 import android.app.Application
 import android.content.*
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.work.*
+import com.google.android.play.core.review.ReviewManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -45,11 +48,14 @@ class MainViewModel @Inject constructor(
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
     private val logger: Logger,
     private val workManager: WorkManager,
+    private val reviewManager: ReviewManager
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
 
     val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
+
+    val triggerPlayStoreRatingFlow = MutableStateFlow(false)
 
     /**
      * Try to open maps with event location.
@@ -257,5 +263,25 @@ class MainViewModel @Inject constructor(
         val userId = accountRepository.getPrimaryUserId().firstOrNull() ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
         if (isConnectedToNetwork.not()) return IcsSurgeryUtils.HandleIcsResult.Error.NetworkError
         return handleIcsUseCase.execute(iCalString, userId, senderEmail, recipientEmail)
+    }
+
+    fun startPlayStoreRating(activity: Activity) {
+        val request = reviewManager.requestReviewFlow()
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // We got the ReviewInfo object
+                val reviewInfo = task.result
+                val flow = reviewManager.launchReviewFlow(activity, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                    // The flow has finished. The API does not indicate whether the user
+                    // reviewed or not, or even whether the review dialog was shown. Thus, no
+                    // matter the result, we continue our app flow.
+                }
+            } else {
+                // There was some problem, log or handle the error code.
+                val reviewError = task.exception
+                logger.d("Rate app request failed $reviewError")
+            }
+        }
     }
 }
