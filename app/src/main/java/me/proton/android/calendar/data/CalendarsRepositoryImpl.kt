@@ -715,24 +715,19 @@ class CalendarsRepositoryImpl @Inject constructor(
 
             coroutineScope {
 
-                // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
-                // all we need to do is decrypt EventEntity and return full Events with correct occurrences
-
-                val eventIds = deduplicatedEventSkeletons.map { it.id }.distinct()
-                val chunkedEventIds = eventIds.chunked(100)
-                val eventEntities = chunkedEventIds.flatMap {
-                    database.eventsDao().selectAllById(it)
-                }
-
-                val transformedEvents = eventEntities.map { eventEntity ->
+                val transformedEvents = deduplicatedEventSkeletons.distinct().map { skeleton ->
                     async {
                         val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                            eventDecryptor.decrypt(eventEntity)
+                            // get Event from cache based on metadata, or select entire EventEntity and decrypt it in case of cache miss
+                            eventDecryptor.getFromCache(skeleton.id, skeleton.calendar.id, skeleton.modifyTime) ?: database.eventsDao().selectById(skeleton.id)?.let { eventDecryptor.decrypt(it) }
                         } else {
-                            transformEventUseCase.execute(eventEntity)
+                            database.eventsDao().selectById(skeleton.id)?.let { transformEventUseCase.execute(it) }
                         }
 
-                        val skeletons = deduplicatedEventSkeletons.filter { it.id == eventEntity.id }
+                        val skeletons = deduplicatedEventSkeletons.filter { it.id == skeleton.id }
+
+                        // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
+                        // all we need to do is decrypt EventEntity and return full Events with correct occurrences
 
                         if (transformedEvent != null) {
                             skeletons.map {
@@ -832,7 +827,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
             val transformedEvents = eventEntities.map { eventEntity ->
                 async {
-                    val transformedEvent = if (USE_EVENT_DECRYPTOR) {
+                    val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                         eventDecryptor.decrypt(eventEntity)
                     } else {
                         transformEventUseCase.execute(eventEntity)

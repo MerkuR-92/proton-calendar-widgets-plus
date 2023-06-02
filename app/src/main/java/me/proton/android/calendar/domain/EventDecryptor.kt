@@ -14,4 +14,6 @@ interface EventDecryptor {
 
     suspend fun clearCache()
 
+    suspend fun getFromCache(eventId: String, calendarId: String, modifyTime: Long): Event?
+
 }

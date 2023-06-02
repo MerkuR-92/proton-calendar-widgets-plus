@@ -18,7 +18,8 @@ class EventDecryptorImpl @Inject constructor(
 
     private data class CacheKey(
         val eventId: String,
-        val calendarId: String
+        val calendarId: String,
+        val modifyTime: Long
     )
 
     private data class CacheValue(
@@ -30,7 +31,7 @@ class EventDecryptorImpl @Inject constructor(
     private val mutex = Mutex()
 
     override suspend fun decrypt(eventEntity: EventEntity): Event? = mutex.withLock {
-        val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId)
+        val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
         val cacheValue = cache[cacheKey]
         val cachedEntity = cacheValue?.eventEntity
 
@@ -67,7 +68,7 @@ class EventDecryptorImpl @Inject constructor(
         val decryptedEvent = transformEventUseCase.execute(eventEntity, allowApiCall = true)
 
         mutex.withLock {
-            val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId)
+            val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
 
             if (decryptedEvent != null) {
                 cache[cacheKey] = CacheValue(eventEntity, decryptedEvent)
@@ -80,6 +81,11 @@ class EventDecryptorImpl @Inject constructor(
 
     override suspend fun clearCache() = mutex.withLock {
         cache.clear()
+    }
+
+    override suspend fun getFromCache(eventId: String, calendarId: String, modifyTime: Long): Event? {
+        val cacheKey = CacheKey(eventId, calendarId, modifyTime)
+        return cache[cacheKey]?.event
     }
 
     private fun EventEntity.isTheSameAs(other: EventEntity): Boolean {
