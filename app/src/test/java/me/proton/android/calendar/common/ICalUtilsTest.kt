@@ -5056,19 +5056,19 @@ internal class ICalUtilsTest {
 
         val skeletonEntities = listOf<SkeletonEvent>(
             // original event
-            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics1)!!)!!, calendar = calendarSubscribed),
+            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics1)!!)!!, calendar = calendarSubscribed, id = "id1"),
             // actual duplicate
-            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics2)!!)!!, calendar = calendarSubscribed),
+            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics2)!!)!!, calendar = calendarSubscribed, id = "id2"),
             // the same UID but different date start
-            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics3DifferentDateStart)!!)!!, calendar = calendarSubscribed),
+            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics3DifferentDateStart)!!)!!, calendar = calendarSubscribed, id = "id3"),
             // different event
-            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics4DifferentUid)!!)!!, calendar = calendarSubscribed),
+            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics4DifferentUid)!!)!!, calendar = calendarSubscribed,  id = "id4"),
 
             // same event content but should be on the list because it's a non-subscribed calendar
-            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics1)!!)!!, calendar = calendarRegular),
+            SkeletonEvent.from(SkeletonEvent.dummyFrom(parseICalString(ics1)!!)!!, calendar = calendarRegular, id = "id5"),
         )
 
-        val filtered = skeletonEntities.filterOutDuplicatesInSubscribedCalendars()
+        val filtered = skeletonEntities.filterOutDuplicatesInSubscribedCalendars().first
 
         assertThat(filtered.size).isEqualTo(4)
 
@@ -5123,12 +5123,12 @@ internal class ICalUtilsTest {
         val skeletonEntities = eventsWithOccurrences.map {
             listOf(
                 // add each Event twice to get duplicates
-                SkeletonEvent.from(SkeletonEvent.from(it)),
-                SkeletonEvent.from(SkeletonEvent.from(it))
+                SkeletonEvent.from(SkeletonEvent.from(it, id = "1:${System.currentTimeMillis()}")),
+                SkeletonEvent.from(SkeletonEvent.from(it, id = "2:${System.currentTimeMillis()}"))
             )
         }.flatten()
 
-        val filtered = skeletonEntities.filterOutDuplicatesInSubscribedCalendars()
+        val filtered = skeletonEntities.filterOutDuplicatesInSubscribedCalendars().first
 
         assertThat(filtered.size).isEqualTo(3)
 

@@ -154,11 +154,13 @@ interface ICalUtils {
     /**
      * TODO this is a hack for hiding duplicated Events in Subscribed Calendars
      *
-     * Events are considered duplicated if they have the same UID, CalendarID and Calendar is of type "subscribed" (1).
+     * Events are considered duplicated if they have the same UID, RecurrenceID, CalendarID and Calendar is of type "subscribed" (1).
      *
      * Out of all duplicates, we return the one with highest "modifyTime" value.
+     *
+     * @return Pair<Unique Events, Duplicated Events>
      */
-    fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent>
+    fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): Pair<List<SkeletonEvent>, List<SkeletonEvent>>
 
     /**
      * Returns event ZonedDateTime on Date format
