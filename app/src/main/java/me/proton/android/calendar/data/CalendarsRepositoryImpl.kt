@@ -185,10 +185,17 @@ class CalendarsRepositoryImpl @Inject constructor(
                     }
                 }
 
+                val existingAddressIds = mutableMapOf<String, Boolean>() // AddressId -> exists/doesn't exist
+
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
 
-                    if ((skeletonEventEntity.addressId != null) && (database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) == null)) {
+                    // cache information if Address exists locally or not
+                    if ((skeletonEventEntity.addressId != null) && existingAddressIds.contains(skeletonEventEntity.addressId).not()) {
+                        existingAddressIds[skeletonEventEntity.addressId] = database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) != null
+                    }
+
+                    if ((skeletonEventEntity.addressId != null) && existingAddressIds[skeletonEventEntity.addressId] == false) {
                         // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
                         null
                     } else calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
@@ -792,9 +799,17 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         val visibleCalendars = selectAllCalendars(userId).filterVisibleCalendars()
 
+        val existingAddressIds = mutableMapOf<String, Boolean>() // AddressId -> exists/doesn't exist
+
         val visibleSkeletons = visibleCalendars.map { calendar ->
             database.eventsDao().selectSkeletonEvents(calendar.id).mapNotNull { skeletonEventEntity ->
-                if ((skeletonEventEntity.addressId != null) && (database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) == null)) {
+
+                // cache information if Address exists locally or not
+                if ((skeletonEventEntity.addressId != null) && existingAddressIds.contains(skeletonEventEntity.addressId).not()) {
+                    existingAddressIds[skeletonEventEntity.addressId] = database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) != null
+                }
+
+                if ((skeletonEventEntity.addressId != null) && existingAddressIds[skeletonEventEntity.addressId] == false) {
                     // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
                     null
                 } else calendar.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
@@ -854,7 +869,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getEvents(
+    override fun getEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,

@@ -138,7 +138,7 @@ interface CalendarsRepository {
     /**
      * @return Transformed Events.
      */
-    fun getEvents(
+    fun getEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,

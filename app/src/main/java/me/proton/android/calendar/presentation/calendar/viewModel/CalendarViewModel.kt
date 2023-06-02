@@ -469,7 +469,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<Event>> {
-        return calendarsRepository.getEvents(fromDate, toDate, timeZoneId, allowCached = true).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+        return calendarsRepository.getEventsFlow(fromDate, toDate, timeZoneId, allowCached = true).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
     }
 
     suspend fun handleDeleteEvent(eventId: String,
