@@ -38,10 +38,8 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
-import me.proton.android.calendar.data.entity.getDefaultAlarms
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -744,7 +742,7 @@ object ICalUtilsImpl : ICalUtils {
 
         if (isCurrentEventAnInvitation) return false
 
-        if (fromEvent.isPartOfChain() || !FeatureFlag.CHANGE_CALENDAR_SIMPLE_EVENT) return false
+        if (fromEvent.isPartOfChain() || !CalendarFeatureFlag.ChangeCalendarSimpleEvent.fallbackValue) return false
 
         return true
     }

@@ -5,7 +5,6 @@ import android.os.Build
 import biweekly.util.DateTimeComponents
 import biweekly.util.ICalDate
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
 import me.proton.android.calendar.common.aliasesTimezonesMap
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.logger.TimberLogger
@@ -382,7 +381,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * We only allow Locales used to format date & time that our application is translated to.
      */
     override fun getLocaleForFormatting(): Locale {
-        if (!CHANGE_LANGUAGE) return Locale.US
+        if (!CalendarFeatureFlag.ChangeLanguage.fallbackValue) return Locale.US
         val appDefaultLocale = Locale.getDefault()
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             getSupportedLocaleOrNull(

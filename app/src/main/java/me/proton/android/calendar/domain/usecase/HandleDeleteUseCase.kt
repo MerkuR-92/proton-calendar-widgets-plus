@@ -2,11 +2,11 @@ package me.proton.android.calendar.domain.usecase
 
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
-import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.EventDeletionReason
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.utils.AndroidUtils.toInt
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.addExceptionDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrence
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getSingleEditOriginalOccurrenceNumber
@@ -14,9 +14,14 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.handleDeleteThisAn
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
-import me.proton.android.calendar.data.api.*
+import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.SyncEventDeleteContainer
+import me.proton.android.calendar.data.api.SyncEventsUpdateApiRequest
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.EventDecryptor
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SendPreferences
@@ -26,7 +31,7 @@ import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Date
 import javax.inject.Inject
 
 class HandleDeleteUseCase @Inject constructor( // TODO TESTS
@@ -66,7 +71,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             } else return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
         }
 
-        val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+        val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(eventEntity)
         } else {
             transformEventUseCase.execute(eventEntity)
@@ -90,7 +95,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
                     if (!isOrphanSingleEdit) {
                         val rootEventEntity = calendarsRepository.selectRootEventEntity(event.uid)
-                        val rootEvent = rootEventEntity?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                        val rootEvent = rootEventEntity?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                             eventDecryptor.decrypt(it)
                         } else {
                             transformEventUseCase.execute(it)
@@ -139,7 +144,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             EventEditDeleteOption.THIS_EVENT_AND_FUTURE -> {
 
                 val rootEvent =
-                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                         eventDecryptor.decrypt(it)
                     } else {
                         transformEventUseCase.execute(it)
@@ -189,7 +194,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
                 // delete single edits and the original event as the last one
                 val rootEvent =
-                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                    if (event.isSingleEdit()) calendarsRepository.selectRootEventEntity(event.uid)?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                         eventDecryptor.decrypt(it)
                     } else {
                         transformEventUseCase.execute(it)
@@ -279,7 +284,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
     private suspend fun deleteSingleEditsAfter(userId: UserId, eventId: String, recurrenceIdIsAfter: ZonedDateTime) : UseCase.Result {
 
         val eventEntity = calendarsRepository.selectEventEntity(eventId) ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId doesn't exist in DB")
-        val event = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+        val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(eventEntity)
         } else {
             transformEventUseCase.execute(eventEntity)
@@ -288,7 +293,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
 
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
-        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(it)
         } else {
             transformEventUseCase.execute(it)

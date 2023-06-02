@@ -49,7 +49,6 @@ import kotlinx.coroutines.yield
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
 import me.proton.android.calendar.common.MAX_CALENDAR_PAID
 import me.proton.android.calendar.common.SIGNATURE_VERIFICATION_API_TIMEOUT
@@ -60,6 +59,7 @@ import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.getWeekStart
 import me.proton.android.calendar.common.getWeekStartFlow
 import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffsetsDifferent
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
@@ -880,7 +880,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun displayImport(): Boolean {
-        return IMPORT_ASSISTANT && isDelinquentUser() == false
+        return CalendarFeatureFlag.ImportAssistant.fallbackValue && isDelinquentUser() == false
     }
 
     suspend fun isDelinquentUser(): Boolean? {

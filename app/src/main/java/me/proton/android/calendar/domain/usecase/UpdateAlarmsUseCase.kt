@@ -1,16 +1,14 @@
 package me.proton.android.calendar.domain.usecase
 
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
-import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import javax.inject.Inject
@@ -37,7 +35,7 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         val eventChains = eventIds.mapNotNull {
             val dbOriginalEvent = database.eventsDao().selectById(it)
-            val originalEvent = dbOriginalEvent?.let { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            val originalEvent = dbOriginalEvent?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(it)
             } else {
                 transformEventUseCase.execute(it)
@@ -56,7 +54,7 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         eventChains.forEach {
 
-            val transformedChain = it.second.mapNotNull { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            val transformedChain = it.second.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(it)
             } else {
                 transformEventUseCase.execute(it)

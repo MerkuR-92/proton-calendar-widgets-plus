@@ -35,17 +35,12 @@ import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
 import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
-import me.proton.android.calendar.common.FeatureFlag.CLEAR_CALENDAR
-import me.proton.android.calendar.common.FeatureFlag.DELETE_CALENDAR
-import me.proton.android.calendar.common.FeatureFlag.EDITING_SHARED_CALENDARS
-import me.proton.android.calendar.common.FeatureFlag.HOLIDAY_CALENDAR
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
@@ -60,6 +55,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
@@ -79,6 +75,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val calendarFormViewModel: CalendarFormViewModel by activityViewModels()
     private val holidayCalendarViewModel: HolidayCalendarViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
 
     private val resourceProvider: ResourceProvider by inject()
@@ -127,7 +124,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             getString(R.string.settings_general_info_time_zone),
             getString(R.string.settings_general_info_calendar_layout)
         )
-        if (CHANGE_LANGUAGE) {
+        if (CalendarFeatureFlag.ChangeLanguage.fallbackValue) {
             generalSettingsDescription = getString(
                 R.string.settings_general_info_separator,
                 getString(R.string.settings_general_info_language),
@@ -456,16 +453,16 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             editLayout?.visibleOrGone(
                 (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
                         calendar.isSubscribed || // subscribed calendar
-                        (calendar.isSharedWithMe && EDITING_SHARED_CALENDARS) || // shared calendar
-                        (calendar.isHolidayCalendar && HOLIDAY_CALENDAR) // holiday calendar
+                        (calendar.isSharedWithMe && CalendarFeatureFlag.EditingSharedCalendars.fallbackValue) || // shared calendar
+                        (calendar.isHolidayCalendar && featureFlagViewModel.isHolidayCalendarEnabled()) // holiday calendar
             )
 
             val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
-            deleteLayout?.visibleOrGone(DELETE_CALENDAR)
+            deleteLayout?.visibleOrGone(CalendarFeatureFlag.DeleteCalendar.fallbackValue)
 
             val recreateLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_recreate)
             recreateLayout?.visibleOrGone(
-                CLEAR_CALENDAR &&
+                CalendarFeatureFlag.ClearCalendar.fallbackValue &&
                         calendar.isSubscribed.not() &&
                         calendar.isSharedWithMe.not() &&
                         calendar.isHolidayCalendar.not() &&
@@ -513,7 +510,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
-        addHolidayCalendar?.visibleOrGone(HOLIDAY_CALENDAR)
+        addHolidayCalendar?.visibleOrGone(
+            featureFlagViewModel.isHolidayCalendarEnabled()
+        )
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()

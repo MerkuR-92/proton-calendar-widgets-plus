@@ -69,8 +69,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.ATTENDEE_AUTO_EXPAND_LIMIT
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_ANSWER
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -85,7 +83,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.rotateArrowUpward
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartEndForActualEndDate
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
@@ -563,7 +561,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            if (FeatureFlag.SHOW_SIGNATURE_VERIFICATION_BADGES) {
+            if (CalendarFeatureFlag.ShowSignatureVerificationBadges.fallbackValue) {
                 when (event.verificationStatus) {
                     Event.SignatureVerification.SUCCESS, Event.SignatureVerification.NOT_SIGNED, Event.SignatureVerification.SIGNED_BUT_NO_KEYS -> {
                         section_verification_badge.visibleOrGone(false)
@@ -650,7 +648,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
      *  without updating the participation status value
      **/
     private fun handleAttendeeAnswerViewVisibility(userAddresses: List<UserAddress>) {
-        if (!CHANGE_ANSWER) {
+        if (!CalendarFeatureFlag.ChangeAnswer.fallbackValue) {
             // TODO Remove feature flag
             section_answer.visibleOrGone(false)
             return

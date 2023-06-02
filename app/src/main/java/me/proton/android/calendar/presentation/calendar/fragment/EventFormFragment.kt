@@ -74,7 +74,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag.ADD_ATTENDEES
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
 import me.proton.android.calendar.common.FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG
@@ -92,6 +91,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
@@ -578,7 +578,10 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             )
 
             lifecycleScope.launch {
-                event_form_participant_layout.visibleOrGone(ADD_ATTENDEES && eventViewModel.allowSendForCalendarAddress() && event.hasProtonUid) // TODO Remove feature flag
+                event_form_participant_layout.visibleOrGone(CalendarFeatureFlag.AddAttendees.fallbackValue &&
+                        eventViewModel.allowSendForCalendarAddress() &&
+                        event.hasProtonUid
+                )
 
                 event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 

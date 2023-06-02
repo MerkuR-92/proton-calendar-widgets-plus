@@ -2,7 +2,6 @@ package me.proton.android.calendar.common.utils
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Resources
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
@@ -20,10 +19,6 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CALENDAR_PROVIDER_VERSION_CODE
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ASSISTANT
-import me.proton.android.calendar.common.FeatureFlag.IMPORT_ICS
-import me.proton.android.calendar.common.FeatureFlag.SHOW_EVENT_SEARCH
-import me.proton.android.calendar.common.FeatureFlag.SPOTLIGHT
 import me.proton.android.calendar.common.IMPORT_VERSION_CODE
 import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.REBRANDING_VERSION_CODE
@@ -105,8 +100,6 @@ object SpotlightUtils {
     }
 
     fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null) {
-        if (!SPOTLIGHT) return
-
         val lastSpotlightShown = this.getLastSpotlightShown()
         val lastSpotlightVersionCode = SPOTLIGHT_VERSION_CODES.maxOrNull() ?: 0 // Should never be null
 
@@ -165,7 +158,6 @@ object SpotlightUtils {
             }
             IMPORT_VERSION_CODE -> {
                 // Import
-                if (!IMPORT_ICS) return
                 val weekViewContent = getImportDialogContent()
                 this.displaySpotlightDialog(
                     weekViewContent.first,
@@ -183,8 +175,7 @@ object SpotlightUtils {
                 )
             }
             SEARCH_VERSION_CODE -> {
-                if (!SHOW_EVENT_SEARCH) return
-
+                if (!CalendarFeatureFlag.ShowEventSearch.fallbackValue) return
                 val content = getSearchDialogContent()
                 this.displaySpotlightDialog(
                     content.first,

@@ -10,15 +10,15 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
-import me.proton.core.util.kotlin.toBoolean
 import me.proton.android.calendar.test.shared.mocks.*
+import me.proton.core.util.kotlin.toBoolean
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
@@ -120,7 +120,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
     fun editInviteErrorTest() { // TODO To remove once editing invite is allowed
         runBlocking {
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -174,7 +174,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event with hidden calendar
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -290,7 +290,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -411,7 +411,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -532,7 +532,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -765,7 +765,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
@@ -885,7 +885,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
 
             // Mock event
-            coEvery { if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+            coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
             } else {
                 transformEventUseCaseMock.execute(EventMocks.provideEventEntity())

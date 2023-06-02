@@ -114,33 +114,6 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     SEARCH_VERSION_CODE // Search view (2.10.3)
 )
 
-object FeatureFlag {
-    const val SETTINGS_DRAWER = true
-    const val ADD_ATTENDEES = true
-    const val CHANGE_ANSWER = true
-    const val OPEN_INVITATION = true
-    const val APP_LINKS = true
-    const val DELETE_CALENDAR = true
-    const val CHANGE_CALENDAR_SIMPLE_EVENT = true
-    const val USE_EVENT_DECRYPTOR = true
-    const val CHANGE_LANGUAGE = true
-    const val MONTH_VIEW = true
-    const val SPOTLIGHT = true
-    const val SUBSCRIPTION = false
-    const val FEEDBACK = true
-    const val AUTO_INVITES_SETTING = true
-    const val IMPORT_ASSISTANT = true
-    const val SHOW_SIGNATURE_VERIFICATION_BADGES = false
-    const val THREE_DAYS_VIEW = true
-    const val WEEK_VIEW = true
-    const val DRAG_AND_DROP = false
-    const val EDITING_SHARED_CALENDARS = true
-    const val CLEAR_CALENDAR = false
-    const val IMPORT_ICS = true
-    const val SHOW_EVENT_SEARCH = true
-    const val HOLIDAY_CALENDAR = false
-}
-
 object HttpResponseCode {
     const val NOT_FOUND = 404
     const val UNPROCESSABLE_ENTITY = 422

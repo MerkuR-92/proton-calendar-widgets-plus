@@ -12,14 +12,17 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.PERIODIC_CALENDAR_WORKER_REFRESH_PERIOD
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.core.account.domain.entity.AccountState
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getAccounts
+import me.proton.core.featureflag.domain.FeatureFlagManager
 import java.util.concurrent.TimeUnit
 
 @HiltWorker
@@ -29,7 +32,8 @@ class PeriodicCalendarWorker @AssistedInject constructor(
     private val logger: Logger,
     private val accountManager: AccountManager,
     private val widgetRefresher: WidgetRefresher,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val featureFlagManager: FeatureFlagManager
 ) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result {

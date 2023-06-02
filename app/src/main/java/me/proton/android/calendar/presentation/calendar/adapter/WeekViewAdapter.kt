@@ -3,7 +3,7 @@ package me.proton.android.calendar.presentation.calendar.adapter
 import android.graphics.RectF
 import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.WeekViewPagingAdapterJsr310
-import me.proton.android.calendar.common.FeatureFlag.DRAG_AND_DROP
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
 import me.proton.android.calendar.domain.model.toWeekViewEntity
 import java.time.LocalDate
@@ -65,7 +65,7 @@ class WeekViewAdapter(
     }
 
     override fun onEventLongClick(data: WeekViewCalendarEntity, bounds: RectF): Boolean {
-        return !DRAG_AND_DROP // Return true to disable drag and drop
+        return !CalendarFeatureFlag.DragAndDrop.fallbackValue // Return true to disable drag and drop
     }
 
     private fun yearMonthsBetween(startDate: LocalDate, endDate: LocalDate): List<YearMonth> {

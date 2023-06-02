@@ -55,9 +55,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.DAY_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.EventEditDeleteOption
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.SEARCH_VERSION_CODE
 import me.proton.android.calendar.common.THREE_DAYS_VIEW_DAYS_COUNT
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.WEEK_VIEW_DATE_FORMATTER_PATTERN
@@ -73,6 +71,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWee
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
@@ -82,7 +81,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadd
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
-import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -99,7 +97,6 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPager
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
@@ -121,7 +118,6 @@ class MonthFragment : BaseFragment() {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
-    private val searchViewModel: SearchViewModel by activityViewModels()
 
     @Inject
     lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
@@ -177,7 +173,7 @@ class MonthFragment : BaseFragment() {
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
-            if (FeatureFlag.SHOW_EVENT_SEARCH) {
+            if (CalendarFeatureFlag.ShowEventSearch.fallbackValue) {
                 addView(buttonSearch, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))

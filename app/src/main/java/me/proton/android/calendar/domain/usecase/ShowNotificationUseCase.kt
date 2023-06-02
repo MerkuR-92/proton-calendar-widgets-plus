@@ -11,15 +11,14 @@ import biweekly.property.Trigger
 import biweekly.util.Duration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.FeatureFlag
 import me.proton.android.calendar.common.getTimeFormat
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartForNotification
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventAlarmEntity
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -76,7 +75,7 @@ class ShowNotificationUseCase @Inject constructor(
             if (eventEntity == null) {
                 logger.e("could not find EventEntity to show notification")
             } else {
-                val dbEvent = if (FeatureFlag.USE_EVENT_DECRYPTOR) {
+                val dbEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
                     transformEventUseCase.execute(eventEntity)

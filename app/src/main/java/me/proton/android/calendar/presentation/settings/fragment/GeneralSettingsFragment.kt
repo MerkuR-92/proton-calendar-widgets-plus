@@ -43,9 +43,6 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.AppTheme
-import me.proton.android.calendar.common.FeatureFlag
-import me.proton.android.calendar.common.FeatureFlag.CHANGE_LANGUAGE
-import me.proton.android.calendar.common.FeatureFlag.SHOW_EVENT_SEARCH
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -54,6 +51,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToI
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -124,8 +122,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        settings_auto_invites_separator.visibleOrGone(FeatureFlag.AUTO_INVITES_SETTING)
-        settings_auto_invites.visibleOrGone(FeatureFlag.AUTO_INVITES_SETTING)
+        settings_auto_invites_separator.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
+        settings_auto_invites.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
 
         settings_auto_invites_press.setOnClickListener {
             settings_auto_invites_switch.performClick()
@@ -243,7 +241,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         val appLanguageDialogLabels = appLanguagesLabels.toMutableList()
         appLanguageDialogLabels.add(0, systemDefaultLabel)
 
-        settings_language.visibleOrGone(CHANGE_LANGUAGE)
+        settings_language.visibleOrGone(CalendarFeatureFlag.ChangeLanguage.fallbackValue)
         settings_language_press.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
@@ -307,7 +305,9 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        settings_search.visibleOrGone(SHOW_EVENT_SEARCH)
+        settings_search.visibleOrGone(
+            CalendarFeatureFlag.ShowEventSearch.fallbackValue
+        )
 
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {

@@ -22,7 +22,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.common.FeatureFlag.SUBSCRIPTION
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.core.plan.domain.ClientPlanFilter
 import me.proton.core.plan.domain.ProductOnlyPaidPlans
 import me.proton.core.plan.domain.SupportSignupPaidPlans
@@ -34,11 +34,11 @@ object PlanModule {
 
     @Provides
     @SupportSignupPaidPlans
-    fun provideSupportSignupPaidPlans() = SUBSCRIPTION
+    fun provideSupportSignupPaidPlans() = CalendarFeatureFlag.Subscription.fallbackValue
 
     @Provides
     @SupportUpgradePaidPlans
-    fun provideSupportUpgradePaidPlans() = SUBSCRIPTION
+    fun provideSupportUpgradePaidPlans() = CalendarFeatureFlag.Subscription.fallbackValue
 
     @Provides
     @ProductOnlyPaidPlans
