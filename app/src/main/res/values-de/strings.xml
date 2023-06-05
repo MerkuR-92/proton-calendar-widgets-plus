@@ -39,6 +39,8 @@
     <string name="action_done">Fertig</string>
     <string name="action_edit">Bearbeiten</string>
     <string name="action_delete">Löschen</string>
+    <string name="action_remove">Entfernen</string>
+    <string name="action_leave">Verlassen</string>
     <string name="action_recreate">Leeren</string>
     <string name="action_today">Heute</string>
     <string name="action_create_event">Termin erstellen</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Meine Kalender</string>
     <string name="nav_view_subscribed_calendars">Abonnierte Kalender</string>
+    <string name="nav_view_other_calendars">Weitere Kalender</string>
     <string name="nav_view_disabled_calendars">%1$s (Deaktiviert)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Nicht synchronisiert)</string>
     <string name="nav_view_syncing_calendars">%1$s (Wird synchronisiert)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Standardkalender aktualisiert</string>
     <string name="snack_update_default_calendar_error">Fehler beim Aktualisieren des Standardkalenders. Bitte versuche es später erneut.</string>
     <string name="snack_calendar_init_error">Fehler beim Laden von Kalenderinformationen</string>
+    <string name="snack_holiday_calendar_init_error">Fehler beim Laden von Feiertagskalenderinformationen</string>
     <string name="snack_update_calendar_error">Fehler beim Aktualisieren der Kalenderinformationen. Bitte versuche es später noch einmal.</string>
     <string name="snack_update_calendar_settings_error">Fehler beim Aktualisieren einiger Kalenderinformationen. Bitte versuche es später erneut.</string>
     <string name="snack_update_calendar_success">Kalender aktualisiert</string>
     <string name="snack_create_calendar_success">Kalender erstellt</string>
+    <string name="snack_add_calendar_success">Kalender hinzugefügt</string>
     <string name="snack_calendar_saving">Kalender wird gespeichert</string>
     <string name="snack_create_calendar_error">Fehler beim Erstellen des Kalenders. Bitte versuche es später noch einmal.</string>
+    <string name="snack_add_calendar_error">Fehler beim Hinzufügen des Kalenders. Bitte versuche es später noch einmal.</string>
     <string name="snack_create_calendar_settings_error">Der Kalender wurde erstellt, aber einige Informationen wurden nicht aktualisiert. Bitte versuche es später noch einmal.</string>
     <string name="snack_ics_default_error">Fehler beim Öffnen des Kalenders</string>
     <string name="snack_ics_event_not_found_error">Termin nicht gefunden</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">Zeitzone</string>
     <string name="settings_general_info_calendar_layout">Kalenderlayout</string>
     <string name="settings_calendars">Meine Kalender</string>
+    <string name="settings_calendars_empty">Keine Kalender gefunden</string>
     <string name="settings_subscribed_calendars">Abonnierte Kalender</string>
+    <string name="settings_other_calendars">Weitere Kalender</string>
     <string name="settings_calendar_default" comment="Default calendar">Standard</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Deaktiviert</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Nicht synchronisiert</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Der Link zum Kalender ist vorübergehend nicht erreichbar</string>
     <string name="settings_calendar_subscribed_last_sync_old">Seit der letzten Aktualisierung sind mehr als 12 Stunden vergangen</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalender konnte nicht entschlüsselt werden</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Nur anzeigen</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Kalender erstellen</string>
     <string name="calendar_form_update_title">Kalender bearbeiten</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Name</string>
     <string name="calendar_form_description">Beschreibung</string>
     <string name="calendar_form_color">Kalenderfarbe</string>
+    <string name="calendar_form_language">Sprache</string>
     <string name="calendar_form_default_event_duration">Standard-Termindauer</string>
     <string name="calendar_form_default_event_notifications">Terminbenachrichtigungen</string>
     <string name="calendar_form_default_all_day_event_notifications">Benachrichtigungen zu ganztägigem Termin</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Bitte Namen angeben</string>
     <string name="calendar_form_description_hint">Füge eine Beschreibung des Kalenders hinzu</string>
     <string name="add_calendar_text">Kalender hinzufügen</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Hinzufügen</string>
     <string name="create_calendar_limit_reached">Du hast die maximale Anzahl an Kalendern erreicht.</string>
     <string name="create_calendar_limit_reached_title">Es können keine weiteren Kalender hinzugefügt werden</string>
     <string name="create_calendar_limit_reached_paid_description">Du hast die maximale Anzahl von 25 Kalendern, die in deinem Abonnement verfügbar sind, erreicht.\n\nUm einen neuen Kalender hinzuzufügen, entferne einen bestehenden.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Bitte stelle sicher, dass du mindestens einen persönlichen Kalender hast, bevor du das Limit von 25 Kalendern in deinem Abonnement erreichst.</string>
     <string name="create_calendar_limit_reached_manage">Kalender verwalten</string>
     <string name="create_calendar_limit_reached_free_description">Du hast die maximale Anzahl von 3 Kalendern, die in deinem Abonnement verfügbar sind, erreicht.\n\nUm einen neuen Kalender hinzuzufügen, entferne einen bestehenden.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Du musst mindestens einen persönlichen Kalender haben, bevor du das Limit von 3 Kalendern in deinem Abonnement erreichst.</string>
     <string name="create_calendar_limit_reached_error">Fehler</string>
     <string name="delete_calendar_dialog_title">Kalender löschen</string>
     <string name="delete_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen?</string>
+    <string name="remove_calendar_dialog_title">Kalender entfernen</string>
+    <string name="remove_calendar_dialog_message">Möchtest du diesen Kalender wirklich entfernen?</string>
+    <string name="leave_calendar_dialog_title">Kalender verlassen</string>
+    <string name="leave_calendar_dialog_message">Wenn du diesen Kalender verlässt, musst du den Eigentümer um erneuten Beitritt bitten.</string>
     <string name="delete_default_calendar_dialog_message">Möchtest du diesen Kalender wirklich löschen? \"%1$s\" wird dann zum Standardkalender.</string>
     <string name="delete_calendar_snack_deleted">Kalender gelöscht</string>
+    <string name="remove_calendar_snack_removed">Kalender entfernt</string>
     <string name="delete_calendar_snack_error">Fehler beim Löschen des Kalenders</string>
+    <string name="remove_calendar_snack_error">Fehler beim Entfernen des Kalenders</string>
+    <string name="leave_calendar_snack_error">Fehler beim Verlassen des Kalenders</string>
     <string name="delete_calendar_snack_error_password_confirmation">Passwort-Bestätigung fehlgeschlagen</string>
     <string name="recreate_calendar_dialog_title">Kalender leeren</string>
     <string name="recreate_calendar_dialog_message">Mit dieser Aktion werden alle Termine und eingeladenen Benutzer entfernt.\n\nBist du sicher, dass du diesen Kalender löschen möchtest?</string>
     <string name="recreate_calendar_snack_error">Fehler beim Leeren des Kalenders</string>
     <string name="recreate_calendar_snack_deleted">Kalender geleert</string>
     <string name="recreate_calendar_snack_clearing">Kalender wird geleert…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Feiertagskalender hinzufügen</string>
+    <string name="holiday_calendar_title">Feiertagskalender</string>
+    <string name="add_holiday_calendar_country_search_hint">Nach einem Land suchen</string>
+    <string name="holiday_calendar_form_picker_title">Land</string>
+    <string name="holiday_calendar_time_zone_based">Basierend auf deiner Zeitzone</string>
+    <string name="holiday_calendar_already_exists">Feiertagskalender existiert bereits</string>
+    <string name="holiday_calendar_value_placeholder">Land wählen</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Mit diesem Konto sind keine Kalender verknüpft.</string>

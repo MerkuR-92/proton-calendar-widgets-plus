@@ -39,6 +39,8 @@
     <string name="action_done">Hotovo</string>
     <string name="action_edit">Upravit</string>
     <string name="action_delete">Smazat</string>
+    <string name="action_remove">Odstranit</string>
+    <string name="action_leave">Opustit</string>
     <string name="action_recreate">Vyčistit</string>
     <string name="action_today">Dnes</string>
     <string name="action_create_event">Vytvořit událost</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mé kalendáře</string>
     <string name="nav_view_subscribed_calendars">Odebírané kalendáře</string>
+    <string name="nav_view_other_calendars">Ostatní kalendáře</string>
     <string name="nav_view_disabled_calendars">%1$s (Vypnuto)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Nesynchronizováno)</string>
     <string name="nav_view_syncing_calendars">%1$s (Synchronizuji)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Výchozí kalendář byl aktualizován</string>
     <string name="snack_update_default_calendar_error">Chyba aktualizace výchozího kalendáře, zkuste to prosím později</string>
     <string name="snack_calendar_init_error">Chyba při načítaní informací z kalendáře</string>
+    <string name="snack_holiday_calendar_init_error">Chyba při načítaní informací kalendáře svátků</string>
     <string name="snack_update_calendar_error">Chyba aktualizace informací kalendáře, zkuste to prosím později</string>
     <string name="snack_update_calendar_settings_error">Chyba aktualizace některých informací kalendáře, zkuste to prosím později</string>
     <string name="snack_update_calendar_success">Kalendář aktualizován</string>
     <string name="snack_create_calendar_success">Kalendář byl vytvořen</string>
+    <string name="snack_add_calendar_success">Kalendář přidán</string>
     <string name="snack_calendar_saving">Ukládám kalendář</string>
     <string name="snack_create_calendar_error">Chyba při vytváření kalendáře, zkuste to prosím později</string>
+    <string name="snack_add_calendar_error">Chyba při přidávání kalendáře, zkuste to prosím později</string>
     <string name="snack_create_calendar_settings_error">Kalendář byl vytvořen, ale některé informace nebyly aktualizovány, zkuste to prosím později</string>
     <string name="snack_ics_default_error">Chyba při otevírání kalendáře</string>
     <string name="snack_ics_event_not_found_error">Událost nebyla nalezena</string>
@@ -386,7 +392,7 @@
     <string name="bug_report_discard_changes_confirm">Zahodit</string>
     <!-- Settings -->
     <string name="settings_theme_title">Motiv</string>
-    <string name="settings_theme_info">Toto nastavení ovlivňuje pouze vzhled aplikace Proton Calendar na tomto zařízení. Po změně motivu, se aplikace restartuje.</string>
+    <string name="settings_theme_info">Toto nastavení ovlivňuje pouze vzhled aplikace Proton Calendar na tomto zařízení. Po změně motivu se aplikace restartuje.</string>
     <string name="settings_timezone_title">Časové pásmo</string>
     <string name="settings_language_title">Jazyk aplikace</string>
     <string name="settings_language_default">Automatická detekce</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">časové pásmo</string>
     <string name="settings_general_info_calendar_layout">uspořádání kalendáře</string>
     <string name="settings_calendars">Mé kalendáře</string>
+    <string name="settings_calendars_empty">Nebyly nalezeny žádné kalendáře</string>
     <string name="settings_subscribed_calendars">Odebírané kalendáře</string>
+    <string name="settings_other_calendars">Ostatní kalendáře</string>
     <string name="settings_calendar_default" comment="Default calendar">Výchozí</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Zakázáno</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Není synchronizováno</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Odkaz na kalendář je momentálně nedostupný</string>
     <string name="settings_calendar_subscribed_last_sync_old">Od poslední aktualizace uplynulo více než 12 hodin</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalendář se nepodařilo dešifrovat</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Pouze zobrazení</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Vytvořit kalendář</string>
     <string name="calendar_form_update_title">Upravit kalendář</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Název</string>
     <string name="calendar_form_description">Popis</string>
     <string name="calendar_form_color">Barva kalendáře</string>
+    <string name="calendar_form_language">Jazyk</string>
     <string name="calendar_form_default_event_duration">Doba trvání události</string>
     <string name="calendar_form_default_event_notifications">Oznámení události</string>
     <string name="calendar_form_default_all_day_event_notifications">Oznámení celodenních událostí</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Název je povinný</string>
     <string name="calendar_form_description_hint">Přidat popis kalendáře</string>
     <string name="add_calendar_text">Přidat kalendář</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Přidat</string>
     <string name="create_calendar_limit_reached">Bylo dosaženo maximálního počtu kalendářů.</string>
     <string name="create_calendar_limit_reached_title">Nelze přidat další kalendáře</string>
     <string name="create_calendar_limit_reached_paid_description">Dosáhli jste maximálního počtu 25 kalendářů dostupných ve vašem tarifu.\n\nChcete-li přidat nový kalendář, odstraňte stávající.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Než dosáhnete v tarifu limitu 25 kalendářů, musíte mít alespoň jeden osobní kalendář.</string>
     <string name="create_calendar_limit_reached_manage">Spravovat kalendáře</string>
     <string name="create_calendar_limit_reached_free_description">Dosáhli jste maximálního počtu 3 kalendářů dostupných ve vašem tarifu.\n\nChcete-li přidat nový kalendář, odstraňte stávající.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Než dosáhnete v tarifu limitu 3 kalendářů, musíte mít alespoň jeden osobní kalendář.</string>
     <string name="create_calendar_limit_reached_error">Chyba</string>
     <string name="delete_calendar_dialog_title">Smazat kalendář</string>
     <string name="delete_calendar_dialog_message">Opravdu chcete vymazat tento kalendář?</string>
+    <string name="remove_calendar_dialog_title">Odstranit kalendář</string>
+    <string name="remove_calendar_dialog_message">Opravdu chcete odstranit tento kalendář?</string>
+    <string name="leave_calendar_dialog_title">Opustit kalendář</string>
+    <string name="leave_calendar_dialog_message">Pokud opustíte tento kalendář, budete muset znovu požádat vlastníka pro opětovné připojení.</string>
     <string name="delete_default_calendar_dialog_message">Opravdu chcete smazat tento kalendář? \"%1$s\" bude nastaven jako výchozí kalendář.</string>
     <string name="delete_calendar_snack_deleted">Kalendář byl smazán</string>
+    <string name="remove_calendar_snack_removed">Kalendář byl odstraněn</string>
     <string name="delete_calendar_snack_error">Chyba při mazání kalendáře</string>
+    <string name="remove_calendar_snack_error">Chyba při odstraňování kalendáře</string>
+    <string name="leave_calendar_snack_error">Chyba při opouštění kalendáře</string>
     <string name="delete_calendar_snack_error_password_confirmation">Potvrzení hesla selhalo</string>
     <string name="recreate_calendar_dialog_title">Vyčistit kalendář</string>
     <string name="recreate_calendar_dialog_message">Tato akce odstraní všechny události a pozvané uživatele.\n\nOpravdu chcete tento kalendář vymazat?</string>
     <string name="recreate_calendar_snack_error">Chyba při mazání kalendáře</string>
     <string name="recreate_calendar_snack_deleted">Kalendář byl smazán</string>
     <string name="recreate_calendar_snack_clearing">Mazání kalendáře…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Přidat kalendář svátků</string>
+    <string name="holiday_calendar_title">Kalendář svátků</string>
+    <string name="add_holiday_calendar_country_search_hint">Hledat zemi</string>
+    <string name="holiday_calendar_form_picker_title">Země</string>
+    <string name="holiday_calendar_time_zone_based">Na základě vašeho časového pásma</string>
+    <string name="holiday_calendar_already_exists">Kalendář svátků již existuje</string>
+    <string name="holiday_calendar_value_placeholder">Vyberte zemi</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Neexistují žádné kalendáře přidružené k tomuto účtu.</string>

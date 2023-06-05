@@ -39,6 +39,8 @@
     <string name="action_done">Færdig</string>
     <string name="action_edit">Redigér</string>
     <string name="action_delete">Slet</string>
+    <string name="action_remove">Fjern</string>
+    <string name="action_leave">Forlad</string>
     <string name="action_recreate">Ryd</string>
     <string name="action_today">I dag</string>
     <string name="action_create_event">Opret begivenhed</string>
@@ -159,8 +161,8 @@
     <string name="search_settings_dialog_toggle_off_text">Du skal downloade dine kalendere igen, hvis du vil søge.</string>
     <string name="search_settings_dialog_toggle_on_title">Download kalendere til denne enhed?</string>
     <string name="search_settings_dialog_toggle_on_text">Dette er nødvendigt for at kunne søge.</string>
-    <string name="search_onboarding_header">Want to search your calendar?</string>
-    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_onboarding_header">Vil du søge i din kalender?</string>
+    <string name="search_onboarding_text">Først skal du downloade en krypteret kopi af dine kalendere. Dette tager kun et øjeblik og du kan bruge appen imens. <a href="https://proton.me/support/calendar-search">Læs mere</a></string>
     <string name="search_onboarding_action_download_calendars">Download kalendere</string>
     <string name="search_onboarding_action_pause">Sæt på pause</string>
     <string name="search_onboarding_action_resume">Genoptag</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mine kalendere</string>
     <string name="nav_view_subscribed_calendars">Kalenderabonnementer</string>
+    <string name="nav_view_other_calendars">Andre kalendere</string>
     <string name="nav_view_disabled_calendars">%1$s (deaktiveret)</string>
     <string name="nav_view_not_synced_calendars">%1$s (ikke synkroniseret)</string>
     <string name="nav_view_syncing_calendars">%1$s (synkroniserer)</string>
@@ -300,7 +303,7 @@
     <string name="snack_send_bug_report_error">Fejl ved afsendelse af rapport, prøv igen senere</string>
     <string name="snack_send_bug_report_description_empty">Beskriv venligst din rapport</string>
     <string name="snack_create_event_no_active_personal_calendar">Du skal have en personlig, aktiv kalender for at oprette begivenheder</string>
-    <string name="snack_create_event_no_active_calendar">You need an active calendar to create events</string>
+    <string name="snack_create_event_no_active_calendar">Du skal have en aktiv kalender for at oprette begivenheder</string>
     <string name="snack_add_self_as_participant">Selvinvitation er ikke tilladt</string>
     <string name="snack_maximum_participants_reached">Det maksimale antal deltagere er nået.</string>
     <string name="snack_add_participant_error">Fejl under tilføjelse af deltageren</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Standardkalender opdateret</string>
     <string name="snack_update_default_calendar_error">Fejl ved opdatering af standardkalender, prøv venligst igen senere</string>
     <string name="snack_calendar_init_error">Fejl ved indlæsning af kalenderoplysninger</string>
+    <string name="snack_holiday_calendar_init_error">Fejl ved læsning af helligdagskalenderoplysninger</string>
     <string name="snack_update_calendar_error">Fejl ved opdatering af kalenderoplysninger, prøv venligst igen senere</string>
     <string name="snack_update_calendar_settings_error">Fejl ved opdatering af nogle kalenderoplysninger, prøv venligst igen senere</string>
     <string name="snack_update_calendar_success">Kalender opdateret</string>
     <string name="snack_create_calendar_success">Kalender oprettet</string>
+    <string name="snack_add_calendar_success">Kalender tilføjet</string>
     <string name="snack_calendar_saving">Gemmer kalender</string>
     <string name="snack_create_calendar_error">Fejl ved oprettelse af kalender, prøv venligst igen senere</string>
+    <string name="snack_add_calendar_error">Fejl ved tilføjelse af kalender, prøv venligst igen senere</string>
     <string name="snack_create_calendar_settings_error">Kalenderen blev oprettet, men nogle oplysninger blev ikke opdateret, prøv venligst igen senere</string>
     <string name="snack_ics_default_error">Fejl ved åbning af kalender</string>
     <string name="snack_ics_event_not_found_error">Begivenhed ikke fundet</string>
@@ -332,8 +338,8 @@
     <string name="snack_ics_party_crasher_error">Din e-mail er ikke på deltagerlisten</string>
     <string name="snack_ics_reply_party_crasher_error">Deltagere, der ikke er inviteret af arrangøren, kan ikke tilføjes</string>
     <string name="snack_ics_missing_uid_error">Begivenheden mangler UID</string>
-    <string name="snack_ics_no_active_personal_calendar_error">There is no active personal calendar associated with this account</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active calendar associated with this account</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Der er ingen aktiv personlig kalender tilknyttet denne konto</string>
+    <string name="snack_ics_no_active_calendar_error">Der er ingen aktiv kalender tilknyttet denne konto.</string>
     <string name="snack_ics_unsupported_duration_error">Angivelse af varighed er ikke understøttet</string>
     <string name="snack_ics_too_many_events_error">Fler-begivenheder er endnu ikke understøttet</string>
     <string name="snack_ics_no_events_error">Denne kalender indeholder ikke nogen begivenhed</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">tidszone</string>
     <string name="settings_general_info_calendar_layout">kalenderlayout</string>
     <string name="settings_calendars">Mine kalendere</string>
+    <string name="settings_calendars_empty">Ingen kalendere fundet</string>
     <string name="settings_subscribed_calendars">Kalenderabonnementer</string>
+    <string name="settings_other_calendars">Andre kalendere</string>
     <string name="settings_calendar_default" comment="Default calendar">Standard</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Deaktiveret</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Ikke synkroniseret</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Kalenderlink er midlertidig ikke tilgængeligt</string>
     <string name="settings_calendar_subscribed_last_sync_old">Der er gået mere end 12 timer siden seneste opdatering</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalender kunne ikke dekrypteres</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">View-only</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Opret kalender</string>
     <string name="calendar_form_update_title">Rediger kalender</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Navn</string>
     <string name="calendar_form_description">Beskrivelse</string>
     <string name="calendar_form_color">Kalenderfarve</string>
+    <string name="calendar_form_language">Sprog</string>
     <string name="calendar_form_default_event_duration">Begivenhedsvarighed</string>
     <string name="calendar_form_default_event_notifications">Begivenhedsnotifikationer</string>
     <string name="calendar_form_default_all_day_event_notifications">Notifikationer for heldagsbegivenheder</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Navn påkrævet</string>
     <string name="calendar_form_description_hint">Tilføj en kalenderbeskrivelse</string>
     <string name="add_calendar_text">Tilføj kalender</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Tilføj</string>
     <string name="create_calendar_limit_reached">Du har nået det maksimale antal kalendere.</string>
     <string name="create_calendar_limit_reached_title">Kan ikke tilføje flere kalendere</string>
     <string name="create_calendar_limit_reached_paid_description">Du har nået det maksimale antal på 25 kalendere, der er tilgængelige i dit abonnement.\n\nFor at tilføje en ny kalender, skal du først fjerne en eksisterende.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Du skal have mindst én personlig kalender, inden du når dit abonnements loft på 25 kalendere.</string>
     <string name="create_calendar_limit_reached_manage">Administrer kalendere</string>
     <string name="create_calendar_limit_reached_free_description">Du har nået det maksimale antal på 3 kalendere, der er tilgængelige i dit abonnement.\n\nFor at tilføje en ny kalender, skal du først fjerne en eksisterende.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Du skal have mindst én personlig kalender, inden du når dit abonnements loft på 3 kalendere.</string>
     <string name="create_calendar_limit_reached_error">Fejl</string>
     <string name="delete_calendar_dialog_title">Slet kalender</string>
     <string name="delete_calendar_dialog_message">Er du sikker på, at du vil slette denne kalender?</string>
+    <string name="remove_calendar_dialog_title">Fjern kalender</string>
+    <string name="remove_calendar_dialog_message">Er du sikker på, at du vil fjerne denne kalender?</string>
+    <string name="leave_calendar_dialog_title">Forlad kalender</string>
+    <string name="leave_calendar_dialog_message">Hvis du forlader denne kalender, skal du bede ejeren om at blive medlem igen.</string>
     <string name="delete_default_calendar_dialog_message">Er du sikker på, at du vil slette denne kalender? \"%1$s\" vil blive indstillet som standardkalender.</string>
     <string name="delete_calendar_snack_deleted">Kalender slettet</string>
+    <string name="remove_calendar_snack_removed">Kalender fjernet</string>
     <string name="delete_calendar_snack_error">Fejl ved sletning af kalender</string>
+    <string name="remove_calendar_snack_error">Fejl ved fjernelse af kalender</string>
+    <string name="leave_calendar_snack_error">Error leaving calendar</string>
     <string name="delete_calendar_snack_error_password_confirmation">Adgangskodebekræftelse mislykkedes</string>
     <string name="recreate_calendar_dialog_title">Ryd kalender</string>
     <string name="recreate_calendar_dialog_message">Denne handling vil fjerne alle begivenheder og inviterede brugere.\n\nEr du sikker på, at du vil slette denne kalender?</string>
     <string name="recreate_calendar_snack_error">Fejl ved rydning af kalender</string>
     <string name="recreate_calendar_snack_deleted">Kalender ryddet</string>
     <string name="recreate_calendar_snack_clearing">Rydder kalender…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Tilføj helligdagskalender</string>
+    <string name="holiday_calendar_title">Helligdagskalender</string>
+    <string name="add_holiday_calendar_country_search_hint">Søg efter land</string>
+    <string name="holiday_calendar_form_picker_title">Land</string>
+    <string name="holiday_calendar_time_zone_based">Baseret på din tidszone</string>
+    <string name="holiday_calendar_already_exists">Helligdagskalender findes allerede</string>
+    <string name="holiday_calendar_value_placeholder">Vælg land</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Ok</string>
     <string name="bootstrap_error_no_calendar_title">Der er ingen aktive kalendere tilknyttet denne konto.</string>
@@ -509,11 +538,11 @@
     <string name="spotlight_v5_dialog_rebranding_description">Vi præsenterer Proton\'s nye udseende. Mange tjenester, én mission. Velkommen til et internet, hvor privatlivsbeskyttelse er standard. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
     <string name="spotlight_dialog_week_view_title">Flere visningsmuligheder</string>
     <string name="spotlight_dialog_week_view_description">• Nu kan du vælge kalendervisninger med <b>3 dage</b> og en <b>uge</b>. Vælg din foretrukne visning i <b>menuen</b>.\n\n• Juster højden af rækkerne i dagsgitteret ved at knibe med to fingre for at zoome ind eller ud.</string>
-    <string name="spotlight_dialog_search_title">Search for events</string>
-    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_search_title">Søg efter begivenheder</string>
+    <string name="spotlight_dialog_search_description">Find nemt de begivenheder du leder efter, med vores nye søgefunktion. <a href="https://proton.me/support/calendar-search">Læs mere</a></string>
     <string name="spotlight_dialog_import_title">Flere måder at tilføje begivenheder</string>
     <string name="spotlight_dialog_import_description">• Importer begivenheder til din kalender fra filer på din telefon.\n\n• Tilføj rejsebookinger direkte fra Proton Mail.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
+    <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
     <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>

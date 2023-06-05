@@ -39,6 +39,8 @@
     <string name="action_done">Гатова</string>
     <string name="action_edit">Рэдагаваць</string>
     <string name="action_delete">Выдаліць</string>
+    <string name="action_remove">Выдаліць</string>
+    <string name="action_leave">Выйсці</string>
     <string name="action_recreate">Ачысціць</string>
     <string name="action_today">Сёння</string>
     <string name="action_create_event">Стварыць падзею</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мае календары</string>
     <string name="nav_view_subscribed_calendars">Падпісаныя календары</string>
+    <string name="nav_view_other_calendars">Іншыя календары</string>
     <string name="nav_view_disabled_calendars">%1$s (адключаны)</string>
     <string name="nav_view_not_synced_calendars">%1$s (не сінхранізаваны)</string>
     <string name="nav_view_syncing_calendars">%1$s (сінхранізацыя)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Прадвызначаны каляндар абноўлены</string>
     <string name="snack_update_default_calendar_error">Памылка абнаўлення прадвызначанага календара. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_calendar_init_error">Памылка загрузкі інфармацыі календара</string>
+    <string name="snack_holiday_calendar_init_error">Памылка загрузкі інфармацыі аб календары са святамі</string>
     <string name="snack_update_calendar_error">Памылка абнаўлення інфармацыі календара. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_update_calendar_settings_error">Памылка абнаўлення некаторай інфармацыі календара. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_update_calendar_success">Каляндар абноўлены</string>
     <string name="snack_create_calendar_success">Каляндар створаны</string>
+    <string name="snack_add_calendar_success">Каляндар дададзены</string>
     <string name="snack_calendar_saving">Захаванне календара</string>
     <string name="snack_create_calendar_error">Памылка стварэння календара. Паспрабуйце яшчэ раз пазней</string>
+    <string name="snack_add_calendar_error">Памылка дадавання календара. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_create_calendar_settings_error">Каляндар створаны, але некаторая інфармацыя не была абноўлена. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_ics_default_error">Памылка адкрыцця календара</string>
     <string name="snack_ics_event_not_found_error">Падзея не знойдзена</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">часавы пояс</string>
     <string name="settings_general_info_calendar_layout">выгляд календара</string>
     <string name="settings_calendars">Мае календары</string>
+    <string name="settings_calendars_empty">Календары не знойдзены</string>
     <string name="settings_subscribed_calendars">Падпісаныя календары</string>
+    <string name="settings_other_calendars">Іншыя календары</string>
     <string name="settings_calendar_default" comment="Default calendar">Прадвызначана</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Адключана</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Не сінхранізавана</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Спасылка на каляндар часова недаступна</string>
     <string name="settings_calendar_subscribed_last_sync_old">Ад моманту апошняга абнаўлення мінула больш за 12 гадзін</string>
     <string name="settings_calendar_subscribed_not_decrypted">Не атрымалася расшыфраваць каляндар</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Толькі прагляд</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Стварэнне календара</string>
     <string name="calendar_form_update_title">Рэдагаваць каляндар</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Назва</string>
     <string name="calendar_form_description">Апісанне</string>
     <string name="calendar_form_color">Колер календара</string>
+    <string name="calendar_form_language">Мова</string>
     <string name="calendar_form_default_event_duration">Працягласць падзеі</string>
     <string name="calendar_form_default_event_notifications">Апавяшчэнні пра падзею</string>
     <string name="calendar_form_default_all_day_event_notifications">Апавяшчэнні пра падзеі на ўвесь дзень</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Патрабуецца назва</string>
     <string name="calendar_form_description_hint">Дадаць апісанне календара</string>
     <string name="add_calendar_text">Дадаць каляндар</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Дадаць</string>
     <string name="create_calendar_limit_reached">Вы дасягнулі максімальнай колькасці календароў.</string>
     <string name="create_calendar_limit_reached_title">Немагчыма дадаць больш календароў</string>
     <string name="create_calendar_limit_reached_paid_description">Вы дасягнулі максімальнай колькасці з 25 календароў, якія даступны на вашым тарыфным плане.\n\nВыдаліце адзін з існуючых календароў, каб дадаць новы.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">У вас павінен быць прынамсі адзін асабісты каляндар перад тым, як абмежаванне ў 25 календароў будзе дасягнута на вашым тарыфным плане.</string>
     <string name="create_calendar_limit_reached_manage">Кіраванне календарамі</string>
     <string name="create_calendar_limit_reached_free_description">Вы дасягнулі максімальнай колькасці з 3 календароў, якія даступны на вашым тарыфным плане.\n\nВыдаліце адзін з існуючых календароў, каб дадаць новы.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">У вас павінен быць прынамсі адзін асабісты каляндар перад тым, як абмежаванне ў 3 календары будзе дасягнута на вашым тарыфным плане.</string>
     <string name="create_calendar_limit_reached_error">Памылка</string>
     <string name="delete_calendar_dialog_title">Выдаліць каляндар</string>
     <string name="delete_calendar_dialog_message">Вы сапраўды хочаце выдаліць гэты каляндар?</string>
+    <string name="remove_calendar_dialog_title">Выдаліць каляндар</string>
+    <string name="remove_calendar_dialog_message">Вы сапраўды хочаце выдаліць гэты каляндар?</string>
+    <string name="leave_calendar_dialog_title">Выйсці з календара</string>
+    <string name="leave_calendar_dialog_message">Калі вы выйдзіце з гэтага календара, вам давядзецца адпраўляць запыт на далучэнне ўладальніку яшчэ раз.</string>
     <string name="delete_default_calendar_dialog_message">Вы сапраўды хочаце выдаліць гэты каляндар? \"%1$s\" будзе зададзены прадвызначаным календаром.</string>
     <string name="delete_calendar_snack_deleted">Каляндар выдалены</string>
+    <string name="remove_calendar_snack_removed">Каляндар выдалены</string>
     <string name="delete_calendar_snack_error">Памылка выдалення календара</string>
+    <string name="remove_calendar_snack_error">Памылка выдалення календара</string>
+    <string name="leave_calendar_snack_error">Памылка выхаду з календара</string>
     <string name="delete_calendar_snack_error_password_confirmation">Не ўдалося пацвердзіць пароль</string>
     <string name="recreate_calendar_dialog_title">Ачысціць каляндар</string>
     <string name="recreate_calendar_dialog_message">Гэта дзеянне выдаліць усе падзеі і запрошаных карыстальнікаў.\n\nВы сапраўды хочаце ачысціць гэты каляндар?</string>
     <string name="recreate_calendar_snack_error">Памылка ачысткі календара</string>
     <string name="recreate_calendar_snack_deleted">Каляндар ачышчаны</string>
     <string name="recreate_calendar_snack_clearing">Ачыстка календара…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Дадаць каляндар са святамі</string>
+    <string name="holiday_calendar_title">Каляндар са святамі</string>
+    <string name="add_holiday_calendar_country_search_hint">Пошук краіны</string>
+    <string name="holiday_calendar_form_picker_title">Краіна</string>
+    <string name="holiday_calendar_time_zone_based">На падставе вашага часавага пояса</string>
+    <string name="holiday_calendar_already_exists">Каляндар са святамі ўжо існуе</string>
+    <string name="holiday_calendar_value_placeholder">Выберыце краіну</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Добра</string>
     <string name="bootstrap_error_no_calendar_title">Адсутнічаюць календары, якія звязаны з гэтым уліковым запісам.</string>

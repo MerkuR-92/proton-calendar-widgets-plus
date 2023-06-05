@@ -39,6 +39,8 @@
     <string name="action_done">Terminé</string>
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
+    <string name="action_remove">Supprimer</string>
+    <string name="action_leave">Quitter</string>
     <string name="action_recreate">Supprimer le contenu</string>
     <string name="action_today">Aujourd\'hui</string>
     <string name="action_create_event">Créer un événement</string>
@@ -46,7 +48,7 @@
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">Aucun événement</string>
     <string name="agenda_loading_events">Chargement des événements…</string>
-    <string name="agenda_loading_events_error">Une erreur s\'est produite lors du chargement des événements.</string>
+    <string name="agenda_loading_events_error">Une erreur s\'est produite pendant le chargement des événements.</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
     <string name="day_view_all_day_more">+ %1$d de plus</string>
     <!-- EVENT DETAILS   -->
@@ -168,7 +170,7 @@
     <string name="search_onboarding_progress_header_ongoing">Téléchargement des calendriers…</string>
     <string name="search_onboarding_progress_header_completed">Le téléchargement est terminé.</string>
     <string name="search_onboarding_progress_header_paused">Le téléchargement des calendriers est suspendu.</string>
-    <string name="search_onboarding_progress_header_error">Une erreur s\'est produite lors du téléchargement des calendriers.</string>
+    <string name="search_onboarding_progress_header_error">Une erreur s\'est produite pendant le téléchargement des calendriers.</string>
     <string name="search_spotlight_activation_snack">La recherche dans le calendrier est activée.</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Ajouter une notification</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mes calendriers</string>
     <string name="nav_view_subscribed_calendars">Calendriers souscrits</string>
+    <string name="nav_view_other_calendars">Autres calendriers</string>
     <string name="nav_view_disabled_calendars">%1$s (désactivé)</string>
     <string name="nav_view_not_synced_calendars">%1$s (non synchronisé)</string>
     <string name="nav_view_syncing_calendars">%1$s (synchronisation)</string>
@@ -277,7 +280,7 @@
     <string name="snack_event_deleted">L\'événement a été supprimé.</string>
     <string name="snack_event_deleted_as_organizer">L\'annulation a été envoyée et l\'événement a été supprimé.</string>
     <string name="snack_event_deleted_as_attendee">La réponse est envoyée et l\'événement est supprimé.</string>
-    <string name="snack_event_deleted_error">Une erreur s\'est produite lors de la suppression de l\'événement.</string>
+    <string name="snack_event_deleted_error">Une erreur s\'est produite pendant la suppression de l\'événement.</string>
     <string name="snack_event_deleted_as_organizer_error">Le message d\'annulation ne peut pas être envoyé, veuillez réessayer.</string>
     <string name="snack_event_opening_error">Une erreur s\'est produite en ouvrant l\'événement.</string>
     <string name="snack_event_saving">L\'événement est en cours d\'enregistrement.</string>
@@ -286,42 +289,45 @@
     <string name="snack_event_part_stat_updated">Le statut de participation a été mis à jour.</string>
     <string name="snack_event_updated">L\'événement a été mis à jour.</string>
     <string name="snack_event_updated_error_failed_mail">L\'invitation n\'a pas pu être envoyée.</string>
-    <string name="snack_event_updated_error">Une erreur s\'est produite lors de la mise à jour de l\'événement.</string>
+    <string name="snack_event_updated_error">Une erreur s\'est produite pendant la mise à jour de l\'événement.</string>
     <string name="snack_event_created">L\'événement a été créé.</string>
     <string name="snack_event_created_failed_mail">L\'événement est créé, mais l\'invitation n\'a pas été envoyée.</string>
-    <string name="snack_event_created_error">Une erreur s\'est produite lors de la création de l\'événement.</string>
-    <string name="snack_event_opening_edit_error">Une erreur s\'est produite lors de l\'ouverture de l\'événement pour le modifier.</string>
+    <string name="snack_event_created_error">Une erreur s\'est produite pendant la création de l\'événement.</string>
+    <string name="snack_event_opening_edit_error">Une erreur s\'est produite pendant l\'ouverture de l\'événement pour le modifier.</string>
     <string name="snack_event_edit_with_attendees_error">La modification des événements avec des participants n\'est pas encore possible.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Il n\'est pas possible d\'ajouter des participants et de modifier le calendrier en même temps.</string>
-    <string name="snack_event_init_error">Une erreur s\'est produite lors de l\'initialisation du nouvel événement.</string>
-    <string name="snack_event_calendar_error">Une erreur s\'est produite lors du changement de calendrier.</string>
+    <string name="snack_event_init_error">Une erreur s\'est produite pendant l\'initialisation du nouvel événement.</string>
+    <string name="snack_event_calendar_error">Une erreur s\'est produite pendant le changement de calendrier.</string>
     <string name="snack_event_maximum_alarm_reached_error">Le nombre maximal de notifications est atteint.</string>
     <string name="snack_send_bug_report_success">Le rapport est envoyé, merci pour vos commentaires.</string>
-    <string name="snack_send_bug_report_error">Une erreur s\'est produite lors de l\'envoi du rapport, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_send_bug_report_error">Une erreur s\'est produite pendant l\'envoi du rapport, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_send_bug_report_description_empty">Merci de fournir une description de votre rapport.</string>
     <string name="snack_create_event_no_active_personal_calendar">Vous avez besoin d\'un calendrier personnel actif pour créer des événements.</string>
     <string name="snack_create_event_no_active_calendar">Vous devez avoir un calendrier actif pour créer des événements.</string>
     <string name="snack_add_self_as_participant">Vous ne pouvez pas vous inviter vous-même.</string>
     <string name="snack_maximum_participants_reached">Le nombre maximum de participants est atteint.</string>
-    <string name="snack_add_participant_error">Une erreur s\'est produite lors de l\'ajout du participant.</string>
+    <string name="snack_add_participant_error">Une erreur s\'est produite pendant l\'ajout du participant.</string>
     <string name="snack_add_participant_invalid_email">L\'adresse e-mail n\'est pas valide.</string>
-    <string name="snack_change_attendee_answer_error">Une erreur s\'est produite lors de l\'envoi de la réponse, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_change_attendee_answer_error">Une erreur s\'est produite pendant l\'envoi de la réponse, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_network_error">Une erreur de réseau s\'est produite, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_import_event_signed_out">Vous devez vous connecter pour importer les événements.</string>
     <string name="snack_app_link_signed_out">Vous devez vous connecter pour voir votre événement.</string>
     <string name="snack_update_default_calendar">Le calendrier par défaut a été mis à jour.</string>
-    <string name="snack_update_default_calendar_error">Une erreur s\'est produite lors de la mise à jour du calendrier par défaut, nous vous invitons à réessayer plus tard.</string>
-    <string name="snack_calendar_init_error">Une erreur s\'est produite lors du chargement des informations du calendrier.</string>
-    <string name="snack_update_calendar_error">Une erreur s\'est produite lors de la mise à jour des informations du calendrier, nous vous invitons à réessayer plus tard.</string>
-    <string name="snack_update_calendar_settings_error">Une erreur s\'est produite lors de la mise à jour de certaines informations du calendrier. Nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_update_default_calendar_error">Une erreur s\'est produite pendant la mise à jour du calendrier par défaut, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_calendar_init_error">Une erreur s\'est produite pendant le chargement des informations du calendrier.</string>
+    <string name="snack_holiday_calendar_init_error">Une erreur s\'est produite pendant le chargement des informations du calendrier des jours fériés.</string>
+    <string name="snack_update_calendar_error">Une erreur s\'est produite pendant la mise à jour des informations du calendrier, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_update_calendar_settings_error">Une erreur s\'est produite pendant la mise à jour de certaines informations du calendrier. Nous vous invitons à réessayer plus tard.</string>
     <string name="snack_update_calendar_success">Le calendrier a été mis à jour.</string>
     <string name="snack_create_calendar_success">Le calendrier a été créé.</string>
+    <string name="snack_add_calendar_success">Le calendrier a été ajouté.</string>
     <string name="snack_calendar_saving">Le calendrier est en cours d\'enregistrement.</string>
-    <string name="snack_create_calendar_error">Une erreur s\'est produite lors de la création du calendrier, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_create_calendar_error">Une erreur s\'est produite pendant la création du calendrier, nous vous invitons à réessayer plus tard.</string>
+    <string name="snack_add_calendar_error">Une erreur s\'est produite pendant l\'ajout du calendrier, nous vous invitons à réessayer plus tard.</string>
     <string name="snack_create_calendar_settings_error">Le calendrier est créé mais certaines informations n\'ont pas été mises à jour, nous vous invitons à réessayer plus tard.</string>
-    <string name="snack_ics_default_error">Une erreur s\'est produite lors de l\'ouverture du calendrier.</string>
+    <string name="snack_ics_default_error">Une erreur s\'est produite pendant l\'ouverture du calendrier.</string>
     <string name="snack_ics_event_not_found_error">L\'événement n\'a pas été trouvé.</string>
-    <string name="snack_ics_create_error">Une erreur s\'est produite lors de la création de l\'événement.</string>
+    <string name="snack_ics_create_error">Une erreur s\'est produite pendant la création de l\'événement.</string>
     <string name="snack_ics_parsing_error">Une erreur s\'est produite lors de la lecture du calendrier.</string>
     <string name="snack_ics_unsupported_method_error">Ce type d\'événement n\'est pas encore disponible.</string>
     <string name="snack_ics_unsupported_add_error">L\'ajout d\'occurrences à un événement n\'est pas possible pour le moment.</string>
@@ -364,7 +370,7 @@
     <string name="dialog_title_calendar_picker">Calendrier</string>
     <string name="import_from_google_title">Importer depuis Google</string>
     <string name="notifications_permission_dialog_title">Autoriser Proton Calendar à afficher des notifications ?</string>
-    <string name="notifications_permission_dialog_message">Proton Calendar a besoin de permission pour vous afficher les notifications des événements à venir.</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar a besoin d\'une autorisation pour vous montrer des notifications d\'événements à venir.</string>
     <string name="notifications_permission_dialog_open_settings">Ouvrir les Paramètres</string>
     <string name="notifications_permission_dialog_cancel">Refuser</string>
     <!-- NOTIFICATIONS -->
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">fuseau horaire</string>
     <string name="settings_general_info_calendar_layout">mise en page du calendrier</string>
     <string name="settings_calendars">Mes calendriers</string>
+    <string name="settings_calendars_empty">Aucun calendrier n\'a été trouvé.</string>
     <string name="settings_subscribed_calendars">Calendriers souscrits</string>
+    <string name="settings_other_calendars">Autres calendriers</string>
     <string name="settings_calendar_default" comment="Default calendar">Par défaut</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Désactivé</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Non synchronisé</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Le lien du calendrier est temporairement inaccessible.</string>
     <string name="settings_calendar_subscribed_last_sync_old">La dernière mise à jour remonte à plus de 12 heures.</string>
     <string name="settings_calendar_subscribed_not_decrypted">Le calendrier n\'a pas pu être déchiffré.</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Lecture seule</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Créer un calendrier</string>
     <string name="calendar_form_update_title">Modifier le calendrier</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Nom</string>
     <string name="calendar_form_description">Description</string>
     <string name="calendar_form_color">Couleur du calendrier</string>
+    <string name="calendar_form_language">Langue</string>
     <string name="calendar_form_default_event_duration">Durée de l’événement</string>
     <string name="calendar_form_default_event_notifications">Notifications de l’événement</string>
     <string name="calendar_form_default_all_day_event_notifications">Notifications pour les événements d\'une journée entière</string>
@@ -440,28 +451,46 @@
     <string name="calendar_form_name_required_error">Le nom est nécessaire.</string>
     <string name="calendar_form_description_hint">Ajouter une description au calendrier</string>
     <string name="add_calendar_text">Ajouter un calendrier</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Ajouter</string>
     <string name="create_calendar_limit_reached">Vous avez atteint le nombre maximum de calendriers.</string>
-    <string name="create_calendar_limit_reached_title">Impossible d\'ajouter d\'autres calendriers</string>
+    <string name="create_calendar_limit_reached_title">Il n\'est pas possible d\'ajouter d\'autres calendriers.</string>
     <string name="create_calendar_limit_reached_paid_description">Vous avez atteint le nombre maximum de 25 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en supprimer un existant.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Vous devez avoir au moins un calendrier personnel avant d\'atteindre la limite de 25 calendriers de votre abonnement.</string>
     <string name="create_calendar_limit_reached_manage">Gérer les calendriers</string>
     <string name="create_calendar_limit_reached_free_description">Vous avez atteint le nombre maximum de 3 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en supprimer un existant.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Vous devez avoir au moins un calendrier personnel avant d\'atteindre la limite de 3 calendriers de votre abonnement.</string>
     <string name="create_calendar_limit_reached_error">Erreur</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ?</string>
+    <string name="remove_calendar_dialog_title">Supprimer le calendrier</string>
+    <string name="remove_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ?</string>
+    <string name="leave_calendar_dialog_title">Quitter le calendrier </string>
+    <string name="leave_calendar_dialog_message">Si vous quittez ce calendrier, vous devrez à nouveau demander au propriétaire de le rejoindre.</string>
     <string name="delete_default_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
     <string name="delete_calendar_snack_deleted">Le calendrier a été supprimé.</string>
-    <string name="delete_calendar_snack_error">Une erreur s\'est produite lors de la suppression du calendrier.</string>
+    <string name="remove_calendar_snack_removed">Le calendrier a été supprimé.</string>
+    <string name="delete_calendar_snack_error">Une erreur s\'est produite pendant la suppression du calendrier.</string>
+    <string name="remove_calendar_snack_error">Une erreur s\'est produite pendant la suppression du calendrier.</string>
+    <string name="leave_calendar_snack_error">Une erreur s\'est produite en quittant le calendrier.</string>
     <string name="delete_calendar_snack_error_password_confirmation">Le mot de passe n\'a pas pu être confirmé.</string>
     <string name="recreate_calendar_dialog_title">Supprimer le contenu du calendrier</string>
     <string name="recreate_calendar_dialog_message">Cette action supprimera tous les événements et les utilisateurs invités. \n\nVoulez-vous vraiment supprimer le contenu de ce calendrier ?</string>
-    <string name="recreate_calendar_snack_error">Une erreur s\'est produite lors de la suppression du contenu du calendrier.</string>
+    <string name="recreate_calendar_snack_error">Une erreur s\'est produite pendant la suppression du contenu du calendrier.</string>
     <string name="recreate_calendar_snack_deleted">Le contenu du calendrier a été supprimé.</string>
     <string name="recreate_calendar_snack_clearing">Suppression du contenu du calendrier…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Ajouter un calendrier de jours fériés</string>
+    <string name="holiday_calendar_title">Calendrier de jours fériés</string>
+    <string name="add_holiday_calendar_country_search_hint">Recherchez un pays</string>
+    <string name="holiday_calendar_form_picker_title">Pays</string>
+    <string name="holiday_calendar_time_zone_based">Selon votre fuseau horaire</string>
+    <string name="holiday_calendar_already_exists">Le calendrier de jours fériés existe déjà.</string>
+    <string name="holiday_calendar_value_placeholder">Sélectionnez un pays</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Aucun calendrier n\'est associé à ce compte.</string>
     <string name="bootstrap_error_no_calendar_message">Pour en configurer un, rendez-vous sur <a href="https://calendar.proton.me">calendar.proton.me</a>.</string>
-    <string name="bootstrap_error_some_calendars_failed_title">Une erreur s\'est produite lors de la préparation des calendriers.</string>
+    <string name="bootstrap_error_some_calendars_failed_title">Une erreur s\'est produite pendant la préparation des calendriers.</string>
     <string name="bootstrap_error_some_calendars_failed_message">Ces calendriers n\'ont pas pu être configurés.</string>
     <string name="bootstrap_error_no_active_calendar_title">Aucun calendrier personnel actif n\'est associé à ce compte.</string>
     <string name="bootstrap_error_no_active_calendar_message">Pour savoir comment activer un calendrier, rendez-vous sur notre <a href="https://proton.me/support">base de connaissances</a>.</string>
@@ -518,12 +547,12 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
-    <string name="import_assistant_prepare_import_error">Une erreur s\'est produite lors de la préparation de l\'importation, nous vous invitons à réessayer plus tard.</string>
+    <string name="import_assistant_prepare_import_error">Une erreur s\'est produite pendant la préparation de l\'importation, nous vous invitons à réessayer plus tard.</string>
     <string name="import_assistant_prepare_import">L\'importation est en cours de préparation.</string>
     <string name="import_assistant_gathering_data_loader_title">Vos données sont en cours de traitement.</string>
     <string name="import_assistant_summary_title">Résumé de l\'importation</string>
     <string name="import_assistant_summary_customize_import">Personnaliser l\'importation</string>
-    <string name="import_assistant_error">Une erreur s\'est produite lors de la récupération des données.</string>
+    <string name="import_assistant_error">Une erreur s\'est produite pendant la récupération des données.</string>
     <string name="import_assistant_data_gathering_error">Les données n\'ont pas pu être collectées.</string>
     <string name="import_assistant_update_import_error">L\'importation n\'a pas pu être mise à jour, nous vous invitons à réessayer plus tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">Ce n\'est pas le bon compte. Connectez-vous avec le compte que vous avez utilisé pour l\'importation du calendrier.</string>
@@ -614,8 +643,8 @@
         <item quantity="other">Fusionner %1$d calendriers dans Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Impossible de créer suffisamment de nouveaux calendriers pour tous ceux à importer, en raison de la limite du nombre de calendriers.\n • Désélectionnez au moins %1$d calendrier.</item>
-        <item quantity="other">Impossible de créer suffisamment de nouveaux calendriers pour tous ceux à importer, en raison de la limite du nombre de calendriers.\n • Désélectionnez au moins %1$d calendriers.</item>
+        <item quantity="one">Il n\'est pas possible de créer suffisamment de nouveaux calendriers pour tous ceux à importer, en raison de la limite du nombre de calendriers.\n • Désélectionnez au moins %1$d calendrier.</item>
+        <item quantity="other">Il n\'est pas possible de créer suffisamment de nouveaux calendriers pour tous ceux à importer, en raison de la limite du nombre de calendriers.\n • Désélectionnez au moins %1$d calendriers.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ou\n • Fusionner au moins %1$d calendrier avec les calendriers Proton existants.</item>
