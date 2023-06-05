@@ -30,7 +30,7 @@ class EventDecryptorImpl @Inject constructor(
     private val cache = mutableMapOf<CacheKey, CacheValue>()
     private val mutex = Mutex()
 
-    override suspend fun decrypt(eventEntity: EventEntity): Event? = mutex.withLock {
+    override suspend fun decrypt(eventEntity: EventEntity): Event? {
         val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
         val cacheValue = cache[cacheKey]
         val cachedEntity = cacheValue?.eventEntity
@@ -42,7 +42,9 @@ class EventDecryptorImpl @Inject constructor(
             database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database, json)?.let { calendar ->
                 if (calendar != cacheValue.event.calendar) {
                     val eventCopy = Event.from(cachedValue, calendar = calendar)
-                    cache[cacheKey] = CacheValue(eventEntity, eventCopy)
+                    mutex.withLock {
+                        cache[cacheKey] = CacheValue(eventEntity, eventCopy)
+                    }
                     return eventCopy
                 }
             }
@@ -50,12 +52,16 @@ class EventDecryptorImpl @Inject constructor(
             cachedValue
         } else {
 
-            cache.remove(cacheKey)
+            mutex.withLock {
+                cache.remove(cacheKey)
+            }
 
             val decryptedEvent = transformEventUseCase.execute(eventEntity)
 
             if (decryptedEvent != null) {
-                cache[cacheKey] = CacheValue(eventEntity, decryptedEvent)
+                mutex.withLock {
+                    cache[cacheKey] = CacheValue(eventEntity, decryptedEvent)
+                }
             }
 
             cache[cacheKey]?.event
