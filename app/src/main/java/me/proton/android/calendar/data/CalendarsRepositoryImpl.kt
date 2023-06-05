@@ -173,18 +173,29 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private val visibleSkeletonEventsFlow =
         database.eventsDao().skeletonEventCountFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
-            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { skeletonEventCount, calendarEntities ->
+            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { _, calendarEntities ->
 
                 // in order to prevent too large cursors, we subscribe to overall COUNT and then select data in a paginated way, manually
                 val pageSize = 100
-                val skeletonEventEntities = (0 until ceil(skeletonEventCount / pageSize.toDouble()).toInt()).flatMap { page ->
-                    database.eventsDao().selectSkeletonEventsPaginated(pageSize, pageSize * page)
+                val skeletonEventEntities = calendarEntities.flatMap { calendarEntity ->
+                    val allEventsInCalendarCount = database.eventsDao().count(calendarEntity.id)
+
+                    (0 until ceil(allEventsInCalendarCount / pageSize.toDouble()).toInt()).flatMap { page ->
+                        database.eventsDao().selectSkeletonEventsInCalendarPaginated(calendarEntity.id, pageSize, pageSize * page)
+                    }
                 }
+
+                val existingAddressIds = mutableMapOf<String, Boolean>() // AddressId -> exists/doesn't exist
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
                     val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
 
-                    if ((skeletonEventEntity.addressId != null) && (database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) == null)) {
+                    // cache information if Address exists locally or not
+                    if ((skeletonEventEntity.addressId != null) && existingAddressIds.contains(skeletonEventEntity.addressId).not()) {
+                        existingAddressIds[skeletonEventEntity.addressId] = database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) != null
+                    }
+
+                    if ((skeletonEventEntity.addressId != null) && existingAddressIds[skeletonEventEntity.addressId] == false) {
                         // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
                         null
                     } else calendar?.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
@@ -693,34 +704,34 @@ class CalendarsRepositoryImpl @Inject constructor(
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<Event>> { eventSkeletons ->
 
             // TODO hack for hiding duplicated events from subscribed Calendars
-            val deduplicatedEventSkeletons = eventSkeletons.filterOutDuplicatesInSubscribedCalendars()
+            val (uniqueEventSkeletons, duplicatedEventSkeletons) = eventSkeletons.filterOutDuplicatesInSubscribedCalendars()
 
-            if (eventSkeletons.size != deduplicatedEventSkeletons.size) {
-                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars")
+            if (eventSkeletons.size != uniqueEventSkeletons.size) {
+                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars, deleting / 100: ${duplicatedEventSkeletons.size / 100}")
+
+                // delete duplicated subscribed events from local DB
+                duplicatedEventSkeletons.chunked(50).forEach {
+                    database.eventsDao().deleteByIds(it.map { it.id })
+                }
             }
 
-            logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.fromDate}")
+            logger.v("events flow: createEventsFlow for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
 
             coroutineScope {
 
-                // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
-                // all we need to do is decrypt EventEntity and return full Events with correct occurrences
-
-                val eventIds = deduplicatedEventSkeletons.map { it.id }.distinct()
-                val chunkedEventIds = eventIds.chunked(100)
-                val eventEntities = chunkedEventIds.flatMap {
-                    database.eventsDao().selectAllById(it)
-                }
-
-                val transformedEvents = eventEntities.map { eventEntity ->
+                val transformedEvents = uniqueEventSkeletons.distinct().map { skeleton ->
                     async {
                         val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                            eventDecryptor.decrypt(eventEntity)
+                            // get Event from cache based on metadata, or select entire EventEntity and decrypt it in case of cache miss
+                            eventDecryptor.getFromCache(skeleton.id, skeleton.calendar.id, skeleton.modifyTime) ?: database.eventsDao().selectById(skeleton.id)?.let { eventDecryptor.decrypt(it) }
                         } else {
-                            transformEventUseCase.execute(eventEntity)
+                            database.eventsDao().selectById(skeleton.id)?.let { transformEventUseCase.execute(it) }
                         }
 
-                        val skeletons = deduplicatedEventSkeletons.filter { it.id == eventEntity.id }
+                        val skeletons = uniqueEventSkeletons.filter { it.id == skeleton.id }
+
+                        // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
+                        // all we need to do is decrypt EventEntity and return full Events with correct occurrences
 
                         if (transformedEvent != null) {
                             skeletons.map {
@@ -779,7 +790,83 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
-    override fun getEvents(
+    override suspend fun getEvents(userId: String, fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<Event> {
+
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
+
+        val visibleCalendars = selectAllCalendars(userId).filterVisibleCalendars()
+
+        val existingAddressIds = mutableMapOf<String, Boolean>() // AddressId -> exists/doesn't exist
+
+        val visibleSkeletons = visibleCalendars.map { calendar ->
+            database.eventsDao().selectSkeletonEvents(calendar.id).mapNotNull { skeletonEventEntity ->
+
+                // cache information if Address exists locally or not
+                if ((skeletonEventEntity.addressId != null) && existingAddressIds.contains(skeletonEventEntity.addressId).not()) {
+                    existingAddressIds[skeletonEventEntity.addressId] = database.addressDao().getByAddressId(AddressId(skeletonEventEntity.addressId)) != null
+                }
+
+                if ((skeletonEventEntity.addressId != null) && existingAddressIds[skeletonEventEntity.addressId] == false) {
+                    // if it's an auto-added invite and I don't have the Address to decrypt it, filter it out
+                    null
+                } else calendar.run { skeletonEventEntity.toSkeletonEvent(json, this.color, this.type) }
+            }.filterOutDuplicatesInSubscribedCalendars().first
+        }
+
+        val skeletonsInWindow = visibleSkeletons.map { skeletons ->
+            skeletons.map {
+                    skeletonEvent ->
+                    expandSkeletonEventsAndFilterInWindow(
+                    skeletonEvent,
+                    skeletons,
+                    eventsWindow
+                )
+            }.flatten()
+        }.flatten()
+
+        logger.v("getEvents [List<Event>] for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+
+        return coroutineScope {
+
+            // Skeleton Events already have correct Occurrence & DTSTART/DTEND applied,
+            // all we need to do is decrypt EventEntity and return full Events with correct occurrences
+
+            val eventIds = skeletonsInWindow.map { it.id }.distinct()
+            val chunkedEventIds = eventIds.chunked(20)
+            val eventEntities = chunkedEventIds.flatMap {
+                database.eventsDao().selectAllById(it)
+            }
+
+            val transformedEvents = eventEntities.map { eventEntity ->
+                async {
+                    val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                        eventDecryptor.decrypt(eventEntity)
+                    } else {
+                        transformEventUseCase.execute(eventEntity)
+                    }
+
+                    val skeletons = skeletonsInWindow.filter { it.id == eventEntity.id }
+
+                    if (transformedEvent != null) {
+                        skeletons.map {
+                            if (it.occurrence == null) { // non-recurring event
+                                transformedEvent
+                            } else if (it.isSingleEdit()) { // single edits, copy occurrence it replaces
+                                transformedEvent.occurrence = it.occurrence
+                                transformedEvent
+                            } else { // recurring event, apply occurrence
+                                Event.withOccurrence(transformedEvent, it.occurrence!!)
+                            }
+                        }
+                    } else null
+                }
+            }.awaitAll().filterNotNull().flatten()
+
+            transformedEvents
+        }
+    }
+
+    override fun getEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
@@ -797,7 +884,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
             val deduplicated = containSearchTerm.mapNotNull { searchEventEntity ->
                 database.eventsDao().selectEvent(searchEventEntity.eventId, searchEventEntity.calendarId)?.let { eventDecryptor.decrypt(it) }
-            }.filterOutDuplicatesInSubscribedCalendars()
+            }.filterOutDuplicatesInSubscribedCalendars().first
 
             emit(CalendarsRepository.GetEventsResult.Success(deduplicated))
         }.onStart {

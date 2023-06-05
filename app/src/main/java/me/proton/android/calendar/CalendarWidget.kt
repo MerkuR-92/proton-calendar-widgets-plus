@@ -520,18 +520,14 @@ internal class CalendarWidgetRemoteViewsFactory(
                 val toDate = LocalDate.now(zoneId).plusDays(WIDGET_DAYS_AHEAD.toLong())
 
                 val events = withContext(this.coroutineContext) {
-                    val eventsFlow = calendarsRepository.getEvents(
-                        fromDate,
-                        toDate,
-                        zoneId.id,
-                        allowCached = false
-                    ).firstOrNull { it !is CalendarsRepository.GetEventsResult.InProgress }
-
-                    if (eventsFlow is CalendarsRepository.GetEventsResult.Success) {
-                        eventsFlow.events
-                    } else {
-                        emptyList()
-                    }
+                    if (userId != null) {
+                        calendarsRepository.getEvents(
+                            userId.id,
+                            fromDate,
+                            toDate,
+                            zoneId.id
+                        )
+                    } else emptyList()
                 }
 
                 // create a list of Events with correct time labels to display on Widget list

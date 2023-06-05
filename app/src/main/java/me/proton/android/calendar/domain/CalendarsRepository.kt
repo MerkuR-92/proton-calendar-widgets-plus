@@ -138,12 +138,19 @@ interface CalendarsRepository {
     /**
      * @return Transformed Events.
      */
-    fun getEvents(
+    fun getEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
         allowCached: Boolean
     ): Flow<GetEventsResult<Event>>
+
+    suspend fun getEvents(
+        userId: String,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): List<Event>
 
     fun getSearchEvents(
         userId: String,

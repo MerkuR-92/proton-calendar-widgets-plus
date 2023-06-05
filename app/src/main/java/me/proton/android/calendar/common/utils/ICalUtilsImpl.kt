@@ -627,11 +627,13 @@ object ICalUtilsImpl : ICalUtils {
         }
     }
 
-    override fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): List<SkeletonEvent> {
+    override fun List<SkeletonEvent>.filterOutDuplicatesInSubscribedCalendars(): Pair<List<SkeletonEvent>, List<SkeletonEvent>> {
 
-        val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.occurrence?.occurrenceNumber}, ${it.iCalEvent.dateStart?.value?.time}" }
+        val grouped = this.groupBy { "${it.uid}, ${it.calendar.id}, ${it.getRecurrenceId("UTC")}, ${it.occurrence?.occurrenceNumber}, ${it.iCalEvent.dateStart?.value?.time}" }
 
-        val result = mutableListOf<SkeletonEvent>()
+        val unique = mutableListOf<SkeletonEvent>()
+        val duplicated = mutableListOf<SkeletonEvent>()
+
         grouped.forEach {
 
             val skeletons = it.value
@@ -642,17 +644,24 @@ object ICalUtilsImpl : ICalUtils {
                 val maxModifyTime = skeletons.maxByOrNull { it.modifyTime }?.modifyTime
 
                 // in case of different Skeletons with the same modifyTime, make sure to always return the same one
-                skeletons.filter { it.modifyTime == maxModifyTime }.maxByOrNull { it.id }?.let {
-                    result.add(it)
+                val uniqueSkeletonId = skeletons.filter { it.modifyTime == maxModifyTime }.maxByOrNull { it.id }?.id
+
+                // split skeletons for this one event into 1 unique and the rest are duplicates
+                skeletons.forEach { sk ->
+                    if (sk.id == uniqueSkeletonId) {
+                        unique.add(sk)
+                    } else {
+                        duplicated.add(sk)
+                    }
                 }
             } else {
                 // Calendar is regular type, add all Skeletons to result (in theory it should be only one)
-                result.addAll(skeletons)
+                unique.addAll(skeletons)
             }
 
         }
 
-        return result
+        return Pair(unique, duplicated)
     }
 
     /**
