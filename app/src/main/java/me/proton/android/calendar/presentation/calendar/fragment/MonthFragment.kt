@@ -1004,6 +1004,10 @@ class MonthFragment : BaseFragment() {
             }
         }
 
+        if (viewMode != ViewMode.WEEK && viewMode != ViewMode.THREE_DAY && viewMode != ViewMode.DAY &&
+            this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
         if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)){
             mini_calendar_chevron.clearAnimation()
             mini_calendar_chevron.visibleOrGone(true)
@@ -1022,6 +1026,7 @@ class MonthFragment : BaseFragment() {
             ViewMode.MONTH -> {
                 // Hide the agenda
                 agendaPager?.visibleOrGone(false)
+                agendaPager?.adapter = null
                 weekView?.visibleOrGone(false)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(false)
                 mini_calendar_chevron.clearAnimation()
@@ -1093,6 +1098,7 @@ class MonthFragment : BaseFragment() {
                 }
 
                 agendaPager?.visibleOrGone(false)
+                agendaPager?.adapter = null
                 weekView?.visibleOrGone(true)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(true)
                 mini_calendar_chevron.clearAnimation()
