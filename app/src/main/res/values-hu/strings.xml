@@ -39,6 +39,8 @@
     <string name="action_done">Kész</string>
     <string name="action_edit">Szerkesztés</string>
     <string name="action_delete">Törlés</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_leave">Leave</string>
     <string name="action_recreate">Ürítés</string>
     <string name="action_today">Ma</string>
     <string name="action_create_event">Esemény létrehozása</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Saját naptárak</string>
     <string name="nav_view_subscribed_calendars">Feliratkozott naptárak</string>
+    <string name="nav_view_other_calendars">Other calendars</string>
     <string name="nav_view_disabled_calendars">%1$s (Kikapcsolva)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Nincs szinkronizálva)</string>
     <string name="nav_view_syncing_calendars">%1$s (Szinkronizálás)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Alapértelmezett naptár frissítve</string>
     <string name="snack_update_default_calendar_error">Hiba az alapértelmezett naptár frissítése közben, kérjük, próbálja újra később</string>
     <string name="snack_calendar_init_error">Hiba történt a naptár információjának betöltése közben</string>
+    <string name="snack_holiday_calendar_init_error">Error loading holiday calendar information</string>
     <string name="snack_update_calendar_error">Hiba a naptárinformációk frissítésekor. Próbálja újra később</string>
     <string name="snack_update_calendar_settings_error">Hiba történt néhány naptárinformáció frissítésekor. Próbálja újra később</string>
     <string name="snack_update_calendar_success">Naptár frissítve</string>
     <string name="snack_create_calendar_success">Naptár létrehozva</string>
+    <string name="snack_add_calendar_success">Calendar added</string>
     <string name="snack_calendar_saving">Naptár mentése</string>
     <string name="snack_create_calendar_error">Hiba a naptár létrehozásakor, próbálja újra később</string>
+    <string name="snack_add_calendar_error">Error adding calendar, please try again later</string>
     <string name="snack_create_calendar_settings_error">A naptár elkészült, de néhány információ frissítése nem sikerült. Próbálja meg később</string>
     <string name="snack_ics_default_error">Hiba a naptár megnyitásakor</string>
     <string name="snack_ics_event_not_found_error">Az esemény nem található</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">időzóna</string>
     <string name="settings_general_info_calendar_layout">naptár elrendezés</string>
     <string name="settings_calendars">Saját naptárak</string>
+    <string name="settings_calendars_empty">No calendars found</string>
     <string name="settings_subscribed_calendars">Feliratkozott naptárak</string>
+    <string name="settings_other_calendars">Other calendars</string>
     <string name="settings_calendar_default" comment="Default calendar">Alapért.</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Letiltva</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Nincs szinkronizálva</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">A naptár hivatkozás átmenetileg nem érhető el</string>
     <string name="settings_calendar_subscribed_last_sync_old">Több mint 12 óra telt el a legutóbbi frissítés óta</string>
     <string name="settings_calendar_subscribed_not_decrypted">A naptár visszafejtése nem sikerült</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">View-only</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Naptár létrehozása</string>
     <string name="calendar_form_update_title">Naptár szerkesztése</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Név</string>
     <string name="calendar_form_description">Leírás</string>
     <string name="calendar_form_color">Naptár színe</string>
+    <string name="calendar_form_language">Language</string>
     <string name="calendar_form_default_event_duration">Esemény időtartama</string>
     <string name="calendar_form_default_event_notifications">Esemény értesítései</string>
     <string name="calendar_form_default_all_day_event_notifications">Egész napos esemény emlékeztetők</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Név megadása kötelező</string>
     <string name="calendar_form_description_hint">Adja meg a naptár leírását</string>
     <string name="add_calendar_text">Naptár hozzáadása</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Add</string>
     <string name="create_calendar_limit_reached">Elérte a naptárak maximális számát.</string>
     <string name="create_calendar_limit_reached_title">Nem adhat hozzá több naptárat</string>
     <string name="create_calendar_limit_reached_paid_description">Elérte a csomagjában maximálisan elérhető 25 naptárat. \n\nÚj naptár hozzáadásához töröljön egyet a már meglévők közül.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">You must have at least one personal calendar before reaching your plan limit of 25 calendars.</string>
     <string name="create_calendar_limit_reached_manage">Naptárak kezelése</string>
     <string name="create_calendar_limit_reached_free_description">Elérte a csomagjában maximálisan elérhető 3 naptárat. \n\nÚj naptár hozzáadásához töröljön egyet a már meglévők közül.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">You must have at least one personal calendar before reaching your plan limit of 3 calendars.</string>
     <string name="create_calendar_limit_reached_error">Hiba</string>
     <string name="delete_calendar_dialog_title">Naptár törlése</string>
     <string name="delete_calendar_dialog_message">Biztos, hogy törölni szeretné ezt a naptárat?</string>
+    <string name="remove_calendar_dialog_title">Remove calendar</string>
+    <string name="remove_calendar_dialog_message">Are you sure you want to remove this calendar?</string>
+    <string name="leave_calendar_dialog_title">Leave calendar</string>
+    <string name="leave_calendar_dialog_message">If you leave this calendar, you\'ll have to ask the owner to join again.</string>
     <string name="delete_default_calendar_dialog_message">Biztos, hogy törli ezt a naptárat? \"%1$s\" kerül beállításra alapértelmezett naptárként.</string>
     <string name="delete_calendar_snack_deleted">Naptár eltávolítva</string>
+    <string name="remove_calendar_snack_removed">Calendar removed</string>
     <string name="delete_calendar_snack_error">Hiba a naptár törlése közben</string>
+    <string name="remove_calendar_snack_error">Error removing calendar</string>
+    <string name="leave_calendar_snack_error">Error leaving calendar</string>
     <string name="delete_calendar_snack_error_password_confirmation">A jelszó megerősítése sikertelen</string>
     <string name="recreate_calendar_dialog_title">Naptár megtisztítása</string>
     <string name="recreate_calendar_dialog_message">Ez a művelet az összes eseményt és meghívottat törli.\n\nBiztos, hogy üríti ezt a naptárat?</string>
     <string name="recreate_calendar_snack_error">Hiba a naptár megtisztításakor</string>
     <string name="recreate_calendar_snack_deleted">Naptár megtisztítva</string>
     <string name="recreate_calendar_snack_clearing">Naptár megtisztítása…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Add holiday calendar</string>
+    <string name="holiday_calendar_title">Holiday calendar</string>
+    <string name="add_holiday_calendar_country_search_hint">Search for a country</string>
+    <string name="holiday_calendar_form_picker_title">Country</string>
+    <string name="holiday_calendar_time_zone_based">Based on your time zone</string>
+    <string name="holiday_calendar_already_exists">Holiday calendar already exists</string>
+    <string name="holiday_calendar_value_placeholder">Select country</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Ehhez a fiókhoz nincs naptár.</string>

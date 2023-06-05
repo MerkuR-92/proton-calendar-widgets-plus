@@ -39,6 +39,8 @@
     <string name="action_done">Tamam</string>
     <string name="action_edit">Düzenle</string>
     <string name="action_delete">Sil</string>
+    <string name="action_remove">Kaldır</string>
+    <string name="action_leave">Ayrıl</string>
     <string name="action_recreate">Temizle</string>
     <string name="action_today">Bugün</string>
     <string name="action_create_event">Etkinlik ekle</string>
@@ -252,22 +254,23 @@
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s iptal edildi.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Takvimlerim</string>
-    <string name="nav_view_subscribed_calendars">Abone olunan takvimler</string>
+    <string name="nav_view_subscribed_calendars">Abone olunmuş takvimler</string>
+    <string name="nav_view_other_calendars">Diğer takvimler</string>
     <string name="nav_view_disabled_calendars">%1$s (devre dışı)</string>
     <string name="nav_view_not_synced_calendars">%1$s (eşitlenmemiş)</string>
     <string name="nav_view_syncing_calendars">%1$s (eşitleniyor)</string>
     <string name="nav_view_more">Diğer</string>
     <string name="nav_view_switcher">Görüntüle</string>
-    <string name="nav_view_switcher_day">Gün</string>
-    <string name="nav_view_switcher_three_day">3 Gün</string>
-    <string name="nav_view_switcher_week">Hafta</string>
+    <string name="nav_view_switcher_day">Günlük</string>
+    <string name="nav_view_switcher_three_day">3 günlük</string>
+    <string name="nav_view_switcher_week">Haftalık</string>
     <string name="nav_view_switcher_agenda">Gün akışı</string>
-    <string name="nav_view_switcher_month">Ay</string>
+    <string name="nav_view_switcher_month">Aylık</string>
     <string name="nav_view_timezone">Saat dilimi</string>
     <string name="nav_view_settings">Ayarlar</string>
     <string name="nav_view_feedback">Bize geri bildirim verin</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Genel</string>
-    <string name="nav_view_more_bug">Bir sorun bildireceğim</string>
+    <string name="nav_view_more_bug">Sorun bildirin</string>
     <string name="nav_view_more_subscription">Abonelik</string>
     <string name="nav_view_more_logout">Oturumu kapat</string>
     <string name="nav_view_more_login">Oturum aç</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Varsayılan takvim güncellendi</string>
     <string name="snack_update_default_calendar_error">Varsayılan takvim güncellenirken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_calendar_init_error">Takvim bilgileri yüklenirken sorun çıktı</string>
+    <string name="snack_holiday_calendar_init_error">Tatil takvimi bilgileri yüklenirken sorun çıktı</string>
     <string name="snack_update_calendar_error">Takvim bilgileri güncellenirken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_update_calendar_settings_error">Bazı takvim bilgileri güncellenirken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_update_calendar_success">Takvim güncellendi</string>
     <string name="snack_create_calendar_success">Takvim eklendi</string>
+    <string name="snack_add_calendar_success">Takvim eklendi</string>
     <string name="snack_calendar_saving">Takvim kaydediliyor</string>
     <string name="snack_create_calendar_error">Takvim eklenirken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
+    <string name="snack_add_calendar_error">Takvim eklenirken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_create_calendar_settings_error">Takvim eklendi fakat bazı bilgiler güncellenmedi. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_ics_default_error">Takvim açılırken sorun çıktı</string>
     <string name="snack_ics_event_not_found_error">Etkinlik bulunamadı</string>
@@ -398,7 +404,7 @@
     <string name="settings_week_start_title">Hafta başlangıcı</string>
     <string name="settings_time_format_title">Saat biçimi</string>
     <string name="settings_week_numbers_title">Hafta numaraları görüntülensin</string>
-    <string name="settings_auto_invites_title">Davetleri takvime ekle ve bekliyor olarak işaretle</string>
+    <string name="settings_auto_invites_title">Davetler takvime eklensin ve bekliyor olarak işaretlensin</string>
     <string name="settings_search_title">Takvimlerde arama</string>
     <string name="settings_search_subtitle">Arama yapabilmek için takviminizin içeriğinin bu aygıta indirilip kaydedilmesini sağlar. Bu seçenek kapatıldığında indirilmiş içerik silinir.</string>
     <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">saat dilimi</string>
     <string name="settings_general_info_calendar_layout">takvim görünümü</string>
     <string name="settings_calendars">Takvimlerim</string>
+    <string name="settings_calendars_empty">Herhangi bir takvim bulunamadı!</string>
     <string name="settings_subscribed_calendars">Abone olunmuş takvimler</string>
+    <string name="settings_other_calendars">Diğer takvimler</string>
     <string name="settings_calendar_default" comment="Default calendar">Varsayılan</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Devre dışı</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Eşitlenmemiş</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Takvim bağlantısına geçici olarak erişilemiyor</string>
     <string name="settings_calendar_subscribed_last_sync_old">Son güncellemeden bu yana 12 saatten fazla zaman geçti</string>
     <string name="settings_calendar_subscribed_not_decrypted">Takvimin şifresi çözülemedi</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Yalnızca görüntüleme</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Takvim ekle</string>
     <string name="calendar_form_update_title">Takvimi düzenle</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Ad</string>
     <string name="calendar_form_description">Açıklama</string>
     <string name="calendar_form_color">Takvim rengi</string>
+    <string name="calendar_form_language">Dil</string>
     <string name="calendar_form_default_event_duration">Etkinlik süresi</string>
     <string name="calendar_form_default_event_notifications">Etkinlik bildirimleri</string>
     <string name="calendar_form_default_all_day_event_notifications">Tüm günlük etkinlik bildirimleri</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Ad zorunludur</string>
     <string name="calendar_form_description_hint">Bir takvim açıklaması ekleyin</string>
     <string name="add_calendar_text">Takvim ekle</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Ekle</string>
     <string name="create_calendar_limit_reached">Eklenebilecek en fazla takvim sayısı sınırına ulaştınız.</string>
     <string name="create_calendar_limit_reached_title">Başka takvim eklenemez</string>
     <string name="create_calendar_limit_reached_paid_description">Tarifenizle kullanılabilecek olan en fazla 25 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi silin.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">25 takvimlik tarife sınırınıza ulaşmadan önce en az bir kişisel takviminiz olmalıdır.</string>
     <string name="create_calendar_limit_reached_manage">Takvim yönetimi</string>
     <string name="create_calendar_limit_reached_free_description">Tarifenizle kullanılabilecek olan en fazla 3 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi silin.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">3 takvimlik tarife sınırınıza ulaşmadan önce en az bir kişisel takviminiz olmalıdır.</string>
     <string name="create_calendar_limit_reached_error">Hata</string>
     <string name="delete_calendar_dialog_title">Takvimi sil</string>
     <string name="delete_calendar_dialog_message">Bu takvimi silmek istediğinize emin misiniz?</string>
+    <string name="remove_calendar_dialog_title">Takvimi kaldır</string>
+    <string name="remove_calendar_dialog_message">Bu takvimi kaldırmak istediğinize emin misiniz?</string>
+    <string name="leave_calendar_dialog_title">Takvimden ayrıl</string>
+    <string name="leave_calendar_dialog_message">Bu takvimden ayrılırsanız, yeniden katılmak için sahibi ile görüşmelisiniz.</string>
     <string name="delete_default_calendar_dialog_message">Bu takvimi silmek istediğinize emin misiniz? \"%1$s\" varsayılan takvim olarak ayarlanacak.</string>
     <string name="delete_calendar_snack_deleted">Takvim silindi</string>
+    <string name="remove_calendar_snack_removed">Takvim kaldırıldı</string>
     <string name="delete_calendar_snack_error">Takvim silinirken sorun çıktı</string>
+    <string name="remove_calendar_snack_error">Takvim kaldırılırken sorun çıktı</string>
+    <string name="leave_calendar_snack_error">Takvimden ayrılırken sorun çıktı</string>
     <string name="delete_calendar_snack_error_password_confirmation">Parola doğrulanamadı</string>
     <string name="recreate_calendar_dialog_title">Takvimi temizle</string>
     <string name="recreate_calendar_dialog_message">Bu işlem, tüm etkinlikleri ve davet edilen kullanıcıları silecek.\n\nBu takvimi temizlemek istediğinize emin misiniz?</string>
     <string name="recreate_calendar_snack_error">Takvim temizlenirken sorun çıktı</string>
     <string name="recreate_calendar_snack_deleted">Takvim temizlendi</string>
     <string name="recreate_calendar_snack_clearing">Takvim temizleniyor…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Tatil takvimi ekle</string>
+    <string name="holiday_calendar_title">Tatil takvimi</string>
+    <string name="add_holiday_calendar_country_search_hint">Ülke ara</string>
+    <string name="holiday_calendar_form_picker_title">Ülke</string>
+    <string name="holiday_calendar_time_zone_based">Saat diliminize göre</string>
+    <string name="holiday_calendar_already_exists">Tatil takvimi zaten var</string>
+    <string name="holiday_calendar_value_placeholder">Ülke seçin</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Tamam</string>
     <string name="bootstrap_error_no_calendar_title">Bu hesap ile ilişkilendirilmiş herhangi bir takvim bulunamadı.</string>
@@ -514,7 +543,7 @@
     <string name="spotlight_dialog_import_title">Etkinlik eklemenin diğer yolları</string>
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
     <string name="spotlight_dialog_calendar_provider_title">Takvim özellikleri</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Diğer uygulamalardaki etkinlikleri doğrudan Proton Calendar içine ekleyin.\n\n• Sizinle paylaşılan takvimlerde etkinlikler oluşturun ve yönetin.\n\n• Uygulamayı açarken karşılaşmak istediğiniz varsayılan görünümü ayarlayın.\n\ n• 13 yeni dilde daha kullanılabilir.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Diğer uygulamalardaki etkinlikleri doğrudan Proton Calendar içine ekleyin.\n\n• Sizinle paylaşılan takvimlerde etkinlikler oluşturun ve yönetin.\n\n• Uygulamayı açılışında görmek istediğiniz varsayılan görünümü ayarlayın.\n\n• 13 yeni dilde daha kullanılabilir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>

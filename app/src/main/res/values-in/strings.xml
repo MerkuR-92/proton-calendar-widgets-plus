@@ -39,6 +39,8 @@
     <string name="action_done">Selesai</string>
     <string name="action_edit">Sunting</string>
     <string name="action_delete">Hapus</string>
+    <string name="action_remove">Hapus</string>
+    <string name="action_leave">Tinggalkan</string>
     <string name="action_recreate">Kosongkan</string>
     <string name="action_today">Hari ini</string>
     <string name="action_create_event">Buat acara</string>
@@ -160,7 +162,7 @@
     <string name="search_settings_dialog_toggle_on_title">Unduh kalender ke perangkat ini?</string>
     <string name="search_settings_dialog_toggle_on_text">Hal ini dibutuhkan agar kamu dapat melakukan pencarian.</string>
     <string name="search_onboarding_header">Ingin mencari kalender Anda?</string>
-    <string name="search_onboarding_text">Pertama, Anda perlu mengunduh salinan kalender terenkripsi Anda. Ini akan membutuhkan beberapa waktu, dan Anda masih dapat menggunakan aplikasi. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="search_onboarding_text">Pertama-tama, Anda perlu mengunduh salinan kalender terenkripsi Anda. Hal ini akan memakan waktu sejenak, dan Anda akan tetap dapat menggunakan kalender seperti biasa dalam prosesnya. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="search_onboarding_action_download_calendars">Unduh kalender</string>
     <string name="search_onboarding_action_pause">Jeda</string>
     <string name="search_onboarding_action_resume">Lanjutkan</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Kalender saya</string>
     <string name="nav_view_subscribed_calendars">Kalender langganan</string>
+    <string name="nav_view_other_calendars">Kalender lainnya</string>
     <string name="nav_view_disabled_calendars">%1$s (Dinonaktifkan)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Tidak disinkronkan)</string>
     <string name="nav_view_syncing_calendars">%1$s (Menyinkronkan)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Kalendar bawaan diperbarui</string>
     <string name="snack_update_default_calendar_error">Terjadi kesalahan saat memperbarui kalender bawaan, mohon coba kembali nanti</string>
     <string name="snack_calendar_init_error">Terjadi masalah saat memuat informasi kalender</string>
+    <string name="snack_holiday_calendar_init_error">Terjadi masalah saat memuat informasi kalender liburan</string>
     <string name="snack_update_calendar_error">Terjadi masalah saat mengubah informasi kalender, mohon coba kembali</string>
     <string name="snack_update_calendar_settings_error">Terjadi masalah saat memperbarui informasi kalender, mohon coba kembali nanti</string>
     <string name="snack_update_calendar_success">Kalender berhasil diperbarui</string>
     <string name="snack_create_calendar_success">Kalender berhasil dibuat</string>
+    <string name="snack_add_calendar_success">Kalender ditambahkan</string>
     <string name="snack_calendar_saving">Menyimpan kalender</string>
     <string name="snack_create_calendar_error">Pembuatan kalender tidak berhasil, mohon coba kembali nanti</string>
+    <string name="snack_add_calendar_error">Penambahan kalender tidak berhasil, mohon coba kembali nanti</string>
     <string name="snack_create_calendar_settings_error">Kalender berhasil dibuat namun sebagian informasi gagal diperbarui, silakan coba lagi nanti</string>
     <string name="snack_ics_default_error">Terjadi masalah saat membuka kalender</string>
     <string name="snack_ics_event_not_found_error">Acara tidak ditemukan</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">zona waktu</string>
     <string name="settings_general_info_calendar_layout">tampilan kalender</string>
     <string name="settings_calendars">Kalender saya</string>
+    <string name="settings_calendars_empty">Tidak ada kalender yang ditemukan</string>
     <string name="settings_subscribed_calendars">Kalender langganan</string>
+    <string name="settings_other_calendars">Kalender lainnya</string>
     <string name="settings_calendar_default" comment="Default calendar">Bawaan</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Dinonaktifkan</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Tidak disinkronkan</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Tautan kalender untuk sementara tidak dapat diakses</string>
     <string name="settings_calendar_subscribed_last_sync_old">Lebih dari 12 jam telah berlalu sejak pembaruan terakhir</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalender tidak dapat didekripsi</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Hanya lihat</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Buat kalender</string>
     <string name="calendar_form_update_title">Ubah kalender</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Nama</string>
     <string name="calendar_form_description">Deskripsi</string>
     <string name="calendar_form_color">Warna kalender</string>
+    <string name="calendar_form_language">Bahasa</string>
     <string name="calendar_form_default_event_duration">Durasi acara</string>
     <string name="calendar_form_default_event_notifications">Pemberitahuan acara</string>
     <string name="calendar_form_default_all_day_event_notifications">Pemberitahuan acara sepanjang hari</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Nama diperlukan</string>
     <string name="calendar_form_description_hint">Tambahkan deskripsi kalender</string>
     <string name="add_calendar_text">Tambah kalender</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Tambah</string>
     <string name="create_calendar_limit_reached">Anda telah mencapai batas maksimum jumlah kalender.</string>
     <string name="create_calendar_limit_reached_title">Tidak dapat menambahkan lebih banyak kalender</string>
     <string name="create_calendar_limit_reached_paid_description">Anda telah mencapai batas jumlah 25 kalender yang diperkenankan oleh paket Anda.\n\nUntuk menambahkan kalender baru, hapus kalender yang telah ada.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Anda harus memiliki setidaknya satu kalender personal sebelum mencapai batas 25 kalender yang diperkenankan oleh paket Anda.</string>
     <string name="create_calendar_limit_reached_manage">Kelola kalender</string>
     <string name="create_calendar_limit_reached_free_description">Anda telah mencapai batas jumlah 3 kalender yang diperkenankan oleh paket Anda.\n\nUntuk menambahkan kalender baru, hapus kalender yang telah ada.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Anda harus memiliki setidaknya satu kalender personal sebelum mencapai batas 3 kalender yang diperkenankan oleh paket Anda.</string>
     <string name="create_calendar_limit_reached_error">Kesalahan</string>
     <string name="delete_calendar_dialog_title">Hapus kalender</string>
     <string name="delete_calendar_dialog_message">Anda yakin ingin menghapus kalender ini?</string>
+    <string name="remove_calendar_dialog_title">Hapus kalender</string>
+    <string name="remove_calendar_dialog_message">Apakah Anda yakin untuk menghapus kalender ini?</string>
+    <string name="leave_calendar_dialog_title">Tinggalkan kalender</string>
+    <string name="leave_calendar_dialog_message">Apabila Anda tinggalkan dari kalender ini, Anda akan perlu untuk meminta kepada pemilik kalender untuk dapat bergabung kembali ke depannya.</string>
     <string name="delete_default_calendar_dialog_message">Apakah Anda yakin ingin menghapus kalender ini? \"%1$s\" akan diatur sebagai kalender bawaan.</string>
     <string name="delete_calendar_snack_deleted">Kalender terhapus</string>
+    <string name="remove_calendar_snack_removed">Kalender dihapus</string>
     <string name="delete_calendar_snack_error">Terjadi masalah saat menghapus kalender</string>
+    <string name="remove_calendar_snack_error">Terjadi kesalahan saat menghapus kalender</string>
+    <string name="leave_calendar_snack_error">Terjadi kesalahan saat meninggalkan kalender</string>
     <string name="delete_calendar_snack_error_password_confirmation">Konfirmasi sandi gagal</string>
     <string name="recreate_calendar_dialog_title">Kosongkan isi kalender</string>
     <string name="recreate_calendar_dialog_message">Tindakan ini akan menghapus seluruh daftar acara dan pengguna yang diundang.\n\nApakah Anda yakin untuk mengosongkan isi kalender ini?</string>
     <string name="recreate_calendar_snack_error">Terdapat kesalahan dalam mengosongkan isi kalender</string>
     <string name="recreate_calendar_snack_deleted">Isi kalender dikosongkan</string>
     <string name="recreate_calendar_snack_clearing">Mengosongkan isi kalender…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Tambah kalender hari libur</string>
+    <string name="holiday_calendar_title">Kalender hari libur</string>
+    <string name="add_holiday_calendar_country_search_hint">Cari negara</string>
+    <string name="holiday_calendar_form_picker_title">Negara</string>
+    <string name="holiday_calendar_time_zone_based">Berdasarkan zona waktu Anda</string>
+    <string name="holiday_calendar_already_exists">Kalender hari libur telah ada</string>
+    <string name="holiday_calendar_value_placeholder">Pilih negara</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Tidak ada kalender yang terhubung dengan akun ini.</string>
@@ -510,7 +539,7 @@
     <string name="spotlight_dialog_week_view_title">Pilihan tampilan lainnya</string>
     <string name="spotlight_dialog_week_view_description">• Memperkenalkan mode tampilan kalender per <b>3 hari</b> dan per <b>Pekan</b>. Pilih mode tampilan yang Anda kehendaki pada <b>menu</b>.\n\n• Sesuaikan tinggi masing-masing baris dengan menggunakan dua jari untuk memperbesar atau memperkecil layar.</string>
     <string name="spotlight_dialog_search_title">Cari acara</string>
-    <string name="spotlight_dialog_search_description">Cari acara yang Anda cari dengan mudah dengan fitur pencarian kami yang baru. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="spotlight_dialog_search_description">Cari acara yang Anda inginkan dengan mudah dengan fitur pencarian kami yang baru. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>

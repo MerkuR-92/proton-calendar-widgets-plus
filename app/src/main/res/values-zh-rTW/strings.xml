@@ -39,6 +39,8 @@
     <string name="action_done">完成</string>
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
+    <string name="action_remove">移除</string>
+    <string name="action_leave">離開</string>
     <string name="action_recreate">清除</string>
     <string name="action_today">今天</string>
     <string name="action_create_event">創建活動</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">我的行事曆</string>
     <string name="nav_view_subscribed_calendars">已訂購授權的行事曆</string>
+    <string name="nav_view_other_calendars">其他行事曆</string>
     <string name="nav_view_disabled_calendars">%1$s（已停用）</string>
     <string name="nav_view_not_synced_calendars">%1$s（未同步）</string>
     <string name="nav_view_syncing_calendars">%1$s（正在同步）</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">預設行事曆已更新</string>
     <string name="snack_update_default_calendar_error">更新預設行事曆時發生錯誤，請稍後再試</string>
     <string name="snack_calendar_init_error">載入行事曆資訊時發生錯誤</string>
+    <string name="snack_holiday_calendar_init_error">載入節日行事曆資訊時發生錯誤</string>
     <string name="snack_update_calendar_error">更新行事曆資訊時發生錯誤，請稍後再試</string>
     <string name="snack_update_calendar_settings_error">更新部分行事曆資訊時發生錯誤，請稍後再試</string>
     <string name="snack_update_calendar_success">行事曆已更新</string>
     <string name="snack_create_calendar_success">行事曆已創建</string>
+    <string name="snack_add_calendar_success">行事曆已新增</string>
     <string name="snack_calendar_saving">正在儲存行事曆</string>
     <string name="snack_create_calendar_error">創建行事曆時發生錯誤，請稍後再試</string>
+    <string name="snack_add_calendar_error">新增行事曆時發生錯誤，請稍後再試</string>
     <string name="snack_create_calendar_settings_error">行事曆已創建，惟部分資訊未更新，請稍後再試</string>
     <string name="snack_ics_default_error">開啟行事曆時發生錯誤</string>
     <string name="snack_ics_event_not_found_error">找不到活動</string>
@@ -405,14 +411,16 @@
     <string name="settings_alternative_routing_subtitle">萬一 Proton 網站遭到封鎖，此設定允許此應用程式嘗試以替代網路路由連接 Proton，這或有助繞過防火牆或網路問題。建議保持此設定開啟，有備無患。</string>
     <string name="settings_value_placeholder">輕觸以選取</string>
     <string name="settings_general_title">一般</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s 等。</string>
-    <string name="settings_general_info_separator" comment="Theme, language">%1$s，%2$s</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s等。</string>
+    <string name="settings_general_info_separator" comment="Theme, language">%1$s、%2$s</string>
     <string name="settings_general_info_theme">佈景主題</string>
     <string name="settings_general_info_language">語言</string>
     <string name="settings_general_info_time_zone">時區</string>
     <string name="settings_general_info_calendar_layout">行事曆配置</string>
     <string name="settings_calendars">我的行事曆</string>
+    <string name="settings_calendars_empty">找不到任何行事曆</string>
     <string name="settings_subscribed_calendars">已訂購授權的行事曆</string>
+    <string name="settings_other_calendars">其他行事曆</string>
     <string name="settings_calendar_default" comment="Default calendar">預設值</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">已停用</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">未同步</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">行事曆連結暫時無法存取</string>
     <string name="settings_calendar_subscribed_last_sync_old">距離上次更新已超過了12小時以上</string>
     <string name="settings_calendar_subscribed_not_decrypted">行事曆無法解密</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">僅能檢視</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">創建行事曆</string>
     <string name="calendar_form_update_title">編輯行事曆</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">名稱</string>
     <string name="calendar_form_description">描述</string>
     <string name="calendar_form_color">行事曆色彩</string>
+    <string name="calendar_form_language">語言</string>
     <string name="calendar_form_default_event_duration">活動持續時間</string>
     <string name="calendar_form_default_event_notifications">活動通知</string>
     <string name="calendar_form_default_all_day_event_notifications">全日行程通知</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">必須填寫名稱</string>
     <string name="calendar_form_description_hint">新增行事曆描述</string>
     <string name="add_calendar_text">加入行事曆</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">加入</string>
     <string name="create_calendar_limit_reached">您已達到行事曆數目上限。</string>
     <string name="create_calendar_limit_reached_title">無法新增更多行事曆</string>
     <string name="create_calendar_limit_reached_paid_description">您已達到方案中可用的最多 25 個行事曆。\n\n要新增行事曆，請先移除既有的。</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">在達到 25 個行事曆的方案限制前，您必須擁有至少一個個人行事曆。</string>
     <string name="create_calendar_limit_reached_manage">管理行事曆</string>
     <string name="create_calendar_limit_reached_free_description">您已達到方案中可用的最多 3 個行事曆。\n\n要新增行事曆，請先移除既有的。</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">在達到 3 個行事曆的方案限制前，您必須擁有至少一個個人行事曆。</string>
     <string name="create_calendar_limit_reached_error">錯誤</string>
     <string name="delete_calendar_dialog_title">刪除行事曆</string>
     <string name="delete_calendar_dialog_message">您確定要刪除此日曆？</string>
+    <string name="remove_calendar_dialog_title">移除行事曆</string>
+    <string name="remove_calendar_dialog_message">請問您確定要移除此行事曆？</string>
+    <string name="leave_calendar_dialog_title">離開行事曆</string>
+    <string name="leave_calendar_dialog_message">如果您離開此行事曆，您必須詢問擁有者才能再次加入。</string>
     <string name="delete_default_calendar_dialog_message">您確定要刪除此行事曆嗎？「%1$s」將會被設定為預設的行事曆。</string>
     <string name="delete_calendar_snack_deleted">行事曆已刪除</string>
+    <string name="remove_calendar_snack_removed">已移除行事曆</string>
     <string name="delete_calendar_snack_error">刪除行事曆時發生錯誤</string>
+    <string name="remove_calendar_snack_error">移除行事曆時發生錯誤</string>
+    <string name="leave_calendar_snack_error">離開行事曆時發生錯誤</string>
     <string name="delete_calendar_snack_error_password_confirmation">密碼驗證失敗</string>
     <string name="recreate_calendar_dialog_title">清除行事曆</string>
     <string name="recreate_calendar_dialog_message">此動作將會移除所有事件與被邀請的使用者。\n\n您確定您想要清除此行事曆嗎？</string>
     <string name="recreate_calendar_snack_error">清除行事曆時發生錯誤</string>
     <string name="recreate_calendar_snack_deleted">已清除行事曆</string>
     <string name="recreate_calendar_snack_clearing">正在清除行事曆……</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">加入節日行事曆</string>
+    <string name="holiday_calendar_title">節日行事曆</string>
+    <string name="add_holiday_calendar_country_search_hint">搜尋國家</string>
+    <string name="holiday_calendar_form_picker_title">國家</string>
+    <string name="holiday_calendar_time_zone_based">依據您的時區</string>
+    <string name="holiday_calendar_already_exists">已存在節日行事曆</string>
+    <string name="holiday_calendar_value_placeholder">選擇國家</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">確定</string>
     <string name="bootstrap_error_no_calendar_title">無任何與此帳號關聯的行事曆。</string>
@@ -589,7 +618,7 @@
         <item quantity="other">行事曆</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="other">匯入 %1$d 行事曆</item>
+        <item quantity="other">匯入 %1$d 個行事曆</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
         <item quantity="other">%1$d 個進行中的匯入</item>

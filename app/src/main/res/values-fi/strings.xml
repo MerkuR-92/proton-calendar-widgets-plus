@@ -39,6 +39,8 @@
     <string name="action_done">Valmis</string>
     <string name="action_edit">Muokkaa</string>
     <string name="action_delete">Poista</string>
+    <string name="action_remove">Poista</string>
+    <string name="action_leave">Poistu</string>
     <string name="action_recreate">Tyhjennä</string>
     <string name="action_today">Tänään</string>
     <string name="action_create_event">Luo tapahtuma</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Omat kalenterit</string>
     <string name="nav_view_subscribed_calendars">Tilatut kalenterit</string>
+    <string name="nav_view_other_calendars">Muut kalenterit</string>
     <string name="nav_view_disabled_calendars">%1$s (ei käytössä)</string>
     <string name="nav_view_not_synced_calendars">%1$s (ei synkronoitu)</string>
     <string name="nav_view_syncing_calendars">%1$s (synkronoidaan)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Oletuskalenteri vaihdettiin</string>
     <string name="snack_update_default_calendar_error">Virhe oletuskalenterin vaihdossa, yritä uudelleen myöhemmin</string>
     <string name="snack_calendar_init_error">Virhe ladattaessa kalenterin tietoja</string>
+    <string name="snack_holiday_calendar_init_error">Virhe ladattaessa juhlapäiväkalenterin tietoja</string>
     <string name="snack_update_calendar_error">Virhe päivitettäessä kalenterin tietoja, yritä uudelleen myöhemmin</string>
     <string name="snack_update_calendar_settings_error">Virhe päivitettäessä joitakin kalenterin tietoja, yritä uudelleen myöhemmin</string>
     <string name="snack_update_calendar_success">Kalenteri päivitettiin</string>
     <string name="snack_create_calendar_success">Kalenteri luotiin</string>
+    <string name="snack_add_calendar_success">Kalenteri lisättiin</string>
     <string name="snack_calendar_saving">Tallennetaan kalenteria</string>
     <string name="snack_create_calendar_error">Virhe oletuskalenterin luonnissa, yritä uudelleen myöhemmin</string>
+    <string name="snack_add_calendar_error">Virhe kalenterin lisäämisessä, yritä myöhemmin uudelleen</string>
     <string name="snack_create_calendar_settings_error">Kalenteri luotiin, mutta joitakin tietoja ei päivitetty. Yritä myöhemmin uudelleen</string>
     <string name="snack_ics_default_error">Virhe avattaessa kalenteria</string>
     <string name="snack_ics_event_not_found_error">Tapahtumaa ei löytynyt</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">aikavyöhyke</string>
     <string name="settings_general_info_calendar_layout">kalenterien asettelu</string>
     <string name="settings_calendars">Omat kalenterit</string>
+    <string name="settings_calendars_empty">Kalentereita löytynyt</string>
     <string name="settings_subscribed_calendars">Tilatut kalenterit</string>
+    <string name="settings_other_calendars">Muut kalenterit</string>
     <string name="settings_calendar_default" comment="Default calendar">Oletus</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Ei käytössä</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Synkronoimaton</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Kalenterilinkki on tilapäisesti tavoittamattomissa</string>
     <string name="settings_calendar_subscribed_last_sync_old">Edellisestä päivityksestä on yli 12 tuntia</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalenterin salausta ei voitu purkaa</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Vain tarkastelu</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Luo kalenteri</string>
     <string name="calendar_form_update_title">Muokkaa kalenteria</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Nimi</string>
     <string name="calendar_form_description">Kuvaus</string>
     <string name="calendar_form_color">Kalenterin väri</string>
+    <string name="calendar_form_language">Kieli</string>
     <string name="calendar_form_default_event_duration">Tapahtuman kesto</string>
     <string name="calendar_form_default_event_notifications">Tapahtuman ilmoitukset</string>
     <string name="calendar_form_default_all_day_event_notifications">Koko päivän tapahtuman ilmoitukset</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Nimi vaaditaan</string>
     <string name="calendar_form_description_hint">Kuvaile kalenteria</string>
     <string name="add_calendar_text">Lisää kalenteri</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Lisää</string>
     <string name="create_calendar_limit_reached">Olet saavuttanut kalenterien enimmäismäärän.</string>
     <string name="create_calendar_limit_reached_title">Enempää kalentereita ei voida lisätä</string>
     <string name="create_calendar_limit_reached_paid_description">Olet saavuttanut tilaukseesi sisältyvän 25 kalenterin enimmäismäärän.\n\nLisätäksesi uuden kalenterin, poista nykyisiä kalentereita.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Sinulla on oltava vähintään yksi henkilökohtainen kalenteri, ennen kuin saavutat tilauksesi 25 kalenterin rajan.</string>
     <string name="create_calendar_limit_reached_manage">Hallitse kalentereita</string>
     <string name="create_calendar_limit_reached_free_description">Olet saavuttanut tilaukseesi sisältyvän 3 kalenterin enimmäismäärän.\n\nLisätäksesi uuden kalenterin, poista nykyisiä kalentereita.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Sinulla on oltava vähintään yksi henkilökohtainen kalenteri, ennen kuin saavutat tilauksesi 3 kalenterin rajan.</string>
     <string name="create_calendar_limit_reached_error">Virhe</string>
     <string name="delete_calendar_dialog_title">Poista kalenteri</string>
     <string name="delete_calendar_dialog_message">Haluatko varmasti poistaa kalenterin?</string>
+    <string name="remove_calendar_dialog_title">Poista kalenteri</string>
+    <string name="remove_calendar_dialog_message">Haluatko varmasti poistaa tämän kalenterin?</string>
+    <string name="leave_calendar_dialog_title">Poistutaanko kalenterista</string>
+    <string name="leave_calendar_dialog_message">Jos poistut kalenterista, sinun on pyydettävä uudelleenlittymistä sen omistajalta.</string>
     <string name="delete_default_calendar_dialog_message">Haluatko varmasti poistaa kalenterin? \"%1$s\" asetetaan oletuskalenteriksi.</string>
     <string name="delete_calendar_snack_deleted">Kalenteri poistettiin</string>
+    <string name="remove_calendar_snack_removed">Kalenteri poistettiin</string>
     <string name="delete_calendar_snack_error">Virhe poistettaessa kalenteria</string>
+    <string name="remove_calendar_snack_error">Virhe kalenteria poistettaessa</string>
+    <string name="leave_calendar_snack_error">Virhe kalenterista poistuessa</string>
     <string name="delete_calendar_snack_error_password_confirmation">Salasanan vahvistus epäonnistui</string>
     <string name="recreate_calendar_dialog_title">Tyhjennä kalenteri</string>
     <string name="recreate_calendar_dialog_message">Toiminto poistaa kaikki tapahtumat ja käyttäjien kutsuntatiedot.\n\nHaluatko varmasti tyhjentää tämän kalenterin?</string>
     <string name="recreate_calendar_snack_error">Virhe tyhjennettäesä kalenteria</string>
     <string name="recreate_calendar_snack_deleted">Kalenteri tyhjennettiin</string>
     <string name="recreate_calendar_snack_clearing">Tyhjennetään kalenteria…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Lisää juhlapäiväkalenteri</string>
+    <string name="holiday_calendar_title">Juhlapäiväkalenteri</string>
+    <string name="add_holiday_calendar_country_search_hint">Hae maata</string>
+    <string name="holiday_calendar_form_picker_title">Maa</string>
+    <string name="holiday_calendar_time_zone_based">Aikavyöhykkeesi perusteella</string>
+    <string name="holiday_calendar_already_exists">Juhlapäiväkalenteri on jo olemassa</string>
+    <string name="holiday_calendar_value_placeholder">Valitse maa</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Tiliin liitettyjä aktiivisia kalentereita ei ole.</string>
@@ -512,7 +541,7 @@
     <string name="spotlight_dialog_search_title">Hae tapahtumia</string>
     <string name="spotlight_dialog_search_description">Löydä etsimäsi tapahtuma helposti uudella hakutoiminnollamme. <a href="https://proton.me/support/calendar-search">Lisätietoja</a></string>
     <string name="spotlight_dialog_import_title">Muita tapoja lisätä tapahtumia</string>
-    <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia mobiililaitteesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
+    <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia puhelimesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenterin ominaisuudet</string>
     <string name="spotlight_dialog_calendar_provider_description">• Lisää tapahtumia suoraan Proton-kalenteriin muista sovelluksista.\n\n• Luo ja hallinnoi tapahtumia kalentereissa, jotka on jaettu kanssasi.\n\n• Aseta oletusnäkymä, jonka haluat nähdä, kun avaat sovelluksen.\n\n• 13 uutta kieltä saatavilla.</string>
     <!-- Import -->

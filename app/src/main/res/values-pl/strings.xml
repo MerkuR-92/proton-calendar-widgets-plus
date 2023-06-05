@@ -39,6 +39,8 @@
     <string name="action_done">Gotowe</string>
     <string name="action_edit">Edytuj</string>
     <string name="action_delete">Usuń</string>
+    <string name="action_remove">Usuń</string>
+    <string name="action_leave">Opuść</string>
     <string name="action_recreate">Wyczyść</string>
     <string name="action_today">Dzisiaj</string>
     <string name="action_create_event">Utwórz wydarzenie</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Moje kalendarze</string>
     <string name="nav_view_subscribed_calendars">Subskrybowane kalendarze</string>
+    <string name="nav_view_other_calendars">Inne kalendarze</string>
     <string name="nav_view_disabled_calendars">%1$s (wyłączony)</string>
     <string name="nav_view_not_synced_calendars">%1$s (niezsynchronizowany)</string>
     <string name="nav_view_syncing_calendars">%1$s (trwa synchronizacja)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Domyślny kalendarz został zaktualizowany</string>
     <string name="snack_update_default_calendar_error">Wystąpił błąd podczas aktualizowania domyślnego kalendarza. Spróbuj ponownie później</string>
     <string name="snack_calendar_init_error">Wystąpił błąd podczas ładowania informacji o kalendarzu</string>
+    <string name="snack_holiday_calendar_init_error">Wystąpił błąd podczas ładowania informacji o kalendarzu świąt</string>
     <string name="snack_update_calendar_error">Wystąpił błąd podczas aktualizowania informacji o kalendarzu. Spróbuj ponownie później</string>
     <string name="snack_update_calendar_settings_error">Wystąpił błąd podczas aktualizowania informacji o kalendarzu. Spróbuj ponownie później</string>
     <string name="snack_update_calendar_success">Kalendarz został zaktualizowany</string>
     <string name="snack_create_calendar_success">Kalendarz został utworzony</string>
+    <string name="snack_add_calendar_success">Kalendarz został dodany</string>
     <string name="snack_calendar_saving">Zapisywanie kalendarza</string>
     <string name="snack_create_calendar_error">Wystąpił błąd podczas tworzenia kalendarza. Spróbuj ponownie później</string>
+    <string name="snack_add_calendar_error">Wystąpił błąd podczas dodawania kalendarza. Spróbuj ponownie później</string>
     <string name="snack_create_calendar_settings_error">Kalendarz został utworzony, ale niektóre informacje nie zostały zaktualizowane. Spróbuj ponownie później</string>
     <string name="snack_ics_default_error">Wystąpił błąd podczas odczytywania kalendarza</string>
     <string name="snack_ics_event_not_found_error">Wydarzenie nie zostało znalezione</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">strefa czasowa</string>
     <string name="settings_general_info_calendar_layout">widok kalendarza</string>
     <string name="settings_calendars">Moje kalendarze</string>
+    <string name="settings_calendars_empty">Nie znaleziono kalendarzy</string>
     <string name="settings_subscribed_calendars">Subskrybowane kalendarze</string>
+    <string name="settings_other_calendars">Inne kalendarze</string>
     <string name="settings_calendar_default" comment="Default calendar">Domyślny</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Wyłączony</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Niezsynchronizowany</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Link kalendarza jest tymczasowo niedostępny</string>
     <string name="settings_calendar_subscribed_last_sync_old">Od ostatniej aktualizacji minęło ponad 12 godzin</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalendarz nie może zostać odszyfrowany</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Tylko do odczytu</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Utwórz kalendarz</string>
     <string name="calendar_form_update_title">Edytuj kalendarz</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Nazwa</string>
     <string name="calendar_form_description">Opis</string>
     <string name="calendar_form_color">Kolor kalendarza</string>
+    <string name="calendar_form_language">Język</string>
     <string name="calendar_form_default_event_duration">Czas trwania wydarzenia</string>
     <string name="calendar_form_default_event_notifications">Powiadomienia wydarzenia</string>
     <string name="calendar_form_default_all_day_event_notifications">Powiadomienia wydarzenia całodniowego</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Nazwa jest wymagana</string>
     <string name="calendar_form_description_hint">Dodaj opis kalendarza</string>
     <string name="add_calendar_text">Dodaj kalendarz</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Dodaj</string>
     <string name="create_calendar_limit_reached">Osiągnięto maksymalną liczbę kalendarzy.</string>
     <string name="create_calendar_limit_reached_title">Nie można dodać więcej kalendarzy</string>
     <string name="create_calendar_limit_reached_paid_description">Osiągnięto maksymalną liczbę 25 kalendarzy dostępnych w Twoim planie.\n\nAby utworzyć nowy, usuń obecny kalendarz.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Musisz posiadać osobisty kalendarz przed osiągnięciem limitu 25 kalendarzy.</string>
     <string name="create_calendar_limit_reached_manage">Zarządzaj kalendarzami</string>
     <string name="create_calendar_limit_reached_free_description">Osiągnięto maksymalną liczbę 3 kalendarzy dostępnych w Twoim planie.\n\nAby utworzyć nowy kalendarz, usuń obecny.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Musisz posiadać osobisty kalendarz przed osiągnięciem limitu 3 kalendarzy.</string>
     <string name="create_calendar_limit_reached_error">Błąd</string>
     <string name="delete_calendar_dialog_title">Usuń kalendarz</string>
     <string name="delete_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz?</string>
+    <string name="remove_calendar_dialog_title">Usuń kalendarz</string>
+    <string name="remove_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz?</string>
+    <string name="leave_calendar_dialog_title">Opuść kalendarz</string>
+    <string name="leave_calendar_dialog_message">Jeśli opuścisz kalendarz, zaproszenie od właściciela będzie niezbędne do ponownego dołączania.</string>
     <string name="delete_default_calendar_dialog_message">Czy na pewno chcesz usunąć ten kalendarz? Domyślnym kalendarzem zostanie \"%1$s\".</string>
     <string name="delete_calendar_snack_deleted">Kalendarz został usunięty</string>
+    <string name="remove_calendar_snack_removed">Kalendarz został usunięty</string>
     <string name="delete_calendar_snack_error">Wystąpił błąd podczas usuwania kalendarza</string>
+    <string name="remove_calendar_snack_error">Wystąpił błąd podczas usuwania kalendarza</string>
+    <string name="leave_calendar_snack_error">Wystąpił błąd podczas opuszczania kalendarza</string>
     <string name="delete_calendar_snack_error_password_confirmation">Weryfikacja hasła nie powiodła się</string>
     <string name="recreate_calendar_dialog_title">Wyczyść kalendarz</string>
     <string name="recreate_calendar_dialog_message">Ta akcja spowoduje usunięcie wszystkich wydarzeń i zaproszonych użytkowników.\n\nCzy na pewno chcesz wyczyścić kalendarz?</string>
     <string name="recreate_calendar_snack_error">Wystąpił błąd podczas czyszczenia kalendarza</string>
     <string name="recreate_calendar_snack_deleted">Kalendarz został wyczyszczony</string>
     <string name="recreate_calendar_snack_clearing">Czyszczenie kalendarza…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Dodaj kalendarz świąt</string>
+    <string name="holiday_calendar_title">Kalendarz świąt</string>
+    <string name="add_holiday_calendar_country_search_hint">Szukaj kraju</string>
+    <string name="holiday_calendar_form_picker_title">Kraj</string>
+    <string name="holiday_calendar_time_zone_based">Na podstawie strefy czasowej</string>
+    <string name="holiday_calendar_already_exists">Kalendarz świąt już istnieje</string>
+    <string name="holiday_calendar_value_placeholder">Wybierz kraj</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Brak kalendarzy skojarzonych z tym kontem.</string>
@@ -510,7 +539,7 @@
     <string name="spotlight_dialog_week_view_title">Więcej opcji widoku</string>
     <string name="spotlight_dialog_week_view_description">• Przedstawiamy widok kalendarza <b>3-dniowy</b> i <b>tygodniowy</b>. Wybierz preferowany widok w <b>menu</b>.\n\n• Dostosuj wysokość rzędów za pomocą dwóch palców, powiększając i pomniejszając siatkę dni.</string>
     <string name="spotlight_dialog_search_title">Szukaj wydarzeń</string>
-    <string name="spotlight_dialog_search_description">Znajdź w wyszukiwarce wydarzenie, które chcesz znaleźć. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
+    <string name="spotlight_dialog_search_description">Znajdź łatwo wydarzenie za pomocą naszej nowej wyszukiwarki. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
     <string name="spotlight_dialog_import_title">Więcej sposobów na dodanie wydarzenia</string>
     <string name="spotlight_dialog_import_description">• Importuj wydarzenia do kalendarza z plików na telefonie.\n\n• Dodaj rezerwacje wycieczek bezpośrednio z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcje kalendarza</string>

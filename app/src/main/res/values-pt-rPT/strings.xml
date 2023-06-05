@@ -39,6 +39,8 @@
     <string name="action_done">Feito</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="action_remove">Remover</string>
+    <string name="action_leave">Abandonar</string>
     <string name="action_recreate">Limpar</string>
     <string name="action_today">Hoje</string>
     <string name="action_create_event">Criar evento</string>
@@ -48,7 +50,7 @@
     <string name="agenda_loading_events">A carregar eventos…</string>
     <string name="agenda_loading_events_error">Erro ao carregar eventos</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d more</string>
+    <string name="day_view_all_day_more">mais %1$d outros</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Dia inteiro</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -143,33 +145,33 @@
     <string name="event_text_attendees_none">Nenhum</string>
     <string name="event_text_calendar">Calendário</string>
     <string name="event_text_timezone_start">Fuso horário</string>
-    <string name="invite_in_shared_calendar_disclaimer">Sending invitations is available only within personal calendars.</string>
-    <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
-    <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
+    <string name="invite_in_shared_calendar_disclaimer">O envio de convites está disponível apenas em calendários pessoais.</string>
+    <string name="invite_change_calendar_disclaimer">Não é possível modificar o calendário associado aos convites.</string>
+    <string name="change_calendar_recurring_disclaimer">Ainda não é possível alterar o calendário para um evento recorrente.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">O que procura?</string>
     <string name="search_empty_results_title">Nenhum resultado</string>
-    <string name="search_empty_results_subtitle">Try another term, e.g., Eric, birthday, webinar, book club.</string>
-    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Downloading calendars (%1$s)</string>
+    <string name="search_empty_results_subtitle">Tente outro termo, por exemplo, Eric, aniversário, webinar, clube do livro.</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">A transferir calendários (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Tempo restante: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Calculando o tempo restante…</string>
-    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">almost done</string>
-    <string name="search_downloading_pause">Pause download</string>
-    <string name="search_settings_dialog_toggle_off_title">Remove all downloaded calendars?</string>
-    <string name="search_settings_dialog_toggle_off_text">You\'ll need to download your calendars again if you want to search.</string>
-    <string name="search_settings_dialog_toggle_on_title">Download calendars to this device?</string>
-    <string name="search_settings_dialog_toggle_on_text">This is required so you can search.</string>
-    <string name="search_onboarding_header">Want to search your calendar?</string>
-    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
-    <string name="search_onboarding_action_download_calendars">Download calendars</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">quase pronto</string>
+    <string name="search_downloading_pause">Pausar a transferência</string>
+    <string name="search_settings_dialog_toggle_off_title">Remover todos os calendários transferidos?</string>
+    <string name="search_settings_dialog_toggle_off_text">Terá de descarregar novamente os seus calendários se quiser pesquisar.</string>
+    <string name="search_settings_dialog_toggle_on_title">Descarregar calendários para este dispositivo?</string>
+    <string name="search_settings_dialog_toggle_on_text">Isto é necessário para poder pesquisar.</string>
+    <string name="search_onboarding_header">Quer procurar no seu calendário?</string>
+    <string name="search_onboarding_text">Primeiro, é necessário descarregar uma cópia encriptada dos seus calendários. Isto demora apenas um momento e pode continuar a utilizar a aplicação. <a href="https://proton.me/support/calendar-search">Saiba mais</a></string>
+    <string name="search_onboarding_action_download_calendars">Descarregar calendários</string>
     <string name="search_onboarding_action_pause">Pausar</string>
     <string name="search_onboarding_action_resume">Retomar</string>
     <string name="search_onboarding_action_retry">Tentar de novo</string>
-    <string name="search_onboarding_progress_header_ongoing">Downloading calendars…</string>
-    <string name="search_onboarding_progress_header_completed">Downloading completed</string>
-    <string name="search_onboarding_progress_header_paused">Downloading calendars paused</string>
-    <string name="search_onboarding_progress_header_error">Error downloading calendars</string>
-    <string name="search_spotlight_activation_snack">Calendar search activated</string>
+    <string name="search_onboarding_progress_header_ongoing">A descarregar calendários...</string>
+    <string name="search_onboarding_progress_header_completed">Descarregamento concluído</string>
+    <string name="search_onboarding_progress_header_paused">Descarregamento de calendários em pausa</string>
+    <string name="search_onboarding_progress_header_error">Erro ao descarregar calendários</string>
+    <string name="search_spotlight_activation_snack">Pesquisa de calendário ativada</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Adicionar notificação</string>
     <string name="event_text_description">Descrição</string>
@@ -231,7 +233,7 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Convite para um evento a partir de %1$s às %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Convite para um evento em %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Convite para um evento a partir de %1$s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellation of an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancelamento de um evento com início em %1$s a %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancelamento de um evento em %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancelamento de um evento começando em %1$s</string>
     <string name="event_send_invite_mail_body">Recebeu um convite para %1$s\nQuando: %2$s</string>
@@ -253,9 +255,10 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Os meus calendários</string>
     <string name="nav_view_subscribed_calendars">Calendários subscritos</string>
-    <string name="nav_view_disabled_calendars">%1$s (Disabled)</string>
-    <string name="nav_view_not_synced_calendars">%1$s (Not synced)</string>
-    <string name="nav_view_syncing_calendars">%1$s (Syncing)</string>
+    <string name="nav_view_other_calendars">Outros calendários</string>
+    <string name="nav_view_disabled_calendars">%1$s (desativado)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (não sincronizada)</string>
+    <string name="nav_view_syncing_calendars">%1$s (a sincronizar)</string>
     <string name="nav_view_more">Mais</string>
     <string name="nav_view_switcher">Ver</string>
     <string name="nav_view_switcher_day">Dia</string>
@@ -300,7 +303,7 @@
     <string name="snack_send_bug_report_error">Erro ao enviar o relatório. Tente novamente mais tarde.</string>
     <string name="snack_send_bug_report_description_empty">Forneça uma descrição do seu relatório</string>
     <string name="snack_create_event_no_active_personal_calendar">Precisa de um calendário pessoal ativo para criar eventos.</string>
-    <string name="snack_create_event_no_active_calendar">You need an active calendar to create events</string>
+    <string name="snack_create_event_no_active_calendar">Precisa de um calendário ativo para criar eventos.</string>
     <string name="snack_add_self_as_participant">Impossível convidar-se a si próprio</string>
     <string name="snack_maximum_participants_reached">O número máximo de participantes foi atingido.</string>
     <string name="snack_add_participant_error">Erro ao adicionar o participante</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Calendário predefinido atualizado</string>
     <string name="snack_update_default_calendar_error">Erro ao atualizar o calendário predefinido. Tente mais tarde.</string>
     <string name="snack_calendar_init_error">Erro ao carregar informação do calendário</string>
+    <string name="snack_holiday_calendar_init_error">Erro ao carregar informações do calendário de feriados</string>
     <string name="snack_update_calendar_error">Erro ao atualizar informação do calendário. Tente mais tarde.</string>
     <string name="snack_update_calendar_settings_error">Erro ao atualizar alguma informação do calendário. Tente mais tarde.</string>
     <string name="snack_update_calendar_success">Calendário atualizado</string>
     <string name="snack_create_calendar_success">Calendário criado</string>
+    <string name="snack_add_calendar_success">Calendário adicionado</string>
     <string name="snack_calendar_saving">Salvar o calendário</string>
     <string name="snack_create_calendar_error">Erro ao criar o calendário. Tente novamente mais tarde.</string>
+    <string name="snack_add_calendar_error">Erro ao adicionar o calendário, tente novamente mais tarde</string>
     <string name="snack_create_calendar_settings_error">O calendário foi criado mas algumas informações não foram atualizadas. Tente mais tarde</string>
     <string name="snack_ics_default_error">Erro ao abrir o calendário</string>
     <string name="snack_ics_event_not_found_error">Evento não encontrado</string>
@@ -332,8 +338,8 @@
     <string name="snack_ics_party_crasher_error">O seu endereço não está na lista de participantes</string>
     <string name="snack_ics_reply_party_crasher_error">Não é possível adicionar participantes que não foram convidados pelo organizador</string>
     <string name="snack_ics_missing_uid_error">UID do evento em falta</string>
-    <string name="snack_ics_no_active_personal_calendar_error">There is no active personal calendar associated with this account</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active calendar associated with this account</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Não há um calendário pessoal ativo associado a esta conta.</string>
+    <string name="snack_ics_no_active_calendar_error">Não há um calendário activo associado a esta conta.</string>
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é suportada</string>
     <string name="snack_ics_too_many_events_error">Múltiplos eventos ainda não são suportados</string>
     <string name="snack_ics_no_events_error">Este calendário não contém nenhum evento.</string>
@@ -348,7 +354,7 @@
     <string name="snack_app_link_import_error">Autenticação cancelada</string>
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Abrindo evento…</string>
-    <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
+    <string name="snack_invite_in_shared_calendar_error">Não é permitido criar convites num calendário partilhado</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -363,14 +369,14 @@
     <string name="contacts_permission_dialog_cancel">Recusar</string>
     <string name="dialog_title_calendar_picker">Calendário</string>
     <string name="import_from_google_title">Importar do Google</string>
-    <string name="notifications_permission_dialog_title">Allow Proton Calendar to display notifications?</string>
-    <string name="notifications_permission_dialog_message">Proton Calendar needs permission to show you upcoming event notifications.</string>
+    <string name="notifications_permission_dialog_title">Permitir que o Calendário Proton apresente notificações?</string>
+    <string name="notifications_permission_dialog_message">O Calendário Proton precisa de autorização para lhe mostrar notificações de eventos futuros.</string>
     <string name="notifications_permission_dialog_open_settings">Abrir definições</string>
     <string name="notifications_permission_dialog_cancel">Recusar</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificações de eventos</string>
     <string name="notification_channel_sync">Sincronização do calendário</string>
-    <string name="notification_channel_calendar_fetch">Fetching Calendars</string>
+    <string name="notification_channel_calendar_fetch">A obter calendários</string>
     <string name="notification_sync">Sincronização de calendários…</string>
     <string name="notification_text_today">Hoje</string>
     <string name="notification_text_today_part_time">Hoje ás %1$s</string>
@@ -390,8 +396,8 @@
     <string name="settings_timezone_title">Fuso horário</string>
     <string name="settings_language_title">Idioma da aplicação</string>
     <string name="settings_language_default">Detetar automaticamente</string>
-    <string name="settings_default_view_title">Default view</string>
-    <string name="settings_default_view_default">Last view</string>
+    <string name="settings_default_view_title">Vista predefinida</string>
+    <string name="settings_default_view_default">Última visualização</string>
     <string name="settings_update_timezone_title">Pedir para atualizar a definição de fuso horário</string>
     <string name="settings_update_timezone_subtitle">Se o fuso horário do sistema não coincidir com a definição de fuso horário atual, ser-lhe-á pedido que o atualize.</string>
     <string name="settings_update_timezone_checkbox">Não perguntar novamente</string>
@@ -399,8 +405,8 @@
     <string name="settings_time_format_title">Formato da hora</string>
     <string name="settings_week_numbers_title">Mostrar número da semana</string>
     <string name="settings_auto_invites_title">Adicione convites ao calendário e marque-os como pendentes</string>
-    <string name="settings_search_title">Search calendars</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.</string>
+    <string name="settings_search_title">Pesquisar calendários</string>
+    <string name="settings_search_subtitle">Descarrega e armazena conteúdos do calendário no seu dispositivo para pesquisa. Se desativar esta opção, o conteúdo descarregado será removido.</string>
     <string name="settings_alternative_routing_title">Permitir redirecionamento alternativo</string>
     <string name="settings_alternative_routing_subtitle">Caso as páginas do Proton estejam bloqueadas, esta definição permite à aplicação tentar redireccionar o tráfego para ligar ao Proton, o que pode ser útil para contornar firewalls ou problemas de rede. Recomendamos que mantenha esta definição para maior confiança.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">fuso horário</string>
     <string name="settings_general_info_calendar_layout">disposição do calendário</string>
     <string name="settings_calendars">Os meus calendários</string>
+    <string name="settings_calendars_empty">Não foram encontrados calendários</string>
     <string name="settings_subscribed_calendars">Calendários subscritos</string>
+    <string name="settings_other_calendars">Outros calendários</string>
     <string name="settings_calendar_default" comment="Default calendar">Predefinição</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Desativado</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Não sincronizado</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Ligação ao evento temporariamente inacessível</string>
     <string name="settings_calendar_subscribed_last_sync_old">Mais de 12 horas passaram desde a última atualização</string>
     <string name="settings_calendar_subscribed_not_decrypted">O calendário não pôde ser decifrado.</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Apenas visualização</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Criar um calendário</string>
     <string name="calendar_form_update_title">Editar o calendário</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Nome</string>
     <string name="calendar_form_description">Descrição</string>
     <string name="calendar_form_color">Cor do calendário</string>
+    <string name="calendar_form_language">Idioma</string>
     <string name="calendar_form_default_event_duration">Duração do evento</string>
     <string name="calendar_form_default_event_notifications">Notificação de eventos</string>
     <string name="calendar_form_default_all_day_event_notifications">Notificação de eventos de dia inteiro</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Nome obrigatório</string>
     <string name="calendar_form_description_hint">Adicionar uma descrição ao calendário</string>
     <string name="add_calendar_text">Adicionar um calendário</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Adicionar</string>
     <string name="create_calendar_limit_reached">Atingiu o número máximo de calendários.</string>
-    <string name="create_calendar_limit_reached_title">Cannot add more calendars</string>
-    <string name="create_calendar_limit_reached_paid_description">You’ve reached the maximum number of 25 calendars available in your plan.\n\nTo add a new calendar, remove an existing one.</string>
+    <string name="create_calendar_limit_reached_title">Não é possível adicionar mais calendários</string>
+    <string name="create_calendar_limit_reached_paid_description">Atingiu o número máximo de 25 calendários disponíveis no seu plano.\n\nPara adicionar um novo calendário, remova um existente.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Tem de ter pelo menos um calendário pessoal antes de atingir o limite do plano de 25 calendários.</string>
     <string name="create_calendar_limit_reached_manage">Gerir os calendários</string>
-    <string name="create_calendar_limit_reached_free_description">You’ve reached the maximum number of 3 calendars available in your plan.\n\nTo add a new calendar, remove an existing one.</string>
+    <string name="create_calendar_limit_reached_free_description">Atingiu o número máximo de 3 calendários disponíveis no seu plano.\n\nPara adicionar um novo calendário, remova um existente.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Tem de ter pelo menos um calendário pessoal antes de atingir o limite do plano de 3 calendários.</string>
     <string name="create_calendar_limit_reached_error">Erro</string>
     <string name="delete_calendar_dialog_title">Eliminar um calendário</string>
     <string name="delete_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário?</string>
+    <string name="remove_calendar_dialog_title">Remover calendário</string>
+    <string name="remove_calendar_dialog_message">Tem a certeza de que pretende remover este calendário?</string>
+    <string name="leave_calendar_dialog_title">Sair do calendário</string>
+    <string name="leave_calendar_dialog_message">Se sair deste calendário, terá de pedir ao proprietário para aderir novamente.</string>
     <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário? \"%1$s\" será definido como calendário predefinido.</string>
     <string name="delete_calendar_snack_deleted">Calendário eliminado</string>
+    <string name="remove_calendar_snack_removed">Calendário removido</string>
     <string name="delete_calendar_snack_error">Erro ao eliminar o calendário</string>
+    <string name="remove_calendar_snack_error">Erro ao remover o calendário</string>
+    <string name="leave_calendar_snack_error">Erro ao sair do calendário</string>
     <string name="delete_calendar_snack_error_password_confirmation">Falha na confirmação da palavra-passe</string>
     <string name="recreate_calendar_dialog_title">Limpar o calendário</string>
-    <string name="recreate_calendar_dialog_message">This action will remove all events and invited users.\n\nAre you sure you want to clear this calendar?</string>
+    <string name="recreate_calendar_dialog_message">Esta ação irá remover todos os eventos e utilizadores convidados.\n\nTem a certeza de que pretende limpar este calendário?</string>
     <string name="recreate_calendar_snack_error">Erro ao limpar o calendário</string>
     <string name="recreate_calendar_snack_deleted">O calendário foi limpo</string>
     <string name="recreate_calendar_snack_clearing">Limpando calendário…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Adicionar calendários de feriados</string>
+    <string name="holiday_calendar_title">Calendário de feriados</string>
+    <string name="add_holiday_calendar_country_search_hint">Procurar por um país.</string>
+    <string name="holiday_calendar_form_picker_title">País</string>
+    <string name="holiday_calendar_time_zone_based">Com base no seu fuso horário</string>
+    <string name="holiday_calendar_already_exists">O calendário de feriados já existe.</string>
+    <string name="holiday_calendar_value_placeholder">Seleccione o país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Aceitar</string>
     <string name="bootstrap_error_no_calendar_title">Não há calendários associados a esta conta.</string>
@@ -509,7 +538,7 @@
     <string name="spotlight_v5_dialog_rebranding_description">Apresentando o visual atualizado do Proton. Muitos serviços, uma missão. Bem-vindo a uma Internet onde a privacidade é o padrão. <a href="https://proton.me/news/updated-proton">Saber mais</a></string>
     <string name="spotlight_dialog_week_view_title">Mais opções de visualização</string>
     <string name="spotlight_dialog_week_view_description">- Apresentando as vistas <b>3 dias</b> e <b>Semana</b> do calendário. Selecione a sua vista preferida no <b>menu</b>.\n\n- Ajuste a altura das linhas na grelha do dia tocando com dois dedos para aumentar ou diminuir o zoom.</string>
-    <string name="spotlight_dialog_search_title">Search for events</string>
+    <string name="spotlight_dialog_search_title">Procurar por eventos.</string>
     <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
     <string name="spotlight_dialog_import_title">More ways to add events</string>
     <string name="spotlight_dialog_import_description">• Import events to your calendar from files on your phone.\n\n• Add trip bookings directly from Proton Mail.</string>
@@ -542,7 +571,7 @@
     <string name="import_assistant_new_calendar_header">Criar um</string>
     <string name="import_assistant_merge_calendar_header">Unir com existente</string>
     <string name="import_assistant_in_progress_title">Importação em curso</string>
-    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importing data from %1s to %2s.</string>
+    <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importando dados de %1s para %2s.</string>
     <string name="import_assistant_in_progress_redirect">Verifique o progresso</string>
     <string name="import_assistant_in_progress_sub_description">Importações grandes podem demorar vários dias. Avisaremos quando a importação for concluída. Pode fechar este ecrã.</string>
     <string name="import_assistant_guide_subtitle">Faça a mudança para a privacidade. De forma fácil e segura.</string>

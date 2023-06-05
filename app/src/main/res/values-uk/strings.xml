@@ -39,6 +39,8 @@
     <string name="action_done">Готово</string>
     <string name="action_edit">Змінити</string>
     <string name="action_delete">Видалити</string>
+    <string name="action_remove">Вилучити</string>
+    <string name="action_leave">Залишити</string>
     <string name="action_recreate">Очистити</string>
     <string name="action_today">Сьогодні</string>
     <string name="action_create_event">Створити подію</string>
@@ -160,7 +162,7 @@
     <string name="search_settings_dialog_toggle_on_title">Завантажити календарі на цей пристрій?</string>
     <string name="search_settings_dialog_toggle_on_text">Це необхідно, щоб ви могли здійснювати пошук.</string>
     <string name="search_onboarding_header">Хочете виконати пошук у календарі?</string>
-    <string name="search_onboarding_text">Спочатку вам потрібно завантажити зашифровану копію ваших календарів. Це забере лише мить, і ви зможете продовжувати користуватися застосунком. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
+    <string name="search_onboarding_text">Спочатку вам потрібно завантажити зашифровану копію ваших календарів. Це триватиме лише мить, і в цей час ви зможете користуватися застосунком. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
     <string name="search_onboarding_action_download_calendars">Завантажити календарі</string>
     <string name="search_onboarding_action_pause">Призупинити</string>
     <string name="search_onboarding_action_resume">Продовжити</string>
@@ -253,6 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мої календарі</string>
     <string name="nav_view_subscribed_calendars">Підписні календарі</string>
+    <string name="nav_view_other_calendars">Інші календарі</string>
     <string name="nav_view_disabled_calendars">%1$s (Вимкнено)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Не синхронізується)</string>
     <string name="nav_view_syncing_calendars">%1$s (Синхронізується)</string>
@@ -312,12 +315,15 @@
     <string name="snack_update_default_calendar">Типовий календар оновлено</string>
     <string name="snack_update_default_calendar_error">Помилка оновлення типового календаря. Спробуйте знову пізніше</string>
     <string name="snack_calendar_init_error">Помилка при завантаженні інформації календаря</string>
+    <string name="snack_holiday_calendar_init_error">Помилка під час завантаження інформації календаря свят</string>
     <string name="snack_update_calendar_error">Помилка при оновленні інформації календаря. Спробуйте знову пізніше</string>
     <string name="snack_update_calendar_settings_error">Помилка при оновленні інформації календаря. Спробуйте знову пізніше</string>
     <string name="snack_update_calendar_success">Календар оновлено</string>
     <string name="snack_create_calendar_success">Календар створено</string>
+    <string name="snack_add_calendar_success">Календар додано</string>
     <string name="snack_calendar_saving">Збереження календаря</string>
     <string name="snack_create_calendar_error">Помилка створення календаря. Спробуйте знову пізніше</string>
+    <string name="snack_add_calendar_error">Помилка додавання календаря. Спробуйте знову пізніше</string>
     <string name="snack_create_calendar_settings_error">Календар створено, але деяку інформацію не було оновлено. Спробуйте знову пізніше</string>
     <string name="snack_ics_default_error">Помилка відкриття календаря</string>
     <string name="snack_ics_event_not_found_error">Подію не знайдено</string>
@@ -412,7 +418,9 @@
     <string name="settings_general_info_time_zone">часовий пояс</string>
     <string name="settings_general_info_calendar_layout">вигляд календарів</string>
     <string name="settings_calendars">Мої календарі</string>
+    <string name="settings_calendars_empty">Календарів не знайдено</string>
     <string name="settings_subscribed_calendars">Підписні календарі</string>
+    <string name="settings_other_calendars">Інші календарі</string>
     <string name="settings_calendar_default" comment="Default calendar">Типовий</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Вимкнено</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Не синхронізовано</string>
@@ -423,6 +431,8 @@
     <string name="settings_calendar_subscribed_tmp_not_accessible">Посилання календаря тимчасово недоступне</string>
     <string name="settings_calendar_subscribed_last_sync_old">Понад 12 годин минуло після попередньої синхронізації</string>
     <string name="settings_calendar_subscribed_not_decrypted">Не вдалося розшифрувати календар</string>
+    <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Лише перегляд</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Створити календар</string>
     <string name="calendar_form_update_title">Редагувати календар</string>
@@ -430,6 +440,7 @@
     <string name="calendar_form_name">Назва</string>
     <string name="calendar_form_description">Опис</string>
     <string name="calendar_form_color">Колір календаря</string>
+    <string name="calendar_form_language">Мова</string>
     <string name="calendar_form_default_event_duration">Тривалість події</string>
     <string name="calendar_form_default_event_notifications">Сповіщення про події</string>
     <string name="calendar_form_default_all_day_event_notifications">Сповіщення події на цілий день</string>
@@ -440,23 +451,41 @@
     <string name="calendar_form_name_required_error">Назва обов\'язкова</string>
     <string name="calendar_form_description_hint">Додати опис календаря</string>
     <string name="add_calendar_text">Додати календар</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Додати</string>
     <string name="create_calendar_limit_reached">Ви досягли максимальної кількості календарів.</string>
     <string name="create_calendar_limit_reached_title">Неможливо додати більше календарів</string>
     <string name="create_calendar_limit_reached_paid_description">Ваш тарифний план дозволяє створити максимум 25 календарів.\n\nЩоб додати новий календар, спершу вилучіть один із наявних.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Ви повинні мати принаймні один особистий календар до того, як досягнете ліміту 25 календарів у вашому тарифі.</string>
     <string name="create_calendar_limit_reached_manage">Керувати календарями</string>
     <string name="create_calendar_limit_reached_free_description">Ваш тарифний план дозволяє створити максимум 3 календарі.\n\nЩоб додати новий календар, спершу вилучіть один із наявних.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Ви повинні мати принаймні один особистий календар до того, як досягнете ліміту 3 календарі у вашому тарифі.</string>
     <string name="create_calendar_limit_reached_error">Помилка</string>
     <string name="delete_calendar_dialog_title">Видалити календар</string>
     <string name="delete_calendar_dialog_message">Ви дійсно хочете видалити цей календар?</string>
+    <string name="remove_calendar_dialog_title">Вилучити календар</string>
+    <string name="remove_calendar_dialog_message">Ви дійсно хочете вилучити цей календар?</string>
+    <string name="leave_calendar_dialog_title">Покинути календар</string>
+    <string name="leave_calendar_dialog_message">Якщо ви покинете цей календар, вам доведеться просити власника про повторне приєднання.</string>
     <string name="delete_default_calendar_dialog_message">Ви впевнені, що хочете видалити цей календар? \"%1$s\" буде встановлено типовим календарем.</string>
     <string name="delete_calendar_snack_deleted">Календар видалено</string>
+    <string name="remove_calendar_snack_removed">Календар вилучено</string>
     <string name="delete_calendar_snack_error">Помилка видалення календаря</string>
+    <string name="remove_calendar_snack_error">Помилка вилучення календаря</string>
+    <string name="leave_calendar_snack_error">Помилка виходу з календаря</string>
     <string name="delete_calendar_snack_error_password_confirmation">Не вдалося підтвердити пароль</string>
     <string name="recreate_calendar_dialog_title">Очистити календар</string>
     <string name="recreate_calendar_dialog_message">Ця дія вилучить усі події та запрошених користувачів.\n\nВи впевнені, що хочете очистити календар?</string>
     <string name="recreate_calendar_snack_error">Помилка очищення календаря</string>
     <string name="recreate_calendar_snack_deleted">Календар очищено</string>
     <string name="recreate_calendar_snack_clearing">Очищення календаря…</string>
+    <!-- Holiday calendar form -->
+    <string name="add_holiday_calendar_title">Додати календар свят</string>
+    <string name="holiday_calendar_title">Календар свят</string>
+    <string name="add_holiday_calendar_country_search_hint">Пошук країни</string>
+    <string name="holiday_calendar_form_picker_title">Країна</string>
+    <string name="holiday_calendar_time_zone_based">На основі вашого часового поясу</string>
+    <string name="holiday_calendar_already_exists">Календар свят уже існує</string>
+    <string name="holiday_calendar_value_placeholder">Обрати країну</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Гаразд</string>
     <string name="bootstrap_error_no_calendar_title">Немає календарів, пов\'язаних із цим обліковим записом.</string>
