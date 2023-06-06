@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.flow.shareIn
@@ -166,29 +167,33 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val skeletonEventsCache = mutableMapOf<CalendarsRepository.EventsWindow, List<SkeletonEvent>>()
     private val skeletonEventsCacheMutex = Mutex()
 
-    private val visibleCalendarEntitiesFlow =
+    private val allCalendarsFlow =
         database.calendarsDao().flowCalendars().joinToCalendars(database, json).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
-            .map { it.filterVisibleCalendars() }.distinctUntilChanged()
+            .distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1).onEach {
+                eventDecryptor.setCalendars(it)
+            }
+
+    private val visibleCalendarsFlow =
+        allCalendarsFlow.map { it.filterVisibleCalendars() }.distinctUntilChanged()
             .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 
     private val visibleSkeletonEventsFlow =
         database.eventsDao().skeletonEventCountFlow().debounce(DEBOUNCE_EVENTS_UPDATE.toMillis())
-            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarEntitiesFlow) { _, calendarEntities ->
-
+            .combineTransform<Int, List<Calendar>, List<SkeletonEvent>>(visibleCalendarsFlow) { _, calendars ->
                 // in order to prevent too large cursors, we subscribe to overall COUNT and then select data in a paginated way, manually
                 val pageSize = 100
-                val skeletonEventEntities = calendarEntities.flatMap { calendarEntity ->
-                    val allEventsInCalendarCount = database.eventsDao().count(calendarEntity.id)
+                val skeletonEventEntities = calendars.flatMap { calendar ->
+                    val allEventsInCalendarCount = database.eventsDao().count(calendar.id)
 
                     (0 until ceil(allEventsInCalendarCount / pageSize.toDouble()).toInt()).flatMap { page ->
-                        database.eventsDao().selectSkeletonEventsInCalendarPaginated(calendarEntity.id, pageSize, pageSize * page)
+                        database.eventsDao().selectSkeletonEventsInCalendarPaginated(calendar.id, pageSize, pageSize * page)
                     }
                 }
 
                 val existingAddressIds = mutableMapOf<String, Boolean>() // AddressId -> exists/doesn't exist
 
                 val skeletonEvents = skeletonEventEntities.mapNotNull { skeletonEventEntity ->
-                    val calendar = calendarEntities.firstOrNull { it.id == skeletonEventEntity.calendarId }
+                    val calendar = calendars.firstOrNull { it.id == skeletonEventEntity.calendarId }
 
                     // cache information if Address exists locally or not
                     if ((skeletonEventEntity.addressId != null) && existingAddressIds.contains(skeletonEventEntity.addressId).not()) {
