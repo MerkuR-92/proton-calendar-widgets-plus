@@ -1704,9 +1704,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
         })
 
-        featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
-            holidayCalendarFeatureFlag ?: return@Observer
-        })
+        // TODO Uncomment in Holiday calendar release
+//        featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
+//            holidayCalendarFeatureFlag ?: return@Observer
+//        })
     }
 
     private fun setUserPersonalCalendarsList(userPersonalCalendars: List<Calendar>, defaultCalendarId: String? = null) {

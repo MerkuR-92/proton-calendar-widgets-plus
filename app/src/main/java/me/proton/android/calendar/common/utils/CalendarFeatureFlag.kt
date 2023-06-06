@@ -9,7 +9,8 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     //  - Others: {Product}{Platform}{FeatureName} (ex: CalendarAndroidHoliday)
 
     // Remote flags
-    CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, false),
+    // TODO Uncomment in Holiday calendar release
+//    CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, false),
     RatingAndroidCalendar(FeatureId("RatingAndroidCalendar"), false, false),
 
     // Local only flag (unknown to remote API)
@@ -31,6 +32,8 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ImportIcs(FeatureId("ImportIcs"), true, true),
     EditingSharedCalendars(FeatureId("EditingSharedCalendars"), true, true),
     ShowEventSearch(FeatureId("ShowEventSearch"), true, true),
+    // TODO Remove in Holiday calendar release
+    CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, true),
 
     // Disabled
     Subscription(FeatureId("Subscription"), false, true),

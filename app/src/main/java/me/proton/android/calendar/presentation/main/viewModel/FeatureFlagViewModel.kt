@@ -50,12 +50,13 @@ class FeatureFlagViewModel @Inject constructor(
      */
     fun initRemoteFeatureFlagsToObserve(userId: UserId) {
         // Holiday calendar feature flag
-        holidayCalendarFeatureFlag = featureFlagManager.observe(
-            userId,
-            CalendarFeatureFlag.CalendarAndroidHoliday.featureId
-        ).map {
-            it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
-        }.asLiveData(Dispatchers.Default)
+        // TODO Uncomment in Holiday calendar release
+//        holidayCalendarFeatureFlag = featureFlagManager.observe(
+//            userId,
+//            CalendarFeatureFlag.CalendarAndroidHoliday.featureId
+//        ).map {
+//            it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
+//        }.asLiveData(Dispatchers.Default)
     }
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
@@ -83,7 +84,10 @@ class FeatureFlagViewModel @Inject constructor(
     }
 
     fun isHolidayCalendarEnabled(): Boolean {
-        return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
+        // TODO Remove in Holiday calendar release
+        return CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
+        // TODO Uncomment in Holiday calendar release
+//        return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
     }
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {
