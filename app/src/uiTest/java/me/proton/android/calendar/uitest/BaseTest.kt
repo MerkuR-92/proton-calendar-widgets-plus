@@ -18,41 +18,75 @@
 
 package me.proton.android.calendar.uitest
 
+import android.app.Application
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.testing.HiltAndroidRule
+import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.presentation.main.MainActivity
+import me.proton.android.calendar.uitest.robot.Robot
 import me.proton.android.calendar.uitest.rule.AtlasEnvironmentRule
 import me.proton.android.calendar.uitest.rule.HiltInjectRule
+import me.proton.android.calendar.uitest.rule.LogoutAllRule
 import me.proton.android.calendar.uitest.rule.MainInitializerRule
-import me.proton.core.auth.domain.testing.LoginTestHelper
+import me.proton.android.calendar.uitest.rule.SharedPreferencesRule
+import me.proton.android.calendar.uitest.rule.TimeZoneRule
+import me.proton.core.auth.presentation.testing.ProtonTestEntryPoint
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
+import me.proton.core.util.kotlin.EMPTY_STRING
+import me.proton.core.util.kotlin.deserialize
 import me.proton.core.util.kotlin.deserializeList
-import org.junit.After
-import org.junit.Before
+import me.proton.test.fusion.FusionConfig
+import me.proton.test.fusion.FusionConfig.targetContext
+import me.proton.test.fusion.ui.espresso.EspressoWaiter
+import me.proton.test.fusion.ui.espresso.wrappers.EspressoAssertions
 import org.junit.Rule
-import javax.inject.Inject
+import org.junit.rules.RuleChain
+import java.util.TimeZone
+import kotlin.time.Duration
 
-open class BaseTest {
+open class  BaseTest: EspressoWaiter {
 
-    @get:Rule(order = RuleOrder_00_First)
-    val hiltRule = HiltAndroidRule(this)
+    open val sharedPreferences = arrayOf(
+        SharedPreferencesKeys.LAST_SPOTLIGHT_SHOWN to Int.MAX_VALUE as Any
+    )
 
-    @get:Rule(order = RuleOrder_00_First)
-    val atlasEnvironmentRule = AtlasEnvironmentRule()
+    open val host = "pavlov.proton.black"
 
-    @get:Rule(order = RuleOrder_10_Initialization)
-    val mainInitializerRule = MainInitializerRule()
+    open val proxyToken = "nclrruz0g1gdxwcsvihibco520zzkk4a3zin1sfg"
 
-    @get:Rule(order = RuleOrder_20_Injection)
-    val hiltInjectRule = HiltInjectRule(hiltRule)
+    open val timeZone: TimeZone get() = TimeZone.getTimeZone("GMT+2")
 
-    @get:Rule(order = RuleOrder_30_ActivityLaunch)
-    val activityScenarioRule = ActivityScenarioRule(MainActivity::class.java)
+    private val hiltRule get() = HiltAndroidRule(this)
 
-    @Inject
-    lateinit var loginTestHelper: LoginTestHelper
+    private val atlasRule get() = AtlasEnvironmentRule(host, proxyToken)
+
+    open val baseChain: RuleChain =
+        RuleChain
+            .outerRule(hiltRule)
+            .around(MainInitializerRule(targetContext))
+            .around(HiltInjectRule(hiltRule))
+            .around(LogoutAllRule)
+            .around(atlasRule)
+            .around(TimeZoneRule(timeZone))
+            .around(SharedPreferencesRule(sharedPreferences))
+
+
+    private val protonTestEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(
+            ApplicationProvider.getApplicationContext<Application>(),
+            ProtonTestEntryPoint::class.java,
+        )
+    }
+
+    val loginTestHelper by lazy { protonTestEntryPoint.loginTestHelper }
+
+    @get:Rule
+    val ruleChain: RuleChain
+        get() = baseChain.around(ActivityScenarioRule(MainActivity::class.java))
 
     val users = Users(
         InstrumentationRegistry.getInstrumentation().context
@@ -62,26 +96,19 @@ open class BaseTest {
             .use { it.readText() }
             .deserializeList())
 
-    val quark: Quark get() = atlasEnvironmentRule.quark
+    val quark
+        get() = Quark(
+            host = atlasRule.host,
+            proxyToken = atlasRule.proxyToken,
+            InstrumentationRegistry.getInstrumentation().context
+                .assets
+                .open("internal_api.json")
+                .bufferedReader()
+                .use { it.readText() }
+                .deserialize())
 
-    @Before
-    open fun setup() {
-        loginTestHelper.logoutAll()
-    }
-
-    @After
-    open fun cleanup() {
-        loginTestHelper.logoutAll()
-    }
-
-    companion object {
-        const val RuleOrder_00_First = 0
-        const val RuleOrder_10_Initialization = 10
-        const val RuleOrder_11_Initialized = 11
-        const val RuleOrder_20_Injection = 20
-        const val RuleOrder_21_Injected = 21
-        const val RuleOrder_30_ActivityLaunch = 30
-        const val RuleOrder_31_ActivityLaunched = 31
-        const val RuleOrder_99_Last = 99
-    }
+    fun <T : Robot> T.verify(
+        timeout: Duration = FusionConfig.commandTimeout,
+        block: T.() -> EspressoAssertions
+    ): T = waitFor(timeout) { block() }
 }
