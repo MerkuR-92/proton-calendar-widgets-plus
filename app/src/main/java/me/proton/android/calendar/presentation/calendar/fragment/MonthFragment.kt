@@ -1004,6 +1004,10 @@ class MonthFragment : BaseFragment() {
             }
         }
 
+        if (viewMode != ViewMode.WEEK && viewMode != ViewMode.THREE_DAY && viewMode != ViewMode.DAY &&
+            this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+            eventsLiveData.removeObservers(viewLifecycleOwner)
+        }
         if (weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)){
             mini_calendar_chevron.clearAnimation()
             mini_calendar_chevron.visibleOrGone(true)
@@ -1022,6 +1026,7 @@ class MonthFragment : BaseFragment() {
             ViewMode.MONTH -> {
                 // Hide the agenda
                 agendaPager?.visibleOrGone(false)
+                agendaPager?.adapter = null
                 weekView?.visibleOrGone(false)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(false)
                 mini_calendar_chevron.clearAnimation()
@@ -1093,6 +1098,7 @@ class MonthFragment : BaseFragment() {
                 }
 
                 agendaPager?.visibleOrGone(false)
+                agendaPager?.adapter = null
                 weekView?.visibleOrGone(true)
                 miniCalendarDaysHeaderLayout?.visibleOrGone(true)
                 mini_calendar_chevron.clearAnimation()
@@ -1146,14 +1152,14 @@ class MonthFragment : BaseFragment() {
                 } ?: monthPagerAdapter.startingPosition
 
             adapter = monthPagerAdapter
-            offscreenPageLimit = 2
+            offscreenPageLimit = 1
 
             val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
             setCurrentItem(item, false)
         }
         // TODO Try and see if this is still needed
-        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = true
-        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(5)
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(1) // We keep one view cached
     }
 
     private fun displayMiniCalendarPager() {
