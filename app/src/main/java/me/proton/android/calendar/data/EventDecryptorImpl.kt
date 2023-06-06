@@ -55,7 +55,7 @@ class EventDecryptorImpl @Inject constructor(
 
             val cachedValue = cacheValue.event
 
-            if (calendar.color != cachedValue.calendar.color) { // Calendar color changed since last decryption
+            if (calendar != cachedValue.calendar) { // Calendar changed since last decryption
                 val eventCopy = Event.from(cachedValue, calendar = calendar)
                 eventsMutex.withLock {
                     cache[cacheKey] = CacheValue(eventEntity, eventCopy)
@@ -113,7 +113,7 @@ class EventDecryptorImpl @Inject constructor(
         val cacheValue = cache[cacheKey]
 
         return if (cacheValue != null) {
-            if (calendar.color != cacheValue.event.calendar.color) { // Calendar color changed since last decryption
+            if (calendar != cacheValue.event.calendar) { // Calendar changed since last decryption
                 val eventCopy = Event.from(cacheValue.event, calendar = calendar)
                 eventsMutex.withLock {
                     cache[cacheKey] = CacheValue(cacheValue.eventEntity, eventCopy)
