@@ -54,9 +54,9 @@ open class  BaseTest: EspressoWaiter {
         SharedPreferencesKeys.LAST_SPOTLIGHT_SHOWN to Int.MAX_VALUE as Any
     )
 
-    open val host = "pavlov.proton.black"
+    open val host = "proton.black"
 
-    open val proxyToken = "nclrruz0g1gdxwcsvihibco520zzkk4a3zin1sfg"
+    open val proxyToken = EMPTY_STRING
 
     open val timeZone: TimeZone get() = TimeZone.getTimeZone("GMT+2")
 
