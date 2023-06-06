@@ -1152,14 +1152,14 @@ class MonthFragment : BaseFragment() {
                 } ?: monthPagerAdapter.startingPosition
 
             adapter = monthPagerAdapter
-            offscreenPageLimit = 2
+            offscreenPageLimit = 1
 
             val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
             setCurrentItem(item, false)
         }
         // TODO Try and see if this is still needed
-        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = true
-        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(5)
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.layoutManager?.isItemPrefetchEnabled = false
+        (miniCalendarPager?.getChildAt(0) as? RecyclerView)?.setItemViewCacheSize(1) // We keep one view cached
     }
 
     private fun displayMiniCalendarPager() {
