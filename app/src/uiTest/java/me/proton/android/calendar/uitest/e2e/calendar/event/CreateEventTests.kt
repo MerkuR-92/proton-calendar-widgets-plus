@@ -9,7 +9,7 @@ import org.junit.Test
 @HiltAndroidTest
 class CreateEventTests : AuthenticatedTest() {
     @Test
-    fun createEventWithDefaultNotification() {
+    fun createPartDayEventWithAddedSameTimeNotification() {
         val eventName = "Event"
         HomeRobot
             .clickAddEvent()
