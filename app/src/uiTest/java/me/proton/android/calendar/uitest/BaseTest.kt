@@ -49,7 +49,7 @@ import org.junit.rules.RuleChain
 import java.util.TimeZone
 import kotlin.time.Duration
 
-open class  BaseTest: EspressoWaiter {
+open class BaseTest: EspressoWaiter {
 
     open val sharedPreferences = arrayOf(
         SharedPreferencesKeys.LAST_SPOTLIGHT_SHOWN to Int.MAX_VALUE as Any
@@ -74,7 +74,6 @@ open class  BaseTest: EspressoWaiter {
             .around(atlasRule)
             .around(TimeZoneRule(timeZone))
             .around(SharedPreferencesRule(sharedPreferences))
-
 
     private val protonTestEntryPoint by lazy {
         EntryPointAccessors.fromApplication(

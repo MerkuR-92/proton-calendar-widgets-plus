@@ -45,7 +45,7 @@ class SameDayNotificationTests(
             .clickAddNotification()
             .clickNotification(notification)
             .clickDone()
-            .apply {
+            .verify {
                 notificationIsDisplayed(notification)
             }
     }
