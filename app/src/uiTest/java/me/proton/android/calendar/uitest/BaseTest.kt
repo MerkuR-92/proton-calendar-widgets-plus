@@ -43,6 +43,7 @@ import me.proton.test.fusion.FusionConfig
 import me.proton.test.fusion.FusionConfig.targetContext
 import me.proton.test.fusion.ui.espresso.EspressoWaiter
 import me.proton.test.fusion.ui.espresso.wrappers.EspressoAssertions
+import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.RuleChain
 import java.util.TimeZone
@@ -111,4 +112,9 @@ open class  BaseTest: EspressoWaiter {
         timeout: Duration = FusionConfig.commandTimeout,
         block: T.() -> EspressoAssertions
     ): T = waitFor(timeout) { block() }
+
+    @Before
+    fun jailUnban() {
+        quark.jailUnban()
+    }
 }
