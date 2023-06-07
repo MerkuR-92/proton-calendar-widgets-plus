@@ -15,22 +15,23 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import biweekly.parameter.ParticipationStatus
-import kotlinx.android.synthetic.main.event_info.view.view_calendar_bar
-import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
-import kotlinx.android.synthetic.main.item_agenda_event_header.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.GenericDiffCallback
+import me.proton.android.calendar.common.utils.AndroidUtils
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.setStripedBackground
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
+import me.proton.android.calendar.databinding.ItemAgendaEventAllDayBinding
+import me.proton.android.calendar.databinding.ItemAgendaEventHeaderBinding
+import me.proton.android.calendar.databinding.ItemAgendaEventPartialDayBinding
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter.EventViewHolder.HeaderViewHolder
 import me.proton.core.util.kotlin.nullIfBlank
@@ -63,34 +64,34 @@ class EventAdapter(
         this.userEmails.addAll(userEmails)
     }
 
-    sealed class EventViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    sealed class EventViewHolder(itemBinding: ViewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        class HeaderViewHolder(itemView: View) : EventViewHolder(itemView) {
+        class HeaderViewHolder(itemBinding: ItemAgendaEventHeaderBinding) : EventViewHolder(itemBinding) {
+            private val textHeader: TextView = itemBinding.textHeader
             fun bind(date: LocalDate, timeZoneId: String) {
+                val context = itemView.context
                 if (date == LocalDate.now(ZoneId.of(timeZoneId))) {
-                    itemView.text_header.setTextColor(itemView.context.getColorFromAttr(R.attr.proton_text_accent))
+                    textHeader.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
                 } else {
-                    itemView.text_header.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                    textHeader.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
                 }
-                itemView.text_header.text = itemView.context.getString(R.string.agenda_header_date, date.formatDayOfWeek(), date.dayOfMonth)
+                textHeader.text = context.getString(R.string.agenda_header_date, date.formatDayOfWeek(), date.dayOfMonth)
             }
         }
 
-        class PartialDayEventViewHolder(private val itemView: View) : EventViewHolder(
-            itemView
-        ) {
+        class PartialDayEventViewHolder(itemBinding: ItemAgendaEventPartialDayBinding) : EventViewHolder(itemBinding) {
 
-            private val imageViewIcon: View = itemView.findViewById(R.id.image_icon)
-            private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
-            private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
-            private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
+            private val imageViewIcon: View = itemBinding.imageIcon
+            private val textViewHeader: TextView = itemBinding.textHeader
+            private val textViewSubheader: TextView = itemBinding.textSubheader
+            private val textViewSubheaderSide: TextView = itemBinding.textSubheaderSide
 
-            private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
-            private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+            private val decryptionErrorIcon: ImageView = itemBinding.decryptionErrorIcon
+            private val decryptionErrorView: View = itemBinding.decryptionErrorView
 
             // TODO consider databinding
             fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
-
+                val context = itemView.context
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
 
                 if (!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION) {
@@ -107,12 +108,11 @@ class EventAdapter(
                         timeZoneId
                     ))?.formatTime(timeZoneId, is24Hour)}" // TODO
 
-                textViewSubheader.text = event.summary?.nullIfBlank() ?: itemView.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
-
                     textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
                     textViewSubheaderSide.visibleOrGone(true)
                 }
@@ -128,14 +128,14 @@ class EventAdapter(
                 }
 
                 if (event.isInThePast(timeZoneId)) {
-                    textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall_Weak)
-                    textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
-                    textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default_Weak)
-                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
+                    textViewHeader.setTextAppearance(context, R.style.Text_DefaultSmall_Weak)
+                    textViewSubheader.setTextAppearance(context, R.style.Text_Default_Weak)
+                    textViewSubheaderSide.setTextAppearance(context, R.style.Text_Default_Weak)
+                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.icon_weak)))
                 } else {
-                    textViewHeader.setTextAppearance(itemView.context, R.style.Text_DefaultSmall)
-                    textViewSubheader.setTextAppearance(itemView.context, R.style.Text_Default)
-                    textViewSubheaderSide.setTextAppearance(itemView.context, R.style.Text_Default)
+                    textViewHeader.setTextAppearance(context, R.style.Text_DefaultSmall)
+                    textViewSubheader.setTextAppearance(context, R.style.Text_Default)
+                    textViewSubheaderSide.setTextAppearance(context, R.style.Text_Default)
                 }
 
                 if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
@@ -151,27 +151,25 @@ class EventAdapter(
         }
 
         // TODO this viewholder can actually is used also for partial-day events, that span more than one day
-        class AllDayEventViewHolder(itemView: View) : EventViewHolder(itemView) {
+        class AllDayEventViewHolder(itemBinding: ItemAgendaEventAllDayBinding) : EventViewHolder(itemBinding) {
 
-//            private val ivBackground: ImageView = itemView.findViewById(R.id.background)
-
-            private val viewBackground: LayerDrawable = itemView.findViewById<View>(R.id.view_background).background as LayerDrawable
+            private val viewBackground: LayerDrawable = itemBinding.viewBackground.background as LayerDrawable
             private val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
             private val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
 
-            private val textViewHeader: TextView = itemView.findViewById(R.id.text_header)
-            private val textViewSubheader: TextView = itemView.findViewById(R.id.text_subheader)
-            private val textViewSubheaderSide: TextView = itemView.findViewById(R.id.text_subheader_side)
+            private val textViewHeader: TextView = itemBinding.textHeader
+            private val textViewSubheader: TextView = itemBinding.textSubheader
+            private val textViewSubheaderSide: TextView = itemBinding.textSubheaderSide
 
-            private val viewBackgroundStripedLayout: CardView = itemView.findViewById(R.id.view_background_striped_layout)
-            private val viewBackgroundStriped: View = itemView.findViewById(R.id.view_background_striped)
+            private val viewBackgroundStripedLayout: CardView = itemBinding.viewBackgroundStripedLayout
+            private val viewBackgroundStriped: View = itemBinding.viewBackgroundStriped
 
-            private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
-            private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+            private val decryptionErrorIcon: ImageView = itemBinding.decryptionErrorIcon
+            private val decryptionErrorView: View = itemBinding.decryptionErrorView
 
             // TODO consider databinding
             fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
-
+                val context = itemView.context
                 val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
@@ -187,7 +185,7 @@ class EventAdapter(
                     textViewHeader.visibleOrGone(false)
                 }
 
-                textViewSubheader.text = event.summary?.nullIfBlank() ?: itemView.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay(timeZoneId = timeZoneId)) {
                     textViewSubheaderSide.visibleOrGone(false)
@@ -213,20 +211,20 @@ class EventAdapter(
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
-                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
+                    ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.icon_weak)))
 
                     if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                        viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
                     } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                        viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
                         setStripedBackground(
                             viewBackgroundStriped,
-                            itemView.context,
-                            ContextCompat.getColor(itemView.context, R.color.shade_60)
+                            context,
+                            ContextCompat.getColor(context, R.color.shade_60)
                         ) // striped background with 20% opacity for unanswered all day events
                     } else {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_secondary))
-                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_secondary))
+                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_norm))
                         decryptionErrorView.alpha = 0.1f
                     }
                 } else {
@@ -235,24 +233,24 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
 
                     if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
+                        viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
                     } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
-                        viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                        textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
-                        textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
-                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
+                        viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
+                        textViewHeader.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
+                        textViewSubheader.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
+                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
                         setStripedBackground(
                             viewBackgroundStriped,
-                            itemView.context,
+                            context,
                             Color.parseColor(event.calendar.color)
                         ) // striped background with 20% opacity for unanswered all day events
                     } else {
                         viewMainSurface.setTint(Color.parseColor(event.calendar.color))
-                        textViewHeader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
-                        textViewSubheader.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
-                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
-                        ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color)))
-                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.text_on_calendar_color))
+                        textViewHeader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
+                        textViewSubheader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
+                        textViewSubheaderSide.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
+                        ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_on_calendar_color)))
+                        decryptionErrorView.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.text_on_calendar_color))
                         decryptionErrorView.alpha = 0.2f
                     }
                 }
@@ -298,29 +296,14 @@ class EventAdapter(
         viewType: Int /*later when we have more view types*/
     ): EventViewHolder {
         return if (viewType == ITEM_TYPE_HEADER) {
-            HeaderViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_agenda_event_header,
-                    parent,
-                    false
-                )
-            )
+            val itemBinding = ItemAgendaEventHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            HeaderViewHolder(itemBinding)
         } else if (viewType == ITEM_TYPE_EVENT_PARTIAL_DAY) {
-            EventViewHolder.PartialDayEventViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_agenda_event_partial_day,
-                    parent,
-                    false
-                )
-            )
+            val itemBinding = ItemAgendaEventPartialDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            EventViewHolder.PartialDayEventViewHolder(itemBinding)
         } else {
-            EventViewHolder.AllDayEventViewHolder(
-                LayoutInflater.from(parent.context).inflate(
-                    R.layout.item_agenda_event_all_day,
-                    parent,
-                    false
-                )
-            )
+            val itemBinding = ItemAgendaEventAllDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            EventViewHolder.AllDayEventViewHolder(itemBinding)
         }
     }
 

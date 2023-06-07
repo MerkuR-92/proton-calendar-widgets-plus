@@ -3,24 +3,11 @@ package me.proton.android.calendar.presentation.calendar.adapter
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_timeline.view.decryption_error_icon
-import kotlinx.android.synthetic.main.item_timeline.view.decryption_error_view
-import kotlinx.android.synthetic.main.item_timeline.view.iv_calendar_bar
-import kotlinx.android.synthetic.main.item_timeline.view.rl_event
-import kotlinx.android.synthetic.main.item_timeline.view.rl_event_day_container
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_date_header
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_date_text
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_header
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_header_day_indicator
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_subheader
-import kotlinx.android.synthetic.main.item_timeline.view.tv_event_subheader_side_text
-import kotlinx.android.synthetic.main.item_timeline.view.v_event_spacing
-import kotlinx.android.synthetic.main.item_timeline_header.view.text_header
+import androidx.viewbinding.ViewBinding
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
@@ -28,6 +15,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatShort
+import me.proton.android.calendar.databinding.ItemTimelineBinding
+import me.proton.android.calendar.databinding.ItemTimelineHeaderBinding
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
@@ -54,8 +43,8 @@ class TimelineEventAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(TimelineItemType.values()[viewType]) {
-            TimelineItemType.Header -> HeaderViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_timeline_header, parent, false))
-            TimelineItemType.Event -> EventViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_timeline, parent, false))
+            TimelineItemType.Header -> HeaderViewHolder(ItemTimelineHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            TimelineItemType.Event -> EventViewHolder(ItemTimelineBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         }
     }
 
@@ -76,76 +65,76 @@ class TimelineEventAdapter(
         data class Event(val event: TimelineEvent): TimelineItem(TimelineItemType.Event)
     }
 
-    abstract class ViewHolder(private val eventView: View): RecyclerView.ViewHolder(eventView)
+    abstract class ViewHolder(private val itemBinding: ViewBinding): RecyclerView.ViewHolder(itemBinding.root)
 
-    inner class EventViewHolder(private val eventView: View): ViewHolder(eventView) {
+    inner class EventViewHolder(private val itemBinding: ItemTimelineBinding): ViewHolder(itemBinding) {
         fun bind(eventItem: TimelineItem.Event) {
-
+            val context = itemBinding.root.context
             val event = eventItem.event
-            with(eventView) {
+            with(itemBinding) {
                 // show or hide date column
-                rl_event_day_container.visibleOrInvisible(event.showDateColumn)
-                tv_event_date_header.text = if (event.showDateColumn) event.happensOn.month.formatShort() else ""
-                tv_event_date_text.text = if (event.showDateColumn) "${event.happensOn.dayOfMonth}" else ""
+                rlEventDayContainer.visibleOrInvisible(event.showDateColumn)
+                tvEventDateHeader.text = if (event.showDateColumn) event.happensOn.month.formatShort() else ""
+                tvEventDateText.text = if (event.showDateColumn) "${event.happensOn.dayOfMonth}" else ""
 
                 // highlight date column
                 if (event.highlightDateColumn) {
-                    tv_event_date_header.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
-                    tv_event_date_text.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
+                    tvEventDateHeader.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
+                    tvEventDateText.setTextColor(context.getColorFromAttr(R.attr.proton_text_accent))
                 } else {
-                    tv_event_date_header.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
-                    tv_event_date_text.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
+                    tvEventDateHeader.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
+                    tvEventDateText.setTextColor(context.getColorFromAttr(R.attr.proton_text_norm))
                 }
 
                 // strikethrough if event is cancelled
                 if (event.isCancelledOrDeclined) {
-                    tv_event_header.paintFlags = tv_event_header.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    tv_event_subheader.paintFlags = tv_event_subheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    tvEventHeader.paintFlags = tvEventHeader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    tvEventSubheader.paintFlags = tvEventSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
-                    tv_event_header.paintFlags = tv_event_header.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    tv_event_subheader.paintFlags = tv_event_subheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    tvEventHeader.paintFlags = tvEventHeader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    tvEventSubheader.paintFlags = tvEventSubheader.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
 
                 // set summary and time
-                tv_event_header.text = event.summary
-                tv_event_header_day_indicator.text = if (event.fullDayCounter != null) " " + event.fullDayCounter else ""
-                tv_event_subheader.text = event.dateContent
-                tv_event_subheader_side_text.text = event.location
+                tvEventHeader.text = event.summary
+                tvEventHeaderDayIndicator.text = if (event.fullDayCounter != null) " " + event.fullDayCounter else ""
+                tvEventSubheader.text = event.dateContent
+                tvEventSubheaderSideText.text = event.location
 
                 if (event.searchTerm.isNotBlank()) {
-                    tv_event_header.highlightSearchTokens(event.searchTerm.split(" ", ignoreCase = true))
-                    tv_event_subheader_side_text.highlightSearchTokens(event.searchTerm.split(" ", ignoreCase = true))
+                    tvEventHeader.highlightSearchTokens(event.searchTerm.split(" ", ignoreCase = true))
+                    tvEventSubheaderSideText.highlightSearchTokens(event.searchTerm.split(" ", ignoreCase = true))
                 }
 
                 // clear summary and show views for event that failed decryption
-                if (event.failedToDecrypt) tv_event_header.text = ""
-                decryption_error_view.visibleOrInvisible(event.failedToDecrypt)
-                decryption_error_icon.visibleOrInvisible(event.failedToDecrypt)
+                if (event.failedToDecrypt) tvEventHeader.text = ""
+                decryptionErrorView.visibleOrInvisible(event.failedToDecrypt)
+                decryptionErrorIcon.visibleOrInvisible(event.failedToDecrypt)
 
                 // add spacing after last event in a day
-                v_event_spacing.visibleOrGone(event.showBottomSpacing)
+                vEventSpacing.visibleOrGone(event.showBottomSpacing)
 
                 // set style of calendar bar
                 if (event.needsAction) {
-                    iv_calendar_bar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
+                    ivCalendarBar.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
                 } else {
-                    iv_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
+                    ivCalendarBar.setBackgroundResource(R.drawable.shape_calendar_bar)
                 }
 
                 // tint calendar bar
-                iv_calendar_bar.background.setTint(Color.parseColor(event.calendarColor))
+                ivCalendarBar.background.setTint(Color.parseColor(event.calendarColor))
 
             }
 
-            eventView.rl_event.setOnSingleClickListener {
+            itemBinding.rlEvent.setOnSingleClickListener {
                 clickListener(eventItem.event)
             }
         }
     }
 
-    inner class HeaderViewHolder(private val headerView: View): ViewHolder(headerView){
+    inner class HeaderViewHolder(private val itemBinding: ItemTimelineHeaderBinding): ViewHolder(itemBinding){
         fun bind(headerItem: TimelineItem.Header) {
-            headerView.text_header.text = headerItem.year.toString()
+            itemBinding.textHeader.text = headerItem.year.toString()
         }
     }
 

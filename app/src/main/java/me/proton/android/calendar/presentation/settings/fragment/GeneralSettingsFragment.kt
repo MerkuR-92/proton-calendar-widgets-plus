@@ -2,7 +2,9 @@ package me.proton.android.calendar.presentation.settings.fragment
 
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
@@ -10,33 +12,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_alternative_routing_switch
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_separator
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_auto_invites_switch
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_default_view_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_default_view_value
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_language
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_language_value
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_search
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_search_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_search_switch
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_theme_value
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_time_format_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_time_format_value
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_timezone_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_timezone_value
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_update_timezone_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_update_timezone_switch
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_numbers_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_numbers_switch
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_press
-import kotlinx.android.synthetic.main.fragment_general_settings.settings_week_start_value
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,6 +29,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.databinding.FragmentCalendarFormBinding
+import me.proton.android.calendar.databinding.FragmentGeneralSettingsBinding
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
@@ -66,7 +43,7 @@ import java.time.DayOfWeek
 import java.time.Instant
 
 @AndroidEntryPoint
-class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
+class GeneralSettingsFragment : BaseDialogFragment<FragmentGeneralSettingsBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "GeneralSettingsFragment"
@@ -96,6 +73,8 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_more_general_settings)
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentGeneralSettingsBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -108,52 +87,52 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        settings_week_numbers_press.setOnClickListener {
-            settings_week_numbers_switch.performClick()
+        binding.settingsWeekNumbersPress.root.setOnClickListener {
+            binding.settingsWeekNumbersSwitch.performClick()
         }
-        settings_week_numbers_switch.setOnClickListener {
+        binding.settingsWeekNumbersSwitch.setOnClickListener {
             if (!mainViewModel.isConnectedToNetwork) {
                 displayNetworkError()
-                settings_week_numbers_switch.isChecked = !settings_week_numbers_switch.isChecked
+                binding.settingsWeekNumbersSwitch.isChecked = !binding.settingsWeekNumbersSwitch.isChecked
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                calendarViewModel.updateDisplayWeekNumber(settings_week_numbers_switch.isChecked)
+                calendarViewModel.updateDisplayWeekNumber(binding.settingsWeekNumbersSwitch.isChecked)
             }
         }
 
-        settings_auto_invites_separator.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
-        settings_auto_invites.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
+        binding.settingsAutoInvitesSeparator.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
+        binding.settingsAutoInvites.visibleOrGone(CalendarFeatureFlag.AutoInvitesSetting.fallbackValue)
 
-        settings_auto_invites_press.setOnClickListener {
-            settings_auto_invites_switch.performClick()
+        binding.settingsAutoInvitesPress.root.setOnClickListener {
+            binding.settingsAutoInvitesSwitch.performClick()
         }
-        settings_auto_invites_switch.setOnClickListener {
+        binding.settingsAutoInvitesSwitch.setOnClickListener {
             if (!mainViewModel.isConnectedToNetwork) {
                 displayNetworkError()
-                settings_auto_invites_switch.isChecked = !settings_auto_invites_switch.isChecked
+                binding.settingsAutoInvitesSwitch.isChecked = !binding.settingsAutoInvitesSwitch.isChecked
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                calendarViewModel.updateAutoImportInvite(settings_auto_invites_switch.isChecked)
+                calendarViewModel.updateAutoImportInvite(binding.settingsAutoInvitesSwitch.isChecked)
             }
         }
 
-        settings_update_timezone_press.setOnClickListener {
-            settings_update_timezone_switch.performClick()
+        binding.settingsUpdateTimezonePress.root.setOnClickListener {
+            binding.settingsUpdateTimezoneSwitch.performClick()
         }
-        settings_update_timezone_switch.setOnClickListener {
+        binding.settingsUpdateTimezoneSwitch.setOnClickListener {
             if (!mainViewModel.isConnectedToNetwork) {
                 displayNetworkError()
-                settings_update_timezone_switch.isChecked = !settings_update_timezone_switch.isChecked
+                binding.settingsUpdateTimezoneSwitch.isChecked = !binding.settingsUpdateTimezoneSwitch.isChecked
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                calendarViewModel.updateAutoDetectPrimaryTimezone(settings_update_timezone_switch.isChecked)
+                calendarViewModel.updateAutoDetectPrimaryTimezone(binding.settingsUpdateTimezoneSwitch.isChecked)
             }
         }
 
-        settings_timezone_press.setOnSingleClickListener {
+        binding.settingsTimezonePress.root.setOnSingleClickListener {
             val forInstant = Instant.now()
             val formattedTimeZoneIds = allowedTimezoneIds.map {
                 DateTimeUtilsImpl.formatTimeZoneId(it, forInstant)
@@ -176,19 +155,19 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val appThemes = resources.getStringArray(R.array.app_themes)
-        settings_theme_value.text = appThemes[application.getAppTheme().value]
+        binding.settingsThemeValue.text = appThemes[application.getAppTheme().value]
 
         // TODO Handle themes for Android P and below
-        settings_theme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        binding.settingsTheme.visibleOrGone(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            settings_theme_press.setOnSingleClickListener {
+            binding.settingsThemePress.root.setOnSingleClickListener {
                 AndroidUtils.displaySingleChoicePicker(
                     requireContext(),
                     getString(R.string.settings_theme_title),
                     appThemes,
                     AppTheme.values().indexOf(application.getAppTheme())
                 ) { index ->
-                    settings_theme_value.text = appThemes[index]
+                    binding.settingsThemeValue.text = appThemes[index]
                     application.changeAppTheme(AppTheme.values()[index])
                 }
             }
@@ -202,11 +181,11 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             getString(R.string.nav_view_switcher_week),
             getString(R.string.nav_view_switcher_month)
         )
-        settings_default_view_value.text =
+        binding.settingsDefaultViewValue.text =
             if (mainViewModel.useDefaultViewMode()) viewModes[mainViewModel.getLastViewMode().value + 1]
             else viewModes[0]
 
-        settings_default_view_press.setOnSingleClickListener {
+        binding.settingsDefaultViewPress.root.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
                 getString(R.string.settings_default_view_title),
@@ -214,7 +193,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 if (!mainViewModel.useDefaultViewMode()) 0
                 else mainViewModel.getLastViewMode().value + 1
             ) { index ->
-                settings_default_view_value.text = viewModes[index]
+                binding.settingsDefaultViewValue.text = viewModes[index]
                 mainViewModel.setUseDefaultViewMode(index != 0)
                 if (index != 0) {
                     mainViewModel.setViewMode(ViewMode.values()[index - 1])
@@ -236,13 +215,13 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             else indexOfTag
         }
         val systemDefaultLabel = resources.getString(R.string.settings_language_default)
-        settings_language_value.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
+        binding.settingsLanguageValue.text = if (selectedLanguageIndex == -1) systemDefaultLabel else appLanguagesLabels[selectedLanguageIndex]
 
         val appLanguageDialogLabels = appLanguagesLabels.toMutableList()
         appLanguageDialogLabels.add(0, systemDefaultLabel)
 
-        settings_language.visibleOrGone(CalendarFeatureFlag.ChangeLanguage.fallbackValue)
-        settings_language_press.setOnSingleClickListener {
+        binding.settingsLanguage.visibleOrGone(CalendarFeatureFlag.ChangeLanguage.fallbackValue)
+        binding.settingsLanguagePress.root.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
                 getString(R.string.settings_language_title),
@@ -259,39 +238,39 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 }
             ) { index ->
                 if (index == 0) {
-                    settings_language_value.text = systemDefaultLabel
+                    binding.settingsLanguageValue.text = systemDefaultLabel
                     (activity as? MainActivity)?.changeAppLanguage(null) // Use empty string for System default
                 } else {
-                    settings_language_value.text = appLanguagesLabels[index - 1]
+                    binding.settingsLanguageValue.text = appLanguagesLabels[index - 1]
                     (activity as? MainActivity)?.changeAppLanguage(appLanguagesValues[index - 1])
                 }
             }
         }
 
         val timeFormats = resources.getStringArray(R.array.time_formats)
-        settings_time_format_press.setOnSingleClickListener {
+        binding.settingsTimeFormatPress.root.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
                 getString(R.string.settings_time_format_title),
                 timeFormats,
-                timeFormats.indexOf(settings_time_format_value.text)
+                timeFormats.indexOf(binding.settingsTimeFormatValue.text)
             ) { index ->
                 if (!mainViewModel.isConnectedToNetwork) {
                     displayNetworkError()
                     return@displaySingleChoicePicker
                 }
-                settings_time_format_value.text = timeFormats[index]
+                binding.settingsTimeFormatValue.text = timeFormats[index]
                 calendarViewModel.updateTimeFormat(index)
             }
         }
 
         val weekStartValues = resources.getStringArray(R.array.week_start)
-        settings_week_start_press.setOnSingleClickListener {
+        binding.settingsWeekStartPress.root.setOnSingleClickListener {
             AndroidUtils.displaySingleChoicePicker(
                 requireContext(),
                 getString(R.string.settings_week_start_title),
                 weekStartValues,
-                weekStartValues.indexOf(settings_week_start_value.text)) { index ->
+                weekStartValues.indexOf(binding.settingsWeekStartValue.text)) { index ->
                 if (!mainViewModel.isConnectedToNetwork) {
                     displayNetworkError()
                     return@displaySingleChoicePicker
@@ -305,24 +284,24 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        settings_search.visibleOrGone(
+        binding.settingsSearch.visibleOrGone(
             CalendarFeatureFlag.ShowEventSearch.fallbackValue
         )
 
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
-                settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
+                binding.settingsSearchSwitch.isChecked = searchViewModel.isCalendarDownloadEnabled()
             }
         }
 
-        settings_search_press.setOnClickListener {
-            settings_search_switch.performClick()
+        binding.settingsSearchPress.root.setOnClickListener {
+            binding.settingsSearchSwitch.performClick()
         }
-        settings_search_switch.setOnClickListener {
+        binding.settingsSearchSwitch.setOnClickListener {
 
             val builder = MaterialAlertDialogBuilder(requireContext())
 
-            if (settings_search_switch.isChecked) { // turning ON
+            if (binding.settingsSearchSwitch.isChecked) { // turning ON
                 builder.setTitle(R.string.search_settings_dialog_toggle_on_title)
                 builder.setMessage(R.string.search_settings_dialog_toggle_on_text)
                 builder.setPositiveButton(R.string.dialog_button_download) { _, _ ->
@@ -342,7 +321,7 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
                 // bring back the correct toggle value in case user changed their mind
                 lifecycleScope.launch {
                     withContext(Dispatchers.Main) {
-                        settings_search_switch.isChecked = searchViewModel.isCalendarDownloadEnabled()
+                        binding.settingsSearchSwitch.isChecked = searchViewModel.isCalendarDownloadEnabled()
                     }
                 }
             }
@@ -350,28 +329,28 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         val isAlternativeRoutingEnabled = mainViewModel.isAlternativeRoutingEnabled()
-        settings_alternative_routing_switch.isChecked = isAlternativeRoutingEnabled
-        settings_alternative_routing_press.setOnClickListener {
-            settings_alternative_routing_switch.performClick()
+        binding.settingsAlternativeRoutingSwitch.isChecked = isAlternativeRoutingEnabled
+        binding.settingsAlternativeRoutingPress.root.setOnClickListener {
+            binding.settingsAlternativeRoutingSwitch.performClick()
         }
-        settings_alternative_routing_switch.setOnClickListener {
-            mainViewModel.setAlternativeRoutingEnabled(settings_alternative_routing_switch.isChecked)
+        binding.settingsAlternativeRoutingSwitch.setOnClickListener {
+            mainViewModel.setAlternativeRoutingEnabled(binding.settingsAlternativeRoutingSwitch.isChecked)
         }
 
         // Observers
 
         calendarViewModel.timeFormat.observe(viewLifecycleOwner) { timeFormat ->
-            settings_time_format_value.text = timeFormats[timeFormat]
+            binding.settingsTimeFormatValue.text = timeFormats[timeFormat]
         }
 
         calendarViewModel.timeZoneId.observe(viewLifecycleOwner) { zoneId ->
-            settings_timezone_value.text = zoneId.id?.let {
+            binding.settingsTimezoneValue.text = zoneId.id?.let {
                 DateTimeUtilsImpl.formatTimeZoneId(it, Instant.now())
             } ?: getString(R.string.settings_value_placeholder)
         }
 
         calendarViewModel.weekStart.observe(viewLifecycleOwner) { weekStart ->
-            settings_week_start_value.text = when (weekStart) {
+            binding.settingsWeekStartValue.text = when (weekStart) {
                 DayOfWeek.SATURDAY.value -> weekStartValues[2] // 6 is value for Saturday and index 2 in available days string array
                 DayOfWeek.SUNDAY.value -> weekStartValues[3] // 7 is value for Sunday and index 3 in available days string array
                 else -> weekStartValues[weekStart]
@@ -379,18 +358,18 @@ class GeneralSettingsFragment : BaseDialogFragment(), KoinComponent {
         }
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-            settings_week_numbers_switch.isChecked = displayWeekNumber
-            settings_week_numbers_switch.jumpDrawablesToCurrentState()
+            binding.settingsWeekNumbersSwitch.isChecked = displayWeekNumber
+            binding.settingsWeekNumbersSwitch.jumpDrawablesToCurrentState()
         }
 
         calendarViewModel.autoImportInvite.observe(viewLifecycleOwner) { autoImportInvite ->
-            settings_auto_invites_switch.isChecked = autoImportInvite
-            settings_auto_invites_switch.jumpDrawablesToCurrentState()
+            binding.settingsAutoInvitesSwitch.isChecked = autoImportInvite
+            binding.settingsAutoInvitesSwitch.jumpDrawablesToCurrentState()
         }
 
         calendarViewModel.autoDetectPrimaryTimezone.observe(viewLifecycleOwner) { autoDetectPrimaryTimezone ->
-            settings_update_timezone_switch.isChecked = autoDetectPrimaryTimezone
-            settings_update_timezone_switch.jumpDrawablesToCurrentState()
+            binding.settingsUpdateTimezoneSwitch.isChecked = autoDetectPrimaryTimezone
+            binding.settingsUpdateTimezoneSwitch.jumpDrawablesToCurrentState()
         }
     }
 

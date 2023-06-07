@@ -5,7 +5,9 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -23,16 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import biweekly.property.Attendee
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_appbar
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_done
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_list
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_list_header
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_list_layout
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_search_clear
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_search_input
-import kotlinx.android.synthetic.main.fragment_event_form_attendees.event_form_attendees_search_list
-import kotlinx.android.synthetic.main.item_add_attendee.view.item_add_attendee_press
-import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CONTACTS_SEARCH_QUERY
@@ -47,13 +39,14 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.validateEmail
+import me.proton.android.calendar.databinding.FragmentEventFormAttendeesBinding
 import me.proton.android.calendar.presentation.calendar.adapter.AddAttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.core.KoinComponent
 
-class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
+class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttendeesBinding>(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
 
     override val TAG = "EventFormAttendeesFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_attendees
@@ -85,19 +78,21 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
         }
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentEventFormAttendeesBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dialog_appbar.visibleOrGone(false)
-        event_form_attendees_done.toolbar_action_text.text = getString(R.string.action_done)
-        event_form_attendees_list_header.text = getString(R.string.event_text_participants, 0, ATTENDEE_MAX_ALLOWED)
+        dialogAppbar.visibleOrGone(false)
+        binding.eventFormAttendeesDone.toolbarActionText.text = getString(R.string.action_done)
+        binding.eventFormAttendeesListHeader.text = getString(R.string.event_text_participants, 0, ATTENDEE_MAX_ALLOWED)
 
-        event_form_attendees_done.toolbar_action_text.setOnSingleClickListener {
+        binding.eventFormAttendeesDone.toolbarActionText.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
 
-        event_form_attendees_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        binding.eventFormAttendeesList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -107,7 +102,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             }
         })
 
-        event_form_attendees_search_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        binding.eventFormAttendeesSearchList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -117,16 +112,16 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
             }
         })
 
-        event_form_attendees_search_input.onTextChange { query ->
-            event_form_attendees_done.visibleOrInvisible(query.isEmpty())
-            event_form_attendees_search_clear.visibleOrGone(query.isNotEmpty())
+        binding.eventFormAttendeesSearchInput.onTextChange { query ->
+            binding.eventFormAttendeesDone.root.visibleOrInvisible(query.isEmpty())
+            binding.eventFormAttendeesSearchClear.visibleOrGone(query.isNotEmpty())
 
             val attendeeList = eventViewModel.eventLiveData.value?.iCalEvent?.attendees
-            event_form_attendees_list_layout.visibleOrGone(query.isEmpty() && !attendeeList.isNullOrEmpty())
-            if (query.isEmpty()) event_form_attendees_search_list.visibleOrGone(false)
+            binding.eventFormAttendeesListLayout.visibleOrGone(query.isEmpty() && !attendeeList.isNullOrEmpty())
+            if (query.isEmpty()) binding.eventFormAttendeesSearchList.visibleOrGone(false)
 
             if (query.isNotEmpty()) {
-                event_form_attendees_search_list.visibleOrGone(true)
+                binding.eventFormAttendeesSearchList.visibleOrGone(true)
                 searchAttendeeListAdapter.setQuery(query.toString())
 
                 if (contactsAccessGranted) {
@@ -144,47 +139,47 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                             else -> listOf()
                         }
 
-                    event_form_attendees_search_list.visibleOrGone(searchResult.isNotEmpty())
+                    binding.eventFormAttendeesSearchList.visibleOrGone(searchResult.isNotEmpty())
                     _searchAttendeeList.postValue(searchResult)
                 }
             }
         }
 
-        event_form_attendees_search_input.setOnEditorActionListener { v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE && validateEmail(event_form_attendees_search_input.text)) {
-                val query = event_form_attendees_search_input.text.toString()
+        binding.eventFormAttendeesSearchInput.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE && validateEmail(binding.eventFormAttendeesSearchInput.text)) {
+                val query = binding.eventFormAttendeesSearchInput.text.toString()
                 val index = searchAttendeeListAdapter.currentList.indexOfFirst {
                     it.extractEmail().equals(query, true)
                 }
                 if (index != -1) {
-                    val itemPress = event_form_attendees_search_list.getChildAt(index).item_add_attendee_press
+                    val itemPress = binding.eventFormAttendeesSearchList.getChildAt(index).findViewById<View>(R.id.item_add_attendee_press)
                     if (itemPress.isVisible) itemPress.performClick()
                 }
             }
             false
         }
 
-        event_form_attendees_search_clear.setOnSingleClickListener {
-            event_form_attendees_search_input.text.clear()
+        binding.eventFormAttendeesSearchClear.setOnSingleClickListener {
+            binding.eventFormAttendeesSearchInput.text.clear()
         }
 
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        event_form_attendees_list.layoutManager = attendeesLayoutManager
+        binding.eventFormAttendeesList.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false) {
             lifecycleScope.launch {
                 eventViewModel.handleAttendee(it, addAttendee = false)
             }
         }
-        (event_form_attendees_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        event_form_attendees_list.adapter = attendeeListAdapter
+        (binding.eventFormAttendeesList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        binding.eventFormAttendeesList.adapter = attendeeListAdapter
 
         val searchAttendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        event_form_attendees_search_list.layoutManager = searchAttendeesLayoutManager
+        binding.eventFormAttendeesSearchList.layoutManager = searchAttendeesLayoutManager
         searchAttendeeListAdapter = AddAttendeeListAdapter(true) {
             addAttendee(it)
         }
-        (event_form_attendees_search_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-        event_form_attendees_search_list.adapter = searchAttendeeListAdapter
+        (binding.eventFormAttendeesSearchList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        binding.eventFormAttendeesSearchList.adapter = searchAttendeeListAdapter
 
         searchAttendeeList.observe(viewLifecycleOwner) { searchAttendeeList ->
             searchAttendeeListAdapter.submitList(searchAttendeeList.sortedBy { it.commonName })
@@ -224,17 +219,17 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 val scrollUp = attendeeList.size > attendeeListAdapter.currentList.size
 
                 attendeeListAdapter.submitList(attendeeList) {
-                    if (scrollUp) event_form_attendees_list?.smoothScrollToPosition(0) // Scroll up top to new attendee
+                    if (scrollUp) binding.eventFormAttendeesList.smoothScrollToPosition(0) // Scroll up top to new attendee
                 }
 
-                event_form_attendees_list_header.visibleOrGone(attendeeList.isNotEmpty())
+                binding.eventFormAttendeesListHeader.visibleOrGone(attendeeList.isNotEmpty())
                 val attendeeCount = if (attendeeList.size > 0) attendeeList.size - 1 else 0 // Subtract organizer that was added to bottom of list
-                event_form_attendees_list_header.text = getString(R.string.event_text_participants, attendeeCount, ATTENDEE_MAX_ALLOWED)
-                event_form_attendees_list_layout.visibleOrGone(attendeeList.isNotEmpty())
+                binding.eventFormAttendeesListHeader.text = getString(R.string.event_text_participants, attendeeCount, ATTENDEE_MAX_ALLOWED)
+                binding.eventFormAttendeesListLayout.visibleOrGone(attendeeList.isNotEmpty())
             }
         })
 
-        event_form_attendees_search_input.requestFocus()
+        binding.eventFormAttendeesSearchInput.requestFocus()
         requireContext().showKeyboard()
     }
 
@@ -269,7 +264,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
 
                 tmpAttendeeList.add(attendee)
 
-                event_form_attendees_search_input.text.clear()
+                binding.eventFormAttendeesSearchInput.text.clear()
 
                 eventViewModel.handleAttendee(attendee, canonicalEmail)
 
@@ -318,7 +313,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
                 _searchAttendeeList.postValue(attendees)
             } else {
                 // If no results in contacts, suggest email
-                val query = event_form_attendees_search_input.text
+                val query = binding.eventFormAttendeesSearchInput.text
                 val searchResult =
                     when {
                         validateEmail(query) -> {
@@ -337,8 +332,10 @@ class EventFormAttendeesFragment() : BaseDialogFragment(), KoinComponent, Loader
     }
 
     private fun Cursor.extractAttendee(): Attendee {
-        val name = getString(getColumnIndex(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY))
-        val email = getString(getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS))
+        val displayNamePrimary = getColumnIndex(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY)
+        val emailAddress = getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+        val name = getString(if (displayNamePrimary >= 0) displayNamePrimary else 0)
+        val email = getString(if (emailAddress >= 0) emailAddress else 0)
         return Attendee(
             name,
             email

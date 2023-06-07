@@ -19,25 +19,6 @@ import biweekly.component.VAlarm
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_calendar_color_picker_layout
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_color_icon
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_color_press
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_icon
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_list
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_all_day_event_notifications_press
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_press
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_email_value
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_layout
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_press
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_duration_value
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_icon
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_list
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_default_event_notifications_press
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_description_value
-import kotlinx.android.synthetic.main.fragment_calendar_form.calendar_form_name_value
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarForm
@@ -53,6 +34,9 @@ import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.databinding.DialogCalendarColorPickerBinding
+import me.proton.android.calendar.databinding.FragmentCalendarFormBinding
+import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
 import me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -66,7 +50,7 @@ import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
-class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
+class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), KoinComponent {
 
     private val navigationArguments: CalendarFormFragmentArgs by navArgs()
 
@@ -97,10 +81,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Save calendar name in VM
-        calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString())
+        calendarFormViewModel.handleCalendarName(binding.calendarFormNameValue.text.toString())
 
         // Save calendar description in VM
-        calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString())
+        calendarFormViewModel.handleCalendarDescription(binding.calendarFormDescriptionValue.text.toString())
 
         // Check if we need to display discard changes dialog
         if (calendarFormViewModel.hasFormBeenEdited()) {
@@ -121,24 +105,24 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
+        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialogToolbarContent, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(
                 R.string.calendar_form_save
             )
             setOnSingleClickListener {
-                if (calendar_form_name_value.text.toString().isBlank()) {
-                    calendar_form_name_value.setInputError(getString(R.string.calendar_form_name_required_error))
+                if (binding.calendarFormNameValue.text.toString().isBlank()) {
+                    binding.calendarFormNameValue.setInputError(getString(R.string.calendar_form_name_required_error))
                     return@setOnSingleClickListener
                 }
 
                 requireActivity().clearFocusAndHideKeyboard(view)
 
                 // Save calendar name in VM
-                calendarFormViewModel.handleCalendarName(calendar_form_name_value.text.toString().trim().replace("\n", ""))
+                calendarFormViewModel.handleCalendarName(binding.calendarFormNameValue.text.toString().trim().replace("\n", ""))
 
                 // Save calendar description in VM
-                calendarFormViewModel.handleCalendarDescription(calendar_form_description_value.text.toString().trim())
+                calendarFormViewModel.handleCalendarDescription(binding.calendarFormDescriptionValue.text.toString().trim())
 
                 if (!mainViewModel.isConnectedToNetwork) {
                     view?.displaySnackBar(getString(R.string.snack_network_error))
@@ -155,7 +139,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialogToolbarContent, false)
         loadingAction.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
@@ -172,6 +156,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
     }
+
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentCalendarFormBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -190,10 +176,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 calendarFormViewModel.initUpdateCalendarForm(it)
 
                 // hide "default event duration" for Subscribed and Shared Calendars
-                calendar_form_default_event_duration_layout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed && !calendarFormViewModel.calendarIsSharedWithMe)
+                binding.calendarFormDefaultEventDurationLayout.visibleOrGone(!calendarFormViewModel.calendarIsSubscribed && !calendarFormViewModel.calendarIsSharedWithMe)
             } ?: run {
                 // Init character limit text
-                calendar_form_name_value.helpText = resources.getQuantityString(
+                binding.calendarFormNameValue.helpText = resources.getQuantityString(
                     R.plurals.calendar_form_name_character_limit,
                     CALENDAR_NAME_CHARACTER_LIMIT,
                     0,
@@ -201,14 +187,14 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 )
 
                 // Init character limit text
-                calendar_form_description_value.helpText = resources.getQuantityString(
+                binding.calendarFormDescriptionValue.helpText = resources.getQuantityString(
                     R.plurals.calendar_form_description_character_limit,
                     CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
                     0,
                     CALENDAR_DESCRIPTION_CHARACTER_LIMIT
                 )
 
-                calendar_form_name_value.requestFocus()
+                binding.calendarFormNameValue.requestFocus()
                 requireContext().showKeyboard()
 
                 // Use random color from array as calendar color
@@ -220,9 +206,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         initOnClickListeners(calendarId == null)
 
-        calendar_form_name_value.onTextChange {
-            if (it.isNotEmpty()) calendar_form_name_value.clearInputError()
-            calendar_form_name_value.helpText = resources.getQuantityString(
+        binding.calendarFormNameValue.onTextChange {
+            if (it.isNotEmpty()) binding.calendarFormNameValue.clearInputError()
+            binding.calendarFormNameValue.helpText = resources.getQuantityString(
                 R.plurals.calendar_form_name_character_limit,
                 CALENDAR_NAME_CHARACTER_LIMIT,
                 it.length,
@@ -230,9 +216,9 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
 
-        calendar_form_description_value.onTextChange {
-            if (it.isNotEmpty()) calendar_form_description_value.clearInputError()
-            calendar_form_description_value.helpText = resources.getQuantityString(
+        binding.calendarFormDescriptionValue.onTextChange {
+            if (it.isNotEmpty()) binding.calendarFormDescriptionValue.clearInputError()
+            binding.calendarFormDescriptionValue.helpText = resources.getQuantityString(
                 R.plurals.calendar_form_description_character_limit,
                 CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
                 it.length,
@@ -247,8 +233,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun observeCalendarFormValues() {
 
         calendarFormViewModel.calendarName.observe(viewLifecycleOwner) { calendarName ->
-            calendar_form_name_value.text = calendarName
-            calendar_form_name_value.helpText = resources.getQuantityString(
+            binding.calendarFormNameValue.text = calendarName
+            binding.calendarFormNameValue.helpText = resources.getQuantityString(
                 R.plurals.calendar_form_name_character_limit,
                 CALENDAR_NAME_CHARACTER_LIMIT,
                 calendarName.length,
@@ -256,8 +242,8 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
         calendarFormViewModel.calendarDescription.observe(viewLifecycleOwner) { calendarDescription ->
-            calendar_form_description_value.text = calendarDescription
-            calendar_form_description_value.helpText = resources.getQuantityString(
+            binding.calendarFormDescriptionValue.text = calendarDescription
+            binding.calendarFormDescriptionValue.helpText = resources.getQuantityString(
                 R.plurals.calendar_form_description_character_limit,
                 CALENDAR_DESCRIPTION_CHARACTER_LIMIT,
                 calendarDescription.length,
@@ -265,10 +251,10 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
         }
         calendarFormViewModel.calendarEmail.observe(viewLifecycleOwner) { calendarEmail ->
-            calendar_form_default_email_value.text = calendarEmail
+            binding.calendarFormDefaultEmailValue.text = calendarEmail
         }
         calendarFormViewModel.defaultEventDuration.observe(viewLifecycleOwner) { defaultEventDuration ->
-            calendar_form_default_event_duration_value.text = resources.getQuantityString(
+            binding.calendarFormDefaultEventDurationValue.text = resources.getQuantityString(
                 R.plurals.calendar_form_default_event_duration_value,
                 defaultEventDuration,
                 defaultEventDuration.toString()
@@ -277,30 +263,30 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor == 0) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
-                calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(calendarColor)
+            binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor)
         }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
-            calendar_form_default_event_notifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
+            binding.calendarFormDefaultEventNotifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
             displayNotifications(
                 allDay = false,
                 defaultPartDayAlarms,
-                calendar_form_default_event_notifications_list,
-                calendar_form_default_event_notifications_icon,
-                calendar_form_default_event_notifications_press
+                binding.calendarFormDefaultEventNotificationsList,
+                binding.calendarFormDefaultEventNotificationsIcon,
+                binding.calendarFormDefaultEventNotificationsPress.root
             )
         }
         calendarFormViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
-            calendar_form_default_all_day_event_notifications.visibleOrGone(defaultAllDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
+            binding.calendarFormDefaultAllDayEventNotifications.visibleOrGone(defaultAllDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
             displayNotifications(
                 allDay = true,
                 defaultAllDayAlarms,
-                calendar_form_default_all_day_event_notifications_list,
-                calendar_form_default_all_day_event_notifications_icon,
-                calendar_form_default_all_day_event_notifications_press
+                binding.calendarFormDefaultAllDayEventNotificationsList,
+                binding.calendarFormDefaultAllDayEventNotificationsIcon,
+                binding.calendarFormDefaultAllDayEventNotificationsPress.root
             )
         }
 
@@ -312,22 +298,22 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             buttonSave.visibleOrGone(!processingEvent)
 
             // Disable/Enable all items linked to actions from our view
-            calendar_form_name_value.isEnabled = !processingEvent
-            calendar_form_description_value.isEnabled = !processingEvent
-            calendar_form_color_press.isEnabled = !processingEvent
-            calendar_form_default_event_duration_press.isEnabled = !processingEvent
+            binding.calendarFormNameValue.isEnabled = !processingEvent
+            binding.calendarFormDescriptionValue.isEnabled = !processingEvent
+            binding.calendarFormColorPress.root.isEnabled = !processingEvent
+            binding.calendarFormDefaultEventDurationPress.root.isEnabled = !processingEvent
 
-            calendar_form_default_event_notifications_press.isEnabled = !processingEvent
-            for (i in 0 until calendar_form_default_event_notifications_list.childCount) {
+            binding.calendarFormDefaultEventNotificationsPress.root.isEnabled = !processingEvent
+            for (i in 0 until binding.calendarFormDefaultEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                calendar_form_default_event_notifications_list.getChildAt(i)
+                binding.calendarFormDefaultEventNotificationsList.getChildAt(i)
                     .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
 
-            calendar_form_default_all_day_event_notifications_press.isEnabled = !processingEvent
-            for (i in 0 until calendar_form_default_all_day_event_notifications_list.childCount) {
+            binding.calendarFormDefaultAllDayEventNotificationsPress.root.isEnabled = !processingEvent
+            for (i in 0 until binding.calendarFormDefaultAllDayEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                calendar_form_default_all_day_event_notifications_list.getChildAt(i)
+                binding.calendarFormDefaultAllDayEventNotificationsList.getChildAt(i)
                     .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
         }
@@ -349,12 +335,12 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-                val alarmView = layoutInflater.inflate(
-                    R.layout.item_alarm_text_button,
+                val alarmViewBinding = ItemAlarmTextButtonBinding.inflate(
+                    layoutInflater,
                     alarmsListView,
                     false
                 )
-                alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
+                alarmViewBinding.itemSimpleTextButtonTitle.apply {
                     text = AndroidUtils.formatAlarm(
                         resources,
                         allDay,
@@ -364,7 +350,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     )
                     isClickable = false
                 }
-                alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+                alarmViewBinding.itemSimpleTextButtonDelete.apply {
                     // Remove notification listener
                     setOnSingleClickListener {
                         requireActivity().clearFocusAndHideKeyboard(view)
@@ -373,7 +359,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     isClickable = true
                 }
                 if (index == 0) notificationIcon.visibleOrGone(false)
-                alarmsListView.addView(alarmView)
+                alarmsListView.addView(alarmViewBinding.root)
             }
         }
 
@@ -391,7 +377,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun initOnClickListeners(isCreate: Boolean) {
 
         // Calendar color
-        calendar_form_color_press.setOnSingleClickListener {
+        binding.calendarFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             var dialog: AlertDialog? = null
@@ -400,11 +386,14 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
             val calendarColors = resources.getIntArray(R.array.accent_colors_base)
 
             // Get dialog custom view
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.dialog_calendar_color_picker, null, false)
+            val colorPickerViewBinding = DialogCalendarColorPickerBinding.inflate(
+                LayoutInflater.from(context),
+                null,
+                false
+            )
 
             // Set grid view with color list
-            val calendarColorPickerGridView = view.dialog_calendar_color_picker_layout
+            val calendarColorPickerGridView = colorPickerViewBinding.dialogCalendarColorPickerLayout
             calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), calendarFormViewModel.calendarColor.value) { calendarColor ->
                 calendarFormViewModel.handleCalendarColor(calendarColor)
                 dialog?.dismiss()
@@ -412,14 +401,14 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Display dialog
             dialog = MaterialAlertDialogBuilder(requireContext())
-                .setView(view)
+                .setView(colorPickerViewBinding.root)
                 .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
                 .show()
         }
 
         // Calendar email (can only be changed for create calendar)
-        calendar_form_default_email_press.visibleOrGone(isCreate)
-        calendar_form_default_email_press.setOnSingleClickListener {
+        binding.calendarFormDefaultEmailPress.root.visibleOrGone(isCreate)
+        binding.calendarFormDefaultEmailPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             val userEmails = calendarFormViewModel.userEmails ?: return@setOnSingleClickListener
@@ -434,7 +423,7 @@ class CalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Default event duration
-        calendar_form_default_event_duration_press.setOnSingleClickListener {
+        binding.calendarFormDefaultEventDurationPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             AndroidUtils.displayPickerDialog(

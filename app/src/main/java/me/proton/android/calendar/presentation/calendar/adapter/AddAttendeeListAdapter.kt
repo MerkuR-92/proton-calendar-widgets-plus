@@ -3,7 +3,6 @@ package me.proton.android.calendar.presentation.calendar.adapter
 import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
@@ -17,14 +16,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.property.Attendee
-import kotlinx.android.synthetic.main.item_add_attendee.view.*
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.databinding.ItemAddAttendeeBinding
 
 class AddAttendeeListAdapter(
     private val searchList: Boolean = false,
@@ -46,8 +44,8 @@ class AddAttendeeListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_add_attendee, parent, false)
-        return ViewHolder(view)
+        val itemBinding = ItemAddAttendeeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -55,23 +53,24 @@ class AddAttendeeListAdapter(
         holder.bind(item, position)
     }
 
-    inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        private val attendeeItemTextLayout: LinearLayout = view.item_add_attendee_text_layout
-        private val attendeeItemTitle: TextView = view.item_add_attendee_title
-        private val attendeeItemDescription: TextView = view.item_add_attendee_description
-        private val attendeeItemInitials: TextView = view.item_add_attendee_initials
-        private val attendeeItemIconDelete: ImageView = view.item_add_attendee_delete_icon
-        private val attendeeItemIconLoading: ProgressBar = view.item_add_attendee_loading_icon
-        private val attendeeItemIconCheck: ImageView = view.item_add_attendee_check_icon
-        private val attendeeItemPress: View = view.item_add_attendee_press
+    inner class ViewHolder(itemBinding: ItemAddAttendeeBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        private val attendeeItemTextLayout: LinearLayout = itemBinding.itemAddAttendeeTextLayout
+        private val attendeeItemTitle: TextView = itemBinding.itemAddAttendeeTitle
+        private val attendeeItemDescription: TextView = itemBinding.itemAddAttendeeDescription
+        private val attendeeItemInitials: TextView = itemBinding.itemAddAttendeeInitials
+        private val attendeeItemIconDelete: ImageView = itemBinding.itemAddAttendeeDeleteIcon
+        private val attendeeItemIconLoading: ProgressBar = itemBinding.itemAddAttendeeLoadingIcon
+        private val attendeeItemIconCheck: ImageView = itemBinding.itemAddAttendeeCheckIcon
+        private val attendeeItemPress: View = itemBinding.itemAddAttendeePress.root
 
         fun bind(attendee : Attendee, position : Int) {
+            val context = itemView.context
             val isOrganizer = organizerEmail.equals(attendee.extractEmail(), true)
             // If has common name use it, else use email and hide description field
             val title =
                 when {
                     !searchList && isOrganizer -> {
-                        view.context.getString(R.string.event_current_user_organizer)
+                        context.getString(R.string.event_current_user_organizer)
                     }
                     attendee.commonName.isNullOrEmpty() -> attendee.extractEmail() ?: ""
                     else -> attendee.commonName
@@ -88,12 +87,12 @@ class AddAttendeeListAdapter(
             val textLayoutParams = attendeeItemTextLayout.layoutParams as ConstraintLayout.LayoutParams
             if (description.isEmpty()) {
                 // Update margins if description is hidden
-                textLayoutParams.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
-                textLayoutParams.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
+                textLayoutParams.topMargin = context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
+                textLayoutParams.bottomMargin = context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin_large)
             } else {
                 // Update margins if description is visible
-                textLayoutParams.topMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
-                textLayoutParams.bottomMargin = view.context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
+                textLayoutParams.topMargin = context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
+                textLayoutParams.bottomMargin = context.resources.getDimensionPixelSize(R.dimen.attendee_item_vertical_margin)
             }
             attendeeItemTextLayout.layoutParams = textLayoutParams
 

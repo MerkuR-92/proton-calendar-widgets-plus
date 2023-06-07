@@ -11,20 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_checkbox
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_badge
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_email
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_layout
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_options
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_press
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_destination_title
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_press
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_secondary_press
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_source_email
-import kotlinx.android.synthetic.main.item_import_calendar.view.item_import_calendar_source_title
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.databinding.ItemImportCalendarBinding
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
 
 class ImportCalendarMappingListAdapter(
@@ -58,8 +48,8 @@ class ImportCalendarMappingListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_import_calendar, parent, false)
-        return ViewHolder(view)
+        val itemBinding = ItemImportCalendarBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -67,21 +57,20 @@ class ImportCalendarMappingListAdapter(
         holder.bind(item)
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val sourceTitle: TextView = view.item_import_calendar_source_title
-        private val sourceEmail: TextView = view.item_import_calendar_source_email
-        private val importCheckBox: CheckBox = view.item_import_calendar_checkbox
-        private val primaryPressOverlay: View = view.item_import_calendar_press
-        private val secondaryPressOverlay: View = view.item_import_calendar_secondary_press
-        private val destinationLayout: ConstraintLayout = view.item_import_calendar_destination_layout
-        private val destinationTitle: TextView = view.item_import_calendar_destination_title
-        private val destinationEmail: TextView = view.item_import_calendar_destination_email
-        private val destinationBadgeView: View = view.item_import_calendar_destination_badge
-        private val destinationPressOverlay: View = view.item_import_calendar_destination_press
-        private val destinationOptionsButton: ImageView = view.item_import_calendar_destination_options
+    inner class ViewHolder(itemBinding: ItemImportCalendarBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        private val sourceTitle: TextView = itemBinding.itemImportCalendarSourceTitle
+        private val sourceEmail: TextView = itemBinding.itemImportCalendarSourceEmail
+        private val importCheckBox: CheckBox = itemBinding.itemImportCalendarCheckbox
+        private val primaryPressOverlay: View = itemBinding.itemImportCalendarPress.root
+        private val secondaryPressOverlay: View = itemBinding.itemImportCalendarSecondaryPress.root
+        private val destinationLayout: ConstraintLayout = itemBinding.itemImportCalendarDestinationLayout
+        private val destinationTitle: TextView = itemBinding.itemImportCalendarDestinationTitle
+        private val destinationEmail: TextView = itemBinding.itemImportCalendarDestinationEmail
+        private val destinationBadgeView: View = itemBinding.itemImportCalendarDestinationBadge.root
+        private val destinationPressOverlay: View = itemBinding.itemImportCalendarDestinationPress
+        private val destinationOptionsButton: ImageView = itemBinding.itemImportCalendarDestinationOptions
 
         fun bind(importCalendarMapping : ImportCalendarMapping) {
-
             sourceTitle.setTextColor(
                 ContextCompat.getColor(itemView.context,
                     if (importCalendarMapping.importCalendar) R.color.text_norm

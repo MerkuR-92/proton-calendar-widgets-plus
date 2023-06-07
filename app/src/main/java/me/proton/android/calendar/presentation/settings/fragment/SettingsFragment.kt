@@ -4,7 +4,9 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -21,18 +23,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_settings.settings_calendars
-import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_list
-import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_subtitle
-import kotlinx.android.synthetic.main.fragment_settings.settings_calendars_title_add
-import kotlinx.android.synthetic.main.fragment_settings.settings_general_info
-import kotlinx.android.synthetic.main.fragment_settings.settings_general_press
-import kotlinx.android.synthetic.main.fragment_settings.settings_import
-import kotlinx.android.synthetic.main.fragment_settings.settings_import_press
-import kotlinx.android.synthetic.main.fragment_settings.settings_import_separator
-import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars
-import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_list
-import kotlinx.android.synthetic.main.fragment_settings.settings_other_calendars_title_add
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -48,6 +38,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMa
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.databinding.FragmentGeneralSettingsBinding
+import me.proton.android.calendar.databinding.FragmentSettingsBinding
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
@@ -64,7 +56,7 @@ import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 @AndroidEntryPoint
-class SettingsFragment : BaseDialogFragment(), KoinComponent {
+class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "SettingsFragment"
@@ -104,19 +96,21 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = resources.getString(R.string.nav_view_settings)
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentSettingsBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        settings_general_press.setOnSingleClickListener {
+        binding.settingsGeneralPress.root.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
         }
 
         lifecycleScope.launch {
             val displayImport = calendarViewModel.displayImport()
-            settings_import.visibleOrGone(displayImport)
-            settings_import_separator.visibleOrGone(displayImport)
+            binding.settingsImport.visibleOrGone(displayImport)
+            binding.settingsImportSeparator.visibleOrGone(displayImport)
         }
-        settings_import_press.setOnSingleClickListener {
+        binding.settingsImportPress.root.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_import_assistant_guide)
         }
 
@@ -140,19 +134,19 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
                 generalSettingsDescription
             )
         }
-        settings_general_info.text = getString(R.string.settings_general_info, generalSettingsDescription).replaceFirstChar {
+        binding.settingsGeneralInfo.text = getString(R.string.settings_general_info, generalSettingsDescription).replaceFirstChar {
             it.titlecase(DateTimeUtilsImpl.getLocaleForFormatting())
         }
 
-        settings_calendars_title_add.setOnSingleClickListener {
+        binding.settingsCalendarsTitleAdd.setOnSingleClickListener {
             showCalendarsOptionsDialog()
         }
 
-        settings_other_calendars_title_add.setOnSingleClickListener {
+        binding.settingsOtherCalendarsTitleAdd.setOnSingleClickListener {
             showCalendarsOptionsDialog()
         }
 
-        val settingsCalendarListView = settings_calendars_list
+        val settingsCalendarListView = binding.settingsCalendarsList
         val settingsCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         settingsCalendarListView.layoutManager = settingsCalendarLayoutManager
         settingsUserCalendarListAdapter = SettingsCalendarListAdapter() { calendar ->
@@ -168,7 +162,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
             refreshUserPersonalCalendarList(userPersonalCalendars.filter { it.isActive || it.isDisabled })
         }
 
-        val settingsOtherCalendarListView = settings_other_calendars_list
+        val settingsOtherCalendarListView = binding.settingsOtherCalendarsList
         val settingsOtherCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         settingsOtherCalendarListView.layoutManager = settingsOtherCalendarLayoutManager
         settingsOtherCalendarListAdapter = SettingsCalendarListAdapter() { calendar ->
@@ -205,7 +199,7 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
 
                     settingsOtherCalendarListAdapter.submitList(otherCalendars)
                     if (dataSetChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
-                    settings_other_calendars.visibleOrGone(otherCalendars.isNotEmpty())
+                    binding.settingsOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
                 }
             }
         }
@@ -258,9 +252,9 @@ class SettingsFragment : BaseDialogFragment(), KoinComponent {
     private fun refreshUserPersonalCalendarList(userPersonalCalendars: List<Calendar>) {
         lifecycleScope.launch {
             val otherCalendars = calendarViewModel.getOtherCalendars() ?: emptyList()
-            settings_calendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
-            settings_other_calendars_title_add.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
-            settings_calendars_subtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
+            binding.settingsCalendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+            binding.settingsOtherCalendarsTitleAdd.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+            binding.settingsCalendarsSubtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
             lifecycleScope.launch {
                 var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
                 val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == defaultCalendarId }

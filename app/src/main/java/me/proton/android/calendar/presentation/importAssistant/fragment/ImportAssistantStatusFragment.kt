@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
@@ -21,20 +23,17 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_list
-import kotlinx.android.synthetic.main.fragment_import_assistant_status.fragment_import_assistant_status_refresh
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
+import me.proton.android.calendar.databinding.FragmentImportAssistantGuideBinding
+import me.proton.android.calendar.databinding.FragmentImportAssistantStatusBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Import
-import me.proton.android.calendar.domain.model.ImportCalendarMapping
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.adapter.ImportStatusListAdapter
@@ -49,7 +48,7 @@ import java.time.ZoneId
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
+class ImportAssistantStatusFragment : BaseDialogFragment<FragmentImportAssistantStatusBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "ImportAssistantStatusFragment"
@@ -105,6 +104,8 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentImportAssistantStatusBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -112,10 +113,10 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
 
         initImportList()
 
-        calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
+        calendarViewModel.userCalendars.observe(viewLifecycleOwner) {
         }
 
-        fragment_import_assistant_status_refresh.isRefreshing = true
+        binding.fragmentImportAssistantStatusRefresh.isRefreshing = true
         refreshList()
 
         val importListMediator = MediatorLiveData<Triple<List<ImporterEntity>, List<ReportEntity>, ZoneId>>()
@@ -140,7 +141,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         importListMediator.observe(viewLifecycleOwner) {
             it ?: return@observe
 
-            fragment_import_assistant_status_refresh.isRefreshing = false
+            binding.fragmentImportAssistantStatusRefresh.isRefreshing = false
 
             val importerList = it.first
             val reportList = it.second
@@ -190,7 +191,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun initImportList() {
-        val importListView = fragment_import_assistant_status_list
+        val importListView = binding.fragmentImportAssistantStatusList
         val importLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         importListView.layoutManager = importLayoutManager
         val timeFormatIs24Hour = calendarViewModel.timeFormat.value?.let { calendarViewModel.timeFormatIs24Hour(it, requireContext()) } ?: true
@@ -278,7 +279,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         }
         importListView.adapter = importStatusListAdapter
 
-        fragment_import_assistant_status_refresh.setOnRefreshListener {
+        binding.fragmentImportAssistantStatusRefresh.setOnRefreshListener {
             refreshList()
         }
     }
@@ -346,7 +347,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             if (!mainViewModel.isConnectedToNetwork) {
                 displayNetworkError()
-                fragment_import_assistant_status_refresh.isRefreshing = false
+                binding.fragmentImportAssistantStatusRefresh.isRefreshing = false
                 return@launch
             }
             importAssistantViewModel.getReports()

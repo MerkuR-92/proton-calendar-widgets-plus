@@ -8,15 +8,35 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import me.proton.android.calendar.R
+import me.proton.android.calendar.databinding.FragmentBaseBinding
+import me.proton.android.calendar.databinding.FragmentRootBinding
 import me.proton.android.calendar.presentation.main.MainActivity
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment<VB: ViewBinding> : Fragment() {
 
     abstract val TAG: String
     abstract val layoutResourceId: Int
 
+    private var _binding: VB? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    protected val binding get() = _binding!!
+
+    private var _fragmentBaseBinding: FragmentBaseBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val fragmentBaseBinding get() = _fragmentBaseBinding!!
+
     protected open fun onToolbarCreated(toolbar: Toolbar) {}
+
+    val fragmentToolbarContent get() = fragmentBaseBinding.fragmentToolbarContent
+    val fragmentToolbarTitleLayout get() = fragmentBaseBinding.fragmentToolbarTitleLayout
+    val fragmentProgressBar get() = fragmentBaseBinding.fragmentProgressBar
+    val miniCalendarChevron get() = fragmentBaseBinding.miniCalendarChevron
+
+    abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VB
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -24,15 +44,14 @@ abstract class BaseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val rootView = inflater.inflate(R.layout.fragment_base, container, false)
-        rootView.findViewById<ViewGroup>(R.id.fragment_container).addView(
-            inflater.inflate(layoutResourceId, container, false)
-        )
+        _fragmentBaseBinding = FragmentBaseBinding.inflate(inflater, container, false)
+        _binding = getViewBinding(inflater, container)
+        fragmentBaseBinding.fragmentContainer.addView(binding.root)
 
         // Hide splash screen
         (requireActivity() as? MainActivity)?.displaySplashScreen(false)
 
-        val toolbar = rootView.findViewById(R.id.fragment_toolbar) as Toolbar
+        val toolbar = fragmentBaseBinding.fragmentToolbar
         toolbar.apply {
             setNavigationIcon(R.drawable.ic_proton_hamburger)
 
@@ -43,6 +62,12 @@ abstract class BaseFragment : Fragment() {
             onToolbarCreated(this)
         }
 
-        return rootView
+        return fragmentBaseBinding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        _fragmentBaseBinding = null
     }
 }

@@ -2,7 +2,7 @@ package me.proton.android.calendar.presentation.bugReport
 
 import android.content.DialogInterface
 import android.os.Build
-import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -15,9 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.work.Operation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_bug_report.bug_report_description
-import kotlinx.android.synthetic.main.fragment_bug_report.bug_report_title
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,11 +24,12 @@ import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKey
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.databinding.FragmentBugReportBinding
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import org.koin.core.KoinComponent
 
-class BugReportFragment : BaseDialogFragment(), KoinComponent {
+class BugReportFragment : BaseDialogFragment<FragmentBugReportBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "BugReportFragment"
@@ -45,8 +43,10 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentBugReportBinding.inflate(inflater, container, false)
+
     override fun onBackPressedCustom() {
-        if (bug_report_title.text.isNotEmpty() || bug_report_description.text.isNotEmpty()) {
+        if (binding.bugReportTitle.text.isNotEmpty() || binding.bugReportDescription.text.isNotEmpty()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 // Reinitialise event view model data when user chooses to discard modifications
                 lifecycleScope.launch {
@@ -71,13 +71,13 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        buttonSend = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
+        buttonSend = layoutInflater.inflate(R.layout.toolbar_action_button, dialogToolbarContent, false)
         with (buttonSend) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_paper_plane))
             setOnSingleClickListener {
                 requireActivity().clearFocusAndHideKeyboard(view)
 
-                if (bug_report_description.text.isEmpty()) {
+                if (binding.bugReportDescription.text.isEmpty()) {
                     view?.displaySnackBar(requireContext().getString(R.string.snack_send_bug_report_description_empty))
                     return@setOnSingleClickListener
                 }
@@ -94,8 +94,8 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
                         R.string.nav_view_version_name,
                         BuildConfig.VERSION_NAME
                     )
-                    val title: String = bug_report_title.text.toString()
-                    val description: String = bug_report_description.text.toString()
+                    val title: String = binding.bugReportTitle.text.toString()
+                    val description: String = binding.bugReportDescription.text.toString()
                     val username: String = user?.name ?: ""
                     val email: String = user?.email ?: ""
 
@@ -121,7 +121,7 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialogToolbarContent, false)
         loadingAction.visibleOrGone(false)
 
         with(toolbar.findViewById<ViewGroup>(R.id.dialog_toolbar_content)) {
@@ -144,9 +144,5 @@ class BugReportFragment : BaseDialogFragment(), KoinComponent {
         // Update action bar buttons visibility
         loadingAction.visibleOrGone(display)
         buttonSend.visibleOrGone(!display)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 }

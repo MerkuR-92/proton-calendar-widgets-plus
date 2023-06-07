@@ -4,7 +4,9 @@ import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -18,29 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_close_button
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_illustration
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_import_button
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_description
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_illustration
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_in_progress_redirect
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_description
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_loader_title
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_scroll_view
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_count
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_create_details
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_customize_import_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_email
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_error
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_error_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_header_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_list
-import kotlinx.android.synthetic.main.fragment_import_assistant.fragment_import_assistant_summary_merge_details
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
 import me.proton.android.calendar.common.MAX_CALENDAR_PAID
@@ -49,6 +29,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.databinding.FragmentHolidayCalendarSearchBinding
+import me.proton.android.calendar.databinding.FragmentImportAssistantBinding
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -61,7 +43,7 @@ import me.proton.core.presentation.ui.view.ProtonProgressButton
 import org.koin.core.KoinComponent
 
 @AndroidEntryPoint
-class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
+class ImportAssistantFragment : BaseDialogFragment<FragmentImportAssistantBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "ImportAssistantFragment"
@@ -80,11 +62,11 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     private lateinit var importCalendarMappingListAdapter: ImportCalendarMappingListAdapter
 
     override fun onBackPressedCustom() {
-        if (fragment_import_assistant_import_button.currentState == ProtonProgressButton.State.LOADING) {
+        if (binding.fragmentImportAssistantImportButton.currentState == ProtonProgressButton.State.LOADING) {
             view?.displaySnackBar(getString(R.string.import_assistant_in_progress_snack))
             return
         }
-        if (fragment_import_assistant_close_button.visibility == View.VISIBLE) findNavController().navigateUp()
+        if (binding.fragmentImportAssistantCloseButton.visibility == View.VISIBLE) findNavController().navigateUp()
         else {
             displayDiscardChangesConfirmationDialog { _, _ ->
                 findNavController().navigateUp()
@@ -110,6 +92,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = "" // No Title
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentImportAssistantBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -131,15 +115,15 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             checkCalendarLimit()
         }
 
-        fragment_import_assistant_summary_customize_import_layout.setOnSingleClickListener {
-            fragment_import_assistant_scroll_view.smoothScrollTo(
+        binding.fragmentImportAssistantSummaryCustomizeImportLayout.setOnSingleClickListener {
+            binding.fragmentImportAssistantScrollView.smoothScrollTo(
                 0,
-                fragment_import_assistant_summary_customize_import_layout.bottom + fragment_import_assistant_illustration.bottom + requireContext().dpToPixel(34)
+                binding.fragmentImportAssistantSummaryCustomizeImportLayout.bottom + binding.fragmentImportAssistantIllustration.bottom + requireContext().dpToPixel(34)
             )
         }
 
-        fragment_import_assistant_import_button.setOnSingleClickListener {
-            if (fragment_import_assistant_import_button.currentState == ProtonProgressButton.State.LOADING) return@setOnSingleClickListener
+        binding.fragmentImportAssistantImportButton.setOnSingleClickListener {
+            if (binding.fragmentImportAssistantImportButton.currentState == ProtonProgressButton.State.LOADING) return@setOnSingleClickListener
             onStartImportClick()
         }
 
@@ -149,7 +133,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         initExternalCalendarList()
 
         importAssistantViewModel.sourceEmail.observe(viewLifecycleOwner) { sourceEmail ->
-            fragment_import_assistant_summary_email.text = sourceEmail
+            binding.fragmentImportAssistantSummaryEmail.text = sourceEmail
         }
 
         importAssistantViewModel.importCalendarMappingList.observe(viewLifecycleOwner) { importCalendarMappingList ->
@@ -192,7 +176,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun initExternalCalendarList() {
-        val externalCalendarListView = fragment_import_assistant_summary_list
+        val externalCalendarListView = binding.fragmentImportAssistantSummaryList
         val externalCalendarLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         externalCalendarListView.layoutManager = externalCalendarLayoutManager
         importCalendarMappingListAdapter = ImportCalendarMappingListAdapter(
@@ -225,8 +209,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             if (importCalendarsToCreateCount > 0 &&
                 (isFreeUser && (calendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_FREE ||
                         !isFreeUser && (calendarsCount + importCalendarsToCreateCount) > MAX_CALENDAR_PAID)) {
-                fragment_import_assistant_summary_header_layout.visibleOrGone(false)
-                fragment_import_assistant_summary_error_layout.visibleOrGone(true)
+                binding.fragmentImportAssistantSummaryHeaderLayout.visibleOrGone(false)
+                binding.fragmentImportAssistantSummaryErrorLayout.visibleOrGone(true)
                 val countCalendarsOverLimit =
                     if (isFreeUser) {
                         if (calendarsCount >= MAX_CALENDAR_FREE) importCalendarsToCreateCount
@@ -245,7 +229,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                         countCalendarsOverLimit
                     )
                 } else ""
-                fragment_import_assistant_summary_error.text = resources.getQuantityString(
+                binding.fragmentImportAssistantSummaryError.text = resources.getQuantityString(
                     R.plurals.import_assistant_import_summary_error,
                     countCalendarsOverLimit,
                     countCalendarsOverLimit
@@ -256,8 +240,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
                     importCalendarMappingListAdapter.setLimitReached(true)
                 }
             } else {
-                fragment_import_assistant_summary_header_layout.visibleOrGone(true)
-                fragment_import_assistant_summary_error_layout.visibleOrGone(false)
+                binding.fragmentImportAssistantSummaryHeaderLayout.visibleOrGone(true)
+                binding.fragmentImportAssistantSummaryErrorLayout.visibleOrGone(false)
                 if (importCalendarsToImportCount > 0) importButtonIsEnabled(true)
                 if (this@ImportAssistantFragment::importCalendarMappingListAdapter.isInitialized) {
                     importCalendarMappingListAdapter.setLimitReached(false)
@@ -268,11 +252,11 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
     // TODO Remove this method and only use isEnabled once core ProtonButton has been updated
     private fun importButtonIsEnabled(isEnabled: Boolean) {
-        fragment_import_assistant_import_button.isEnabled = isEnabled
+        binding.fragmentImportAssistantImportButton.isEnabled = isEnabled
 
         // TODO Remove custom disabled style once core ProtonButton has been updated
-        fragment_import_assistant_import_button.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
-        fragment_import_assistant_import_button.backgroundTintList = ColorStateList.valueOf(
+        binding.fragmentImportAssistantImportButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_inverted))
+        binding.fragmentImportAssistantImportButton.backgroundTintList = ColorStateList.valueOf(
             requireContext().getColorFromAttr(
                 if (isEnabled) R.attr.proton_interaction_norm
                 else R.attr.proton_interaction_norm_disabled
@@ -288,7 +272,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
         lifecycleScope.launch {
             // Display loading state on import button
-            fragment_import_assistant_import_button.setLoading()
+            binding.fragmentImportAssistantImportButton.setLoading()
 
             if (calendarsToImport.any { it.createDestinationCalendar }) {
                 // Create new calendars
@@ -313,7 +297,7 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             )
 
             // Reset import button state
-            fragment_import_assistant_import_button.setIdle()
+            binding.fragmentImportAssistantImportButton.setIdle()
 
             when (startImportResult) {
                 is ImportAssistantViewModel.ImportResult.Error -> {
@@ -372,53 +356,53 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        fragment_import_assistant_loader_description.text = getString(R.string.import_assistant_creating_calendars_finish)
+        binding.fragmentImportAssistantLoaderDescription.text = getString(R.string.import_assistant_creating_calendars_finish)
         return allCalendarCreated
     }
 
     private fun showImportInProgressView() {
         // Display import in progress layout
-        fragment_import_assistant_loader_layout.visibleOrGone(false)
-        fragment_import_assistant_in_progress_layout.visibleOrGone(true)
-        fragment_import_assistant_summary_layout.visibleOrGone(false)
+        binding.fragmentImportAssistantLoaderLayout.visibleOrGone(false)
+        binding.fragmentImportAssistantInProgressLayout.visibleOrGone(true)
+        binding.fragmentImportAssistantSummaryLayout.visibleOrGone(false)
 
         val defaultUserEmail = importAssistantViewModel.defaultUserEmail.value ?: "" // TODO Handle null ?
         val sourceEmail = importAssistantViewModel.sourceEmail.value ?: "" // TODO Handle null ?
-        fragment_import_assistant_in_progress_description.text = getString(
+        binding.fragmentImportAssistantInProgressDescription.text = getString(
             R.string.import_assistant_in_progress_description,
             sourceEmail,
             defaultUserEmail
         )
 
         // Show close button
-        fragment_import_assistant_import_button.visibleOrGone(false)
-        fragment_import_assistant_close_button.visibleOrGone(true)
+        binding.fragmentImportAssistantImportButton.visibleOrGone(false)
+        binding.fragmentImportAssistantCloseButton.visibleOrGone(true)
 
         // Change illustration
-        fragment_import_assistant_in_progress_illustration.visibleOrGone(true)
-        fragment_import_assistant_illustration.visibleOrGone(false)
+        binding.fragmentImportAssistantInProgressIllustration.visibleOrGone(true)
+        binding.fragmentImportAssistantIllustration.visibleOrGone(false)
 
-        fragment_import_assistant_close_button.setOnSingleClickListener {
+        binding.fragmentImportAssistantCloseButton.setOnSingleClickListener {
             onNavigationIconClicked()
         }
 
-        fragment_import_assistant_in_progress_redirect.setOnSingleClickListener {
+        binding.fragmentImportAssistantInProgressRedirect.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_import_assistant_to_nav_import_assistant_status)
         }
     }
 
     private fun showGatheringDataView() {
         // Set loader title
-        fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_gathering_data_loader_title)
+        binding.fragmentImportAssistantLoaderTitle.text = getString(R.string.import_assistant_gathering_data_loader_title)
 
         // Display loader layout
-        fragment_import_assistant_loader_layout.visibleOrGone(true)
-        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
-        fragment_import_assistant_summary_layout.visibleOrGone(false)
+        binding.fragmentImportAssistantLoaderLayout.visibleOrGone(true)
+        binding.fragmentImportAssistantInProgressLayout.visibleOrGone(false)
+        binding.fragmentImportAssistantSummaryLayout.visibleOrGone(false)
 
         // Hide the buttons
-        fragment_import_assistant_import_button.visibleOrGone(false)
-        fragment_import_assistant_close_button.visibleOrGone(false)
+        binding.fragmentImportAssistantImportButton.visibleOrGone(false)
+        binding.fragmentImportAssistantCloseButton.visibleOrGone(false)
     }
 
     private fun showImportSummaryView(importCalendarMappingList: List<ImportCalendarMapping>) {
@@ -429,18 +413,18 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Display summary layout
-        fragment_import_assistant_loader_layout.visibleOrGone(false)
-        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
-        fragment_import_assistant_summary_layout.visibleOrGone(true)
+        binding.fragmentImportAssistantLoaderLayout.visibleOrGone(false)
+        binding.fragmentImportAssistantInProgressLayout.visibleOrGone(false)
+        binding.fragmentImportAssistantSummaryLayout.visibleOrGone(true)
 
         val calendarsToImport = importCalendarMappingList.filter { it.importCalendar }
-        fragment_import_assistant_summary_count.text = resources.getQuantityString(
+        binding.fragmentImportAssistantSummaryCount.text = resources.getQuantityString(
             R.plurals.import_assistant_summary_count,
             importCalendarMappingList.size,
             calendarsToImport.size,
             importCalendarMappingList.size
         )
-        fragment_import_assistant_import_button.text = resources.getQuantityString(
+        binding.fragmentImportAssistantImportButton.text = resources.getQuantityString(
             R.plurals.import_assistant_import_button,
             calendarsToImport.size,
             calendarsToImport.size
@@ -451,8 +435,8 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
         // Display calendars to create count
         val calendarsToCreate = importCalendarMappingList.filter { it.createDestinationCalendar && it.importCalendar }.size
-        fragment_import_assistant_summary_create_details.visibleOrGone(calendarsToCreate > 0)
-        fragment_import_assistant_summary_create_details.text = resources.getQuantityString(
+        binding.fragmentImportAssistantSummaryCreateDetails.visibleOrGone(calendarsToCreate > 0)
+        binding.fragmentImportAssistantSummaryCreateDetails.text = resources.getQuantityString(
             R.plurals.fragment_import_assistant_summary_create_details,
             calendarsToCreate,
             calendarsToCreate
@@ -460,43 +444,43 @@ class ImportAssistantFragment : BaseDialogFragment(), KoinComponent {
 
         // Display calendars to merge count
         val calendarsToMerge = importCalendarMappingList.filter { it.mergeCalendar && it.importCalendar }.size
-        fragment_import_assistant_summary_merge_details.visibleOrGone(calendarsToMerge > 0)
-        fragment_import_assistant_summary_merge_details.text = resources.getQuantityString(
+        binding.fragmentImportAssistantSummaryMergeDetails.visibleOrGone(calendarsToMerge > 0)
+        binding.fragmentImportAssistantSummaryMergeDetails.text = resources.getQuantityString(
             R.plurals.fragment_import_assistant_summary_merge_details,
             calendarsToMerge,
             calendarsToMerge
         )
 
         // Reset import button state
-        fragment_import_assistant_import_button.setIdle()
+        binding.fragmentImportAssistantImportButton.setIdle()
 
         // Show the import button
-        fragment_import_assistant_import_button.visibleOrGone(true)
-        fragment_import_assistant_close_button.visibleOrGone(false)
+        binding.fragmentImportAssistantImportButton.visibleOrGone(true)
+        binding.fragmentImportAssistantCloseButton.visibleOrGone(false)
     }
 
     private fun showCreatingCalendarsView(calendarsToCreateCount: Int, calendarsCreatedCount: Int, destinationEmail: String) {
         // Set loader title
-        fragment_import_assistant_loader_title.text = getString(R.string.import_assistant_creating_calendars)
+        binding.fragmentImportAssistantLoaderTitle.text = getString(R.string.import_assistant_creating_calendars)
 
         // Hide the buttons
-        fragment_import_assistant_import_button.visibleOrGone(false)
-        fragment_import_assistant_close_button.visibleOrGone(false)
+        binding.fragmentImportAssistantImportButton.visibleOrGone(false)
+        binding.fragmentImportAssistantCloseButton.visibleOrGone(false)
 
         // Display loader layout
-        fragment_import_assistant_loader_layout.visibleOrGone(true)
-        fragment_import_assistant_in_progress_layout.visibleOrGone(false)
-        fragment_import_assistant_summary_layout.visibleOrGone(false)
+        binding.fragmentImportAssistantLoaderLayout.visibleOrGone(true)
+        binding.fragmentImportAssistantInProgressLayout.visibleOrGone(false)
+        binding.fragmentImportAssistantSummaryLayout.visibleOrGone(false)
 
         // Set initial loader description text
         updateCalendarCreatedView(calendarsToCreateCount, calendarsCreatedCount,destinationEmail)
 
         // Display loader description
-        fragment_import_assistant_loader_description.visibleOrGone(true)
+        binding.fragmentImportAssistantLoaderDescription.visibleOrGone(true)
     }
 
     private fun updateCalendarCreatedView(calendarsToCreateCount: Int, calendarsCreatedCount: Int, destinationEmail: String) {
-        fragment_import_assistant_loader_description.text = resources.getQuantityString(
+        binding.fragmentImportAssistantLoaderDescription.text = resources.getQuantityString(
             R.plurals.import_assistant_creating_calendars_count,
             calendarsCreatedCount,
             calendarsCreatedCount,

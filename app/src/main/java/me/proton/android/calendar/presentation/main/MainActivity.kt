@@ -53,49 +53,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_main.drawer_layout
-import kotlinx.android.synthetic.main.activity_main.nav_view_main_content
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_create
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_calendars_list_add_layout_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_other_calendars_create
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_agenda_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_day_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_layout
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_month_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_three_day_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_switcher_week_press
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_timezone
-import kotlinx.android.synthetic.main.nav_view_main.nav_view_user_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_calendars_list
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_bug_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_feedback_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_feedback_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_login_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_logout_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_settings_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_more_subscription_press
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_other_calendars
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_other_calendars_list
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_icon
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_agenda_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_icon
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_day_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_icon
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_month_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_icon
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_three_day_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_icon
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_switcher_week_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_user_layout
-import kotlinx.android.synthetic.main.nav_view_main.view.nav_view_version
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -143,6 +100,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCa
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.databinding.ActivityMainBinding
+import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -171,6 +130,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), KoinComponent {
+
+    private lateinit var binding: ActivityMainBinding
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -318,6 +279,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             )
         }
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
 
         // https://stackoverflow.com/questions/16283079/re-launch-of-activity-on-home-button-but-only-the-first-time/16447508#16447508
         if (!isTaskRoot &&
@@ -332,9 +295,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         widgetRefresher.broadcastRefresh()
 
-        setContentView(R.layout.activity_main)
+        setContentView(view)
 
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        val navView: NavigationView = binding.navView
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_view) as NavHostFragment
@@ -344,7 +307,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_calendar//, R.id.nav_settings, R.id.nav_contacts, R.id.nav_feedback
-            ), drawer_layout
+            ), binding.drawerLayout
         )
 
         intent?.let {
@@ -467,7 +430,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         calendarViewModel.viewMode.value = mainViewModel.getLastViewMode()
 
-        nav_view_main_content.nav_view_version.text = getString(
+        binding.navViewMainContent.navViewVersion.text = getString(
             R.string.nav_view_version_name,
             BuildConfig.VERSION_NAME
         )
@@ -484,7 +447,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         })
 
         // Set timezone visibility to gone by default
-        nav_view_timezone.visibleOrGone(false)
+        binding.navViewMainContent.navViewTimezone.visibleOrGone(false)
     }
 
     private fun handleAccountState(accountViewModel: AccountViewModel, state: AccountViewModel.State) {
@@ -1078,7 +1041,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         calendarViewModel.fetchingEvents.postValue(spinnerText)
 
-        drawer_layout.setDrawerLockMode(if (display) LOCK_MODE_LOCKED_CLOSED else LOCK_MODE_UNLOCKED)
+        binding.drawerLayout.setDrawerLockMode(if (display) LOCK_MODE_LOCKED_CLOSED else LOCK_MODE_UNLOCKED)
 
         val backgroundDrawable = if (display) R.drawable.splash_screen else R.color.background_norm
         val statusBarBackgroundColor = if (display) R.color.splash_screen_color else R.color.background_norm
@@ -1097,44 +1060,44 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     private fun initDrawerListeners() {
         //Navigation drawer items on click listeners
-        nav_view_main_content.nav_view_user_layout.setOnSingleClickListener {
-            drawer_layout.close()
+        binding.navViewMainContent.navViewUserLayout.setOnSingleClickListener {
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_more_bug_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreBugPress.setOnSingleClickListener {
             navController.navigate(R.id.action_nav_calendar_to_nav_bug_report)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_more_feedback_layout.visibleOrGone(CalendarFeatureFlag.Feedback.fallbackValue)
-        nav_view_main_content.nav_view_more_feedback_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreFeedbackLayout.visibleOrGone(CalendarFeatureFlag.Feedback.fallbackValue)
+        binding.navViewMainContent.navViewMoreFeedbackPress.setOnSingleClickListener {
             showFeedbackDialog()
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_more_subscription_layout.visibleOrGone(CalendarFeatureFlag.Subscription.fallbackValue)
-        nav_view_main_content.nav_view_more_subscription_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreSubscriptionLayout.visibleOrGone(CalendarFeatureFlag.Subscription.fallbackValue)
+        binding.navViewMainContent.navViewMoreSubscriptionPress.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_more_settings_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreSettingsPress.setOnSingleClickListener {
             navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
         accountViewModel.hasPrimary.observe(this@MainActivity, Observer { hasPrimary ->
-            nav_view_main_content.nav_view_more_logout_layout.isVisible = hasPrimary
-            nav_view_main_content.nav_view_more_login_layout.isGone = hasPrimary
+            binding.navViewMainContent.navViewMoreLogoutLayout.isVisible = hasPrimary
+            binding.navViewMainContent.navViewMoreLoginLayout.isGone = hasPrimary
         })
-        nav_view_main_content.nav_view_more_logout_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreLogoutPress.setOnSingleClickListener {
             accountViewModel.logoutPrimary()
             displaySplashScreen(true, spinnerText = "")
             safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.rootFragment, false)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
-        nav_view_main_content.nav_view_more_login_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewMoreLoginPress.setOnSingleClickListener {
             accountViewModel.addAccount()
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
@@ -1146,93 +1109,93 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             currentViewMode = viewMode
         })
 
-        nav_view_switcher_day_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewSwitcherDayPress.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.DAY)
             mainViewModel.setLastViewMode(ViewMode.DAY)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_three_day_layout.visibleOrGone(CalendarFeatureFlag.ThreeDaysView.fallbackValue)
-        nav_view_switcher_three_day_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewSwitcherThreeDayLayout.visibleOrGone(CalendarFeatureFlag.ThreeDaysView.fallbackValue)
+        binding.navViewMainContent.navViewSwitcherThreeDayPress.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_main_content.nav_view_switcher_week_layout.visibleOrGone(CalendarFeatureFlag.WeekView.fallbackValue)
-        nav_view_switcher_week_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewSwitcherWeekLayout.visibleOrGone(CalendarFeatureFlag.WeekView.fallbackValue)
+        binding.navViewMainContent.navViewSwitcherWeekPress.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.WEEK)
             mainViewModel.setLastViewMode(ViewMode.WEEK)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_switcher_agenda_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewSwitcherAgendaPress.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.AGENDA)
             mainViewModel.setLastViewMode(ViewMode.AGENDA)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_switcher_month_layout.visibleOrGone(CalendarFeatureFlag.MonthView.fallbackValue)
-        nav_view_switcher_month_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewSwitcherMonthLayout.visibleOrGone(CalendarFeatureFlag.MonthView.fallbackValue)
+        binding.navViewMainContent.navViewSwitcherMonthPress.setOnSingleClickListener {
             calendarViewModel.viewMode.postValue(ViewMode.MONTH)
             mainViewModel.setLastViewMode(ViewMode.MONTH)
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_calendars_list_add_layout_press.setOnSingleClickListener {
+        binding.navViewMainContent.navViewCalendarsListAddLayoutPress.setOnSingleClickListener {
             lifecycleScope.launch {
                 showCalendarsOptionsDialog()
             }
         }
 
-        nav_view_calendars_create.setOnSingleClickListener {
+        binding.navViewMainContent.navViewCalendarsCreate.setOnSingleClickListener {
             lifecycleScope.launch {
                 showCalendarsOptionsDialog()
             }
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
-        nav_view_other_calendars_create.setOnSingleClickListener {
+        binding.navViewMainContent.navViewOtherCalendarsCreate.setOnSingleClickListener {
             lifecycleScope.launch {
                 showCalendarsOptionsDialog()
             }
-            drawer_layout.close()
+            binding.drawerLayout.close()
         }
 
         calendarViewModel.viewMode.observe(this@MainActivity, Observer { viewMode ->
             viewMode ?: return@Observer
 
             // Set selected background
-            nav_view_main_content.nav_view_switcher_agenda_layout.background =
+            binding.navViewMainContent.navViewSwitcherAgendaLayout.background =
                 if (viewMode == ViewMode.AGENDA) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 else null
-            nav_view_main_content.nav_view_switcher_day_layout.background =
+            binding.navViewMainContent.navViewSwitcherDayLayout.background =
                 if (viewMode == ViewMode.DAY) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 else null
-            nav_view_main_content.nav_view_switcher_three_day_layout.background =
+            binding.navViewMainContent.navViewSwitcherThreeDayLayout.background =
                 if (viewMode == ViewMode.THREE_DAY) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 else null
-            nav_view_main_content.nav_view_switcher_week_layout.background =
+            binding.navViewMainContent.navViewSwitcherWeekLayout.background =
                 if (viewMode == ViewMode.WEEK) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 else null
-            nav_view_main_content.nav_view_switcher_month_layout.background =
+            binding.navViewMainContent.navViewSwitcherMonthLayout.background =
                 if (viewMode == ViewMode.MONTH) ContextCompat.getDrawable(this, R.color.sidebar_interaction_pressed)
                 else null
 
             // Set icon tint
-            nav_view_main_content.nav_view_switcher_agenda_icon.imageTintList =
+            binding.navViewMainContent.navViewSwitcherAgendaIcon.imageTintList =
                 if (viewMode == ViewMode.AGENDA) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            nav_view_main_content.nav_view_switcher_day_icon.imageTintList =
+            binding.navViewMainContent.navViewSwitcherDayIcon.imageTintList =
                 if (viewMode == ViewMode.DAY) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            nav_view_main_content.nav_view_switcher_three_day_icon.imageTintList =
+            binding.navViewMainContent.navViewSwitcherThreeDayIcon.imageTintList =
                 if (viewMode == ViewMode.THREE_DAY) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            nav_view_main_content.nav_view_switcher_week_icon.imageTintList =
+            binding.navViewMainContent.navViewSwitcherWeekIcon.imageTintList =
                 if (viewMode == ViewMode.WEEK) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
-            nav_view_main_content.nav_view_switcher_month_icon.imageTintList =
+            binding.navViewMainContent.navViewSwitcherMonthIcon.imageTintList =
                 if (viewMode == ViewMode.MONTH) ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_norm))
                 else ColorStateList.valueOf(ContextCompat.getColor(this, R.color.sidebar_icon_weak))
         })
@@ -1250,11 +1213,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     when (calendarType) {
                         Calendar.CalendarType.NORMAL -> {
                             navController.navigate(R.id.action_nav_calendar_to_nav_calendar_form)
-                            drawer_layout.close()
+                            binding.drawerLayout.close()
                         }
                         Calendar.CalendarType.HOLIDAY -> {
                             navController.navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
-                            drawer_layout.close()
+                            binding.drawerLayout.close()
                         }
                         Calendar.CalendarType.SUBSCRIBED -> {} // Creating subscribed calendar has not yet been implemented
                     }
@@ -1264,7 +1227,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displayFreeUserCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
                         navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                        drawer_layout.close()
+                        binding.drawerLayout.close()
                     }
                 }
                 CalendarViewModel.CalendarLimit.FREE_MANDATORY_PERSONAL_REACHED -> {
@@ -1272,7 +1235,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displayFreeUserMandatoryPersonalCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
                         navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                        drawer_layout.close()
+                        binding.drawerLayout.close()
                     }
                 }
                 CalendarViewModel.CalendarLimit.PAID_REACHED -> {
@@ -1280,7 +1243,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displayPaidUserCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
                         navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                        drawer_layout.close()
+                        binding.drawerLayout.close()
                     }
                 }
                 CalendarViewModel.CalendarLimit.PAID_MANDATORY_PERSONAL_REACHED -> {
@@ -1288,7 +1251,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     this@MainActivity.displayPaidUserMandatoryPersonalCalendarLimitReached() { _, _ ->
                         // Open calendar settings view
                         navController.navigate(R.id.action_nav_calendar_to_nav_settings)
-                        drawer_layout.close()
+                        binding.drawerLayout.close()
                     }
                 }
             }
@@ -1594,11 +1557,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun initDrawerHeader() {
-        nav_view_user_layout.setViewModel(accountSwitcherViewModel)
+        binding.navViewMainContent.navViewUserLayout.setViewModel(accountSwitcherViewModel)
     }
 
     private fun initDrawerCalendarsList() {
-        val userCalendarListView = nav_view_main_content.nav_view_calendars_list
+        val userCalendarListView = binding.navViewMainContent.navViewCalendarsList
         val userCalendarsLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         userCalendarListView.layoutManager = userCalendarsLayoutManager
         userCalendarListAdapter = CalendarListAdapter { calendar ->
@@ -1611,7 +1574,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         (userCalendarListView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         userCalendarListView.adapter = userCalendarListAdapter
 
-        val otherCalendarListView = nav_view_main_content.nav_view_other_calendars_list
+        val otherCalendarListView = binding.navViewMainContent.navViewOtherCalendarsList
         val otherCalendarLayoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         otherCalendarListView.layoutManager = otherCalendarLayoutManager
         otherCalendarListAdapter = CalendarListAdapter { calendar ->
@@ -1700,7 +1663,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val dataSetChanged = otherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
                 otherCalendarListAdapter.submitList(otherCalendars)
                 if (dataSetChanged) otherCalendarListAdapter.notifyDataSetChanged()
-                nav_view_main_content.nav_view_other_calendars.visibleOrGone(otherCalendars.isNotEmpty())
+                binding.navViewMainContent.navViewOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
             }
         })
 
@@ -1715,10 +1678,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             // We only keep active and disabled calendars for the navigation drawer calendar list
             val filteredUserPersonalCalendars = userPersonalCalendars.filter { it.isActive || it.isDisabled }
             val otherCalendars = calendarViewModel.getOtherCalendars() ?: emptyList()
-            nav_view_calendars.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty() || (filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
-            nav_view_calendars_list_add_layout.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
-            nav_view_calendars_create.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty())
-            nav_view_other_calendars_create.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+            binding.navViewMainContent.navViewCalendars.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty() || (filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+            binding.navViewMainContent.navViewCalendarsListAddLayout.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
+            binding.navViewMainContent.navViewCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty())
+            binding.navViewMainContent.navViewOtherCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
             lifecycleScope.launch {
                 var tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
                 val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
@@ -1741,8 +1704,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
     override fun onBackPressed() {
 
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
-            drawer_layout.closeDrawer(GravityCompat.START)
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else if (returnToView == ViewMode.MONTH && CalendarFeatureFlag.MonthView.fallbackValue) {
             // Navigate back to month view
             calendarViewModel.monthViewDate?.let {
@@ -1775,16 +1738,16 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         fun displayRationale(context: Context) {
 
-            val view = LayoutInflater.from(context).inflate(R.layout.dialog_checkbox, null, false)
+            val dialogCheckboxBinding = DialogCheckboxBinding.inflate(LayoutInflater.from(context))
 
-            view.dialog_checkbox_header.text = getString(R.string.notifications_permission_dialog_message)
-            view.dialog_checkbox_press.setOnClickListener {
-                view.dialog_checkbox.performClick()
+            dialogCheckboxBinding.dialogCheckboxHeader.text = getString(R.string.notifications_permission_dialog_message)
+            dialogCheckboxBinding.dialogCheckboxPress.root.setOnClickListener {
+                dialogCheckboxBinding.dialogCheckbox.performClick()
             }
 
             MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.notifications_permission_dialog_title)
-                .setView(view)
+                .setView(dialogCheckboxBinding.root)
                 .setPositiveButton(R.string.notifications_permission_dialog_open_settings) { _, _ ->
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -1794,7 +1757,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 .setNegativeButton(R.string.notifications_permission_dialog_cancel) { _, _ -> }
                 .setOnCancelListener { }
                 .setOnDismissListener {
-                    if (view.dialog_checkbox.isChecked) {
+                    if (dialogCheckboxBinding.dialogCheckbox.isChecked) {
                         with (PreferenceManager.getDefaultSharedPreferences(context).edit()) {
                             putBoolean(SharedPreferencesKeys.SHOW_NOTIFICATIONS_PERMISSIONS_DIALOG, false)
                             apply()

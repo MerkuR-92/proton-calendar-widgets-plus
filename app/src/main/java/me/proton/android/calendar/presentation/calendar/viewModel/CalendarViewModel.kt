@@ -26,9 +26,6 @@ import androidx.work.workDataOf
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -73,6 +70,7 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -778,23 +776,22 @@ class CalendarViewModel @Inject constructor(
                     Html.fromHtml(context.getString(R.string.update_timezone_dialog_message, "<b>${systemTimeZone}</b>"))
                 }
 
-                val view = LayoutInflater.from(context)
-                    .inflate(R.layout.dialog_checkbox, null, false)
+                val viewBinding = DialogCheckboxBinding.inflate(LayoutInflater.from(context), null, false)
 
-                view.dialog_checkbox_header.text = dialogMessage
-                view.dialog_checkbox_press.setOnClickListener {
-                    view.dialog_checkbox.performClick()
+                viewBinding.dialogCheckboxHeader.text = dialogMessage
+                viewBinding.dialogCheckboxPress.root.setOnClickListener {
+                    viewBinding.dialogCheckbox.performClick()
                 }
 
                 MaterialAlertDialogBuilder(context)
                     .setTitle(R.string.update_timezone_dialog_title)
-                    .setView(view)
+                    .setView(viewBinding.root)
                     .setPositiveButton(R.string.update_timezone_dialog_confirmation) { _, _ ->
                         updatePrimaryTimezone(systemTimeZone)
                     }
                     .setNegativeButton(R.string.update_timezone_dialog_cancel) { _, _ -> }
                     .show().setOnDismissListener {
-                        if (view.dialog_checkbox.isChecked) {
+                        if (viewBinding.dialogCheckbox.isChecked) {
                             updateAutoDetectPrimaryTimezone(false)
                         }
                     }
