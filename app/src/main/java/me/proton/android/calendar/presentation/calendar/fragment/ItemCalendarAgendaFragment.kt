@@ -14,18 +14,19 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import biweekly.ICalendar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.item_calendar_agenda_fragment.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
+import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
+import me.proton.android.calendar.databinding.ItemCalendarAgendaFragmentBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -34,9 +35,8 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
-import java.util.*
+import java.util.Collections
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -44,6 +44,11 @@ class ItemCalendarAgendaFragment: Fragment() {
 
     @Inject
     lateinit var logger: Logger
+
+    private var _binding: ItemCalendarAgendaFragmentBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
 
@@ -86,7 +91,8 @@ class ItemCalendarAgendaFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.item_calendar_agenda_fragment, container, false)
+        _binding = ItemCalendarAgendaFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,7 +100,7 @@ class ItemCalendarAgendaFragment: Fragment() {
 
         val eventsListLayoutManager =
             LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
-        rv_agenda.layoutManager = eventsListLayoutManager
+        binding.rvAgenda.layoutManager = eventsListLayoutManager
         eventsListLayoutAdapter =
             EventAdapter {
                 if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
@@ -134,7 +140,7 @@ class ItemCalendarAgendaFragment: Fragment() {
                     }
                 }
             }
-        rv_agenda.adapter = eventsListLayoutAdapter
+        binding.rvAgenda.adapter = eventsListLayoutAdapter
 
         val agendaMediator = MediatorLiveData<Pair<String, Boolean>>()
         agendaMediator.addSource(calendarViewModel.timeZoneId) { value ->
@@ -166,7 +172,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         eventsListLayoutAdapter.setTimeFormatIs24Hour(timeFormatIs24Hour)
 
         // Check if recycler view is not null because of the delay
-        if (rv_agenda == null) return
+        if (binding.rvAgenda == null) return
 
         eventsListLayoutAdapter.submitList(listOf(fakeHeaderEvent))
 
@@ -218,8 +224,8 @@ class ItemCalendarAgendaFragment: Fragment() {
                         val currentList = eventsListLayoutAdapter.currentList
                         if (currentList.size <= 1 && this.isResumed) {
                             calendarViewModel.setLoading(true, position)
-                            list_view_status.visibleOrInvisible(true)
-                            list_view_status.text = resources.getString(R.string.agenda_loading_events)
+                            binding.listViewStatus.visibleOrInvisible(true)
+                            binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
@@ -241,10 +247,10 @@ class ItemCalendarAgendaFragment: Fragment() {
                             } else null
 
                         if (sortedEvents.isEmpty()) {
-                            list_view_status.visibleOrInvisible(true)
-                            list_view_status.text = resources.getString(R.string.agenda_no_events)
+                            binding.listViewStatus.visibleOrInvisible(true)
+                            binding.listViewStatus.text = resources.getString(R.string.agenda_no_events)
                         } else {
-                            list_view_status.visibleOrInvisible(false)
+                            binding.listViewStatus.visibleOrInvisible(false)
                         }
 
                         lifecycleScope.launch {
@@ -259,8 +265,8 @@ class ItemCalendarAgendaFragment: Fragment() {
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
-                        list_view_status.visibleOrInvisible(true)
-                        list_view_status.text =
+                        binding.listViewStatus.visibleOrInvisible(true)
+                        binding.listViewStatus.text =
                             resources.getString(R.string.agenda_loading_events_error)
 
                         eventsListLayoutAdapter.submitList(
@@ -276,5 +282,6 @@ class ItemCalendarAgendaFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         calendarViewModel.setLoading(false, position)
+        _binding = null
     }
 }

@@ -1,18 +1,15 @@
 package me.proton.android.calendar.presentation.settings.adapter
 
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
-import me.proton.android.calendar.R
-import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.databinding.ItemCalendarColorPickerBinding
 import me.proton.core.presentation.utils.ProtonAccentColorCompat
-import me.proton.core.util.kotlin.equalsNoCase
 
 class CalendarColorListAdapter(
     val colors: List<Int>,
@@ -27,12 +24,16 @@ class CalendarColorListAdapter(
     override fun getItemId(position: Int): Long = position.toLong()
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_calendar_color_picker, null)
+        val viewBinding = ItemCalendarColorPickerBinding.inflate(
+            LayoutInflater.from(parent?.context),
+            null,
+            false
+        )
 
-        val colorItemFilled: ImageView = view.findViewById(R.id.item_calendar_color_picker_filled)
-        val colorItemMain: ImageView = view.findViewById(R.id.item_calendar_color_picker_main)
-        val colorItemOuter: ImageView = view.findViewById(R.id.item_calendar_color_picker_outer)
-        val colorItemInner: ImageView = view.findViewById(R.id.item_calendar_color_picker_inner)
+        val colorItemFilled: ImageView = viewBinding.itemCalendarColorPickerFilled
+        val colorItemMain: ImageView = viewBinding.itemCalendarColorPickerMain
+        val colorItemOuter: ImageView = viewBinding.itemCalendarColorPickerOuter
+        val colorItemInner: ImageView = viewBinding.itemCalendarColorPickerInner
 
         val color = getItem(position)
 
@@ -48,10 +49,10 @@ class CalendarColorListAdapter(
         colorItemOuter.visibleOrGone(selected)
         colorItemInner.visibleOrGone(selected)
 
-        view.setOnSingleClickListener {
+        viewBinding.root.setOnSingleClickListener {
             listener(color)
         }
 
-        return view
+        return viewBinding.root
     }
 }

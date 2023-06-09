@@ -28,48 +28,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import biweekly.property.Action
-import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_header
-import kotlinx.android.synthetic.main.dialog_checkbox.view.dialog_checkbox_press
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_icon
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_list
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_alarm_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_all_day_switch
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_disclaimer
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_icon
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_calendar_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_description
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_description_icon
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_date
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_date_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_time
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_end_time_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_location
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_location_icon
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day_end
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_partial_day_start
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_chip_group
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_disclaimer
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_icon
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_layout
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_participant_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_recurrence
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_recurrence_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_date
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_date_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_time
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_start_time_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_layout
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_timezone_press
-import kotlinx.android.synthetic.main.fragment_event_form.event_form_title
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -100,6 +59,10 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.databinding.DialogCheckboxBinding
+import me.proton.android.calendar.databinding.FragmentEventFormBinding
+import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
+import me.proton.android.calendar.databinding.ItemAttendeeChipBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -115,7 +78,7 @@ import java.time.Instant
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
-class EventFormFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), KoinComponent {
 
     private val navigationArguments: EventFormFragmentArgs by navArgs()
 
@@ -238,7 +201,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
+        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialogToolbarContent, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_save)
             setOnSingleClickListener {
@@ -262,7 +225,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialogToolbarContent, false)
         loadingAction.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
@@ -299,13 +262,15 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun persistFormData() {
         eventViewModel.persistRecurrenceFormData(
-            event_form_title.text.toString().ifBlank { null },
-            event_form_location.text.toString().ifBlank { null },
-            event_form_description.text.toString().ifBlank { null }
+            binding.eventFormTitle.text.toString().ifBlank { null },
+            binding.eventFormLocation.text.toString().ifBlank { null },
+            binding.eventFormDescription.text.toString().ifBlank { null }
         )
 
         // TODO CREATE EVENT WITHOUT SAVING BEFOREHAND? EXAMPLE CALL -> calendarViewModel.TEST_CREATE_EVENT_TODO()
     }
+
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentEventFormBinding.inflate(inflater, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -313,7 +278,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
 
             // TODO Fix transition so title hint doesn't blink on screen
-            if (navigationArguments.eventId != null) event_form_title.hint = ""
+            if (navigationArguments.eventId != null) binding.eventFormTitle.hint = ""
 
             // TODO maybe don't wait for init to be done, but show loading screen and maybe errors
 
@@ -375,7 +340,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
             if (viewModeInitStatus == EventViewModel.InitResult.Success) {
                 if (navigationArguments.eventId == null) {
-                    event_form_title.requestFocus()
+                    binding.eventFormTitle.requestFocus()
                     requireContext().showKeyboard()
                 }
                 launch {
@@ -424,31 +389,31 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 buttonSave.visibleOrGone(!processingEvent)
 
                 // Disable/Enable all items linked to actions from our view
-                event_form_title.isEnabled = !processingEvent
-                event_form_location.isEnabled = !processingEvent
-                event_form_description.isEnabled = !processingEvent
-                event_form_all_day_press.isEnabled = !processingEvent
-                event_form_all_day_switch.isClickable = !processingEvent
-                event_form_all_day_switch.isFocusable = !processingEvent
-                event_form_timezone_press.isEnabled = !processingEvent
-                event_form_start_date_press.isEnabled = !processingEvent
-                event_form_end_date_press.isEnabled = !processingEvent
-                event_form_start_time_press.isEnabled = !processingEvent
-                event_form_end_time_press.isEnabled = !processingEvent
-                event_form_calendar_press.isEnabled = !processingEvent
-                event_form_recurrence_press.isEnabled = !processingEvent
-                event_form_alarm_press.isEnabled = !processingEvent
+                binding.eventFormTitle.isEnabled = !processingEvent
+                binding.eventFormLocation.isEnabled = !processingEvent
+                binding.eventFormDescription.isEnabled = !processingEvent
+                binding.eventFormAllDayPress.root.isEnabled = !processingEvent
+                binding.eventFormAllDaySwitch.isClickable = !processingEvent
+                binding.eventFormAllDaySwitch.isFocusable = !processingEvent
+                binding.eventFormTimezonePress.root.isEnabled = !processingEvent
+                binding.eventFormStartDatePress.isEnabled = !processingEvent
+                binding.eventFormEndDatePress.isEnabled = !processingEvent
+                binding.eventFormStartTimePress.isEnabled = !processingEvent
+                binding.eventFormEndTimePress.isEnabled = !processingEvent
+                binding.eventFormCalendarPress.root.isEnabled = !processingEvent
+                binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
+                binding.eventFormAlarmPress.root.isEnabled = !processingEvent
 
-                for (i in 0 until event_form_alarm_list.childCount) {
+                for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
-                    event_form_alarm_list.getChildAt(i)
+                    binding.eventFormAlarmList.getChildAt(i)
                         .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
                 }
 
-                event_form_participant_press.isEnabled = !processingEvent
-                for (i in 0 until event_form_participant_chip_group.childCount) {
+                binding.eventFormParticipantPress.root.isEnabled = !processingEvent
+                for (i in 0 until binding.eventFormParticipantChipGroup.childCount) {
                     // Disable the chips from inside attendees items views
-                    event_form_participant_chip_group.getChildAt(i).isEnabled = !processingEvent
+                    binding.eventFormParticipantChipGroup.getChildAt(i).isEnabled = !processingEvent
                 }
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
@@ -466,54 +431,54 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             val event = nullableEvent ?: return@Observer
 
             // TODO Fix transition so title hint doesn't blink on screen
-            event_form_title.hint = resources.getString(R.string.event_hint_title)
+            binding.eventFormTitle.hint = resources.getString(R.string.event_hint_title)
             event.summary?.let {
-                if (it.isNotEmpty()) event_form_title.setText(it)
-            } ?: event_form_title.clearText()
-            event.location?.let { event_form_location.setText(it) } ?: event_form_location.clearText()
-            event.description?.let { event_form_description.setText(it) } ?: event_form_description.clearText()
+                if (it.isNotEmpty()) binding.eventFormTitle.setText(it)
+            } ?: binding.eventFormTitle.clearText()
+            event.location?.let { binding.eventFormLocation.setText(it) } ?: binding.eventFormLocation.clearText()
+            event.description?.let { binding.eventFormDescription.setText(it) } ?: binding.eventFormDescription.clearText()
 
-            event_form_title.doAfterTextChanged { if (event_form_title.hasFocus()) persistFormData() }
-            event_form_location.doAfterTextChanged { if (event_form_location.hasFocus()) persistFormData() }
-            event_form_description.doAfterTextChanged { if (event_form_description.hasFocus()) persistFormData() }
+            binding.eventFormTitle.doAfterTextChanged { if (binding.eventFormTitle.hasFocus()) persistFormData() }
+            binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
+            binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
 
             ImageViewCompat.setImageTintList(
-                event_form_location_icon,
+                binding.eventFormLocationIcon,
                 ColorStateList.valueOf(
                     ContextCompat.getColor(
                         requireContext(),
-                        if (event_form_location.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
+                        if (binding.eventFormLocation.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
                     )
                 )
             )
             ImageViewCompat.setImageTintList(
-                event_form_description_icon,
+                binding.eventFormDescriptionIcon,
                 ColorStateList.valueOf(
                     ContextCompat.getColor(
                         requireContext(),
-                        if (event_form_description.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
+                        if (binding.eventFormDescription.text.isEmpty()) R.color.icon_hint else R.color.icon_norm
                     )
                 )
             )
 
-            event_form_all_day_switch.isChecked = event.isAllDay()
-            event_form_all_day_switch.jumpDrawablesToCurrentState()
+            binding.eventFormAllDaySwitch.isChecked = event.isAllDay()
+            binding.eventFormAllDaySwitch.jumpDrawablesToCurrentState()
 
-            event_form_partial_day_start.visibleOrGone(!event.isAllDay())
-            event_form_partial_day_end.visibleOrGone(!event.isAllDay())
-            event_form_timezone_layout.visibleOrGone(!event.isAllDay())
+            binding.eventFormPartialDayStart.visibleOrGone(!event.isAllDay())
+            binding.eventFormPartialDayEnd.visibleOrGone(!event.isAllDay())
+            binding.eventFormTimezoneLayout.visibleOrGone(!event.isAllDay())
 
             if (eventViewModel.validateDateTime()) {
-                event_form_start_date.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
-                event_form_start_time.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                binding.eventFormStartDate.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
+                binding.eventFormStartTime.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_norm))
             } else {
-                event_form_start_date.setTextColor(
+                binding.eventFormStartDate.setTextColor(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.textColorValidationError
                     )
                 )
-                event_form_start_time.setTextColor(
+                binding.eventFormStartTime.setTextColor(
                     ContextCompat.getColor(
                         requireContext(),
                         R.color.textColorValidationError
@@ -525,34 +490,34 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 eventViewModel.eventTimeZoneId,
                 eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             )
-            event_form_start_date.text = formattedStart.first ?: ""
-            event_form_start_time.text = formattedStart.second ?: ""
+            binding.eventFormStartDate.text = formattedStart.first ?: ""
+            binding.eventFormStartTime.text = formattedStart.second ?: ""
 
             val formattedEnd = event.formatEnd(
                 eventViewModel.eventTimeZoneId,
                 eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             )
-            event_form_end_date.text = formattedEnd.first ?: ""
-            event_form_end_time.text = formattedEnd.second ?: ""
+            binding.eventFormEndDate.text = formattedEnd.first ?: ""
+            binding.eventFormEndTime.text = formattedEnd.second ?: ""
 
-            event_form_timezone.text = formatTimeZoneId(
+            binding.eventFormTimezone.text = formatTimeZoneId(
                 event.defaultTimeZone!!,
                 eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
-            event_form_calendar.text = event.calendar.name
+            binding.eventFormCalendar.text = event.calendar.name
             ImageViewCompat.setImageTintList(
-                event_form_calendar_icon,
+                binding.eventFormCalendarIcon,
                 ColorStateList.valueOf(Color.parseColor(event.calendar.color))
             )
 
-            event_form_recurrence.text =
+            binding.eventFormRecurrence.text =
                 AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
                     ?: resources.getString(R.string.event_recurrence_none)
 
             displayAlarms()
 
-            event_form_participant_chip_group.removeAllViews()
+            binding.eventFormParticipantChipGroup.removeAllViews()
             event.iCalEvent.attendees.take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
                 val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
                 chipTitle?.let {
@@ -572,7 +537,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 }
             }
             ImageViewCompat.setImageTintList(
-                event_form_participant_icon, ColorStateList.valueOf(
+                binding.eventFormParticipantIcon, ColorStateList.valueOf(
                     ContextCompat.getColor(
                         requireContext(),
                         if (event.iCalEvent.attendees.isNullOrEmpty()) R.color.icon_hint
@@ -582,46 +547,46 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             )
 
             lifecycleScope.launch {
-                event_form_participant_layout.visibleOrGone(CalendarFeatureFlag.AddAttendees.fallbackValue &&
+                binding.eventFormParticipantLayout.visibleOrGone(CalendarFeatureFlag.AddAttendees.fallbackValue &&
                         eventViewModel.allowSendForCalendarAddress() &&
                         event.hasProtonUid
                 )
 
-                event_form_participant_chip_group.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
+                binding.eventFormParticipantChipGroup.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
                 val isCreateEvent = navigationArguments.eventId.isNullOrEmpty()
                 // We do not display any disclaimer if there is only one selectable calendar
                 val selectableCalendarsCount = getSelectableCalendars()?.size ?: 0
-                event_form_calendar_disclaimer.text =
+                binding.eventFormCalendarDisclaimer.text =
                     if (selectableCalendarsCount > 1 && eventViewModel.isOriginalEventPartOfChain()) {
                         getString(R.string.change_calendar_recurring_disclaimer)
                     } else if (selectableCalendarsCount > 1 && eventViewModel.isEventAnInvitation() && !isCreateEvent) {
                         getString(R.string.invite_change_calendar_disclaimer)
                     } else ""
-                event_form_calendar_disclaimer.visibleOrGone(event_form_calendar_disclaimer.text.isNotEmpty())
-                event_form_calendar_press.isEnabled = event_form_calendar_disclaimer.text.isEmpty()
+                binding.eventFormCalendarDisclaimer.visibleOrGone(binding.eventFormCalendarDisclaimer.text.isNotEmpty())
+                binding.eventFormCalendarPress.root.isEnabled = binding.eventFormCalendarDisclaimer.text.isEmpty()
                 if (calendarViewModel.getPersonalCalendarsCount() <= 1 && (event.iCalEvent.attendees?.isNotEmpty() == true || event.iCalEvent.organizer != null)) {
-                    event_form_calendar_press.isEnabled = false
+                    binding.eventFormCalendarPress.root.isEnabled = false
                 }
 
                 if (!event.calendar.isOwner) {
                     // Editing a shared calendar event
-                    event_form_participant.visibleOrGone(false)
-                    event_form_participant_disclaimer.visibleOrGone(true)
-                    event_form_participant_disclaimer.text = getString(R.string.invite_in_shared_calendar_disclaimer)
-                    event_form_participant_press.visibleOrGone(false)
+                    binding.eventFormParticipant.visibleOrGone(false)
+                    binding.eventFormParticipantDisclaimer.visibleOrGone(true)
+                    binding.eventFormParticipantDisclaimer.text = getString(R.string.invite_in_shared_calendar_disclaimer)
+                    binding.eventFormParticipantPress.root.visibleOrGone(false)
                 } else if (eventViewModel.hasCalendarBeenChanged()) {
                     // Changing calendar
-                    event_form_participant.visibleOrGone(false)
-                    event_form_participant_disclaimer.visibleOrGone(true)
-                    event_form_participant_disclaimer.text = getString(R.string.snack_event_edit_calendar_with_attendees_error)
-                    event_form_participant_press.visibleOrGone(false)
+                    binding.eventFormParticipant.visibleOrGone(false)
+                    binding.eventFormParticipantDisclaimer.visibleOrGone(true)
+                    binding.eventFormParticipantDisclaimer.text = getString(R.string.snack_event_edit_calendar_with_attendees_error)
+                    binding.eventFormParticipantPress.root.visibleOrGone(false)
                 } else {
                     // Default state
-                    event_form_participant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
-                    event_form_participant_disclaimer.visibleOrGone(false)
-                    event_form_participant_disclaimer.text = ""
-                    event_form_participant_press.visibleOrGone(true)
+                    binding.eventFormParticipant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
+                    binding.eventFormParticipantDisclaimer.visibleOrGone(false)
+                    binding.eventFormParticipantDisclaimer.text = ""
+                    binding.eventFormParticipantPress.root.visibleOrGone(true)
                 }
             }
         })
@@ -684,12 +649,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun addAttendeeChip(title: String) {
-        val chip = layoutInflater.inflate(R.layout.item_attendee_chip, event_form_participant_chip_group, false) as Chip
+        val chipViewBinding = ItemAttendeeChipBinding.inflate(layoutInflater, binding.eventFormParticipantChipGroup, false)
+        val chip = chipViewBinding.root
         chip.text = title
         chip.setOnSingleClickListener {
             navigateToAttendees()
         }
-        event_form_participant_chip_group.addView(chip)
+        binding.eventFormParticipantChipGroup.addView(chip)
     }
 
     private suspend fun getSelectableCalendars(): List<Calendar>? {
@@ -706,36 +672,36 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
     private fun attachActionHandlers() {
 
-        event_form_location.setOnFocusChangeListener { _, hasFocus ->
+        binding.eventFormLocation.setOnFocusChangeListener { _, hasFocus ->
             when {
                 hasFocus ->
-                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
-                event_form_location.text.isNotEmpty() ->
-                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                    ImageViewCompat.setImageTintList(binding.eventFormLocationIcon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
+                binding.eventFormLocation.text.isNotEmpty() ->
+                    ImageViewCompat.setImageTintList(binding.eventFormLocationIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
                 else ->
-                    ImageViewCompat.setImageTintList(event_form_location_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+                    ImageViewCompat.setImageTintList(binding.eventFormLocationIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
             }
         }
-        event_form_description.setOnFocusChangeListener { _, hasFocus ->
+        binding.eventFormDescription.setOnFocusChangeListener { _, hasFocus ->
             when {
                 hasFocus ->
-                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
-                event_form_description.text.isNotEmpty() ->
-                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
+                    ImageViewCompat.setImageTintList(binding.eventFormDescriptionIcon, ColorStateList.valueOf(requireContext().getColorFromAttr(R.attr.proton_icon_accent)))
+                binding.eventFormDescription.text.isNotEmpty() ->
+                    ImageViewCompat.setImageTintList(binding.eventFormDescriptionIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_norm)))
                 else ->
-                    ImageViewCompat.setImageTintList(event_form_description_icon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
+                    ImageViewCompat.setImageTintList(binding.eventFormDescriptionIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
             }
         }
 
-        event_form_all_day_press.setOnClickListener {
+        binding.eventFormAllDayPress.root.setOnClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            event_form_all_day_switch.performClick()
+            binding.eventFormAllDaySwitch.performClick()
         }
-        event_form_all_day_switch.setOnCheckedChangeListener { _, checked ->
+        binding.eventFormAllDaySwitch.setOnCheckedChangeListener { _, checked ->
             eventViewModel.handleAllDaySwitch(checked)
         }
 
-        event_form_timezone_press.setOnSingleClickListener {
+        binding.eventFormTimezonePress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             val forInstant = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toInstant()!!
@@ -753,7 +719,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_start_date_press.setOnSingleClickListener {
+        binding.eventFormStartDatePress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -766,7 +732,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_end_date_press.setOnSingleClickListener {
+        binding.eventFormEndDatePress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val date = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalDate()
             AndroidUtils.displayDatePicker(
@@ -780,7 +746,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_start_time_press.setOnSingleClickListener {
+        binding.eventFormStartTimePress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getStart(eventViewModel.eventTimeZoneId)?.toLocalTime()
@@ -789,7 +755,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_end_time_press.setOnSingleClickListener {
+        binding.eventFormEndTimePress.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             val is24Hour = eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
             val time = eventViewModel.eventLiveData.value?.getEnd(eventViewModel.eventTimeZoneId)?.toLocalTime()
@@ -798,7 +764,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_calendar_press.setOnSingleClickListener {
+        binding.eventFormCalendarPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
                 val calendars = getSelectableCalendars()
@@ -820,13 +786,13 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        event_form_recurrence_press.setOnSingleClickListener {
+        binding.eventFormRecurrencePress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForRecurrence()
             findNavController().navigate(R.id.nav_event_form_recurrence)
         }
 
-        event_form_participant_press.setOnSingleClickListener {
+        binding.eventFormParticipantPress.root.setOnSingleClickListener {
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
                 navigateToAttendees()
             }
@@ -875,12 +841,11 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun displayCustomPermissionDialog(openSettings: Boolean) {
-        val view = LayoutInflater.from(context)
-            .inflate(R.layout.dialog_checkbox, null, false)
+        val dialogCheckboxBinding = DialogCheckboxBinding.inflate(layoutInflater, null, false)
 
-        view.dialog_checkbox_header.text = getString(R.string.contacts_permission_dialog_message)
-        view.dialog_checkbox_press.setOnClickListener {
-            view.dialog_checkbox.performClick()
+        dialogCheckboxBinding.dialogCheckboxHeader.text = getString(R.string.contacts_permission_dialog_message)
+        dialogCheckboxBinding.dialogCheckboxPress.root.setOnClickListener {
+            dialogCheckboxBinding.dialogCheckbox.performClick()
         }
         val positiveButtonText =
             if (openSettings) R.string.contacts_permission_dialog_open_settings
@@ -888,7 +853,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.contacts_permission_dialog_title)
-            .setView(view)
+            .setView(dialogCheckboxBinding.root)
             .setPositiveButton(positiveButtonText) { _, _ ->
                 if (openSettings) {
                     val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -907,7 +872,7 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
                 findNavController().navigate(R.id.nav_event_form_attendees)
             }
             .setOnDismissListener {
-                if (view.dialog_checkbox.isChecked) {
+                if (dialogCheckboxBinding.dialogCheckbox.isChecked) {
                     changeContactsPermissionsPreferences(false)
                 }
             }
@@ -915,31 +880,31 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun displayAlarms() {
-        event_form_alarm_list.removeAllViews()
-        event_form_alarm_icon.visibleOrGone(true)
+        binding.eventFormAlarmList.removeAllViews()
+        binding.eventFormAlarmIcon.visibleOrGone(true)
 
         val event = eventViewModel.eventLiveData.value!!
 
         event.alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-            val alarmView = layoutInflater.inflate(R.layout.item_alarm_text_button, event_form_alarm_list, false)
-            alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
+            val alarmViewBinding = ItemAlarmTextButtonBinding.inflate(layoutInflater, binding.eventFormAlarmList, false)
+            alarmViewBinding.itemSimpleTextButtonTitle.apply {
                 text = AndroidUtils.formatAlarm(resources, event.isAllDay(), eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext())), event.getStart(eventViewModel.eventTimeZoneId), alarm)
                 isClickable = false
             }
-            alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+            alarmViewBinding.itemSimpleTextButtonDelete.apply {
                 setOnSingleClickListener {
                     requireActivity().clearFocusAndHideKeyboard(view)
                     eventViewModel.handleAlarmDelete(alarm)
                 }
                 isClickable = true
             }
-            if (index == 0) event_form_alarm_icon.visibleOrGone(false)
-            event_form_alarm_list.addView(alarmView)
+            if (index == 0) binding.eventFormAlarmIcon.visibleOrGone(false)
+            binding.eventFormAlarmList.addView(alarmViewBinding.root)
         }
 
         // "add alarm" button
-        event_form_alarm_press.setOnSingleClickListener {
+        binding.eventFormAlarmPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             eventViewModel.initialiseForAlarm()
             val bundle = Bundle().apply {
@@ -948,6 +913,6 @@ class EventFormFragment() : BaseDialogFragment(), KoinComponent {
             }
             findNavController().navigate(R.id.nav_event_form_alarm, bundle)
         }
-        event_form_alarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
+        binding.eventFormAlarm.visibleOrGone(!eventViewModel.isAlarmLimitReached())
     }
 }

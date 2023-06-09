@@ -7,7 +7,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.7.20"
     id("org.sonarqube") version "3.3"
     id("com.android.application")
-    id("kotlin-android-extensions")
     id("kotlin-android")
     id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
@@ -35,6 +34,7 @@ android {
 
     buildFeatures {
         dataBinding = true
+        viewBinding = true
     }
 
     signingConfigs {

@@ -64,20 +64,14 @@ import biweekly.util.Frequency
 import biweekly.util.Recurrence
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_header
-import kotlinx.android.synthetic.main.dialog_calendar_list.view.dialog_calendar_list_recycler_view
-import kotlinx.android.synthetic.main.item_popup_error.view.press_popup
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.onStart
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.Animation.HEIGHT_CHANGE_DURATION
 import me.proton.android.calendar.common.CLICK_INTERVAL_MS
 import me.proton.android.calendar.common.MAX_ANIM_DURATION
 import me.proton.android.calendar.common.logger.TimberLogger
-import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
@@ -85,11 +79,14 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toBiweeklyDayOf
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
+import me.proton.android.calendar.databinding.DialogCalendarListBinding
+import me.proton.android.calendar.databinding.ItemCalendarDialogBinding
+import me.proton.android.calendar.databinding.ItemCalendarPickerBinding
+import me.proton.android.calendar.databinding.ItemPickerDialogBinding
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.core.presentation.utils.normSnack
-import me.proton.core.util.kotlin.takeIfNotBlank
 import okhttp3.internal.toHexString
 import java.text.CharacterIterator
 import java.text.Normalizer
@@ -118,7 +115,7 @@ object AndroidUtils {
     ) {
         val immutableInitialTime = initialTime?: LocalTime.now()
         val timePickerDialog = TimePickerDialog(context, 0,
-            { view, hourOfDay, minute ->
+            { _, hourOfDay, minute ->
                 callback(LocalTime.of(hourOfDay, minute))
             },
             immutableInitialTime.hour,
@@ -137,7 +134,7 @@ object AndroidUtils {
     ) {
         val immutableInitialDate = initialDate?: LocalDate.now()
         val datePickerDialog = DatePickerDialog(context, 0,
-            { view, year, month, dayOfMonth ->
+            { _, year, month, dayOfMonth ->
                 callback(LocalDate.of(year, month + 1, dayOfMonth))
             },
             immutableInitialDate.year,
@@ -180,7 +177,7 @@ object AndroidUtils {
         var selectedItem = 0
         val builder = MaterialAlertDialogBuilder(context)
         title?.apply { builder.setTitle(this) }
-        builder.setSingleChoiceItems(items, selectedIndex) { dialog, item ->
+        builder.setSingleChoiceItems(items, selectedIndex) { _, item ->
             selectedItem = item
         }
         builder.setPositiveButton(R.string.dialog_button_ok) { dialog, _ ->
@@ -226,11 +223,14 @@ object AndroidUtils {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 var view = convertView
                 if (view == null) {
-                    view = LayoutInflater.from(context)
-                        .inflate(R.layout.item_picker_dialog, parent, false)
+                    view = ItemPickerDialogBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    ).root
                 }
 
-                view!!.findViewById<AppCompatCheckedTextView>(R.id.ctv_item_name).apply {
+                view.findViewById<AppCompatCheckedTextView>(R.id.ctv_item_name).apply {
                     text = items[position]
                     tag = position
                     isChecked = position == selectedIndex
@@ -274,11 +274,14 @@ object AndroidUtils {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 var view = convertView
                 if (view == null) {
-                    view = LayoutInflater.from(context)
-                        .inflate(R.layout.item_calendar_picker, parent, false)
+                    view = ItemCalendarPickerBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    ).root
                 }
 
-                view!!.findViewById<AppCompatCheckedTextView>(R.id.ctv_calendar_name).apply {
+                view.findViewById<AppCompatCheckedTextView>(R.id.ctv_calendar_name).apply {
                     text = items[position].name
                     tag = position
                     isChecked = position == selectedIndex
@@ -328,11 +331,14 @@ object AndroidUtils {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 var view = convertView
                 if (view == null) {
-                    view = LayoutInflater.from(context)
-                        .inflate(R.layout.item_calendar_dialog, parent, false)
+                    view = ItemCalendarDialogBinding.inflate(
+                        LayoutInflater.from(context),
+                        parent,
+                        false
+                    ).root
                 }
 
-                view!!.findViewById<TextView>(R.id.item_calendar_dialog_title).apply {
+                view.findViewById<TextView>(R.id.item_calendar_dialog_title).apply {
                     text = getItem(position)?.name
                     tag = position
                 }
@@ -350,15 +356,14 @@ object AndroidUtils {
 
         }
 
-        val view = LayoutInflater.from(this)
-            .inflate(R.layout.dialog_calendar_list, null, false)
+        val viewBinding = DialogCalendarListBinding.inflate(LayoutInflater.from(this), null, false)
 
-        view.dialog_calendar_list_header.text = getString(message)
+        viewBinding.dialogCalendarListHeader.text = getString(message)
 
-        view.dialog_calendar_list_recycler_view.adapter = adapter
-        view.dialog_calendar_list_recycler_view.divider = null
+        viewBinding.dialogCalendarListRecyclerView.adapter = adapter
+        viewBinding.dialogCalendarListRecyclerView.divider = null
 
-        materialDialogBuilder.setView(view)
+        materialDialogBuilder.setView(viewBinding.root)
         materialDialogBuilder.show()
     }
 
@@ -709,8 +714,6 @@ object AndroidUtils {
      */
     fun displayPopupMenu(
         view: View,
-        labels: List<Pair<Int, Int?>>,
-        icons: List<Pair<Int?, Int?>>,
         onItemClicked: (position: Int) -> Unit
     ) {
 
@@ -735,7 +738,7 @@ object AndroidUtils {
         ) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
                 return super.getView(position, convertView, parent).apply {
-                    press_popup.setOnSingleClickListener {
+                    findViewById<View>(R.id.press_popup).setOnSingleClickListener {
                         onItemClicked(position)
                         popupWindow.dismiss()
                     }

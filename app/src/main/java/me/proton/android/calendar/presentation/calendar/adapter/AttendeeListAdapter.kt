@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
-import kotlinx.android.synthetic.main.item_attendee.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
+import me.proton.android.calendar.databinding.ItemAttendeeBinding
 
 class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 
@@ -36,8 +36,8 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_attendee, parent, false)
-        return ViewHolder(view)
+        val itemBinding = ItemAttendeeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -45,16 +45,17 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
         holder.bind(item, position)
     }
 
-    inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        private val attendeeItemLayout: ConstraintLayout = view.item_attendee_layout
-        private val attendeeItemTextLayout: LinearLayout = view.item_attendee_text_layout
-        private val attendeeItemTitle: TextView = view.item_attendee_title
-        private val attendeeItemDescription: TextView = view.item_attendee_description
-        private val attendeeItemInitials: TextView = view.item_attendee_initials
-        private val attendeeItemStatus: ImageView = view.item_attendee_status
-        private val attendeeItemOptional: TextView = view.item_attendee_optional
+    inner class ViewHolder(itemBinding: ItemAttendeeBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        private val attendeeItemLayout: ConstraintLayout = itemBinding.itemAttendeeLayout
+        private val attendeeItemTextLayout: LinearLayout = itemBinding.itemAttendeeTextLayout
+        private val attendeeItemTitle: TextView = itemBinding.itemAttendeeTitle
+        private val attendeeItemDescription: TextView = itemBinding.itemAttendeeDescription
+        private val attendeeItemInitials: TextView = itemBinding.itemAttendeeInitials
+        private val attendeeItemStatus: ImageView = itemBinding.itemAttendeeStatus
+        private val attendeeItemOptional: TextView = itemBinding.itemAttendeeOptional
 
         fun bind(attendee : Attendee, position : Int) {
+            val context = itemView.context
             // If has common name use it, else use email and hide description field
             val attendeeEmail = attendee.extractEmail()
             val title =
@@ -74,7 +75,7 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
                 ) == true
             } ?: false
             attendeeItemTitle.text =
-                if (attendeeIsCurrentUser) view.context.getString(R.string.event_attendee_is_current_user)
+                if (attendeeIsCurrentUser) context.getString(R.string.event_attendee_is_current_user)
                 else title
             attendeeItemDescription.visibleOrGone(description.isNotEmpty() || attendeeIsCurrentUser)
             if (description.isNotEmpty() || attendeeIsCurrentUser) {
@@ -91,7 +92,7 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
                     //  in order to keep the correct alignment
                     attendeeItemOptional.visibleOrGone(false)
                     attendeeItemDescription.visibleOrGone(true)
-                    attendeeItemDescription.text = view.context.getString(R.string.event_attendee_optional)
+                    attendeeItemDescription.text = context.getString(R.string.event_attendee_optional)
                 } else {
                     attendeeItemOptional.visibleOrGone(true)
                     // If has Optional label, we need to clear LinearLayout constraint
@@ -105,7 +106,7 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
                 attendeeItemOptional.visibleOrGone(false)
             }
 
-            initAttendeeStatus(attendeeItemStatus, attendee.participationStatus ?: ParticipationStatus.NEEDS_ACTION, view.context)
+            initAttendeeStatus(attendeeItemStatus, attendee.participationStatus ?: ParticipationStatus.NEEDS_ACTION, context)
         }
     }
 }

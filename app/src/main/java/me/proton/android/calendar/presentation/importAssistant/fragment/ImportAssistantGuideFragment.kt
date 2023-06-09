@@ -1,7 +1,9 @@
 package me.proton.android.calendar.presentation.importAssistant.fragment
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
@@ -9,13 +11,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_layout
-import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_press
-import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_imports_subtitle
-import kotlinx.android.synthetic.main.fragment_import_assistant_guide.import_assistant_status_guide_new_import_button
 import kotlinx.coroutines.GlobalScope.coroutineContext
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarImport.PRODUCT_CALENDAR
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -23,6 +20,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.api.ImporterEntity
 import me.proton.android.calendar.data.api.ReportEntity
+import me.proton.android.calendar.databinding.FragmentImportAssistantBinding
+import me.proton.android.calendar.databinding.FragmentImportAssistantGuideBinding
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.importAssistant.viewModel.ImportAssistantViewModel
@@ -32,7 +31,7 @@ import org.koin.core.KoinComponent
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
-class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
+class ImportAssistantGuideFragment : BaseDialogFragment<FragmentImportAssistantGuideBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "ImportAssistantGuideFragment"
@@ -59,6 +58,8 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = "" // No Title
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentImportAssistantGuideBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -70,7 +71,7 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Hidden by default
-        import_assistant_status_guide_imports_subtitle.visibleOrGone(false)
+        binding.importAssistantStatusGuideImportsSubtitle.visibleOrGone(false)
 
         importAssistantViewModel.importerList.observe(viewLifecycleOwner) { importerList ->
             importerList ?: return@observe
@@ -91,11 +92,11 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
         observeImportGuideSnackState(coroutineContext)
 
-        import_assistant_status_guide_new_import_button.setOnSingleClickListener {
+        binding.importAssistantStatusGuideNewImportButton.setOnSingleClickListener {
             (requireActivity() as MainActivity).showImportGoogleAuthDialog()
         }
 
-        import_assistant_status_guide_imports_press.setOnSingleClickListener {
+        binding.importAssistantStatusGuideImportsPress.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_import_assistant_guide_to_nav_import_assistant_status)
         }
     }
@@ -110,10 +111,10 @@ class ImportAssistantGuideFragment : BaseDialogFragment(), KoinComponent {
 
     private fun refreshOngoingImportText(importerList: List<ImporterEntity>?, reportList: List<ReportEntity>?) {
         val ongoingImports = importerList?.count { it.product.contains(PRODUCT_CALENDAR) && it.active?.calendar != null }
-        import_assistant_status_guide_imports_layout.visibleOrGone((ongoingImports != null && ongoingImports > 0) || reportList.isNullOrEmpty().not())
-        import_assistant_status_guide_imports_subtitle.visibleOrGone(ongoingImports != null && ongoingImports > 0)
+        binding.importAssistantStatusGuideImportsLayout.visibleOrGone((ongoingImports != null && ongoingImports > 0) || reportList.isNullOrEmpty().not())
+        binding.importAssistantStatusGuideImportsSubtitle.visibleOrGone(ongoingImports != null && ongoingImports > 0)
         if (ongoingImports != null && ongoingImports > 0) {
-            import_assistant_status_guide_imports_subtitle.text = resources.getQuantityString(
+            binding.importAssistantStatusGuideImportsSubtitle.text = resources.getQuantityString(
                 R.plurals.import_assistant_ongoing_import,
                 ongoingImports,
                 ongoingImports

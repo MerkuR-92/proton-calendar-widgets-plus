@@ -13,9 +13,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
-import kotlinx.android.synthetic.main.item_calendar_month_fragment.monthFragmentWeekDaysLayout
-import kotlinx.android.synthetic.main.item_calendar_month_fragment.monthFragmentWeekNumberLayout
-import kotlinx.android.synthetic.main.item_calendar_month_fragment.month_fragment_loader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -26,12 +23,13 @@ import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.FragmentArguments
 import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.databinding.ItemCalendarMonthFragmentBinding
+import me.proton.android.calendar.databinding.ItemMonthViewGridBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -50,6 +48,11 @@ import java.time.ZoneId
 import java.util.Collections
 
 class ItemCalendarMonthFragment : Fragment(), KoinComponent {
+
+    private var _binding: ItemCalendarMonthFragmentBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
@@ -112,12 +115,10 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val rootView = inflater.inflate(R.layout.item_calendar_month_fragment, container, false)
-
-        monthView = rootView.findViewById(R.id.month_fragment_month_view)
-
-        return rootView
+    ): View {
+        _binding = ItemCalendarMonthFragmentBinding.inflate(inflater, container, false)
+        monthView = binding.monthFragmentMonthView
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -130,7 +131,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
 
-            monthFragmentWeekNumberLayout.visibleOrGone(displayWeekNumber)
+            binding.monthFragmentWeekNumberLayout.visibleOrGone(displayWeekNumber)
 
             monthView.setShowWeekNumbers(displayWeekNumber)
         }
@@ -167,7 +168,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             CalendarSettings.DAYS_IN_A_WEEK - (weekStart.value - 1)
         )
         weekDays.forEachIndexed { index, dayOfWeek ->
-            val textView = monthFragmentWeekDaysLayout.getChildAt(index) as TextView
+            val textView = binding.monthFragmentWeekDaysLayout.getChildAt(index) as TextView
             val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
             textView.text = firstLetterDayOfWeek
             val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
@@ -258,7 +259,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     private fun setMonthGridClickableItems(skeletonList: List<LocalDate>, timeZoneId: String) {
         // Set the clickable grid items
-        view?.findViewById<GridLayout>(R.id.month_fragment_grid_layout)?.run {
+        binding.monthFragmentGridLayout.run {
             this.removeAllViews()
 
             // Set the row and column counts
@@ -269,8 +270,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             for (rowIndex in 0 until ROWS_MAX) {
                 for (columnIndex in 0 until COLUMNS_MAX) {
 
-                    val dayItemView = LayoutInflater.from(this.context).inflate(
-                        R.layout.item_month_view_grid,
+                    val dayItemViewBinding = ItemMonthViewGridBinding.inflate(
+                        LayoutInflater.from(this.context),
                         this,
                         false
                     )
@@ -279,17 +280,17 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                     val row = GridLayout.spec(rowIndex, GridLayout.FILL, 1f)
                     val column = GridLayout.spec(columnIndex, GridLayout.FILL, 1f)
                     val layoutParams = GridLayout.LayoutParams(row, column)
-                    dayItemView.layoutParams = layoutParams
+                    dayItemViewBinding.root.layoutParams = layoutParams
 
                     if (skeletonListIndex <= skeletonList.lastIndex) {
                         // Make sure we don't go out of bound
                         val date = skeletonList[skeletonListIndex]
 
-                        dayItemView.setOnSingleClickListener {
+                        dayItemViewBinding.root.setOnSingleClickListener {
                             val selectedDateEvents = events?.filter {
                                 it.getOccurrenceStart(timeZoneId).toLocalDate() == date && it.spansSingleDay(true, timeZoneId)
                             }
-                            if (selectedDateEvents != null && selectedDateEvents.isNotEmpty()) {
+                            if (!selectedDateEvents.isNullOrEmpty()) {
                                 // Save the time of the first event of the selected day in order for the day view to be
                                 //  initialized on that position without waiting for the events loading to finish
                                 calendarViewModel.firstEventOfTheDayTime =
@@ -312,7 +313,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         }
                     }
 
-                    this.addView(dayItemView)
+                    this.addView(dayItemViewBinding.root)
 
                     skeletonListIndex++
                 }
@@ -334,7 +335,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             when (skeletonEventsResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     // Show progress bar
-                    month_fragment_loader.visibleOrGone(true)
+                    binding.monthFragmentLoader.visibleOrGone(true)
                 }
                 is CalendarsRepository.GetEventsResult.Success -> {
 
@@ -342,7 +343,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                     displayMonthViewEvents(skeletonEventsResult.events, fromDate, timeZoneId, true)
 
                     // Hide progress bar
-                    month_fragment_loader.visibleOrGone(false)
+                    binding.monthFragmentLoader.visibleOrGone(false)
 
                     // Load the decrypted events list
                     getEvents(fromDate, toDate, timeZoneId, position)
@@ -355,7 +356,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         skeletonEventsResult.throwable
                     )
                     // Hide progress bar
-                    month_fragment_loader.visibleOrGone(false)
+                    binding.monthFragmentLoader.visibleOrGone(false)
 
                     // TODO Show the error somewhere ?
                 }
@@ -378,7 +379,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                             // Progress is shown through the skeleton events
                         } else {
                             // Show progress bar
-                            month_fragment_loader.visibleOrGone(true)
+                            binding.monthFragmentLoader.visibleOrGone(true)
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
@@ -425,7 +426,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     private fun setupWeekNumbers(firstDay: LocalDate, startWeekOn: DayOfWeek) {
         // Setup week numbers
-        view?.findViewById<LinearLayout>(R.id.monthFragmentWeekNumberLayout)?.run {
+        binding.monthFragmentWeekNumberLayout.run {
             for (i in 0 until 6) {
                 val weekNumberLinearLayout = this.getChildAt(i) as LinearLayout
                 val weekNumberTextView = weekNumberLinearLayout.getChildAt(0) as TextView
@@ -440,5 +441,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         if (loading) {
             position?.let { calendarViewModel.monthViewLoading.value = Pair(it, false) }
         }
+        _binding = null
     }
 }

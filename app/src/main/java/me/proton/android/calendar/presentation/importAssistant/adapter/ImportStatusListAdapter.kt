@@ -11,19 +11,12 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_account
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_badge
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_details
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_icon
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_button
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_description
-import kotlinx.android.synthetic.main.item_import_status.view.item_import_status_warning_title
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.humanReadableByteCountBin
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
+import me.proton.android.calendar.databinding.ItemImportStatusBinding
 import me.proton.android.calendar.domain.model.Import
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -50,8 +43,8 @@ class ImportStatusListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_import_status, parent, false)
-        return ViewHolder(view)
+        val itemBinding = ItemImportStatusBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -59,30 +52,30 @@ class ImportStatusListAdapter(
         holder.bind(item)
     }
 
-    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val account: TextView = view.item_import_status_account
-        private val details: TextView = view.item_import_status_details
-        private val badge: View = view.item_import_status_badge
-        private val icon: ImageView = view.item_import_status_icon
-        private val warningLayout: LinearLayout = view.item_import_status_warning
-        private val warningTitle: TextView = view.item_import_status_warning_title
-        private val warningDescription: TextView = view.item_import_status_warning_description
-        private val warningButton: TextView = view.item_import_status_warning_button
+    inner class ViewHolder(itemBinding: ItemImportStatusBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        private val account: TextView = itemBinding.itemImportStatusAccount
+        private val details: TextView = itemBinding.itemImportStatusDetails
+        private val badge: View = itemBinding.itemImportStatusBadge.root
+        private val icon: ImageView = itemBinding.itemImportStatusIcon
+        private val warningLayout: LinearLayout = itemBinding.itemImportStatusWarning
+        private val warningTitle: TextView = itemBinding.itemImportStatusWarningTitle
+        private val warningDescription: TextView = itemBinding.itemImportStatusWarningDescription
+        private val warningButton: TextView = itemBinding.itemImportStatusWarningButton
 
         fun bind(import : Import) {
-
+            val context = itemView.context
             account.text = import.account
             val importSize = humanReadableByteCountBin(import.size?.toLong() ?: 0L)
             val date = import.dateTime?.toLocalDate()?.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
             val time = import.dateTime?.toLocalTime()?.formatTime(is24Hour, short = false)
-            val dateTime = itemView.context.getString(
+            val dateTime = context.getString(
                 R.string.import_assistant_report_details_date_time,
                 date,
                 time
             )
             details.text =
                 if (import.size != null) {
-                    itemView.context.getString(
+                    context.getString(
                         R.string.import_assistant_report_details,
                         importSize,
                         dateTime
@@ -93,7 +86,7 @@ class ImportStatusListAdapter(
             badge.visibleOrGone(import.state != null)
             warningLayout.visibleOrGone(import.state != null)
             if (import.state != null) {
-                (badge as TextView).text = itemView.context.getString(
+                (badge as TextView).text = context.getString(
                     when (import.state) {
                         Import.ImportState.QUEUED -> R.string.import_assistant_status_queued
                         Import.ImportState.RUNNING -> R.string.import_assistant_status_in_progress
@@ -179,22 +172,22 @@ class ImportStatusListAdapter(
                 if (import.lostConnection) {
                     warningLayout.visibleOrGone(true)
                     warningTitle.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_title)
+                        context.getString(R.string.import_assistant_status_paused_lost_connection_title)
                     warningDescription.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_description)
+                        context.getString(R.string.import_assistant_status_paused_lost_connection_description)
                     warningButton.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_lost_connection_button)
+                        context.getString(R.string.import_assistant_status_paused_lost_connection_button)
                     warningButton.setOnSingleClickListener {
                         listener(import, Action.RESUME)
                     }
                 } else if (import.storageFull) {
                     warningLayout.visibleOrGone(true)
                     warningTitle.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_title)
+                        context.getString(R.string.import_assistant_status_paused_storage_full_title)
                     warningDescription.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_description)
+                        context.getString(R.string.import_assistant_status_paused_storage_full_description)
                     warningButton.text =
-                        itemView.context.getString(R.string.import_assistant_status_paused_storage_full_button)
+                        context.getString(R.string.import_assistant_status_paused_storage_full_button)
                     warningButton.setOnSingleClickListener {
                         listener(import, Action.RESUME)
                     }

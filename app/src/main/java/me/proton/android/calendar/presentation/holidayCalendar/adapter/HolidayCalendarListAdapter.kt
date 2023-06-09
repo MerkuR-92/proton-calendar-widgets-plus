@@ -8,13 +8,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_holiday_calendar.view.item_holiday_calendar_country
-import kotlinx.android.synthetic.main.item_holiday_calendar.view.item_holiday_calendar_country_flag
-import kotlinx.android.synthetic.main.item_holiday_calendar.view.item_holiday_calendar_press
-import kotlinx.android.synthetic.main.item_holiday_calendar_header.view.item_holiday_calendar_header_text
+import androidx.viewbinding.ViewBinding
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.highlightSearchTokens
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.databinding.ItemHolidayCalendarBinding
+import me.proton.android.calendar.databinding.ItemHolidayCalendarHeaderBinding
 import me.proton.android.calendar.domain.model.Holiday
 
 class HolidayCalendarListAdapter(
@@ -41,8 +40,8 @@ class HolidayCalendarListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when(HolidayItemType.values()[viewType]) {
-            HolidayItemType.Header -> HeaderViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_holiday_calendar_header, parent, false))
-            HolidayItemType.Value -> HolidayViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_holiday_calendar, parent, false))
+            HolidayItemType.Header -> HeaderViewHolder(ItemHolidayCalendarHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+            HolidayItemType.Value -> HolidayViewHolder(ItemHolidayCalendarBinding.inflate(LayoutInflater.from(parent.context), parent, false))
         }
     }
 
@@ -69,12 +68,12 @@ class HolidayCalendarListAdapter(
         data class Value(val holiday: Holiday): HolidayItem(HolidayItemType.Value)
     }
 
-    abstract class ViewHolder(private val holidayView: View): RecyclerView.ViewHolder(holidayView)
+    abstract class ViewHolder(itemBinding: ViewBinding): RecyclerView.ViewHolder(itemBinding.root)
 
-    inner class HolidayViewHolder(private val holidayView: View): ViewHolder(holidayView) {
-        private val holidayFlag: ImageView = holidayView.item_holiday_calendar_country_flag
-        private val holidayCountryName: TextView = holidayView.item_holiday_calendar_country
-        private val holidayPress: View = holidayView.item_holiday_calendar_press
+    inner class HolidayViewHolder(itemBinding: ItemHolidayCalendarBinding): ViewHolder(itemBinding) {
+        private val holidayFlag: ImageView = itemBinding.itemHolidayCalendarCountryFlag
+        private val holidayCountryName: TextView = itemBinding.itemHolidayCalendarCountry
+        private val holidayPress: View = itemBinding.itemHolidayCalendarPress.root
 
         fun bind(value: HolidayItem.Value) {
             val holiday = value.holiday
@@ -92,10 +91,13 @@ class HolidayCalendarListAdapter(
         }
     }
 
-    inner class HeaderViewHolder(private val headerView: View): ViewHolder(headerView){
+    inner class HeaderViewHolder(itemBinding: ItemHolidayCalendarHeaderBinding): ViewHolder(itemBinding) {
+        private val holidayCalendarHeaderText: TextView = itemBinding.itemHolidayCalendarHeaderText
+
         fun bind(headerItem: HolidayItem.Header) {
-            headerView.item_holiday_calendar_header_text.text =
-                if (headerItem.basedOnTimeZone) headerView.context.getString(R.string.holiday_calendar_time_zone_based)
+            val context = itemView.context
+            holidayCalendarHeaderText.text =
+                if (headerItem.basedOnTimeZone) context.getString(R.string.holiday_calendar_time_zone_based)
                 else headerItem.letter
         }
     }

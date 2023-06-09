@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
@@ -29,41 +30,6 @@ import biweekly.property.Action
 import biweekly.property.Attendee
 import biweekly.property.Organizer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_list
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendee_organizer_layout
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_button
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_description
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_press
-import kotlinx.android.synthetic.main.event_attendees_view.event_attendees_title
-import kotlinx.android.synthetic.main.event_info.view.text_date_time
-import kotlinx.android.synthetic.main.event_info.view.text_recurrence
-import kotlinx.android.synthetic.main.event_info.view.text_status
-import kotlinx.android.synthetic.main.event_info.view.text_summary
-import kotlinx.android.synthetic.main.event_info.view.view_calendar_bar
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_event_details.section_alarms
-import kotlinx.android.synthetic.main.fragment_event_details.section_answer
-import kotlinx.android.synthetic.main.fragment_event_details.section_attendees
-import kotlinx.android.synthetic.main.fragment_event_details.section_calendar
-import kotlinx.android.synthetic.main.fragment_event_details.section_description
-import kotlinx.android.synthetic.main.fragment_event_details.section_event_info
-import kotlinx.android.synthetic.main.fragment_event_details.section_location
-import kotlinx.android.synthetic.main.fragment_event_details.section_verification_badge
-import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_description
-import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_initials
-import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_status
-import kotlinx.android.synthetic.main.item_attendee.view.item_attendee_title
-import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_maybe
-import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_no
-import kotlinx.android.synthetic.main.item_change_answer.view.item_change_answer_button_yes
-import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_layout
-import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_loader
-import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_press
-import kotlinx.android.synthetic.main.item_change_answer_button.view.item_change_answer_button_title
-import kotlinx.android.synthetic.main.item_form_section.view.image_button_action
-import kotlinx.android.synthetic.main.item_form_section.view.image_dot_icon
-import kotlinx.android.synthetic.main.item_form_section.view.image_icon
-import kotlinx.android.synthetic.main.item_form_section.view.text_header
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -90,6 +56,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.presentation.account.AccountViewModel
@@ -108,7 +75,7 @@ import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
-class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
+class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), KoinComponent {
 
     override val TAG = "EventDetailsFragment"
     override val layoutResourceId = R.layout.fragment_event_details
@@ -177,7 +144,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     override fun onToolbarCreated(toolbar: Toolbar) {
 
-        buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
+        buttonEdit = layoutInflater.inflate(R.layout.toolbar_action_button, dialogToolbarContent, false)
         with(buttonEdit) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
@@ -194,7 +161,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 )
             }
         }
-        buttonDelete = layoutInflater.inflate(R.layout.toolbar_action_button, dialog_toolbar_content, false)
+        buttonDelete = layoutInflater.inflate(R.layout.toolbar_action_button, dialogToolbarContent, false)
         with(buttonDelete) {
             (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(
                 ContextCompat.getDrawable(
@@ -217,7 +184,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialogToolbarContent, false)
         loadingAction.visibleOrGone(false)
 
 
@@ -246,15 +213,19 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentEventDetailsBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        section_answer.item_change_answer_button_yes.item_change_answer_button_title.text =
-            getString(R.string.event_answer_yes)
-        section_answer.item_change_answer_button_no.item_change_answer_button_title.text =
-            getString(R.string.event_answer_no)
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.text =
-            getString(R.string.event_answer_maybe)
+        with(binding.sectionAnswer) {
+            itemChangeAnswerButtonYes.itemChangeAnswerButtonTitle.text =
+                getString(R.string.event_answer_yes)
+            itemChangeAnswerButtonNo.itemChangeAnswerButtonTitle.text =
+                getString(R.string.event_answer_no)
+            itemChangeAnswerButtonMaybe.itemChangeAnswerButtonTitle.text =
+                getString(R.string.event_answer_maybe)
+        }
 
         // `by activityViewModels` is lazy and must be resolved in main thread so sadly, this is needed
         eventViewModel
@@ -344,14 +315,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
     private fun attachActionHandlers() {
         // This opens google maps with the location field data
-//        section_location.text_header.setOnSingleClickListener {
+//        binding.sectionLocation.textHeader.setOnSingleClickListener {
 //            eventViewModel.eventLiveData.value?.location?.let {
 //                if (!mainViewModel.handleEventLocationShow(it)) {
 //                    logger.i("could not show location on map")
 //                }
 //            }
 //        }
-        section_location.image_button_action.setOnSingleClickListener {
+        binding.sectionLocation.imageButtonAction.setOnSingleClickListener {
             eventViewModel.eventLiveData.value?.location?.let {
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
@@ -361,22 +332,24 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        section_answer.item_change_answer_button_yes.item_change_answer_button_press.setOnSingleClickListener {
-            lifecycleScope.launch {
-                // Ignore the result if true
-                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+        with(binding.sectionAnswer) {
+            itemChangeAnswerButtonYes.itemChangeAnswerButtonPress.setOnSingleClickListener {
+                lifecycleScope.launch {
+                    // Ignore the result if true
+                    eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.ACCEPTED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                }
             }
-        }
-        section_answer.item_change_answer_button_no.item_change_answer_button_press.setOnSingleClickListener {
-            lifecycleScope.launch {
-                // Ignore the result if true
-                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+            itemChangeAnswerButtonNo.itemChangeAnswerButtonPress.setOnSingleClickListener {
+                lifecycleScope.launch {
+                    // Ignore the result if true
+                    eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.DECLINED, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                }
             }
-        }
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_press.setOnSingleClickListener {
-            lifecycleScope.launch {
-                // Ignore the result if true
-                eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))
+            itemChangeAnswerButtonMaybe.itemChangeAnswerButtonPress.setOnSingleClickListener {
+                lifecycleScope.launch {
+                    // Ignore the result if true
+                    eventViewModel.onChangeAnswerClick(provideDisplayDialog(), ParticipationStatus.TENTATIVE, calendarViewModel.timeFormatIs24Hour(requireContext()))
+                }
             }
         }
     }
@@ -453,7 +426,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
 
             // Make a copy of the list so we can freely remove organizer if also is an attendee
             val attendeeList = ArrayList(event.iCalEvent.attendees)
-            section_attendees.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
+            binding.sectionAttendees.root.visibleOrGone(event.iCalEvent.organizer != null && attendeeList.isNotEmpty())
             if (attendeeList.isNotEmpty()) {
                 initParticipantsItem(attendeeList)
 
@@ -478,56 +451,56 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 }
             }
 
-            with(section_event_info) {
+            with(binding.sectionEventInfo) {
 
                 if (event.isCancelled()) {
-                    this.text_status.visibleOrGone(true)
-                    this.text_status.text = getString(R.string.event_status_canceled)
+                    textStatus.visibleOrGone(true)
+                    textStatus.text = getString(R.string.event_status_canceled)
                 }
 
-                this.text_summary.text =
+                textSummary.text =
                     event.summary?.nullIfBlank() ?: resources.getString(R.string.default_event_summary)
 
-                this.text_date_time.text = event.formatStartEndForActualEndDate(
+                textDateTime.text = event.formatStartEndForActualEndDate(
                     eventViewModel.displayTimeZoneId,
                     resources,
                     eventViewModel.userSettings.timeFormatIs24Hour(DateFormat.is24HourFormat(requireContext()))
                 )
 
                 if (event.isRecurring()) {
-                    this.text_recurrence.visibleOrGone(true)
-                    this.text_recurrence.text = AndroidUtils.formatRecurrence(
+                    textRecurrence.visibleOrGone(true)
+                    textRecurrence.text = AndroidUtils.formatRecurrence(
                         requireContext().resources,
                         event,
                         eventViewModel.eventTimeZoneId
                     )
                 }
 
-                visibleOrGone(true)
+                root.visibleOrGone(true)
             }
 
             event.location?.nullIfBlank()?.let {
-                with(section_location) {
-                    text_header.text = event.location
-                    Linkify.addLinks(text_header, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS)
-                    image_icon.setImageResource(R.drawable.ic_proton_map_pin)
-                    image_button_action.setImageResource(R.drawable.ic_proton_squares)
-                    image_button_action.visibleOrInvisible(true)
-                    visibleOrGone(true)
+                with(binding.sectionLocation) {
+                    textHeader.text = event.location
+                    Linkify.addLinks(textHeader, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS)
+                    imageIcon.setImageResource(R.drawable.ic_proton_map_pin)
+                    imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
+                    imageButtonAction.visibleOrInvisible(true)
+                    root.visibleOrGone(true)
                 }
             }
 
-            with(section_calendar) {
-                text_header.text = if (event.calendar.isActive) {
+            with(binding.sectionCalendar) {
+                textHeader.text = if (event.calendar.isActive) {
                     event.calendar.name
                 } else {
                     requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
                 }
                 //Set icon view to Invisible to keep the text view constraints
-                image_icon.visibleOrInvisible(false)
-                image_dot_icon.visibleOrGone(true)
-                image_dot_icon.drawable.setTint(Color.parseColor(event.calendar.color))
-                visibleOrGone(true)
+                imageIcon.visibleOrInvisible(false)
+                imageDotIcon.visibleOrGone(true)
+                imageDotIcon.drawable.setTint(Color.parseColor(event.calendar.color))
+                root.visibleOrGone(true)
             }
 
             lifecycleScope.launch {
@@ -544,32 +517,32 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                     }
 
                 withContext(Dispatchers.Main) {
-                    section_alarms.visibleOrGone(alarmLabels.isNotEmpty())
+                    binding.sectionAlarms.root.visibleOrGone(alarmLabels.isNotEmpty())
                     if (alarmLabels.isNotEmpty()) {
-                        with(section_alarms) {
-                            text_header.text = alarmLabels.joinToString(separator = "\n")
-                            image_icon.setImageResource(R.drawable.ic_proton_bell)
+                        with(binding.sectionAlarms) {
+                            textHeader.text = alarmLabels.joinToString(separator = "\n")
+                            imageIcon.setImageResource(R.drawable.ic_proton_bell)
                         }
                     }
                 }
             }
 
             event.description?.nullIfBlank()?.let {
-                with(section_description) {
-                    text_header.text = event.description
-                    Linkify.addLinks(text_header, Linkify.ALL)
-                    image_icon.setImageResource(R.drawable.ic_proton_text_align_left)
-                    visibleOrGone(true)
+                with(binding.sectionDescription) {
+                    textHeader.text = event.description
+                    Linkify.addLinks(textHeader, Linkify.ALL)
+                    imageIcon.setImageResource(R.drawable.ic_proton_text_align_left)
+                    root.visibleOrGone(true)
                 }
             }
 
             if (CalendarFeatureFlag.ShowSignatureVerificationBadges.fallbackValue) {
                 when (event.verificationStatus) {
                     Event.SignatureVerification.SUCCESS, Event.SignatureVerification.NOT_SIGNED, Event.SignatureVerification.SIGNED_BUT_NO_KEYS -> {
-                        section_verification_badge.visibleOrGone(false)
+                        binding.sectionVerificationBadge.visibleOrGone(false)
                     }
                     null, Event.SignatureVerification.FAILURE -> {
-                        with (section_verification_badge) {
+                        with (binding.sectionVerificationBadge) {
                             setBackgroundResource(R.drawable.shape_background_error)
                             setText(R.string.event_signature_verification_failure)
                             visibleOrGone(true)
@@ -589,7 +562,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun onVerificationBadgeClicked(event: Event) {
         lifecycleScope.launch {
 
-            with (section_verification_badge) {
+            with (binding.sectionVerificationBadge) {
                 setBackgroundResource(R.drawable.shape_background_norm)
                 setText(R.string.event_signature_verification_in_progress)
                 visibleOrGone(true)
@@ -608,7 +581,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             val showNetworkErrorBadge = verificationWithApiCall == null || verificationWithApiCall == Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS
 
             withContext(Dispatchers.Main) {
-                with(section_verification_badge) {
+                with(binding.sectionVerificationBadge) {
                     if (showVerificationErrorBadge) { // verifying with API keys failed
                         setBackgroundResource(R.drawable.shape_background_error)
                         setText(R.string.event_signature_verification_failure)
@@ -634,14 +607,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
         if (participationStatus == ParticipationStatus.NEEDS_ACTION && !isCancelled) {
             AndroidUtils.setStripedBackground(
-                section_event_info.view_calendar_bar,
+                binding.sectionEventInfo.viewCalendarBar,
                 requireContext(),
                 Color.parseColor(calendarColor),
                 true
             )
         } else {
-            section_event_info.view_calendar_bar.setBackgroundResource(R.drawable.shape_calendar_bar)
-            section_event_info.view_calendar_bar.background.setTint(Color.parseColor(calendarColor))
+            binding.sectionEventInfo.viewCalendarBar.setBackgroundResource(R.drawable.shape_calendar_bar)
+            binding.sectionEventInfo.viewCalendarBar.background.setTint(Color.parseColor(calendarColor))
         }
     }
 
@@ -652,7 +625,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun handleAttendeeAnswerViewVisibility(userAddresses: List<UserAddress>) {
         if (!CalendarFeatureFlag.ChangeAnswer.fallbackValue) {
             // TODO Remove feature flag
-            section_answer.visibleOrGone(false)
+            binding.sectionAnswer.root.visibleOrGone(false)
             return
         }
         lifecycleScope.launch {
@@ -665,14 +638,14 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
                 val participationStatus = event.getParticipationStatus(userEmails)
 
                 if (participationStatus != null && isActive && isUserAddressAllowedSend && !event.isCancelled()) {
-                    section_answer.visibleOrGone(true)
-                } else section_answer.visibleOrGone(false)
-            } else section_answer.visibleOrGone(false)
+                    binding.sectionAnswer.root.visibleOrGone(true)
+                } else binding.sectionAnswer.root.visibleOrGone(false)
+            } else binding.sectionAnswer.root.visibleOrGone(false)
         }
     }
 
     private fun initParticipantsItem(attendeeList: List<Attendee>) {
-        event_attendees_title.text = resources.getString(
+        binding.sectionAttendees.eventAttendeesTitle.text = resources.getString(
             R.string.event_attendee_count,
             attendeeList.size,
             resources.getQuantityString(
@@ -718,7 +691,7 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
             R.string.event_attendee_unanswered,
             attendeesStatusDescription
         )
-        event_attendees_description.text = attendeesStatusDescription
+        binding.sectionAttendees.eventAttendeesDescription.text = attendeesStatusDescription
     }
 
     private fun buildAttendeesStatusesDescription(
@@ -740,129 +713,152 @@ class EventDetailsFragment : BaseDialogFragment(), KoinComponent {
     private fun initOrganizerItem(organizer: Organizer, organizerAttendee: Attendee?) {
         // TODO stop using field from Activity once we have actual user management
         lifecycleScope.launch {
-            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
-            event_attendee_organizer_layout.item_attendee_description.visibleOrGone(true)
-            val organizerEmail = organizer.extractEmail()
-            if (organizerEmail != null && canonicalUserEmails?.contains(canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)) == true) {
-                event_attendee_organizer_layout.item_attendee_title.text =
-                    resources.getString(R.string.event_attendee_is_organizer)
-                event_attendee_organizer_layout.item_attendee_description.text = organizer.extractEmail()
-            } else {
-                event_attendee_organizer_layout.item_attendee_title.text = organizer.extractEmail()
-                event_attendee_organizer_layout.item_attendee_description.text =
-                    resources.getString(R.string.event_attendee_organizer)
-            }
-            event_attendee_organizer_layout.item_attendee_initials.text = getInitials(organizer.extractEmail() ?: "")
+            with(binding.sectionAttendees) {
+                val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
+                eventAttendeeOrganizerLayout.itemAttendeeDescription.visibleOrGone(true)
+                val organizerEmail = organizer.extractEmail()
+                if (organizerEmail != null && canonicalUserEmails?.contains(canonicalizeProtonEmail(organizerEmail, forceCanonicalization = true)) == true) {
+                    eventAttendeeOrganizerLayout.itemAttendeeTitle.text =
+                        resources.getString(R.string.event_attendee_is_organizer)
+                    eventAttendeeOrganizerLayout.itemAttendeeDescription.text = organizer.extractEmail()
+                } else {
+                    eventAttendeeOrganizerLayout.itemAttendeeTitle.text = organizer.extractEmail()
+                    eventAttendeeOrganizerLayout.itemAttendeeDescription.text =
+                        resources.getString(R.string.event_attendee_organizer)
+                }
+                eventAttendeeOrganizerLayout.itemAttendeeInitials.text = getInitials(organizer.extractEmail() ?: "")
 
-            val organizerStatus = event_attendee_organizer_layout.item_attendee_status
-            if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
-                initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
-            } else organizerStatus.visibleOrGone(false)
+                val organizerStatus = eventAttendeeOrganizerLayout.itemAttendeeStatus
+                if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
+                    initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
+                } else organizerStatus.visibleOrGone(false)
+            }
         }
     }
 
     private var attendeesListHeight: Int? = null
     private fun initAttendeeList(attendeeList: MutableList<Attendee>, organizerAttendee: Attendee?) {
         lifecycleScope.launch {
-            val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
-            val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            event_attendee_list.layoutManager = attendeesLayoutManager
-            attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails)
-            (event_attendee_list.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
-            event_attendee_list.adapter = attendeeListAdapter
+            with(binding.sectionAttendees) {
+                val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
+                val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+                eventAttendeeList.layoutManager = attendeesLayoutManager
+                attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails)
+                (eventAttendeeList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
+                    false
+                eventAttendeeList.adapter = attendeeListAdapter
 
-            // Remove organizer attendee from the list if it exists to avoid duplicates
-            if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
+                // Remove organizer attendee from the list if it exists to avoid duplicates
+                if (organizerAttendee != null) attendeeList.remove(organizerAttendee)
 
-            // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
-            val sortedAttendeeList =
-                attendeeList.sortedWith(compareBy { attendee ->
-                    attendee.participationStatus?.let { participationStatus ->
-                        getParticipationStatusPriorityValue(participationStatus)
+                // Sort list by Participation status in following order : Accepted > Tentative > Declined > Needs action
+                val sortedAttendeeList =
+                    attendeeList.sortedWith(compareBy { attendee ->
+                        attendee.participationStatus?.let { participationStatus ->
+                            getParticipationStatusPriorityValue(participationStatus)
+                        }
+                    })
+                attendeeListAdapter.submitList(sortedAttendeeList)
+
+                // Reset LayoutParams
+                eventAttendeeList.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
+                eventAttendeeList.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
+
+                if (attendeesListHeight == null) {
+                    if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
+                        eventAttendeeList.visibleOrGone(true)
+                        rotateArrowUpward(eventAttendeesButton, 0)
+                    } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
+                        eventAttendeeList.visibleOrGone(false)
+                        eventAttendeesButton.visibleOrGone(false)
+                        eventAttendeesPress.root.visibleOrGone(false)
+                        return@launch
                     }
-                })
-            attendeeListAdapter.submitList(sortedAttendeeList)
-
-            // Reset LayoutParams
-            event_attendee_list.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
-            event_attendee_list.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
-
-            if (attendeesListHeight == null) {
-                if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
-                    event_attendee_list.visibleOrGone(true)
-                    rotateArrowUpward(event_attendees_button, 0)
-                } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
-                    event_attendee_list.visibleOrGone(false)
-                    event_attendees_button.visibleOrGone(false)
-                    event_attendees_press.visibleOrGone(false)
-                    return@launch
                 }
-            }
 
-            // Reset view height
-            attendeesListHeight = null
+                // Reset view height
+                attendeesListHeight = null
 
-            event_attendees_press.setOnClickListener {
-                if (event_attendee_list.isVisible) {
-                    // Save expanded view height only once
-                    val height = collapse(event_attendee_list).first
-                    if (attendeesListHeight == null) attendeesListHeight = height
-                    rotateArrowDownward(event_attendees_button)
-                } else {
-                    // TODO: Workaround for special case where desired height is not properly calculated.
-                    //  Passing 0 skips the animation.
-                    //  It means that List with more than 5 items will not have expand animation on first expand.
-                    expand(event_attendee_list, height = attendeesListHeight ?: 0)
-                    rotateArrowUpward(event_attendees_button)
+                eventAttendeesPress.root.setOnClickListener {
+                    if (eventAttendeeList.isVisible) {
+                        // Save expanded view height only once
+                        val height = collapse(eventAttendeeList).first
+                        if (attendeesListHeight == null) attendeesListHeight = height
+                        rotateArrowDownward(eventAttendeesButton)
+                    } else {
+                        // TODO: Workaround for special case where desired height is not properly calculated.
+                        //  Passing 0 skips the animation.
+                        //  It means that List with more than 5 items will not have expand animation on first expand.
+                        expand(eventAttendeeList, height = attendeesListHeight ?: 0)
+                        rotateArrowUpward(eventAttendeesButton)
+                    }
                 }
             }
         }
     }
 
     private fun displayAttendeeAnswerState(participationStatus: ParticipationStatus?, loading: Boolean) {
-        section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
-        section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
-            ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+        with(binding.sectionAnswer) {
+            itemChangeAnswerButtonYes.itemChangeAnswerButtonLayout.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+            itemChangeAnswerButtonNo.itemChangeAnswerButtonLayout.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+            itemChangeAnswerButtonMaybe.itemChangeAnswerButtonLayout.backgroundTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
 
-        section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(true)
-        section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(false)
-        section_answer.item_change_answer_button_no.item_change_answer_button_title.visibleOrInvisible(true)
-        section_answer.item_change_answer_button_no.item_change_answer_button_loader.visibleOrGone(false)
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_title.visibleOrInvisible(true)
-        section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(false)
+            itemChangeAnswerButtonYes.itemChangeAnswerButtonTitle.visibleOrInvisible(true)
+            itemChangeAnswerButtonYes.itemChangeAnswerButtonLoader.visibleOrGone(false)
+            itemChangeAnswerButtonNo.itemChangeAnswerButtonTitle.visibleOrInvisible(true)
+            itemChangeAnswerButtonNo.itemChangeAnswerButtonLoader.visibleOrGone(false)
+            itemChangeAnswerButtonMaybe.itemChangeAnswerButtonTitle.visibleOrInvisible(true)
+            itemChangeAnswerButtonMaybe.itemChangeAnswerButtonLoader.visibleOrGone(false)
 
-        when (participationStatus) {
-            ParticipationStatus.ACCEPTED -> {
-                section_answer.item_change_answer_button_yes.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
-                        if (loading) R.color.background_norm
-                        else R.color.interaction_weak_pressed
-                    ))
-                section_answer.item_change_answer_button_yes.item_change_answer_button_title.visibleOrInvisible(!loading)
-                section_answer.item_change_answer_button_yes.item_change_answer_button_loader.visibleOrGone(loading)
-            }
-            ParticipationStatus.DECLINED -> {
-                section_answer.item_change_answer_button_no.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
-                        if (loading) R.color.background_norm
-                        else R.color.interaction_weak_pressed
-                    ))
-                section_answer.item_change_answer_button_no.item_change_answer_button_title.visibleOrInvisible(!loading)
-                section_answer.item_change_answer_button_no.item_change_answer_button_loader.visibleOrGone(loading)
-            }
-            ParticipationStatus.TENTATIVE -> {
-                section_answer.item_change_answer_button_maybe.item_change_answer_button_layout.backgroundTintList =
-                    ColorStateList.valueOf(ContextCompat.getColor(requireContext(),
-                        if (loading) R.color.background_norm
-                        else R.color.interaction_weak_pressed
-                    ))
-                section_answer.item_change_answer_button_maybe.item_change_answer_button_title.visibleOrInvisible(!loading)
-                section_answer.item_change_answer_button_maybe.item_change_answer_button_loader.visibleOrGone(loading)
+            when (participationStatus) {
+                ParticipationStatus.ACCEPTED -> {
+                    with(itemChangeAnswerButtonYes) {
+                        itemChangeAnswerButtonLayout.backgroundTintList =
+                            ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    if (loading) R.color.background_norm
+                                    else R.color.interaction_weak_pressed
+                                )
+                            )
+                        itemChangeAnswerButtonTitle.visibleOrInvisible(!loading)
+                        itemChangeAnswerButtonLoader.visibleOrGone(loading)
+                    }
+                }
+
+                ParticipationStatus.DECLINED -> {
+                    with(itemChangeAnswerButtonNo) {
+                        itemChangeAnswerButtonLayout.backgroundTintList =
+                            ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    if (loading) R.color.background_norm
+                                    else R.color.interaction_weak_pressed
+                                )
+                            )
+                        itemChangeAnswerButtonTitle.visibleOrInvisible(!loading)
+                        itemChangeAnswerButtonLoader.visibleOrGone(loading)
+                    }
+                }
+
+                ParticipationStatus.TENTATIVE -> {
+                    with(itemChangeAnswerButtonMaybe) {
+                        itemChangeAnswerButtonLayout.backgroundTintList =
+                            ColorStateList.valueOf(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    if (loading) R.color.background_norm
+                                    else R.color.interaction_weak_pressed
+                                )
+                            )
+                        itemChangeAnswerButtonTitle.visibleOrInvisible(!loading)
+                        itemChangeAnswerButtonLoader.visibleOrGone(loading)
+                    }
+                }
             }
         }
     }
-
 }

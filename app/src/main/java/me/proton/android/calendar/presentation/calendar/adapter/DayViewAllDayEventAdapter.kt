@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import biweekly.parameter.ParticipationStatus
-import kotlinx.android.synthetic.main.item_day_view_event_all_day.view.*
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -25,6 +24,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
+import me.proton.android.calendar.databinding.ItemDayViewEventAllDayBinding
 import me.proton.android.calendar.domain.model.Event
 import java.time.LocalDate
 
@@ -64,8 +64,8 @@ class DayViewAllDayEventAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_day_view_event_all_day, parent, false)
-        return ViewHolder(view)
+        val itemBinding = ItemDayViewEventAllDayBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(itemBinding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -73,22 +73,22 @@ class DayViewAllDayEventAdapter(
         holder.bind(item, position)
     }
 
-    inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        private val eventItemTitle: TextView = view.text_title
-        private val eventItemTitleSide: TextView = view.text_title_side
+    inner class ViewHolder(itemBinding: ItemDayViewEventAllDayBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        private val eventItemTitle: TextView = itemBinding.textTitle
+        private val eventItemTitleSide: TextView = itemBinding.textTitleSide
 
-        private val viewBackground: LayerDrawable = itemView.findViewById<View>(R.id.view_background).background as LayerDrawable
+        private val viewBackground: LayerDrawable = itemBinding.viewBackground.background as LayerDrawable
         private val viewMainSurface: Drawable = viewBackground.findDrawableByLayerId(R.id.main_surface)
         private val viewSideStrip: Drawable = viewBackground.findDrawableByLayerId(R.id.side_strip)
 
-        private val viewBackgroundStripedLayout: CardView = itemView.findViewById(R.id.view_background_striped_layout)
-        private val viewBackgroundStriped: View = itemView.findViewById(R.id.view_background_striped)
+        private val viewBackgroundStripedLayout: CardView = itemBinding.viewBackgroundStripedLayout
+        private val viewBackgroundStriped: View = itemBinding.viewBackgroundStriped
 
-        private val decryptionErrorIcon: ImageView = itemView.findViewById(R.id.decryption_error_icon)
-        private val decryptionErrorView: View = itemView.findViewById(R.id.decryption_error_view)
+        private val decryptionErrorIcon: ImageView = itemBinding.decryptionErrorIcon
+        private val decryptionErrorView: View = itemBinding.decryptionErrorView
 
         fun bind(event : Event, position : Int) {
-
+            val context = itemView.context
             val immutableTimeZoneId = timeZoneId
             val immutableTimeFormatIs24Hour = timeFormatIs24Hour
             val immutableDate = date
@@ -97,10 +97,10 @@ class DayViewAllDayEventAdapter(
             val participationStatus = event.getParticipationStatus(userEmails ?: arrayListOf())
             viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
-            eventItemTitle.text = if (event.summary.isNullOrEmpty()) view.context.getString(R.string.default_event_summary) else event.summary
+            eventItemTitle.text = if (event.summary.isNullOrEmpty()) context.getString(R.string.default_event_summary) else event.summary
             if (!event.spansSingleDay(timeZoneId = immutableTimeZoneId)) {
                 if (event.getStart(immutableTimeZoneId).toLocalDate() == date && !event.isAllDay()) {
-                    eventItemTitle.text = view.context.getString(
+                    eventItemTitle.text = context.getString(
                         R.string.multiple_days_event_summary,
                         event.getStart(immutableTimeZoneId).formatTime(immutableTimeZoneId, immutableTimeFormatIs24Hour),
                         eventItemTitle.text

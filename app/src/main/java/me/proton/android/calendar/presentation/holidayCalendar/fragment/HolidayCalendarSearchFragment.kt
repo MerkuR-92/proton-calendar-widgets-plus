@@ -2,7 +2,9 @@ package me.proton.android.calendar.presentation.holidayCalendar.fragment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.activityViewModels
@@ -11,16 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_appbar
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_country_list
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_clear
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_close
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_input
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_search.holiday_calendar_search_no_result
-import kotlinx.android.synthetic.main.toolbar_action_button.view.imageButton
-import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.HOLIDAY_SEARCH_MIN_QUERY_LENGTH
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
@@ -29,6 +22,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
+import me.proton.android.calendar.databinding.FragmentHolidayCalendarFormBinding
+import me.proton.android.calendar.databinding.FragmentHolidayCalendarSearchBinding
 import me.proton.android.calendar.domain.model.Holiday
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.holidayCalendar.adapter.HolidayCalendarListAdapter
@@ -39,7 +34,7 @@ import org.koin.core.KoinComponent
 import java.time.ZoneId
 
 @AndroidEntryPoint
-class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
+class HolidayCalendarSearchFragment : BaseDialogFragment<FragmentHolidayCalendarSearchBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "HolidayCalendarSearchFragment"
@@ -68,29 +63,31 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = "" // No Title
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentHolidayCalendarSearchBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         // Hide app bar
-        dialog_appbar.visibleOrGone(false)
+        dialogAppbar.visibleOrGone(false)
 
-        holiday_calendar_search_close.toolbar_action_text.text = getString(R.string.dialog_button_close)
-        holiday_calendar_search_close.toolbar_action_text.setOnSingleClickListener {
+        binding.holidayCalendarSearchClose.toolbarActionText.text = getString(R.string.dialog_button_close)
+        binding.holidayCalendarSearchClose.toolbarActionText.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
 
-        with(holiday_calendar_search_clear.imageButton) {
+        with(binding.holidayCalendarSearchClear.imageButton) {
             setImageResource(R.drawable.ic_proton_cross)
             setOnSingleClickListener {
-                holiday_calendar_search_no_result.visibleOrGone(false)
-                holiday_calendar_search_input.text.clear()
+                binding.holidayCalendarSearchNoResult.visibleOrGone(false)
+                binding.holidayCalendarSearchInput.text.clear()
                 holidayCalendarListAdapter.setSearchQuery("")
                 holidayCalendarListAdapter.submitList(holidayCalendarList)
             }
         }
 
-        holiday_calendar_country_list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        binding.holidayCalendarCountryList.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (dy > 0) {
@@ -101,7 +98,7 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
         })
 
         val countryListLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        holiday_calendar_country_list.layoutManager = countryListLayoutManager
+        binding.holidayCalendarCountryList.layoutManager = countryListLayoutManager
         holidayCalendarListAdapter = HolidayCalendarListAdapter {
             lifecycleScope.launch {
                 holidayCalendarViewModel.handleCountry(it.country, requireContext().resources.configuration.currentLocale().language.lowercase())
@@ -109,7 +106,7 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
             requireActivity().clearFocusAndHideKeyboard(view)
             findNavController().navigateUp()
         }
-        holiday_calendar_country_list.adapter = holidayCalendarListAdapter
+        binding.holidayCalendarCountryList.adapter = holidayCalendarListAdapter
 
         setupSearch()
 
@@ -161,9 +158,9 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
     }
 
     private fun setupSearch() {
-        holiday_calendar_search_input.onTextChange { rawQuery ->
+        binding.holidayCalendarSearchInput.onTextChange { rawQuery ->
 
-            holiday_calendar_search_clear.visibleOrGone(rawQuery.isNotBlank())
+            binding.holidayCalendarSearchClear.root.visibleOrGone(rawQuery.isNotBlank())
 
             val query = rawQuery.trim().toString()
 
@@ -178,11 +175,11 @@ class HolidayCalendarSearchFragment : BaseDialogFragment(), KoinComponent {
                     resultList.add(HolidayCalendarListAdapter.HolidayItem.Header(it.key.toString(), false))
                     resultList.addAll(it.value)
                 }
-                holiday_calendar_search_no_result.visibleOrGone(resultList.isEmpty())
+                binding.holidayCalendarSearchNoResult.visibleOrGone(resultList.isEmpty())
                 holidayCalendarListAdapter.submitList(resultList.distinct())
             } else {
                 holidayCalendarListAdapter.setSearchQuery("")
-                holiday_calendar_search_no_result.visibleOrGone(false)
+                binding.holidayCalendarSearchNoResult.visibleOrGone(false)
                 holidayCalendarListAdapter.submitList(holidayCalendarList)
             }
         }

@@ -8,13 +8,6 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_negative_button
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_custom_positive_button
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_description
-import kotlinx.android.synthetic.main.dialog_spotlight.view.dialog_spotlight_title
-import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_description
-import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_got_it_button
-import kotlinx.android.synthetic.main.dialog_spotlight_v5.view.dialog_spotlight_v5_title
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CALENDAR_PROVIDER_VERSION_CODE
@@ -28,6 +21,8 @@ import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.WEEK_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.databinding.DialogSpotlightBinding
+import me.proton.android.calendar.databinding.DialogSpotlightV5Binding
 import me.proton.android.calendar.presentation.main.MainActivity
 
 object SpotlightUtils {
@@ -212,48 +207,47 @@ object SpotlightUtils {
         val materialDialogBuilder = MaterialAlertDialogBuilder(this)
             .setCancelable(true)
 
-        val view = LayoutInflater.from(this)
-            .inflate(R.layout.dialog_spotlight, null, false)
+        val viewBinding = DialogSpotlightBinding.inflate(LayoutInflater.from(this), null, false)
 
         materialDialogBuilder.setOnDismissListener {
-            customOnDismissCallback?.onClick(view)
+            customOnDismissCallback?.onClick(viewBinding.root)
             // Set current version name as last spotlight shown
             this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
         }
 
         // Support link in text with getText
-        view.dialog_spotlight_title.text = getText(title)
-        view.dialog_spotlight_description.text = getText(description)
+        viewBinding.dialogSpotlightTitle.text = getText(title)
+        viewBinding.dialogSpotlightDescription.text = getText(description)
         // Support click on link in text
-        view.dialog_spotlight_description.movementMethod = LinkMovementMethod.getInstance()
+        viewBinding.dialogSpotlightDescription.movementMethod = LinkMovementMethod.getInstance()
 
         var dialog: AlertDialog? = null
 
-        view.dialog_spotlight_custom_positive_button.visibleOrGone(customPositiveButtonText != null)
+        viewBinding.dialogSpotlightCustomPositiveButton.visibleOrGone(customPositiveButtonText != null)
         if (customPositiveButtonText != null) {
             // Use custom positive button if text is provided
-            view.dialog_spotlight_custom_positive_button.text = getText(customPositiveButtonText)
-            view.dialog_spotlight_custom_positive_button.setOnSingleClickListener {
+            viewBinding.dialogSpotlightCustomPositiveButton.text = getText(customPositiveButtonText)
+            viewBinding.dialogSpotlightCustomPositiveButton.setOnSingleClickListener {
                 dialog?.dismiss()
                 customPositiveButtonCallback?.onClick(it)
             }
         } else {
             materialDialogBuilder.setPositiveButton(materialPositiveButtonText ?: R.string.spotlight_dialog_confirmation_button) { _, _ ->
                 // Nothing to do here
-                customPositiveButtonCallback?.onClick(view)
+                customPositiveButtonCallback?.onClick(viewBinding.root)
             }
         }
 
-        view.dialog_spotlight_custom_negative_button.visibleOrGone(customNegativeButtonText != null)
+        viewBinding.dialogSpotlightCustomNegativeButton.visibleOrGone(customNegativeButtonText != null)
         if (customNegativeButtonText != null) {
             // Use custom negative button if text is provided
-            view.dialog_spotlight_custom_negative_button.text = getText(customNegativeButtonText)
-            view.dialog_spotlight_custom_negative_button.setOnSingleClickListener {
+            viewBinding.dialogSpotlightCustomNegativeButton.text = getText(customNegativeButtonText)
+            viewBinding.dialogSpotlightCustomNegativeButton.setOnSingleClickListener {
                 dialog?.dismiss()
             }
         }
 
-        materialDialogBuilder.setView(view)
+        materialDialogBuilder.setView(viewBinding.root)
         dialog = materialDialogBuilder.show()
     }
 
@@ -268,21 +262,20 @@ object SpotlightUtils {
                 this.setLastSpotlightShown(BuildConfig.VERSION_CODE)
             }
 
-        val view = LayoutInflater.from(this)
-            .inflate(R.layout.dialog_spotlight_v5, null, false)
+        val viewBinding = DialogSpotlightV5Binding.inflate(LayoutInflater.from(this), null, false)
 
         // Support link in text with getText
-        view.dialog_spotlight_v5_title.text = getString(title)
-        view.dialog_spotlight_v5_description.text = getText(description)
+        viewBinding.dialogSpotlightV5Title.text = getString(title)
+        viewBinding.dialogSpotlightV5Description.text = getText(description)
         // Support click on link in text
-        view.dialog_spotlight_v5_description.movementMethod = LinkMovementMethod.getInstance()
+        viewBinding.dialogSpotlightV5Description.movementMethod = LinkMovementMethod.getInstance()
 
         var dialog: AlertDialog? = null
-        view.dialog_spotlight_v5_got_it_button.setOnSingleClickListener {
+        viewBinding.dialogSpotlightV5GotItButton.setOnSingleClickListener {
             dialog?.dismiss()
         }
 
-        materialDialogBuilder.setView(view)
+        materialDialogBuilder.setView(viewBinding.root)
         dialog = materialDialogBuilder.show()
     }
 }

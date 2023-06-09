@@ -19,26 +19,7 @@ import biweekly.component.VAlarm
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.dialog_calendar_color_picker.view.dialog_calendar_color_picker_layout
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_color_icon
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_color_press
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_flag
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_search_disclaimer
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_search_error
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value_placeholder
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_country_value_press
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_icon
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_list
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_default_all_day_event_notifications_press
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_layout
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_press
-import kotlinx.android.synthetic.main.fragment_holiday_calendar_form.holiday_calendar_form_language_value
-import kotlinx.android.synthetic.main.toolbar_action_text.view.toolbar_action_text
 import kotlinx.coroutines.launch
-import me.proton.android.calendar.ProtonCalendarApplication
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.FragmentArguments
@@ -51,6 +32,9 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.databinding.DialogCalendarColorPickerBinding
+import me.proton.android.calendar.databinding.FragmentHolidayCalendarFormBinding
+import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
 import me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
@@ -64,7 +48,7 @@ import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
 @AndroidEntryPoint
-class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
+class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFormBinding>(), KoinComponent {
 
     override val TAG: String
         get() = "HolidayCalendarFormFragment"
@@ -116,7 +100,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
     override fun onToolbarCreated(toolbar: Toolbar) {
         toolbar.findViewById<TextView>(R.id.dialog_toolbar_title).text = getString(R.string.holiday_calendar_title)
 
-        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
+        buttonSave = layoutInflater.inflate(R.layout.toolbar_action_text, dialogToolbarContent, false)
         with (buttonSave) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(
                 R.string.action_save
@@ -140,7 +124,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialog_toolbar_content, false)
+        loadingAction = layoutInflater.inflate(R.layout.toolbar_action_loader, dialogToolbarContent, false)
         loadingAction.visibleOrGone(false)
 
         // TODO extract somewhere to remove boilerplate
@@ -158,6 +142,8 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
     }
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentHolidayCalendarFormBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -168,7 +154,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             calendarId?.let {
                 // Hide disclaimer based on time zone
-                holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
+                binding.holidayCalendarFormCountrySearchDisclaimer.visibleOrGone(false)
                 // Init form for existing calendar
                 holidayCalendarViewModel.initUpdateHolidayCalendar(it)
             } ?: run {
@@ -198,14 +184,14 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
         holidayCalendarViewModel.country.observe(viewLifecycleOwner) { country ->
             // Hide the language field if country field is empty
-            holiday_calendar_form_language_layout.visibleOrGone(country.isNotEmpty())
+            binding.holidayCalendarFormLanguageLayout.visibleOrGone(country.isNotEmpty())
             // Display placeholder if country field is empty
-            holiday_calendar_form_country_value.visibleOrInvisible(country.isNotEmpty())
-            holiday_calendar_form_country_value_placeholder.visibleOrGone(country.isEmpty())
-            holiday_calendar_form_country_value.text = country
+            binding.holidayCalendarFormCountryValue.visibleOrInvisible(country.isNotEmpty())
+            binding.holidayCalendarFormCountryValuePlaceholder.visibleOrGone(country.isEmpty())
+            binding.holidayCalendarFormCountryValue.text = country
             // Set the country flag
             val countryCode = holidayCalendarViewModel.holidayCalendars.value?.firstOrNull { it.country == country }?.countryCode
-            holiday_calendar_form_country_flag.setImageResource(
+            binding.holidayCalendarFormCountryFlag.setImageResource(
                 resources.getIdentifier(
                     "${requireContext().packageName}:drawable/flag_$countryCode",
                     "drawable",
@@ -213,31 +199,31 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                 )
             )
             // Disable the language field if there is only one option available
-            holiday_calendar_form_language_press.isEnabled = holidayCalendarViewModel.getLanguages().size > 1
+            binding.holidayCalendarFormLanguagePress.root.isEnabled = holidayCalendarViewModel.getLanguages().size > 1
         }
 
         holidayCalendarViewModel.language.observe(viewLifecycleOwner) { language ->
             if (language.isNullOrEmpty()) return@observe
-            holiday_calendar_form_language_value.text = language
+            binding.holidayCalendarFormLanguageValue.text = language
         }
 
         holidayCalendarViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
             if (calendarColor == 0) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
-                holiday_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
+                binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            holiday_calendar_form_color_icon?.imageTintList = ColorStateList.valueOf(calendarColor)
+            binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor)
         }
 
         holidayCalendarViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
-            holiday_calendar_form_default_all_day_event_notifications.visibleOrGone(defaultAllDayAlarms.size < CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX)
+            binding.holidayCalendarFormDefaultAllDayEventNotifications.visibleOrGone(defaultAllDayAlarms.size < CalendarForm.DEFAULT_NOTIFICATIONS_COUNT_MAX)
             displayNotifications(
                 defaultAllDayAlarms,
-                holiday_calendar_form_default_all_day_event_notifications_list,
-                holiday_calendar_form_default_all_day_event_notifications_icon,
-                holiday_calendar_form_default_all_day_event_notifications_press
+                binding.holidayCalendarFormDefaultAllDayEventNotificationsList,
+                binding.holidayCalendarFormDefaultAllDayEventNotificationsIcon,
+                binding.holidayCalendarFormDefaultAllDayEventNotificationsPress.root
             )
         }
 
@@ -247,26 +233,27 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             val pickBasedOnTimeZone = holidayCalendarState is HolidayCalendarViewModel.HolidayCalendarState.PickBasedOnTimeZone
 
             // Display disclaimer based on time zone
-            holiday_calendar_form_country_search_disclaimer.visibleOrGone(pickBasedOnTimeZone)
+            binding.holidayCalendarFormCountrySearchDisclaimer.visibleOrGone(pickBasedOnTimeZone)
 
             // Update action bar buttons visibility
             loadingAction.visibleOrGone(processingEvent)
             buttonSave.visibleOrGone(!processingEvent)
 
             // Disable/Enable all items linked to actions from our view
-            holiday_calendar_form_country_value_press.isEnabled = !processingEvent
-            holiday_calendar_form_color_press.isEnabled = !processingEvent
+            binding.holidayCalendarFormCountryValuePress.isEnabled = !processingEvent
+            binding.holidayCalendarFormColorPress.root.isEnabled = !processingEvent
 
-            holiday_calendar_form_default_all_day_event_notifications_press.isEnabled = !processingEvent
-            for (i in 0 until holiday_calendar_form_default_all_day_event_notifications_list.childCount) {
+            binding.holidayCalendarFormDefaultAllDayEventNotificationsPress.root.isEnabled = !processingEvent
+            for (i in 0 until binding.holidayCalendarFormDefaultAllDayEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                holiday_calendar_form_default_all_day_event_notifications_list.getChildAt(i)
+                binding.holidayCalendarFormDefaultAllDayEventNotificationsList.getChildAt(i)
                     .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
             }
 
             // Disable save when calendar already exists
             buttonSave.isEnabled = !alreadyExists
-            buttonSave.toolbar_action_text.setTextColor(
+            val toolbarActionText = buttonSave.findViewById<TextView>(R.id.toolbar_action_text)
+            toolbarActionText.setTextColor(
                 requireContext().getColorFromAttr(
                     if (alreadyExists) R.attr.proton_interaction_norm_disabled
                     else R.attr.proton_text_accent
@@ -274,10 +261,10 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             )
 
             // Hide time zone disclaimer if we show error
-            if (alreadyExists) holiday_calendar_form_country_search_disclaimer.visibleOrGone(false)
+            if (alreadyExists) binding.holidayCalendarFormCountrySearchDisclaimer.visibleOrGone(false)
             // Display error subtext when calendar already exists
-            holiday_calendar_form_country_search_error.visibleOrGone(alreadyExists)
-            holiday_calendar_form_country_search_error.text =
+            binding.holidayCalendarFormCountrySearchError.visibleOrGone(alreadyExists)
+            binding.holidayCalendarFormCountrySearchError.text =
                 if (alreadyExists) getString(R.string.holiday_calendar_already_exists)
                 else ""
         }
@@ -298,12 +285,12 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         lifecycleScope.launch {
             alarms.filter { it.action == Action.display() || it.action == Action.email() }.forEachIndexed { index, alarm ->
 
-                val alarmView = layoutInflater.inflate(
-                    R.layout.item_alarm_text_button,
+                val alarmViewBinding = ItemAlarmTextButtonBinding.inflate(
+                    layoutInflater,
                     alarmsListView,
                     false
                 )
-                alarmView.findViewById<TextView>(R.id.item_simple_text_button_title).apply {
+                alarmViewBinding.itemSimpleTextButtonTitle.apply {
                     text = AndroidUtils.formatAlarm(
                         resources,
                         true,
@@ -313,7 +300,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     )
                     isClickable = false
                 }
-                alarmView.findViewById<View>(R.id.item_simple_text_button_delete).apply {
+                alarmViewBinding.itemSimpleTextButtonDelete.apply {
                     // Remove notification listener
                     setOnSingleClickListener {
                         requireActivity().clearFocusAndHideKeyboard(view)
@@ -322,7 +309,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
                     isClickable = true
                 }
                 if (index == 0) notificationIcon.visibleOrGone(false)
-                alarmsListView.addView(alarmView)
+                alarmsListView.addView(alarmViewBinding.root)
             }
         }
 
@@ -340,14 +327,14 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
     private fun initOnClickListeners() {
 
         // Country
-        holiday_calendar_form_country_value_press.setOnSingleClickListener {
+        binding.holidayCalendarFormCountryValuePress.setOnSingleClickListener {
             if (!holidayCalendarViewModel.holidayCalendars.value.isNullOrEmpty()) {
                 findNavController().navigate(R.id.action_nav_holiday_calendar_form_to_nav_holiday_calendar_search)
             }
         }
 
         // Calendar language
-        holiday_calendar_form_language_press.setOnSingleClickListener {
+        binding.holidayCalendarFormLanguagePress.root.setOnSingleClickListener {
             val languages = holidayCalendarViewModel.getLanguages().sorted()
             if (languages.size <= 1) return@setOnSingleClickListener
             AndroidUtils.displayPickerDialog(
@@ -365,7 +352,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
         }
 
         // Calendar color
-        holiday_calendar_form_color_press.setOnSingleClickListener {
+        binding.holidayCalendarFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
             var dialog: AlertDialog? = null
@@ -374,11 +361,14 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
             val calendarColors = resources.getIntArray(R.array.accent_colors_base)
 
             // Get dialog custom view
-            val view = LayoutInflater.from(context)
-                .inflate(R.layout.dialog_calendar_color_picker, null, false)
+            val colorPickerViewBinding = DialogCalendarColorPickerBinding.inflate(
+                LayoutInflater.from(context),
+            null,
+                false
+            )
 
             // Set grid view with color list
-            val calendarColorPickerGridView = view.dialog_calendar_color_picker_layout
+            val calendarColorPickerGridView = colorPickerViewBinding.dialogCalendarColorPickerLayout
             calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), holidayCalendarViewModel.calendarColor.value) { calendarColor ->
                 holidayCalendarViewModel.handleCalendarColor(calendarColor)
                 dialog?.dismiss()
@@ -386,7 +376,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment(), KoinComponent {
 
             // Display dialog
             dialog = MaterialAlertDialogBuilder(requireContext())
-                .setView(view)
+                .setView(colorPickerViewBinding.root)
                 .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
                 .show()
         }

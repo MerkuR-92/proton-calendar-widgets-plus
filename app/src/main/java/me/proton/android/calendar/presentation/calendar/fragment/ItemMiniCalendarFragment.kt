@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -15,30 +17,43 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.item_mini_calendar.view.*
-import kotlinx.android.synthetic.main.item_mini_calendar_fragment.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWeek
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
+import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWeek
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
+import me.proton.android.calendar.databinding.ItemMiniCalendarBinding
+import me.proton.android.calendar.databinding.ItemMiniCalendarFragmentBinding
+import me.proton.android.calendar.databinding.MiniCalendarDotBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import java.time.*
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.math.ceil
 
 @AndroidEntryPoint
 class ItemMiniCalendarFragment : Fragment() {
+
+    private var _binding: ItemMiniCalendarFragmentBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
+
     private var position: Int? = null
     private var startingPosition: Int? = null
     private var date: LocalDate? = null
@@ -127,18 +142,13 @@ class ItemMiniCalendarFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        if (fetchingEventsScope.isActive) fetchingEventsScope.cancel()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.item_mini_calendar_fragment, container, false)
+        _binding = ItemMiniCalendarFragmentBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -167,7 +177,7 @@ class ItemMiniCalendarFragment : Fragment() {
         }
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-            view.findViewById<LinearLayout>(R.id.ll_weeknumbers).visibleOrGone(displayWeekNumber)
+            binding.llWeeknumbers.visibleOrGone(displayWeekNumber)
         }
     }
 
@@ -180,9 +190,6 @@ class ItemMiniCalendarFragment : Fragment() {
         val firstDayMonthView = immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
 
         calendarViewModel.lifeCycleScope.launch {
-
-            // Check if view still exists after delay in case of fast swipe
-            if (gl_mini_calendar == null) return@launch
 
             val firstDayOfTheMonth = firstDayMonthView.withDayOfMonth(1)
             val firstDayOfTheMonthWeekNumber = firstDayOfTheMonth.dayOfWeek.value - startWeekOn.value
@@ -273,7 +280,7 @@ class ItemMiniCalendarFragment : Fragment() {
         if (currentMiniCalendarMonthList == skeletonList && todayCurrentValue == LocalDate.now(ZoneId.of(timeZoneId))) return
         todayCurrentValue = LocalDate.now(ZoneId.of(timeZoneId))
         currentMiniCalendarMonthList = skeletonList
-        view?.findViewById<GridLayout>(R.id.gl_mini_calendar)?.run {
+        binding.glMiniCalendar.run {
             this.removeAllViews()
             selectedMiniCalendarItem = -1
             fullWeeksInMonth = calculateFullWeeksInMonth(firstDay, startWeekOn)
@@ -292,65 +299,62 @@ class ItemMiniCalendarFragment : Fragment() {
 
     private fun ViewGroup.addMiniCalendarItemView(skeletonList: List<MiniCalendarItem>, forDate: LocalDate) {
         skeletonList.forEach { item ->
-            val miniCalendarItemView = LayoutInflater.from(this.context).inflate(
-                R.layout.item_mini_calendar,
-                this,
-                false
-            )
+            val miniCalendarItemViewBinding = ItemMiniCalendarBinding.inflate(layoutInflater, this, false)
+            val viewContext = miniCalendarItemViewBinding.root.context
 
             if (this.childCount > DAYS_IN_A_WEEK) {
                 val itemLayoutParams: GridLayout.LayoutParams =
-                    miniCalendarItemView.layoutParams as GridLayout.LayoutParams
+                    miniCalendarItemViewBinding.root.layoutParams as GridLayout.LayoutParams
                 itemLayoutParams.topMargin =
-                    miniCalendarItemView.context.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
+                    viewContext.resources.getDimensionPixelSize(R.dimen.calendar_item_day_vertical_spacing)
             }
 
             when {
                 item.isSelected -> {
-                    miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextAppearance(
+                        viewContext,
                         R.style.Text_DefaultSmall_Strong_Inverted
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
                 }
                 item.date == LocalDate.now(ZoneId.of(timeZoneId)) -> {
-                    miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextAppearance(
+                        viewContext,
                         R.style.Text_DefaultSmall_Strong
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setTextColor(
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextColor(
                         requireContext().getColorFromAttr(
                             R.attr.proton_text_accent
                         )
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
                 }
                 item.date.month != forDate.month -> {
-                    miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextAppearance(
+                        viewContext,
                         R.style.Text_DefaultSmall_Strong
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setTextColor(
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextColor(
                         ContextCompat.getColor(
-                            miniCalendarItemView.context,
+                            viewContext,
                             R.color.text_hint
                         )
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setBackgroundResource(0)
                 }
                 else -> {
-                    miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setTextAppearance(
+                        viewContext,
                         R.style.Text_DefaultSmall_Strong
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
+                    miniCalendarItemViewBinding.itemMiniCalendarText.setBackgroundResource(0)
                 }
             }
 
-            miniCalendarItemView.itemMiniCalendarText.text = "${item.date.dayOfMonth}"
+            miniCalendarItemViewBinding.itemMiniCalendarText.text = "${item.date.dayOfMonth}"
 
-            miniCalendarItemView.ll_calendar_dots.visibleOrInvisible(true)
-            miniCalendarItemView.ll_calendar_dots.apply {
+            miniCalendarItemViewBinding.llCalendarDots.visibleOrInvisible(true)
+            miniCalendarItemViewBinding.llCalendarDots.apply {
                 this.children.forEachIndexed { index, view ->
                     if (item.indicatorColors.size - 1 >= index) {
                         (view as ImageView).drawable.setTint(Color.parseColor(item.indicatorColors[index]))
@@ -361,36 +365,37 @@ class ItemMiniCalendarFragment : Fragment() {
                 }
             }
 
-            miniCalendarItemView.setOnClickListener {
+            miniCalendarItemViewBinding.root.setOnClickListener {
                 calendarViewModel.handleDaySelected(item.date)
             }
 
-            this.addView(miniCalendarItemView)
+            this.addView(miniCalendarItemViewBinding.root)
         }
     }
 
     private fun applyMiniCalendarIndicators(indicators: Map<LocalDate, List<String>>, firstMiniCalendarDay: LocalDate) {
-        gl_mini_calendar.children.forEach {
-            it.ll_calendar_dots.removeAllViews()
+        binding.glMiniCalendar.children.forEach {
+            it.findViewById<LinearLayout>(R.id.ll_calendar_dots).removeAllViews()
         }
         val processedViewIndexList = arrayListOf<Int>()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarIndex = ChronoUnit.DAYS.between(firstMiniCalendarDay, date).toInt()
-            val itemView = gl_mini_calendar.getChildAt(miniCalendarIndex)
+            val itemView = binding.glMiniCalendar.getChildAt(miniCalendarIndex)
             itemView?.let {
-                itemView.ll_calendar_dots.visibleOrInvisible(true)
+                val llCalendarDotsView = itemView.findViewById<LinearLayout>(R.id.ll_calendar_dots)
+                llCalendarDotsView.visibleOrInvisible(true)
                 processedViewIndexList.add(miniCalendarIndex)
                 indicatorColors.forEach { indicatorColor ->
-                    val miniCalendarDotView = LayoutInflater.from(this.context).inflate(
-                        R.layout.mini_calendar_dot,
-                        itemView.ll_calendar_dots,
+                    val miniCalendarDotViewBinding = MiniCalendarDotBinding.inflate(
+                        LayoutInflater.from(this.context),
+                        llCalendarDotsView,
                         false
                     )
 
-                    (miniCalendarDotView as View).backgroundTintList = ColorStateList.valueOf(
+                    miniCalendarDotViewBinding.root.backgroundTintList = ColorStateList.valueOf(
                         Color.parseColor(indicatorColor)
                     )
-                    itemView.ll_calendar_dots.addView(miniCalendarDotView)
+                    llCalendarDotsView.addView(miniCalendarDotViewBinding.root)
                 }
             }
         }
@@ -402,7 +407,7 @@ class ItemMiniCalendarFragment : Fragment() {
         firstDayOfTheMonth: LocalDate,
         timeZoneId: String
     ) {
-        if (gl_mini_calendar.childCount <= 0) return
+        if (binding.glMiniCalendar.childCount <= 0) return
 
         val newSelectedMiniCalendarItem = ChronoUnit.DAYS.between(firstMiniCalendarDay, selectedDate).toInt()
 
@@ -410,65 +415,65 @@ class ItemMiniCalendarFragment : Fragment() {
         if (selectedMiniCalendarItem != newSelectedMiniCalendarItem && firstDayOfTheMonth.month == selectedDate.month) {
 
             val selectedMiniCalendarItem = selectedMiniCalendarItem
-            if (selectedMiniCalendarItem != null) {
+            if (selectedMiniCalendarItem != null && selectedMiniCalendarItem >= 0) {
 
-                val miniCalendarItemView = gl_mini_calendar.getChildAt(selectedMiniCalendarItem)
-                miniCalendarItemView?.let {
-                    if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now(ZoneId.of(timeZoneId))) {
-                        // Apply today's style
-                        miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
+                val miniCalendarItemView = binding.glMiniCalendar.getChildAt(selectedMiniCalendarItem)
+                val miniCalendarText = miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)
+                if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now(ZoneId.of(timeZoneId))) {
+                    // Apply today's style
+                    miniCalendarText.setTextAppearance(
+                        miniCalendarItemView.context,
+                        R.style.Text_DefaultSmall_Strong
+                    )
+                    miniCalendarText.setTextColor(
+                        requireContext().getColorFromAttr(
+                            R.attr.proton_text_accent
+                        )
+                    )
+                    miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
+                } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
+                        selectedMiniCalendarItem.toLong()
+                    ).month &&
+                    firstDayOfTheMonth.month != firstMiniCalendarDay.plusDays(
+                        selectedMiniCalendarItem.toLong()
+                    ).month &&
+                    newSelectedMiniCalendarItem >= 0 &&
+                    newSelectedMiniCalendarItem < binding.glMiniCalendar.childCount
+                ) {
+                    // Apply previous / upcoming month items style
+                    miniCalendarText.setTextAppearance(
+                        miniCalendarItemView.context,
+                        R.style.Text_DefaultSmall_Strong
+                    )
+                    miniCalendarText.setTextColor(
+                        ContextCompat.getColor(
                             miniCalendarItemView.context,
-                            R.style.Text_DefaultSmall_Strong
+                            R.color.text_hint
                         )
-                        miniCalendarItemView.itemMiniCalendarText.setTextColor(
-                            requireContext().getColorFromAttr(
-                                R.attr.proton_text_accent
-                            )
-                        )
-                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
-                    } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
-                            selectedMiniCalendarItem.toLong()
-                        ).month &&
-                        firstDayOfTheMonth.month != firstMiniCalendarDay.plusDays(
-                            selectedMiniCalendarItem.toLong()
-                        ).month &&
-                        newSelectedMiniCalendarItem >= 0 &&
-                        newSelectedMiniCalendarItem < gl_mini_calendar.childCount
-                    ) {
-                        // Apply previous / upcoming month items style
-                        miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                            miniCalendarItemView.context,
-                            R.style.Text_DefaultSmall_Strong
-                        )
-                        miniCalendarItemView.itemMiniCalendarText.setTextColor(
-                            ContextCompat.getColor(
-                                miniCalendarItemView.context,
-                                R.color.text_hint
-                            )
-                        )
-                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
-                    } else {
-                        // Apply default items style
-                        miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
-                            miniCalendarItemView.context,
-                            R.style.Text_DefaultSmall_Strong
-                        )
-                        miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(0)
-                    }
+                    )
+                    miniCalendarText.setBackgroundResource(0)
+                } else {
+                    // Apply default items style
+                    miniCalendarText.setTextAppearance(
+                        miniCalendarItemView.context,
+                        R.style.Text_DefaultSmall_Strong
+                    )
+                    miniCalendarText.setBackgroundResource(0)
                 }
             }
 
             this.selectedMiniCalendarItem = newSelectedMiniCalendarItem
             if (selectedDate.month == firstDayOfTheMonth.month) {
                 // Only display selected date style for month currently displayed
-                val miniCalendarItemView = gl_mini_calendar.getChildAt(newSelectedMiniCalendarItem)
+                val miniCalendarItemView = binding.glMiniCalendar.getChildAt(newSelectedMiniCalendarItem)
+                val miniCalendarText = miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)
                 miniCalendarItemView?.let {
                     // Apply selected date item style
-                    miniCalendarItemView.itemMiniCalendarText.setTextAppearance(
+                    miniCalendarText.setTextAppearance(
                         miniCalendarItemView.context,
                         R.style.Text_DefaultSmall_Strong_Inverted
                     )
-                    miniCalendarItemView.itemMiniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
                 }
             }
         }
@@ -476,7 +481,7 @@ class ItemMiniCalendarFragment : Fragment() {
 
     private fun setupWeekNumbers(firstDay: LocalDate, startWeekOn: DayOfWeek) {
         // Setup week numbers
-        view?.findViewById<LinearLayout>(R.id.ll_weeknumbers)?.run {
+        binding.llWeeknumbers.run {
             this.removeAllViews()
             fullWeeksInMonth = calculateFullWeeksInMonth(firstDay, startWeekOn)
             for (i in 0 until fullWeeksInMonth) {
@@ -497,5 +502,11 @@ class ItemMiniCalendarFragment : Fragment() {
                 addView(weekNumberView)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (fetchingEventsScope.isActive) fetchingEventsScope.cancel()
+        _binding = null
     }
 }

@@ -2,6 +2,7 @@ package me.proton.android.calendar.presentation.calendar.fragment
 
 import android.os.Bundle
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
@@ -15,29 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import biweekly.util.Frequency
 import com.google.android.material.chip.Chip
-import kotlinx.android.synthetic.main.chip_group_day_of_week.chip_group_day_of_week_layout
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_chips_layout
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_count
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_count_layout
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_1
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_2
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_3
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_count
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_end_count_suffix
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_group
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_1
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_2
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_3
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_occurrence_time_radio_group
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_1
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_2
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_3
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_4
-import kotlinx.android.synthetic.main.event_form_custom_recurrence_view.custom_recurrence_period_radio_group
-import kotlinx.android.synthetic.main.fragment_base_dialog.dialog_toolbar_content
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_custom_edit
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_custom_layout
-import kotlinx.android.synthetic.main.fragment_event_form_recurrence.event_form_recurrence_radio_group
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.utils.AndroidUtils
@@ -55,6 +33,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatWithDayOf
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
+import me.proton.android.calendar.databinding.FragmentEventFormRecurrenceBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.customView.NoLayoutRadioGroup
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
@@ -66,7 +45,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.WeekFields
 
-class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
+class EventFormRecurrenceFragment : BaseDialogFragment<FragmentEventFormRecurrenceBinding>(), KoinComponent {
 
     override val TAG = "EventFormRecurrenceFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form_recurrence
@@ -87,6 +66,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     lateinit var customEndingRadioGroup: NoLayoutRadioGroup
     private var lastSelectedRadioButtonId: Int = -1
 
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) = FragmentEventFormRecurrenceBinding.inflate(inflater, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -99,13 +80,13 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onBackPressedCustom() {
-        if (event_form_recurrence_radio_group.checkedRadioButtonId == R.id.event_form_recurrence_custom
-            && event_form_recurrence_custom_layout.isVisible) {
+        if (binding.eventFormRecurrenceRadioGroup.checkedRadioButtonId == R.id.event_form_recurrence_custom
+            && binding.eventFormRecurrenceCustomLayout.root.isVisible) {
             //TODO set to last selected before clicking custom radio button ?
-            if (lastSelectedRadioButtonId != -1) event_form_recurrence_radio_group.check(lastSelectedRadioButtonId)
-            else event_form_recurrence_radio_group.clearCheck()
-            event_form_recurrence_radio_group.visibleOrGone(true)
-            event_form_recurrence_custom_layout.visibleOrGone(false)
+            if (lastSelectedRadioButtonId != -1) binding.eventFormRecurrenceRadioGroup.check(lastSelectedRadioButtonId)
+            else binding.eventFormRecurrenceRadioGroup.clearCheck()
+            binding.eventFormRecurrenceRadioGroup.visibleOrGone(true)
+            binding.eventFormRecurrenceCustomLayout.root.visibleOrGone(false)
             toolbarTitle.text = getString(R.string.event_recurrence_title)
         } else {
             findNavController().navigateUp()
@@ -113,7 +94,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     override fun onToolbarCreated(toolbar: Toolbar) {
-        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, dialog_toolbar_content, false)
+        val buttonDone = layoutInflater.inflate(R.layout.toolbar_action_text, dialogToolbarContent, false)
         with (buttonDone) {
             (findViewById<TextView>(R.id.toolbar_action_text)).text = getString(R.string.action_done)
             setOnSingleClickListener {
@@ -130,7 +111,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun onDoneClick() {
-        when (event_form_recurrence_radio_group.checkedRadioButtonId) {
+        when (binding.eventFormRecurrenceRadioGroup.checkedRadioButtonId) {
             R.id.event_form_recurrence_custom_edit -> {
                 //Do nothing, we don't need to update recurrence and keep the custom one
             }
@@ -156,29 +137,29 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
                 // "repeat until" options, apply to all recurrence periods
                 when (customEndingRadioGroup.getCheckedRadioButtonId()) {
-                    custom_recurrence_end_1.id -> {} // ends: never
-                    custom_recurrence_end_2.id -> { // ends: on specific Date
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd1.id -> {} // ends: never
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd2.id -> { // ends: on specific Date
                         untilDateChecked = true
                     }
-                    custom_recurrence_end_3.id -> { // ends: after X occurrences
-                        thisManyRepeats = custom_recurrence_end_count.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd3.id -> { // ends: after X occurrences
+                        thisManyRepeats = binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.text.toString().toIntOrNull() ?: FormValidation.OCCURRENCE_COUNT_DEFAULT // TODO force when null?
                     }
                 }
 
                 // "repeat X times"
-                when (getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)) {
+                when (getCheckedRadioButtonIndex(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup)) {
                     0 -> { // days
-                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                        val interval = binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.text.toString().toIntOrNull()
                             ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
 
                         eventViewModel.handleRecurrence(Frequency.DAILY, untilDateChecked, interval, thisManyRepeats)
                     }
                     1 -> { // weeks
-                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                        val interval = binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.text.toString().toIntOrNull()
                             ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT
 
                         // weekdays for occurrence
-                        val daysOfWeek = (chip_group_day_of_week_layout as ViewGroup).children.mapIndexedNotNull() { index, chip ->
+                        val daysOfWeek = (binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.chipGroupDayOfWeekLayout as ViewGroup).children.mapIndexedNotNull { index, chip ->
                             if ((chip as Chip).isChecked) {
                                 val weekStart = if (eventViewModel.userSettings.weekStart == 0) WeekFields.of(
                                     getLocaleForFormatting()
@@ -190,13 +171,13 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                         eventViewModel.handleRecurrence(Frequency.WEEKLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = daysOfWeek, customMonthly = false)
                     }
                     2 -> { // months
-                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                        val interval = binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.text.toString().toIntOrNull()
                             ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT
 
                         eventViewModel.handleRecurrence(Frequency.MONTHLY, untilDateChecked, interval, thisManyRepeats, daysOfWeek = null, customMonthly = true)
                     }
                     3 -> { // years
-                        val interval = custom_recurrence_count.text.toString().toIntOrNull()
+                        val interval = binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.text.toString().toIntOrNull()
                             ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT
 
                         eventViewModel.handleRecurrence(Frequency.YEARLY, untilDateChecked, interval, thisManyRepeats)
@@ -212,21 +193,21 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun attachActionHandlers() {
 
         // main recurrence type radio group
-        event_form_recurrence_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
+        binding.eventFormRecurrenceRadioGroup.setCustomOnCheckedChangeListener { radioGroup, index ->
             if (index == R.id.event_form_recurrence_custom) {
-                event_form_recurrence_radio_group.visibleOrGone(false)
-                event_form_recurrence_custom_layout.visibleOrGone(true)
-                showCustomRecurrenceForms(getCheckedRadioButtonIndex(custom_recurrence_period_radio_group))
+                binding.eventFormRecurrenceRadioGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.root.visibleOrGone(true)
+                showCustomRecurrenceForms(getCheckedRadioButtonIndex(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup))
                 toolbarTitle.text = getString(R.string.event_recurrence_custom_title)
             } else {
                 lastSelectedRadioButtonId = index
             }
         }
 
-        custom_recurrence_end_1.setOnCheckedChangeListener { _, isChecked ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd1.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) requireActivity().clearFocusAndHideKeyboard(view)
         }
-        custom_recurrence_end_2.setOnCheckedChangeListener { _, isChecked ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd2.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) requireActivity().clearFocusAndHideKeyboard(view)
         }
 
@@ -243,9 +224,9 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         customEndingRadioGroup = NoLayoutRadioGroup {
             // handle checks and focus
             if (it == R.id.custom_recurrence_end_3) {
-                if (!custom_recurrence_end_count.hasFocus()) custom_recurrence_end_count.requestFocus()
+                if (!binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.hasFocus()) binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.requestFocus()
             } else {
-                custom_recurrence_end_count.clearFocus()
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.clearFocus()
             }
 
             val eventStartDate = eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)
@@ -268,7 +249,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     FormValidation.MAX_SUPPORTED_DATETIME.withZoneSameInstant(ZoneId.of(eventViewModel.eventTimeZoneId)).toLocalDate()
                 ) { newDate ->
                     eventViewModel.handleRecurrenceUntilDate(newDate)
-                    custom_recurrence_end_2.text = getString(
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd2.text = getString(
                         R.string.event_recurrence_ends_on_date,
                         newDate.formatWithDayOfWeek()
                     )
@@ -285,7 +266,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         customEndingRadioGroup.check(R.id.custom_recurrence_end_1)
 
         // "after X occurrences" radio button
-        custom_recurrence_end_count_suffix.setText(
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCountSuffix.setText(
             resources.getQuantityString(
                 R.plurals.plural_occurrence,
                 FormValidation.OCCURRENCE_COUNT_DEFAULT
@@ -293,14 +274,14 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         )
 
         // "after X occurrences" edit text
-        custom_recurrence_end_count.setText(FormValidation.OCCURRENCE_COUNT_DEFAULT.toString())
-        custom_recurrence_end_count.apply {
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.setText(FormValidation.OCCURRENCE_COUNT_DEFAULT.toString())
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.apply {
             doAfterFilteredIntValueChanged(
                 FormValidation.OCCURRENCE_COUNT_DEFAULT,
                 FormValidation.OCCURRENCE_COUNT_MIN,
                 FormValidation.OCCURRENCE_COUNT_MAX
             ) {
-                custom_recurrence_end_count_suffix.setText(
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCountSuffix.setText(
                     resources.getQuantityString(
                         R.plurals.plural_occurrence,
                         it
@@ -309,28 +290,28 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
             }
         }
 
-        custom_recurrence_end_count_suffix.setOnSingleClickListener {
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCountSuffix.setOnSingleClickListener {
             customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
-            custom_recurrence_end_count.requestFocus()
+            binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.requestFocus()
         }
 
-        custom_recurrence_end_count.setOnFocusChangeListener { _, hasFocus ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
-                custom_recurrence_end_count.setSelection(custom_recurrence_end_count.length())
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.setSelection(binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.length())
                 requireContext().showKeyboard()
             }
         }
 
-        custom_recurrence_end_1.setOnCheckedChangeListener { button, isChecked ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd1.setOnCheckedChangeListener { button, isChecked ->
             if (!isChecked) button.jumpDrawablesToCurrentState()
             else requireActivity().clearFocusAndHideKeyboard(view)
         }
-        custom_recurrence_end_2.setOnCheckedChangeListener { button, isChecked ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd2.setOnCheckedChangeListener { button, isChecked ->
             if (!isChecked) button.jumpDrawablesToCurrentState()
             else requireActivity().clearFocusAndHideKeyboard(view)
         }
-        custom_recurrence_end_3.setOnCheckedChangeListener { button, isChecked ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd3.setOnCheckedChangeListener { button, isChecked ->
             if (!isChecked) button.jumpDrawablesToCurrentState()
             else requireActivity().clearFocusAndHideKeyboard(view)
         }
@@ -339,10 +320,10 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun setupCustomRecurrenceSpinnerComponent() {
         var lastSelectedIndex: Int? = null
 
-        custom_recurrence_period_radio_group.setCustomOnCheckedChangeListener { radioGroup, index ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.setCustomOnCheckedChangeListener { radioGroup, index ->
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            val position = getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)
+            val position = getCheckedRadioButtonIndex(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup)
             showCustomRecurrenceForms(position)
 
             // prevent infinite loop when resetting adapters by EditText changes and Radio group selection
@@ -385,20 +366,20 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         }
 
         // init with WEEK
-        custom_recurrence_count.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
         resetRecurrencePeriodText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-        custom_recurrence_period_radio_group.check(custom_recurrence_period_2.id)
+        binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.check(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriod2.id)
 
-        custom_recurrence_count_layout.setEndIconOnClickListener {
-            when (getCheckedRadioButtonIndex(custom_recurrence_period_radio_group)) {
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceCountLayout.setEndIconOnClickListener {
+            when (getCheckedRadioButtonIndex(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup)) {
                 // day
-                0 -> custom_recurrence_count.setText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT.toString())
+                0 -> binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT.toString())
                 // week
-                1 -> custom_recurrence_count.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
+                1 -> binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT.toString())
                 // month
-                2 -> custom_recurrence_count.setText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT.toString())
+                2 -> binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT.toString())
                 // year
-                3 -> custom_recurrence_count.setText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT.toString())
+                3 -> binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT.toString())
             }
         }
 
@@ -410,7 +391,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // DayOfWeek of java.time starts on Monday (ordinal 0) and ends on Sunday (ordinal 6)
         val indexOfEventStartDay =
-            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)!!.dayOfWeek.ordinal
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId).dayOfWeek.ordinal
         val checkedDayIndices: List<Int> = byDayIndices + indexOfEventStartDay
 
         val weekDayLetters = (DayOfWeek.MONDAY.value .. DayOfWeek.SUNDAY.value).map { DayOfWeek.of(it).format(firstLetter = true) }
@@ -441,15 +422,15 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
         // TODO get this from VM
         val eventStartDate =
-            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)!!
+            eventViewModel.eventLiveData.value!!.getStart(eventViewModel.eventTimeZoneId)
                 .toLocalDate()
 
         // applies only to month
-        custom_recurrence_occurrence_time_radio_group.check(
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.check(
             when (eventViewModel.tempMonthlyRepeatOption) {
-                EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
-                EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
-                EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
+                EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime1.id
+                EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime2.id
+                EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime3.id
             }
         )
 
@@ -458,24 +439,24 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
         optionsRepeatOn.forEach {
             when (it) {
                 EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> {
-                    custom_recurrence_occurrence_time_1.visibleOrGone(true)
-                    custom_recurrence_occurrence_time_1.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime1.visibleOrGone(true)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime1.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_1] = it
                 }
                 EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> {
-                    custom_recurrence_occurrence_time_2.visibleOrGone(true)
-                    custom_recurrence_occurrence_time_2.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime2.visibleOrGone(true)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime2.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_2] = it
                 }
                 EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> {
-                    custom_recurrence_occurrence_time_3.visibleOrGone(true)
-                    custom_recurrence_occurrence_time_3.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime3.visibleOrGone(true)
+                    binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime3.text = mapMonthlyRecurrenceOnToString(eventStartDate, it)
                     monthlyRecurrenceOnMap[R.id.custom_recurrence_occurrence_time_3] = it
                 }
             }
         }
 
-        custom_recurrence_occurrence_time_radio_group.setCustomOnCheckedChangeListener { _, checkedId ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.setCustomOnCheckedChangeListener { _, checkedId ->
             requireActivity().clearFocusAndHideKeyboard(view)
             val monthlyRepeatOnOption = monthlyRecurrenceOnMap[checkedId]
             if (monthlyRepeatOnOption != null) eventViewModel.handleRecurrenceRepeatOn(monthlyRepeatOnOption)
@@ -483,7 +464,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     }
 
     private fun setChipItemContent(index: Int, stringArrayIndex: Int, indexOfEventStartDay: Int, checkedDayIndices: List<Int>, dayName: String) {
-        ((chip_group_day_of_week_layout as ViewGroup).getChildAt(index) as Chip).apply {
+        ((binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.chipGroupDayOfWeekLayout as ViewGroup).getChildAt(index) as Chip).apply {
             text = dayName
             isClickable =
                 (stringArrayIndex != indexOfEventStartDay) // we disable and check by default the day of event's start
@@ -523,15 +504,15 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
 
             if (event.isCustomRecurring()) {
                 //Set custom edit radio button text
-                event_form_recurrence_custom_edit.visibleOrGone(true)
-                event_form_recurrence_custom_edit.text = AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
+                binding.eventFormRecurrenceCustomEdit.visibleOrGone(true)
+                binding.eventFormRecurrenceCustomEdit.text = AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId) ?: resources.getString(R.string.event_recurrence_none)
 
                 // handle custom recurrence rule
-                custom_recurrence_occurrence_time_radio_group.check(
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.check(
                     when (eventViewModel.calculateMonthlyRepeatOnOptions()[eventViewModel.calculateMonthlyRepeatOnOptionIndex()]) {
-                        EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> custom_recurrence_occurrence_time_1.id
-                        EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> custom_recurrence_occurrence_time_2.id
-                        EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> custom_recurrence_occurrence_time_3.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_DAY_X -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime1.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_X_WEEKDAY -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime2.id
+                        EventViewModel.MonthlyRepeatOnOption.ON_LAST_WEEKDAY -> binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTime3.id
                     }
                 )
 
@@ -541,8 +522,7 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     // "ends" section
                     if (this.until != null) {
                         customEndingRadioGroup.check(R.id.custom_recurrence_end_2)
-                        val isAllDay = eventViewModel.eventLiveData.value!!.isAllDay()
-                        custom_recurrence_end_2.text = getString(
+                        binding.eventFormRecurrenceCustomLayout.customRecurrenceEnd2.text = getString(
                             R.string.event_recurrence_ends_on_date,
                             this.until.toZonedDateTime(eventViewModel.eventTimeZoneId)
                                 .formatDate(eventViewModel.eventTimeZoneId)
@@ -550,36 +530,36 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
                     }
                     if (this.count != null) {
                         customEndingRadioGroup.check(R.id.custom_recurrence_end_3)
-                        custom_recurrence_end_count.setText("${this.count}")
+                        binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCount.setText("${this.count}")
                     }
 
                     // "repeats every" section
                     when (this.frequency) {
                         Frequency.WEEKLY -> {
-                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
+                            binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText("${this.interval ?: FormValidation.INTERVAL_WEEK_COUNT_DEFAULT}")
                             resetRecurrencePeriodText(FormValidation.INTERVAL_WEEK_COUNT_DEFAULT)
-                            custom_recurrence_period_radio_group.check(custom_recurrence_period_2.id)
+                            binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.check(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriod2.id)
                         }
                         Frequency.MONTHLY -> {
-                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
+                            binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText("${this.interval ?: FormValidation.INTERVAL_MONTH_COUNT_DEFAULT}")
                             resetRecurrencePeriodText(FormValidation.INTERVAL_MONTH_COUNT_DEFAULT)
-                            custom_recurrence_period_radio_group.check(custom_recurrence_period_3.id)
+                            binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.check(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriod3.id)
                         }
                         Frequency.YEARLY -> {
-                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
+                            binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText("${this.interval ?: FormValidation.INTERVAL_YEAR_COUNT_DEFAULT}")
                             resetRecurrencePeriodText(FormValidation.INTERVAL_YEAR_COUNT_DEFAULT)
-                            custom_recurrence_period_radio_group.check(custom_recurrence_period_4.id)
+                            binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.check(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriod4.id)
                         }
                         else -> { // fallback to Frequency.DAILY
-                            custom_recurrence_count.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
+                            binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText("${this.interval ?: FormValidation.INTERVAL_DAY_COUNT_DEFAULT}")
                             resetRecurrencePeriodText(FormValidation.INTERVAL_DAY_COUNT_DEFAULT)
-                            custom_recurrence_period_radio_group.check(custom_recurrence_period_1.id)
+                            binding.eventFormRecurrenceCustomLayout.customRecurrencePeriodRadioGroup.check(binding.eventFormRecurrenceCustomLayout.customRecurrencePeriod1.id)
                         }
                     }
                 }
             }
 
-            event_form_recurrence_radio_group.check(
+            binding.eventFormRecurrenceRadioGroup.check(
                 if (event.isCustomRecurring()) R.id.event_form_recurrence_custom_edit
                 else radioButtonId
             )
@@ -590,10 +570,12 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
      * Applies correct pluralisation to dropdown items.
      */
     private fun resetRecurrencePeriodText(count: Int) {
-        custom_recurrence_period_1.text = resources.getQuantityString(R.plurals.plural_day, count, count)
-        custom_recurrence_period_2.text = resources.getQuantityString(R.plurals.plural_week, count, count)
-        custom_recurrence_period_3.text = resources.getQuantityString(R.plurals.plural_month, count, count)
-        custom_recurrence_period_4.text = resources.getQuantityString(R.plurals.plural_year, count, count)
+        with(binding.eventFormRecurrenceCustomLayout) {
+            customRecurrencePeriod1.text = resources.getQuantityString(R.plurals.plural_day, count, count)
+            customRecurrencePeriod2.text = resources.getQuantityString(R.plurals.plural_week, count, count)
+            customRecurrencePeriod3.text = resources.getQuantityString(R.plurals.plural_month, count, count)
+            customRecurrencePeriod4.text = resources.getQuantityString(R.plurals.plural_year, count, count)
+        }
     }
 
     // we keep track of TextWatcher so we can remove it when resetting recurrence validation
@@ -602,16 +584,16 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun resetRecurrenceCountValidation(default: Int, min: Int, max: Int) {
 
         // remove current recurrence count text watcher
-        etRecurrenceTextWatcher?.let { custom_recurrence_count.removeTextChangedListener(it) }
+        etRecurrenceTextWatcher?.let { binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.removeTextChangedListener(it) }
 
         // set new text watcher with new config
         etRecurrenceTextWatcher =
-            custom_recurrence_count.doAfterFilteredIntValueChanged(default, min, max) {
+            binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.doAfterFilteredIntValueChanged(default, min, max) {
                 resetRecurrencePeriodText(it)
             }
 
         // set current value again because it might be outside of newly set limits
-        custom_recurrence_count.setText(custom_recurrence_count.text)
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.setText(binding.eventFormRecurrenceCustomLayout.customRecurrenceCount.text)
     }
 
     /**
@@ -620,24 +602,25 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
     private fun showCustomRecurrenceForms(recurrenceTypeIndex: Int) {
         when (recurrenceTypeIndex) {
             0 -> { // day
-                custom_recurrence_occurrence_time_radio_group.visibleOrGone(false)
-                custom_recurrence_occurrence_group.visibleOrGone(false)
-                custom_recurrence_chips_layout.visibleOrGone(false)
+
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.root.visibleOrGone(false)
             }
             1 -> { // week
-                custom_recurrence_occurrence_time_radio_group.visibleOrGone(false)
-                custom_recurrence_occurrence_group.visibleOrGone(false)
-                custom_recurrence_chips_layout.visibleOrGone(true)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.root.visibleOrGone(true)
             }
             2 -> { // month
-                custom_recurrence_occurrence_time_radio_group.visibleOrGone(true)
-                custom_recurrence_occurrence_group.visibleOrGone(true)
-                custom_recurrence_chips_layout.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.visibleOrGone(true)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceGroup.visibleOrGone(true)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.root.visibleOrGone(false)
             }
             3 -> { // year
-                custom_recurrence_occurrence_time_radio_group.visibleOrGone(false)
-                custom_recurrence_occurrence_group.visibleOrGone(false)
-                custom_recurrence_chips_layout.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceTimeRadioGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceOccurrenceGroup.visibleOrGone(false)
+                binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.root.visibleOrGone(false)
             }
         }
     }
@@ -646,8 +629,8 @@ class EventFormRecurrenceFragment() : BaseDialogFragment(), KoinComponent {
      * Updates week days chips height to match dynamic width measured by the system to keep the chips round
      */
     private fun updateChipHeight() {
-        custom_recurrence_chips_layout.viewTreeObserver.addOnGlobalLayoutListener {
-            (chip_group_day_of_week_layout as ViewGroup).children.forEach { view ->
+        binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.root.viewTreeObserver.addOnGlobalLayoutListener {
+            (binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.chipGroupDayOfWeekLayout as ViewGroup).children.forEach { view ->
                 if (view.measuredWidth == 0) return@addOnGlobalLayoutListener
                 val currentLayoutParams = view.layoutParams
                 val maxChipSizePixel = resources.getDimensionPixelSize(R.dimen.week_day_chip_max_size)
