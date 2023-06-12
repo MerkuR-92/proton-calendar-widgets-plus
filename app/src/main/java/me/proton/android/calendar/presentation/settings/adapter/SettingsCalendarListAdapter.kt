@@ -88,7 +88,7 @@ class SettingsCalendarListAdapter(
             // Calendar user email
             calendarItemUserEmail.visibleOrGone(calendar.email.isNotEmpty())
             calendarItemUserEmail.text =
-                if (!calendar.allowEditEvents) {
+                if (!calendar.isHolidayCalendar && !calendar.allowEditEvents) {
                     context.getString(
                         R.string.settings_other_calendars_subtitle,
                         context.getString(R.string.settings_other_calendars_read_only),
