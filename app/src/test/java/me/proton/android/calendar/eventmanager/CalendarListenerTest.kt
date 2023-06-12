@@ -17,11 +17,8 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
-import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
-import me.proton.android.calendar.test.shared.mocks.CalendarMocks
-import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendarSettingsEntity
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventsResponse
@@ -87,7 +84,10 @@ class CalendarListenerTest {
     fun `onCreate starts calendar bootstraping`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
             )
             coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success(Unit)
 
@@ -102,7 +102,10 @@ class CalendarListenerTest {
     fun `If bootstraping in onCreate fails, the calendar is just persisted`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
             )
             coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("error")
 
@@ -117,7 +120,10 @@ class CalendarListenerTest {
     fun `onUpdate just persists the calendar`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
             )
 
             val calendarSettingsEntity: CalendarSettingsEntity = mockk()
@@ -127,7 +133,10 @@ class CalendarListenerTest {
             coEvery { calendarSettingsEntity.defaultFullDayNotifications } returns emptyList()
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar.from(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
                 MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "address_id", "member email", "calendar_id", "fff", 1, 1,  "Name", "Description"),
                 calendarSettingsEntity,
                 json
@@ -143,7 +152,10 @@ class CalendarListenerTest {
     fun `onUpdate calendar doesn't exist yet in db do bootstrap`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
@@ -160,7 +172,10 @@ class CalendarListenerTest {
     fun `onUpdate calendar doesn't exist yet in db bootstrap failed persist calendar`() {
         runBlocking {
             val entities = listOf(
-                CalendarEntity("calendar_id"),
+                CalendarEntity(
+                    "calendar_id",
+                    owner = null
+                ),
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
@@ -204,7 +219,10 @@ private const val validResponse = """
                 "Flags": 1,
                 "Color": "#9DB99F",
                 "Display": 1,
-                "CalendarID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw=="
+                "CalendarID": "xZLizr66ZlJwAfcVTwiH5ewAQ3a5h6IptTBHdtP-mpuv4Sqqy5B3S8KfD-7_W8i0jxBd976glUl8q5eMAo4JCw==",
+                "Owner": {
+                    "Email": "owner@pm.me"
+                }
             }
         }
     ],

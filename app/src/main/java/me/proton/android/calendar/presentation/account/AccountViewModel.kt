@@ -201,8 +201,12 @@ class AccountViewModel @Inject constructor(
         _errorReport.postValue(null)
     }
 
-    fun resetCalendarsKey(userId: UserId) {
+    fun resetCalendarsKey() {
         viewModelScope.launch {
+            val userId = getPrimaryUserId() ?: run {
+                logger.e("User ID was null in resetCalendarsKey")
+                return@launch
+            }
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
             resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
             if (resetCalendarsKeyResult !is UseCase.Result.Success<*>) {
@@ -214,8 +218,12 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updatePassphrase(userId: UserId) {
+    fun updatePassphrase() {
         viewModelScope.launch {
+            val userId = getPrimaryUserId() ?: run {
+                logger.e("User ID was null in updatePassphrase")
+                return@launch
+            }
             setupUser(userId, false)
         }
     }

@@ -27,7 +27,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
 
     suspend fun execute(userId: UserId, calendarId: String, eventId: String, personalPartICalString: String, notifications: List<Notification>?): UseCase.Result {
 
-        val member = database.membersDao().select(calendarId).firstOrNull()
+        val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull()
             ?: return UseCase.Result.InvalidParams("there is no valid first Member when updating Event personal part")
 
         var personalEventContentApiRequest: PersonalEventContentApiRequest? = null

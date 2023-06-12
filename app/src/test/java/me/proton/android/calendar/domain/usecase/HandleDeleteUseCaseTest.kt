@@ -64,7 +64,7 @@ internal class HandleDeleteUseCaseTest {
             )
         )
 
-        coEvery { appDatabaseMock.membersDao().select(any()) } returns listOf(
+        coEvery { appDatabaseMock.membersDao().selectCalendarMembers(any()) } returns listOf(
             MemberEntity(
                 id = "id",
                 permissions = 64,
@@ -186,7 +186,7 @@ internal class HandleDeleteUseCaseTest {
             } else {
                 transformEventUseCaseMock.execute(any())
             } }
-            coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
+            coVerify(exactly = 1) { appDatabaseMock.membersDao().selectCalendarMembers(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(event.calendar.id, listOf(event.id)) }
@@ -222,7 +222,7 @@ internal class HandleDeleteUseCaseTest {
             } else {
                 transformEventUseCaseMock.execute(any())
             } }
-            coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
+            coVerify(exactly = 1) { appDatabaseMock.membersDao().selectCalendarMembers(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.deleteEventsById(event.calendar.id, listOf(event.id)) }
@@ -258,7 +258,7 @@ internal class HandleDeleteUseCaseTest {
             } else {
                 transformEventUseCaseMock.execute(any())
             } }
-            coVerify(exactly = 1) { appDatabaseMock.membersDao().select(any()) }
+            coVerify(exactly = 1) { appDatabaseMock.membersDao().selectCalendarMembers(any()) }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarUserSettings(userId.id) }
             coVerify(exactly = 0) { editCreateEventUseCaseMock.execute(userId, any(), any(), any()) }
             coVerify(exactly = 0) { calendarsRepositoryMock.deleteEventsById(event.calendar.id, listOf(event.id)) }

@@ -682,7 +682,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+            coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -801,7 +801,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+            coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -916,7 +916,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+            coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
@@ -1059,7 +1059,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+            coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call
             coEvery {
@@ -1201,7 +1201,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
             )
 
             // Mock calendar member
-            coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+            coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {

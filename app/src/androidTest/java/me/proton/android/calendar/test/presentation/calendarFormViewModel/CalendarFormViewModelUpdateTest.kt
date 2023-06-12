@@ -93,7 +93,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         }
 
         coVerify(exactly = 0) {
-            calendarsRepositoryMock.selectMembers(calendarId)
+            calendarsRepositoryMock.selectCalendarMembers(calendarId)
         }
 
         assert(calendarFormViewModel.calendarFormState.value == CalendarFormViewModel.CalendarFormState.Idle)
@@ -128,7 +128,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         }
 
         coVerify(exactly = 0) {
-            calendarsRepositoryMock.selectMembers(calendarId)
+            calendarsRepositoryMock.selectCalendarMembers(calendarId)
         }
 
         assert(calendarFormViewModel.calendarFormState.value == CalendarFormViewModel.CalendarFormState.Idle)
@@ -164,7 +164,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         }
 
         coVerify(exactly = 0) {
-            calendarsRepositoryMock.selectMembers(calendarId)
+            calendarsRepositoryMock.selectCalendarMembers(calendarId)
         }
 
         assert(calendarFormViewModel.calendarFormState.value == CalendarFormViewModel.CalendarFormState.Idle)
@@ -194,7 +194,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         // Mock calendar
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+        coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
         coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = customCalendarName, color = customCalendarColor) } returns UseCase.Result.Success<Unit>()
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm)) } returns UseCase.Result.Success<Unit>()
@@ -253,7 +253,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         // Mock calendar
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+        coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
         coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = customCalendarName, color = customCalendarColor) } returns UseCase.Result.Error("Test")
 
@@ -311,7 +311,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         // Mock calendar
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+        coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
         coEvery { updateCalendarUseCaseMock.executeUpdate(userId, calendarId, name = customCalendarName, color = customCalendarColor) } returns UseCase.Result.Success<Unit>()
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm)) } returns UseCase.Result.Error("Test")
@@ -368,7 +368,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
         // Mock calendar
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         coEvery { calendarsRepositoryMock.selectCalendarSettings(calendarId) } returns CalendarMocks.provideCalendarSettingsEntity()
-        coEvery { calendarsRepositoryMock.selectMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
+        coEvery { calendarsRepositoryMock.selectCalendarMembers(calendarId) } returns listOf(CalendarMocks.provideMemberEntity())
 
         coEvery { updateCalendarSettingsUseCaseMock.updateCalendarSettings(userId, calendarId, customDefaultEventDuration, listOf(customPartDayAlarm), listOf(customAllDayAlarm)) } returns UseCase.Result.Error("Test")
 

@@ -32,6 +32,7 @@ import me.proton.android.calendar.test.shared.mocks.CalendarMocks
 import me.proton.android.calendar.test.shared.mocks.UserMocks
 import me.proton.android.calendar.test.shared.mocks.calendarColor
 import me.proton.android.calendar.test.shared.mocks.calendarDisplay
+import me.proton.android.calendar.test.shared.mocks.userEmail
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
@@ -95,6 +96,7 @@ internal class TransformEventUseCaseTest {
             val calendarEntity = CalendarEntity(
                 "id",
                 1,
+                owner = Json.decodeFromString("{\"Email\": \"$userEmail\"}"),
                 fkUserId = "fkUserId")
             coEvery { database.calendarsDao().selectById(any()) } returns calendarEntity
 
@@ -114,7 +116,7 @@ internal class TransformEventUseCaseTest {
             } returns listOf(UserMocks.provideAddressEntity())
 
             coEvery {
-                database.membersDao().select(any())
+                database.membersDao().selectCalendarMembers(any())
             } returns listOf(CalendarMocks.provideMemberEntity())
 
             coEvery {

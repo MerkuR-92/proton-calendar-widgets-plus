@@ -737,8 +737,22 @@ class CalendarViewModel @Inject constructor(
         updatingCalendarPassphrase = false
     }
 
-    suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
+    suspend fun fetchCalendars(): List<Calendar>? {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchCalendars")
+            return null
+        }
         return calendarsRepository.fetchCalendars(userId)
+    }
+
+    suspend fun refreshCalendars(calendarIds: List<String>) {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel refreshCalendars")
+            return
+        }
+        calendarsRepository.refreshCalendars(userId, calendarIds)
     }
 
     suspend fun refreshMember(calendarId: String): Boolean {

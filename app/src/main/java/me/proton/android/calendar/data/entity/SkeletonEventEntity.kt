@@ -33,7 +33,7 @@ fun SkeletonEventEntity.toSkeletonEvent(json: Json, calendarColor: String? = nul
         if (it.events.firstOrNull()?.sanitise() == true) {
             Event.from(
                 this.id,
-                Calendar(this.calendarId, "", "", "", calendarColor ?: "", 0, false, calendarType ?: 0, 0, 0, emptyList(), emptyList()),
+                Calendar(this.calendarId, "", "", "", "", calendarColor ?: "", 0, false, calendarType ?: 0, 0, 0, emptyList(), emptyList()),
                 it,
                 modifyTime,
                 null,

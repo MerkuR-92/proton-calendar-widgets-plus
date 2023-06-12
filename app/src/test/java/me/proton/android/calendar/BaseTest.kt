@@ -10,6 +10,7 @@ internal abstract class BaseTest {
             "calendar-id",
             "calendar",
             "email",
+            "ownerEmail",
             "description",
             "",
             1,

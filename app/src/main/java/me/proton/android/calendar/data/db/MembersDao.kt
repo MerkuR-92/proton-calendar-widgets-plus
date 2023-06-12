@@ -15,7 +15,7 @@ abstract class MembersDao : BaseDao<MemberEntity> {
     suspend abstract fun selectMembers(): List<MemberEntity>
 
     @Query("SELECT * FROM members WHERE calendarId = :calendarId")
-    abstract suspend fun select(calendarId: String): List<MemberEntity>
+    abstract suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
 
     @Query("SELECT * FROM members WHERE id = :memberId")
     abstract suspend fun selectById(memberId: String): MemberEntity?

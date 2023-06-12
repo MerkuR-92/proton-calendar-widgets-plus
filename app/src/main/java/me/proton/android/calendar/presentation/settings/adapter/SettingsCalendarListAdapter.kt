@@ -27,8 +27,8 @@ class SettingsCalendarListAdapter(
     val listener: (Calendar) -> Unit
 ) : ListAdapter<Calendar, SettingsCalendarListAdapter.ViewHolder>(CalendarDiffCallback()) {
 
-    private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
-    private var defaultCalendarId: String? = null
+    private var calendarSubscriptions: List<CalendarSubscriptionEntity> = emptyList()
+    private var defaultCalendarId: String = ""
 
     class CalendarDiffCallback : DiffUtil.ItemCallback<Calendar>() {
         override fun areItemsTheSame(oldItem: Calendar, newItem: Calendar): Boolean {
@@ -58,14 +58,15 @@ class SettingsCalendarListAdapter(
 
     fun setDefaultCalendarId(defaultCalendarId: String?): Boolean {
         val dataSetChanged = this.defaultCalendarId != defaultCalendarId
-        this.defaultCalendarId = defaultCalendarId
+        this.defaultCalendarId = defaultCalendarId ?: ""
         return dataSetChanged
     }
 
     inner class ViewHolder(itemBinding: ItemSettingsCalendarBinding) : RecyclerView.ViewHolder(itemBinding.root) {
         private val calendarItemPress: View = itemBinding.itemSettingsCalendarPress
         private val calendarItemTitle: TextView = itemBinding.itemSettingsCalendarTitle
-        private val calendarItemSubtitle: TextView = itemBinding.itemSettingsCalendarSubtitle
+        private val calendarItemOwnerEmail: TextView = itemBinding.itemSettingsCalendarOwnerEmail
+        private val calendarItemUserEmail: TextView = itemBinding.itemSettingsCalendarUserEmail
         private val calendarItemHelper: TextView = itemBinding.itemSettingsCalendarHelper
         private val calendarItemMenuIcon: ImageView = itemBinding.itemSettingsCalendarMenuIcon
         private val calendarItemIcon: ImageView = itemBinding.itemSettingsCalendarIcon
@@ -73,12 +74,20 @@ class SettingsCalendarListAdapter(
 
         fun bind(calendar : Calendar) {
             val context = itemView.context
+
             // Calendar name
             calendarItemTitle.text = calendar.name
 
-            // Calendar email
-            calendarItemSubtitle.visibleOrGone(calendar.email.isNotEmpty())
-            calendarItemSubtitle.text =
+            // Calendar owner email
+            val showCalendarOwnerEmail = calendar.isSharedWithMe && !calendar.ownerEmail.isNullOrEmpty()
+            calendarItemOwnerEmail.visibleOrGone(showCalendarOwnerEmail)
+            if (showCalendarOwnerEmail) {
+                calendarItemOwnerEmail.text =  context.getString(R.string.settings_shared_calendars_owner, calendar.ownerEmail)
+            }
+
+            // Calendar user email
+            calendarItemUserEmail.visibleOrGone(calendar.email.isNotEmpty())
+            calendarItemUserEmail.text =
                 if (!calendar.allowEditEvents) {
                     context.getString(
                         R.string.settings_other_calendars_subtitle,

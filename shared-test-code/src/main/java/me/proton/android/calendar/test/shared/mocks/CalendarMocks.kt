@@ -5,9 +5,11 @@ import biweekly.property.Trigger
 import biweekly.util.Duration
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
+import me.proton.core.util.kotlin.serializeToJson
 import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
@@ -16,6 +18,7 @@ object CalendarMocks {
         return CalendarEntity(
             id = id,
             type = calendarType,
+            owner = Json.decodeFromString("{\"Email\": \"$userEmail\"}"),
             fkUserId = userId.id
         )
     }
@@ -56,6 +59,7 @@ object CalendarMocks {
         return Calendar(
             id,
             calendarName,
+            userEmail,
             userEmail,
             calendarDescription,
             calendarColor,

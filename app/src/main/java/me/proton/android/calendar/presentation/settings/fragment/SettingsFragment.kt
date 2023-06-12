@@ -38,7 +38,6 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMa
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
-import me.proton.android.calendar.databinding.FragmentGeneralSettingsBinding
 import me.proton.android.calendar.databinding.FragmentSettingsBinding
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
@@ -52,6 +51,7 @@ import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewMod
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -81,6 +81,9 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     private var defaultCalendarId: String? = null
+
+    // Used to make sure we're not looping on refreshing calendars
+    private var refreshedCalendarIds: List<String> = emptyList()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -194,12 +197,22 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                     }
                     val calendarSubscriptions = it.second
 
-                    val dataSetChanged =
+                    val calendarSubscriptionsChanged =
                         settingsOtherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
 
                     settingsOtherCalendarListAdapter.submitList(otherCalendars)
-                    if (dataSetChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
+                    if (calendarSubscriptionsChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
                     binding.settingsOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
+
+                    // Refresh calendars if any are missing owner field
+                    otherCalendars.filter { it.isSharedWithMe && it.ownerEmail.isNullOrEmpty() }.takeIfNotEmpty()?.let { calendars ->
+                        val calendarIds = calendars.map { it.id }.filterNot { calendarId ->
+                            refreshedCalendarIds.any { it.equals(calendarId) }
+                        }
+                        // Keep calendar ids to make sure we're not looping on refreshing calendars
+                        refreshedCalendarIds = calendarIds
+                        if (calendarIds.isNotEmpty()) calendarViewModel.refreshCalendars(calendarIds)
+                    }
                 }
             }
         }

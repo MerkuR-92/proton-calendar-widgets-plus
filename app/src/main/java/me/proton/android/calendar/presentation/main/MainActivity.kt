@@ -379,8 +379,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     // Display dialog with list of calendars to fix
                     lifecycleScope.launch {
                         // If we fail to fetch calendars, we still display dialog without the calendar list
-                        val userId = accountViewModel.getPrimaryUserId()
-                        val calendars = if (userId != null) calendarViewModel.fetchCalendars(userId) ?: arrayListOf() else arrayListOf()
+                        val calendars = calendarViewModel.fetchCalendars() ?: arrayListOf()
                         this@MainActivity.displayCalendarListMaterialDialog(
                             dialogTitle,
                             dialogMessage,
@@ -390,10 +389,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         ) { _, _ ->
                             if (errorReport == UseCase.Error.Bootstrap.ResetNeeded) {
                                 clearError()
-                                userId?.let { accountViewModel.resetCalendarsKey(it) }
+                                accountViewModel.resetCalendarsKey()
                             } else if (errorReport == UseCase.Error.Bootstrap.UpdatePassphrase) {
                                 clearError()
-                                userId?.let { accountViewModel.updatePassphrase(it) }
+                                accountViewModel.updatePassphrase()
                             }
                         }
                     }
@@ -401,8 +400,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     // Display dialog with list of calendars to fix
                     lifecycleScope.launch {
                         // If we fail to fetch calendars, we still display dialog without the calendar list
-                        val userId = accountViewModel.getPrimaryUserId()
-                        val calendars = if (userId != null) calendarViewModel.fetchCalendars(userId) ?: arrayListOf() else arrayListOf()
+                        val calendars = calendarViewModel.fetchCalendars() ?: arrayListOf()
                         this@MainActivity.displayCalendarListMaterialDialog(
                             dialogTitle,
                             dialogMessage,

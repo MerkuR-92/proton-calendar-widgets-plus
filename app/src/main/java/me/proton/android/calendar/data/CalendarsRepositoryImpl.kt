@@ -512,6 +512,23 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>) {
+        val calendars = arrayListOf<CalendarEntity>()
+        calendarIds.forEach {
+            val calendarResponse = calendarsApi.getCalendar(userId, it)
+            if (calendarResponse !is ApiResponse.Success) {
+                // We log but ignore the error
+                logger.e("error getting calendar from API in CalendarsRepositoryImpl")
+            } else {
+                calendars.add(calendarResponse.data.calendar)
+            }
+        }
+        calendars.forEach {
+            // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
+            persistCalendar(userId.id, it)
+        }
+    }
+
     override suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
         return fetchCalendarEntities(userId)?.map {
             Calendar.from(
@@ -607,12 +624,12 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
-        val member = selectMembers(calendarId).firstOrNull()
+        val member = selectCalendarMembers(calendarId).firstOrNull()
         return if (member != null) member.display == newDisplay else false
     }
 
     override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
-        database.membersDao().select(calendarId).firstOrNull()?.let {
+        database.membersDao().selectCalendarMembers(calendarId).firstOrNull()?.let {
             database.membersDao().updateDisplay(calendarId, display.toInt())
             widgetRefresher.refreshEventList()
         }
@@ -1419,8 +1436,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.passphrasesDao().deleteById(id)
     }
 
-    override suspend fun selectMembers(calendarId: String): List<MemberEntity> {
-        return database.membersDao().select(calendarId)
+    override suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity> {
+        return database.membersDao().selectCalendarMembers(calendarId)
     }
 
     override suspend fun selectMemberById(memberId: String): MemberEntity? {
@@ -1644,7 +1661,7 @@ suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase, json: Js
     return this.mapNotNull { calendarEntity ->
         val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
         // Get all members for that calendar
-        val calendarMembers = database.membersDao().select(calendarEntity.id)
+        val calendarMembers = database.membersDao().selectCalendarMembers(calendarEntity.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar
@@ -1663,7 +1680,7 @@ suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase, json: Json): C
         val userAddresses = database.addressDao().getByUserId(UserId(this.fkUserId))
         val calendarSettings = database.calendarSettingsDao().select(this.id) ?: return null
         // Get all members for that calendar
-        val calendarMembers = database.membersDao().select(this.id)
+        val calendarMembers = database.membersDao().selectCalendarMembers(this.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar

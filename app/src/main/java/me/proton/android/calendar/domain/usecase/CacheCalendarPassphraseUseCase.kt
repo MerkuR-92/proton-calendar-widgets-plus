@@ -32,7 +32,7 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
-        val calendarMembers = database.membersDao().select(calendarId)
+        val calendarMembers = database.membersDao().selectCalendarMembers(calendarId)
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 

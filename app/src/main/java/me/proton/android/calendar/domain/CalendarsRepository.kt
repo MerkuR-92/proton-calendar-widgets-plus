@@ -91,6 +91,8 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendars(userId: UserId): Boolean
 
+    suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>)
+
     suspend fun fetchCalendars(userId: UserId): List<Calendar>?
 
     suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>?
@@ -254,7 +256,7 @@ interface CalendarsRepository {
     suspend fun deletePassphraseById(id: String)
 
     // members
-    suspend fun selectMembers(calendarId: String): List<MemberEntity>
+    suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
 
     suspend fun selectMemberById(memberId: String): MemberEntity?
 
