@@ -137,7 +137,7 @@ class CalendarListenerTest {
                     "calendar_id",
                     owner = null
                 ),
-                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "address_id", "member email", "calendar_id", "fff", 1, 1,  "Name", "Description"),
+                MemberEntity("member_id", MemberEntity.Permission.ADMIN.value, "address_id", "member email", "calendar_id", "fff", 1, 1,  "Name", "Description", 0),
                 calendarSettingsEntity,
                 json
             )
@@ -240,7 +240,8 @@ private const val validResponse = """
                 "Color": "#9DB99F",
                 "Display": 1,
                 "Name": "ASDADADSASD",
-                "Description": ""
+                "Description": "",
+                "Priority": 0
             }
         }
     ],

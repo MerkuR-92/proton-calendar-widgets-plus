@@ -42,6 +42,7 @@ import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
@@ -54,7 +55,7 @@ class EditCreateEventUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val cryptoContext: CryptoContext,
     private val calendarsRepository: CalendarsRepository,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
     private val database: AppDatabase,
@@ -81,7 +82,7 @@ class EditCreateEventUseCase @Inject constructor(
             (upgradeEventUseCase.execute(userId, sanitizedNewEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
         } else null
 
-        val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
+        val userAddresses = userAddressManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")
 
         // 0. split Event according to the matrix
         val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(sanitizedNewEvent.iCalendar)
@@ -504,7 +505,7 @@ class EditCreateEventUseCase @Inject constructor(
     private suspend fun getMemberKey(userId: UserId, userAddresses: List<UserAddress>, calendarId: String): UseCase.Result {
 
         val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member")
-        val memberAddress = calendarsRepository.getAddressForMember(userId, member, userAddresses) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
+        val memberAddress = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail, userAddresses) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
 
         if (!memberAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get MemberAddress valid for encryption in EditCreateEventUseCase", UseCase.Error.Crypto.UserAddressInvalidForEncryption)

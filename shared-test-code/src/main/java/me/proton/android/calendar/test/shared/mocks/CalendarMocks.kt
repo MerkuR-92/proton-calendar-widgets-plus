@@ -63,6 +63,9 @@ object CalendarMocks {
             userEmail,
             calendarDescription,
             calendarColor,
+            0,
+            addressId.id,
+            memberId,
             if (isDisabled) MemberEntity.CalendarFlags.DISABLED.value else calendarFlags,
             if (isHidden) false else calendarDisplay.toBoolean(),
             calendarType,
@@ -97,7 +100,8 @@ object CalendarMocks {
             display = calendarDisplay,
             flags = flags,
             name = calendarName,
-            description = calendarDescription
+            description = calendarDescription,
+            priority = 0
         )
     }
 }

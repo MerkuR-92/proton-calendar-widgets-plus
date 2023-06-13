@@ -458,6 +458,7 @@ object AppDatabaseMigrations {
     val MIGRATION_56_57 = object : Migration(56, 57) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.addTableColumn(TABLE_CALENDARS, "owner", "TEXT")
+            database.addTableColumn(TABLE_MEMBERS, "priority", "INTEGER")
         }
     }
 

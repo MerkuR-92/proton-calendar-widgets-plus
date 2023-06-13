@@ -51,6 +51,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
@@ -89,6 +90,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.data.entity.AddressEntity
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
@@ -120,6 +122,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val searchDatabase: SearchDatabase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager
 ) : CalendarsRepository {
 
@@ -1590,21 +1593,29 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun getAddressForMember(
         userId: UserId,
-        member: MemberEntity,
-        addresses: List<UserAddress>?,
-        refresh: Boolean
+        addressId: String?,
+        memberId: String,
+        canonicalEmail: String,
+        addresses: List<UserAddress>?
     ): UserAddress? {
-        val address = (addresses ?: userManager.getAddressesOrNull(userId, refresh))?.firstOrNull {
-            if (!member.addressId.isNullOrEmpty()) {
-                it.addressId.id.equalsNoCase(member.addressId)
+        val address =
+            if (!addressId.isNullOrEmpty() && !addresses.isNullOrEmpty()) {
+                addresses.firstOrNull { it.addressId.id.equalsNoCase(addressId) }
+            } else if (!addressId.isNullOrEmpty()) {
+                userAddressManager.getAddressOrNull(userId, addressId)
+            } else if (!addresses.isNullOrEmpty()) {
+                addresses.firstOrNull {
+                    canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalEmail)
+                }
             } else {
-                canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-                    .equalsNoCase(member.canonicalEmail)
+                userAddressManager.getAddressesOrNull(userId)?.firstOrNull {
+                    canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalEmail)
+                }
             }
-        }
-        if (address != null && member.addressId.isNullOrEmpty()) {
+
+        if (address != null && addressId.isNullOrEmpty()) {
             // Update AddressId in member if a match was found and field was not already persisted
-            database.membersDao().updateMemberAddressId(member.id, address.addressId.id)
+            database.membersDao().updateMemberAddressId(memberId, address.addressId.id)
         }
         return address
     }

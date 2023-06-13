@@ -345,9 +345,10 @@ interface CalendarsRepository {
 
     suspend fun getAddressForMember(
         userId: UserId,
-        member: MemberEntity,
-        addresses: List<UserAddress>? = null,
-        refresh: Boolean = false
+        addressId: String?,
+        memberId: String,
+        canonicalEmail: String,
+        addresses: List<UserAddress>? = null
     ): UserAddress?
 
     fun getUserMember(userAddresses: List<UserAddress>, members: List<MemberEntity>): MemberEntity?

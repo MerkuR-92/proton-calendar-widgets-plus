@@ -31,6 +31,7 @@ import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
@@ -41,7 +42,7 @@ import javax.inject.Inject
 class TransformEventUseCase @Inject constructor(
     private val json: Json,
     private val database: AppDatabase,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
@@ -77,7 +78,7 @@ class TransformEventUseCase @Inject constructor(
             return null
         }
 
-        val userAddresses = userManager.getAddressesOrNull(UserId(userId))
+        val userAddresses = userAddressManager.getAddressesOrNull(UserId(userId))
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
             return null
@@ -241,6 +242,9 @@ class TransformEventUseCase @Inject constructor(
                 calendar.ownerEmail,
                 calendar.description,
                 calendar.color,
+                calendar.priority,
+                calendar.addressId,
+                calendar.memberId,
                 calendar.flags,
                 calendar.display,
                 calendarEntity.type,

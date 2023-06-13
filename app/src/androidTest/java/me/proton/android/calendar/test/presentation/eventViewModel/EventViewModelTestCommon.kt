@@ -44,6 +44,7 @@ import me.proton.android.calendar.test.shared.mocks.calendarId
 import me.proton.android.calendar.test.shared.mocks.eventId
 import me.proton.android.calendar.test.shared.mocks.singleEditEventId
 import me.proton.android.calendar.test.shared.mocks.userId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.Before
@@ -63,6 +64,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val eventDecryptorMock: EventDecryptor = mockk()
 
     val userManagerMock: UserManager = mockk()
+    val userAddressManagerMock: UserAddressManager = mockk()
 
     val transformEventUseCaseMock: TransformEventUseCase = mockk()
     val updateParticipationStatusUseCaseMock: UpdateParticipationStatusUseCase = mockk()
@@ -119,6 +121,7 @@ open class EventViewModelTestCommon: KoinComponent {
         return EventViewModel(
             application = protonCalendarApplication,
             userManager = userManagerMock,
+            userAddressManager = userAddressManagerMock,
             calendarsRepository = calendarsRepositoryMock,
             userSettingsRepository = userSettingsRepositoryMock,
             transformEventUseCase = transformEventUseCaseMock,

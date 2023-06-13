@@ -21,13 +21,16 @@ class LeaveCalendarUseCase @Inject constructor(
 
     suspend fun execute(
         userId: UserId,
-        calendarId: String
+        calendarId: String,
+        memberId: String?
     ): UseCase.Result {
 
-        val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull() ?: return UseCase.Result.Success<Unit>() // If member was not in DB then user already left that calendar
+        val memberId = memberId
+                ?: database.membersDao().selectCalendarMembers(calendarId).firstOrNull()?.id
+                ?: return UseCase.Result.Success<Unit>() // If member was not in DB then user already left that calendar
 
         return when (val leaveCalendarResponse =
-            calendarsApi.leaveCalendar(userId, calendarId, member.id)
+            calendarsApi.leaveCalendar(userId, calendarId, memberId)
         ) {
             is ApiResponse.Success -> {
                 // Delete Calendar from DB

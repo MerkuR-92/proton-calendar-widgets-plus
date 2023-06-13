@@ -34,7 +34,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
 
         if (personalPartICalString.isNotEmpty()) {
 
-            val memberAddressKey = calendarsRepository.getAddressForMember(userId, member)?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
+            val memberAddressKey = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail)?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
 
             val signatureOfPersonalPart = kotlin.runCatching {
                 memberAddressKey.privateKey.signText(cryptoContext, personalPartICalString)

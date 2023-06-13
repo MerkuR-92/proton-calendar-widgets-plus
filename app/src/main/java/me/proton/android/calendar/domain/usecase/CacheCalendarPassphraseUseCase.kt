@@ -45,7 +45,7 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         val memberPassphrase = calendarPassphrase.memberPassphrases.find { it.memberId == member.id }
             ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no user address")
 
-        val memberAddress = calendarsRepository.getAddressForMember(userId, member) ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
+        val memberAddress = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail) ?: return UseCase.Result.Error("CacheCalendarPassphraseUseCase: No valid Member Address found")
 
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey

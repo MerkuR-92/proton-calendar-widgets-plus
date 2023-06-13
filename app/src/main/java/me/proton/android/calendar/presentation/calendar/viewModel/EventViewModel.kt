@@ -101,6 +101,7 @@ import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
@@ -149,6 +150,7 @@ import kotlin.collections.toTypedArray
 class EventViewModel @Inject constructor(
     application: Application,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val transformEventUseCase: TransformEventUseCase,
@@ -526,6 +528,9 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.ownerEmail,
                 defaultCalendar.description,
                 defaultCalendar.color,
+                defaultCalendar.priority,
+                defaultCalendar.addressId,
+                defaultCalendar.memberId,
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
@@ -833,6 +838,9 @@ class EventViewModel @Inject constructor(
                     calendar.ownerEmail,
                     calendar.description,
                     calendar.color,
+                    calendar.priority,
+                    calendar.addressId,
+                    calendar.memberId,
                     calendar.flags,
                     calendar.display,
                     calendar.type,
@@ -2007,7 +2015,7 @@ class EventViewModel @Inject constructor(
             return
         }
 
-        val userAddresses = userManager.getAddressesOrNull(userId)
+        val userAddresses = userAddressManager.getAddressesOrNull(userId)
         if (userAddresses == null) {
             logger.e("EventViewModel onDeleteClick, userAddresses == null")
             return
@@ -2683,7 +2691,7 @@ class EventViewModel @Inject constructor(
 
         if (eventDetailsState.value is EventState.Processing || attendeeAnswerState.value?.second == true) return
 
-        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
+        val userEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
             address.email
         }
 
@@ -2869,7 +2877,7 @@ class EventViewModel @Inject constructor(
     ) {
         val status = participationStatus.toInt()
 
-        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
+        val userEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
             address.email
         }
 

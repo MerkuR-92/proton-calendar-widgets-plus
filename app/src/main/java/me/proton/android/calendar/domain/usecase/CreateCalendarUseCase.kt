@@ -14,6 +14,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
@@ -24,7 +25,7 @@ class CreateCalendarUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val keySetupUseCase: KeySetupUseCase,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase
@@ -36,9 +37,10 @@ class CreateCalendarUseCase @Inject constructor(
         description: String = "",
         color: Int = DEFAULT_CALENDAR_COLOR,
         display: Int = 1,
-        email: String? = null) : UseCase.Result {
+        email: String? = null
+    ) : UseCase.Result {
 
-        val address = userManager.getAddressesOrNull(userId)?.firstOrNull { address ->
+        val address = userAddressManager.getAddressesOrNull(userId)?.firstOrNull { address ->
             email?.let { address.email == it } ?: address.canSend && address.canReceive
         } ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found")
 
@@ -81,7 +83,7 @@ class CreateCalendarUseCase @Inject constructor(
                 calendarsRepository.persistMember(memberEntity)
 
                 val userAddress =
-                    address ?: (calendarsRepository.getAddressForMember(userId, memberEntity) ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found"))
+                    address ?: (calendarsRepository.getAddressForMember(userId, memberEntity.addressId, memberEntity.id, memberEntity.canonicalEmail) ?: return UseCase.Result.Error("CreateCalendarUseCase: No valid Address found"))
 
                 val keySetupResult = keySetupUseCase.execute(
                     userId,

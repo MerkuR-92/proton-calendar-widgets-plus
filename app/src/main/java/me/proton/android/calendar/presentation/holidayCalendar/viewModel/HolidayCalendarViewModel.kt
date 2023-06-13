@@ -457,7 +457,7 @@ class HolidayCalendarViewModel @Inject constructor(
             }
 
             // Leave current holiday calendar
-            val leaveCalendarUseCaseResult = leaveCalendarUseCase.execute(userId, calendar.id)
+            val leaveCalendarUseCaseResult = leaveCalendarUseCase.execute(userId, calendar.id, calendar.memberId)
             if (leaveCalendarUseCaseResult !is UseCase.Result.Success<*>) {
                 holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_update_calendar_error)

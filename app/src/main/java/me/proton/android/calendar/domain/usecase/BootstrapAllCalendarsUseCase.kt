@@ -13,6 +13,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.util.TimeZone
@@ -28,7 +29,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val syncAlarmsUseCase: SyncAlarmsUseCase,
     private val keySetupUseCase: KeySetupUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val userSettingsRepository: UserSettingsRepository,
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase
 ): UseCase {
@@ -89,7 +90,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         val addresses =
             if (allCalendars.any { it.hasIncompleteKeySetup || it.hasUpdatePassphrase }) {
                 // Fetch the user addresses only once if we need to do key setup or reactivate calendar keys
-                userManager.getAddressesOrNull(userId)
+                userAddressManager.getAddressesOrNull(userId)
             } else null
         allCalendars.forEach {
             if (it.hasIncompleteKeySetup) {

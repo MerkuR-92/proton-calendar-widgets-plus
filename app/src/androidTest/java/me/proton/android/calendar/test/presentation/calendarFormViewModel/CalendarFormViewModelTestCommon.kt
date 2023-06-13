@@ -15,6 +15,7 @@ import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import org.junit.Before
@@ -33,6 +34,7 @@ open class CalendarFormViewModelTestCommon: KoinComponent {
     val userSettingsRepositoryMock: UserSettingsRepository = mockk()
 
     val userManagerMock: UserManager = mockk()
+    val userAddressManagerMock: UserAddressManager = mockk()
 
     val updateCalendarUseCaseMock: UpdateCalendarUseCase = mockk()
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
@@ -67,6 +69,7 @@ open class CalendarFormViewModelTestCommon: KoinComponent {
             application = protonCalendarApplication,
             calendarsRepository = calendarsRepositoryMock,
             userManager = userManagerMock,
+            userAddressManager = userAddressManagerMock,
             logger = testsLogger,
             json = json,
             updateCalendarUseCase = updateCalendarUseCaseMock,

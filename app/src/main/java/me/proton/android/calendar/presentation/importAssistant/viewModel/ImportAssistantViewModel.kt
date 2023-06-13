@@ -32,6 +32,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
 
@@ -41,6 +42,7 @@ class ImportAssistantViewModel @Inject constructor(
     private val logger: Logger,
     private val accountManager: AccountManager,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val importerApi: ImporterApi,
     private val createCalendarUseCase: CreateCalendarUseCase,
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
@@ -106,7 +108,7 @@ class ImportAssistantViewModel @Inject constructor(
     private suspend fun getDefaultUserEmail(): String? {
         val userId = getPrimaryUserIdOrNull() ?: return null
 
-        val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
+        val userAddresses = userAddressManager.getAddressesOrNull(userId) ?: emptyList()
 
         val defaultUserEmail = userManager.getUser(userId).email
         val defaultUserAddress =

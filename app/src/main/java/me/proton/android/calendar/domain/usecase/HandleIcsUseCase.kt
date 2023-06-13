@@ -35,6 +35,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
@@ -44,7 +45,7 @@ import javax.inject.Inject
 class HandleIcsUseCase @Inject constructor(
     private val logger: Logger,
     private val json: Json,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val calendarsRepository: CalendarsRepository,
     private val transformEventUseCase: TransformEventUseCase,
     private val editCreateEventUseCase: EditCreateEventUseCase,
@@ -105,6 +106,9 @@ class HandleIcsUseCase @Inject constructor(
                 defaultCalendar.ownerEmail,
                 defaultCalendar.description,
                 defaultCalendar.color,
+                defaultCalendar.priority,
+                defaultCalendar.addressId,
+                defaultCalendar.memberId,
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
@@ -182,7 +186,7 @@ class HandleIcsUseCase @Inject constructor(
 
     private suspend fun handleInviteIcs(iCalendar: ICalendar, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
 
-        val canonicalUserEmails = userManager.getAddressesOrNull(userId)?.map { address ->
+        val canonicalUserEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         } ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
 
@@ -382,6 +386,9 @@ class HandleIcsUseCase @Inject constructor(
                 existingCalendar?.ownerEmail ?: defaultCalendar.ownerEmail,
                 existingCalendar?.description ?: defaultCalendar.description,
                 existingCalendar?.color ?: defaultCalendar.color,
+                existingCalendar?.priority ?: defaultCalendar.priority,
+                existingCalendar?.addressId ?: defaultCalendar.addressId,
+                existingCalendar?.memberId ?: defaultCalendar.memberId,
                 existingCalendar?.flags ?: defaultCalendar.flags,
                 existingCalendar?.display ?: defaultCalendar.display,
                 existingCalendar?.type ?: defaultCalendar.type,

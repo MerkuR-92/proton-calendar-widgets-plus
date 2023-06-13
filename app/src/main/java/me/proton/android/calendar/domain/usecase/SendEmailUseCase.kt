@@ -20,6 +20,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getCancelIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getInviteIcs
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -34,6 +35,7 @@ import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
@@ -43,7 +45,7 @@ import javax.inject.Inject
 class SendEmailUseCase @Inject constructor(
     private val logger: Logger,
     private val sendEmailDirectUseCase: SendEmailDirect,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val database: AppDatabase,
     private val json: Json,
     private val transformEventUseCase: TransformEventUseCase,
@@ -94,12 +96,12 @@ class SendEmailUseCase @Inject constructor(
         } else getResponseIcs(event.iCalendar, userAttendee, participationStatus, originalTimeZoneInfo, dtStamp, isProtonProtonInvite)
 
         val userAttendeeCanonicalEmail = canonicalizeProtonEmail(userAttendeeEmail, forceCanonicalization = true)
-        val senderAddressId = userManager.getAddressesOrNull(userId)?.find {
+        val senderAddressId = userAddressManager.getAddressesOrNull(userId)?.find {
             canonicalizeProtonEmail(it.email, forceCanonicalization = true) == userAttendeeCanonicalEmail
         }?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address ID for sender") // TODO better error
 
         val senderAddress =
-            userManager.getAddressesOrNull(userId)?.find {
+            userAddressManager.getAddressesOrNull(userId)?.find {
                 it.addressId.id == senderAddressId
             } ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendReplyToOrganizer failed to get address for sender") // TODO better error
 
@@ -164,7 +166,7 @@ class SendEmailUseCase @Inject constructor(
             (sharedPropertiesResult.returnValue as Pair<*, *>).second as String
         )
 
-        val senderAddressResult = getSenderAddress(userId, newEventEntity)
+        val senderAddressResult = getSenderAddress(userId, newEventEntity, event.calendar.addressId)
         if (senderAddressResult !is UseCase.Result.Success<*>) return senderAddressResult
 
         val attachmentBytes = ics.toByteArray()
@@ -229,7 +231,7 @@ class SendEmailUseCase @Inject constructor(
             sharedEventId
         )
 
-        val senderAddressResult = getSenderAddress(userId, eventEntity)
+        val senderAddressResult = getSenderAddress(userId, eventEntity, event.calendar.addressId)
         if (senderAddressResult !is UseCase.Result.Success<*>) return senderAddressResult
 
         val attachmentBytes = ics.toByteArray()
@@ -281,14 +283,19 @@ class SendEmailUseCase @Inject constructor(
         )
     }
 
-    private suspend fun getSenderAddress(userId: UserId, eventEntity: EventEntity): UseCase.Result {
-        val member = database.membersDao().selectCalendarMembers(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
-        val senderAddressId = calendarsRepository.getAddressForMember(userId, member)?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
-
+    private suspend fun getSenderAddress(userId: UserId, eventEntity: EventEntity, addressId: String?): UseCase.Result {
         val senderAddress =
-            userManager.getAddressesOrNull(userId)?.find {
-                it.addressId.id == senderAddressId
-            } ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
+            addressId?.let {
+                userAddressManager.getAddressOrNull(userId, addressId)
+                    ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
+            } ?: run {
+                val member = database.membersDao().selectCalendarMembers(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
+                val senderAddressId = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail)?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
+
+                userAddressManager.getAddressesOrNull(userId)?.find {
+                    it.addressId.id == senderAddressId
+                } ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
+            }
 
         if (!senderAddress.isValidForEncryption(cryptoContext, logger)) {
             return UseCase.Result.Error("couldn't get UserAddress valid for encryption to attendees", UseCase.Error.Crypto.UserAddressInvalidForEncryption)
