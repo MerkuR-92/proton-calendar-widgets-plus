@@ -171,9 +171,14 @@ interface CalendarsApiService : BaseRetrofitApi {
     ) : JoinCalendarApiResponse
 
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
-    suspend fun leaveCalendar(
+    suspend fun leaveSharedCalendar(
         @Path("calendarId") calendarId: String,
         @Path("memberId") memberId: String
+    ) : StatusCodeApiResponse
+
+    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/managed")
+    suspend fun leaveManagedCalendar(
+        @Path("calendarId") calendarId: String
     ) : StatusCodeApiResponse
 }
 
@@ -427,12 +432,19 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         joinCalendar(calendarId, addressId, body)
     }.toApiResponse()
 
-    override suspend fun leaveCalendar(
+    override suspend fun leaveSharedCalendar(
         userId: UserId,
         calendarId: String,
         memberId: String
     ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-        leaveCalendar(calendarId, memberId)
+        leaveSharedCalendar(calendarId, memberId)
+    }.toApiResponse()
+
+    override suspend fun leaveManagedCalendar(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        leaveManagedCalendar(calendarId)
     }.toApiResponse()
 }
 

@@ -81,7 +81,8 @@ import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
-import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
@@ -125,7 +126,8 @@ class CalendarViewModel @Inject constructor(
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val deleteCalendarUseCase: DeleteCalendarUseCase,
     private val recreateCalendarUseCase: RecreateCalendarUseCase,
-    private val leaveCalendarUseCase: LeaveCalendarUseCase,
+    private val leaveSharedCalendarUseCase: LeaveSharedCalendarUseCase,
+    private val leaveManagedCalendarUseCase: LeaveManagedCalendarUseCase,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
@@ -529,13 +531,22 @@ class CalendarViewModel @Inject constructor(
         return recreateCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
-    suspend fun leaveCalendar(calendarId: String, memberId: String?): UseCase.Result {
+    suspend fun leaveSharedCalendar(calendarId: String, memberId: String?): UseCase.Result {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel recreateCalendar")
-            return UseCase.Result.Error("userID == null in recreateCalendar")
+            logger.e("User ID was null in CalendarViewModel leaveCalendar")
+            return UseCase.Result.Error("userID == null in leaveCalendar")
         }
-        return leaveCalendarUseCase.execute(UserId(userId), calendarId, memberId)
+        return leaveSharedCalendarUseCase.execute(UserId(userId), calendarId, memberId)
+    }
+
+    suspend fun leaveHolidayCalendar(calendarId: String): UseCase.Result {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel leaveHolidayCalendar")
+            return UseCase.Result.Error("userID == null in leaveHolidayCalendar")
+        }
+        return leaveManagedCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
     fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {

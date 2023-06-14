@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
@@ -54,7 +53,6 @@ import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewMod
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
-import me.proton.core.util.kotlin.takeIfNotEmpty
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -349,7 +347,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                         setMessage(resourceProvider.provideString(R.string.remove_calendar_dialog_message))
                         setPositiveButton(R.string.action_remove) { _, _ ->
                             lifecycleScope.launch {
-                                when (calendarViewModel.leaveCalendar(calendar.id, calendar.memberId)) {
+                                when (calendarViewModel.leaveHolidayCalendar(calendar.id)) {
                                     is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                     is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_removed))
@@ -366,7 +364,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                         setMessage(resourceProvider.provideString(R.string.leave_calendar_dialog_message))
                         setPositiveButton(R.string.action_leave) { _, _ ->
                             lifecycleScope.launch {
-                                when (calendarViewModel.leaveCalendar(calendar.id, calendar.memberId)) {
+                                when (calendarViewModel.leaveSharedCalendar(calendar.id, calendar.memberId)) {
                                     is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.leave_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                     is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))

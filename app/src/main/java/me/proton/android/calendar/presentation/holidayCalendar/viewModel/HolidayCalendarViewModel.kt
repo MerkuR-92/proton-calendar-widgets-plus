@@ -30,7 +30,7 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
-import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -50,7 +50,7 @@ class HolidayCalendarViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val joinCalendarUseCase: JoinCalendarUseCase,
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
-    private val leaveCalendarUseCase: LeaveCalendarUseCase,
+    private val leaveManagedCalendarUseCase: LeaveManagedCalendarUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val workManager: WorkManager
     ) : AndroidViewModel(application) {
@@ -457,7 +457,7 @@ class HolidayCalendarViewModel @Inject constructor(
             }
 
             // Leave current holiday calendar
-            val leaveCalendarUseCaseResult = leaveCalendarUseCase.execute(userId, calendar.id, calendar.memberId)
+            val leaveCalendarUseCaseResult = leaveManagedCalendarUseCase.execute(userId, calendar.id)
             if (leaveCalendarUseCaseResult !is UseCase.Result.Success<*>) {
                 holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_update_calendar_error)
