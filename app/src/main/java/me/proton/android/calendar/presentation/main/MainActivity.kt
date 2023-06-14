@@ -98,6 +98,8 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCa
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortOtherCalendars
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightDialog
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.databinding.ActivityMainBinding
@@ -121,6 +123,7 @@ import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toBooleanOrFalse
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
@@ -168,6 +171,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private var returnToView: ViewMode? = null
 
     private var googleSignInClient: GoogleSignInClient? = null
+
+    // Used to make sure we're not looping on refreshing calendars
+    private var refreshedCalendarIds: List<String> = emptyList()
 
     private fun navigateTo(uri: Uri) {
         lifecycleScope.launch(Dispatchers.Default) {
@@ -1640,12 +1646,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
             }
 
-            lifecycleScope.launch {
-                userPersonalCalendars.forEach {
-                    // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
-                    if (it.description == "0") calendarViewModel.refreshMember(calendarId = it.id)
-                }
-            }
+            refreshCalendarsWithMissingFields(userPersonalCalendars)
         })
 
         calendarViewModel.defaultCalendarId.observe(this@MainActivity, Observer { defaultCalendarId ->
@@ -1680,20 +1681,40 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         otherCalendarsMediator.observe(this@MainActivity, Observer {
             it?.let {
-                val otherCalendars = it.first.sortedBy {
-                    it.isDisabled // Disabled will appear last
-                }
+                val otherCalendars = sortOtherCalendars(it.first)
                 val calendarSubscriptions = it.second
                 val dataSetChanged = otherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
                 otherCalendarListAdapter.submitList(otherCalendars)
                 if (dataSetChanged) otherCalendarListAdapter.notifyDataSetChanged()
                 binding.navViewMainContent.navViewOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
+
+                refreshCalendarsWithMissingFields(otherCalendars)
             }
         })
 
         featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
             holidayCalendarFeatureFlag ?: return@Observer
         })
+    }
+
+    private fun refreshCalendarsWithMissingFields(calendars: List<Calendar>) {
+        lifecycleScope.launch {
+            // Refresh calendars that are missing owner / priority / addressId fields
+            calendars.filter {
+                it.isSharedWithMe && it.ownerEmail.isNullOrEmpty() ||
+                        it.priority == null ||
+                        it.addressId.isNullOrEmpty() ||
+                        it.description == "0" // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
+            }.takeIfNotEmpty()?.let { calendarsToRefresh ->
+                logger.e("Test test refreshCalendarsWithMissingFields calendarsToRefresh $calendarsToRefresh")
+                val calendarIds = calendarsToRefresh.map { it.id }.filterNot { calendarId ->
+                    refreshedCalendarIds.any { it == calendarId }
+                }
+                // Keep calendar ids to make sure we're not looping on refreshing calendars
+                refreshedCalendarIds = calendarIds
+                if (calendarIds.isNotEmpty()) calendarViewModel.refreshCalendars(calendarIds)
+            }
+        }
     }
 
     private fun setUserPersonalCalendarsList(userPersonalCalendars: List<Calendar>, defaultCalendarId: String? = null) {
@@ -1710,11 +1731,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
                 if (defaultCalendar?.isActive == false) tmpDefaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive }?.id
                 userCalendarListAdapter.submitList(
-                    filteredUserPersonalCalendars.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }.sortedByDescending {
-                        it.id == tmpDefaultCalendarId // Default will appear first
-                    }
+                    sortPersonalCalendars(filteredUserPersonalCalendars, tmpDefaultCalendarId)
                 )
             }
         }

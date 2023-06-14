@@ -517,6 +517,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>) {
         val calendars = arrayListOf<CalendarEntity>()
+        val members = hashMapOf<String, MemberEntity>()
         calendarIds.forEach {
             val calendarResponse = calendarsApi.getCalendar(userId, it)
             if (calendarResponse !is ApiResponse.Success) {
@@ -524,11 +525,24 @@ class CalendarsRepositoryImpl @Inject constructor(
                 logger.e("error getting calendar from API in CalendarsRepositoryImpl")
             } else {
                 calendars.add(calendarResponse.data.calendar)
+                // Get members for calendar
+                val memberListResponse = calendarsApi.getMemberList(userId, it)
+                if (memberListResponse !is ApiResponse.Success) {
+                    // We log but ignore the error
+                    logger.e("error getting member from API in CalendarsRepositoryImpl")
+                } else {
+                    memberListResponse.data.members.firstOrNull()?. let { memberEntity ->
+                        members[it] = memberEntity
+                    }
+                }
             }
         }
         calendars.forEach {
             // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
             persistCalendar(userId.id, it)
+            members[it.id]?.let { memberEntity ->
+                persistMember(memberEntity)
+            }
         }
     }
 

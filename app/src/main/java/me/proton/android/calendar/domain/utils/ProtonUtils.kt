@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import me.proton.android.calendar.domain.model.Calendar
 import java.time.LocalDate
 
 interface ProtonUtils {
@@ -16,4 +17,6 @@ interface ProtonUtils {
     fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun Context.displayPaidUserMandatoryPersonalCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun getCachedMonthViewsTimeWindow(selectedDate: LocalDate, weekStart: Int): Pair<LocalDate, LocalDate>
+    fun sortPersonalCalendars(calendars: List<Calendar>, defaultCalendarId: String?): List<Calendar>
+    fun sortOtherCalendars(calendars: List<Calendar>): List<Calendar>
 }

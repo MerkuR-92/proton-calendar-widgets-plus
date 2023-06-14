@@ -27,16 +27,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.FragmentArguments.CALENDAR_ID_ARG
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.databinding.FragmentSettingsBinding
 import me.proton.android.calendar.domain.ResourceProvider
@@ -81,9 +84,6 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
 
     private var defaultCalendarId: String? = null
-
-    // Used to make sure we're not looping on refreshing calendars
-    private var refreshedCalendarIds: List<String> = emptyList()
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
@@ -192,9 +192,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
         otherCalendarsMediator.observe(viewLifecycleOwner) {
             it?.let {
                 lifecycleScope.launch {
-                    val otherCalendars = it.first.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }
+                    val otherCalendars = ProtonUtilsImpl.sortOtherCalendars(it.first)
                     val calendarSubscriptions = it.second
 
                     val calendarSubscriptionsChanged =
@@ -203,16 +201,6 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                     settingsOtherCalendarListAdapter.submitList(otherCalendars)
                     if (calendarSubscriptionsChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
                     binding.settingsOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
-
-                    // Refresh calendars if any are missing owner field
-                    otherCalendars.filter { it.isSharedWithMe && it.ownerEmail.isNullOrEmpty() }.takeIfNotEmpty()?.let { calendars ->
-                        val calendarIds = calendars.map { it.id }.filterNot { calendarId ->
-                            refreshedCalendarIds.any { it.equals(calendarId) }
-                        }
-                        // Keep calendar ids to make sure we're not looping on refreshing calendars
-                        refreshedCalendarIds = calendarIds
-                        if (calendarIds.isNotEmpty()) calendarViewModel.refreshCalendars(calendarIds)
-                    }
                 }
             }
         }
@@ -276,13 +264,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                 }
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
                 val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-                settingsUserCalendarListAdapter.submitList(
-                    userPersonalCalendars.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }.sortedByDescending {
-                        it.id == defaultCalendarId // Default will appear first
-                    }
-                )
+                settingsUserCalendarListAdapter.submitList(sortPersonalCalendars(userPersonalCalendars, defaultCalendarId))
                 if (dataSetChanged) settingsUserCalendarListAdapter.notifyDataSetChanged()
             }
         }

@@ -8,6 +8,7 @@ import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.presentation.utils.InputValidationResult
@@ -149,6 +150,38 @@ object ProtonUtilsImpl : ProtonUtils {
         val toDate = firstDayOfMaxMonth.with(TemporalAdjusters.lastDayOfMonth()).plusDays(maxMonthLastDayOfMonthOffset.toLong())
 
         return Pair(fromDate, toDate)
+    }
+
+    override fun sortPersonalCalendars(calendars: List<Calendar>, defaultCalendarId: String?): List<Calendar> {
+        return if (calendars.any { it.priority == null }) {
+            calendars.sortedBy {
+                it.isDisabled // Disabled will appear last
+            }.sortedByDescending {
+                it.id == defaultCalendarId // Default will appear first
+            }
+        } else {
+            calendars.sortedBy {
+                it.priority
+            }.sortedBy {
+                it.isDisabled // Disabled will appear last
+            }.sortedByDescending {
+                it.id == defaultCalendarId // Default will appear first
+            }
+        }
+    }
+
+    override fun sortOtherCalendars(calendars: List<Calendar>): List<Calendar> {
+        return if (calendars.any { it.priority == null }) {
+            calendars.sortedBy {
+                it.isDisabled // Disabled will appear last
+            }
+        } else {
+            calendars.sortedBy {
+                it.priority
+            }.sortedBy {
+                it.isDisabled // Disabled will appear last
+            }
+        }
     }
 }
 
