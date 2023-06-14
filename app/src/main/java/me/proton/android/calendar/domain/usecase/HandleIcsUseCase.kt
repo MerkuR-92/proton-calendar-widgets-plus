@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
@@ -36,7 +37,6 @@ import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.util.concurrent.TimeUnit
@@ -82,18 +82,10 @@ class HandleIcsUseCase @Inject constructor(
 
     private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isOpeningFromProtonMail: Boolean): IcsSurgeryUtils.HandleIcsResult {
 
-        // Try to get default calendar if it exists
-        var defaultCalendar = calendarsRepository.getDefaultCalendarId(userId.id)?.let { defaultCalendarId ->
+        // Get default calendar
+        val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let { defaultCalendarId ->
             calendarsRepository.selectCalendar(defaultCalendarId)
-        }
-        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.allowEditEvents) {
-            // Fallback if no default calendar was set
-            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
-            defaultCalendar =
-                activeUserCalendars.firstOrNull { it.isOwner} // First try to get a personal active calendar
-                    ?: activeUserCalendars.firstOrNull { it.allowEditEvents } // Fallback to any active writable calendar
-                            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
-        }
+        } ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
 
         // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones
         val notifications = NotificationMigration(false, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
@@ -277,14 +269,10 @@ class HandleIcsUseCase @Inject constructor(
         if (!isOrganizerMode && userAttendee == null) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
 
         // Use the default calendar to create the event
-        val defaultCalendarId = calendarsRepository.getDefaultCalendarIdOrFirstActiveId(userId.id)
-            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
-        var defaultCalendar = calendarsRepository.selectCalendar(defaultCalendarId)
         // Calendar needs to be active and user needs to be owner (we don't allow members to add invites in shared cals even with write permissions)
-        if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
-            defaultCalendar = calendarsRepository.selectActiveUserCalendars(userId.id).filter { it.isOwner }.firstOrNull()
-                ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
-        }
+        val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = false)?.let {
+            calendarsRepository.selectCalendar(it)
+        } ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
 
         // Fetch all events sharing UID from BE
         val eventsSharingUidResponse = (

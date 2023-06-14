@@ -410,24 +410,13 @@ class EventViewModel @Inject constructor(
      * @returns Default calendar (and load calendar settings to be stored in calendarSettings) or InitResult error.
      */
     private suspend fun initializeDefaultCalendar(): InitResult {
-        // Try to get default calendar if it exists
-        var defaultCalendar = calendarsRepository.getDefaultCalendarId(userId.id)?.let { defaultCalendarId ->
-            calendarsRepository.selectCalendar(defaultCalendarId)
-        }
-        var defaultCalendarId = defaultCalendar?.id
-
-        if (defaultCalendarId == null || defaultCalendar?.isActive != true || !defaultCalendar.allowEditEvents) {
-            // Fallback if no default calendar was set
-            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
-            defaultCalendar =
-                activeUserCalendars.firstOrNull { it.isOwner} // First try to get a personal active calendar
-                    ?: activeUserCalendars.firstOrNull { it.allowEditEvents } // Fallback to any active writable calendar
-                            ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
-            defaultCalendarId = defaultCalendar.id
-        }
+        // Get default calendar
+        val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let {
+            calendarsRepository.selectCalendar(it)
+        } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
 
         // Load settings for given calendar id and stores them in calendarSettings
-        if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error.Default("EventViewModel: could not get CalendarSettings")
+        if (!loadSettingsForCalendar(defaultCalendar.id)) return InitResult.Error.Default("EventViewModel: could not get CalendarSettings")
 
         return InitResult.InitDefaultCalendarSuccess(defaultCalendar)
     }

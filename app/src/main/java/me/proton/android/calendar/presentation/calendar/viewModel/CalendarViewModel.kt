@@ -1040,14 +1040,14 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getDefaultCalendarId(): String? {
+    suspend fun getDefaultCalendarIdWithFallback(allowShared: Boolean): String? {
         return defaultCalendarId.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
                 logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
                 return null
             }
-            calendarsRepository.getDefaultCalendarId(userId.id)
+            calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared)
         }
     }
 

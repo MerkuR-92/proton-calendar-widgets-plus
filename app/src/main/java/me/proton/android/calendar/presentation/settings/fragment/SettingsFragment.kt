@@ -257,11 +257,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
             binding.settingsOtherCalendarsTitleAdd.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
             binding.settingsCalendarsSubtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
             lifecycleScope.launch {
-                var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-                val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == defaultCalendarId }
-                if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
-                    defaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive && it.isOwner }?.id
-                }
+                val defaultCalendarId = calendarViewModel.getDefaultCalendarIdWithFallback(allowShared = false)
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
                 val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
                 settingsUserCalendarListAdapter.submitList(sortPersonalCalendars(userPersonalCalendars, defaultCalendarId))

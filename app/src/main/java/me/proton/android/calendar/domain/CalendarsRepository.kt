@@ -315,7 +315,7 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarUserSettingsByUserId(userId: String)
 
-    suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String?
+    suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String?
 
     suspend fun getDefaultCalendarId(userId: String): String?
 

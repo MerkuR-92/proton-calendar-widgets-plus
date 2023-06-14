@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -37,6 +38,7 @@ class DeleteCalendarUseCase @Inject constructor(
 
         val calendar = calendarsRepository.selectCalendar(calendarId)
             ?: return DeleteCalendarOption.Error("could not select Calendar from DB")
+        // Do not use getDefaultCalendarIdWithFallback here as we only want to update the default calendar field if value was set
         val defaultCalendarId = calendarsRepository.getDefaultCalendarId(userId.id)
         val isCalendarDefault =
             calendar.id == defaultCalendarId && calendar.isActive && calendar.isSubscribed.not()
@@ -44,7 +46,11 @@ class DeleteCalendarUseCase @Inject constructor(
 
         return if (isCalendarDefault) {
 
-            val nextDefaultCalendar = activeOwnedUserCalendars.firstOrNull { it.id != calendarId }
+            // Pick the first from active personal calendars sorted by priority as next default calendar
+            val nextDefaultCalendar = sortPersonalCalendars(
+                activeOwnedUserCalendars,
+                null
+            ).firstOrNull { it.id != calendarId }
             if (nextDefaultCalendar != null) {
                 DeleteCalendarOption.Delete.DefaultNextActive(
                     calendarId,

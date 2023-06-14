@@ -51,6 +51,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
@@ -91,7 +92,6 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
@@ -1565,8 +1565,23 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarUserSettingsDao().deleteByUserId(userId)
     }
 
-    override suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String? {
-        return getDefaultCalendarId(userId) ?: selectActiveUserCalendars(userId).firstOrNull()?.id
+    override suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String? {
+        // Get user calendar settings default calendar id or fallback to first sorted personal active user calendar id
+        return getDefaultCalendarId(userId)
+            ?: run {
+                if (allowShared) {
+                    val sortedActiveUserCalendars = sortPersonalCalendars(selectActiveUserCalendars(userId), null)
+                    sortedActiveUserCalendars.firstOrNull {
+                        it.isOwner // First try to get a personal calendar
+                    }?.id ?: sortedActiveUserCalendars.firstOrNull {
+                        it.allowEditEvents // Fallback to a writable calendar
+                    }?.id
+                } else {
+                    sortPersonalCalendars(selectActiveUserCalendars(userId), null).firstOrNull {
+                        it.isOwner
+                    }?.id
+                }
+            }
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {

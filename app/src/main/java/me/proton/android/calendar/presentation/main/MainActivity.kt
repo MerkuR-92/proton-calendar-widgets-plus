@@ -1727,9 +1727,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             binding.navViewMainContent.navViewCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty())
             binding.navViewMainContent.navViewOtherCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
             lifecycleScope.launch {
-                var tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarId()
-                val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == tmpDefaultCalendarId }
-                if (defaultCalendar?.isActive == false) tmpDefaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive }?.id
+                val tmpDefaultCalendarId = defaultCalendarId ?: calendarViewModel.getDefaultCalendarIdWithFallback(allowShared = false)
                 userCalendarListAdapter.submitList(
                     sortPersonalCalendars(filteredUserPersonalCalendars, tmpDefaultCalendarId)
                 )

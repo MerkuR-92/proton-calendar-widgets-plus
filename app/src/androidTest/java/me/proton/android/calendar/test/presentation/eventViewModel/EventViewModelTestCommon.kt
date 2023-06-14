@@ -91,7 +91,7 @@ open class EventViewModelTestCommon: KoinComponent {
         val application = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as Application
         protonCalendarApplication = application
 
-        coEvery { calendarsRepositoryMock.getDefaultCalendarIdOrFirstActiveId(userId.id) } returns calendarId
+        coEvery { calendarsRepositoryMock.getDefaultCalendarIdWithFallback(userId.id, true) } returns calendarId
         coEvery { calendarsRepositoryMock.selectCalendar(calendarId) } returns CalendarMocks.provideCalendar()
         // TODO Test fallback to first active user calendar when default calendar is null
         coEvery { calendarsRepositoryMock.selectActiveUserCalendars(userId.id) } returns listOf(CalendarMocks.provideCalendar())
@@ -163,7 +163,7 @@ open class EventViewModelTestCommon: KoinComponent {
 
         if (editMode) {
             if (eventId == null) {
-                coVerify(exactly = 1) { calendarsRepositoryMock.getDefaultCalendarIdOrFirstActiveId(any()) }
+                coVerify(exactly = 1) { calendarsRepositoryMock.getDefaultCalendarIdWithFallback(any(), any()) }
                 coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendar(any()) }
             }
             coVerify(exactly = 1) { calendarsRepositoryMock.selectCalendarSettings(any()) }
