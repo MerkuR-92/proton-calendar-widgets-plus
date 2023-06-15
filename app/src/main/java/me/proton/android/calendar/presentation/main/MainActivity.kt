@@ -70,6 +70,7 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.EVENT_ID
 import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.GoogleSignInCodes
+import me.proton.android.calendar.common.HOLIDAY_CALENDAR_VERSION_CODE
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
@@ -477,6 +478,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Ready -> {
 
+                featureFlagViewModel.prefetchForCurrentUser()
+
                 lifecycleScope.launch {
                     val searchEnabled = searchViewModel.isCalendarDownloadEnabled()
                     if (searchEnabled && mainViewModel.isConnectedToNetwork) {
@@ -500,21 +503,34 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         materialDialogBuilder.show()
                     } else {
                         // Display spotlight dialog if needed
-                        val spotlightShown = showLastSpotlightDialog {
-                            if (it == SEARCH_VERSION_CODE) {
-                                searchViewModel.enableCalendarDownload()
-                                displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+                        val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
+                        val spotlightShown = showLastSpotlightDialog(
+                            featureFlagViewModel.isHolidayCalendarEnabled(),
+                            isCalendarLimitReached
+                        ) {
+                            when (it) {
+                                SEARCH_VERSION_CODE -> {
+                                    searchViewModel.enableCalendarDownload()
+                                    displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+                                }
+                                HOLIDAY_CALENDAR_VERSION_CODE -> {
+                                    if (isCalendarLimitReached) {
+                                        // Open calendar settings view
+                                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                                    } else {
+                                        // Open holiday calendar form
+                                        navController.navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
+                                    }
+                                }
                             }
                         }
 
                         // Make sure we don't overlap spotlight and play store rating dialogs
                         if (!spotlightShown) {
-                            lifecycleScope.launch {
-                                // We need to wait a few seconds before displaying the dialog
-                                delay(PLAY_STORE_RATING_DELAY.toMillis())
-                                // Check if we need to display play store rating dialog
-                                handlePlayStoreRatingFlow()
-                            }
+                            // We need to wait a few seconds before displaying the dialog
+                            delay(PLAY_STORE_RATING_DELAY.toMillis())
+                            // Check if we need to display play store rating dialog
+                            handlePlayStoreRatingFlow()
                         }
                     }
                 }
@@ -527,8 +543,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 val newEventIntent =
                     mainViewModel.consumeIntent(MainViewModel.INTENT_ACTION_NEW_EVENT)
-
-                featureFlagViewModel.prefetchForCurrentUser()
 
                 if (eventDetailsIntent != null && eventDetailsIntent.data != null) {
                     logger.v("converting deeplink and navigating manually")
