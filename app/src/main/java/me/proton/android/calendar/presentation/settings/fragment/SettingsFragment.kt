@@ -242,7 +242,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                     }
                     else -> { } // We do not use the other values
                 }
-                calendarFormViewModel.calendarSettingsSnackState.value = null
+                holidayCalendarViewModel.calendarSettingsSnackState.value = null
             }
         }
     }
