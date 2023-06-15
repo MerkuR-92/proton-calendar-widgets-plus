@@ -432,4 +432,10 @@ object AppDatabaseMigrations {
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_managed_holiday_calendars_fkUserId` ON `${TABLE_MANAGED_HOLIDAY_CALENDARS}` (`fkUserId`)")
         }
     }
+
+    val MIGRATION_53_54 = object : Migration(53, 54) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            UserDatabase.MIGRATION_2.migrate(database)
+        }
+    }
 }

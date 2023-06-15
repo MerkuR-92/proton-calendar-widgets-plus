@@ -176,7 +176,7 @@ dependencies {
     // Proton Core libraries.
     implementation(libs.core.account)
     implementation(libs.core.accountManager)
-    implementation(libs.core.accountManager.dagger)
+    implementation(libs.core.accountRecovery)
     implementation(libs.core.auth)
     implementation(libs.core.contact)
     implementation(libs.core.country)

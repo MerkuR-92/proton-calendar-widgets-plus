@@ -61,6 +61,7 @@ object UserMocks {
             services = services,
             subscribed = subscribed,
             delinquent = delinquent,
+            recovery = null,
             keys = emptyList()
         )
     }
