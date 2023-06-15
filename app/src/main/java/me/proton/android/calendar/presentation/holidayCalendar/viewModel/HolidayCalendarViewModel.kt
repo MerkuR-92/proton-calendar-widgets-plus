@@ -37,6 +37,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.util.kotlin.equalsNoCase
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -53,7 +54,7 @@ class HolidayCalendarViewModel @Inject constructor(
     private val leaveManagedCalendarUseCase: LeaveManagedCalendarUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val workManager: WorkManager
-    ) : AndroidViewModel(application) {
+) : AndroidViewModel(application) {
 
     sealed class HolidayCalendarSnackState {
 
@@ -257,12 +258,14 @@ class HolidayCalendarViewModel @Inject constructor(
         val calendarsMatchingCode =
             if (calendarsMatchingTimeZone.size > 1) {
                 // If there are more than one match, use the Locale country tag.
-                if (defaultCountryCode.isNotEmpty()) {
-                    calendarsMatchingTimeZone.filter {
-                        it.countryCode.equalsNoCase(defaultCountryCode)
-                    }
-                } else {
-                    // If we don't have a country tag, use the Locale language tag.
+                val calendarsMatchingCountryCode =
+                    defaultCountryCode.takeIfNotEmpty()?.let {
+                        calendarsMatchingTimeZone.filter {
+                            it.countryCode.equalsNoCase(defaultCountryCode)
+                        }
+                    } ?: emptyList()
+                // If we don't have a country tag or didn't find a match, use the Locale language tag.
+                calendarsMatchingCountryCode.ifEmpty {
                     calendarsMatchingTimeZone.filter {
                         it.languageCode.equalsNoCase(defaultLanguageCode)
                     }
