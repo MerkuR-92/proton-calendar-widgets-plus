@@ -199,6 +199,10 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                     settingsOtherCalendarListAdapter.submitList(otherCalendars)
                     if (calendarSubscriptionsChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
                     binding.settingsOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
+                    val userPersonalCalendars = calendarViewModel.getUserPersonalCalendars() ?: emptyList()
+                    binding.settingsCalendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+                    binding.settingsOtherCalendarsTitleAdd.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+                    binding.settingsCalendarsSubtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
                 }
             }
         }

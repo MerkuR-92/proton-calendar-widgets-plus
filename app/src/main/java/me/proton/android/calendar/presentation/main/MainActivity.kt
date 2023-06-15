@@ -1687,6 +1687,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 otherCalendarListAdapter.submitList(otherCalendars)
                 if (dataSetChanged) otherCalendarListAdapter.notifyDataSetChanged()
                 binding.navViewMainContent.navViewOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
+                lifecycleScope.launch {
+                    // We only keep active and disabled calendars for the navigation drawer calendar list
+                    val filteredUserPersonalCalendars = calendarViewModel.getUserPersonalCalendars()?.filter { it.isActive || it.isDisabled } ?: emptyList()
+                    binding.navViewMainContent.navViewCalendars.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty() || (filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+                    binding.navViewMainContent.navViewCalendarsListAddLayout.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
+                    binding.navViewMainContent.navViewCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isNotEmpty())
+                    binding.navViewMainContent.navViewOtherCalendarsCreate.visibleOrGone(filteredUserPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+                }
 
                 refreshCalendarsWithMissingFields(otherCalendars)
             }
