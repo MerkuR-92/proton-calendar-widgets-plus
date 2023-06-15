@@ -38,11 +38,13 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
 import java.security.MessageDigest
 import java.time.*
@@ -547,6 +549,69 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     /**
+     * Combines expanding, including single edits and filtering by exdates.
+     */
+    override fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>
+    ): List<UiEvent>? {
+        val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
+            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
+        } else {
+            toDate
+        }
+
+        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
+
+        val exZonedDateTimes =
+            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                exDates.values.map { exDate ->
+                    exDate.toZonedDateTime(timeZoneId)
+                }
+            }
+
+        return occurrences.mapNotNull { occurrence ->
+
+            if (occurrence.startDateTime in exZonedDateTimes || !startEndOverlapsWithFullDayRange(occurrence.startDateTime, occurrence.endDateTime, fromDate, toDate, timeZoneId)) {
+                // occurrence is exdated or is outside of the window
+                null
+            } else {
+                val event = // single edit or original event
+                    eventsSharingUid.find {
+                        it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
+                            occurrence.startDateTime,
+                            originalEvent.isAllDay()
+                        )
+                    } ?: originalEvent
+
+                UiEvent(
+                    event.id,
+                    event.calendar.id,
+                    event.uid,
+                    event.summary,
+                    event.location,
+                    event.description,
+                    occurrence.startDateTime,
+                    occurrence.endDateTime,
+                    event.isAllDay(),
+                    occurrence.occurrenceNumber,
+                    event.isRecurring(),
+                    event.calendar.color,
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
+                    event.getParticipationStatus(userEmails),
+                    event.status
+                )
+            }
+
+        }
+    }
+
+    /**
      * Creates ICalendar using only plaintext shared event part.
      */
     override fun toICalendarFromPlaintextSharedPart(json: Json, sharedEvents: List<JsonElement>): ICalendar? {
@@ -905,6 +970,23 @@ object ICalUtilsImpl : ICalUtils {
         )
         result.addAll(
             groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.getOccurrenceStart(timeZoneId) }, { it.summary }))
+                ?: emptyList()
+        )
+        return result
+    }
+
+    /**
+     * Groups all-day and spanning multiple days Events first.
+     */
+    override fun List<UiEvent>.sortUiEventsForAgendaView(timeZoneId: String): List<UiEvent> {
+        val groupedByAllDayEvents = this.groupBy { it.isAllDay || !it.spansSingleDay(timeZoneId = timeZoneId)}
+        val result = mutableListOf<UiEvent>()
+        result.addAll(
+            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)) }, { it.summary }))
+                ?: emptyList()
+        )
+        result.addAll(
+            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)) }, { it.summary }))
                 ?: emptyList()
         )
         return result

@@ -77,6 +77,7 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
@@ -468,6 +469,10 @@ class CalendarViewModel @Inject constructor(
 
     fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<Event>> {
         return calendarsRepository.getEventsFlow(fromDate, toDate, timeZoneId, allowCached = true).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+    }
+
+    fun getUiEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
+        return calendarsRepository.getUiEventsFlow(fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
     }
 
     suspend fun handleDeleteEvent(eventId: String,

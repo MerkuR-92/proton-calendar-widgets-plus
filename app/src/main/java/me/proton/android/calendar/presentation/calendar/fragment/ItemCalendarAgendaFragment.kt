@@ -12,7 +12,6 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import biweekly.ICalendar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,18 +23,19 @@ import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForAgendaView
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortUiEventsForAgendaView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.databinding.ItemCalendarAgendaFragmentBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.Collections
 import javax.inject.Inject
 
@@ -55,12 +55,12 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var position: Int? = null
     private var date: LocalDate? = null
 
-    private val fakeHeaderEvent = Event.from("", Calendar("", "", "", "", "", 1, true, 0, 0, 0, emptyList(), emptyList()), ICalendar(), 0)
+    private val fakeHeaderEvent = UiEvent()
 
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
 
-    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
+    private lateinit var uiEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var selectedDate: LocalDate? = null
 
     private lateinit var eventsListLayoutAdapter: EventAdapter
@@ -107,16 +107,16 @@ class ItemCalendarAgendaFragment: Fragment() {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(
                             it.id,
-                            it.occurrence?.occurrenceNumber ?: 0
+                            it.occurrenceNumber ?: 0
                         )
                     )
                 } else {
-                    requireContext().displayEventDecryptionErrorDialog(it.isRecurring()) { _, _ ->
+                    requireContext().displayEventDecryptionErrorDialog(it.isRecurring) { _, _ ->
                         lifecycleScope.launch {
                             val deleteResult = withContext(Dispatchers.Default) {
                                 calendarViewModel.handleDeleteEvent(
                                     it.id,
-                                    it.calendar.id,
+                                    it.calendarId,
                                     EventEditDeleteOption.ALL_EVENTS
                                 )
                             }
@@ -192,14 +192,14 @@ class ItemCalendarAgendaFragment: Fragment() {
                 // Set the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                 calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
             }
-            if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers() &&
+            if (this::uiEventsLiveData.isInitialized && uiEventsLiveData.hasActiveObservers() &&
                 immutableDate != selectedDate &&
                 immutableDate != selectedDate.minusDays(1) &&
                 immutableDate != selectedDate.plusDays(1)) {
                 logger.v("events flow: remove observer for $immutableDate. Selected date is $selectedDate")
                 calendarViewModel.setLoading(false, position)
-                eventsLiveData.removeObservers(viewLifecycleOwner)
-            } else if (this::eventsLiveData.isInitialized && !eventsLiveData.hasActiveObservers() &&
+                uiEventsLiveData.removeObservers(viewLifecycleOwner)
+            } else if (this::uiEventsLiveData.isInitialized && !uiEventsLiveData.hasActiveObservers() &&
                 (immutableDate == selectedDate ||
                         immutableDate == selectedDate.minusDays(1) ||
                         immutableDate == selectedDate.plusDays(1))) {
@@ -210,15 +210,16 @@ class ItemCalendarAgendaFragment: Fragment() {
     }
 
     private fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
+        if (this::uiEventsLiveData.isInitialized && uiEventsLiveData.hasActiveObservers()) {
             logger.v("events flow: remove already existing observer for $immutableDate")
             calendarViewModel.setLoading(false, position)
-            eventsLiveData.removeObservers(viewLifecycleOwner)
+            uiEventsLiveData.removeObservers(viewLifecycleOwner)
         }
-        eventsLiveData = calendarViewModel.getEvents(immutableDate, immutableDate, timeZoneId, this.lifecycle)
-        eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
-            eventsResult?.let {
+        uiEventsLiveData = calendarViewModel.getUiEvents(immutableDate, immutableDate, timeZoneId, this.lifecycle)
+        uiEventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
+
+        eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
                         val currentList = eventsListLayoutAdapter.currentList
@@ -231,17 +232,17 @@ class ItemCalendarAgendaFragment: Fragment() {
                     is CalendarsRepository.GetEventsResult.Success -> {
 
                         // Sort the events
-                        val sortedEvents = it.events.sortForAgendaView(timeZoneId)
+                        val sortedEvents = it.events.sortUiEventsForAgendaView(timeZoneId)
 
                         val partDayEvents = it.events.filter {
-                            !it.isAllDay() && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
+                            !it.isAllDay && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
                         }
                         // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                         firstEventOfTheDayTime =
                             if (partDayEvents.isNotEmpty()) {
                                 Collections.min(
                                     partDayEvents.map {
-                                        it.getOccurrenceStart(timeZoneId).toLocalTime()
+                                        it.dateStart.withZoneSameLocal(ZoneId.of(timeZoneId)).toLocalTime()
                                     }
                                 )
                             } else null

@@ -24,6 +24,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrence
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.utils.EventUtils
 import me.proton.core.user.domain.entity.UserAddress
 import java.time.*
@@ -73,19 +74,12 @@ object EventUtilsImpl : EventUtils {
         }?.participationStatus = status
     }
 
-    /**
-     * For given LocalDate and TimeZoneId, returns
-     * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
-     * Pair<-1, x> if event doesn't span the given date
-     */
-    override fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> {
+    private fun calculateFullDayCounter(date: LocalDate, dateStart: ZonedDateTime, dateEnd: ZonedDateTime): Pair<Int, Int> {
 
-        val occurrenceStart = getOccurrenceStart(timeZoneId).toLocalDate()
-        val occurrenceEndAdjustedForMidnight = getOccurrenceEnd(timeZoneId).toLocalDate()
-            .minusDays(if (getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT) 1 else 0)
+        val dateEndAdjustedForMidnight = dateEnd.toLocalDate().minusDays(if (dateEnd.toLocalTime() == LocalTime.MIDNIGHT) 1 else 0)
 
-        val todayOffset = ChronoUnit.DAYS.between(occurrenceStart, date).toInt() + 1
-        val durationInDays = ChronoUnit.DAYS.between(occurrenceStart, occurrenceEndAdjustedForMidnight).toInt() + 1
+        val todayOffset = ChronoUnit.DAYS.between(dateStart.toLocalDate(), date).toInt() + 1
+        val durationInDays = ChronoUnit.DAYS.between(dateStart.toLocalDate(), dateEndAdjustedForMidnight).toInt() + 1
 
         // special case for zero-duration event
         val maxOffset = if (durationInDays == 0) 1 else durationInDays
@@ -96,12 +90,31 @@ object EventUtilsImpl : EventUtils {
         }
     }
 
+    /**
+     * For given LocalDate and TimeZoneId, returns
+     * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
+     * Pair<-1, x> if event doesn't span the given date
+     */
+    override fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> =
+        calculateFullDayCounter(date, getOccurrenceStart(timeZoneId), getOccurrenceEnd(timeZoneId))
+
+    /**
+     * For given LocalDate and TimeZoneId, returns
+     * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
+     * Pair<-1, x> if event doesn't span the given date
+     */
+    override fun UiEvent.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> =
+        calculateFullDayCounter(date, dateStart, dateEnd)
+
     override fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
-
         if (spansSingleDay(timeZoneId = timeZoneId)) return null
-
         val fullDayCounter = this.calculateFullDayCounter(date, timeZoneId)
+        return "(${fullDayCounter.first}/${fullDayCounter.second})"
+    }
 
+    override fun UiEvent.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
+        if (spansSingleDay(timeZoneId = timeZoneId)) return null
+        val fullDayCounter = this.calculateFullDayCounter(date, timeZoneId)
         return "(${fullDayCounter.first}/${fullDayCounter.second})"
     }
 

@@ -23,6 +23,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -42,6 +45,7 @@ import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutBySearchTerm
@@ -78,11 +82,13 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserManager
@@ -115,7 +121,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val searchDatabase: SearchDatabase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val accountManager: AccountManager
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -675,6 +682,73 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
+    override fun getUiEventsFlow(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> {
+
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
+
+        return visibleSkeletonEventsFlow.map<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<UiEvent>> { visibleSkeletonEvents ->
+
+            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userManager.getAddresses(it) }
+                ?: return@map CalendarsRepository.GetEventsResult.Exception(Exception("could not get user addresses in getUiEventsFlow"))
+
+            val userEmails = userAddresses.map { it.email }
+
+            logger.v("getUiEventsFlow flow for ${eventsWindow.fromDate} - ${eventsWindow.toDate} we have ${visibleSkeletonEvents.size} skeletons to expand")
+
+            // TODO hack for hiding duplicated events from subscribed Calendars
+            val (uniqueEventSkeletons, duplicatedEventSkeletons) = visibleSkeletonEvents.filterOutDuplicatesInSubscribedCalendars()
+
+            if (visibleSkeletonEvents.size != uniqueEventSkeletons.size) {
+                logger.i("found duplicates in filterOutDuplicatesInSubscribedCalendars, deleting / 100: ${duplicatedEventSkeletons.size / 100}")
+
+                // delete duplicated subscribed events from local DB
+                duplicatedEventSkeletons.chunked(50).forEach {
+                    database.eventsDao().deleteByIds(it.map { it.id })
+                }
+            }
+
+            coroutineScope {
+
+                val transformedEvents = uniqueEventSkeletons.distinct().map { skeleton ->
+                    async {
+                        val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                            // get Event from cache based on metadata, or select entire EventEntity and decrypt it in case of cache miss
+                            eventDecryptor.getFromCache(skeleton.id, skeleton.calendar.id, skeleton.modifyTime) ?: database.eventsDao().selectById(skeleton.id)?.let { eventDecryptor.decrypt(it) }
+                        } else {
+                            database.eventsDao().selectById(skeleton.id)?.let { transformEventUseCase.execute(it) }
+                        }
+
+                        transformedEvent// TODO cache what we were able to transform? maybe not because decryptor caches it anyway?
+                    }
+                }.awaitAll().filterNotNull()
+
+                // TODO let's see if we have less memory issues without Repo's eventsCache
+//                eventsCacheMutex.withLock {
+//                    eventsCache[eventsWindow] = transformedEvents
+//                }
+
+                val events = transformedEvents.map { event ->
+                    expandSkeletonEventsAndFilterInWindowToUiEvents(
+                        event,
+                        visibleSkeletonEvents,
+                        eventsWindow,
+                        userEmails
+                    )
+                }.flatten()
+
+                CalendarsRepository.GetEventsResult.Success(events)
+
+            }
+
+        }.onStart {
+            emit(CalendarsRepository.GetEventsResult.InProgress)
+        }.flowOn(Dispatchers.Default).distinctUntilChanged()
+    }
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     data class FetchWindow(
         val userId: UserId,
@@ -1093,6 +1167,32 @@ class CalendarsRepositoryImpl @Inject constructor(
             }
         } else {
             if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event) else emptyList()
+        }
+    }
+
+    private fun expandSkeletonEventsAndFilterInWindowToUiEvents(event: Event, allEvents: List<Event>, eventsWindow: CalendarsRepository.EventsWindow, userEmails: List<String>): List<UiEvent> {
+
+        return if (event.isRecurring()) {
+            // occurrences are already filtered for time window
+            ICalUtilsImpl.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                event,
+                allEvents.filter { it.uid == event.uid },
+                eventsWindow.fromDate,
+                eventsWindow.toDate,
+                eventsWindow.timeZoneId,
+                userEmails
+            )!!
+        } else if (event.isSingleEdit()) {
+            // single edits are already generated when expanding above ^
+            //  however, orphaned single edits (without original recurring event)
+            //  have to be added to the list manually
+            if (allEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
+                emptyList()
+            } else {
+                if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId)) else emptyList()
+            }
+        } else {
+            if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId)) else emptyList()
         }
     }
 

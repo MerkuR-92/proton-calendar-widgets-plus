@@ -10,6 +10,7 @@ import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.entity.UserAddress
 import java.time.LocalDate
@@ -144,6 +145,12 @@ interface CalendarsRepository {
         timeZoneId: String,
         allowCached: Boolean
     ): Flow<GetEventsResult<Event>>
+
+    fun getUiEventsFlow(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Flow<GetEventsResult<UiEvent>>
 
     suspend fun getEvents(
         userId: String,

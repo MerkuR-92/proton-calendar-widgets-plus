@@ -22,6 +22,7 @@ import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -136,6 +137,15 @@ interface ICalUtils {
         timeZoneId: String
     ): List<Event>?
 
+    fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>
+    ): List<UiEvent>?
+
     /**
      * Creates ICalendar using only plaintext shared event part.
      */
@@ -239,6 +249,8 @@ interface ICalUtils {
      * Groups all-day and spanning multiple days Events first.
      */
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
+
+    fun List<UiEvent>.sortUiEventsForAgendaView(timeZoneId: String): List<UiEvent>
 
     /**
      * Sorts events with following order:
