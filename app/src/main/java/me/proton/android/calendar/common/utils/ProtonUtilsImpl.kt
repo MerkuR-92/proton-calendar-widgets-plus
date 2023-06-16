@@ -8,10 +8,13 @@ import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.presentation.utils.InputValidationResult
+import me.proton.core.util.kotlin.equalsNoCase
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
@@ -182,6 +185,42 @@ object ProtonUtilsImpl : ProtonUtils {
                 it.isDisabled // Disabled will appear last
             }
         }
+    }
+
+    override fun getMatchingDefaultHolidayCalendar(
+        holidayCalendars: List<ManagedHolidayCalendarEntity>,
+        primaryTimeZoneId: String,
+        defaultLanguageCode: String,
+        defaultCountryCode: String
+    ): ManagedHolidayCalendarEntity? {
+        // Get calendars matching the default time zone
+        val calendarsMatchingTimeZone = holidayCalendars.filter {
+            it.timezones.contains(primaryTimeZoneId)
+        }
+
+        val calendarsMatchingCode =
+            if (calendarsMatchingTimeZone.size > 1) {
+                // If there are more than one match, use the Locale country tag.
+                val calendarsMatchingCountryCode =
+                    defaultCountryCode.takeIfNotEmpty()?.let {
+                        calendarsMatchingTimeZone.filter {
+                            it.countryCode.equalsNoCase(defaultCountryCode)
+                        }
+                    } ?: emptyList()
+                // If we don't have a country tag or didn't find a match, use the Locale language tag.
+                calendarsMatchingCountryCode.ifEmpty {
+                    calendarsMatchingTimeZone.filter {
+                        it.languageCode.equalsNoCase(defaultLanguageCode)
+                    }
+                }
+            } else calendarsMatchingTimeZone
+
+        // Get the calendar matching the default language
+        val matchingDefaultHolidayCalendar = calendarsMatchingCode.firstOrNull {
+            it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
+        } ?: calendarsMatchingCode.firstOrNull()
+
+        return matchingDefaultHolidayCalendar
     }
 }
 

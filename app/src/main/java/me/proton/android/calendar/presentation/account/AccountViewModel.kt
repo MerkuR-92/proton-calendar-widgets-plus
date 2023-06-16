@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
+import me.proton.android.calendar.common.DEFAULT_HOLIDAY_CALENDAR_COLOR
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -47,6 +49,7 @@ import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onAddAccountResult
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
+import me.proton.core.presentation.utils.currentLocale
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
@@ -81,11 +84,16 @@ class AccountViewModel @Inject constructor(
     private val _hasPrimary = MutableLiveData<Boolean>()
     private val _errorReport = MutableLiveData<UseCase.Error?>()
 
-    private var defaultCalendarName: String = "My calendar" // This value is set in init.
+    // Those values are set in init.
+    private var defaultCalendarName: String = "My calendar"
+    private var defaultCalendarColor: Int = DEFAULT_CALENDAR_COLOR
+    private var defaultHolidayCalendarColor: Int = DEFAULT_HOLIDAY_CALENDAR_COLOR
+    private var defaultCountryCode: String? = null
+    private var defaultLanguageCode: String? = null
 
     private suspend fun Account.isBootstrapped() = calendarsRepository.selectCalendarUserSettings(userId.id) != null
 
-    private suspend fun checkAccount(account: Account) {
+    private suspend fun checkAccount(account: Account, context: Context) {
         runCatching {
             if (account.isBootstrapped()) return
 
@@ -93,6 +101,19 @@ class AccountViewModel @Inject constructor(
             val eventId = checkNotNull(account.details.session?.initialEventId)
 
             valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
+
+            defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
+            val calendarColors = context.resources.getIntArray(R.array.accent_colors_base)
+            defaultCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
+            defaultHolidayCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
+            for (i in 0 until 10) {
+                // Try and use a different value for default calendar and holiday calendar colors
+                if (defaultHolidayCalendarColor != defaultCalendarColor) break
+                defaultHolidayCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
+            }
+            val languageTag = context.resources.configuration.currentLocale().toLanguageTag().lowercase()
+            defaultCountryCode = languageTag.substringAfter("-", "")
+            defaultLanguageCode = context.resources.configuration.currentLocale().language.lowercase()
 
             setupUser(account.userId)
         }.onFailure {
@@ -106,7 +127,15 @@ class AccountViewModel @Inject constructor(
     private suspend fun setupUser(userId: UserId, showConfirmationDialog: Boolean = true) {
         _state.tryEmit(State.Processing)
 
-        val bootstrapResult = bootstrapAllCalendarsUseCase.execute(userId, defaultCalendarName, showConfirmationDialog)
+        val bootstrapResult = bootstrapAllCalendarsUseCase.execute(
+            userId,
+            showConfirmationDialog,
+            defaultCalendarName,
+            defaultCalendarColor,
+            defaultHolidayCalendarColor,
+            defaultLanguageCode,
+            defaultCountryCode
+        )
         bootstrapResult.ifSuccessAndLogErrors(logger) { }
         if (bootstrapResult !is UseCase.Result.Success<*>) {
             if (bootstrapResult is UseCase.Result.Error) {
@@ -145,14 +174,12 @@ class AccountViewModel @Inject constructor(
         // Make sure we clear error on init
         clearError()
 
-        defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
-
         // Account state handling.
         with(authOrchestrator) {
             register(context)
 
             accountManager.observe(context.lifecycle, minActiveState = Lifecycle.State.CREATED)
-                .onAccountReady { checkAccount(it) }
+                .onAccountReady { checkAccount(it, context) }
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }

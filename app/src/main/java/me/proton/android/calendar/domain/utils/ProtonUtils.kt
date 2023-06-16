@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
 import java.time.LocalDate
 
@@ -19,4 +20,11 @@ interface ProtonUtils {
     fun getCachedMonthViewsTimeWindow(selectedDate: LocalDate, weekStart: Int): Pair<LocalDate, LocalDate>
     fun sortPersonalCalendars(calendars: List<Calendar>, defaultCalendarId: String?): List<Calendar>
     fun sortOtherCalendars(calendars: List<Calendar>): List<Calendar>
+
+    fun getMatchingDefaultHolidayCalendar(
+        holidayCalendars: List<ManagedHolidayCalendarEntity>,
+        primaryTimeZoneId: String,
+        defaultLanguageCode: String,
+        defaultCountryCode: String
+    ): ManagedHolidayCalendarEntity?
 }

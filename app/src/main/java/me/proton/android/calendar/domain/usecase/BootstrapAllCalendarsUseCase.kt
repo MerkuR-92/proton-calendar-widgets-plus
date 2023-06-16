@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
@@ -14,7 +15,6 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.util.TimeZone
 import javax.inject.Inject
@@ -31,10 +31,19 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val userAddressManager: UserAddressManager,
     private val userSettingsRepository: UserSettingsRepository,
-    private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase
+    private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
+    private val joinCalendarUseCase: JoinCalendarUseCase
 ): UseCase {
 
-    suspend fun execute(userId: UserId, defaultCalendarName: String, showConfirmationDialog: Boolean): UseCase.Result {
+    suspend fun execute(
+        userId: UserId,
+        showConfirmationDialog: Boolean,
+        defaultCalendarName: String,
+        defaultCalendarColor: Int,
+        defaultHolidayCalendarColor: Int,
+        defaultLanguageCode: String?,
+        defaultCountryCode: String?
+    ): UseCase.Result {
 
         logger.v("executing BootstrapCalendarsUseCase")
 
@@ -63,7 +72,11 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         var ownedUserCalendars = userCalendars.filter { it.isOwner }
         if (ownedUserCalendars.isEmpty()) {
 
-            val createDefaultCalendarResult = createCalendarUseCase.execute(userId, defaultCalendarName)
+            val createDefaultCalendarResult = createCalendarUseCase.execute(
+                userId,
+                defaultCalendarName,
+                color = defaultCalendarColor
+            )
 
             createDefaultCalendarResult.ifSuccessAndLogErrors(logger) {
                 // Only update user primary timezone if we just created the first calendar
@@ -81,6 +94,36 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             if (createDefaultCalendarResult !is UseCase.Result.Success<*>) {
                 logger.e("BootstrapCalendarsUseCase: error unable to create default calendar for user")
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
+            }
+
+            // Make sure user doesn't have any holiday calendar already
+            if (!allCalendarEntities.any { it.isHolidayCalendar } && !defaultLanguageCode.isNullOrEmpty() && !defaultCountryCode.isNullOrEmpty()) {
+                val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
+                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let { holidayCalendars ->
+                    // Get calendars matching the default time zone
+                    val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
+                        holidayCalendars,
+                        primaryTimeZone,
+                        defaultLanguageCode,
+                        defaultCountryCode
+                    )
+
+                    // If holiday calendar already exists, leave the fields empty
+                    matchingDefaultHolidayCalendar?.let { holidayCalendar ->
+                        val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
+                            userId,
+                            holidayCalendar,
+                            defaultHolidayCalendarColor,
+                            arrayListOf()
+                        )
+
+                        if (joinCalendarResult !is UseCase.Result.Success<*>) {
+                            logger.e("BootstrapCalendarsUseCase: error unable to join holiday calendar for user")
+                        }
+                    }
+                } ?: run {
+                    logger.e("BootstrapCalendarsUseCase: error failed to fetch holiday calendars for user")
+                }
             }
 
             redoGetCalendars = true
