@@ -109,10 +109,10 @@ class EventAdapter(
 
                 textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
+                if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
-                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date)
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
@@ -126,7 +126,7 @@ class EventAdapter(
                     textViewSubheader.visibleOrGone(true)
                 }
 
-                if (event.isInThePast(timeZoneId)) {
+                if (event.isInThePast()) {
                     textViewHeader.setTextAppearance(context, R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(context, R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(context, R.style.Text_Default_Weak)
@@ -172,8 +172,8 @@ class EventAdapter(
                 val participationStatus = event.participationStatus
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
-                if (!event.isAllDay && !event.spansSingleDay(timeZoneId = timeZoneId)) {
-                    val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
+                if (!event.isAllDay && !event.spansSingleDay()) {
+                    val fullDayCounter = event.calculateFullDayCounter(date)
                     if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
                         textViewHeader.visibleOrGone(true)
                         textViewHeader.text = "${(event.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)))?.formatTime(timeZoneId, is24Hour)}"
@@ -186,10 +186,10 @@ class EventAdapter(
 
                 textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
+                if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
-                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date)
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
@@ -206,7 +206,7 @@ class EventAdapter(
 
                 viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendarColor)))
 
-                if (event.isInThePast(timeZoneId)) {
+                if (event.isInThePast()) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
@@ -274,7 +274,7 @@ class EventAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) {
             ITEM_TYPE_HEADER
-        } else if (getItem(position).isAllDay || !getItem(position).spansSingleDay(timeZoneId = timeZoneId)) {
+        } else if (getItem(position).isAllDay || !getItem(position).spansSingleDay()) {
             ITEM_TYPE_EVENT_ALL_DAY
         } else {
             ITEM_TYPE_EVENT_PARTIAL_DAY

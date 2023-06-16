@@ -235,7 +235,7 @@ class ItemCalendarAgendaFragment: Fragment() {
                         val sortedEvents = it.events.sortUiEventsForAgendaView(timeZoneId)
 
                         val partDayEvents = it.events.filter {
-                            !it.isAllDay && it.spansSingleDay(true, timeZoneId) // Multi day events are displayed in the day view header
+                            !it.isAllDay && it.spansSingleDay(true) // Multi day events are displayed in the day view header
                         }
                         // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                         firstEventOfTheDayTime =

@@ -103,7 +103,7 @@ object EventUtilsImpl : EventUtils {
      * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
      * Pair<-1, x> if event doesn't span the given date
      */
-    override fun UiEvent.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int> =
+    override fun UiEvent.calculateFullDayCounter(date: LocalDate): Pair<Int, Int> =
         calculateFullDayCounter(date, dateStart, dateEnd)
 
     override fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
@@ -112,9 +112,9 @@ object EventUtilsImpl : EventUtils {
         return "(${fullDayCounter.first}/${fullDayCounter.second})"
     }
 
-    override fun UiEvent.formatFullDayCounter(date: LocalDate, timeZoneId: String): String? {
-        if (spansSingleDay(timeZoneId = timeZoneId)) return null
-        val fullDayCounter = this.calculateFullDayCounter(date, timeZoneId)
+    override fun UiEvent.formatFullDayCounter(date: LocalDate): String? {
+        if (spansSingleDay()) return null
+        val fullDayCounter = this.calculateFullDayCounter(date)
         return "(${fullDayCounter.first}/${fullDayCounter.second})"
     }
 

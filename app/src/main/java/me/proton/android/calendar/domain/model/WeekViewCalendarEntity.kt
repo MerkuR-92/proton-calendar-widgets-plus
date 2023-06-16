@@ -13,7 +13,6 @@ import com.alamkanak.weekview.setEndTime
 import com.alamkanak.weekview.setStartTime
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import java.time.LocalDateTime
 
@@ -51,31 +50,26 @@ fun WeekViewCalendarEntity.Event.getActualEventId(): String {
     return id.substring(0, if (occurrenceNumberIndex >= 0) occurrenceNumberIndex else id.length)
 }
 
-fun Event.toWeekViewCalendarEntityEvent(userEmails: List<String>?, timeZoneId: String, defaultEventTitle: String): WeekViewCalendarEntity.Event {
+fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): WeekViewCalendarEntity.Event {
     // We add the occurrence number as a suffix to the event id so that week view doesn't recycle events with the same id, and so that we easily find the event occurrence on click
-    val occurrenceNumberSuffix = this.occurrence?.occurrenceNumber?.let {
-        OCCURRENCE_NUMBER_SUFFIX + this.occurrence?.occurrenceNumber
-    } ?: ""
+    val occurrenceNumberSuffix = if (this.isRecurring) "" else OCCURRENCE_NUMBER_SUFFIX + this.occurrenceNumber
     val weekViewEventId = this.id + occurrenceNumberSuffix
-    val participationStatus =
-        if (userEmails != null) this.getParticipationStatus(userEmails)
-        else null
     return WeekViewCalendarEntity.Event(
         id = weekViewEventId,
         // Use empty title for failed to decrypt event state
         title = if (this.decryptionStatus == Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
         location = "",
-        startTime = this.getStart(timeZoneId).toLocalDateTime(),
-        endTime = this.getEnd(timeZoneId).toLocalDateTime(),
-        color = Color.parseColor(this.calendar.color),
-        isAllDay = this.isAllDay(),
+        startTime = this.dateStart.toLocalDateTime(),
+        endTime = this.dateEnd.toLocalDateTime(),
+        color = Color.parseColor(this.calendarColor),
+        isAllDay = this.isAllDay,
         strikeThroughTitle = this.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
-        isPastEvent = this.isInThePast(timeZoneId),
+        isPastEvent = this.isInThePast(),
         isUnanswered = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-        calendarId = this.calendar.id,
+        calendarId = this.calendarId,
         decrypted = this.decryptionStatus == Event.DecryptionStatus.SUCCESS,
-        isRecurring = this.isRecurring(),
-        occurrenceNumber = this.occurrence?.occurrenceNumber
+        isRecurring = this.isRecurring,
+        occurrenceNumber = if (this.occurrenceNumber == 0) null else this.occurrenceNumber
     )
 }
 

@@ -630,12 +630,11 @@ data class Event private constructor(
             this.getOccurrenceStart(timeZoneId),
             this.getOccurrenceEnd(timeZoneId),
             isAllDay(),
-            occurrence?.occurrenceNumber ?: 0, // TODO?
-            this.isRecurring(),
+            occurrence?.occurrenceNumber ?: 0,
             calendar.color,
             decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
             getParticipationStatus(userEmails),
-            this.status
+            this.status ?: Status.confirmed()
         )
 }
 

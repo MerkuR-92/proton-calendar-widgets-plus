@@ -20,18 +20,18 @@ data class UiEvent(
     val dateStart: ZonedDateTime, // this is actual date start of single event or occurrence of recurring event
     val dateEnd: ZonedDateTime,
     val isAllDay: Boolean,
-    val occurrenceNumber: Int, // TODO make it nullable or 0 is non-recurring?
-    val isRecurring: Boolean, // TODO technically we could determine this from occurrenceNumber being > 0
+    val occurrenceNumber: Int, // 0 means it's non-recurring
 
     val calendarColor: String,
 
     val decryptionStatus: Event.DecryptionStatus,
 
-    // TODO null for non-invite
     val participationStatus: ParticipationStatus?,
-    val status: Status? // TODO non-nullable and make it default to what?
+    val status: Status
 
 ) : BaseModel() {
+
+    val isRecurring get() = occurrenceNumber > 0
 
     constructor() : this(
         "",
@@ -44,21 +44,20 @@ data class UiEvent(
         ZonedDateTime.now(),
         false,
         0,
-        false,
         "#CCCCCC",
         Event.DecryptionStatus.FAILURE,
         null,
-        null
+        Status.confirmed()
     )
 
     /**
      * Attention: part-time Event ending at 00:00 is not considered to span the end-day.
      */
-    fun spansSingleDay(actualEndDate: Boolean = false, timeZoneId: String? = null): Boolean {
+    fun spansSingleDay(actualEndDate: Boolean = false): Boolean {
 
-        val dateTimeStart = this.dateStart.withZoneSameInstant(if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault())
+        val dateTimeStart = this.dateStart
         val dateStart = dateTimeStart.toLocalDate()
-        val dateTimeEnd = this.dateEnd.withZoneSameInstant(if (timeZoneId != null) ZoneId.of(timeZoneId) else ZoneId.systemDefault())
+        val dateTimeEnd = this.dateEnd
         val dateEnd = dateTimeEnd.toLocalDate()
 
         return if (this.isAllDay) {
@@ -76,9 +75,9 @@ data class UiEvent(
         }
     }
 
-    fun isInThePast(timeZoneId: String): Boolean = this.dateEnd.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId)))
+    fun isInThePast(): Boolean = this.dateEnd.isBefore(ZonedDateTime.now())
 
-    fun isCancelled(): Boolean = (this.status != null) && this.status.isCancelled
+    fun isCancelled(): Boolean = this.status.isCancelled
 
 }
 

@@ -600,11 +600,10 @@ object ICalUtilsImpl : ICalUtils {
                     occurrence.endDateTime,
                     event.isAllDay(),
                     occurrence.occurrenceNumber,
-                    event.isRecurring(),
                     event.calendar.color,
                     originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
                     event.getParticipationStatus(userEmails),
-                    event.status
+                    event.status ?: Status.confirmed()
                 )
             }
 
@@ -979,14 +978,14 @@ object ICalUtilsImpl : ICalUtils {
      * Groups all-day and spanning multiple days Events first.
      */
     override fun List<UiEvent>.sortUiEventsForAgendaView(timeZoneId: String): List<UiEvent> {
-        val groupedByAllDayEvents = this.groupBy { it.isAllDay || !it.spansSingleDay(timeZoneId = timeZoneId)}
+        val groupedByAllDayEvents = this.groupBy { it.isAllDay || !it.spansSingleDay() }
         val result = mutableListOf<UiEvent>()
         result.addAll(
-            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)) }, { it.summary }))
+            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
                 ?: emptyList()
         )
         result.addAll(
-            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)) }, { it.summary }))
+            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
                 ?: emptyList()
         )
         return result
@@ -995,24 +994,21 @@ object ICalUtilsImpl : ICalUtils {
     /**
      * @returns true if event a is all day and event b is partial single day
      */
-    private fun isAllDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
-        return a.isAllDay() &&
-                !b.isAllDay() &&
-                a.getOccurrenceStart(
-                    timeZoneId
-                ).toLocalDate().isEqual((b.getOccurrenceEnd(
-                    timeZoneId
-                )).toLocalDate()) && b.spansSingleDay(timeZoneId = timeZoneId)
+    private fun isAllDayPrio(a: UiEvent, b: UiEvent): Boolean {
+        return a.isAllDay &&
+                !b.isAllDay &&
+                a.dateStart.toLocalDate().isEqual((b.dateEnd).toLocalDate()) &&
+                b.spansSingleDay()
     }
 
     /**
      * @returns true if event a is single day and event b is spanning multiple days
      */
-    private fun isMultiDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
-        return !a.isAllDay() &&
-                !b.isAllDay() &&
-                !a.spansSingleDay(timeZoneId = timeZoneId) &&
-                b.spansSingleDay(timeZoneId = timeZoneId)
+    private fun isMultiDayPrio(a: UiEvent, b: UiEvent): Boolean {
+        return !a.isAllDay &&
+                !b.isAllDay &&
+                !a.spansSingleDay() &&
+                b.spansSingleDay()
     }
 
     /**
@@ -1022,16 +1018,16 @@ object ICalUtilsImpl : ICalUtils {
      * 3- Partial day spanning multiple days
      * 4- Partial day
      */
-    override fun List<Event>.sortForMonthView(timeZoneId: String): List<Event> {
-        val comparator = Comparator<Event> { a, b ->
+    override fun List<UiEvent>.sortForMonthView(): List<UiEvent> {
+        val comparator = Comparator<UiEvent> { a, b ->
             return@Comparator when {
-                isAllDayPrio(timeZoneId, a, b) ->  -1
-                isAllDayPrio(timeZoneId, b, a) -> 1
-                isMultiDayPrio(timeZoneId, a, b) -> -1
-                isMultiDayPrio(timeZoneId, b, a) -> 1
+                isAllDayPrio(a, b) ->  -1
+                isAllDayPrio(b, a) -> 1
+                isMultiDayPrio(a, b) -> -1
+                isMultiDayPrio(b, a) -> 1
                 else -> {
-                    val coefficient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
-                    val coefficient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
+                    val coefficient1 = a.dateStart.toEpochSecond() - b.dateStart.toEpochSecond()
+                    val coefficient2 = b.dateEnd.toEpochSecond() - a.dateEnd.toEpochSecond()
 
                     if (coefficient1 > 0) 1
                     else if (coefficient1 < 0) -1

@@ -61,7 +61,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
@@ -465,10 +464,6 @@ class CalendarViewModel @Inject constructor(
         coroutineScope.launch {
             calendarsRepository.fetchEvents(userId, fromDate, toDate, timeZoneId)
         }
-    }
-
-    fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<Event>> {
-        return calendarsRepository.getEventsFlow(fromDate, toDate, timeZoneId, allowCached = true).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
     }
 
     fun getUiEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
@@ -1069,19 +1064,18 @@ class CalendarViewModel @Inject constructor(
     }
 
     suspend fun getMonthViewEventsMap(
-        events: List<Event>,
-        fromDate:LocalDate,
+        events: List<UiEvent>,
+        fromDate: LocalDate,
         maxEventCount: Int,
-        timeZoneId: String,
         isSkeletonEvent: Boolean
     ): Map<Int, List<MonthView.MonthViewEvent>> {
 
-        val monthGridMap = mutableMapOf<Int, ArrayList<Event>>()
+        val monthGridMap = mutableMapOf<Int, ArrayList<UiEvent>>()
         // Split the events for each day of the month
         events.forEach { skeletonEvent ->
-            val partTimeEndsOnMidnight = (!skeletonEvent.isAllDay() && skeletonEvent.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
-            var start = skeletonEvent.getOccurrenceStart(timeZoneId).toLocalDate()
-            val end = skeletonEvent.getOccurrenceEnd(timeZoneId).toLocalDate()
+            val partTimeEndsOnMidnight = (!skeletonEvent.isAllDay && skeletonEvent.dateEnd.toLocalTime() == LocalTime.MIDNIGHT)
+            var start = skeletonEvent.dateStart.toLocalDate()
+            val end = skeletonEvent.dateEnd.toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
@@ -1094,7 +1088,7 @@ class CalendarViewModel @Inject constructor(
                 start = start.plusDays(1)
 
                 // All day events end on next day 00:00 so we need to break loop to exclude end day
-                if (start == end && (skeletonEvent.isAllDay() || partTimeEndsOnMidnight)) break
+                if (start == end && (skeletonEvent.isAllDay || partTimeEndsOnMidnight)) break
             }
         }
 
@@ -1104,31 +1098,29 @@ class CalendarViewModel @Inject constructor(
             // Filter out the events spanning multiple days if it is not the first day
             val filteredList = it.value.filterNot { event ->
                 it.key != 0 &&
-                        !event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        !event.spansSingleDay() &&
                         event.calculateFullDayCounter(
-                            fromDate.plusDays(it.key.toLong()),
-                            timeZoneId
+                            fromDate.plusDays(it.key.toLong())
                         ).first > 1
             }
             // Sort the list for the month view
-            val sortedList: MutableList<Event> = filteredList.sortForMonthView(timeZoneId).toMutableList()
+            val sortedList: MutableList<UiEvent> = filteredList.sortForMonthView().toMutableList()
             it.value.clear()
             it.value.addAll(sortedList)
         }
 
-        val rootMap: MutableMap<Int, Map<Int, Event>> = mutableMapOf()
+        val rootMap: MutableMap<Int, Map<Int, UiEvent>> = mutableMapOf()
         for (key in 0 until MonthView.MonthViewSettings.MONTH_GRID_ITEMS_MAX) {
             val eventList = monthGridMap[key]
 
-            val childMap = mutableMapOf<Int, Event>()
+            val childMap = mutableMapOf<Int, UiEvent>()
             if (key > 0) {
                 // Insert the events spanning multiple days depending on the previous day list, in order to extend the multi day event on this day with the same index
                 val previousChildMap = rootMap[key - 1]
                 previousChildMap?.forEach { (index, event) ->
-                    if (!event.spansSingleDay(timeZoneId = timeZoneId) &&
+                    if (!event.spansSingleDay() &&
                         event.calculateFullDayCounter(
-                            fromDate.plusDays(key.toLong()),
-                            timeZoneId
+                            fromDate.plusDays(key.toLong())
                         ).first > 1) {
                         childMap[index] = event
                     }
@@ -1146,8 +1138,6 @@ class CalendarViewModel @Inject constructor(
             rootMap[key] = childMap
         }
 
-        val userEmails = getUserEmails()
-
         // Transform the child map of events to a list of MonthViewEvent
         rootMap.forEach { (dayIndex, childMap) ->
 
@@ -1156,12 +1146,8 @@ class CalendarViewModel @Inject constructor(
             childMap.forEach { (indexInDay, event) ->
 
                 val fullDayCounter = event.calculateFullDayCounter(
-                    fromDate.plusDays(dayIndex.toLong()),
-                    timeZoneId
+                    fromDate.plusDays(dayIndex.toLong())
                 )
-                val participationStatus =
-                    if (userEmails != null) event.getParticipationStatus(userEmails)
-                    else null
 
                 monthViewEvents.add(
                     MonthView.MonthViewEvent(
@@ -1169,10 +1155,10 @@ class CalendarViewModel @Inject constructor(
                         daySpanCount = fullDayCounter.second,
                         daySpanIndex = fullDayCounter.first,
                         calendarColor = if (isSkeletonEvent) resourceProvider.provideColor(R.color.interaction_weak_norm)
-                        else Color.parseColor(event.calendar.color),
-                        pastEvent = event.isInThePast(timeZoneId),
-                        isUnanswered = !event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-                        strikeThroughTitle = event.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
+                        else Color.parseColor(event.calendarColor),
+                        pastEvent = event.isInThePast(),
+                        isUnanswered = !event.isCancelled() && event.participationStatus == ParticipationStatus.NEEDS_ACTION,
+                        strikeThroughTitle = event.isCancelled() || event.participationStatus == ParticipationStatus.DECLINED,
                         decryptionFailed = event.decryptionStatus == Event.DecryptionStatus.FAILURE,
                         eventTitle = if (isSkeletonEvent) null
                         else event.summary?.nullIfBlank() ?: resourceProvider.provideString(R.string.default_event_summary)
