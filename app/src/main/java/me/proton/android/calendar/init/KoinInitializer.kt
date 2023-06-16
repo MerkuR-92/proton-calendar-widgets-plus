@@ -19,6 +19,7 @@ import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -48,6 +49,7 @@ class KoinInitializer : Initializer<Unit> {
                     entryPoint.eventDecryptor(),
                     entryPoint.accountManager(),
                     entryPoint.userManager(),
+                    entryPoint.userAddressManager(),
                     entryPoint.userRepository(),
                     entryPoint.userAddressRepository(),
                     entryPoint.calendarsRepository(),
@@ -74,6 +76,7 @@ class KoinInitializer : Initializer<Unit> {
         fun eventDecryptor(): EventDecryptor
         fun accountManager(): AccountManager
         fun userManager(): UserManager
+        fun userAddressManager(): UserAddressManager
         fun userRepository(): UserRepository
         fun userAddressRepository(): UserAddressRepository
         fun calendarsRepository(): CalendarsRepository

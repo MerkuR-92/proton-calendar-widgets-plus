@@ -82,6 +82,7 @@ import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -176,6 +177,7 @@ fun coreModule(
     eventDecryptor: EventDecryptor,
     accountManager: AccountManager,
     userManager: UserManager,
+    userAddressManager: UserAddressManager,
     userRepository: UserRepository,
     userAddressRepository: UserAddressRepository,
     calendarsRepository: CalendarsRepository,
@@ -190,6 +192,7 @@ fun coreModule(
     single<CryptoContext> { cryptoContext }
     single<AccountManager> { accountManager }
     single<UserManager> { userManager }
+    single<UserAddressManager> { userAddressManager }
     single<UserRepository> { userRepository }
     single<UserAddressRepository> { userAddressRepository }
     single<CalendarsRepository> { calendarsRepository }

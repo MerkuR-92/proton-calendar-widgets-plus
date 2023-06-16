@@ -21,7 +21,6 @@ import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -32,7 +31,6 @@ import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean

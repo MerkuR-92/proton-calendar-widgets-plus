@@ -22,7 +22,6 @@ import me.proton.core.key.domain.publicKey
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
-import java.time.LocalDate
 import javax.inject.Inject
 
 class JoinCalendarUseCase @Inject constructor(

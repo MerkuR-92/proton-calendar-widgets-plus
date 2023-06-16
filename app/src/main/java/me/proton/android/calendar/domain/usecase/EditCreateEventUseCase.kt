@@ -43,7 +43,6 @@ import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt

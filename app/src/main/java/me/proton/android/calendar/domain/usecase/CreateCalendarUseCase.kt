@@ -15,7 +15,6 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.ZoneId

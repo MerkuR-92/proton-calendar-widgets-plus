@@ -18,7 +18,6 @@ import me.proton.core.key.domain.entity.keyholder.KeyHolderPrivateKey
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.signText
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
 
 class ResetCalendarsKeyUseCase @Inject constructor(

@@ -45,7 +45,6 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getPrimaryAccount
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.takeIfNotBlank
 import org.koin.core.KoinComponent

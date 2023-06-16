@@ -36,7 +36,6 @@ import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.util.Date

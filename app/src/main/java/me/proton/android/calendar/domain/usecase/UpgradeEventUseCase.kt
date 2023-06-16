@@ -17,7 +17,6 @@ import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.useKeys
 import me.proton.core.network.domain.ResponseCodes
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import javax.inject.Inject
 

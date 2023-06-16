@@ -15,7 +15,6 @@ import me.proton.core.key.domain.decryptTextOrNull
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import javax.inject.Inject
 

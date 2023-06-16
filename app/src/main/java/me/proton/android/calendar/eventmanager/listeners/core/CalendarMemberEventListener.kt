@@ -15,7 +15,6 @@ import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.deserializeOrNull
 import javax.inject.Inject
