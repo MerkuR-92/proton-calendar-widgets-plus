@@ -729,7 +729,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             firstDayOfWeek?.let {
                 val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
                 val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
-                if (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate) {
+                val weekViewShown = currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK
+                val weekViewFlowInitialized = this@MonthFragment::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()
+                if ((!weekViewFlowInitialized && weekViewShown) || (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate)) {
                     val timeZoneId = calendarViewModel.getTimeZoneId()?.id
                     getEvents(fromDate, toDate, timeZoneId ?: return@launch)
                 }
