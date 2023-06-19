@@ -734,7 +734,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 val events = transformedEvents.map { event ->
                     expandSkeletonEventsAndFilterInWindowToUiEvents(
                         event,
-                        visibleSkeletonEvents,
+                        transformedEvents,
                         eventsWindow,
                         userEmails
                     )
