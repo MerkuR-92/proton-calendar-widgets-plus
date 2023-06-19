@@ -743,7 +743,7 @@
     <string-array name="time_formats">
         <item>Identique au système</item>
         <item>13:00</item>
-        <item>1:00pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Identique au système</item>

@@ -586,7 +586,7 @@
     <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Cancelada</string>
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Cancelando</string>
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Pausada</string>
-    <string name="import_assistant_status_failed" comment="Context: The import has failed">Fallida</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Error</string>
     <string name="import_assistant_status_paused_lost_connection_title">Conexión perdida a Google</string>
     <string name="import_assistant_status_paused_lost_connection_description">Para continuar con la importación, pulse reconectar, inicie sesión en Google y permita el acceso de Proton a los datos de Google otra vez.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
@@ -743,7 +743,7 @@
     <string-array name="time_formats">
         <item>Del sistema</item>
         <item>13:00</item>
-        <item>1:00 pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Del sistema</item>

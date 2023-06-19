@@ -288,7 +288,7 @@
     <string name="snack_event_changing_answer">Actualizando respuesta</string>
     <string name="snack_event_part_stat_updated">Estado de la participación actualizado.</string>
     <string name="snack_event_updated">Evento actualizado</string>
-    <string name="snack_event_updated_error_failed_mail">Erro al enviar la invitación</string>
+    <string name="snack_event_updated_error_failed_mail">Error al enviar la invitación</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
     <string name="snack_event_created">Evento creado</string>
     <string name="snack_event_created_failed_mail">Se ha creado el evento pero no se ha podido enviar la invitación.</string>

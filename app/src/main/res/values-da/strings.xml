@@ -264,7 +264,7 @@
     <string name="nav_view_switcher_day">Dag</string>
     <string name="nav_view_switcher_three_day">3 dage</string>
     <string name="nav_view_switcher_week">Uge</string>
-    <string name="nav_view_switcher_agenda">Dagsorden</string>
+    <string name="nav_view_switcher_agenda">Oversigt</string>
     <string name="nav_view_switcher_month">Måned</string>
     <string name="nav_view_timezone">Tidszone</string>
     <string name="nav_view_settings">Indstillinger</string>
