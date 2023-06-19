@@ -375,21 +375,24 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Get and display decrypted events
         eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
-
+            val useMonthViewLoader = !monthView.eventsDrawn
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
                         if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasActiveObservers()) {
                             // Progress is shown through the skeleton events // TODO not anymore because we disabled them, so display loader here:
-                            binding.monthFragmentLoader.visibleOrGone(true)
+                            if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(true)
+                            else calendarViewModel.setLoading(true)
                         } else {
                             // Show progress bar
-                            binding.monthFragmentLoader.visibleOrGone(true)
+                            if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(true)
+                            else calendarViewModel.setLoading(true)
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
 
-                        binding.monthFragmentLoader.visibleOrGone(false)
+                        if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(false)
+                        else calendarViewModel.setLoading(false)
 
                         val alphabeticallySortedEvents = it.events.sortedBy { event -> event?.summary }
                         events = alphabeticallySortedEvents
@@ -410,7 +413,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         loading = false
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
 
-                        binding.monthFragmentLoader.visibleOrGone(false)
+                        if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(false)
+                        else calendarViewModel.setLoading(false)
 
                         // TODO Show the error somewhere ?
                     }
