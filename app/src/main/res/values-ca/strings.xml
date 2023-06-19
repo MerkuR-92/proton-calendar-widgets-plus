@@ -474,7 +474,7 @@
     <string name="leave_calendar_snack_error">Error en deixar el calendari</string>
     <string name="delete_calendar_snack_error_password_confirmation">No s\'ha pogut confirmar la contrasenya.</string>
     <string name="recreate_calendar_dialog_title">Neteja calendari</string>
-    <string name="recreate_calendar_dialog_message">Aquesta acció eliminarà tots els esdeveniments i els usuaris convidats.calendari\n\nSegur que voleu netejar aquest calendari?</string>
+    <string name="recreate_calendar_dialog_message">Aquesta acció suprimirà tots els esdeveniments i els usuaris convidats.\n\nSegur que voleu netejar aquest calendari?</string>
     <string name="recreate_calendar_snack_error">Error netejant el calendari</string>
     <string name="recreate_calendar_snack_deleted">Calendari netejat</string>
     <string name="recreate_calendar_snack_clearing">S\'està netejant el calendari…</string>
@@ -745,7 +745,7 @@
     <string-array name="time_formats">
         <item>Valors per defecte del sistema</item>
         <item>13:00</item>
-        <item>1:00 pm</item>
+        <item>1:00 PM</item>
     </string-array>
     <string-array name="week_start">
         <item>Valors per defecte del sistema</item>

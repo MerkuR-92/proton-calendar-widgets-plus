@@ -39,8 +39,8 @@
     <string name="action_done">Kész</string>
     <string name="action_edit">Szerkesztés</string>
     <string name="action_delete">Törlés</string>
-    <string name="action_remove">Remove</string>
-    <string name="action_leave">Leave</string>
+    <string name="action_remove">Eltávolítás</string>
+    <string name="action_leave">Elhagyás</string>
     <string name="action_recreate">Ürítés</string>
     <string name="action_today">Ma</string>
     <string name="action_create_event">Esemény létrehozása</string>
@@ -145,9 +145,9 @@
     <string name="event_text_attendees_none">Egyik sem</string>
     <string name="event_text_calendar">Naptár</string>
     <string name="event_text_timezone_start">Időzóna</string>
-    <string name="invite_in_shared_calendar_disclaimer">Sending invitations is available only within personal calendars.</string>
-    <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
-    <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
+    <string name="invite_in_shared_calendar_disclaimer">Meghívók küldése csak személyes naptárakban lehetséges.</string>
+    <string name="invite_change_calendar_disclaimer">A meghívókhoz kapcsolódó naptárat nem lehet módosítani.</string>
+    <string name="change_calendar_recurring_disclaimer">Az ismétlődő esemény naptárának módosítása még nem lehetséges.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mit szeretne keresni?</string>
     <string name="search_empty_results_title">Nincs találat</string>
@@ -161,8 +161,8 @@
     <string name="search_settings_dialog_toggle_off_text">Ismételten le kell majd töltenie a naptárakat, ha keresni szeretne.</string>
     <string name="search_settings_dialog_toggle_on_title">Naptárak letöltése erre az eszközre?</string>
     <string name="search_settings_dialog_toggle_on_text">Ez szükséges a kereséshez.</string>
-    <string name="search_onboarding_header">Want to search your calendar?</string>
-    <string name="search_onboarding_text">First you need to download an encrypted copy of your calendars. This will only take a moment, and you can keep using the app. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="search_onboarding_header">Szeretne keresni a naptárban?</string>
+    <string name="search_onboarding_text">Ehhez le kell töltenie a naptárak egy titkosított másolatát. Ez csak pár másodpercig tart, és közben használhatja az alkalmazást. <a href="https://proton.me/support/calendar-search">További információk</a></string>
     <string name="search_onboarding_action_download_calendars">Naptárak letöltése</string>
     <string name="search_onboarding_action_pause">Szünet</string>
     <string name="search_onboarding_action_resume">Folytatás</string>
@@ -255,7 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Saját naptárak</string>
     <string name="nav_view_subscribed_calendars">Feliratkozott naptárak</string>
-    <string name="nav_view_other_calendars">Other calendars</string>
+    <string name="nav_view_other_calendars">Más naptárak</string>
     <string name="nav_view_disabled_calendars">%1$s (Kikapcsolva)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Nincs szinkronizálva)</string>
     <string name="nav_view_syncing_calendars">%1$s (Szinkronizálás)</string>
@@ -303,7 +303,7 @@
     <string name="snack_send_bug_report_error">Hiba történt a bejelentés küldése közben, kérjük, próbálja újra később</string>
     <string name="snack_send_bug_report_description_empty">Kérjük, adjon részletes ismertetést a bejelentésről</string>
     <string name="snack_create_event_no_active_personal_calendar">Személyes naptárra van szükség események létrehozásához</string>
-    <string name="snack_create_event_no_active_calendar">You need an active calendar to create events</string>
+    <string name="snack_create_event_no_active_calendar">Események létrehozásához szükséges, hogy legyen egy aktív személyes naptára</string>
     <string name="snack_add_self_as_participant">Önmaga meghívása nem lehetséges</string>
     <string name="snack_maximum_participants_reached">Elérte a résztvevők maximális számát.</string>
     <string name="snack_add_participant_error">Hiba történt a résztvevő hozzáadása közben</string>
@@ -315,15 +315,15 @@
     <string name="snack_update_default_calendar">Alapértelmezett naptár frissítve</string>
     <string name="snack_update_default_calendar_error">Hiba az alapértelmezett naptár frissítése közben, kérjük, próbálja újra később</string>
     <string name="snack_calendar_init_error">Hiba történt a naptár információjának betöltése közben</string>
-    <string name="snack_holiday_calendar_init_error">Error loading holiday calendar information</string>
+    <string name="snack_holiday_calendar_init_error">Hiba történt a munkaszüneti naptár információjának betöltése közben</string>
     <string name="snack_update_calendar_error">Hiba a naptárinformációk frissítésekor. Próbálja újra később</string>
     <string name="snack_update_calendar_settings_error">Hiba történt néhány naptárinformáció frissítésekor. Próbálja újra később</string>
     <string name="snack_update_calendar_success">Naptár frissítve</string>
     <string name="snack_create_calendar_success">Naptár létrehozva</string>
-    <string name="snack_add_calendar_success">Calendar added</string>
+    <string name="snack_add_calendar_success">Naptár hozzáadva</string>
     <string name="snack_calendar_saving">Naptár mentése</string>
     <string name="snack_create_calendar_error">Hiba a naptár létrehozásakor, próbálja újra később</string>
-    <string name="snack_add_calendar_error">Error adding calendar, please try again later</string>
+    <string name="snack_add_calendar_error">Hiba a naptár hozzáadásakor, próbálja újra később</string>
     <string name="snack_create_calendar_settings_error">A naptár elkészült, de néhány információ frissítése nem sikerült. Próbálja meg később</string>
     <string name="snack_ics_default_error">Hiba a naptár megnyitásakor</string>
     <string name="snack_ics_event_not_found_error">Az esemény nem található</string>
@@ -338,10 +338,10 @@
     <string name="snack_ics_party_crasher_error">Az ön e-mail címe nem szerepel a résztvevők listáján</string>
     <string name="snack_ics_reply_party_crasher_error">Olyan résztvevők nem adhatók hozzá, akiket a szervező nem hívott meg</string>
     <string name="snack_ics_missing_uid_error">Az esemény UID értéke hiányzik</string>
-    <string name="snack_ics_no_active_personal_calendar_error">There is no active personal calendar associated with this account</string>
-    <string name="snack_ics_no_active_calendar_error">There is no active calendar associated with this account</string>
+    <string name="snack_ics_no_active_personal_calendar_error">Ehhez a fiókhoz nincs aktív személyes naptár</string>
+    <string name="snack_ics_no_active_calendar_error">Ehhez a fiókhoz nincs aktív naptár</string>
     <string name="snack_ics_unsupported_duration_error">Az időtartam tulajdonság nem támogatott</string>
-    <string name="snack_ics_too_many_events_error">Multiple events are not yet supported</string>
+    <string name="snack_ics_too_many_events_error">Egynél több esemény még nem támogatott</string>
     <string name="snack_ics_no_events_error">Ez a naptár nem tartalmaz eseményeket</string>
     <string name="snack_ics_invalid_error">Ez a meghívó érvénytelen</string>
     <string name="snack_ics_disabled_calendar_error">Az esemény frissítéséhez, engedélyezze újra a naptárhoz tartozó címét</string>
@@ -418,9 +418,9 @@
     <string name="settings_general_info_time_zone">időzóna</string>
     <string name="settings_general_info_calendar_layout">naptár elrendezés</string>
     <string name="settings_calendars">Saját naptárak</string>
-    <string name="settings_calendars_empty">No calendars found</string>
+    <string name="settings_calendars_empty">Nincs naptár</string>
     <string name="settings_subscribed_calendars">Feliratkozott naptárak</string>
-    <string name="settings_other_calendars">Other calendars</string>
+    <string name="settings_other_calendars">Más naptárak</string>
     <string name="settings_calendar_default" comment="Default calendar">Alapért.</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Letiltva</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Nincs szinkronizálva</string>
@@ -432,7 +432,7 @@
     <string name="settings_calendar_subscribed_last_sync_old">Több mint 12 óra telt el a legutóbbi frissítés óta</string>
     <string name="settings_calendar_subscribed_not_decrypted">A naptár visszafejtése nem sikerült</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
-    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">View-only</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Csak megtekintés</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Naptár létrehozása</string>
     <string name="calendar_form_update_title">Naptár szerkesztése</string>
@@ -440,7 +440,7 @@
     <string name="calendar_form_name">Név</string>
     <string name="calendar_form_description">Leírás</string>
     <string name="calendar_form_color">Naptár színe</string>
-    <string name="calendar_form_language">Language</string>
+    <string name="calendar_form_language">Nyelv</string>
     <string name="calendar_form_default_event_duration">Esemény időtartama</string>
     <string name="calendar_form_default_event_notifications">Esemény értesítései</string>
     <string name="calendar_form_default_all_day_event_notifications">Egész napos esemény emlékeztetők</string>
@@ -451,27 +451,27 @@
     <string name="calendar_form_name_required_error">Név megadása kötelező</string>
     <string name="calendar_form_description_hint">Adja meg a naptár leírását</string>
     <string name="add_calendar_text">Naptár hozzáadása</string>
-    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Add</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Hozzáadás</string>
     <string name="create_calendar_limit_reached">Elérte a naptárak maximális számát.</string>
     <string name="create_calendar_limit_reached_title">Nem adhat hozzá több naptárat</string>
     <string name="create_calendar_limit_reached_paid_description">Elérte a csomagjában maximálisan elérhető 25 naptárat. \n\nÚj naptár hozzáadásához töröljön egyet a már meglévők közül.</string>
-    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">You must have at least one personal calendar before reaching your plan limit of 25 calendars.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Legalább egy személyes naptárának is kell lennie, mielőtt eléri a csomagjában elérhető 25 naptárat.</string>
     <string name="create_calendar_limit_reached_manage">Naptárak kezelése</string>
     <string name="create_calendar_limit_reached_free_description">Elérte a csomagjában maximálisan elérhető 3 naptárat. \n\nÚj naptár hozzáadásához töröljön egyet a már meglévők közül.</string>
-    <string name="create_mandatory_personal_calendar_limit_reached_free_description">You must have at least one personal calendar before reaching your plan limit of 3 calendars.</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">Legalább egy személyes naptárának is kell lennie, mielőtt eléri a csomagjában elérhető 3 naptárat.</string>
     <string name="create_calendar_limit_reached_error">Hiba</string>
     <string name="delete_calendar_dialog_title">Naptár törlése</string>
     <string name="delete_calendar_dialog_message">Biztos, hogy törölni szeretné ezt a naptárat?</string>
-    <string name="remove_calendar_dialog_title">Remove calendar</string>
-    <string name="remove_calendar_dialog_message">Are you sure you want to remove this calendar?</string>
-    <string name="leave_calendar_dialog_title">Leave calendar</string>
-    <string name="leave_calendar_dialog_message">If you leave this calendar, you\'ll have to ask the owner to join again.</string>
+    <string name="remove_calendar_dialog_title">Naptár eltávolítása</string>
+    <string name="remove_calendar_dialog_message">Biztos, hogy el szeretné távolítani ezt a naptárat?</string>
+    <string name="leave_calendar_dialog_title">Naptár elhagyása</string>
+    <string name="leave_calendar_dialog_message">Ha elhagyja ezt a naptárat, akkor a tulajdonosát kell majd megkérnie, hogy újra csatlakozhasson.</string>
     <string name="delete_default_calendar_dialog_message">Biztos, hogy törli ezt a naptárat? \"%1$s\" kerül beállításra alapértelmezett naptárként.</string>
     <string name="delete_calendar_snack_deleted">Naptár eltávolítva</string>
-    <string name="remove_calendar_snack_removed">Calendar removed</string>
+    <string name="remove_calendar_snack_removed">Naptár eltávolítva</string>
     <string name="delete_calendar_snack_error">Hiba a naptár törlése közben</string>
-    <string name="remove_calendar_snack_error">Error removing calendar</string>
-    <string name="leave_calendar_snack_error">Error leaving calendar</string>
+    <string name="remove_calendar_snack_error">Hiba a naptár eltávolításakor</string>
+    <string name="leave_calendar_snack_error">Hiba a naptár elhagyásakor</string>
     <string name="delete_calendar_snack_error_password_confirmation">A jelszó megerősítése sikertelen</string>
     <string name="recreate_calendar_dialog_title">Naptár megtisztítása</string>
     <string name="recreate_calendar_dialog_message">Ez a művelet az összes eseményt és meghívottat törli.\n\nBiztos, hogy üríti ezt a naptárat?</string>
@@ -479,13 +479,13 @@
     <string name="recreate_calendar_snack_deleted">Naptár megtisztítva</string>
     <string name="recreate_calendar_snack_clearing">Naptár megtisztítása…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">Add holiday calendar</string>
-    <string name="holiday_calendar_title">Holiday calendar</string>
-    <string name="add_holiday_calendar_country_search_hint">Search for a country</string>
-    <string name="holiday_calendar_form_picker_title">Country</string>
-    <string name="holiday_calendar_time_zone_based">Based on your time zone</string>
-    <string name="holiday_calendar_already_exists">Holiday calendar already exists</string>
-    <string name="holiday_calendar_value_placeholder">Select country</string>
+    <string name="add_holiday_calendar_title">Munkaszüneti naptár hozzáadása</string>
+    <string name="holiday_calendar_title">Munkaszüneti naptár</string>
+    <string name="add_holiday_calendar_country_search_hint">Ország keresése</string>
+    <string name="holiday_calendar_form_picker_title">Ország</string>
+    <string name="holiday_calendar_time_zone_based">A jelenlegi időzóna alapján</string>
+    <string name="holiday_calendar_already_exists">Már van munkaszüneti naptár</string>
+    <string name="holiday_calendar_value_placeholder">Válasszon országot</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Ehhez a fiókhoz nincs naptár.</string>
@@ -538,12 +538,12 @@
     <string name="spotlight_v5_dialog_rebranding_description">A Proton új megjelenésének bemutatása. Sok szolgáltatás, egy küldetés. Üdvözli az az internet, amelyen az adatvédelem alapértelmezett. <a href="https://proton.me/news/updated-proton">További információk</a></string>
     <string name="spotlight_dialog_week_view_title">További megtekintési lehetőségek</string>
     <string name="spotlight_dialog_week_view_description">Bemutatjuk a <b>3 napos</b> és <b>Heti</b> naptár nézetet. Válassza ki az önnek tetsző nézetet a <b>menüben</b>.\n\n• Állítsa be az oszlopok magasságát a napi rácson úgy, hogy két ujjával rácsíp a be- vagy kinagyításhoz.</string>
-    <string name="spotlight_dialog_search_title">Search for events</string>
-    <string name="spotlight_dialog_search_description">Easily find the event you\'re looking for with our new search feature. <a href="https://proton.me/support/calendar-search">Learn more</a></string>
+    <string name="spotlight_dialog_search_title">Események keresése</string>
+    <string name="spotlight_dialog_search_description">Találja meg könnyen a keresett eseményt az új keresési lehetőséggel. <a href="https://proton.me/support/calendar-search">További információk</a></string>
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
-    <string name="spotlight_dialog_calendar_provider_title">Calendar features</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -668,7 +668,7 @@
     </plurals>
     <plurals name="plural_week">
         <item quantity="one">hét</item>
-        <item quantity="other">hétig</item>
+        <item quantity="other">hét</item>
     </plurals>
     <plurals name="plural_month">
         <item quantity="one">hó</item>

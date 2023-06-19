@@ -395,7 +395,7 @@
     <string name="settings_theme_info">Asetus vaikuttaa ainoastaan Proton Calendar -sovelluksen ulklasuun tässä laitteessa. Teeman vaihto vaatii sovelluksen uudelleenkäynnistyksen.</string>
     <string name="settings_timezone_title">Aikavyöhyke</string>
     <string name="settings_language_title">Sovelluksen kieli</string>
-    <string name="settings_language_default">Tunnista automaattisesti</string>
+    <string name="settings_language_default">Automaattitunnistus</string>
     <string name="settings_default_view_title">Oletusnäkymä</string>
     <string name="settings_default_view_default">Edellinen näkymä</string>
     <string name="settings_update_timezone_title">Pyydä aikavyöhykeasetuksen päivitystä</string>

@@ -465,7 +465,7 @@
     <string name="remove_calendar_dialog_title">Remover calendário</string>
     <string name="remove_calendar_dialog_message">Tem certeza de que deseja remover este calendário?</string>
     <string name="leave_calendar_dialog_title">Sair do calendário</string>
-    <string name="leave_calendar_dialog_message">Se sair deste calendário, terá de pedir ao proprietário para aderir novamente.</string>
+    <string name="leave_calendar_dialog_message">Se você deixar esse calendário, você terá que perguntar para o proprietário para juntar novamente.</string>
     <string name="delete_default_calendar_dialog_message">Tem certeza de que deseja excluir este calendário? \"%1$s\" será definido como calendário padrão.</string>
     <string name="delete_calendar_snack_deleted">O calendário foi excluído</string>
     <string name="remove_calendar_snack_removed">Calendário removido</string>

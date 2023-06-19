@@ -188,8 +188,8 @@
     <string name="event_alarm_partial_day_5">1 тыдзень</string>
     <string name="event_alarm_all_day_1">у той самы дзень а %1$s</string>
     <string name="event_alarm_all_day_2">За 1 дзень да %1$s</string>
-    <string name="event_alarm_all_day_3">За 1 тыдзень да а %1$s</string>
-    <string name="event_alarm_all_day_4">За 3 тыдні да а %1$s</string>
+    <string name="event_alarm_all_day_3">За 1 тыдзень да падзеі ў %1$s</string>
+    <string name="event_alarm_all_day_4">За 3 тыдні да падзеі ў %1$s</string>
     <string name="event_alarm_at_time" comment="Example: at 15:00">а %1$s</string>
     <string name="event_alarm_action">Адправіць з дапамогай</string>
     <string name="event_alarm_action_notification">апавяшчэнне</string>
@@ -270,7 +270,7 @@
     <string name="nav_view_settings">Налады</string>
     <string name="nav_view_feedback">Пакінуць водгук для нас</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Агульныя</string>
-    <string name="nav_view_more_bug">Паведаміць пра праблему</string>
+    <string name="nav_view_more_bug">Паведаміць аб праблеме</string>
     <string name="nav_view_more_subscription">Падпіска</string>
     <string name="nav_view_more_logout">Выйсці</string>
     <string name="nav_view_more_login">Увайсці</string>
@@ -404,7 +404,7 @@
     <string name="settings_week_start_title">Пачатак тыдня</string>
     <string name="settings_time_format_title">Фармат часу</string>
     <string name="settings_week_numbers_title">Паказваць нумары тыдняў</string>
-    <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнні, што чакаюць разгляду</string>
+    <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнні, якія чакаюць разгляду</string>
     <string name="settings_search_title">Пошук календароў</string>
     <string name="settings_search_subtitle">Спампоўвае і захоўвае змесціва календара на вашай прыладзе для пошуку. Адключэнне гэтага параметра прывядзе да выдалення спампаванага змесціва.</string>
     <string name="settings_alternative_routing_title">Дазваляць альтэрнатыўную маршрутызацыю</string>
