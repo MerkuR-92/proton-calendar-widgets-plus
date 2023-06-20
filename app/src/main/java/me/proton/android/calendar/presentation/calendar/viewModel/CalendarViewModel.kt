@@ -61,6 +61,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
@@ -426,8 +427,12 @@ class CalendarViewModel @Inject constructor(
 
     }
 
-    fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId).asLiveData()
+    suspend fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<SkeletonEvent> {
+        return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId)
+    }
+
+    fun getSkeletonEventsFlow(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+        return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).asLiveData()
     }
 
     fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<Map<LocalDate, List<String>>> {
@@ -1062,7 +1067,118 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getMonthViewEventsMap(
+    // TODO Reduce code duplication with getMonthViewEventsMap
+    fun getMonthViewSkeletonEventsMap(
+        events: List<SkeletonEvent>,
+        fromDate:LocalDate,
+        maxEventCount: Int,
+        timeZoneId: String
+    ): Map<Int, List<MonthView.MonthViewEvent>> {
+
+        val monthGridMap = mutableMapOf<Int, ArrayList<Event>>()
+        // Split the events for each day of the month
+        events.forEach { skeletonEvent ->
+            val partTimeEndsOnMidnight = (!skeletonEvent.isAllDay() && skeletonEvent.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
+            var start = skeletonEvent.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = skeletonEvent.getOccurrenceEnd(timeZoneId).toLocalDate()
+
+            // Use !start.isAfter(end) to iterate inclusive
+            while (!start.isAfter(end)) {
+                val dayIndex = ChronoUnit.DAYS.between(fromDate, start).toInt()
+                val current = monthGridMap[dayIndex]
+                if (current?.contains(skeletonEvent) == false) {
+                    current.add(skeletonEvent)
+                }
+                monthGridMap[dayIndex] = current ?: arrayListOf(skeletonEvent)
+                start = start.plusDays(1)
+
+                // All day events end on next day 00:00 so we need to break loop to exclude end day
+                if (start == end && (skeletonEvent.isAllDay() || partTimeEndsOnMidnight)) break
+            }
+        }
+
+        val monthViewEventsMap = hashMapOf<Int, List<MonthView.MonthViewEvent>>()
+
+        monthGridMap.forEach {
+            // Filter out the events spanning multiple days if it is not the first day
+            val filteredList = it.value.filterNot { event ->
+                it.key != 0 &&
+                        !event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(it.key.toLong()),
+                            timeZoneId
+                        ).first > 1
+            }
+            // Sort the list for the month view
+            val sortedList: MutableList<Event> = filteredList.sortForMonthView(timeZoneId).toMutableList()
+            it.value.clear()
+            it.value.addAll(sortedList)
+        }
+
+        val rootMap: MutableMap<Int, Map<Int, Event>> = mutableMapOf()
+        for (key in 0 until MonthView.MonthViewSettings.MONTH_GRID_ITEMS_MAX) {
+            val eventList = monthGridMap[key]
+
+            val childMap = mutableMapOf<Int, Event>()
+            if (key > 0) {
+                // Insert the events spanning multiple days depending on the previous day list, in order to extend the multi day event on this day with the same index
+                val previousChildMap = rootMap[key - 1]
+                previousChildMap?.forEach { (index, event) ->
+                    if (!event.spansSingleDay(timeZoneId = timeZoneId) &&
+                        event.calculateFullDayCounter(
+                            fromDate.plusDays(key.toLong()),
+                            timeZoneId
+                        ).first > 1) {
+                        childMap[index] = event
+                    }
+                }
+            }
+            var nextAvailableMapIndex = 0
+            // Fill the remaining indexes with the sorted events list
+            eventList?.forEach { event ->
+                while (childMap.containsKey(nextAvailableMapIndex)) nextAvailableMapIndex++
+                if (nextAvailableMapIndex >= maxEventCount + MonthView.MonthViewSettings.MINI_EVENTS_MAX + 1) return@forEach
+                childMap[nextAvailableMapIndex] = event
+                nextAvailableMapIndex++
+            }
+
+            rootMap[key] = childMap
+        }
+
+        // Transform the child map of events to a list of MonthViewEvent
+        rootMap.forEach { (dayIndex, childMap) ->
+
+            val monthViewEvents = arrayListOf<MonthView.MonthViewEvent>()
+
+            childMap.forEach { (indexInDay, event) ->
+
+                val fullDayCounter = event.calculateFullDayCounter(
+                    fromDate.plusDays(dayIndex.toLong()),
+                    timeZoneId
+                )
+
+                monthViewEvents.add(
+                    MonthView.MonthViewEvent(
+                        indexInDay = indexInDay,
+                        daySpanCount = fullDayCounter.second,
+                        daySpanIndex = fullDayCounter.first,
+                        calendarColor = resourceProvider.provideColor(R.color.interaction_weak_norm),
+                        pastEvent = event.isInThePast(timeZoneId),
+                        isUnanswered = false,
+                        strikeThroughTitle = false,
+                        decryptionFailed = false,
+                        eventTitle = null
+                    )
+                )
+            }
+            monthViewEventsMap[dayIndex] = monthViewEvents
+        }
+
+        return monthViewEventsMap
+    }
+
+    // TODO Reduce code duplication with getMonthViewSkeletonEventsMap
+    fun getMonthViewEventsMap(
         events: List<UiEvent>,
         fromDate: LocalDate,
         maxEventCount: Int,

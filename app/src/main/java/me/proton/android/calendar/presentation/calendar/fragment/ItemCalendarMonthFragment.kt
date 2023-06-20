@@ -75,7 +75,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     private lateinit var monthView: MonthView
     private var monthViewMaxEventCount = 0
 
-    private lateinit var skeletonEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>>
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
 
     private var events: List<UiEvent>? = null
@@ -218,9 +217,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         monthView.prepareMonthGrid(skeletonList, forDate.month)
         monthViewMaxEventCount = monthView.calculateMaxEventCount()
 
-        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
-            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
-        }
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
@@ -238,8 +234,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         } else {
             loading = false
             calendarViewModel.monthViewLoading.observe(viewLifecycleOwner) { monthViewLoading ->
-                if ((this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) ||
-                    (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers())) {
+                if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
                     // Remove the monthViewLoading observers if we started loading the events for that fragment as it won't be needed anymore
                     calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
                     return@observe
@@ -322,50 +317,19 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     }
 
     private fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
+        // Show progress bar
+        binding.monthFragmentLoader.visibleOrGone(true)
+
         lifecycleScope.launch {
             calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId, coroutineScope = fetchingEventsScope)
+
+            // Get and display skeleton events
+            val skeletonEvents = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
+            // Display the skeleton events in the month view
+            displayMonthViewSkeletonEvents(skeletonEvents, fromDate, timeZoneId)
+
+            getEvents(fromDate, toDate, timeZoneId, position)
         }
-
-        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasActiveObservers()) {
-            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
-        }
-
-        // Get and display skeleton events
-        //skeletonEventsLiveData = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
-        // TODO skeleton events disabled for now, just load the UiEvents right away:
-        getEvents(fromDate, toDate, timeZoneId, position)
-
-        /*skeletonEventsLiveData.observe(viewLifecycleOwner) { skeletonEventsResult ->
-            when (skeletonEventsResult) {
-                CalendarsRepository.GetEventsResult.InProgress -> {
-                    // Show progress bar
-                    binding.monthFragmentLoader.visibleOrGone(true)
-                }
-                is CalendarsRepository.GetEventsResult.Success -> {
-
-                    // Display the skeleton events in the month view
-                    //displayMonthViewSkeletonEvents(skeletonEventsResult.events, fromDate, timeZoneId)
-
-                    // Hide progress bar
-                    binding.monthFragmentLoader.visibleOrGone(false)
-
-                    // Load the decrypted events list
-                    getEvents(fromDate, toDate, timeZoneId, position)
-                }
-                is CalendarsRepository.GetEventsResult.Exception -> {
-                    loading = false
-                    calendarViewModel.monthViewLoading.value = Pair(position, false)
-                    logger.e(
-                        "ItemCalendarMonthFragment getSkeletonEvents exception getting skeletonEventsLiveData",
-                        skeletonEventsResult.throwable
-                    )
-                    // Hide progress bar
-                    binding.monthFragmentLoader.visibleOrGone(false)
-
-                    // TODO Show the error somewhere ?
-                }
-            }
-        }*/
     }
 
     private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
@@ -375,25 +339,12 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Get and display decrypted events
         eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
-            val useMonthViewLoader = !monthView.eventsDrawn
             eventsResult?.let {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
-                        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasActiveObservers()) {
-                            // Progress is shown through the skeleton events // TODO not anymore because we disabled them, so display loader here:
-                            if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(true)
-                            else calendarViewModel.setLoading(true)
-                        } else {
-                            // Show progress bar
-                            if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(true)
-                            else calendarViewModel.setLoading(true)
-                        }
+                        // Progress is shown through the skeleton events
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
-
-                        if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(false)
-                        else calendarViewModel.setLoading(false)
-
                         val alphabeticallySortedEvents = it.events.sortedBy { event -> event?.summary }
                         events = alphabeticallySortedEvents
 
@@ -401,20 +352,14 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                         displayMonthViewUiEvents(alphabeticallySortedEvents, fromDate, timeZoneId)
 
                         loading = false
+                        // Hide progress bar
+                        binding.monthFragmentLoader.visibleOrGone(false)
                         // Clear monthViewLoading value so that we can load the adjacent fragments content
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
-
-                        // Remove skeletonEventsLiveData observers as this won't be needed anymore
-                        if (this::skeletonEventsLiveData.isInitialized && skeletonEventsLiveData.hasObservers()) {
-                            skeletonEventsLiveData.removeObservers(viewLifecycleOwner)
-                        }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         loading = false
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
-
-                        if (useMonthViewLoader) binding.monthFragmentLoader.visibleOrGone(false)
-                        else calendarViewModel.setLoading(false)
 
                         // TODO Show the error somewhere ?
                     }
@@ -423,38 +368,37 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
     }
 
-    // TODO disabled skeletons for now
-    /*private fun displayMonthViewSkeletonEvents(events: List<Event>, fromDate:LocalDate, timeZoneId: String) {
+    private fun displayMonthViewSkeletonEvents(events: List<SkeletonEvent>, fromDate:LocalDate, timeZoneId: String) {
         val newMaxEventCount = monthView.calculateMaxEventCount()
         if (newMaxEventCount > monthViewMaxEventCount) monthViewMaxEventCount = newMaxEventCount
 
         lifecycleScope.launch {
 
             // Get the map of MonthViewEvent indexed by day
-            val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(events, fromDate, monthViewMaxEventCount, timeZoneId, true)
+            val monthViewEventsMap = calendarViewModel.getMonthViewSkeletonEventsMap(events, fromDate, monthViewMaxEventCount, timeZoneId)
 
             // Set the month view events so that they can be drawn
             monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false, monthViewMaxEventCount)
+
+            // Hide progress bar
+            binding.monthFragmentLoader.visibleOrGone(false)
         }
-    }*/
+    }
 
     private fun displayMonthViewUiEvents(events: List<UiEvent>, fromDate:LocalDate, timeZoneId: String) {
         val newMaxEventCount = monthView.calculateMaxEventCount()
         if (newMaxEventCount > monthViewMaxEventCount) monthViewMaxEventCount = newMaxEventCount
 
-        lifecycleScope.launch {
+        // Get the map of MonthViewEvent indexed by day
+        val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(
+            events,
+            fromDate,
+            monthViewMaxEventCount,
+            false
+        )
 
-            // Get the map of MonthViewEvent indexed by day
-            val monthViewEventsMap = calendarViewModel.getMonthViewEventsMap(
-                events,
-                fromDate,
-                monthViewMaxEventCount,
-                false
-            )
-
-            // Set the month view events so that they can be drawn
-            monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false, monthViewMaxEventCount)
-        }
+        // Set the month view events so that they can be drawn
+        monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false, monthViewMaxEventCount)
     }
 
     private fun setupWeekNumbers(firstDay: LocalDate, startWeekOn: DayOfWeek) {

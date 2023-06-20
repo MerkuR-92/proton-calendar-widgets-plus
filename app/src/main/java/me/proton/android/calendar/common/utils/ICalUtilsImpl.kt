@@ -994,6 +994,29 @@ object ICalUtilsImpl : ICalUtils {
     /**
      * @returns true if event a is all day and event b is partial single day
      */
+    private fun isAllDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
+        return a.isAllDay() &&
+                !b.isAllDay() &&
+                a.getOccurrenceStart(
+                    timeZoneId
+                ).toLocalDate().isEqual((b.getOccurrenceEnd(
+                    timeZoneId
+                )).toLocalDate()) && b.spansSingleDay(timeZoneId = timeZoneId)
+    }
+
+    /**
+     * @returns true if event a is single day and event b is spanning multiple days
+     */
+    private fun isMultiDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
+        return !a.isAllDay() &&
+                !b.isAllDay() &&
+                !a.spansSingleDay(timeZoneId = timeZoneId) &&
+                b.spansSingleDay(timeZoneId = timeZoneId)
+    }
+
+    /**
+     * @returns true if event a is all day and event b is partial single day
+     */
     private fun isAllDayPrio(a: UiEvent, b: UiEvent): Boolean {
         return a.isAllDay &&
                 !b.isAllDay &&
@@ -1009,6 +1032,37 @@ object ICalUtilsImpl : ICalUtils {
                 !b.isAllDay &&
                 !a.spansSingleDay() &&
                 b.spansSingleDay()
+    }
+
+    /**
+     * Sorts events with following order:
+     * 1- All day spanning multiple days
+     * 2- All day
+     * 3- Partial day spanning multiple days
+     * 4- Partial day
+     */
+    override fun List<Event>.sortForMonthView(timeZoneId: String): List<Event> {
+        val comparator = Comparator<Event> { a, b ->
+            return@Comparator when {
+                isAllDayPrio(timeZoneId, a, b) ->  -1
+                isAllDayPrio(timeZoneId, b, a) -> 1
+                isMultiDayPrio(timeZoneId, a, b) -> -1
+                isMultiDayPrio(timeZoneId, b, a) -> 1
+                else -> {
+                    val coefficient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
+                    val coefficient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
+
+                    if (coefficient1 > 0) 1
+                    else if (coefficient1 < 0) -1
+                    else {
+                        if (coefficient2 > 0) 1
+                        else if (coefficient2 < 0) -1
+                        else 0
+                    }
+                }
+            }
+        }
+        return this.sortedWith(comparator)
     }
 
     /**

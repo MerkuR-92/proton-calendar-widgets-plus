@@ -298,58 +298,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/event_form_location_layout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_recurrence_layout"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageView
-                android:id="@+id/event_form_location_icon"
-                style="@style/Icon.Form"
-                app:tint="@color/icon_hint"
-                app:srcCompat="@drawable/ic_proton_map_pin"
-                android:layout_marginTop="@dimen/default_margin_text_vertical_large"
-                app:layout_constraintTop_toTopOf="@+id/event_form_location"
-                app:layout_constraintStart_toStartOf="parent" />
-
-            <EditText
-                android:id="@+id/event_form_location"
-                style="@style/Text.Default"
-                android:textColorHint="@color/text_hint"
-                android:paddingStart="@dimen/default_margin_text_start"
-                android:paddingEnd="@dimen/default_margin_text_end"
-                android:paddingTop="@dimen/default_margin_text_vertical_large"
-                android:paddingBottom="@dimen/default_margin_text_vertical_large"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="@string/event_hint_location"
-                android:inputType="textPostalAddress|textCapSentences|textMultiLine"
-                android:scrollHorizontally="false"
-                android:maxLength="255"
-                android:singleLine="false"
-                android:maxLines="20"
-                android:background="@android:color/transparent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-            <View
-                android:id="@+id/event_form_location_separator"
-                style="@style/Separator"
-                app:layout_constraintTop_toBottomOf="@+id/event_form_location"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/event_form_calendar_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_recurrence_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
@@ -486,13 +438,61 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/event_form_location_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_participant_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/event_form_location_icon"
+                style="@style/Icon.Form"
+                app:tint="@color/icon_hint"
+                app:srcCompat="@drawable/ic_proton_map_pin"
+                android:layout_marginTop="@dimen/default_margin_text_vertical_large"
+                app:layout_constraintTop_toTopOf="@+id/event_form_location"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <EditText
+                android:id="@+id/event_form_location"
+                style="@style/Text.Default"
+                android:textColorHint="@color/text_hint"
+                android:paddingStart="@dimen/default_margin_text_start"
+                android:paddingEnd="@dimen/default_margin_text_end"
+                android:paddingTop="@dimen/default_margin_text_vertical_large"
+                android:paddingBottom="@dimen/default_margin_text_vertical_large"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/event_hint_location"
+                android:inputType="textPostalAddress|textCapSentences|textMultiLine"
+                android:scrollHorizontally="false"
+                android:maxLength="255"
+                android:singleLine="false"
+                android:maxLines="20"
+                android:background="@android:color/transparent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <View
+                android:id="@+id/event_form_location_separator"
+                style="@style/Separator"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_location"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <LinearLayout
             android:id="@+id/event_form_alarm_list"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_participant_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
