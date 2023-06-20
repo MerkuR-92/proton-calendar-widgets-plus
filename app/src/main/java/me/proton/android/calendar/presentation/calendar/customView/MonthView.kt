@@ -80,8 +80,6 @@ class MonthView : ViewGroup {
 
     private val res = context.resources
 
-    public var eventsDrawn: Boolean = false
-
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         setWillNotDraw(false)
 
@@ -150,8 +148,6 @@ class MonthView : ViewGroup {
         drawMonthGrid(canvas)
 
         drawEvents(canvas)
-
-        if (this.monthViewEventsMap.size > 0) eventsDrawn = true
     }
 
     private fun drawMonthGrid(canvas: Canvas?) {

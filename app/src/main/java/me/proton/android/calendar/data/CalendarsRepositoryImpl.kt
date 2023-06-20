@@ -23,9 +23,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -45,7 +44,6 @@ import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.overlapsWithFullDayRange
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutBySearchTerm
@@ -1004,9 +1002,44 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     }
 
-    private fun getSkeletonEvents(
-        eventsWindow: CalendarsRepository.EventsWindow
+    /**
+     * Get Skeleton Events with correct Calendar Colors.
+     */
+    override suspend fun getSkeletonEvents(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): List<SkeletonEvent> {
+
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
+
+        return visibleSkeletonEventsFlow.map { visibleSkeletonEvents ->
+
+            logger.v("events flow: getSkeletonEvents for ${eventsWindow.fromDate} - ${eventsWindow.toDate}")
+
+            visibleSkeletonEvents.map { skeletonEvent ->
+                expandSkeletonEventsAndFilterInWindow(
+                    skeletonEvent,
+                    visibleSkeletonEvents,
+                    eventsWindow
+                )
+            }.flatten()
+
+        }.first()
+    }
+
+    /**
+     * Get Skeleton Events with correct Calendar Colors.
+     */
+    override fun getSkeletonEventsFlow(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
     ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
+
+        logger.v("calling getSkeletonEventsForIndicators $fromDate - $toDate")
+
+        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
         return createSkeletonsFlow(eventsWindow).transform<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<SkeletonEvent>> { eventSkeletons ->
 
@@ -1045,22 +1078,6 @@ class CalendarsRepositoryImpl @Inject constructor(
             emit(CalendarsRepository.GetEventsResult.Exception(it))
         }.flowOn(Dispatchers.Default).distinctUntilChanged()
 
-    }
-
-    /**
-     * Get Skeleton Events with correct Calendar Colors.
-     */
-    override fun getSkeletonEvents(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-
-        logger.v("calling getSkeletonEventsForIndicators $fromDate - $toDate")
-
-        val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
-
-        return getSkeletonEvents(eventsWindow)
     }
 
     override suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean =

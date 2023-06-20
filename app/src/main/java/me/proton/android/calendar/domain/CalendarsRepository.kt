@@ -173,7 +173,16 @@ interface CalendarsRepository {
     /**
      * @return SkeletonEvents with correct Calendar Color.
      */
-    fun getSkeletonEvents(
+    suspend fun getSkeletonEvents(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): List<SkeletonEvent>
+
+    /**
+     * @return SkeletonEvents with correct Calendar Color.
+     */
+    fun getSkeletonEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
