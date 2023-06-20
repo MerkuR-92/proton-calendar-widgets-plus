@@ -44,7 +44,7 @@
                 tools:visibility="visible" />
 
             <include
-                android:id="@+id/section_location"
+                android:id="@+id/section_calendar"
                 layout="@layout/item_form_section"
                 android:visibility="gone"
                 tools:visibility="visible" />
@@ -56,7 +56,7 @@
                 tools:visibility="visible" />
 
             <include
-                android:id="@+id/section_calendar"
+                android:id="@+id/section_location"
                 layout="@layout/item_form_section"
                 android:visibility="gone"
                 tools:visibility="visible" />
