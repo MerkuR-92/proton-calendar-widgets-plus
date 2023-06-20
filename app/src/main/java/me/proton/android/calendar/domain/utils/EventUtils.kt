@@ -4,6 +4,7 @@ import android.content.res.Resources
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.DateOrDateTimeProperty
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.core.user.domain.entity.UserAddress
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -20,7 +21,9 @@ interface EventUtils {
      * Pair<1, 3> if on that day, this is first day out of 3 days that the Event spans.
      */
     fun Event.calculateFullDayCounter(date: LocalDate, timeZoneId: String): Pair<Int, Int>
+    fun UiEvent.calculateFullDayCounter(date: LocalDate): Pair<Int, Int>
     fun Event.formatFullDayCounter(date: LocalDate, timeZoneId: String): String?
+    fun UiEvent.formatFullDayCounter(date: LocalDate): String?
     fun Event.formatStart(timeZoneId: String, is24Hour: Boolean): Pair<String?, String?>
     fun Event.formatStartForNotification(timeZoneId: String, resources: Resources, is24Hour: Boolean?) : String
     fun Event.formatEnd(timeZoneId: String, is24Hour: Boolean): Pair<String?, String?>

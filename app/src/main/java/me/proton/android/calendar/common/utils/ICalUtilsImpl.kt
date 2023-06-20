@@ -38,11 +38,13 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
 import java.security.MessageDigest
 import java.time.*
@@ -547,6 +549,68 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     /**
+     * Combines expanding, including single edits and filtering by exdates.
+     */
+    override fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>
+    ): List<UiEvent>? {
+        val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
+        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
+            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
+        } else {
+            toDate
+        }
+
+        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
+
+        val exZonedDateTimes =
+            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+                exDates.values.map { exDate ->
+                    exDate.toZonedDateTime(timeZoneId)
+                }
+            }
+
+        return occurrences.mapNotNull { occurrence ->
+
+            if (occurrence.startDateTime in exZonedDateTimes || !startEndOverlapsWithFullDayRange(occurrence.startDateTime, occurrence.endDateTime, fromDate, toDate, timeZoneId)) {
+                // occurrence is exdated or is outside of the window
+                null
+            } else {
+                val event = // single edit or original event
+                    eventsSharingUid.find {
+                        it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
+                            occurrence.startDateTime,
+                            originalEvent.isAllDay()
+                        )
+                    } ?: originalEvent
+
+                UiEvent(
+                    event.id,
+                    event.calendar.id,
+                    event.uid,
+                    event.summary,
+                    event.location,
+                    event.description,
+                    occurrence.startDateTime,
+                    occurrence.endDateTime,
+                    event.isAllDay(),
+                    occurrence.occurrenceNumber,
+                    event.calendar.color,
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
+                    event.getParticipationStatus(userEmails),
+                    event.status ?: Status.confirmed()
+                )
+            }
+
+        }
+    }
+
+    /**
      * Creates ICalendar using only plaintext shared event part.
      */
     override fun toICalendarFromPlaintextSharedPart(json: Json, sharedEvents: List<JsonElement>): ICalendar? {
@@ -911,26 +975,40 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     /**
+     * Groups all-day and spanning multiple days Events first.
+     */
+    override fun List<UiEvent>.sortUiEventsForAgendaView(timeZoneId: String): List<UiEvent> {
+        val groupedByAllDayEvents = this.groupBy { it.isAllDay || !it.spansSingleDay() }
+        val result = mutableListOf<UiEvent>()
+        result.addAll(
+            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
+                ?: emptyList()
+        )
+        result.addAll(
+            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
+                ?: emptyList()
+        )
+        return result
+    }
+
+    /**
      * @returns true if event a is all day and event b is partial single day
      */
-    private fun isAllDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
-        return a.isAllDay() &&
-                !b.isAllDay() &&
-                a.getOccurrenceStart(
-                    timeZoneId
-                ).toLocalDate().isEqual((b.getOccurrenceEnd(
-                    timeZoneId
-                )).toLocalDate()) && b.spansSingleDay(timeZoneId = timeZoneId)
+    private fun isAllDayPrio(a: UiEvent, b: UiEvent): Boolean {
+        return a.isAllDay &&
+                !b.isAllDay &&
+                a.dateStart.toLocalDate().isEqual((b.dateEnd).toLocalDate()) &&
+                b.spansSingleDay()
     }
 
     /**
      * @returns true if event a is single day and event b is spanning multiple days
      */
-    private fun isMultiDayPrio(timeZoneId: String, a: Event, b: Event): Boolean {
-        return !a.isAllDay() &&
-                !b.isAllDay() &&
-                !a.spansSingleDay(timeZoneId = timeZoneId) &&
-                b.spansSingleDay(timeZoneId = timeZoneId)
+    private fun isMultiDayPrio(a: UiEvent, b: UiEvent): Boolean {
+        return !a.isAllDay &&
+                !b.isAllDay &&
+                !a.spansSingleDay() &&
+                b.spansSingleDay()
     }
 
     /**
@@ -940,16 +1018,16 @@ object ICalUtilsImpl : ICalUtils {
      * 3- Partial day spanning multiple days
      * 4- Partial day
      */
-    override fun List<Event>.sortForMonthView(timeZoneId: String): List<Event> {
-        val comparator = Comparator<Event> { a, b ->
+    override fun List<UiEvent>.sortForMonthView(): List<UiEvent> {
+        val comparator = Comparator<UiEvent> { a, b ->
             return@Comparator when {
-                isAllDayPrio(timeZoneId, a, b) ->  -1
-                isAllDayPrio(timeZoneId, b, a) -> 1
-                isMultiDayPrio(timeZoneId, a, b) -> -1
-                isMultiDayPrio(timeZoneId, b, a) -> 1
+                isAllDayPrio(a, b) ->  -1
+                isAllDayPrio(b, a) -> 1
+                isMultiDayPrio(a, b) -> -1
+                isMultiDayPrio(b, a) -> 1
                 else -> {
-                    val coefficient1 = (a.getOccurrenceStart(timeZoneId)).toEpochSecond() - (b.getOccurrenceStart(timeZoneId)).toEpochSecond()
-                    val coefficient2 = (b.getOccurrenceEnd(timeZoneId)).toEpochSecond() - (a.getOccurrenceEnd(timeZoneId)).toEpochSecond()
+                    val coefficient1 = a.dateStart.toEpochSecond() - b.dateStart.toEpochSecond()
+                    val coefficient2 = b.dateEnd.toEpochSecond() - a.dateEnd.toEpochSecond()
 
                     if (coefficient1 > 0) 1
                     else if (coefficient1 < 0) -1

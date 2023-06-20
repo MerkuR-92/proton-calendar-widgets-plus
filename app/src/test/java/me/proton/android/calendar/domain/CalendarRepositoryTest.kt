@@ -34,6 +34,7 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
+import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
@@ -58,6 +59,7 @@ internal class CalendarRepositoryTest {
     private val searchDatabaseMock: SearchDatabase = mockk()
     private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()
     private val userManagerMock: UserManager = mockk()
+    private val accountManagerMock: AccountManager = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -367,7 +369,8 @@ internal class CalendarRepositoryTest {
             eventDecryptorMock,
             searchDatabaseMock,
             indexEventForSearchUseCaseMock,
-            userManagerMock
+            userManagerMock,
+            accountManagerMock
         )
     }
 

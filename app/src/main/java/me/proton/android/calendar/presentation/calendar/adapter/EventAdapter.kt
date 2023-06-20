@@ -28,19 +28,19 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.databinding.ItemAgendaEventAllDayBinding
 import me.proton.android.calendar.databinding.ItemAgendaEventHeaderBinding
 import me.proton.android.calendar.databinding.ItemAgendaEventPartialDayBinding
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter.EventViewHolder.HeaderViewHolder
 import me.proton.core.util.kotlin.nullIfBlank
 import java.time.LocalDate
 import java.time.ZoneId
 
 class EventAdapter(
-    private val clickListener: ((Event) -> Unit)?/*TODO or just use entire item click listener from RV*/
-) : ListAdapter<Event, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
+    private val clickListener: ((UiEvent) -> Unit)?
+) : ListAdapter<UiEvent, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
     private val userEmails = mutableListOf<String>()
     private var timeZoneId: String? = null
@@ -89,31 +89,30 @@ class EventAdapter(
             private val decryptionErrorIcon: ImageView = itemBinding.decryptionErrorIcon
             private val decryptionErrorView: View = itemBinding.decryptionErrorView
 
-            // TODO consider databinding
-            fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: UiEvent, timeZoneId: String, is24Hour: Boolean, date: LocalDate, clickListener: ((UiEvent) -> Unit)?) {
                 val context = itemView.context
-                val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
+                val participationStatus = event.participationStatus
 
                 if (!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     imageViewIcon.setBackgroundResource(R.drawable.ic_calendar_bar_unanswered)
                 } else {
                     imageViewIcon.setBackgroundResource(R.drawable.shape_calendar_bar)
                 }
-                imageViewIcon.background.setTint(Color.parseColor(event.calendar.color))
+                imageViewIcon.background.setTint(Color.parseColor(event.calendarColor))
 
                 textViewHeader.text =
-                    "${(event.getOccurrenceStart(
-                        timeZoneId
-                    ))?.formatTime(timeZoneId, is24Hour)} ‐ ${(event.getOccurrenceEnd(
-                        timeZoneId
-                    ))?.formatTime(timeZoneId, is24Hour)}" // TODO
+                    "${(event.dateStart.withZoneSameInstant(
+                        ZoneId.of(timeZoneId)
+                    ))?.formatTime(timeZoneId, is24Hour)} ‐ ${(event.dateEnd.withZoneSameInstant(
+                        ZoneId.of(timeZoneId)
+                    ))?.formatTime(timeZoneId, is24Hour)}"
 
                 textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
+                if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
-                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date)
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
@@ -127,7 +126,7 @@ class EventAdapter(
                     textViewSubheader.visibleOrGone(true)
                 }
 
-                if (event.isInThePast(timeZoneId)) {
+                if (event.isInThePast()) {
                     textViewHeader.setTextAppearance(context, R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(context, R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(context, R.style.Text_Default_Weak)
@@ -168,16 +167,16 @@ class EventAdapter(
             private val decryptionErrorView: View = itemBinding.decryptionErrorView
 
             // TODO consider databinding
-            fun bind(event: Event, timeZoneId: String, is24Hour: Boolean, date: LocalDate, userEmails: List<String>?, clickListener: ((Event) -> Unit)?) {
+            fun bind(event: UiEvent, timeZoneId: String, is24Hour: Boolean, date: LocalDate, clickListener: ((UiEvent) -> Unit)?) {
                 val context = itemView.context
-                val participationStatus = if (userEmails != null) event.getParticipationStatus(userEmails) else null
+                val participationStatus = event.participationStatus
                 viewBackgroundStripedLayout.visibleOrGone(!event.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION)
 
-                if (!event.isAllDay() && !event.spansSingleDay(timeZoneId = timeZoneId)) {
-                    val fullDayCounter = event.calculateFullDayCounter(date, timeZoneId)
+                if (!event.isAllDay && !event.spansSingleDay()) {
+                    val fullDayCounter = event.calculateFullDayCounter(date)
                     if (fullDayCounter.first == 1) { // this is the first day of an ongoing event
                         textViewHeader.visibleOrGone(true)
-                        textViewHeader.text = "${(event.getOccurrenceStart(timeZoneId))?.formatTime(timeZoneId, is24Hour)}" // TODO
+                        textViewHeader.text = "${(event.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)))?.formatTime(timeZoneId, is24Hour)}"
                     } else { // this is second or later day of an ongoing event
                         textViewHeader.visibleOrGone(false)
                     }
@@ -187,10 +186,10 @@ class EventAdapter(
 
                 textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
-                if (event.spansSingleDay(timeZoneId = timeZoneId)) {
+                if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)
                 } else {
-                    textViewSubheaderSide.text = event.formatFullDayCounter(date, timeZoneId)
+                    textViewSubheaderSide.text = event.formatFullDayCounter(date)
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
@@ -205,9 +204,9 @@ class EventAdapter(
                     textViewSubheader.visibleOrGone(true)
                 }
 
-                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendar.color)))
+                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendarColor)))
 
-                if (event.isInThePast(timeZoneId)) {
+                if (event.isInThePast()) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
                     textViewSubheader.setTextAppearance(R.style.Text_Default_Weak)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
@@ -242,10 +241,10 @@ class EventAdapter(
                         setStripedBackground(
                             viewBackgroundStriped,
                             context,
-                            Color.parseColor(event.calendar.color)
+                            Color.parseColor(event.calendarColor)
                         ) // striped background with 20% opacity for unanswered all day events
                     } else {
-                        viewMainSurface.setTint(Color.parseColor(event.calendar.color))
+                        viewMainSurface.setTint(Color.parseColor(event.calendarColor))
                         textViewHeader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
                         textViewSubheader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
                         textViewSubheaderSide.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
@@ -275,7 +274,7 @@ class EventAdapter(
     override fun getItemViewType(position: Int): Int {
         return if (position == 0) {
             ITEM_TYPE_HEADER
-        } else if (getItem(position).isAllDay() || !getItem(position).spansSingleDay(timeZoneId = timeZoneId)) {
+        } else if (getItem(position).isAllDay || !getItem(position).spansSingleDay()) {
             ITEM_TYPE_EVENT_ALL_DAY
         } else {
             ITEM_TYPE_EVENT_PARTIAL_DAY
@@ -324,7 +323,6 @@ class EventAdapter(
                 immutableTimeZoneId,
                 immutableTimeFormatIs24Hour,
                 immutableDate,
-                userEmails,
                 clickListener
             )
             is EventViewHolder.AllDayEventViewHolder -> holder.bind(
@@ -332,7 +330,6 @@ class EventAdapter(
                 immutableTimeZoneId,
                 immutableTimeFormatIs24Hour,
                 immutableDate,
-                userEmails,
                 clickListener
             )
         }

@@ -79,6 +79,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.test.shared.mocks.EventMocks
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -5189,52 +5190,40 @@ internal class ICalUtilsTest {
         // List of event with the 5th as common date
 
         val timeZoneId = "Europe/Paris"
-        val events = listOf(
-            createEvent(
-                ZonedDateTime.of(2021, 10, 3, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 6, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
-                false,
-                timeZoneId,
-                "Multi day all day 3 - 5"
+        val uiEvents = listOf(
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 3, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 6, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Multi day all day 3 - 5"
             ),
-            createEvent(
-                ZonedDateTime.of(2021, 10, 5, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 8, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
-                false,
-                timeZoneId,
-                "Multi day all day 5 - 7"
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 5, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 8, 0, 0, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Multi day all day 5 - 7"
             ),
-            createEvent(
-                ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 6, 13, 0, 0, 0, ZoneId.of(timeZoneId)),
-                true,
-                timeZoneId,
-                "Multi day part day 5 - 6 11h - 13h"
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 6, 13, 0, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Multi day part day 5 - 6 11h - 13h"
             ),
-            createEvent(
-                ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 7, 13, 30, 0, 0, ZoneId.of(timeZoneId)),
-                true,
-                timeZoneId,
-                "Multi day part day 5 - 7 11h30 - 13h30"
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 7, 13, 30, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Multi day part day 5 - 7 11h30 - 13h30"
             ),
-            createEvent(
-                ZonedDateTime.of(2021, 10, 5, 10, 0, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
-                true,
-                timeZoneId,
-                "Part day 5 10h - 11h"
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 5, 10, 0, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 5, 11, 0, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Part day 5 10h - 11h"
             ),
-            createEvent(
-                ZonedDateTime.of(2021, 10, 5, 10, 30, 0, 0, ZoneId.of(timeZoneId)),
-                ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
-                true,
-                timeZoneId,
-                "Part day 5 10h30 - 11h30"
+            UiEvent().copy(
+                dateStart = ZonedDateTime.of(2021, 10, 5, 10, 30, 0, 0, ZoneId.of(timeZoneId)),
+                dateEnd = ZonedDateTime.of(2021, 10, 5, 11, 30, 0, 0, ZoneId.of(timeZoneId)),
+                summary = "Part day 5 10h30 - 11h30"
             )
         )
 
-        val sortedList = events.sortForMonthView(timeZoneId)
+        val sortedList = uiEvents.sortForMonthView()
 
         assertThat(sortedList[0].summary).isEqualTo("Multi day all day 3 - 5")
         assertThat(sortedList[1].summary).isEqualTo("Multi day all day 5 - 7")

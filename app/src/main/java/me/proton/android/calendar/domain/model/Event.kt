@@ -619,6 +619,23 @@ data class Event private constructor(
             searchTerm = searchTerm
         )
     }
+
+    fun toUiEvent(userEmails: List<String>, timeZoneId: String): UiEvent = UiEvent(
+            id,
+            calendar.id,
+            uid,
+            summary,
+            location,
+            description,
+            this.getOccurrenceStart(timeZoneId),
+            this.getOccurrenceEnd(timeZoneId),
+            isAllDay(),
+            occurrence?.occurrenceNumber ?: 0,
+            calendar.color,
+            decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
+            getParticipationStatus(userEmails),
+            this.status ?: Status.confirmed()
+        )
 }
 
 

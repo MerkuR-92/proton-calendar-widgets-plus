@@ -71,7 +71,7 @@ import me.proton.android.calendar.databinding.FragmentMonthBinding
 import me.proton.android.calendar.databinding.ItemMiniCalendarHeaderBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
 import me.proton.android.calendar.domain.model.getActualEventId
 import me.proton.android.calendar.domain.model.toWeekViewCalendarEntityEvent
@@ -142,7 +142,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private var currentFromDate: LocalDate? = null
     private var currentToDate: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
-    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<Event>>
+    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
 
     override fun onToolbarCreated(toolbar: Toolbar) {
@@ -729,7 +729,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             firstDayOfWeek?.let {
                 val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
                 val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
-                if (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate) {
+                val weekViewShown = currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK
+                val weekViewFlowInitialized = this@MonthFragment::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()
+                if ((!weekViewFlowInitialized && weekViewShown) || (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate)) {
                     val timeZoneId = calendarViewModel.getTimeZoneId()?.id
                     getEvents(fromDate, toDate, timeZoneId ?: return@launch)
                 }
@@ -774,7 +776,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         // Get and display decrypted events
         currentFromDate = fromDate
         currentToDate = toDate
-        eventsLiveData = calendarViewModel.getEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
         if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
@@ -785,9 +787,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         lifecycleScope.launch {
-                            val userEmails = calendarViewModel.getUserEmails()
                             val weekViewCalendarEntities = it.events.map { event ->
-                                event.toWeekViewCalendarEntityEvent(userEmails, timeZoneId, getString(R.string.default_event_summary))
+                                event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
                             }
                             weekViewAdapter.submitList(
                                 weekViewCalendarEntities

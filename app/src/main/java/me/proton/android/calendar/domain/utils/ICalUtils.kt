@@ -14,14 +14,13 @@ import biweekly.util.ICalDate
 import biweekly.util.Recurrence
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.utils.CalendarSplit
-import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.model.UiEvent
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -136,6 +135,15 @@ interface ICalUtils {
         timeZoneId: String
     ): List<Event>?
 
+    fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>
+    ): List<UiEvent>?
+
     /**
      * Creates ICalendar using only plaintext shared event part.
      */
@@ -240,6 +248,8 @@ interface ICalUtils {
      */
     fun List<Event>.sortForAgendaView(timeZoneId: String): List<Event>
 
+    fun List<UiEvent>.sortUiEventsForAgendaView(timeZoneId: String): List<UiEvent>
+
     /**
      * Sorts events with following order:
      * 1- All day spanning multiple days
@@ -247,7 +257,7 @@ interface ICalUtils {
      * 3- Partial day spanning multiple days
      * 4- Partial day
      */
-    fun List<Event>.sortForMonthView(timeZoneId: String): List<Event>
+    fun List<UiEvent>.sortForMonthView(): List<UiEvent>
 
     /**
      * Copies all multi-day events across each day in the range, so we can display them day by day.
