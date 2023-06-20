@@ -771,6 +771,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             binding.weekView.showLoadingEvents = false
+            // Return early if we already have that flow running
+            if (fromDate == currentFromDate && toDate == currentToDate) return
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         // Get and display decrypted events
