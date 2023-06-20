@@ -1728,7 +1728,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         it.addressId.isNullOrEmpty() ||
                         it.description == "0" // TODO Temporary fix for MIGRATION_46_47 that caused some users Member.description field to have the value "0" locally
             }.takeIfNotEmpty()?.let { calendarsToRefresh ->
-                logger.e("Test test refreshCalendarsWithMissingFields calendarsToRefresh $calendarsToRefresh")
                 val calendarIds = calendarsToRefresh.map { it.id }.filterNot { calendarId ->
                     refreshedCalendarIds.any { it == calendarId }
                 }
