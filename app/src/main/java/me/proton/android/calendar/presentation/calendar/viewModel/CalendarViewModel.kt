@@ -332,24 +332,24 @@ class CalendarViewModel @Inject constructor(
         _selectedDateTime.value = Pair(date, time)
     }
 
-    private fun calculateCalendarIndicators(events: List<UiEvent>): Map<LocalDate, List<String>> {
+    private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {
 
         val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
 
         events.forEach { event ->
-            val partTimeEndsOnMidnight = (!event.isAllDay && event.dateEnd.toLocalTime() == LocalTime.MIDNIGHT)
-            var start = event.dateStart.toLocalDate()
-            val end = event.dateEnd.toLocalDate()
+            val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
+            var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
+            val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
                 val current = indicators.getValue(start)
-                current.add(event.calendarColor)
+                current.add(event.calendar.color)
                 indicators[start] = current
                 start = start.plusDays(1)
 
                 // All day events end on next day 00:00 so we need to break loop to exclude end day
-                if (start == end && (event.isAllDay || partTimeEndsOnMidnight)) break
+                if (start == end && (event.isAllDay() || partTimeEndsOnMidnight)) break
             }
         }
 
@@ -435,18 +435,19 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).asLiveData()
     }
 
-    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<Map<LocalDate, List<String>>> {
+    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
 
-        return getUiEvents(fromDate, toDate, timeZoneId, lifecycle).map { uiEventResult ->
-            when (uiEventResult) {
+        return getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
+            when (skeletonResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()
                 }
                 is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
-                    uiEventResult.events
+                    skeletonResult.events,
+                    timeZoneId
                 )
                 is CalendarsRepository.GetEventsResult.Exception -> {
-                    logger.e("exception getting calendarIndicators", uiEventResult.throwable)
+                    logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
                     emptyMap()
                 }
             }

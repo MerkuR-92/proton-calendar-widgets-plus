@@ -52,7 +52,7 @@ fun WeekViewCalendarEntity.Event.getActualEventId(): String {
 
 fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): WeekViewCalendarEntity.Event {
     // We add the occurrence number as a suffix to the event id so that week view doesn't recycle events with the same id, and so that we easily find the event occurrence on click
-    val occurrenceNumberSuffix = if (this.isRecurring) "" else OCCURRENCE_NUMBER_SUFFIX + this.occurrenceNumber
+    val occurrenceNumberSuffix = if (!this.isRecurring) "" else OCCURRENCE_NUMBER_SUFFIX + this.occurrenceNumber
     val weekViewEventId = this.id + occurrenceNumberSuffix
     return WeekViewCalendarEntity.Event(
         id = weekViewEventId,

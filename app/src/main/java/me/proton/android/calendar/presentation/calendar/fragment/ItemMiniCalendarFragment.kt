@@ -252,8 +252,7 @@ class ItemMiniCalendarFragment : Fragment() {
             calendarViewModel.calendarIndicators(
                 fromDate,
                 toDate,
-                timeZoneId,
-                lifecycle
+                timeZoneId
             ).observe(viewLifecycleOwner) { indicators ->
                 this@ItemMiniCalendarFragment.indicators = indicators
                 applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
