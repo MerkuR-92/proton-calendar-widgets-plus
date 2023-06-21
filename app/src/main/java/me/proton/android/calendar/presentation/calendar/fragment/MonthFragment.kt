@@ -141,6 +141,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     // Week view values
     private var currentFromDate: LocalDate? = null
     private var currentToDate: LocalDate? = null
+    private var currentTimeZoneId: String? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
@@ -771,13 +772,16 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             binding.weekView.showLoadingEvents = false
-            // Return early if we already have that flow running
-            if (fromDate == currentFromDate && toDate == currentToDate) return
+            if (fromDate == currentFromDate && toDate == currentToDate && timeZoneId == currentTimeZoneId) {
+                // Return early if we already have that flow running
+                return
+            }
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         // Get and display decrypted events
         currentFromDate = fromDate
         currentToDate = toDate
+        currentTimeZoneId = timeZoneId
         eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
         if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
