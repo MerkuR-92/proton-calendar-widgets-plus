@@ -435,7 +435,7 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).asLiveData()
     }
 
-    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {        logger.e("Test test Mini calendar getUiEvents $fromDate $toDate")
+    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
 
         return getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
             when (skeletonResult) {
