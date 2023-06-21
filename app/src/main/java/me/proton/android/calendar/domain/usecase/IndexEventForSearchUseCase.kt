@@ -8,6 +8,7 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.model.Event
 import javax.inject.Inject
 
 class IndexEventForSearchUseCase @Inject constructor(
@@ -30,7 +31,9 @@ class IndexEventForSearchUseCase @Inject constructor(
             val searchEvents = entitiesToIndex.map {
                 async {
                     transformEventUseCase.execute(it)?.let { event ->
-                        SearchEventEntity.from(userId, event)
+                        if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
+                            SearchEventEntity.from(userId, event)
+                        } else null
                     }
                 }
             }.awaitAll().filterNotNull()
