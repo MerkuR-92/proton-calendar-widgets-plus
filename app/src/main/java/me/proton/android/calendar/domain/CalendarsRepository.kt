@@ -6,7 +6,16 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
-import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -42,7 +51,7 @@ interface CalendarsRepository {
 
     suspend fun selectCalendar(calendarId: String): Calendar?
 
-    suspend fun selectCalendars(userId: String): List<CalendarEntity>
+    suspend fun selectCalendarEntities(userId: String): List<CalendarEntity>
 
     suspend fun selectUserCalendars(userId: String): List<Calendar>
 
@@ -89,7 +98,7 @@ interface CalendarsRepository {
     /**
      * Fetches and combines MemberEntity with supplied CalendarEntities
      */
-    suspend fun fetchMembersToCalendarEntities(userId: UserId, calendars: List<CalendarEntity>): List<Calendar>?
+    suspend fun fetchMembersToCalendarEntities(userId: UserId, calendarEntities: List<CalendarEntity>): List<Calendar>
 
     suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>?
 
@@ -336,6 +345,8 @@ interface CalendarsRepository {
         addresses: List<UserAddress>? = null,
         refresh: Boolean = false
     ): UserAddress?
+
+    fun getUserMember(userAddresses: List<UserAddress>, members: List<MemberEntity>): MemberEntity?
 
     val fetchingState: Flow<FetchingState>
 

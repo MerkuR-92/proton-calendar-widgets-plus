@@ -158,8 +158,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val expandEventsToDateFlow = MutableStateFlow<ZonedDateTime>(eventsExpandedUntil)
     private var expandEventsToDateChannel = Channel<ZonedDateTime>()
 
-    private val dbCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
-    private val visibleCalendars = MutableStateFlow<List<CalendarEntity>>(emptyList())
+    private val dbCalendarEntities = MutableStateFlow<List<CalendarEntity>>(emptyList())
+    private val visibleCalendarEntities = MutableStateFlow<List<CalendarEntity>>(emptyList())
 
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
     private var scopeEventFetching = CoroutineScope(Dispatchers.Default)
@@ -226,7 +226,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         // out of all events, filter out invisible ones (because of hidden calendar)
         val events = eventsMutex.withLock {
             allEvents.value.filter { event ->
-                visibleCalendars.value.find { it.id == event.calendar.id } != null
+                visibleCalendarEntities.value.find { it.id == event.calendar.id } != null
             }
         }
 
@@ -409,7 +409,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().selectById(calendarId)?.joinToCalendar(database, json)
     }
 
-    override suspend fun selectCalendars(userId: String): List<CalendarEntity> {
+    override suspend fun selectCalendarEntities(userId: String): List<CalendarEntity> {
         return database.calendarsDao().selectCalendars(userId)
     }
 
@@ -526,15 +526,31 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchMembersToCalendarEntities(
         userId: UserId,
-        calendars: List<CalendarEntity>
-    ): List<Calendar>? {
-        return calendars.map {
-            Calendar.from(
-                it,
-                fetchMembers(userId, it.id)?.firstOrNull() ?: return null,
-                fetchCalendarSettings(userId, it.id) ?: return null,
-                json)
+        calendarEntities: List<CalendarEntity>
+    ): List<Calendar> {
+        val calendars = arrayListOf<Calendar>()
+        coroutineScope {
+            calendarEntities.map {
+                async {
+                    val members = fetchMembers(userId, it.id)?.firstOrNull() ?: run {
+                        logger.e("fetchMembersToCalendarEntities: Failed to fetch members")
+                        return@async null
+                    }
+                    val calendarSettings = fetchCalendarSettings(userId, it.id) ?: run {
+                        logger.e("fetchMembersToCalendarEntities: Failed to fetch calendar settings")
+                        return@async null
+                    }
+                    val calendar = Calendar.from(
+                        it,
+                        members,
+                        calendarSettings,
+                        json
+                    )
+                    calendars.add(calendar)
+                }
+            }.awaitAll()
         }
+        return calendars
     }
 
     override suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>? {
@@ -891,9 +907,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
 
         val skeletonsInWindow = visibleSkeletons.map { skeletons ->
-            skeletons.map {
-                    skeletonEvent ->
-                    expandSkeletonEventsAndFilterInWindow(
+            skeletons.map { skeletonEvent ->
+                expandSkeletonEventsAndFilterInWindow(
                     skeletonEvent,
                     skeletons,
                     eventsWindow
@@ -1573,7 +1588,22 @@ class CalendarsRepositoryImpl @Inject constructor(
         return address
     }
 
-
+    /**
+     * Find member that belongs to user
+     */
+    override fun getUserMember(userAddresses: List<UserAddress>, members: List<MemberEntity>): MemberEntity? {
+        return members.firstOrNull { member ->
+            userAddresses.any { userAddress ->
+                if (!member.addressId.isNullOrEmpty()) {
+                    member.addressId.equalsNoCase(userAddress.addressId.id)
+                } else {
+                    member.canonicalEmail.equalsNoCase(
+                        canonicalizeProtonEmail(userAddress.email, forceCanonicalization = true)
+                    )
+                }
+            }
+        }
+    }
 }
 
 /**
