@@ -276,7 +276,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
         // If holiday calendar already exists, leave the fields empty
         matchingDefaultHolidayCalendar?.let {
-            val holidayCalendarAlreadyExists = calendarsRepository.selectCalendars(userId.id).firstOrNull {
+            val holidayCalendarAlreadyExists = calendarsRepository.selectCalendarEntities(userId.id).firstOrNull {
                 it.id == matchingDefaultHolidayCalendar.calendarId
             } != null
             if (holidayCalendarAlreadyExists) return true
@@ -383,7 +383,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
         val holidayCalendarAlreadyExists =
             userId.value?.id?.let { userId ->
-                calendarsRepository.selectCalendars(userId).firstOrNull {
+                calendarsRepository.selectCalendarEntities(userId).firstOrNull {
                     it.id == holidayCalendarId
                 } != null
             } ?: false
@@ -551,7 +551,7 @@ class HolidayCalendarViewModel @Inject constructor(
     }
 
     private suspend fun handleExistingHolidayCalendar(userId: UserId, holidayCalendar: ManagedHolidayCalendarEntity): Boolean {
-        val holidayCalendarAlreadyExists = calendarsRepository.selectCalendars(userId.id).firstOrNull {
+        val holidayCalendarAlreadyExists = calendarsRepository.selectCalendarEntities(userId.id).firstOrNull {
             it.id == holidayCalendar.calendarId
         } != null
         if (holidayCalendarAlreadyExists) {

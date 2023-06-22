@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.entity.UserAddress
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.TemporalAdjusters
@@ -30,7 +31,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     private val widgetRefresher: WidgetRefresher
 ): UseCase {
 
-    suspend fun executeBootstrap(calendarEntity: CalendarEntity, userId: UserId, displayTimeZoneId: String): UseCase.Result {
+    suspend fun executeBootstrap(calendarEntity: CalendarEntity, userId: UserId, displayTimeZoneId: String, addresses: List<UserAddress>? = null): UseCase.Result {
         when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
             is ApiResponse.Success -> {
                 logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
@@ -52,28 +53,36 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                 // for this calendar at the same time, this will be sent in the event loop automatically
 
                 // extract passphrase for just saved Calendar
-                val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)
-                when (cachePassphraseResult) {
+                when (val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)) {
                     is UseCase.Result.Success<*> -> {
                         // fetch events
-                        val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
-                        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
-                            userId,
-                            listOf(calendarEntity.id),
-                            now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
-                            now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
-                            displayTimeZoneId
-                        )
+                        val calendarMembers = bootstrapResponse.data.members.filter { it.calendarId == calendarEntity.id }
+                        val userMember = addresses?.let {
+                            calendarsRepository.getUserMember(
+                                it,
+                                calendarMembers
+                            )
+                        } ?: calendarMembers.first()
+                        if (userMember.display == 1) {
+                            val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
+                            val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
+                                userId,
+                                listOf(calendarEntity.id),
+                                now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
+                                now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
+                                displayTimeZoneId
+                            )
 
-                        fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
-                            if (fetchEventsResult.second == null) {
-                                logger.e("fetchEventsResult: null event list when Sucess")
-                            } else {
-                                fetchEventsResult.second?.let {
-                                    logger.v("persisting events in bootstrap: ${it.size}")
-                                    calendarsRepository.persistEvents(*it.toTypedArray())
-                                    updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                                    widgetRefresher.refreshEventList()
+                            fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
+                                if (fetchEventsResult.second == null) {
+                                    logger.e("fetchEventsResult: null event list when Sucess")
+                                } else {
+                                    fetchEventsResult.second?.let {
+                                        logger.v("persisting events in bootstrap: ${it.size}")
+                                        calendarsRepository.persistEvents(*it.toTypedArray())
+                                        updateAlarmsUseCase.execute(userId.id, it.map { it.id })
+                                        widgetRefresher.refreshEventList()
+                                    }
                                 }
                             }
                         }

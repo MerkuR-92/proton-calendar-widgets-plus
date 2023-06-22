@@ -1,13 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
@@ -36,7 +38,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         logger.v("executing BootstrapCalendarsUseCase")
 
         var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
-        var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Member for allCalendars")
+        var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities)
         val userCalendars = allCalendars.filterNot { it.isSubscribed }
 
         if (allCalendars.isNotEmpty() && allCalendars.any { it.isResetNeeded }) {
@@ -119,7 +121,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         if (redoGetCalendars) {
             // GET the calendar(entities) list again after creating default one or fixing incomplete setup
             allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
-            allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Members for allCalendars in redoGetCalendars")
+            allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities)
 
             // Subscribed calendars do not count for those checks
             ownedUserCalendars = allCalendars.filterNot { it.isSubscribed && it.isOwner.not() }
@@ -161,29 +163,34 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         val failedCalendarIds = mutableListOf<String>()
 
         // TODO For now we ignore the inactive calendars where user is not an owner
-        allCalendars.filterNot { !it.isOwner && it.isInactive }.forEach { calendar ->
-            val calendarEntity = allCalendarEntities.find { it.id == calendar.id }
+        coroutineScope {
+            allCalendars.filterNot { !it.isOwner && it.isInactive }.map { calendar ->
+                async {
+                    val calendarEntity = allCalendarEntities.find { it.id == calendar.id }
 
-            val executeBootstrapResult = if (calendarEntity != null) {
-                boostrapCalendarUseCase.executeBootstrap(
-                    calendarEntity,
-                    userId,
-                    refreshedCalendarUserSettings.primaryTimezone
-                )
-            } else UseCase.Result.InvalidParams("could not select CalendarEntity for executeBootstrapResult")
+                    val executeBootstrapResult = if (calendarEntity != null) {
+                        boostrapCalendarUseCase.executeBootstrap(
+                            calendarEntity,
+                            userId,
+                            refreshedCalendarUserSettings.primaryTimezone,
+                            addresses
+                        )
+                    } else UseCase.Result.InvalidParams("could not select CalendarEntity for executeBootstrapResult")
 
-            executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-            if (executeBootstrapResult !is UseCase.Result.Success<*>) {
-                failedCalendarIds.add(calendar.id)
+                    executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                    if (executeBootstrapResult !is UseCase.Result.Success<*>) {
+                        failedCalendarIds.add(calendar.id)
 
-                val failReason = if (executeBootstrapResult is UseCase.Result.Error) {
-                    "${executeBootstrapResult.message} + ${executeBootstrapResult.error}"
-                } else if (executeBootstrapResult is UseCase.Result.InvalidParams) {
-                    executeBootstrapResult.message
-                } else null
+                        val failReason = if (executeBootstrapResult is UseCase.Result.Error) {
+                            "${executeBootstrapResult.message} + ${executeBootstrapResult.error}"
+                        } else if (executeBootstrapResult is UseCase.Result.InvalidParams) {
+                            executeBootstrapResult.message
+                        } else null
 
-                logger.e("calendar ${calendar.id} failed bootstrap: ${failReason}")
-            }
+                        logger.e("calendar ${calendar.id} failed bootstrap: ${failReason}")
+                    }
+                }
+            }.awaitAll()
         }
 
         failedCalendarIds.forEach {
