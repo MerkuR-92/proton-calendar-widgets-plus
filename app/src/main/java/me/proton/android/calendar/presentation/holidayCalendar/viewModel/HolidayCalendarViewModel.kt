@@ -425,6 +425,7 @@ class HolidayCalendarViewModel @Inject constructor(
             holidayCalendarState.value = HolidayCalendarState.Idle
             return
         }
+        val calendarPriority = calendar.priority
         val currentDefaultAllDayNotifications = calendar.defaultFullDayNotifications.map { it.toVAlarm() }
         val notificationsChanged = currentDefaultAllDayNotifications != _defaultAllDayAlarms.value
         val colorChanged = calendar.color != calendarColor.toHexColor()
@@ -456,7 +457,8 @@ class HolidayCalendarViewModel @Inject constructor(
                 userId,
                 holidayCalendar,
                 calendarColor,
-                _defaultAllDayAlarms.value
+                _defaultAllDayAlarms.value,
+                calendarPriority
             )
 
             // Clear loading state

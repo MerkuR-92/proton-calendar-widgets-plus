@@ -44,7 +44,8 @@ class JoinCalendarUseCase @Inject constructor(
         userId: UserId,
         managedHolidayCalendarEntity: ManagedHolidayCalendarEntity,
         calendarColor: Int,
-        defaultFullDayNotifications: List<VAlarm>?
+        defaultFullDayNotifications: List<VAlarm>?,
+        priority: Int? = null
     ): UseCase.Result {
 
         val defaultUserEmail = userManager.getUser(userId).email
@@ -74,7 +75,8 @@ class JoinCalendarUseCase @Inject constructor(
                     type = if (it.action.isEmail) 0 else 1,
                     trigger = it.trigger.duration.toString()
                 )
-            }
+            },
+            priority = priority
         )
 
         return when (val joinCalendarResponse =

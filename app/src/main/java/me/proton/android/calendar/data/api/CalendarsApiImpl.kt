@@ -839,7 +839,9 @@ data class JoinCalendarApiRequest(
     @SerialName("Color")
     val color: String,
     @SerialName("DefaultFullDayNotifications")
-    val defaultFullDayNotifications: List<NotificationEntity>? = null
+    val defaultFullDayNotifications: List<NotificationEntity>? = null,
+    @SerialName("Priority")
+    val priority: Int? = null
 )
 
 @Serializable
