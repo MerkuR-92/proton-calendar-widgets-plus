@@ -311,7 +311,6 @@ class EditCreateEventUseCase @Inject constructor(
             if (isCalendarBeingChanged) {
                 // CREATE in new calendar
                 SyncEventsUpdateApiRequest(
-                    memberId = newMemberKey.memberId,
                     events = listOf(
                         SyncEventCreateContainer(
                             event = SyncEvent(
@@ -332,7 +331,6 @@ class EditCreateEventUseCase @Inject constructor(
                 )
             } else { // UPDATE
                 SyncEventsUpdateApiRequest(
-                    memberId = newMemberKey.memberId,
                     events = listOf(
                         SyncEventUpdateContainer(
                             id = sanitizedNewEvent.id,
@@ -362,7 +360,6 @@ class EditCreateEventUseCase @Inject constructor(
                 // This is a proton to proton invite
                 val sharedEventId = sanitizedNewEvent.iCalEvent.getExperimentalProperty(CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID)?.value
                 SyncEventsUpdateApiRequest(
-                    memberId = newMemberKey.memberId,
                     events = listOf(
                         SyncEventCreateContainer(
                             event = SyncEvent(
@@ -379,7 +376,6 @@ class EditCreateEventUseCase @Inject constructor(
                 )
             } else {
                 SyncEventsUpdateApiRequest(
-                    memberId = newMemberKey.memberId,
                     events = listOf(
                         SyncEventCreateContainer(
                             event = SyncEvent(

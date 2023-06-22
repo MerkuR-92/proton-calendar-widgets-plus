@@ -27,13 +27,12 @@ class UpdatePersonalPartUseCase @Inject constructor(
 
     suspend fun execute(userId: UserId, calendarId: String, eventId: String, personalPartICalString: String, notifications: List<Notification>?): UseCase.Result {
 
-        val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull()
-            ?: return UseCase.Result.InvalidParams("there is no valid first Member when updating Event personal part")
-
         var personalEventContentApiRequest: PersonalEventContentApiRequest? = null
 
         if (personalPartICalString.isNotEmpty()) {
 
+            val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull()
+                ?: return UseCase.Result.InvalidParams("there is no valid first Member when updating Event personal part")
             val memberAddressKey = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail)?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
 
             val signatureOfPersonalPart = kotlin.runCatching {
@@ -52,7 +51,6 @@ class UpdatePersonalPartUseCase @Inject constructor(
             calendarId,
             eventId,
             UpdateEventPersonalPartApiRequest(
-                member.id,
                 personalEventContentApiRequest,
                 notifications = notifications?.map { NotificationEntity.fromNotification(it) }
             )

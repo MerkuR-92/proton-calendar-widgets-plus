@@ -498,8 +498,6 @@ data class EventApiResponse(
 
 @Serializable
 data class SyncEventsUpdateApiRequest(
-    @SerialName("MemberID")
-    val memberId: String,
     @SerialName("IsImport")
     val isImport: Int = 0,
     @SerialName("Events")
@@ -778,8 +776,6 @@ data class UpdateParticipationStatusApiRequest(
 
 @Serializable
 data class UpdateEventPersonalPartApiRequest(
-    @SerialName("MemberID")
-    val memberID: String,
     @SerialName("PersonalEventContent")
     val personalEventContent: PersonalEventContentApiRequest? = null,
     @SerialName("Notifications")
