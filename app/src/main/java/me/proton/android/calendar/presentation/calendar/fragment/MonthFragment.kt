@@ -18,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -295,6 +296,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             )
         }
 
+        if (!isResumed) return // TODO ViewBinding NPE
+
         if (animateChange) {
             binding.viewPagerTopGuideline.animateGuidelineHeightChange(
                 desiredHeight,
@@ -474,36 +477,43 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                         true
                     )
                 ) {
-                    adjustMiniCalendarView(firstDayOfMonth, startWeekOn)
+                    whenStarted { // TODO ViewBinding NPE
+                        adjustMiniCalendarView(firstDayOfMonth, startWeekOn)
+                    }
                 }
             }
 
             // Handle selected day change in miniCalendarPager (mini calendar / month views)
-            if (binding.miniCalendarPager.adapter != null) {
+            if (isResumed && binding.miniCalendarPager.adapter != null) { // TODO ViewBinding NPE
                 val monthStartingDate = calendarViewModel.initialToday.withDayOfMonth(1)
                 val offset = ChronoUnit.MONTHS.between(monthStartingDate, selectedDate.withDayOfMonth(1)).toInt()
                 val miniCalendarIndex = monthStartingPosition + offset
                 if (binding.miniCalendarPager.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
                     binding.miniCalendarPager.post {
-                        val currentItem = binding.miniCalendarPager.currentItem
-                        binding.miniCalendarPager.setCurrentItem(
-                            miniCalendarIndex,
-                            if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
-                        )
+                        if (isResumed) { // TODO ViewBinding NPE
+                            val currentItem = binding.miniCalendarPager.currentItem
+                            binding.miniCalendarPager.setCurrentItem(
+                                miniCalendarIndex,
+                                if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
+                            )
+                        }
+
                     }
                 }
             }
 
             // Handle selected day change in agendaPager (agenda / day views)
-            if (binding.agendaPager.adapter != null) {
+            if (isResumed && binding.agendaPager.adapter != null) { // TODO ViewBinding NPE
                 val startingDate = agendaPagerAdapter.startingDate
                 val startingPosition = agendaPagerAdapter.startingPosition
                 val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
                 val agendaIndex = startingPosition + selectedDayOffset
                 if (binding.agendaPager.currentItem != agendaIndex) {
                     binding.agendaPager.post {
-                        binding.agendaPager.setCurrentItem(agendaIndex, false)
+                        if (isResumed) { // TODO ViewBinding NPE
+                            binding.agendaPager.setCurrentItem(agendaIndex, false)
+                        }
                     }
                 }
             }
@@ -676,8 +686,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     }
                 } else {
                     if (firstVisibleDate != calendarViewModel.selectedDateTime.value?.first) {
-                        val verticalScrollOffset = binding.weekView.verticalScrollOffset
-                        val hourHeight = binding.weekView.hourHeight
+                        val verticalScrollOffset = if (isResumed) binding.weekView.verticalScrollOffset else null // TODO ViewBinding NPE
+                        val hourHeight = if (isResumed) binding.weekView.hourHeight else null // TODO ViewBinding NPE
                         if (verticalScrollOffset != null && hourHeight != null) {
                             val hour = (verticalScrollOffset / hourHeight).toInt()
                             val minute = ceil((((verticalScrollOffset / hourHeight) - hour) * 60)).toInt()
@@ -744,11 +754,13 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 // For week view we need to use set date as first day of the week so that we stick to user week start choice
                 lifecycleScope.launch {
                     weekStart?.let { weekStart ->
-                        selectedDate.firstDayOfWeek(weekStart)?.let {
-                            if (selectedTime != null && animate) binding.weekView.scrollToDateTime(it.atTime(selectedTime))
-                            else if (selectedTime != null) binding.weekView.setDateTime(it.atTime(selectedTime))
-                            else if (animate) binding.weekView.scrollToDate(it)
-                            else binding.weekView.setDate(it)
+                        whenStarted { // TODO ViewBinding NPE
+                            selectedDate.firstDayOfWeek(weekStart)?.let {
+                                if (selectedTime != null && animate) binding.weekView.scrollToDateTime(it.atTime(selectedTime))
+                                else if (selectedTime != null) binding.weekView.setDateTime(it.atTime(selectedTime))
+                                else if (animate) binding.weekView.scrollToDate(it)
+                                else binding.weekView.setDate(it)
+                            }
                         }
                     }
                 }
@@ -762,10 +774,12 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
 
             weekStart?.let {
-                val startWeekOn = getWeekStartDayOfWeek(weekStart)
-                val weekNumber = selectedDate.weekNumber(startWeekOn)
-                if (weekNumber != binding.weekView.weekNumber) {
-                    binding.weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                whenStarted { // TODO ViewBinding NPE
+                    val startWeekOn = getWeekStartDayOfWeek(weekStart)
+                    val weekNumber = selectedDate.weekNumber(startWeekOn)
+                    if (weekNumber != binding.weekView.weekNumber) {
+                        binding.weekView.weekNumber = selectedDate.weekNumber(startWeekOn)
+                    }
                 }
             }
         }
@@ -1040,8 +1054,10 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 lifecycleScope.launch {
                     val weekStart = calendarViewModel.getWeekStart()
                     if (weekStart != null) {
-                        calendarViewModel.monthView.value = true
-                        simulateExpandWithScroll(getWeekStartDayOfWeek(weekStart))
+                        whenStarted { // TODO ViewBinding NPE
+                            calendarViewModel.monthView.value = true
+                            simulateExpandWithScroll(getWeekStartDayOfWeek(weekStart))
+                        }
                     }
                 }
                 binding.agendaPager.apply {
@@ -1250,6 +1266,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     }
 
     private fun simulateExpandWithScroll(startWeekOn: DayOfWeek) {
+
+        if (!isResumed) return // TODO ViewBinding NPE
+
         val desiredHeight = calendarViewModel.currentPosDesiredMonthHeight
 
         // Set mini calendar to expanded state
@@ -1267,6 +1286,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             desiredHeight,
             object : AndroidUtils.AnimateGuidelineListener {
                 override fun onHeightChange(animatedValue: Int) {
+                    if (!isResumed) return // TODO ViewBinding NPE
                     val viewPagerSliderGuidelineLayoutParams =
                         (binding.viewPagerSliderGuideline.layoutParams as? ConstraintLayout.LayoutParams)
                     if (viewPagerSliderGuidelineLayoutParams?.guideBegin == 0) {
