@@ -54,6 +54,7 @@ android {
         versionName = Config.versionName
         archivesName.set(Config.archivesBaseName)
         testInstrumentationRunner = Config.testInstrumentationRunner
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
         resourceConfigurations.addAll(Config.resourceConfigurations)
 
         javaCompileOptions {
@@ -265,6 +266,7 @@ dependencies {
     androidTestImplementation(libs.core.auth.test)
     androidTestImplementation(project(":shared-test-code"))
     androidTestImplementation(libs.dagger.hilt.android.testing)
+    androidTestImplementation(libs.test.espresso.core)
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)
@@ -310,7 +312,7 @@ object Config {
     const val buildToolsVersion = "30.0.3"
     const val targetSdk = 33
     const val versionCode = 207
-    const val testInstrumentationRunner = "me.proton.android.calendar.uitest.HiltTestRunner"
+    const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
     const val versionName = "2.11.9"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations

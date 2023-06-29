@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @HiltAndroidTest
 class LoginFlowTests : BaseTest(), MinimalSignInInternalTests {
-    @get:Rule(order = RuleOrder_21_Injected)
+    @get:Rule
     val acceptExternalRule = AcceptExternalRule { extraHeaderProvider }
 
     @Inject

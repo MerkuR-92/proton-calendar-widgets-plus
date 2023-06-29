@@ -19,11 +19,13 @@
 package me.proton.android.calendar.uitest.suite
 
 import me.proton.android.calendar.uitest.e2e.core.login.LoginFlowTests
+import me.proton.android.calendar.uitest.e2e.calendar.event.CreateEventTests
 import org.junit.runner.RunWith
 import org.junit.runners.Suite
 
 @RunWith(Suite::class)
 @Suite.SuiteClasses(
     LoginFlowTests::class,
+    CreateEventTests::class,
 )
 class SmokeSuite

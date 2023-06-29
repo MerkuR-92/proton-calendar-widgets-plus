@@ -1,4 +1,4 @@
-package me.proton.android.calendar.uitest
+package me.proton.android.calendar.uitest.extension
 
 import android.app.Application
 import android.content.Context

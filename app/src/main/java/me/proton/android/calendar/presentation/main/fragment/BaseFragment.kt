@@ -54,6 +54,7 @@ abstract class BaseFragment<VB: ViewBinding> : Fragment() {
         val toolbar = fragmentBaseBinding.fragmentToolbar
         toolbar.apply {
             setNavigationIcon(R.drawable.ic_proton_hamburger)
+            setNavigationContentDescription(R.string.hamburger_button)
 
             setNavigationOnClickListener { // TODO make sure we shouldn't clear this embedded dialog-stack
                 ((requireActivity().findViewById(R.id.drawer_layout) as DrawerLayout).openDrawer(

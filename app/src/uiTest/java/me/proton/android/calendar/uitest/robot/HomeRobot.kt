@@ -19,13 +19,22 @@
 package me.proton.android.calendar.uitest.robot
 
 import me.proton.android.calendar.R
-
 import me.proton.test.fusion.Fusion.view
 
-object HomeRobot {
+object HomeRobot : Robot {
     private val splashLogo = view.withId(R.id.root_splash_logo)
+    private val plusButton = view.withTag(R.drawable.ic_proton_plus.toString())
+    private val hamburgerButton = view.withContentDesc(R.string.hamburger_button)
 
-    fun splashAfterLoginIsDisplayed() {
+    fun clickAddEvent() = plusButton.clickTo(EventFormRobot)
+
+    fun clickHamburgerButton() = hamburgerButton.clickTo(SidebarRobot)
+
+    fun splashAfterLoginIsDisplayed() =
         splashLogo.checkIsDisplayed()
+
+    fun robotDisplayed() = let {
+        plusButton.checkIsDisplayed()
+        hamburgerButton.checkIsDisplayed()
     }
 }

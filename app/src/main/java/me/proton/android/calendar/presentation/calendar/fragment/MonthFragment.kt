@@ -153,7 +153,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
         buttonCreate = layoutInflater.inflate(R.layout.toolbar_action_button, fragmentToolbarContent, false)
         with (buttonCreate) {
-            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, R.drawable.ic_proton_plus))
+            val drawableRes = R.drawable.ic_proton_plus
+            tag = drawableRes.toString()
+            (findViewById<ImageButton>(R.id.imageButton)).setImageDrawable(ContextCompat.getDrawable(this.context, drawableRes))
         }
         buttonToday = layoutInflater.inflate(R.layout.toolbar_action_button, fragmentToolbarContent, false)
         with (buttonToday) {
