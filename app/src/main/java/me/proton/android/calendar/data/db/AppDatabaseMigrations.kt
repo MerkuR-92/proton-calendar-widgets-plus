@@ -448,4 +448,10 @@ object AppDatabaseMigrations {
             PushDatabase.MIGRATION_0.migrate(database)
         }
     }
+
+    val MIGRATION_55_56 = object : Migration(55, 56) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            UserSettingsDatabase.MIGRATION_2.migrate(database)
+        }
+    }
 }
