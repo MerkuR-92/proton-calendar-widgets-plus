@@ -46,10 +46,16 @@ import me.proton.core.keytransparency.data.local.entity.AddressChangeEntity
 import me.proton.core.keytransparency.data.local.entity.SelfAuditResultEntity
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
 import me.proton.core.mailsettings.data.entity.MailSettingsEntity
+import me.proton.core.notification.data.local.db.NotificationConverters
+import me.proton.core.notification.data.local.db.NotificationDatabase
+import me.proton.core.notification.data.local.db.NotificationEntity
 import me.proton.core.observability.data.db.ObservabilityDatabase
 import me.proton.core.observability.data.entity.ObservabilityEventEntity
 import me.proton.core.payment.data.local.db.PaymentDatabase
 import me.proton.core.payment.data.local.entity.GooglePurchaseEntity
+import me.proton.core.push.data.local.db.PushConverters
+import me.proton.core.push.data.local.db.PushDatabase
+import me.proton.core.push.data.local.db.PushEntity
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserConverters
 import me.proton.core.user.data.db.UserDatabase
@@ -93,6 +99,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         ObservabilityEventEntity::class,
         AddressChangeEntity::class,
         SelfAuditResultEntity::class,
+        NotificationEntity::class,
+        PushEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -120,6 +128,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
     ContactConverters::class,
     EventManagerConverters::class,
     ChallengeConverters::class,
+    NotificationConverters::class,
+    PushConverters::class,
     // Calendar
     DatabaseTypeConverters::class
 )
@@ -140,7 +150,9 @@ abstract class AppDatabase :
     ChallengeDatabase,
     PaymentDatabase,
     ObservabilityDatabase,
-    KeyTransparencyDatabase {
+    KeyTransparencyDatabase,
+    NotificationDatabase,
+    PushDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -173,7 +185,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 53
+        const val version = 56
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -208,7 +220,10 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_49_50,
             AppDatabaseMigrations.MIGRATION_50_51,
             AppDatabaseMigrations.MIGRATION_51_52,
-            AppDatabaseMigrations.MIGRATION_52_53
+            AppDatabaseMigrations.MIGRATION_52_53,
+            AppDatabaseMigrations.MIGRATION_53_54,
+            AppDatabaseMigrations.MIGRATION_54_55,
+            AppDatabaseMigrations.MIGRATION_55_56,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

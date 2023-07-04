@@ -49,8 +49,10 @@ import me.proton.core.key.data.entity.PublicAddressEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.keytransparency.data.local.KeyTransparencyDatabase
 import me.proton.core.mailsettings.data.db.MailSettingsDatabase
+import me.proton.core.notification.data.local.db.NotificationDatabase
 import me.proton.core.observability.data.db.ObservabilityDatabase
 import me.proton.core.payment.data.local.db.PaymentDatabase
+import me.proton.core.push.data.local.db.PushDatabase
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserDatabase
 import me.proton.core.user.data.entity.AddressEntity
@@ -430,6 +432,26 @@ object AppDatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_MANAGED_HOLIDAY_CALENDARS}` (`calendarId` TEXT NOT NULL, `country` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `languageCode` TEXT NOT NULL, `language` TEXT NOT NULL, `timezones` TEXT NOT NULL, `passphrase` TEXT NOT NULL, `sessionKey` TEXT NOT NULL, `fkUserId` TEXT NOT NULL, PRIMARY KEY(`calendarId`), FOREIGN KEY(`fkUserId`) REFERENCES `UserEntity`(`userId`) ON UPDATE NO ACTION ON DELETE CASCADE )")
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_managed_holiday_calendars_fkUserId` ON `${TABLE_MANAGED_HOLIDAY_CALENDARS}` (`fkUserId`)")
+        }
+    }
+
+    val MIGRATION_53_54 = object : Migration(53, 54) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            UserDatabase.MIGRATION_2.migrate(database)
+        }
+    }
+
+    val MIGRATION_54_55 = object : Migration(54, 55) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            NotificationDatabase.MIGRATION_0.migrate(database)
+            NotificationDatabase.MIGRATION_1.migrate(database)
+            PushDatabase.MIGRATION_0.migrate(database)
+        }
+    }
+
+    val MIGRATION_55_56 = object : Migration(55, 56) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            UserSettingsDatabase.MIGRATION_2.migrate(database)
         }
     }
 }

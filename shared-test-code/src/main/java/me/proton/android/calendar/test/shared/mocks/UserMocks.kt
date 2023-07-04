@@ -32,16 +32,11 @@ object UserMocks {
             news = null,
             locale = null,
             logAuth = null,
-            invoiceText = null,
             density = null,
-            theme = null,
-            themeType = null,
             weekStart = UserSettings.WeekStart.enumOf(weekStart),
             dateFormat = UserSettings.DateFormat.enumOf(dateFormat),
             timeFormat = UserSettings.TimeFormat.enumOf(timeFormat),
-            welcome = null,
             earlyAccess = null,
-            flags = null
         )
     }
 
@@ -61,6 +56,7 @@ object UserMocks {
             services = services,
             subscribed = subscribed,
             delinquent = delinquent,
+            recovery = null,
             keys = emptyList()
         )
     }
