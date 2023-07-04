@@ -1,8 +1,8 @@
 [versions]
-kotlin = "1.7.20"
+kotlin = "1.8.10"
 coroutine = "1.5.2"
-retrofit = "2.7.1"
-room = "2.4.1"
+retrofit = "2.9.0"
+room = "2.4.3"
 play-services-auth = "20.2.0"
 androidx = "2.5.1"
 androidx-navigation = "2.5.3"
@@ -33,9 +33,8 @@ androidx-emoji = "1.1.0"
 androidx-startup = "1.0.0"
 serialization = "1.3.3"
 assisted-inject = "0.6.0"
-hilt-android = "2.44"
 hilt-androidx = "1.0.0"
-android-gradle-plugin = "7.4.2"
+android-gradle-plugin = "8.0.2"
 jacoco = "0.8.7"
 mockito = "4.5.1"
 mockito-kotlin = "4.0.0"
@@ -43,9 +42,9 @@ mockk = "1.13.3"
 google-truth = "1.1.3"
 junit = "4.13.2"
 kotlin-stdlib = "1.6.21"
-desugar = "1.1.5"
-dagger = "2.44.2"
-core = "12.0.0"
+desugar = "2.0.2"
+dagger = "2.46.1"
+core = "13.0.0"
 fusion = "0.9.52"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
@@ -111,6 +110,7 @@ core-payment = { module = "me.proton.core:payment", version.ref = "core" }
 core-plan = { module = "me.proton.core:plan", version.ref = "core" }
 core-presentation = { module = "me.proton.core:presentation", version.ref = "core" }
 core-presentation-compose = { module = "me.proton.core:presentation-compose", version.ref = "core" }
+core-proguard-rules = { module = "me.proton.core:proguard-rules", version.ref = "core" }
 core-push = { module = "me.proton.core:push", version.ref = "core" }
 core-report = { module = "me.proton.core:report", version.ref = "core" }
 core-test-android = { module = "me.proton.core:test-android", version.ref = "core" }
@@ -131,7 +131,7 @@ core-utilKotlin = { module = "me.proton.core:util-kotlin", version.ref = "core" 
 gradle-plugin-android = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradle-plugin-navigation = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "androidx-navigation" }
-gradle-plugin-hilt = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt-android" }
+gradle-plugin-hilt = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "dagger" }
 
 # Test
 test-mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
