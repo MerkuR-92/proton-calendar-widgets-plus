@@ -314,9 +314,9 @@ object Config {
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "30.0.3"
     const val targetSdk = 33
-    const val versionCode = 211
+    const val versionCode = 213
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
-    const val versionName = "2.11.13"
+    const val versionName = "2.11.15"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(
