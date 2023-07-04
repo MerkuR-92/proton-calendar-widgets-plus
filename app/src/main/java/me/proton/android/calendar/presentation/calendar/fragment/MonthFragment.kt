@@ -15,8 +15,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
@@ -86,6 +89,7 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPager
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
+import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
@@ -107,6 +111,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by activityViewModels()
 
     @Inject
     lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
@@ -169,6 +174,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 addView(buttonSearch, resources.getDimensionPixelSize(
                     R.dimen.action_clickable_size
                 ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+                buttonSearch.visibleOrGone(false)
             }
 
             addView(
@@ -193,6 +199,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonSearch.setOnSingleClickListener {
             requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(R.id.nav_search)
+        }
+        searchViewModel.calendarDownloadEnabledState.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).asLiveData().observe(viewLifecycleOwner) {
+            buttonSearch.visibleOrGone(it)
         }
 
         buttonCreate.setOnSingleClickListener {
