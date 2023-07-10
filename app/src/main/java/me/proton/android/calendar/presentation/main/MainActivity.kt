@@ -293,7 +293,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             return
         }
 
-        widgetRefresher.broadcastRefresh()
+        // TODO bring it back after we contain performance issues or make it more async, maybe when leaving the app?
+        // widgetRefresher.broadcastRefresh()
 
         setContentView(view)
 

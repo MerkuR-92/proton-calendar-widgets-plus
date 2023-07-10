@@ -124,8 +124,8 @@ class CalendarsRepositoryImpl @Inject constructor(
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
-    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(500)
-    private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(200)
+    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
+    private val DEBOUNCE_EVENTS_UPDATE = Duration.ofMillis(1000)
 
     private val eventsMutex = Mutex()
 
@@ -213,7 +213,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 emit(skeletonEvents)
 
-            }.shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
+            }.shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1).distinctUntilChanged()
 
     private fun List<Calendar>.filterVisibleCalendars(): List<Calendar> {
         return this.filter {
@@ -1013,7 +1013,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 )
             }.flatten()
 
-        }.flowOn(Dispatchers.Default)
+        }.flowOn(Dispatchers.Default).distinctUntilChanged()
 
     }
 

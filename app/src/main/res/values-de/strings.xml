@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Kalenderwoche anzeigen</string>
     <string name="settings_auto_invites_title">Einladungen zum Kalender hinzufügen und als ausstehend markieren</string>
     <string name="settings_search_title">Kalender durchsuchen</string>
-    <string name="settings_search_subtitle">Lädt Kalenderinhalte herunter und speichert sie auf deinem Gerät für die Suche. Wenn diese Funktion deaktiviert ist, werden heruntergeladene Inhalte entfernt.</string>
+    <string name="settings_search_subtitle">Lädt Kalenderinhalte herunter und speichert sie auf deinem Gerät für die Suche. Wenn diese Funktion deaktiviert ist, werden heruntergeladene Inhalte entfernt.\n\nKalendersuche ist eine experimentelle Funktion. Sie zu aktivieren könnte die App unstabil machen.</string>
     <string name="settings_alternative_routing_title">Alternatives Routing erlauben</string>
     <string name="settings_alternative_routing_subtitle">Für den Fall, dass Proton-Websites gesperrt sind, ermöglicht diese Einstellung der App, ein alternative Netzwerkweiterleitung auszuprobieren, um Proton zu erreichen, was zur Umgehung von Firewalls oder Netzwerkproblemen nützlich sein kann. Wir empfehlen, diese Einstellung für eine größere Zuverlässigkeit an zu lassen.</string>
     <string name="settings_value_placeholder">Zum Auswählen antippen</string>

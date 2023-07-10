@@ -596,10 +596,10 @@ object ICalUtilsImpl : ICalUtils {
                     event.summary,
                     event.location,
                     event.description,
-                    occurrence.startDateTime,
-                    occurrence.endDateTime,
+                    if (event.isSingleEdit()) event.getStart(timeZoneId) else occurrence.startDateTime,
+                    if (event.isSingleEdit()) event.getEnd(timeZoneId) else occurrence.endDateTime,
                     event.isAllDay(),
-                    occurrence.occurrenceNumber,
+                    if (event.isSingleEdit()) 0 else occurrence.occurrenceNumber,
                     event.calendar.color,
                     originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
                     event.getParticipationStatus(userEmails),

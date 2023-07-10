@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.worker.FetchCalendarsWorker
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
@@ -54,6 +55,15 @@ class SearchViewModel @Inject constructor(
 
     private val _downloadingState = MutableStateFlow<DownloadingState>(DownloadingState.INIT)
     val downloadingState = _downloadingState.asStateFlow()
+
+    private val _calendarDownloadEnabledState = MutableStateFlow(false)
+    val calendarDownloadEnabledState = _calendarDownloadEnabledState.asStateFlow()
+
+    init {
+        coroutineScope.launch {
+            _calendarDownloadEnabledState.update { isCalendarDownloadEnabled() }
+        }
+    }
 
     sealed class DownloadingState {
         object INIT: DownloadingState()
@@ -145,6 +155,8 @@ class SearchViewModel @Inject constructor(
      */
     fun enableCalendarDownload(): java.util.UUID {
 
+        _calendarDownloadEnabledState.update { true }
+
         coroutineScope.launch {
             accountManager.getPrimaryUserId().firstOrNull()?.let {
                 valueStoreProvider.provideValueStore(it.id).putBoolean(ValueKey.SEARCH_ENABLED, true)
@@ -162,6 +174,9 @@ class SearchViewModel @Inject constructor(
     }
 
     fun disableCalendarDownload() {
+
+        _calendarDownloadEnabledState.update { false }
+
         // cancel Work
         workManager.cancelUniqueWork(FetchCalendarsWorker.UNIQUE_WORK_NAME)
 
