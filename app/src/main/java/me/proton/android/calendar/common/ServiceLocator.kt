@@ -60,6 +60,7 @@ import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SendBugReportUseCase
@@ -162,6 +163,7 @@ val useCaseModule = module {
     factory<JoinCalendarUseCase> { JoinCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<LeaveCalendarUseCase> { LeaveCalendarUseCase(get(), get(), get(), get()) }
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(

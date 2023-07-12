@@ -102,6 +102,7 @@ import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightD
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.databinding.ActivityMainBinding
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
+import me.proton.android.calendar.databinding.DialogSpotlightBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -471,6 +472,30 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 ShowNotificationUseCase.cancelAllNotifications(this@MainActivity)
             }
             AccountViewModel.State.Ready -> {
+
+                lifecycleScope.launch {
+                    val searchEnabled = searchViewModel.isCalendarDownloadEnabled()
+                    if (searchEnabled && mainViewModel.isConnectedToNetwork) {
+                        // Clear events DB
+                        mainViewModel.clearLocalEventsDatabase()
+
+                        // Disable search and clear search DB
+                        searchViewModel.disableCalendarDownload()
+                        searchViewModel.clearDownloadingState()
+
+                        val materialDialogBuilder = MaterialAlertDialogBuilder(this@MainActivity).setCancelable(true)
+                        val viewBinding = DialogSpotlightBinding.inflate(LayoutInflater.from(this@MainActivity), null, false)
+                        viewBinding.dialogSpotlightHeader.text = getText(R.string.spotlight_dialog_beta_header)
+                        viewBinding.dialogSpotlightTitle.text = getText(R.string.spotlight_dialog_wipe_search_title)
+                        viewBinding.dialogSpotlightDescription.text = getText(R.string.spotlight_dialog_wipe_search_description)
+                        materialDialogBuilder.setPositiveButton(R.string.spotlight_v5_dialog_got_it_button) { _, _ ->
+                            // Nothing to do here
+                        }
+                        materialDialogBuilder.setView(viewBinding.root)
+                        materialDialogBuilder.setCancelable(false)
+                        materialDialogBuilder.show()
+                    }
+                }
 
                 // Display spotlight dialog if needed
                 val spotlightShown = showLastSpotlightDialog {

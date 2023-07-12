@@ -229,6 +229,8 @@ interface CalendarsRepository {
 
     suspend fun deleteEventsById(calendarId: String, ids: List<String>)
 
+    suspend fun deleteAllEvents()
+
     suspend fun deleteAllEvents(calendarId: String)
 
     suspend fun getEventsByUid(userId: UserId, eventUid: String): ApiResponse<EventsByUidApiResponse>
