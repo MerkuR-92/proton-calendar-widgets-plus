@@ -24,6 +24,7 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.FeedbackApi
 import me.proton.android.calendar.domain.usecase.*
@@ -48,7 +49,9 @@ class MainViewModel @Inject constructor(
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
     private val logger: Logger,
     private val workManager: WorkManager,
-    private val reviewManager: ReviewManager
+    private val reviewManager: ReviewManager,
+    private val resetLocalEventDatabaseUseCase: ResetLocalEventDatabaseUseCase,
+    private val calendarsRepository: CalendarsRepository
 ) : AndroidViewModel(application) {
 
     private val intents = mutableMapOf<String, Intent>()
@@ -283,5 +286,13 @@ class MainViewModel @Inject constructor(
                 logger.d("Rate app request failed $reviewError")
             }
         }
+    }
+
+    suspend fun resetLocalEventsDatabase(userId: UserId) {
+        resetLocalEventDatabaseUseCase.invoke(userId)
+    }
+
+    suspend fun clearLocalEventsDatabase() {
+        calendarsRepository.deleteAllEvents()
     }
 }

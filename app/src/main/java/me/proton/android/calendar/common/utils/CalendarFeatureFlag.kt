@@ -31,7 +31,6 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     WeekView(FeatureId("WeekView"), true, true),
     ImportIcs(FeatureId("ImportIcs"), true, true),
     EditingSharedCalendars(FeatureId("EditingSharedCalendars"), true, true),
-    ShowEventSearch(FeatureId("ShowEventSearch"), true, true),
     // TODO Remove in Holiday calendar release
     CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, true),
 
@@ -39,5 +38,6 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     Subscription(FeatureId("Subscription"), false, true),
     ShowSignatureVerificationBadges(FeatureId("ShowSignatureVerificationBadges"), false, true),
     DragAndDrop(FeatureId("DragAndDrop"), false, true),
-    ClearCalendar(FeatureId("ClearCalendar"), false, true)
+    ClearCalendar(FeatureId("ClearCalendar"), false, true),
+    ShowEventSearch(FeatureId("ShowEventSearch"), false, true)
 }

@@ -112,7 +112,7 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     WEEK_VIEW_VERSION_CODE, // Week view (2.3.10)
     IMPORT_VERSION_CODE, // Import (2.6.6)
     CALENDAR_PROVIDER_VERSION_CODE, // Calendar provider (2.9.1)
-    SEARCH_VERSION_CODE // Search view (2.10.3)
+    SEARCH_VERSION_CODE // Search view // TODO Disabled
 )
 
 object HttpResponseCode {
