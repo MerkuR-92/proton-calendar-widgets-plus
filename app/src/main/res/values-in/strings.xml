@@ -4,7 +4,7 @@
     <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(tanpa alamat email)</string>
     <string name="default_user_display_name">(tanpa nama)</string>
-    <string name="toast_copied_to_clipboard">Disalin ke clipboard</string>
+    <string name="toast_copied_to_clipboard">Disalin ke papan klip</string>
     <!-- DELETE EVENT DIALOG -->
     <string name="dialog_title_delete_event">Hapus acara</string>
     <string name="dialog_title_delete_recurring_event">Hapus acara berulang</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Tampilkan nomor pekan</string>
     <string name="settings_auto_invites_title">Tambah undangan ke kalender dan tandai sebagai menunggu balasan</string>
     <string name="settings_search_title">Cari kalender</string>
-    <string name="settings_search_subtitle">Mengunduh dan menyimpan konten kalender pada perangkat Anda untuk keperluan pencarian. Menonaktifkan pilihan ini akan menghapus seluruh konten yang terunduh.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">Izinkan pengalihan lalu lintas alternatif</string>
     <string name="settings_alternative_routing_subtitle">Apabila situs Proton diblokir, pengaturan ini akan memungkinkan aplikasi kami untuk dapat terhubung dengan Proton melalui lalu lintas jaringan alternatif, yang dapat berguna untuk melewati hadangan firewall atau masalah jaringan. Kami sarankan agar pengaturan ini selalu aktif untuk koneksi yang lebih andal.</string>
     <string name="settings_value_placeholder">Ketuk untuk memilih</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Bahasa</string>
     <string name="calendar_form_default_event_duration">Durasi acara</string>
     <string name="calendar_form_default_event_notifications">Pemberitahuan acara</string>
-    <string name="calendar_form_default_all_day_event_notifications">Pemberitahuan acara sepanjang hari</string>
+    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">Tambahkan pemberitahuan</string>
     <string name="calendar_form_default_email">Alamat email</string>
     <string name="calendar_form_default_email_value_error">Gagal memuat email bawaan</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Selesai pukul %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Apa yang baru</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Tampilan bulanan</string>
     <string name="spotlight_dialog_month_view_description">Dapatkan ulasan acara Anda secara terperinci melalui mode tampilan bulanan baru kami. Anda dapat beralih dari dan ke mode tampilan lainnya melalui menu yang ada.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>
     <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>

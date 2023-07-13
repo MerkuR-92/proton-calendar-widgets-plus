@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Kalenderwoche anzeigen</string>
     <string name="settings_auto_invites_title">Einladungen zum Kalender hinzufügen und als ausstehend markieren</string>
     <string name="settings_search_title">Kalender durchsuchen</string>
-    <string name="settings_search_subtitle">Lädt Kalenderinhalte herunter und speichert sie auf deinem Gerät für die Suche. Wenn diese Funktion deaktiviert ist, werden heruntergeladene Inhalte entfernt.\n\nKalendersuche ist eine experimentelle Funktion. Sie zu aktivieren könnte die App unstabil machen.</string>
+    <string name="settings_search_subtitle">Lädt Kalenderinhalte herunter und speichert sie für die Suche auf deinem Gerät. Beim Deaktivieren werden heruntergeladene Inhalte entfernt.\n\nDie Suche ist eine experimentelle Beta-Funktion. Durch das Aktivieren kann die App instabil werden.</string>
     <string name="settings_alternative_routing_title">Alternatives Routing erlauben</string>
     <string name="settings_alternative_routing_subtitle">Für den Fall, dass Proton-Websites gesperrt sind, ermöglicht diese Einstellung der App, ein alternative Netzwerkweiterleitung auszuprobieren, um Proton zu erreichen, was zur Umgehung von Firewalls oder Netzwerkproblemen nützlich sein kann. Wir empfehlen, diese Einstellung für eine größere Zuverlässigkeit an zu lassen.</string>
     <string name="settings_value_placeholder">Zum Auswählen antippen</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Sprache</string>
     <string name="calendar_form_default_event_duration">Standard-Termindauer</string>
     <string name="calendar_form_default_event_notifications">Terminbenachrichtigungen</string>
-    <string name="calendar_form_default_all_day_event_notifications">Benachrichtigungen zu ganztägigem Termin</string>
+    <string name="calendar_form_default_all_day_event_notifications">Benachrichtigungen zu Ganztagsterminen</string>
     <string name="calendar_form_add_notification">Benachrichtigung hinzufügen</string>
     <string name="calendar_form_default_email">E-Mail-Adresse</string>
     <string name="calendar_form_default_email_value_error">Laden der Standard-E-Mail-Adresse fehlgeschlagen</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Endet um %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Neuigkeiten</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Monatsansicht</string>
     <string name="spotlight_dialog_month_view_description">Verschaffe dir einen Überblick über deine Termine mit unserer neuen Monatsansicht. Wechsle über das Menü zwischen den Ansichten.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importiere Termine aus Dateien auf deinem Handy in deinen Kalender.\n\n• Füge Reisebuchungen direkt aus Proton Mail hinzu.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktionen</string>
     <string name="spotlight_dialog_calendar_provider_description">• Füge Ereignisse aus anderen Apps direkt in Proton Calendar ein.\n\n• Erstelle und verwalte Ereignisse in Kalendern, die für dich freigegeben wurden.\n\n• Lege die Standardansicht fest, die du beim Öffnen der App sehen möchtest.\n\n• 13 neue Sprachen sind verfügbar.</string>
+    <string name="spotlight_dialog_wipe_search_title">Die Suche wurde entfernt, um sie besser zu machen.</string>
+    <string name="spotlight_dialog_wipe_search_description">Wir entfernen die experimentelle Suchfunktion aus der Betaversion von Proton Calendar, um sie für dich noch nützlicher und zuverlässiger zu machen. Dies kann einige Sekunden dauern.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>

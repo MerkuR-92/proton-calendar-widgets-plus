@@ -322,7 +322,7 @@
     <string name="snack_create_calendar_success">Calendar creat</string>
     <string name="snack_add_calendar_success">Calendar adăugat</string>
     <string name="snack_calendar_saving">Se salvează calendarul</string>
-    <string name="snack_create_calendar_error">Eroare la crearea calendarului. Reîncercați mai tărziu.</string>
+    <string name="snack_create_calendar_error">Eroare la crearea calendarului. Reîncercați mai târziu.</string>
     <string name="snack_add_calendar_error">Eroare la adăugarea calendarului. Mai reîncercați.</string>
     <string name="snack_create_calendar_settings_error">Calendarul a fost creat, dar unele informații nu au fost actualizate. Reîncercați mai târziu.</string>
     <string name="snack_ics_default_error">Eroare la deschiderea calendarului</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Afișare număr săptămână</string>
     <string name="settings_auto_invites_title">Adăugare invitații în calendar și marcare ca fiind în așteptare</string>
     <string name="settings_search_title">Căutare calendare</string>
-    <string name="settings_search_subtitle">Se descarcă și se stochează conținutul calendarelor pe dispozitiv pentru a putea căuta. Dezactivarea acestei opțiuni va șterge conținutul descărcat.</string>
+    <string name="settings_search_subtitle">Descarcă și stochează conținutul din calendar pe dispozitiv pentru căutare. Oprirea acestui lucru va elimina conținutul descărcat.\n\nCăutarea este o caracteristică beta experimentală. Activarea acesteia poate face aplicația instabilă.</string>
     <string name="settings_alternative_routing_title">Permitere rută alternativă</string>
     <string name="settings_alternative_routing_subtitle">În cazul în care serverele Proton sunt blocate, această setare permite aplicației să încerce accesarea printr-o rețea alternativă pentru a ajunge la Proton, ceea ce poate fi util pentru ocolirea paravanelor de protecție sau a problemelor de rețea. Se recomandă păstrarea acestei setări pentru o fiabilitate mai mare.</string>
     <string name="settings_value_placeholder">Atingeți pentru a selecta</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Limba</string>
     <string name="calendar_form_default_event_duration">Durată eveniment</string>
     <string name="calendar_form_default_event_notifications">Notificări eveniment</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notificări pe durata evenimentului</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notificări eveniment toată ziua</string>
     <string name="calendar_form_add_notification">Adăugare notificare</string>
     <string name="calendar_form_default_email">Adresa de e-mail</string>
     <string name="calendar_form_default_email_value_error">Eșuare încărcare e-mail implicit</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Se încheie la %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Ce este nou</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vedere lunară</string>
     <string name="spotlight_dialog_month_view_description">Obțineți o imagine de ansamblu a evenimentelor cu noua vizualizare lunară. Comutați între vizualizări folosind meniul.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Caracteristici calendar</string>
     <string name="spotlight_dialog_calendar_provider_description">• Adăugați evenimente direct în Proton Calendar din alte aplicații.\n\n• Creați și gestionați evenimente în calendarele care v-au fost partajate.\n\n• Setați afișarea implicită pe care doriți să o vedeți când deschideți aplicația.\n\n• 13 limbi noi disponibile.</string>
+    <string name="spotlight_dialog_wipe_search_title">Căutarea a fost eliminată pentru a o îmbunătăți</string>
+    <string name="spotlight_dialog_wipe_search_description">Eliminăm capacitatea de căutare experimentală din Proton Calendar Beta, deoarece dorim să o facem mai utilă și mai fiabilă. Poate dura câteva secunde.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>

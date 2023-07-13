@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">კვირის ნომრის ჩვენება</string>
     <string name="settings_auto_invites_title">მოსაწვევების კალენდარში დამატება და მომლოდინედ მონიშვნა</string>
     <string name="settings_search_title">კალენდარების ძებნა</string>
-    <string name="settings_search_subtitle">გადმოწერს და დაიმახსოვრებს კალენდარებს თქვენს მოწყობილობაზე, მათში ძებნისთვის. თუ გამორთავთ, გადმოწერილი შემცველობა წაიშლება.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">ალტერნატიული რაუტინგის ჩართვა</string>
     <string name="settings_alternative_routing_subtitle">იმ შემთხვევაში, თუ Proton-ის საიტები დაბლოკილია, ეს პარამეტრი აპს საშუალებას აძლევს, Proton-მდე მისასვლელად ქსელის ალტერნატიული რაუტინგი სცადოს, რაც შეიძლება, სასარგებლო იყოს ბრანდმაუერის ან ქსელის პრობლემების გვერდის ავლით. მეტი საიმედოობისთვის გირჩევთ, ჩართოთ ეს პარამეტრი.</string>
     <string name="settings_value_placeholder">მოსანიშნად დაატყაპუნეთ</string>
@@ -435,7 +435,7 @@
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">მხოლოდ დათვალიერებისათვის</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">კალენდრის შექმნა</string>
-    <string name="calendar_form_update_title">კალენდარის ჩასწორება</string>
+    <string name="calendar_form_update_title">კალენდრის ჩასწორება</string>
     <string name="calendar_form_save">შენახვა</string>
     <string name="calendar_form_name">სახელი</string>
     <string name="calendar_form_description">აღწერა</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">ენა</string>
     <string name="calendar_form_default_event_duration">მოვლენის ხანგრძლივობა</string>
     <string name="calendar_form_default_event_notifications">მოვლენის გაფრთხილებები</string>
-    <string name="calendar_form_default_all_day_event_notifications">მთელი დღის მოვლენის შეტყობინებები</string>
+    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">შეტყობინების დამატება</string>
     <string name="calendar_form_default_email">ელფოსტის მისამართი</string>
     <string name="calendar_form_default_email_value_error">ნაგულისხმები ელფოსტის ჩატვირთვის შეცდომა</string>
@@ -464,7 +464,7 @@
     <string name="delete_calendar_dialog_message">დარწმუნებული ბრძანდებით, რომ გნებავთ ამ კალენდრის წაშლა?</string>
     <string name="remove_calendar_dialog_title">კალენდარის წაშლა</string>
     <string name="remove_calendar_dialog_message">დარწმუნებული ბრძანდებით, რომ გნებავთ ამ კალენდარის წაშლა?</string>
-    <string name="leave_calendar_dialog_title">კალენდარიდან გასვლა</string>
+    <string name="leave_calendar_dialog_title">კალენდრიდან გასვლა</string>
     <string name="leave_calendar_dialog_message">თუ ამ კალენდარს დატოვებთ, მისი კიდევ ერთხელ სანახავად მფლობელისთვის ნებართვის თხოვნა თავიდან მოგიწევთ.</string>
     <string name="delete_default_calendar_dialog_message">დარწმუნებული ხართ, რომ გსურთ ამ კალენდრის წაშლა? \"%1$s \" იქნება მითითებული, როგორც ნაგულისხმები კალენდარი.</string>
     <string name="delete_calendar_snack_deleted">კალენდარი წაშლილია</string>
@@ -473,7 +473,7 @@
     <string name="remove_calendar_snack_error">კალენდარის წაშლის შეცდომა</string>
     <string name="leave_calendar_snack_error">კალენდარიდან გასვლის შეცდომა</string>
     <string name="delete_calendar_snack_error_password_confirmation">პაროლის დადასტურების შეცდომა</string>
-    <string name="recreate_calendar_dialog_title">კალენდარის გასუფთავება</string>
+    <string name="recreate_calendar_dialog_title">კალენდრის გასუფთავება</string>
     <string name="recreate_calendar_dialog_message">ეს ქმედება წაშლის ყველა მოვლენას და მოწვეულ მომხმარებლებს.\in\დარწმუნებული ხართ, რომ გსურთ ამ კალენდრის გასუფთავება?</string>
     <string name="recreate_calendar_snack_error">კალენდარის გასუფთავების შეცდომა</string>
     <string name="recreate_calendar_snack_deleted">კალენდარი გასუფთავდა</string>
@@ -508,7 +508,7 @@
     <string name="dialog_feedback_header">გამოხმაურების დატოვება</string>
     <string name="dialog_feedback_text">როგორ მოგწონთ ახალი Proton Calender?</string>
     <string name="dialog_feedback_rating_worst">საშინელი</string>
-    <string name="dialog_feedback_rating_best">გადასარევია</string>
+    <string name="dialog_feedback_rating_best">შესანიშნავია</string>
     <string name="dialog_feedback_hint">მოგვიყევით თქვენი გამოცილების შესახებ. (არასავალდებულო)</string>
     <string name="dialog_feedback_submit">გადაცემა</string>
     <string name="dialog_feedback_submit_thank_you">გმადლობთ! თქვენი გამოხმაურება გვეხმარება Proton-ის გაუმჯობესებაში.</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">დამთავრების დრო %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">სიახლეები</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">დიახ</string>
     <string name="spotlight_dialog_month_view_title">თვის ხედი</string>
     <string name="spotlight_dialog_month_view_description">მიიღეთ თქვენი მოვლენების მიმოხილვა ჩვენი ახალი თვის ხედით. ხედებს შორის მენიუს საშუალებით გადაერთეთ.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
     <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდარებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>
@@ -733,7 +736,7 @@
         <item>მეორიდან ბოლომდე</item>
         <item>მესამიდან ბოლომდე</item>
         <item>მეოთხიდან ბოლომდე</item>
-        <item>მეხუთიდან ბოლომდე</item>
+        <item>მეხუთედან ბოლომდე</item>
     </string-array>
     <string-array name="app_themes">
         <item>ღია</item>

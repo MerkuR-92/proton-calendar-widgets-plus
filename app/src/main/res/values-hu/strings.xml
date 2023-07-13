@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Hetek sorszámának megjelenítése</string>
     <string name="settings_auto_invites_title">Adja a meghívókat a naptárhoz és állítsa be őket függőnek</string>
     <string name="settings_search_title">Keresés a naptárakban</string>
-    <string name="settings_search_subtitle">A kereshetőség érdekében, letölti és ezen az eszközön tárolja a naptárakat. Kikapcsolásakor a letöltött tartalom törlődik.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">Alternatív útválasztás engedélyezése</string>
     <string name="settings_alternative_routing_subtitle">Ha a Proton szolgáltatásai le vannak tiltva, ezzel a beállítással az alkalmazás alternatív hálózati útvonalakat próbál meg használni, ami hasznos lehet tűzfalak megkerüléséhez vagy hálózati problémák megoldásához. Javasolt ezt a beállítást bekapcsolva a tartani nagyobb megbízhatóság érdekében.</string>
     <string name="settings_value_placeholder">Koppintson a kiválasztáshoz</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Nyelv</string>
     <string name="calendar_form_default_event_duration">Esemény időtartama</string>
     <string name="calendar_form_default_event_notifications">Esemény értesítései</string>
-    <string name="calendar_form_default_all_day_event_notifications">Egész napos esemény emlékeztetők</string>
+    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">Emlékeztető hozzáadása</string>
     <string name="calendar_form_default_email">E-mail cím</string>
     <string name="calendar_form_default_email_value_error">Az alapértelmezett e-mail betöltse nem sikerült</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Befejezés: %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Újdonságok</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Havi nézet</string>
     <string name="spotlight_dialog_month_view_description">Tekintse át az eseményeit, az új havi nézettel. A menüvel válthat a nézetek közt.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
     <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>

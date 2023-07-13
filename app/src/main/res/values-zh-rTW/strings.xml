@@ -256,9 +256,9 @@
     <string name="nav_view_calendars">我的行事曆</string>
     <string name="nav_view_subscribed_calendars">已訂購授權的行事曆</string>
     <string name="nav_view_other_calendars">其他行事曆</string>
-    <string name="nav_view_disabled_calendars">%1$s（已停用）</string>
-    <string name="nav_view_not_synced_calendars">%1$s（未同步）</string>
-    <string name="nav_view_syncing_calendars">%1$s（正在同步）</string>
+    <string name="nav_view_disabled_calendars">%1$s (已停用)</string>
+    <string name="nav_view_not_synced_calendars">%1$s (未同步)</string>
+    <string name="nav_view_syncing_calendars">%1$s (同步中)</string>
     <string name="nav_view_more">更多</string>
     <string name="nav_view_switcher">檢視</string>
     <string name="nav_view_switcher_day">日</string>
@@ -391,7 +391,7 @@
     <string name="bug_report_discard_changes_cancel">繼續撰寫</string>
     <string name="bug_report_discard_changes_confirm">捨棄</string>
     <!-- Settings -->
-    <string name="settings_theme_title">佈景主題</string>
+    <string name="settings_theme_title">布景視覺主題</string>
     <string name="settings_theme_info">此設定僅影響在此裝置上的 Proton Calendar 應用程式。變更佈景主題後，應用程式將會重新啟動。</string>
     <string name="settings_timezone_title">時區</string>
     <string name="settings_language_title">應用程式語言</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">顯示週次</string>
     <string name="settings_auto_invites_title">加入邀請函至行事曆，同時標記為待辦事項。</string>
     <string name="settings_search_title">搜尋行事曆</string>
-    <string name="settings_search_subtitle">下載並儲存行事曆內容至您的裝置以供搜尋。關閉此功能將會移除已下載的內容。</string>
+    <string name="settings_search_subtitle">下載並將行事曆儲存在您的裝置上以供搜尋。將此關閉將會移除已下載的內容。\n\n搜尋是實驗性的體驗版功能。啟用該功能會讓應用程式不穩定。</string>
     <string name="settings_alternative_routing_title">允許替代路由</string>
     <string name="settings_alternative_routing_subtitle">萬一 Proton 網站遭到封鎖，此設定允許此應用程式嘗試以替代網路路由連接 Proton，這或有助繞過防火牆或網路問題。建議保持此設定開啟，有備無患。</string>
     <string name="settings_value_placeholder">輕觸以選取</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">到 %1$s 結束</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">最新消息</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">確定</string>
     <string name="spotlight_dialog_month_view_title">月份檢視</string>
     <string name="spotlight_dialog_month_view_description">在我們新的月份檢視取得您活動的概覽。使用選單在檢視模式間切換。</string>
@@ -535,7 +536,7 @@
     <string name="spotlight_v5_dialog_got_it_button">了解</string>
     <string name="spotlight_v5_dialog_learn_more_button">了解更多</string>
     <string name="spotlight_v5_dialog_rebranding_title">更新後的 Proton 將所有保護合而為一</string>
-    <string name="spotlight_v5_dialog_rebranding_description">介紹 Proton 煥然一新的外觀。多個服務，一項使命。歡迎來到以隱私為預設的網際網路。<a href="https://proton.me/news/updated-proton">取得更多資訊</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">介紹 Proton 煥然一新的視覺外觀。多種服務，同一使命。歡迎來到一個隱私不間斷的網際網路。<a href="https://proton.me/news/updated-proton">取得更多資訊</a></string>
     <string name="spotlight_dialog_week_view_title">更多檢視選項</string>
     <string name="spotlight_dialog_week_view_description">• 引入<b>三天</b>與<b>週</b>行事曆檢視。在<b>選單</b>中選取您的偏好檢視方式。\n\n• 使用兩根手指合攏來放大或縮小以調整日期網格中的列高度。</string>
     <string name="spotlight_dialog_search_title">搜尋行程</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
     <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>
     <string name="spotlight_dialog_calendar_provider_description">• 從其他應用程式直接在 Proton 行事曆新增活動\n\n• 建立並管理行事曆上共享的活動\n\n• 設定開啟此應用程式想要的預設畫面\n\n• 新增 13 種語言.</string>
+    <string name="spotlight_dialog_wipe_search_title">移除搜索功能以提升服務品質</string>
+    <string name="spotlight_dialog_wipe_search_description">為了提升 Proton Calendar 體驗版的服務與可靠性，我們將移除實驗性的搜索功能。這可能需要幾秒鐘。</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>
@@ -611,7 +614,7 @@
     <string name="import_assistant_in_progress_error_snack">還有一個匯入進行中</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">要匯入為簡單事件嗎？</string>
-    <string name="import_event_disclaimer_dialog_description">\n已匯入的邀請會在 Proton Calendar 中顯示為<b>沒有舉辦人</b>與<b>參與者</b>詳細資訊的簡單事件。\n\n要取得事件更新並檢視參與者，請要求舉辦人以您的 Proton 電子郵件地址向您傳送邀請。</string>
+    <string name="import_event_disclaimer_dialog_description">\n已匯入的邀請會在 Proton Calendar 中顯示為<b>沒有舉辦人</b>與<b>參與者</b>詳細資訊的簡單事件。\n\n要取得事件更新並檢視參與者，請要求舉辦人以您的 Proton 電子郵件位址向您傳送邀請。</string>
     <string name="import_event_disclaimer_dialog_positive">匯入</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">

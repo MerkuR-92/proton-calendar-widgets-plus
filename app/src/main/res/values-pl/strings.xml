@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Pokaż numery tygodni</string>
     <string name="settings_auto_invites_title">Dodaj zaproszenia do kalendarza i oznacz status uczestnictwa na brak odpowiedzi</string>
     <string name="settings_search_title">Szukaj kalendarzy</string>
-    <string name="settings_search_subtitle">Pobiera i przechowuje zawartość kalendarzy na urządzeniu w celu ich przeszukiwania. Wyłączenie tej opcji spowoduje usunięcie pobranej zawartość.</string>
+    <string name="settings_search_subtitle">Pobiera i przechowuje zawartość kalendarza na urządzeniu w celu wyszukiwania. Wyłączenie tej opcji spowoduje usunięcie pobranej zawartości.\n\nWyszukiwanie to eksperymentalna funkcja w wersji beta. Włączenie tej opcji może spowodować niestabilność aplikacji.</string>
     <string name="settings_alternative_routing_title">Zezwalaj na alternatywne przekierowanie połączenia</string>
     <string name="settings_alternative_routing_subtitle">W przypadku zablokowania dostępu do stron Proton, ta konfiguracja pozwoli aplikacji wypróbować alternatywne połączenia sieciowe, które mogą przywrócić ten dostęp. Ta funkcja może być przydatna podczas problemów z siecią lub w celu ominięcia zapór. Zalecamy włączenie tego ustawienia dla zapewnienia większej niezawodności.</string>
     <string name="settings_value_placeholder">Kliknij, aby wybrać</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Kończy się o godzinie %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Co nowego</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Widok miesiąca</string>
     <string name="spotlight_dialog_month_view_description">Uzyskaj podsumowanie swoich wydarzeń dzięki nowemu widokowi miesiąca. Przełącz się między widokami za pomocą menu.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importuj wydarzenia do kalendarza z plików na telefonie.\n\n• Dodaj rezerwacje wycieczek bezpośrednio z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcje kalendarza</string>
     <string name="spotlight_dialog_calendar_provider_description">• Dodawaj wydarzenia do Proton Calendar z innych aplikacji.\n\n• Twórz i zarządzaj wydarzeniami w udostępnionych kalendarzach.\n\n• Wybierz domyślny widok aplikacji.\n\n• 13 nowych języków aplikacji.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Przyznaj dostęp</string>
     <string name="dialog_google_auth_description">Aby rozpocząć proces importowania, zaloguj się do Kalendarza Google i zezwól usłudze Proton na dostęp do danych.</string>

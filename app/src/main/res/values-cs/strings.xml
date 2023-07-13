@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Zobrazovat číslo týdne</string>
     <string name="settings_auto_invites_title">Přidat pozvánky do kalendáře a označit je jako čekající na odpověď</string>
     <string name="settings_search_title">Vyhledávání v kalendářích</string>
-    <string name="settings_search_subtitle">Stáhne a uloží obsah kalendáře do zařízení a umožní v něm vyhledávat. Vypnutím této funkce se stažený obsah odstraní.</string>
+    <string name="settings_search_subtitle">Stáhne a uloží obsah kalendáře do zařízení a umožní v něm vyhledávat. Vypnutím této funkce se stažený obsah odstraní.\n\nVyhledávání je experimentální beta funkce. Její zapnutí může způsobit nestabilitu aplikace.</string>
     <string name="settings_alternative_routing_title">Povolit alternativní směrování</string>
     <string name="settings_alternative_routing_subtitle">V případě, že jsou stránky Proton blokovány, toto nastavení umožňuje aplikaci vyzkoušet alternativní síťové směrování na Proton, což může být užitečné pro obejití bran firewall nebo problémům se sítí. Pro větší spolehlivost doporučujeme ponechat toto nastavení zapnuté.</string>
     <string name="settings_value_placeholder">Klepnutím vyberte</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Jazyk</string>
     <string name="calendar_form_default_event_duration">Doba trvání události</string>
     <string name="calendar_form_default_event_notifications">Oznámení události</string>
-    <string name="calendar_form_default_all_day_event_notifications">Oznámení celodenních událostí</string>
+    <string name="calendar_form_default_all_day_event_notifications">Upozornění celodenních událostí</string>
     <string name="calendar_form_add_notification">Přidat oznámení</string>
     <string name="calendar_form_default_email">E-mailová adresa</string>
     <string name="calendar_form_default_email_value_error">Nelze načít výchozí e-mail</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Končí v %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Co je nového</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Měsíční zobrazení</string>
     <string name="spotlight_dialog_month_view_description">Získejte přehled svých událostí s naším novým měsíčním zobrazením. Přepínejte mezi zobrazeními v menu.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">Importovat události do vašeho kalendáře ze souborů na vašem teleofnu.\n\n• Přidat rezervace výletů přímo z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkce kalendáře</string>
     <string name="spotlight_dialog_calendar_provider_description">• Přidejte události přímo do Proton Calendar z jiných aplikací.\n\n• Vytvořte a spravujte události v kalendářích, které byly sdíleny s vámi.\n\n• Nastavte výchozí zobrazení, které chcete vidět po otevření aplikace\n\n• K dispozici je 13 nových jazyků.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>
