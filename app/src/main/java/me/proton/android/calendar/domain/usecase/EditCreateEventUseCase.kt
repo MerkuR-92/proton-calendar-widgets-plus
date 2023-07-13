@@ -499,7 +499,7 @@ class EditCreateEventUseCase @Inject constructor(
 
     private suspend fun getMemberKey(userId: UserId, userAddresses: List<UserAddress>, calendarId: String): UseCase.Result {
 
-        val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid first Member")
+        val member = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: member was null")
         val memberAddress = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail, userAddresses) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid Member Address")
 
         if (!memberAddress.isValidForEncryption(cryptoContext, logger)) {

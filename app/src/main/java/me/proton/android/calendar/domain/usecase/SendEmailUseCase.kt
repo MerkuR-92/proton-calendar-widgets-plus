@@ -288,7 +288,7 @@ class SendEmailUseCase @Inject constructor(
                 userAddressManager.getAddressOrNull(userId, addressId)
                     ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address for sender") // TODO better error
             } ?: run {
-                val member = database.membersDao().selectCalendarMembers(eventEntity.calendarId).firstOrNull() ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: there is no valid first Member when creating Event")
+                val member = calendarsRepository.selectCalendarUserMember(eventEntity.calendarId) ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress: member was null")
                 val senderAddressId = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail)?.addressId?.id ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSenderAddress failed to get address ID for sender") // TODO better error
 
                 userAddressManager.getAddressesOrNull(userId)?.find {

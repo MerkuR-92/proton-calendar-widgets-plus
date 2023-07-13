@@ -32,11 +32,10 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
-        val calendarMembers = database.membersDao().selectCalendarMembers(calendarId)
+        val member = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: member was null")
         val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 
-        val member = calendarMembers.firstOrNull() ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: there is no calendar member in ")
         // TODO change to multiple members
         // TODO also something to keep in mind is that you can have multiple members for the user in the same calendar
         // you can join a calendar using Address1 and Address2

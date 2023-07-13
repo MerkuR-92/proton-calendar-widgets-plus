@@ -31,8 +31,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
 
         if (personalPartICalString.isNotEmpty()) {
 
-            val member = database.membersDao().selectCalendarMembers(calendarId).firstOrNull()
-                ?: return UseCase.Result.InvalidParams("there is no valid first Member when updating Event personal part")
+            val member = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("UpdatePersonalPartUseCase: member was null")
             val memberAddressKey = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail)?.keys?.primary() ?: return UseCase.Result.InvalidParams("there is no valid AddressKey for Member when updating Event personal part")
 
             val signatureOfPersonalPart = kotlin.runCatching {

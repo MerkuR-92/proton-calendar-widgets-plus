@@ -642,12 +642,12 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
-        val member = selectCalendarMembers(calendarId).firstOrNull()
+        val member = selectCalendarUserMember(calendarId)
         return if (member != null) member.display == newDisplay else false
     }
 
     override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
-        database.membersDao().selectCalendarMembers(calendarId).firstOrNull()?.let {
+        selectCalendarUserMember(calendarId)?.let {
             database.membersDao().updateDisplay(calendarId, display.toInt())
             widgetRefresher.refreshEventList()
         }
@@ -741,7 +741,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         return visibleSkeletonEventsFlow.map<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<UiEvent>> { visibleSkeletonEvents ->
 
-            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userManager.getAddresses(it) }
+            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userAddressManager.getAddressesOrNull(it) }
                 ?: return@map CalendarsRepository.GetEventsResult.Exception(Exception("could not get user addresses in getUiEventsFlow"))
 
             val userEmails = userAddresses.map { it.email }
@@ -1456,6 +1456,18 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity> {
         return database.membersDao().selectCalendarMembers(calendarId)
+    }
+
+    override suspend fun selectCalendarUserMember(calendarId: String): MemberEntity? {
+        // Get user addresses so we can find the calendar member for current user
+        val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userAddressManager.getAddressesOrNull(it) } ?: run {
+            logger.e("selectCalendarUserMember userAddresses were null")
+            return null
+        }
+        // Get all members for that calendar
+        val calendarMembers = database.membersDao().selectCalendarMembers(calendarId)
+        // Find the member that belongs to the current user
+        return getUserMember(userAddresses, calendarMembers)
     }
 
     override suspend fun selectMemberById(memberId: String): MemberEntity? {

@@ -258,6 +258,8 @@ interface CalendarsRepository {
     // members
     suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
 
+    suspend fun selectCalendarUserMember(calendarId: String): MemberEntity?
+
     suspend fun selectMemberById(memberId: String): MemberEntity?
 
     suspend fun persistMember(member: MemberEntity) // calendarId is already there
