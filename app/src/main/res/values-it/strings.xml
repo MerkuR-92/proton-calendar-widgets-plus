@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Mostra i numeri della settimana</string>
     <string name="settings_auto_invites_title">Aggiungere gli inviti al calendario e segnarli come in attesa</string>
     <string name="settings_search_title">Ricerca calendari</string>
-    <string name="settings_search_subtitle">Scarica e archivia i contenuti del calendario sul dispositivo per la ricerca. La disattivazione rimuoverà il contenuto scaricato.</string>
+    <string name="settings_search_subtitle">Scarica e archivia i contenuti del calendario sul tuo dispositivo per la ricerca. La disattivazione rimuoverà i contenuti scaricati.\n\nLa ricerca è una funzione sperimentale beta. Abilitarla potrebbe rendere instabile l\'app.</string>
     <string name="settings_alternative_routing_title">Consenti routing alternativo</string>
     <string name="settings_alternative_routing_subtitle">Nel caso in cui i siti Proton siano bloccati, questa impostazione consente all\'app di provare l\'instradamento di rete alternativo per raggiungere Proton, che può essere utile per aggirare i firewall o problemi di rete. Consigliamo di mantenere questa impostazione per una maggiore affidabilità.</string>
     <string name="settings_value_placeholder">Tocca per selezionare</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Lingua</string>
     <string name="calendar_form_default_event_duration">Durata evento</string>
     <string name="calendar_form_default_event_notifications">Notifiche dell\'evento</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notifiche evento tutto il giorno</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notifiche evento per tutto il giorno</string>
     <string name="calendar_form_add_notification">Aggiungi notifica</string>
     <string name="calendar_form_default_email">Indirizzo email</string>
     <string name="calendar_form_default_email_value_error">Impossibile caricare l\'email predefinita</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Finisce alle %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Cosa c\'è di nuovo</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vista mensile</string>
     <string name="spotlight_dialog_month_view_description">Ottieni una panoramica dei tuoi eventi con la nostra nuova vista del mese. Passa da una visualizzazione all\'altra utilizzando il menu.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importa eventi nel tuo calendario dai file sul tuo telefono.\n\n• Aggiungi prenotazioni di viaggi direttamente da Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funzionalità del calendario</string>
     <string name="spotlight_dialog_calendar_provider_description">• Aggiungi eventi direttamente in Proton Calendar da altre app.\n\n• Crea e gestisci eventi in calendari che sono stati condivisi con te.\n\n• Imposta la visualizzazione predefinita che vuoi vedere all\'apertura dell\'app.\n\n• 13 nuove lingue disponibili.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>

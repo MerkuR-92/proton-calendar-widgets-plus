@@ -147,7 +147,7 @@
     <string name="event_text_timezone_start">Zona horaria</string>
     <string name="invite_in_shared_calendar_disclaimer">El envío de invitaciones solo está disponible dentro de calendarios personales.</string>
     <string name="invite_change_calendar_disclaimer">No es posible modificar el calendario asociado a invitaciones.</string>
-    <string name="change_calendar_recurring_disclaimer">Cambiar de calendario un evento periódico no es posible aún.</string>
+    <string name="change_calendar_recurring_disclaimer">Todavía no es posible cambiar el calendario de un evento periódico.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">¿Qué estás buscando?</string>
     <string name="search_empty_results_title">No se han encontrado resultados.</string>
@@ -161,8 +161,8 @@
     <string name="search_settings_dialog_toggle_off_text">Tienes que descargar los calendarios de nuevo si quieres realizar búsquedas.</string>
     <string name="search_settings_dialog_toggle_on_title">¿Descargar los calendarios a este dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Esto es necesario para que puedas realizar búsquedas.</string>
-    <string name="search_onboarding_header">¿Quieres buscar en tu calendario?</string>
-    <string name="search_onboarding_text">Primero necesitas descargar una copia cifrada de tus calendarios. Esto tomará un momento y podrás usar seguir usando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="search_onboarding_header">¿Quiere buscar en su calendario?</string>
+    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto tomará un momento y, mientras tanto, podrá seguir usando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="search_onboarding_action_download_calendars">Descargar calendarios</string>
     <string name="search_onboarding_action_pause">Pausar</string>
     <string name="search_onboarding_action_resume">Reanudar</string>
@@ -303,7 +303,7 @@
     <string name="snack_send_bug_report_error">Error al enviar el informe. Inténtalo de nuevo más tarde.</string>
     <string name="snack_send_bug_report_description_empty">Indica una descripción de tu informe.</string>
     <string name="snack_create_event_no_active_personal_calendar">Necesitas un calendario personal activo para crear eventos</string>
-    <string name="snack_create_event_no_active_calendar">Necesitas un calendario activo para crear eventos.</string>
+    <string name="snack_create_event_no_active_calendar">Necesita un calendario activo para crear eventos.</string>
     <string name="snack_add_self_as_participant">No puedes invitarte a ti mismo.</string>
     <string name="snack_maximum_participants_reached">Se ha alcanzado el número máximo de participantes.</string>
     <string name="snack_add_participant_error">Error al añadir el participante</string>
@@ -318,12 +318,12 @@
     <string name="snack_holiday_calendar_init_error">Error al cargar la información del calendario de días festivos</string>
     <string name="snack_update_calendar_error">Error al actualizar las informaciones del calendario. Inténtalo de nuevo más tarde.</string>
     <string name="snack_update_calendar_settings_error">Error al actualizar algunas informaciones del calendario. Inténtalo de nuevo más tarde.</string>
-    <string name="snack_update_calendar_success">Calendario actualizado</string>
+    <string name="snack_update_calendar_success">El calendario ha sido actualizado.</string>
     <string name="snack_create_calendar_success">Calendario creado</string>
-    <string name="snack_add_calendar_success">El calendario ha sido añadido.</string>
+    <string name="snack_add_calendar_success">El calendario ha sido añadido</string>
     <string name="snack_calendar_saving">Guardando calendario</string>
     <string name="snack_create_calendar_error">Error al crear el calendario. Inténtalo de nuevo más tarde.</string>
-    <string name="snack_add_calendar_error">Error al añadir el calendario. Inténtalo de nuevo más tarde.</string>
+    <string name="snack_add_calendar_error">Error al añadir el calendario. Inténtelo de nuevo más tarde</string>
     <string name="snack_create_calendar_settings_error">El calendario está creado pero alguna información no se ha actualizado. Inténtalo de nuevo más tarde.</string>
     <string name="snack_ics_default_error">Error al abrir el calendario</string>
     <string name="snack_ics_event_not_found_error">No se ha encontrado el evento.</string>
@@ -338,7 +338,7 @@
     <string name="snack_ics_party_crasher_error">Tu correo electrónico no está en la lista de participantes.</string>
     <string name="snack_ics_reply_party_crasher_error">No se pueden añadir participantes que no hayan sido invitados por el organizador.</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento.</string>
-    <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta.</string>
+    <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta</string>
     <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta.</string>
     <string name="snack_ics_unsupported_duration_error">No se reconoce esta duración.</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles.</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Mostrar los números de la semana</string>
     <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcar como pendiente</string>
     <string name="settings_search_title">Buscar en calendarios</string>
-    <string name="settings_search_subtitle">Descarga y almacena en tu dispositivo el contenido de los calendarios para realizar búsquedas. Al desactivar esto se eliminará el contenido descargado.</string>
+    <string name="settings_search_subtitle">Descarga y almacena el contenido del calendario en tu dispositivo para búsquedas. Desactivar esta opción eliminará el contenido descargado.\n\nLa búsqueda es una función beta experimental. Habilitarla podría hacer la aplicación inestable.</string>
     <string name="settings_alternative_routing_title">Permitir el enrutamiento alternativo</string>
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, esta configuración permite a la aplicación intentar un enrutamiento de red alternativo para llegar a Proton, lo que puede ser útil para evitar los cortafuegos o los problemas de red. Recomendamos mantener esta configuración activada para una mayor fiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Idioma</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones de eventos</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos que ocupan todo el día</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos de todo el día</string>
     <string name="calendar_form_add_notification">Añadir notificación</string>
     <string name="calendar_form_default_email">Dirección de correo electrónico</string>
     <string name="calendar_form_default_email_value_error">Error al cargar el correo electrónico por defecto</string>
@@ -468,9 +468,9 @@
     <string name="leave_calendar_dialog_message">Si abandonas este calendario, deberás pedirle permiso al propietario para unirte de nuevo.</string>
     <string name="delete_default_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
-    <string name="remove_calendar_snack_removed">Calendario quitado</string>
+    <string name="remove_calendar_snack_removed">Calendario eliminado</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
-    <string name="remove_calendar_snack_error">Error al quitar el calendario</string>
+    <string name="remove_calendar_snack_error">Error al eliminar el calendario</string>
     <string name="leave_calendar_snack_error">Error al abandonar el calendario</string>
     <string name="delete_calendar_snack_error_password_confirmation">Error de confirmación de contraseña</string>
     <string name="recreate_calendar_dialog_title">Limpiar calendario</string>
@@ -484,8 +484,8 @@
     <string name="add_holiday_calendar_country_search_hint">Búsqueda por país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">Basado en su zona horaria</string>
-    <string name="holiday_calendar_already_exists">El calendario de días festivos ya existe.</string>
-    <string name="holiday_calendar_value_placeholder">Seleccionar un país</string>
+    <string name="holiday_calendar_already_exists">El calendario de días festivos ya existe</string>
+    <string name="holiday_calendar_value_placeholder">Seleccione un país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Aceptar</string>
     <string name="bootstrap_error_no_calendar_title">No hay ningún calendario asociado con esta cuenta.</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">Aceptar</string>
     <string name="spotlight_dialog_month_view_title">Vista de mes</string>
     <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas usando el menú.</string>
@@ -535,15 +536,17 @@
     <string name="spotlight_v5_dialog_got_it_button">Entendido</string>
     <string name="spotlight_v5_dialog_learn_more_button">Más información</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualizado, protección unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Te damos la bienvenida a una internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Presentamos el nuevo aspecto de Proton. Muchos servicios, una sola misión. Le damos la bienvenida a un internet donde la privacidad es la norma. <a href="https://proton.me/news/updated-proton">Más información</a></string>
     <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Selecciona tu vista preferida en el <b>menú</b>.\n\n• Ajusta la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <string name="spotlight_dialog_search_title">Buscar eventos</string>
-    <string name="spotlight_dialog_search_description">Encuentra fácilmente el evento que estás buscando con nuestra función de búsqueda nueva. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="spotlight_dialog_search_description">Encuentre fácilmente el evento que está buscando con nuestra nueva función de búsqueda. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importar eventos a tu calenario desde ficheros en tu teléfono.\n\n• Añadir reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Características del calendario</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Añade eventos directamente a Proton Calendar desde otras apps.\n\n• Crea y gestiona eventos en calendarios que han sido compartidos contigo.\n\n• Define la vista por defecto que quieres ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que hayan sido compartidos con usted.\n\n• Defina la vista por defecto que quiera ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
+    <string name="spotlight_dialog_wipe_search_title">Búsqueda eliminada para mejorarla</string>
+    <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>

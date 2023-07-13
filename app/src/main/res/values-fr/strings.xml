@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
     <string name="settings_auto_invites_title">Ajouter des invitations au calendrier et les marquer comme en attente</string>
     <string name="settings_search_title">Rechercher des calendriers</string>
-    <string name="settings_search_subtitle">Télécharge et stocke le contenu du calendrier sur votre appareil pour que vous puissiez y faire des recherches. En désactivant cette fonctionnalité, vous supprimez le contenu téléchargé.\n\nLa recherche est une fonctionnalité expérimentale. L\'activer peut rendre l\'application instable.</string>
+    <string name="settings_search_subtitle">Télécharge et stocke le contenu du calendrier sur votre appareil pour permettre les recherches. Si vous désactivez cette fonction, le contenu téléchargé sera supprimé.\n\nLa recherche est une fonctionnalité expérimentale de la version bêta. L\'activer peut rendre l\'application instable.</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un autre routage réseau pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de garder ce paramètre activé pour plus de fiabilité.</string>
     <string name="settings_value_placeholder">Tapotez pour sélectionner</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Langue</string>
     <string name="calendar_form_default_event_duration">Durée de l’événement</string>
     <string name="calendar_form_default_event_notifications">Notifications de l’événement</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notifications pour les événements d\'une journée entière</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notifications événements journée entière</string>
     <string name="calendar_form_add_notification">Ajouter une notification</string>
     <string name="calendar_form_default_email">Adresse e-mail</string>
     <string name="calendar_form_default_email_value_error">L\'adresse e-mail par défaut n\'a pas pu être chargée.</string>
@@ -516,13 +516,14 @@
     <string name="calendar_widget_description">Widget Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">Aucun événement n\'est prévu aujourd\'hui.</string>
     <string name="calendar_widget_loading_events">Chargement des événements…</string>
-    <string name="calendar_widget_loading_events_error">Les événements n\'ont pas pu être chargés.</string>
+    <string name="calendar_widget_loading_events_error">Impossible de charger les événements</string>
     <string name="calendar_widget_no_upcoming_events">Aucun évènement n\'est prévu.</string>
     <string name="calendar_widget_please_log_in">Connectez-vous pour voir vos événements.</string>
     <string name="calendar_widget_part_day_event_starts_at">Commence à %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Se termine à %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Nouveautés</string>
+    <string name="spotlight_dialog_beta_header">Calendar bêta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vue mensuelle</string>
     <string name="spotlight_dialog_month_view_description">Notre nouvelle vue mensuelle vous donne une vue d\'ensemble de vos événements. Passez d\'une vue à l\'autre dans le menu.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importez des évènements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fonctionnalités du calendrier</string>
     <string name="spotlight_dialog_calendar_provider_description">• Ajoutez des événements directement dans Proton Calendar à partir d\'autres applications.\n\n• Créez et gérez des événements dans les calendriers partagés avec vous.\n\n• Définissez l\'affichage par défaut que vous voulez à l\'ouverture de l\'application.\n\n• 13 nouvelles langues sont disponibles.</string>
+    <string name="spotlight_dialog_wipe_search_title">La recherche a été retirée en vue de l\'améliorer.</string>
+    <string name="spotlight_dialog_wipe_search_description">Nous retirons la fonctionnalité expérimentale de recherche de la version bêta de Proton Calendar car nous voulons la rendre plus pratique et fiable. Cette opération peut prendre quelques secondes.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>

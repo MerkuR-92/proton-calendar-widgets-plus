@@ -146,8 +146,8 @@
     <string name="event_text_calendar">Kalender</string>
     <string name="event_text_timezone_start">Tidszone</string>
     <string name="invite_in_shared_calendar_disclaimer">Invitationer kan kun sendes mellem personlige kalendere.</string>
-    <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
-    <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
+    <string name="invite_change_calendar_disclaimer">Det er ikke muligt at ændre kalenderen, der er knyttet til invitationer.</string>
+    <string name="change_calendar_recurring_disclaimer">Ændring af kalender for tilbagevendende begivenheder er endnu ikke muligt.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Hvad søger du?</string>
     <string name="search_empty_results_title">Ingen resultater fundet</string>
@@ -176,11 +176,11 @@
     <string name="event_text_add_alarm">Tilføj notifikation</string>
     <string name="event_text_description">Beskrivelse</string>
     <string name="event_hint_description">Tilføj beskrivelse</string>
-    <string name="event_text_custom">tilpasset</string>
+    <string name="event_text_custom">brugerdefineret</string>
     <string name="event_alert_invalid_start_end_date">Begivenhedens startdato kan ikke være efter slutdato</string>
     <string name="event_alarms_title">Notifikationer</string>
     <string name="event_custom_alarms_field">Påmind</string>
-    <string name="event_custom_alarms_title">Tilpassede notifikationer</string>
+    <string name="event_custom_alarms_title">Brugerdefinerede notifikationer</string>
     <string name="event_alarm_partial_day_1">på tidspunktet for begivenheden</string>
     <string name="event_alarm_partial_day_2">10 minutter</string>
     <string name="event_alarm_partial_day_3">30 minutter</string>
@@ -201,7 +201,7 @@
     <string name="event_recurrence_4">hver måned</string>
     <string name="event_recurrence_5">hvert år</string>
     <string name="event_recurrence_title">Frekvens</string>
-    <string name="event_recurrence_custom_title">Tilpasset frekvens</string>
+    <string name="event_recurrence_custom_title">Brugerdefineret frekvens</string>
     <string name="event_recurrence_occurs_every">Gentages hver</string>
     <string name="event_recurrence_occurs_on">Gentages på</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">på dag %1$d</string>
@@ -264,7 +264,7 @@
     <string name="nav_view_switcher_day">Dag</string>
     <string name="nav_view_switcher_three_day">3 dage</string>
     <string name="nav_view_switcher_week">Uge</string>
-    <string name="nav_view_switcher_agenda">Oversigt</string>
+    <string name="nav_view_switcher_agenda">Dagsplan</string>
     <string name="nav_view_switcher_month">Måned</string>
     <string name="nav_view_timezone">Tidszone</string>
     <string name="nav_view_settings">Indstillinger</string>
@@ -397,7 +397,7 @@
     <string name="settings_language_title">App-sprog</string>
     <string name="settings_language_default">Autoregistrér</string>
     <string name="settings_default_view_title">Standardvisning</string>
-    <string name="settings_default_view_default">Last view</string>
+    <string name="settings_default_view_default">Seneste visning</string>
     <string name="settings_update_timezone_title">Bed om at opdatere tidszoneindstilling</string>
     <string name="settings_update_timezone_subtitle">Hvis systemets tidszone ikke matcher den aktuelle indstilling af tidszone, vil du blive bedt om at opdatere den.</string>
     <string name="settings_update_timezone_checkbox">Spørg mig ikke igen</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Vis ugenumre</string>
     <string name="settings_auto_invites_title">Tilføj invitationer til kalender og markér som afventende</string>
     <string name="settings_search_title">Søg i kalendere</string>
-    <string name="settings_search_subtitle">Downloader og gemmer kalenderindhold på din enhed, så du kan søge i det. Hvis du slår dette fra, fjernes det downloadede indhold.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">Tillad alternativ routing</string>
     <string name="settings_alternative_routing_subtitle">Hvis Proton-websteder er blokeret giver denne indstilling appen mulighed for at prøve alternativ netværksrouting for at nå Proton, hvilket kan være nyttige til at omgå firewalls eller ved netværksproblemer. Vi anbefaler at holde denne indstilling slået til for større pålidelighed.</string>
     <string name="settings_value_placeholder">Tryk for at vælge</string>
@@ -432,7 +432,7 @@
     <string name="settings_calendar_subscribed_last_sync_old">Der er gået mere end 12 timer siden seneste opdatering</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalender kunne ikke dekrypteres</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
-    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">View-only</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Kun visning</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Opret kalender</string>
     <string name="calendar_form_update_title">Rediger kalender</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Sprog</string>
     <string name="calendar_form_default_event_duration">Begivenhedsvarighed</string>
     <string name="calendar_form_default_event_notifications">Begivenhedsnotifikationer</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notifikationer for heldagsbegivenheder</string>
+    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">Tilføj notifikation</string>
     <string name="calendar_form_default_email">E-mailadresse</string>
     <string name="calendar_form_default_email_value_error">Kunne ikke indlæse standard e-mail</string>
@@ -471,7 +471,7 @@
     <string name="remove_calendar_snack_removed">Kalender fjernet</string>
     <string name="delete_calendar_snack_error">Fejl ved sletning af kalender</string>
     <string name="remove_calendar_snack_error">Fejl ved fjernelse af kalender</string>
-    <string name="leave_calendar_snack_error">Error leaving calendar</string>
+    <string name="leave_calendar_snack_error">Fejl da kalender skulle forlades</string>
     <string name="delete_calendar_snack_error_password_confirmation">Adgangskodebekræftelse mislykkedes</string>
     <string name="recreate_calendar_dialog_title">Ryd kalender</string>
     <string name="recreate_calendar_dialog_message">Denne handling vil fjerne alle begivenheder og inviterede brugere.\n\nEr du sikker på, at du vil slette denne kalender?</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Slutter %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Nyheder</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">Ok</string>
     <string name="spotlight_dialog_month_view_title">Månedsvisning</string>
     <string name="spotlight_dialog_month_view_description">Få en oversigt over dine begivenheder med vores nye månedsvisning. Skift mellem visninger ved hjælp af menuen.</string>
@@ -535,7 +536,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Forstået</string>
     <string name="spotlight_v5_dialog_learn_more_button">Få mere at vide</string>
     <string name="spotlight_v5_dialog_rebranding_title">Opdateret Proton, forenet beskyttelse</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Vi præsenterer Proton\'s nye udseende. Mange tjenester, én mission. Velkommen til et internet, hvor privatlivsbeskyttelse er standard. <a href="https://proton.me/news/updated-proton">Learn more</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Vi præsenterer Protons nye udseende. Mange tjenester, én mission. Velkommen til et internet, hvor privatlivsbeskyttelse er standard. <a href="https://proton.me/news/updated-proton">Få mere at vide</a></string>
     <string name="spotlight_dialog_week_view_title">Flere visningsmuligheder</string>
     <string name="spotlight_dialog_week_view_description">• Nu kan du vælge kalendervisninger med <b>3 dage</b> og en <b>uge</b>. Vælg din foretrukne visning i <b>menuen</b>.\n\n• Juster højden af rækkerne i dagsgitteret ved at knibe med to fingre for at zoome ind eller ud.</string>
     <string name="spotlight_dialog_search_title">Søg efter begivenheder</string>
@@ -543,7 +544,9 @@
     <string name="spotlight_dialog_import_title">Flere måder at tilføje begivenheder</string>
     <string name="spotlight_dialog_import_description">• Importer begivenheder til din kalender fra filer på din telefon.\n\n• Tilføj rejsebookinger direkte fra Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Add events directly into Proton Calendar from other apps.\n\n• Create and manage events in calendars that have been shared with you.\n\n• Set the default view you want to see when opening the app.\n\n• 13 new languages available.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Tilføj begivenheder direkte til Proton Calendar fra andre apps.\n\n• Opret og administrer begivenheder i kalendere der er blevet delt med dig.\n\n• Indstil den standardvisning, du vil se, når du åbner appen.\n\n• 13 nye sprog tilgængelige.</string>
+    <string name="spotlight_dialog_wipe_search_title">Søgning fjernet for at gøre den bedre</string>
+    <string name="spotlight_dialog_wipe_search_description">Vi fjerner den eksperimentelle søgefunktion fra Proton Calendar Beta, da vi ønsker at gøre den mere nyttig og pålidelig for dig. Dette kan tage nogle sekunder.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>
     <string name="dialog_google_auth_description">For at starte importen skal du logge ind på Google Kalender og give Proton adgang til dine data.</string>
@@ -574,7 +577,7 @@
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importerer data fra %1s til %2s.</string>
     <string name="import_assistant_in_progress_redirect">Kontrollér fremskridt</string>
     <string name="import_assistant_in_progress_sub_description">Større importer kan tage flere dage. Vi giver dig besked, når importen er færdig. Du kan lukke denne skærm.</string>
-    <string name="import_assistant_guide_subtitle">Skift til beskyttelse af privatlivets fred. Nemt og sikkert.</string>
+    <string name="import_assistant_guide_subtitle">Skift til en privatlivsvenlig løsning. Nemt og sikkert.</string>
     <string name="import_assistant_guide_description">Flyt dine begivenheder og andre data fra Google til Proton. Easy Switch-importøren guider dig hele vejen igennem og krypterer dine data, mens de flyttes.</string>
     <string name="import_assistant_new_import">Ny import</string>
     <string name="import_assistant_previous_import">Tidligere importer</string>

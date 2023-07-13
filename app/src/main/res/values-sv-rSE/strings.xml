@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Visa veckonummer</string>
     <string name="settings_auto_invites_title">Lägg till inbjudningar i kalendern och markera som väntande</string>
     <string name="settings_search_title">Sök kalendrar</string>
-    <string name="settings_search_subtitle">Laddar ner och lagrar kalenderinnehåll på din enhet för sökning. Om du stänger av detta tas nedladdat innehåll bort.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">Tillåt alternativ routing</string>
     <string name="settings_alternative_routing_subtitle">Om Proton-webbplatser blockeras tillåter denna inställning appen att prova alternativ nätverksrouting för att nå Proton, vilket kan vara användbart för att kringgå brandväggar eller nätverksproblem. Vi rekommenderar att du behåller denna inställning på för större tillförlitlighet.</string>
     <string name="settings_value_placeholder">Tryck för att välja</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Språk</string>
     <string name="calendar_form_default_event_duration">Händelsens varaktighet</string>
     <string name="calendar_form_default_event_notifications">Händelseaviseringar</string>
-    <string name="calendar_form_default_all_day_event_notifications">Avisering för heldagshändelsr</string>
+    <string name="calendar_form_default_all_day_event_notifications">Avisering för heldagshändelse</string>
     <string name="calendar_form_add_notification">Lägg till avisering</string>
     <string name="calendar_form_default_email">E-postadress</string>
     <string name="calendar_form_default_email_value_error">Misslyckades att hämta standard e-post</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Slutar kl. %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Vad som är nytt</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Månadsvy</string>
     <string name="spotlight_dialog_month_view_description">Få en överblick över dina händelser med vår nya månadsvy. Växla mellan vyer med hjälp av menyn.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importera händelser till din kalender från filer på din telefon.\n\n• Lägg till resebokningar direkt från Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
     <string name="spotlight_dialog_calendar_provider_description">• Lägg till händelser direkt i Proton Calendar från andra appar.\n\n• Skapa och hantera händelser i kalendrar som har delats med dig.\n\n• Ställ in standardvyn du vill se när du öppnar appen.\n\n• 13 nya språk tillgängliga.</string>
+    <string name="spotlight_dialog_wipe_search_title">Sök borttaget för att göra det bättre</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillåt åtkomst</string>
     <string name="dialog_google_auth_description">För att starta importen, logga in på Google Kalender och tillåt Proton att komma åt dina data.</string>

@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Weeknummers weergeven</string>
     <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als wachtend</string>
     <string name="settings_search_title">Agenda\'s doorzoeken</string>
-    <string name="settings_search_subtitle">Download de inhoud van uw agenda en bewaart deze om op uw apparaat te doorzoeken. Dit uitzetten zal de gedownloade inhoud verwijderen.</string>
+    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
     <string name="settings_alternative_routing_title">Alternatieve routing toestaan</string>
     <string name="settings_alternative_routing_subtitle">In het geval dat Proton-sites worden geblokkeerd, stelt deze instelling de app in staat om alternatieve netwerkroutering te proberen om Proton te bereiken, wat nuttig kan zijn voor het omzeilen van firewalls of netwerkproblemen. We raden aan deze instelling aan te houden voor een grotere betrouwbaarheid.</string>
     <string name="settings_value_placeholder">Tik om te selecteren</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Taal</string>
     <string name="calendar_form_default_event_duration">Duur van de afspraak</string>
     <string name="calendar_form_default_event_notifications">Afspraakmeldingen</string>
-    <string name="calendar_form_default_all_day_event_notifications">De hele dag meldingen van afspraken</string>
+    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
     <string name="calendar_form_add_notification">Melding toevoegen</string>
     <string name="calendar_form_default_email">E-mailadres</string>
     <string name="calendar_form_default_email_value_error">Kan standaard e-mail niet laden</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Eindigt op %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Wat is er nieuw</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Maandweergave</string>
     <string name="spotlight_dialog_month_view_description">Krijg een overzicht van uw afspraken met onze nieuwe maandweergave. Wissel tussen weergaves met het menu.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
     <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>

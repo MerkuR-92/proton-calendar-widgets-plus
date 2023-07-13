@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Паказваць нумары тыдняў</string>
     <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнні, якія чакаюць разгляду</string>
     <string name="settings_search_title">Пошук календароў</string>
-    <string name="settings_search_subtitle">Спампоўвае і захоўвае змесціва календара на вашай прыладзе для пошуку. Адключэнне гэтага параметра прывядзе да выдалення спампаванага змесціва.</string>
+    <string name="settings_search_subtitle">Спампоўвае і захоўвае змест календара на вашу прыладу для пошуку. Выключэнне гэтай функцыі прывядзе да выдалення спампаванага змесціва.\n\nФункцыя пошуку ў цяперашні момант знаходзіцца ў стадыі эксперыментальнага бэта-тэсціравання. Яе ўключэнне можа стаць прычынай нестабільнай працы праграмы.</string>
     <string name="settings_alternative_routing_title">Дазваляць альтэрнатыўную маршрутызацыю</string>
     <string name="settings_alternative_routing_subtitle">У выпадку блакіроўкі сайтаў Proton гэта налада дазваляе праграме скарыстацца альтэрнатыўнай сеткавай маршрутызацыяй, каб атрымаць доступ да Proton, што можа быць карысным для абыходу міжсеткавых экранаў або праблем з сеткай. Для большай надзейнасці мы рэкамендуем пакінуць гэту наладу актыўнай.</string>
     <string name="settings_value_placeholder">Націсніце, каб выбраць</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Завяршаецца %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Што новага</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">Добра</string>
     <string name="spotlight_dialog_month_view_title">Прагляд месяца</string>
     <string name="spotlight_dialog_month_view_description">Атрымайце агляд падзей с дапамогай нашага новага прагляду месяца. Пераключайцеся паміж праглядамі выкарыстоўваючы меню.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функцыі календара</string>
     <string name="spotlight_dialog_calendar_provider_description">• Дадавайце падзеі непасрэдна ў Proton Calendar з іншых праграм.\n\n• Стварайце і кіруйце падзеямі ў календарах, якія абагулілі з вамі.\n\n• Задавайце менавіта той прадвызначаны выгляд, які вы хочаце бачыць пры адкрыцці праграмы.\n\n• Даступна 13 новых моў.</string>
+    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
     <string name="dialog_google_auth_description">Для пачатку імпартавання, увайдзіце ў Google Calendar і дазвольце Proton атрымаць доступ да вашых даных.</string>

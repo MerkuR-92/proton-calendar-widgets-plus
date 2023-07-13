@@ -224,7 +224,7 @@
     <string name="event_recurring_update_this_cancel">Cancelar</string>
     <string name="event_recurring_update_this_confirm">Actualizar</string>
     <string name="event_allow_contacts_title">¿Permitir que Proton Calendar acceda a sus contactos?</string>
-    <string name="event_allow_contacts_description">Proton Calendar necesita acceso a sus contactos para proporcionarle el autocompletado</string>
+    <string name="event_allow_contacts_description">Proton Calendar necesita acceso a sus contactos para proporcionarle el autocompletado.</string>
     <string name="event_allow_contacts_cancel">Denegar</string>
     <string name="event_allow_contacts_confirm">Permitir</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invitación para un evento que comienza el %1$s a las %2$s %3$s</string>
@@ -395,7 +395,7 @@
     <string name="settings_theme_info">Este ajuste sólo afecta a la apariencia de la aplicación Proton Calendar en este dispositivo. La aplicación se reiniciará después de cambiar el tema.</string>
     <string name="settings_timezone_title">Zona horaria</string>
     <string name="settings_language_title">Idioma de la app</string>
-    <string name="settings_language_default">Auto detectar</string>
+    <string name="settings_language_default">Detectar automáticamente</string>
     <string name="settings_default_view_title">Vista por defecto</string>
     <string name="settings_default_view_default">Última vista</string>
     <string name="settings_update_timezone_title">Solicitar actualizar la configuración de zona horaria</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Mostrar números de semana</string>
     <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcarlas como pendiente</string>
     <string name="settings_search_title">Buscar en calendarios</string>
-    <string name="settings_search_subtitle">Descargue y almacene en su dispositivo el contenido de los calendarios para realizar búsquedas. Al desactivar esto se eliminará el contenido descargado.</string>
+    <string name="settings_search_subtitle">Descargue y almacene el contenido del calendario en su dispositivo para búsquedas. Desactivar esta opción eliminará el contenido descargado.\n\nLa búsqueda es una función beta experimental. Habilitarla podría hacer la app inestable.</string>
     <string name="settings_alternative_routing_title">Permitir ruta alternativa</string>
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, este ajuste permite a la aplicación probar rutas alternativas para llegar a Proton, lo que puede ser útil para evitar problemas de red o firewalls. Recomendamos mantener este ajuste activado para mayor confiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>
@@ -443,7 +443,7 @@
     <string name="calendar_form_language">Idioma</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones del evento</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos durante todo el día</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos de todo el día</string>
     <string name="calendar_form_add_notification">Añadir notificación</string>
     <string name="calendar_form_default_email">Dirección de correo</string>
     <string name="calendar_form_default_email_value_error">Error al cargar el correo por defecto</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Termina a las %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vista de mes</string>
     <string name="spotlight_dialog_month_view_description">Obtenga una vista general de sus eventos con nuestra nueva vista de mes. Cambie entre vistas usando el menú.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importe eventos a su calendario desde archivos en su teléfono.\n\n• Añada reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funciones del calendario</string>
     <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras apps.\n\n• Cree y gestione eventos en calendarios que han sido compartidos con usted.\n\n• Defina la vista predeterminada que desea ver al abrir la app.\n\n• 13 idiomas nuevos disponibles.</string>
+    <string name="spotlight_dialog_wipe_search_title">Búsqueda eliminada para mejorarla</string>
+    <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para iniciar la importación, inicie sesión en Google Calendar y permita el acceso de Proton a sus datos.</string>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="default_event_summary" comment="Event has no title">(başlık yok)</string>
+    <string name="default_event_summary" comment="Event has no title">(başlıksız)</string>
     <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(e-posta adresi yok)</string>
     <string name="default_user_display_name">(ad yok)</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Hafta numaraları görüntülensin</string>
     <string name="settings_auto_invites_title">Davetler takvime eklensin ve bekliyor olarak işaretlensin</string>
     <string name="settings_search_title">Takvimlerde arama</string>
-    <string name="settings_search_subtitle">Arama yapabilmek için takviminizin içeriğinin bu aygıta indirilip kaydedilmesini sağlar. Bu seçenek kapatıldığında indirilmiş içerik silinir.</string>
+    <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Etkinleştirilmesi, uygulamayı kararsız hale getirebilir.</string>
     <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
     <string name="settings_alternative_routing_subtitle">Bu seçenek ile, Proton sitelerinin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yöneltmesini dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
     <string name="settings_value_placeholder">Seçmek için dokunun</string>
@@ -523,6 +523,7 @@
     <string name="calendar_widget_part_day_event_ends_at">%1$s saatinde bitiyor</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Yenilikler</string>
+    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_confirmation_button">Tamam</string>
     <string name="spotlight_dialog_month_view_title">Aylık görünüm</string>
     <string name="spotlight_dialog_month_view_description">Yeni aylık görünümümüzle etkinliklerinizin genel görünümüne bakın. Görünümler arasında geçiş yapmak için menüyü kullanın.</string>
@@ -544,6 +545,8 @@
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
     <string name="spotlight_dialog_calendar_provider_title">Takvim özellikleri</string>
     <string name="spotlight_dialog_calendar_provider_description">• Diğer uygulamalardaki etkinlikleri doğrudan Proton Calendar içine ekleyin.\n\n• Sizinle paylaşılan takvimlerde etkinlikler oluşturun ve yönetin.\n\n• Uygulamayı açılışında görmek istediğiniz varsayılan görünümü ayarlayın.\n\n• 13 yeni dilde daha kullanılabilir.</string>
+    <string name="spotlight_dialog_wipe_search_title">İyileştirmek için aramayı kaldırdık</string>
+    <string name="spotlight_dialog_wipe_search_description">Deneysel arama özelliğini daha kullanışlı ve güvenilir yapmak istediğimiz için Proton Calendar Beta sürümünden kaldırıyoruz. Bu işlem birkaç saniye sürebilir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>
