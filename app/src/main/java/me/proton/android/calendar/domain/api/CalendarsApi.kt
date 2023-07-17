@@ -2,8 +2,6 @@ package me.proton.android.calendar.domain.api
 
 import me.proton.android.calendar.data.api.*
 import me.proton.core.domain.entity.UserId
-import retrofit2.http.Path
-import retrofit2.http.Query
 
 interface CalendarsApi {
 
@@ -191,9 +189,17 @@ interface CalendarsApi {
     /**
      * Leave a shared calendar
      */
-    suspend fun leaveCalendar(
+    suspend fun leaveSharedCalendar(
         userId: UserId,
         calendarId: String,
         memberId: String
+    ): ApiResponse<StatusCodeApiResponse>
+
+    /**
+     * Leave a BE managed calendar
+     */
+    suspend fun leaveManagedCalendar(
+        userId: UserId,
+        calendarId: String
     ): ApiResponse<StatusCodeApiResponse>
 }

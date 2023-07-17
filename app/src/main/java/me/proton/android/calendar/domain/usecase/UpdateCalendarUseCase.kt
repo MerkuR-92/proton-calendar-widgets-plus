@@ -26,7 +26,7 @@ class UpdateCalendarUseCase @Inject constructor(
     // Update Single Calendar on Server
     suspend fun executeUpdateDisplayFromDb(userId: UserId, calendarId: String) : UseCase.Result {
 
-        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdateFromDb DB Member was null")
+        val dbMember = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("UpdateCalendarUseCase: executeUpdateFromDb DB member was null")
 
         val updateMemberApiRequest = UpdateMemberApiRequest(
             display = dbMember.display
@@ -36,7 +36,7 @@ class UpdateCalendarUseCase @Inject constructor(
     }
 
     suspend fun executeUpdate(userId: UserId, calendarId: String, description: String? = null, name: String? = null, color: String? = null, display: Int? = null) : UseCase.Result {
-        val dbMember = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Error("UpdateCalendarUseCase: executeUpdate DB Member was null")
+        val dbMember = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("UpdateCalendarUseCase: member was null")
 
         val updateMemberApiRequest = UpdateMemberApiRequest(
             color = color?.takeIf { !dbMember.color.equals(color, ignoreCase = true) }, // No need to send color if it hasn't changed. It also lets us make sure we don't send old color values to BE.

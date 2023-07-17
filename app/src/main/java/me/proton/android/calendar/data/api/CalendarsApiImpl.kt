@@ -171,9 +171,14 @@ interface CalendarsApiService : BaseRetrofitApi {
     ) : JoinCalendarApiResponse
 
     @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/members/{memberId}")
-    suspend fun leaveCalendar(
+    suspend fun leaveSharedCalendar(
         @Path("calendarId") calendarId: String,
         @Path("memberId") memberId: String
+    ) : StatusCodeApiResponse
+
+    @DELETE("calendar/$API_VERSION_CALENDAR/{calendarId}/managed")
+    suspend fun leaveManagedCalendar(
+        @Path("calendarId") calendarId: String
     ) : StatusCodeApiResponse
 }
 
@@ -427,12 +432,19 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         joinCalendar(calendarId, addressId, body)
     }.toApiResponse()
 
-    override suspend fun leaveCalendar(
+    override suspend fun leaveSharedCalendar(
         userId: UserId,
         calendarId: String,
         memberId: String
     ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-        leaveCalendar(calendarId, memberId)
+        leaveSharedCalendar(calendarId, memberId)
+    }.toApiResponse()
+
+    override suspend fun leaveManagedCalendar(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<StatusCodeApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        leaveManagedCalendar(calendarId)
     }.toApiResponse()
 }
 
@@ -486,8 +498,6 @@ data class EventApiResponse(
 
 @Serializable
 data class SyncEventsUpdateApiRequest(
-    @SerialName("MemberID")
-    val memberId: String,
     @SerialName("IsImport")
     val isImport: Int = 0,
     @SerialName("Events")
@@ -766,8 +776,6 @@ data class UpdateParticipationStatusApiRequest(
 
 @Serializable
 data class UpdateEventPersonalPartApiRequest(
-    @SerialName("MemberID")
-    val memberID: String,
     @SerialName("PersonalEventContent")
     val personalEventContent: PersonalEventContentApiRequest? = null,
     @SerialName("Notifications")
@@ -827,7 +835,9 @@ data class JoinCalendarApiRequest(
     @SerialName("Color")
     val color: String,
     @SerialName("DefaultFullDayNotifications")
-    val defaultFullDayNotifications: List<NotificationEntity>? = null
+    val defaultFullDayNotifications: List<NotificationEntity>? = null,
+    @SerialName("Priority")
+    val priority: Int? = null
 )
 
 @Serializable

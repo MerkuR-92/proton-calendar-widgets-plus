@@ -77,8 +77,6 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             transformEventUseCase.execute(eventEntity)
         } ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
-
         // We need timezone when adding ex dates to handle DST
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
 
@@ -123,21 +121,21 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
                         if (isStandaloneSingleEdit) {
                             // delete single edit and root event
-                            deleteEvents(userId, listOf(event.id, rootEvent.id), rootEvent.calendar.id, member.id)
+                            deleteEvents(userId, listOf(event.id, rootEvent.id), rootEvent.calendar.id)
                         } else {
                             val editResult = editCreateEventUseCase.execute(userId, rootEvent)
                             editResult.ifSuccessAndLogErrors(logger) {}
 
                             // delete the single edit
-                            deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                            deleteEvents(userId, listOf(event.id), event.calendar.id)
                         }
                     } else {
                         // delete the single edit
-                        deleteEvents(userId, listOf(event.id), event.calendar.id, member.id)
+                        deleteEvents(userId, listOf(event.id), event.calendar.id)
                     }
                 } else {
                     // delete the non-recurring event
-                    deleteEvents(userId, listOf(event.id), event.calendar.id, member.id, deletionReason)
+                    deleteEvents(userId, listOf(event.id), event.calendar.id, deletionReason)
                 }
 
             }
@@ -212,7 +210,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                         )
                     } else UseCase.Result.Success<Unit>()
                 deleteSingleEditsResult.ifSuccessAndLogErrors(logger) {}
-                val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id, member.id)
+                val deleteResult = deleteEvents(userId, listOf(rootEvent.id), rootEvent.calendar.id)
                 deleteResult.ifSuccessAndLogErrors(logger) {}
 
                 if ((deleteSingleEditsResult is UseCase.Result.Success<*>) && (deleteResult is UseCase.Result.Success<*>)) {
@@ -236,9 +234,8 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         return result
     }
 
-    private suspend fun deleteEvents(userId: UserId, eventIds: List<String>, calendarId: String, memberId: String, deletionReason: EventDeletionReason = EventDeletionReason.ByUser): UseCase.Result  {
+    private suspend fun deleteEvents(userId: UserId, eventIds: List<String>, calendarId: String, deletionReason: EventDeletionReason = EventDeletionReason.ByUser): UseCase.Result  {
         val syncRequestBody = SyncEventsUpdateApiRequest(
-            memberId = memberId,
             events = eventIds.map { SyncEventDeleteContainer(id = it, deletionReason = deletionReason.value) }
         )
 
@@ -290,8 +287,6 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             transformEventUseCase.execute(eventEntity)
         } ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
 
-        val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
-
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
         val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
             eventDecryptor.decrypt(it)
@@ -306,7 +301,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         }
 
         val deleteResult = if (eventsToDelete.isNotEmpty()) {
-            deleteEvents(userId, eventsToDelete.map { it.id }, event.calendar.id, member.id)
+            deleteEvents(userId, eventsToDelete.map { it.id }, event.calendar.id)
         } else UseCase.Result.Success<Unit>()
 
         return deleteResult
@@ -469,8 +464,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         return if (handleDeleteResult is UseCase.Result.Success<*>) {
             // Try to delete any existing cancelled single edits. Silently fail.
             if (!cancelledSingleEdits.isNullOrEmpty() && event.isRecurring()) {
-                val member = database.membersDao().select(event.calendar.id).firstOrNull() ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: could not get Member for calendar ${event.calendar.id}")
-                deleteEvents(userId, cancelledSingleEdits.map { it.id }, event.calendar.id, member.id)
+                deleteEvents(userId, cancelledSingleEdits.map { it.id }, event.calendar.id)
             }
             UseCase.Result.Success(emailSent)
         } else handleDeleteResult

@@ -16,7 +16,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.useKeys
 import me.proton.core.network.domain.ResponseCodes
-import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ class UpgradeEventUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val cryptoContext: CryptoContext,
     private val calendarsRepository: CalendarsRepository,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val crypto: Crypto,
     private val database: AppDatabase,
 ) : UseCase {
@@ -42,7 +42,7 @@ class UpgradeEventUseCase @Inject constructor(
 
         if (eventEntity.addressKeyPacket == null || eventEntity.addressId == null) return UseCase.Result.InvalidParams("UpgradeEventUseCase: not enough data for upgrading Event")
 
-        val userAddresses = userManager.getAddressesOrNull(userId)?.takeIfNotEmpty()
+        val userAddresses = userAddressManager.getAddressesOrNull(userId)?.takeIfNotEmpty()
             ?: return UseCase.Result.InvalidParams("UpgradeEventUseCase: User Addresses is empty")
 
         val calendarPrimaryPrivateKey =

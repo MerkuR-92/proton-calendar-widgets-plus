@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.getMatchingDefaultHolidayCalendar
 import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
@@ -30,13 +31,12 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
-import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import me.proton.core.util.kotlin.equalsNoCase
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -50,10 +50,10 @@ class HolidayCalendarViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val joinCalendarUseCase: JoinCalendarUseCase,
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
-    private val leaveCalendarUseCase: LeaveCalendarUseCase,
+    private val leaveManagedCalendarUseCase: LeaveManagedCalendarUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val workManager: WorkManager
-    ) : AndroidViewModel(application) {
+) : AndroidViewModel(application) {
 
     sealed class HolidayCalendarSnackState {
 
@@ -250,29 +250,12 @@ class HolidayCalendarViewModel @Inject constructor(
         defaultCountryCode: String
     ): Boolean {
         // Get calendars matching the default time zone
-        val calendarsMatchingTimeZone = holidayCalendars.filter {
-            it.timezones.contains(primaryTimezone)
-        }
-
-        val calendarsMatchingCode =
-            if (calendarsMatchingTimeZone.size > 1) {
-                // If there are more than one match, use the Locale country tag.
-                if (defaultCountryCode.isNotEmpty()) {
-                    calendarsMatchingTimeZone.filter {
-                        it.countryCode.equalsNoCase(defaultCountryCode)
-                    }
-                } else {
-                    // If we don't have a country tag, use the Locale language tag.
-                    calendarsMatchingTimeZone.filter {
-                        it.languageCode.equalsNoCase(defaultLanguageCode)
-                    }
-                }
-            } else calendarsMatchingTimeZone
-
-        // Get the calendar matching the default language
-        val matchingDefaultHolidayCalendar = calendarsMatchingCode.firstOrNull {
-            it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
-        } ?: calendarsMatchingCode.firstOrNull()
+        val matchingDefaultHolidayCalendar = getMatchingDefaultHolidayCalendar(
+            holidayCalendars,
+            primaryTimezone,
+            defaultLanguageCode,
+            defaultCountryCode
+        )
 
         // If holiday calendar already exists, leave the fields empty
         matchingDefaultHolidayCalendar?.let {
@@ -281,10 +264,8 @@ class HolidayCalendarViewModel @Inject constructor(
             } != null
             if (holidayCalendarAlreadyExists) return true
         } ?: return false
-        if (calendarsMatchingTimeZone.isNotEmpty()) {
-            // Change state so we display based on time zone disclaimer
-            holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
-        }
+        // Change state so we display based on time zone disclaimer
+        holidayCalendarState.value = HolidayCalendarState.PickBasedOnTimeZone
         _country.value = matchingDefaultHolidayCalendar.country
         _language.value = matchingDefaultHolidayCalendar.language
         return true
@@ -444,6 +425,7 @@ class HolidayCalendarViewModel @Inject constructor(
             holidayCalendarState.value = HolidayCalendarState.Idle
             return
         }
+        val calendarPriority = calendar.priority
         val currentDefaultAllDayNotifications = calendar.defaultFullDayNotifications.map { it.toVAlarm() }
         val notificationsChanged = currentDefaultAllDayNotifications != _defaultAllDayAlarms.value
         val colorChanged = calendar.color != calendarColor.toHexColor()
@@ -457,7 +439,7 @@ class HolidayCalendarViewModel @Inject constructor(
             }
 
             // Leave current holiday calendar
-            val leaveCalendarUseCaseResult = leaveCalendarUseCase.execute(userId, calendar.id)
+            val leaveCalendarUseCaseResult = leaveManagedCalendarUseCase.execute(userId, calendar.id)
             if (leaveCalendarUseCaseResult !is UseCase.Result.Success<*>) {
                 holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
                     resourceProvider.provideString(R.string.snack_update_calendar_error)
@@ -475,7 +457,8 @@ class HolidayCalendarViewModel @Inject constructor(
                 userId,
                 holidayCalendar,
                 calendarColor,
-                _defaultAllDayAlarms.value
+                _defaultAllDayAlarms.value,
+                calendarPriority
             )
 
             // Clear loading state

@@ -91,6 +91,8 @@ interface CalendarsRepository {
 
     suspend fun refreshCalendars(userId: UserId): Boolean
 
+    suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>)
+
     suspend fun fetchCalendars(userId: UserId): List<Calendar>?
 
     suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>?
@@ -254,7 +256,9 @@ interface CalendarsRepository {
     suspend fun deletePassphraseById(id: String)
 
     // members
-    suspend fun selectMembers(calendarId: String): List<MemberEntity>
+    suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
+
+    suspend fun selectCalendarUserMember(calendarId: String): MemberEntity?
 
     suspend fun selectMemberById(memberId: String): MemberEntity?
 
@@ -313,7 +317,7 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarUserSettingsByUserId(userId: String)
 
-    suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String?
+    suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String?
 
     suspend fun getDefaultCalendarId(userId: String): String?
 
@@ -343,9 +347,10 @@ interface CalendarsRepository {
 
     suspend fun getAddressForMember(
         userId: UserId,
-        member: MemberEntity,
-        addresses: List<UserAddress>? = null,
-        refresh: Boolean = false
+        addressId: String?,
+        memberId: String,
+        canonicalEmail: String,
+        addresses: List<UserAddress>? = null
     ): UserAddress?
 
     fun getUserMember(userAddresses: List<UserAddress>, members: List<MemberEntity>): MemberEntity?

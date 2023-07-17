@@ -42,7 +42,9 @@ data class MemberEntity(
     @SerialName("Name")
     val name: String,
     @SerialName("Description")
-    val description: String
+    val description: String,
+    @SerialName("Priority")
+    val priority: Int?
     ) {
     enum class Permission(val value: Int) { // TODO see if this is even deserialized
         /** has financial responsibility. There must always be exactly one owner but it can be transferred */

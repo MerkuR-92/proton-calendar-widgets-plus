@@ -32,9 +32,10 @@ import me.proton.android.calendar.test.shared.mocks.CalendarMocks
 import me.proton.android.calendar.test.shared.mocks.UserMocks
 import me.proton.android.calendar.test.shared.mocks.calendarColor
 import me.proton.android.calendar.test.shared.mocks.calendarDisplay
+import me.proton.android.calendar.test.shared.mocks.userEmail
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
-import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.UserAddress
@@ -52,7 +53,7 @@ internal class TransformEventUseCaseTest {
     private val crypto: Crypto = mockk()
     private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase = mockk()
     private val cryptoContextMock: CryptoContext = mockk()
-    private val userManagerMock: UserManager = mockk()
+    private val userAddressManagerMock: UserAddressManager = mockk()
     private lateinit var database: AppDatabase
 
     @BeforeEach
@@ -95,6 +96,7 @@ internal class TransformEventUseCaseTest {
             val calendarEntity = CalendarEntity(
                 "id",
                 1,
+                owner = Json.decodeFromString("{\"Email\": \"$userEmail\"}"),
                 fkUserId = "fkUserId")
             coEvery { database.calendarsDao().selectById(any()) } returns calendarEntity
 
@@ -114,7 +116,7 @@ internal class TransformEventUseCaseTest {
             } returns listOf(UserMocks.provideAddressEntity())
 
             coEvery {
-                database.membersDao().select(any())
+                database.membersDao().selectCalendarMembers(any())
             } returns listOf(CalendarMocks.provideMemberEntity())
 
             coEvery {
@@ -140,7 +142,7 @@ internal class TransformEventUseCaseTest {
                 valueStoreProviderMock.provideValueStore(any()).getStringFromSet(any(), any())
             } returns "keyPassphrase"
 
-            coEvery { userManagerMock.getAddresses(any()) } returns listOf(
+            coEvery { userAddressManagerMock.getAddresses(any()) } returns listOf(
                 UserAddress(
                     userId = UserId("id"),
                     addressId = AddressId("id"),
@@ -161,7 +163,7 @@ internal class TransformEventUseCaseTest {
             val useCase = TransformEventUseCase(
                 json,
                 database,
-                userManagerMock,
+                userAddressManagerMock,
                 testsLogger,
                 valueStoreProviderMock,
                 crypto,

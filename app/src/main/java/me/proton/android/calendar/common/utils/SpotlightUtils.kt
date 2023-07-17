@@ -12,6 +12,7 @@ import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CALENDAR_PROVIDER_VERSION_CODE
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
+import me.proton.android.calendar.common.HOLIDAY_CALENDAR_VERSION_CODE
 import me.proton.android.calendar.common.IMPORT_VERSION_CODE
 import me.proton.android.calendar.common.MONTH_VIEW_VERSION_CODE
 import me.proton.android.calendar.common.REBRANDING_VERSION_CODE
@@ -94,7 +95,19 @@ object SpotlightUtils {
         )
     }
 
-    fun Activity.showLastSpotlightDialog(positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null): Boolean {
+    private fun getHolidayCalendarDialogContent(limitReached: Boolean): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_holiday_calendar_title,
+            if (limitReached) R.string.spotlight_dialog_holiday_calendar_limit_reached_description
+            else R.string.spotlight_dialog_holiday_calendar_add_description
+        )
+    }
+
+    fun Activity.showLastSpotlightDialog(
+        isHolidayCalendarEnabled: Boolean,
+        calendarLimitReached: Boolean,
+        positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null
+    ): Boolean {
         val lastSpotlightShown = this.getLastSpotlightShown()
         val lastSpotlightVersionCode = SPOTLIGHT_VERSION_CODES.maxOrNull() ?: 0 // Should never be null
 
@@ -188,6 +201,23 @@ object SpotlightUtils {
                 )
                 true
             }
+            HOLIDAY_CALENDAR_VERSION_CODE -> {
+                if (!isHolidayCalendarEnabled) return false
+                // Holiday calendar
+                val content = getHolidayCalendarDialogContent(calendarLimitReached)
+                this.displaySpotlightDialog(
+                    content.first,
+                    content.second,
+                    materialPositiveButtonText =
+                    if (calendarLimitReached) R.string.create_calendar_limit_reached_manage
+                    else R.string.add_calendar_button,
+                    materialNegativeButtonText = R.string.spotlight_dialog_skip,
+                    customPositiveButtonCallback = {
+                        positiveCallback?.invoke(lastSpotlightVersionCode)
+                    }
+                )
+                true
+            }
             else -> {
                 // Do nothing if we don't have any dialog to show for that version code
                 false
@@ -199,6 +229,7 @@ object SpotlightUtils {
         title: Int,
         description: Int,
         materialPositiveButtonText: Int? = null,
+        materialNegativeButtonText: Int? = null,
         customPositiveButtonText: Int? = null,
         customNegativeButtonText: Int? = null,
         customPositiveButtonCallback: View.OnClickListener? = null,
@@ -233,7 +264,7 @@ object SpotlightUtils {
             }
         } else {
             materialDialogBuilder.setPositiveButton(materialPositiveButtonText ?: R.string.spotlight_dialog_confirmation_button) { _, _ ->
-                // Nothing to do here
+                // Trigger callback if provided
                 customPositiveButtonCallback?.onClick(viewBinding.root)
             }
         }
@@ -244,6 +275,10 @@ object SpotlightUtils {
             viewBinding.dialogSpotlightCustomNegativeButton.text = getText(customNegativeButtonText)
             viewBinding.dialogSpotlightCustomNegativeButton.setOnSingleClickListener {
                 dialog?.dismiss()
+            }
+        } else {
+            materialDialogBuilder.setNegativeButton(materialNegativeButtonText ?: R.string.spotlight_dialog_skip) { _, _ ->
+                // Nothing to do here
             }
         }
 

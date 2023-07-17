@@ -4,6 +4,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.getCalendarOwnerEntity
 import me.proton.android.calendar.data.entity.getDefaultNotifications
 import me.proton.core.util.kotlin.toBoolean
 
@@ -11,8 +12,12 @@ data class Calendar(
         override val id: String,
         val name: String,
         val email: String,
+        val ownerEmail: String?,
         val description: String,
         val color: String,
+        val priority: Int?,
+        val addressId: String?,
+        val memberId: String?,
         val flags: Int,
         val display: Boolean,
         val type: Int,
@@ -27,8 +32,12 @@ data class Calendar(
                         id = calendarEntity.id,
                         name = memberEntity.name,
                         email = memberEntity.email,
+                        ownerEmail = calendarEntity.getCalendarOwnerEntity(json)?.email,
                         description = memberEntity.description,
                         color = memberEntity.color,
+                        priority = memberEntity.priority,
+                        addressId = memberEntity.addressId,
+                        memberId = memberEntity.id,
                         flags = memberEntity.flags,
                         display = memberEntity.display.toBoolean(),
                         type = calendarEntity.type,

@@ -54,7 +54,8 @@ import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
-import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
@@ -81,6 +82,7 @@ import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.network.data.ApiProvider
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.repository.UserAddressRepository
 import me.proton.core.user.domain.repository.UserRepository
@@ -128,7 +130,7 @@ val useCaseModule = module {
     factory<FetchEventsUseCase> { FetchEventsUseCase(get(), get(), get()) }
     factory<EditCreateEventUseCase> { EditCreateEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpgradeEventUseCase> { UpgradeEventUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarUseCase> { BootstrapCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
     factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -160,8 +162,9 @@ val useCaseModule = module {
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
-    factory<JoinCalendarUseCase> { JoinCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory<LeaveCalendarUseCase> { LeaveCalendarUseCase(get(), get(), get(), get()) }
+    factory<JoinCalendarUseCase> { JoinCalendarUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory<LeaveSharedCalendarUseCase> { LeaveSharedCalendarUseCase(get(), get(), get(), get()) }
+    factory<LeaveManagedCalendarUseCase> { LeaveManagedCalendarUseCase(get(), get(), get()) }
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
 }
@@ -174,6 +177,7 @@ fun coreModule(
     eventDecryptor: EventDecryptor,
     accountManager: AccountManager,
     userManager: UserManager,
+    userAddressManager: UserAddressManager,
     userRepository: UserRepository,
     userAddressRepository: UserAddressRepository,
     calendarsRepository: CalendarsRepository,
@@ -188,6 +192,7 @@ fun coreModule(
     single<CryptoContext> { cryptoContext }
     single<AccountManager> { accountManager }
     single<UserManager> { userManager }
+    single<UserAddressManager> { userAddressManager }
     single<UserRepository> { userRepository }
     single<UserAddressRepository> { userAddressRepository }
     single<CalendarsRepository> { calendarsRepository }

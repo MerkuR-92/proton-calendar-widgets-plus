@@ -81,7 +81,9 @@ class KeySetupUseCase @Inject constructor(
                 // get Address for that Member
                 val address = calendarsRepository.getAddressForMember(
                     userId,
-                    member,
+                    member.addressId,
+                    member.id,
+                    member.canonicalEmail,
                     addresses
                 ) ?: return UseCase.Result.Error("KeySetupUseCase: No Address found")
 

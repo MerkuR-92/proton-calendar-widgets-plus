@@ -81,7 +81,8 @@ import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
-import me.proton.android.calendar.domain.usecase.LeaveCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
@@ -92,6 +93,7 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.User
@@ -117,13 +119,15 @@ class CalendarViewModel @Inject constructor(
     application: Application,
     private val accountManager: AccountManager,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val deleteCalendarUseCase: DeleteCalendarUseCase,
     private val recreateCalendarUseCase: RecreateCalendarUseCase,
-    private val leaveCalendarUseCase: LeaveCalendarUseCase,
+    private val leaveSharedCalendarUseCase: LeaveSharedCalendarUseCase,
+    private val leaveManagedCalendarUseCase: LeaveManagedCalendarUseCase,
     private val logger: Logger,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
@@ -527,13 +531,22 @@ class CalendarViewModel @Inject constructor(
         return recreateCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
-    suspend fun leaveCalendar(calendarId: String): UseCase.Result {
+    suspend fun leaveSharedCalendar(calendarId: String, memberId: String?): UseCase.Result {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel recreateCalendar")
-            return UseCase.Result.Error("userID == null in recreateCalendar")
+            logger.e("User ID was null in CalendarViewModel leaveCalendar")
+            return UseCase.Result.Error("userID == null in leaveCalendar")
         }
-        return leaveCalendarUseCase.execute(UserId(userId), calendarId)
+        return leaveSharedCalendarUseCase.execute(UserId(userId), calendarId, memberId)
+    }
+
+    suspend fun leaveHolidayCalendar(calendarId: String): UseCase.Result {
+        val userId = userId.value?.id
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel leaveHolidayCalendar")
+            return UseCase.Result.Error("userID == null in leaveHolidayCalendar")
+        }
+        return leaveManagedCalendarUseCase.execute(UserId(userId), calendarId)
     }
 
     fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {
@@ -737,8 +750,22 @@ class CalendarViewModel @Inject constructor(
         updatingCalendarPassphrase = false
     }
 
-    suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
+    suspend fun fetchCalendars(): List<Calendar>? {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchCalendars")
+            return null
+        }
         return calendarsRepository.fetchCalendars(userId)
+    }
+
+    suspend fun refreshCalendars(calendarIds: List<String>) {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel refreshCalendars")
+            return
+        }
+        calendarsRepository.refreshCalendars(userId, calendarIds)
     }
 
     suspend fun refreshMember(calendarId: String): Boolean {
@@ -983,7 +1010,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
-        return userManager.getAddressesOrNull(userId)
+        return userAddressManager.getAddressesOrNull(userId)
     }
 
     suspend fun getUserAddressesFlow(): LiveData<List<UserAddress>?>? {
@@ -993,7 +1020,7 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         return kotlin.runCatching {
-            userManager.getAddressesFlow(userId).mapSuccessValueOrNull()?.asLiveData(Dispatchers.Default)
+            userAddressManager.getAddressesFlow(userId).mapSuccessValueOrNull()?.asLiveData(Dispatchers.Default)
         }.getOrElse {
             logger.e("CalendarViewModel getAddressesFlow threw exception ${it.message}", it)
             null
@@ -1024,14 +1051,14 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getDefaultCalendarId(): String? {
+    suspend fun getDefaultCalendarIdWithFallback(allowShared: Boolean): String? {
         return defaultCalendarId.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
                 logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
                 return null
             }
-            calendarsRepository.getDefaultCalendarId(userId.id)
+            calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared)
         }
     }
 

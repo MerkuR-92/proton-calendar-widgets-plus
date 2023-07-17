@@ -51,6 +51,8 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutOccurrencesByExdates
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
+import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
@@ -89,6 +91,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.data.entity.AddressEntity
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
@@ -120,6 +123,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val searchDatabase: SearchDatabase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager
 ) : CalendarsRepository {
 
@@ -512,6 +516,37 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>) {
+        val calendars = arrayListOf<CalendarEntity>()
+        val members = hashMapOf<String, MemberEntity>()
+        calendarIds.forEach {
+            val calendarResponse = calendarsApi.getCalendar(userId, it)
+            if (calendarResponse !is ApiResponse.Success) {
+                // We log but ignore the error
+                logger.e("error getting calendar from API in CalendarsRepositoryImpl")
+            } else {
+                calendars.add(calendarResponse.data.calendar)
+                // Get members for calendar
+                val memberListResponse = calendarsApi.getMemberList(userId, it)
+                if (memberListResponse !is ApiResponse.Success) {
+                    // We log but ignore the error
+                    logger.e("error getting member from API in CalendarsRepositoryImpl")
+                } else {
+                    memberListResponse.data.members.firstOrNull()?. let { memberEntity ->
+                        members[it] = memberEntity
+                    }
+                }
+            }
+        }
+        calendars.forEach {
+            // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
+            persistCalendar(userId.id, it)
+            members[it.id]?.let { memberEntity ->
+                persistMember(memberEntity)
+            }
+        }
+    }
+
     override suspend fun fetchCalendars(userId: UserId): List<Calendar>? {
         return fetchCalendarEntities(userId)?.map {
             Calendar.from(
@@ -607,12 +642,12 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {
-        val member = selectMembers(calendarId).firstOrNull()
+        val member = selectCalendarUserMember(calendarId)
         return if (member != null) member.display == newDisplay else false
     }
 
     override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
-        database.membersDao().select(calendarId).firstOrNull()?.let {
+        selectCalendarUserMember(calendarId)?.let {
             database.membersDao().updateDisplay(calendarId, display.toInt())
             widgetRefresher.refreshEventList()
         }
@@ -706,7 +741,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         return visibleSkeletonEventsFlow.map<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<UiEvent>> { visibleSkeletonEvents ->
 
-            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userManager.getAddresses(it) }
+            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userAddressManager.getAddressesOrNull(it) }
                 ?: return@map CalendarsRepository.GetEventsResult.Exception(Exception("could not get user addresses in getUiEventsFlow"))
 
             val userEmails = userAddresses.map { it.email }
@@ -1419,8 +1454,20 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.passphrasesDao().deleteById(id)
     }
 
-    override suspend fun selectMembers(calendarId: String): List<MemberEntity> {
-        return database.membersDao().select(calendarId)
+    override suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity> {
+        return database.membersDao().selectCalendarMembers(calendarId)
+    }
+
+    override suspend fun selectCalendarUserMember(calendarId: String): MemberEntity? {
+        // Get user addresses so we can find the calendar member for current user
+        val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userAddressManager.getAddressesOrNull(it) } ?: run {
+            logger.e("selectCalendarUserMember userAddresses were null")
+            return null
+        }
+        // Get all members for that calendar
+        val calendarMembers = database.membersDao().selectCalendarMembers(calendarId)
+        // Find the member that belongs to the current user
+        return getUserMember(userAddresses, calendarMembers)
     }
 
     override suspend fun selectMemberById(memberId: String): MemberEntity? {
@@ -1531,8 +1578,23 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarUserSettingsDao().deleteByUserId(userId)
     }
 
-    override suspend fun getDefaultCalendarIdOrFirstActiveId(userId: String): String? {
-        return getDefaultCalendarId(userId) ?: selectActiveUserCalendars(userId).firstOrNull()?.id
+    override suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String? {
+        // Get user calendar settings default calendar id or fallback to first sorted personal active user calendar id
+        return getDefaultCalendarId(userId)
+            ?: run {
+                if (allowShared) {
+                    val sortedActiveUserCalendars = sortPersonalCalendars(selectActiveUserCalendars(userId), null)
+                    sortedActiveUserCalendars.firstOrNull {
+                        it.isOwner // First try to get a personal calendar
+                    }?.id ?: sortedActiveUserCalendars.firstOrNull {
+                        it.allowEditEvents // Fallback to a writable calendar
+                    }?.id
+                } else {
+                    sortPersonalCalendars(selectActiveUserCalendars(userId), null).firstOrNull {
+                        it.isOwner
+                    }?.id
+                }
+            }
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {
@@ -1573,21 +1635,29 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun getAddressForMember(
         userId: UserId,
-        member: MemberEntity,
-        addresses: List<UserAddress>?,
-        refresh: Boolean
+        addressId: String?,
+        memberId: String,
+        canonicalEmail: String,
+        addresses: List<UserAddress>?
     ): UserAddress? {
-        val address = (addresses ?: userManager.getAddressesOrNull(userId, refresh))?.firstOrNull {
-            if (!member.addressId.isNullOrEmpty()) {
-                it.addressId.id.equalsNoCase(member.addressId)
+        val address =
+            if (!addressId.isNullOrEmpty() && !addresses.isNullOrEmpty()) {
+                addresses.firstOrNull { it.addressId.id.equalsNoCase(addressId) }
+            } else if (!addressId.isNullOrEmpty()) {
+                userAddressManager.getAddressOrNull(userId, addressId)
+            } else if (!addresses.isNullOrEmpty()) {
+                addresses.firstOrNull {
+                    canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalEmail)
+                }
             } else {
-                canonicalizeProtonEmail(it.email, forceCanonicalization = true)
-                    .equalsNoCase(member.canonicalEmail)
+                userAddressManager.getAddressesOrNull(userId)?.firstOrNull {
+                    canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalEmail)
+                }
             }
-        }
-        if (address != null && member.addressId.isNullOrEmpty()) {
+
+        if (address != null && addressId.isNullOrEmpty()) {
             // Update AddressId in member if a match was found and field was not already persisted
-            database.membersDao().updateMemberAddressId(member.id, address.addressId.id)
+            database.membersDao().updateMemberAddressId(memberId, address.addressId.id)
         }
         return address
     }
@@ -1644,7 +1714,7 @@ suspend fun List<CalendarEntity>.joinToCalendars(database: AppDatabase, json: Js
     return this.mapNotNull { calendarEntity ->
         val calendarSettings = database.calendarSettingsDao().select(calendarEntity.id) ?: return@mapNotNull null
         // Get all members for that calendar
-        val calendarMembers = database.membersDao().select(calendarEntity.id)
+        val calendarMembers = database.membersDao().selectCalendarMembers(calendarEntity.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar
@@ -1663,7 +1733,7 @@ suspend fun CalendarEntity?.joinToCalendar(database: AppDatabase, json: Json): C
         val userAddresses = database.addressDao().getByUserId(UserId(this.fkUserId))
         val calendarSettings = database.calendarSettingsDao().select(this.id) ?: return null
         // Get all members for that calendar
-        val calendarMembers = database.membersDao().select(this.id)
+        val calendarMembers = database.membersDao().selectCalendarMembers(this.id)
         // Find the member that belongs to the current user
         val userMember = calendarMembers.getUserMember(userAddresses)
         // Map to Calendar

@@ -33,12 +33,13 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayFreeUserMandatoryPersonalCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserCalendarLimitReached
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayPaidUserMandatoryPersonalCalendarLimitReached
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
-import me.proton.android.calendar.databinding.FragmentGeneralSettingsBinding
 import me.proton.android.calendar.databinding.FragmentSettingsBinding
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
@@ -189,17 +190,19 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
         otherCalendarsMediator.observe(viewLifecycleOwner) {
             it?.let {
                 lifecycleScope.launch {
-                    val otherCalendars = it.first.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }
+                    val otherCalendars = ProtonUtilsImpl.sortOtherCalendars(it.first)
                     val calendarSubscriptions = it.second
 
-                    val dataSetChanged =
+                    val calendarSubscriptionsChanged =
                         settingsOtherCalendarListAdapter.setCalendarSubscriptions(calendarSubscriptions)
 
                     settingsOtherCalendarListAdapter.submitList(otherCalendars)
-                    if (dataSetChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
+                    if (calendarSubscriptionsChanged) settingsOtherCalendarListAdapter.notifyDataSetChanged()
                     binding.settingsOtherCalendars.visibleOrGone(otherCalendars.isNotEmpty())
+                    val userPersonalCalendars = calendarViewModel.getUserPersonalCalendars() ?: emptyList()
+                    binding.settingsCalendars.visibleOrGone(userPersonalCalendars.isNotEmpty() || (userPersonalCalendars.isEmpty() && otherCalendars.isEmpty()))
+                    binding.settingsOtherCalendarsTitleAdd.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
+                    binding.settingsCalendarsSubtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
                 }
             }
         }
@@ -239,7 +242,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                     }
                     else -> { } // We do not use the other values
                 }
-                calendarFormViewModel.calendarSettingsSnackState.value = null
+                holidayCalendarViewModel.calendarSettingsSnackState.value = null
             }
         }
     }
@@ -256,20 +259,10 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
             binding.settingsOtherCalendarsTitleAdd.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isNotEmpty())
             binding.settingsCalendarsSubtitle.visibleOrGone(userPersonalCalendars.isEmpty() && otherCalendars.isEmpty())
             lifecycleScope.launch {
-                var defaultCalendarId = calendarViewModel.getDefaultCalendarId()
-                val defaultCalendar = userPersonalCalendars.firstOrNull { it.id == defaultCalendarId }
-                if (defaultCalendar == null || !defaultCalendar.isActive || !defaultCalendar.isOwner) {
-                    defaultCalendarId = userPersonalCalendars.firstOrNull { it.isActive && it.isOwner }?.id
-                }
+                val defaultCalendarId = calendarViewModel.getDefaultCalendarIdWithFallback(allowShared = false)
                 this@SettingsFragment.defaultCalendarId = defaultCalendarId
                 val dataSetChanged: Boolean = settingsUserCalendarListAdapter.setDefaultCalendarId(defaultCalendarId)
-                settingsUserCalendarListAdapter.submitList(
-                    userPersonalCalendars.sortedBy {
-                        it.isDisabled // Disabled will appear last
-                    }.sortedByDescending {
-                        it.id == defaultCalendarId // Default will appear first
-                    }
-                )
+                settingsUserCalendarListAdapter.submitList(sortPersonalCalendars(userPersonalCalendars, defaultCalendarId))
                 if (dataSetChanged) settingsUserCalendarListAdapter.notifyDataSetChanged()
             }
         }
@@ -358,7 +351,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                         setMessage(resourceProvider.provideString(R.string.remove_calendar_dialog_message))
                         setPositiveButton(R.string.action_remove) { _, _ ->
                             lifecycleScope.launch {
-                                when (calendarViewModel.leaveCalendar(calendar.id)) {
+                                when (calendarViewModel.leaveHolidayCalendar(calendar.id)) {
                                     is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                     is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.remove_calendar_snack_removed))
@@ -375,7 +368,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                         setMessage(resourceProvider.provideString(R.string.leave_calendar_dialog_message))
                         setPositiveButton(R.string.action_leave) { _, _ ->
                             lifecycleScope.launch {
-                                when (calendarViewModel.leaveCalendar(calendar.id)) {
+                                when (calendarViewModel.leaveSharedCalendar(calendar.id, calendar.memberId)) {
                                     is UseCase.Result.Error -> view?.displaySnackBar(resourceProvider.provideString(R.string.leave_calendar_snack_error))
                                     is UseCase.Result.InvalidParams -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_error_password_confirmation))
                                     is UseCase.Result.Success<*> -> view?.displaySnackBar(resourceProvider.provideString(R.string.delete_calendar_snack_deleted))

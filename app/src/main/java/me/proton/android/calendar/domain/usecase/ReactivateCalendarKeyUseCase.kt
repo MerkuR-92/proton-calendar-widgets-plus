@@ -14,7 +14,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.decryptTextOrNull
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyText
-import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val json: Json,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val cryptoContext: CryptoContext,
     private val calendarsRepository: CalendarsRepository
 ): UseCase {
@@ -31,7 +31,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
 
         // We pass the user address list as a parameter because it has refresh flag set at true so we want to reduce
         //  the amount of calls needed in case we're reactivating keys for a list of calendars.
-        val userAddresses = addresses ?: userManager.getAddressesOrNull(userId)
+        val userAddresses = addresses ?: userAddressManager.getAddressesOrNull(userId)
 
         // Get all keys
         val keysResponse = calendarsApi.getKeys(userId, calendarId)
@@ -71,7 +71,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
                     } ?: return@members
 
                     // Load Address linked to member
-                    val memberAddress = calendarsRepository.getAddressForMember(userId, member, userAddresses) ?: return@members
+                    val memberAddress = calendarsRepository.getAddressForMember(userId, member.addressId, member.id, member.canonicalEmail, userAddresses) ?: return@members
 
                     // Try to decrypt passphrase
                     val decryptedPassphrase = memberAddress.useKeys(cryptoContext) {

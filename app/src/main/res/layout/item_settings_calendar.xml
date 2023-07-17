@@ -30,7 +30,7 @@
         android:id="@+id/item_settings_calendar_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="Test 1"
+        tools:text="Title"
         style="@style/Text.Default"
         android:layout_marginStart="@dimen/spacing_page"
         android:layout_marginTop="12dp"
@@ -39,14 +39,24 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
-        android:id="@+id/item_settings_calendar_subtitle"
+        android:id="@+id/item_settings_calendar_owner_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        tools:text="Test 1"
-        style="@style/Text.DefaultSmall.Weak"
+        tools:text="Owner"
+        style="@style/Text.DefaultSmall"
         app:layout_constraintStart_toStartOf="@+id/item_settings_calendar_title"
         app:layout_constraintEnd_toStartOf="@+id/item_settings_calendar_menu_icon"
         app:layout_constraintTop_toBottomOf="@+id/item_settings_calendar_title"/>
+
+    <TextView
+        android:id="@+id/item_settings_calendar_user_email"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        tools:text="User"
+        style="@style/Text.DefaultSmall.Weak"
+        app:layout_constraintStart_toStartOf="@+id/item_settings_calendar_title"
+        app:layout_constraintEnd_toStartOf="@+id/item_settings_calendar_menu_icon"
+        app:layout_constraintTop_toBottomOf="@+id/item_settings_calendar_owner_email"/>
 
     <ImageView
         android:id="@+id/item_settings_calendar_menu_icon"
@@ -72,7 +82,7 @@
         android:layout_marginTop="8dp"
         android:showDividers="middle"
         android:divider="@drawable/horizontal_empty_divider"
-        app:layout_constraintTop_toBottomOf="@+id/item_settings_calendar_subtitle"
+        app:layout_constraintTop_toBottomOf="@+id/item_settings_calendar_user_email"
         app:layout_constraintStart_toStartOf="@+id/item_settings_calendar_title" />
 
     <TextView

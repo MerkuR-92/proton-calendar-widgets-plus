@@ -20,8 +20,8 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.extension.primary
 import me.proton.core.key.domain.publicKey
 import me.proton.core.key.domain.signText
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
-import java.time.LocalDate
 import javax.inject.Inject
 
 class JoinCalendarUseCase @Inject constructor(
@@ -29,6 +29,7 @@ class JoinCalendarUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val cryptoContext: CryptoContext,
     private val crypto: Crypto,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
@@ -43,11 +44,12 @@ class JoinCalendarUseCase @Inject constructor(
         userId: UserId,
         managedHolidayCalendarEntity: ManagedHolidayCalendarEntity,
         calendarColor: Int,
-        defaultFullDayNotifications: List<VAlarm>?
+        defaultFullDayNotifications: List<VAlarm>?,
+        priority: Int? = null
     ): UseCase.Result {
 
         val defaultUserEmail = userManager.getUser(userId).email
-        val address = userManager.getAddressesOrNull(userId)?.firstOrNull { address ->
+        val address = userAddressManager.getAddressesOrNull(userId)?.firstOrNull { address ->
             defaultUserEmail?.let { address.email == it } ?: address.canSend && address.canReceive
         } ?: return UseCase.Result.Error("JoinCalendarUseCase: No valid Address found")
 
@@ -73,7 +75,8 @@ class JoinCalendarUseCase @Inject constructor(
                     type = if (it.action.isEmail) 0 else 1,
                     trigger = it.trigger.duration.toString()
                 )
-            }
+            },
+            priority = priority
         )
 
         return when (val joinCalendarResponse =

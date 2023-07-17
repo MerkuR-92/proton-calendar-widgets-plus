@@ -8,11 +8,10 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
 import javax.inject.Inject
 
-class LeaveCalendarUseCase @Inject constructor(
+class LeaveManagedCalendarUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val calendarsRepository: CalendarsRepository,
-    private val database: AppDatabase
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     companion object {
@@ -24,10 +23,8 @@ class LeaveCalendarUseCase @Inject constructor(
         calendarId: String
     ): UseCase.Result {
 
-        val member = database.membersDao().select(calendarId).firstOrNull() ?: return UseCase.Result.Success<Unit>() // If member was not in DB then user already left that calendar
-
         return when (val leaveCalendarResponse =
-            calendarsApi.leaveCalendar(userId, calendarId, member.id)
+            calendarsApi.leaveManagedCalendar(userId, calendarId)
         ) {
             is ApiResponse.Success -> {
                 // Delete Calendar from DB

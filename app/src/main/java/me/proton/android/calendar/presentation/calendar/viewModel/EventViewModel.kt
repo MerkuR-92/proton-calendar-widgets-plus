@@ -101,6 +101,7 @@ import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
@@ -149,6 +150,7 @@ import kotlin.collections.toTypedArray
 class EventViewModel @Inject constructor(
     application: Application,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val calendarsRepository: CalendarsRepository,
     private val userSettingsRepository: UserSettingsRepository,
     private val transformEventUseCase: TransformEventUseCase,
@@ -408,24 +410,13 @@ class EventViewModel @Inject constructor(
      * @returns Default calendar (and load calendar settings to be stored in calendarSettings) or InitResult error.
      */
     private suspend fun initializeDefaultCalendar(): InitResult {
-        // Try to get default calendar if it exists
-        var defaultCalendar = calendarsRepository.getDefaultCalendarId(userId.id)?.let { defaultCalendarId ->
-            calendarsRepository.selectCalendar(defaultCalendarId)
-        }
-        var defaultCalendarId = defaultCalendar?.id
-
-        if (defaultCalendarId == null || defaultCalendar?.isActive != true || !defaultCalendar.allowEditEvents) {
-            // Fallback if no default calendar was set
-            val activeUserCalendars = calendarsRepository.selectActiveUserCalendars(userId.id)
-            defaultCalendar =
-                activeUserCalendars.firstOrNull { it.isOwner} // First try to get a personal active calendar
-                    ?: activeUserCalendars.firstOrNull { it.allowEditEvents } // Fallback to any active writable calendar
-                            ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
-            defaultCalendarId = defaultCalendar.id
-        }
+        // Get default calendar
+        val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let {
+            calendarsRepository.selectCalendar(it)
+        } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
 
         // Load settings for given calendar id and stores them in calendarSettings
-        if (!loadSettingsForCalendar(defaultCalendarId)) return InitResult.Error.Default("EventViewModel: could not get CalendarSettings")
+        if (!loadSettingsForCalendar(defaultCalendar.id)) return InitResult.Error.Default("EventViewModel: could not get CalendarSettings")
 
         return InitResult.InitDefaultCalendarSuccess(defaultCalendar)
     }
@@ -523,8 +514,12 @@ class EventViewModel @Inject constructor(
                 defaultCalendar.id,
                 defaultCalendar.name,
                 defaultCalendar.email,
+                defaultCalendar.ownerEmail,
                 defaultCalendar.description,
                 defaultCalendar.color,
+                defaultCalendar.priority,
+                defaultCalendar.addressId,
+                defaultCalendar.memberId,
                 defaultCalendar.flags,
                 defaultCalendar.display,
                 defaultCalendar.type,
@@ -829,8 +824,12 @@ class EventViewModel @Inject constructor(
                     calendar.id,
                     calendar.name,
                     calendar.email,
+                    calendar.ownerEmail,
                     calendar.description,
                     calendar.color,
+                    calendar.priority,
+                    calendar.addressId,
+                    calendar.memberId,
                     calendar.flags,
                     calendar.display,
                     calendar.type,
@@ -2005,7 +2004,7 @@ class EventViewModel @Inject constructor(
             return
         }
 
-        val userAddresses = userManager.getAddressesOrNull(userId)
+        val userAddresses = userAddressManager.getAddressesOrNull(userId)
         if (userAddresses == null) {
             logger.e("EventViewModel onDeleteClick, userAddresses == null")
             return
@@ -2681,7 +2680,7 @@ class EventViewModel @Inject constructor(
 
         if (eventDetailsState.value is EventState.Processing || attendeeAnswerState.value?.second == true) return
 
-        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
+        val userEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
             address.email
         }
 
@@ -2867,7 +2866,7 @@ class EventViewModel @Inject constructor(
     ) {
         val status = participationStatus.toInt()
 
-        val userEmails = userManager.getAddressesOrNull(userId)?.map { address ->
+        val userEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
             address.email
         }
 

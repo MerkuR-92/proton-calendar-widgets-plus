@@ -37,7 +37,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -68,7 +68,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -99,7 +99,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -130,7 +130,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -161,7 +161,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -192,7 +192,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -223,7 +223,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -255,7 +255,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -286,7 +286,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!
@@ -317,7 +317,7 @@ internal class EventUtilsTest {
         val timeZoneId = "Europe/Zurich"
         val event = Event.from(
             "id",
-            Calendar("id", "name", "email", "description", DEFAULT_CALENDAR_COLOR.toHexColor(), 1, true, 0, 127, 30, emptyList(), emptyList()),
+            Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()),
             ICalUtilsImpl.parseICalString(iCalString)!!,
             0
         )!!

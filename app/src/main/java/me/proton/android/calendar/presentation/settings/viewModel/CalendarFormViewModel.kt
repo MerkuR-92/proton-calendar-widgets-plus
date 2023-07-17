@@ -42,6 +42,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import javax.inject.Inject
 
@@ -55,6 +56,7 @@ class CalendarFormViewModel @Inject constructor(
     private val updateCalendarSettingsUseCase: UpdateCalendarSettingsUseCase,
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
     private val createCalendarUseCase: CreateCalendarUseCase,
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase
@@ -232,7 +234,7 @@ class CalendarFormViewModel @Inject constructor(
 
         // Save user emails for calendar email picker dialog
         // TODO empty Addresses should not happen but it's better than crashing
-        val userAddresses = userManager.getAddressesOrNull(userId) ?: emptyList()
+        val userAddresses = userAddressManager.getAddressesOrNull(userId) ?: emptyList()
         userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email

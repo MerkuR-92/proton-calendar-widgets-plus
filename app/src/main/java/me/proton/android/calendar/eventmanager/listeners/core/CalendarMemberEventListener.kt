@@ -14,7 +14,8 @@ import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.UserAddressManager
+import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.deserializeOrNull
 import javax.inject.Inject
 
@@ -23,7 +24,7 @@ class CalendarMemberEventListener @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val logger: Logger,
     private val keySetupUseCase: KeySetupUseCase,
-    private val userManager: UserManager
+    private val userAddressManager: UserAddressManager
 ): CalendarBaseEventListener<String, MemberEntity>(db) {
     override val order: Int = 2
     override val type: Type = Type.Core
@@ -104,13 +105,17 @@ class CalendarMemberEventListener @Inject constructor(
         super.onDelete(config, keys)
 
         // Get user addresses emails to compare with members email
-        val addresses = userManager.getAddressesOrNull(config.userId)
+        var addresses: List<UserAddress>? = null
         keys.forEach {
             val member = calendarsRepository.selectMemberById(it)
             // We first delete Member
             calendarsRepository.deleteMemberById(it)
             member?.let {
-                val memberAddress = calendarsRepository.getAddressForMember(config.userId, member, addresses)
+                if (member.addressId.isNullOrEmpty() && addresses.isNullOrEmpty()) {
+                    // Only get addresses from DB if we need them because of missing addressId field
+                    addresses = userAddressManager.getAddressesOrNull(config.userId)
+                }
+                val memberAddress = calendarsRepository.getAddressForMember(config.userId, member.addressId, member.id, member.canonicalEmail, addresses)
                 if (memberAddress != null) {
                     // If member belongs to user, delete the calendar linked to it
                     calendarsRepository.deleteCalendarById(member.calendarId)

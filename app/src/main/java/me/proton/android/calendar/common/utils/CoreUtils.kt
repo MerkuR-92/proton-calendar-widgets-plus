@@ -4,11 +4,11 @@ import me.proton.android.calendar.common.ApiResponseCode
 import me.proton.android.calendar.common.HttpResponseCode
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.core.domain.entity.UserId
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.equalsNoCase
 import okhttp3.internal.toHexString
 
 fun ApiResponse.Error.isTimeout(): Boolean {
@@ -25,9 +25,16 @@ fun ApiResponse.Error.isNotFound(): Boolean {
             (this.httpCode == HttpResponseCode.UNPROCESSABLE_ENTITY && this.errorCode == ApiResponseCode.DOES_NOT_EXIST)
 }
 
-suspend fun UserManager.getAddressesOrNull(userId: UserId, refresh: Boolean = false): List<UserAddress>? {
+suspend fun UserAddressManager.getAddressesOrNull(userId: UserId, refresh: Boolean = false): List<UserAddress>? {
     return kotlin.runCatching { getAddresses(userId, refresh) }.getOrElse {
         TimberLogger.i("UserManager.getAddressesOrNull error", it)
+        null
+    }
+}
+
+suspend fun UserAddressManager.getAddressOrNull(userId: UserId, addressId: String, refresh: Boolean = false): UserAddress? {
+    return kotlin.runCatching { getAddress(userId, AddressId(addressId), refresh) }.getOrElse {
+        TimberLogger.i("UserManager.getAddressOrNull error", it)
         null
     }
 }

@@ -21,7 +21,6 @@ import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -31,7 +30,7 @@ import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.publicKeyRing
 import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
-import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
@@ -41,7 +40,7 @@ import javax.inject.Inject
 class TransformEventUseCase @Inject constructor(
     private val json: Json,
     private val database: AppDatabase,
-    private val userManager: UserManager,
+    private val userAddressManager: UserAddressManager,
     private val logger: Logger,
     private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
@@ -77,7 +76,7 @@ class TransformEventUseCase @Inject constructor(
             return null
         }
 
-        val userAddresses = userManager.getAddressesOrNull(UserId(userId))
+        val userAddresses = userAddressManager.getAddressesOrNull(UserId(userId))
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
             return null
@@ -238,8 +237,12 @@ class TransformEventUseCase @Inject constructor(
                 calendarEntity.id,
                 calendar.name,
                 calendar.email,
+                calendar.ownerEmail,
                 calendar.description,
                 calendar.color,
+                calendar.priority,
+                calendar.addressId,
+                calendar.memberId,
                 calendar.flags,
                 calendar.display,
                 calendarEntity.type,
