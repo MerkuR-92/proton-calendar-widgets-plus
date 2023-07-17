@@ -466,14 +466,14 @@ class ItemMiniCalendarFragment : Fragment() {
             if (selectedDate.month == firstDayOfTheMonth.month) {
                 // Only display selected date style for month currently displayed
                 val miniCalendarItemView = binding.glMiniCalendar.getChildAt(newSelectedMiniCalendarItem)
-                val miniCalendarText = miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)
+                val miniCalendarText = miniCalendarItemView?.findViewById<TextView>(R.id.itemMiniCalendarText)
                 miniCalendarItemView?.let {
                     // Apply selected date item style
-                    miniCalendarText.setTextAppearance(
+                    miniCalendarText?.setTextAppearance(
                         miniCalendarItemView.context,
                         R.style.Text_DefaultSmall_Strong_Inverted
                     )
-                    miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    miniCalendarText?.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
                 }
             }
         }
