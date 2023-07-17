@@ -766,7 +766,9 @@ class EventViewModel @Inject constructor(
     /**
      * Checks if end date/time is not before start date/time
      */
-    fun validateDateTime(): Boolean = !(event.getEnd(eventTimeZoneId).isBefore(event.getStart(eventTimeZoneId)))
+    fun validateDateTime(): Boolean = if (this::event.isInitialized) {
+        !(event.getEnd(eventTimeZoneId).isBefore(event.getStart(eventTimeZoneId)))
+    } else false
 
     // alarm temp values
     private var tempAlarmSendByOption: SendByOption = SendByOption.NOTIFICATION
