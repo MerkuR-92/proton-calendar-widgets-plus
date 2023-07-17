@@ -177,7 +177,7 @@
     <string name="event_text_description">Kuvaus</string>
     <string name="event_hint_description">Lisää kuvaus</string>
     <string name="event_text_custom">mukautettu</string>
-    <string name="event_alert_invalid_start_end_date">Tapahtuman aloitusaika ei voi olla päätösaikaa myöhemmin</string>
+    <string name="event_alert_invalid_start_end_date">Tapahtuman aloituspäivä ei voi olla päättymispäivän jälkeen</string>
     <string name="event_alarms_title">Ilmoitukset</string>
     <string name="event_custom_alarms_field">Ilmoita</string>
     <string name="event_custom_alarms_title">Mukautetut ilmoitukset</string>
@@ -195,11 +195,11 @@
     <string name="event_alarm_action_notification">ilmoitus</string>
     <string name="event_alarm_action_email">sähköposti</string>
     <string name="event_alarm_same_day">tapahtumapäivänä</string>
-    <string name="event_recurrence_1">ei toistu</string>
-    <string name="event_recurrence_2">päivittäin</string>
-    <string name="event_recurrence_3">viikottain</string>
-    <string name="event_recurrence_4">kuukausittain</string>
-    <string name="event_recurrence_5">joka vuosi</string>
+    <string name="event_recurrence_1">Ei toistu</string>
+    <string name="event_recurrence_2">Joka päivä</string>
+    <string name="event_recurrence_3">Joka viikko</string>
+    <string name="event_recurrence_4">Joka kuukausi</string>
+    <string name="event_recurrence_5">Joka vuosi</string>
     <string name="event_recurrence_title">Toistuvuus</string>
     <string name="event_recurrence_custom_title">Mukautettu toistuvuus</string>
     <string name="event_recurrence_occurs_every">Toistuu joka</string>
@@ -207,10 +207,10 @@
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d. päivä</string>
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
     <string name="event_recurrence_ends_on">Päättyy</string>
-    <string name="event_recurrence_ends_never">ei koskaan</string>
-    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">päivänä</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">, %1$s</string>
-    <string name="event_recurrence_ends_after_count_prefix">jälkeen</string>
+    <string name="event_recurrence_ends_never">Ei koskaan</string>
+    <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">Tiettynä päivänä</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
+    <string name="event_recurrence_ends_after_count_prefix"/>
     <string name="event_recurring_edit_this">Tämä tapahtuma</string>
     <string name="event_recurring_edit_this_and_future">Ketjun tämä ja tulevat tapahtumat</string>
     <string name="event_recurring_edit_all_events">Kaikki tapahtumat</string>
@@ -401,7 +401,7 @@
     <string name="settings_update_timezone_title">Pyydä aikavyöhykeasetuksen päivitystä</string>
     <string name="settings_update_timezone_subtitle">Jos järjestelmän aikavyöhyke ei vastaa nykyistä aikavyöhykeasetustasi, sinua pyydetään päivittämään se.</string>
     <string name="settings_update_timezone_checkbox">Älä kysy uudelleen</string>
-    <string name="settings_week_start_title">Viikon aloitus</string>
+    <string name="settings_week_start_title">Viikon aloituspäivä</string>
     <string name="settings_time_format_title">Kellonajan muoto</string>
     <string name="settings_week_numbers_title">Näytä viikkonumerot</string>
     <string name="settings_auto_invites_title">Lisää kutsut kalenteriin ja merkitse ne odottaviksi</string>
@@ -483,7 +483,7 @@
     <string name="holiday_calendar_title">Arkipyhäkalenteri</string>
     <string name="add_holiday_calendar_country_search_hint">Etsi maata</string>
     <string name="holiday_calendar_form_picker_title">Maa</string>
-    <string name="holiday_calendar_time_zone_based">Aikavyöhykkeesi perusteella</string>
+    <string name="holiday_calendar_time_zone_based">Perustuu aikavyöhykkeeseesi</string>
     <string name="holiday_calendar_already_exists">Arkipyhäkalenteri on jo olemassa</string>
     <string name="holiday_calendar_value_placeholder">Valitse maa</string>
     <!-- Bootstrap errors -->
@@ -666,23 +666,23 @@
         <item quantity="other">tuntia</item>
     </plurals>
     <plurals name="plural_day">
-        <item quantity="one">päivä</item>
-        <item quantity="other">päivää</item>
+        <item quantity="one">päivän</item>
+        <item quantity="other">päivän</item>
     </plurals>
     <plurals name="plural_week">
-        <item quantity="one">viikko</item>
-        <item quantity="other">viikko</item>
+        <item quantity="one">viikon</item>
+        <item quantity="other">viikon</item>
     </plurals>
     <plurals name="plural_month">
-        <item quantity="one">kuukausi</item>
-        <item quantity="other">kuukautta</item>
+        <item quantity="one">kuukauden</item>
+        <item quantity="other">kuukauden</item>
     </plurals>
     <plurals name="plural_year">
-        <item quantity="one">vuosi</item>
-        <item quantity="other">vuosi</item>
+        <item quantity="one">vuoden</item>
+        <item quantity="other">vuoden</item>
     </plurals>
     <plurals name="plural_recurrence_count">
-        <item quantity="one">kerran</item>
+        <item quantity="one">1 kerran</item>
         <item quantity="other">kertaa</item>
     </plurals>
     <plurals name="plural_occurrence">
@@ -694,20 +694,20 @@
         <item quantity="other">osallistujaa</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Joka %1$d %2$s</item>
-        <item quantity="other">Joka %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s välein</item>
+        <item quantity="other">%1$d %2$s välein</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Joka %1$d %2$s</item>
-        <item quantity="other">Joka %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s välein</item>
+        <item quantity="other">%1$d %2$s välein</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Joka %1$d %2$s</item>
-        <item quantity="other">Joka %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s välein</item>
+        <item quantity="other">%1$d %2$s välein</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Joka %1$d %2$s</item>
-        <item quantity="other">Joka %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s välein</item>
+        <item quantity="other">%1$d %2$s välein</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%1$s minuutti</item>
@@ -724,19 +724,19 @@
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
         <item translatable="false"/>
-        <item>ensimmäisenä</item>
-        <item>toisena</item>
-        <item>kolmantena</item>
-        <item>neljäntenä</item>
-        <item>viidentenä</item>
+        <item>ensimmäinen</item>
+        <item>toinen</item>
+        <item>kolmas</item>
+        <item>neljäs</item>
+        <item>viides</item>
     </string-array>
     <string-array name="ordinals_as_words_backwards">
         <item translatable="false"/>
-        <item>viimeisenä</item>
-        <item>toiseksi viimeisenä</item>
-        <item>kolmanneksi viimeisenä</item>
-        <item>neljänneksi viimeisenä</item>
-        <item>viidenneksi viimeisenä</item>
+        <item>viimeinen</item>
+        <item>toiseksi viimeinen</item>
+        <item>kolmanneksi viimeinen</item>
+        <item>neljänneksi viimeinen</item>
+        <item>viidenneksi viimeinen</item>
     </string-array>
     <string-array name="app_themes">
         <item>Vaalea</item>

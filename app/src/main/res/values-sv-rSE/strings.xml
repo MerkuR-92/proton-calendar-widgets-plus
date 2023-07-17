@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Visa veckonummer</string>
     <string name="settings_auto_invites_title">Lägg till inbjudningar i kalendern och markera som väntande</string>
     <string name="settings_search_title">Sök kalendrar</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">Laddar ner och lagrar kalenderinnehåll på din enhet för sökning. Om du stänger av detta tas nedladdat innehåll bort.\n\nSökning är en experimentell betafunktion. Att aktivera det kan göra appen instabil.</string>
     <string name="settings_alternative_routing_title">Tillåt alternativ routing</string>
     <string name="settings_alternative_routing_subtitle">Om Proton-webbplatser blockeras tillåter denna inställning appen att prova alternativ nätverksrouting för att nå Proton, vilket kan vara användbart för att kringgå brandväggar eller nätverksproblem. Vi rekommenderar att du behåller denna inställning på för större tillförlitlighet.</string>
     <string name="settings_value_placeholder">Tryck för att välja</string>
