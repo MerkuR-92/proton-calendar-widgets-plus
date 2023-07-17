@@ -759,11 +759,11 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 }
             }
 
-            if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
-                // For week view we need to use set date as first day of the week so that we stick to user week start choice
-                lifecycleScope.launch {
-                    weekStart?.let { weekStart ->
-                        whenStarted { // TODO ViewBinding NPE
+            whenStarted { // TODO ViewBinding NPE
+                if (calendarViewModel.viewMode.value == ViewMode.WEEK) {
+                    // For week view we need to use set date as first day of the week so that we stick to user week start choice
+                    lifecycleScope.launch {
+                        weekStart?.let { weekStart ->
                             selectedDate.firstDayOfWeek(weekStart)?.let {
                                 if (selectedTime != null && animate) binding.weekView.scrollToDateTime(it.atTime(selectedTime))
                                 else if (selectedTime != null) binding.weekView.setDateTime(it.atTime(selectedTime))
@@ -772,14 +772,16 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                             }
                         }
                     }
+                } else if (binding.weekView.firstVisibleDateAsLocalDate != selectedDate) {
+                    if (selectedTime != null && animate) binding.weekView.scrollToDateTime(LocalDateTime.of(selectedDate, selectedTime))
+                    else if (selectedTime != null) binding.weekView.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
+                    else if (animate) binding.weekView.scrollToDate(selectedDate)
+                    else binding.weekView.setDate(selectedDate)
+                } else if (selectedTime != null) {
+                    binding.weekView.scrollToTime(selectedTime)
+                } else {
+                    // TODO Remove empty else when removing encapsulating whenStarted
                 }
-            } else if (binding.weekView.firstVisibleDateAsLocalDate != selectedDate) {
-                if (selectedTime != null && animate) binding.weekView.scrollToDateTime(LocalDateTime.of(selectedDate, selectedTime))
-                else if (selectedTime != null) binding.weekView.setDateTime(LocalDateTime.of(selectedDate, selectedTime))
-                else if (animate) binding.weekView.scrollToDate(selectedDate)
-                else binding.weekView.setDate(selectedDate)
-            } else if (selectedTime != null) {
-                binding.weekView.scrollToTime(selectedTime)
             }
 
             weekStart?.let {
