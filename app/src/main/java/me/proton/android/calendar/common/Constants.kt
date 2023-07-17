@@ -103,7 +103,7 @@ const val WEEK_VIEW_VERSION_CODE = 164
 const val IMPORT_VERSION_CODE = 186
 const val CALENDAR_PROVIDER_VERSION_CODE = 191
 const val SEARCH_VERSION_CODE = 1 // TODO disable search spotlight
-const val HOLIDAY_CALENDAR_VERSION_CODE = 216
+const val HOLIDAY_CALENDAR_VERSION_CODE = 217
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
