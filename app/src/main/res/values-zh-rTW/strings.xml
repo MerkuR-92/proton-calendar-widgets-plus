@@ -545,8 +545,8 @@
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
     <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>
     <string name="spotlight_dialog_calendar_provider_description">• 從其他應用程式直接在 Proton 行事曆新增活動\n\n• 建立並管理行事曆上共享的活動\n\n• 設定開啟此應用程式想要的預設畫面\n\n• 新增 13 種語言.</string>
-    <string name="spotlight_dialog_wipe_search_title">移除搜索功能以提升服務品質</string>
-    <string name="spotlight_dialog_wipe_search_description">為了提升 Proton Calendar 體驗版的服務與可靠性，我們將移除實驗性的搜索功能。這可能需要幾秒鐘。</string>
+    <string name="spotlight_dialog_wipe_search_title">已移除試驗性搜索功能以提升服務品質</string>
+    <string name="spotlight_dialog_wipe_search_description">為了提升 Proton Calendar 體驗版的服務與可靠性，我們正在移除試驗性的搜索功能。這可能需要幾秒鐘。</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>

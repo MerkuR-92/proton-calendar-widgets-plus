@@ -545,8 +545,8 @@
     <string name="spotlight_dialog_import_description">• Importa eventi nel tuo calendario dai file sul tuo telefono.\n\n• Aggiungi prenotazioni di viaggi direttamente da Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funzionalità del calendario</string>
     <string name="spotlight_dialog_calendar_provider_description">• Aggiungi eventi direttamente in Proton Calendar da altre app.\n\n• Crea e gestisci eventi in calendari che sono stati condivisi con te.\n\n• Imposta la visualizzazione predefinita che vuoi vedere all\'apertura dell\'app.\n\n• 13 nuove lingue disponibili.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_title">Ricerca rimossa per renderla migliore</string>
+    <string name="spotlight_dialog_wipe_search_description">Stiamo rimuovendo la funzionalità di ricerca sperimentale da Proton Calendar Beta, questo lo renderà più utile e affidabile. Questa operazione potrebbe richiedere alcuni secondi.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
