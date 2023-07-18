@@ -577,18 +577,20 @@ object ICalUtilsImpl : ICalUtils {
 
         return occurrences.mapNotNull { occurrence ->
 
-            if (occurrence.startDateTime in exZonedDateTimes || !startEndOverlapsWithFullDayRange(occurrence.startDateTime, occurrence.endDateTime, fromDate, toDate, timeZoneId)) {
-                // occurrence is exdated or is outside of the window
+            val event = // single edit or original event
+                eventsSharingUid.find {
+                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
+                        occurrence.startDateTime,
+                        originalEvent.isAllDay()
+                    )
+                } ?: originalEvent
+
+            if (!event.isSingleEdit() && (occurrence.startDateTime in exZonedDateTimes || !startEndOverlapsWithFullDayRange(occurrence.startDateTime, occurrence.endDateTime, fromDate, toDate, timeZoneId))) {
+                // occurrence is exdated
+                null
+            } else if (event.isSingleEdit() && !startEndOverlapsWithFullDayRange(event.getStart(timeZoneId), event.getEnd(timeZoneId), fromDate, toDate, timeZoneId)) {
                 null
             } else {
-                val event = // single edit or original event
-                    eventsSharingUid.find {
-                        it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
-                            occurrence.startDateTime,
-                            originalEvent.isAllDay()
-                        )
-                    } ?: originalEvent
-
                 UiEvent(
                     event.id,
                     event.calendar.id,
