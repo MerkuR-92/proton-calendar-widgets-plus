@@ -457,24 +457,36 @@ class EventViewModel @Inject constructor(
         val newVEvent = newICalendar.events.first()
 
         // If there is no requested start date, we take today
-        val startDate =
+        var startDate =
             if (initStartDate != null) LocalDate.parse(initStartDate)
             else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
 
         // If there is no requested start time, we calculate it according to "now"
         val startTime =
             if (initStartTime != null) LocalTime.parse(initStartTime)
-            else ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
-                .truncatedTo(ChronoUnit.HOURS)
-                .toLocalTime()
+            else {
+                val newStartDate = ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
+                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong()).toLocalDate()
+                if (newStartDate != startDate) {
+                    startDate = newStartDate
+                }
+                ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
+                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
+                    .truncatedTo(ChronoUnit.HOURS)
+                    .toLocalTime()
+            }
 
-        val endDate =
+        var endDate =
             if (initEndDate != null) LocalDate.parse(initEndDate)
             else startDate
         val endTime =
             if (initEndTime != null) LocalTime.parse(initEndTime)
-            else startTime.plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
+            else {
+                if (startTime.toSecondOfDay() + this.calendarSettings.defaultEventDuration.times(60) > LocalTime.MAX.toSecondOfDay()) {
+                    endDate = endDate.plusDays(1)
+                }
+                startTime.plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
+            }
 
         timeStartBackup = startTime
         timeEndBackup = endTime // this time can be before timeStartBackup at this point
@@ -602,7 +614,7 @@ class EventViewModel @Inject constructor(
                 if (editMode) {
                     // Setup event time backup values
                     if (this.isAllDay()) {
-                        val startTime = ICalUtilsImpl.generateEventStartTime(ZoneId.of(eventTimeZoneId))
+                        val startTime = ICalUtilsImpl.generateEventStart(ZoneId.of(eventTimeZoneId)).toLocalTime()
                         timeStartBackup = startTime
                         timeEndBackup =
                             startTime.plusMinutes(this@EventViewModel.calendarSettings.defaultEventDuration.toLong())

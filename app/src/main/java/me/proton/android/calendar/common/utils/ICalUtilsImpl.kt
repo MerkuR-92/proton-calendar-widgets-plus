@@ -50,6 +50,7 @@ import java.security.MessageDigest
 import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 object ICalUtilsImpl : ICalUtils {
@@ -425,9 +426,11 @@ object ICalUtilsImpl : ICalUtils {
         setSequence(0)
     }
 
-    override fun generateEventStartTime(timeZoneId: ZoneId): LocalTime {
-        val time = ZonedDateTime.now(timeZoneId)
-        return time.plusMinutes(30L - (time.minute % 30)).toLocalTime()
+    override fun generateEventStart(timeZoneId: ZoneId): LocalDateTime {
+        val now = ZonedDateTime.now(timeZoneId)
+        return if (now.toLocalTime().toSecondOfDay() > TimeUnit.HOURS.toSeconds(23) + TimeUnit.MINUTES.toSeconds(30)) {
+            now.plusDays(1).toLocalDate().atStartOfDay()
+        } else now.plusMinutes(30L - (now.minute % 30)).toLocalDateTime()
     }
 
     /**
