@@ -493,36 +493,31 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
 
             // Handle selected day change in miniCalendarPager (mini calendar / month views)
-            if (isResumed && binding.miniCalendarPager.adapter != null) { // TODO ViewBinding NPE
+            if (binding?.miniCalendarPager?.adapter != null) {
                 val monthStartingDate = calendarViewModel.initialToday.withDayOfMonth(1)
                 val offset = ChronoUnit.MONTHS.between(monthStartingDate, selectedDate.withDayOfMonth(1)).toInt()
                 val miniCalendarIndex = monthStartingPosition + offset
-                if (binding.miniCalendarPager.currentItem != miniCalendarIndex) {
+                if (binding?.miniCalendarPager?.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
-                    binding.miniCalendarPager.post {
-                        if (isResumed) { // TODO ViewBinding NPE
-                            val currentItem = binding.miniCalendarPager.currentItem
-                            binding.miniCalendarPager.setCurrentItem(
-                                miniCalendarIndex,
-                                if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
-                            )
-                        }
-
+                    binding?.miniCalendarPager?.post {
+                        val currentItem = binding?.miniCalendarPager?.currentItem
+                        binding?.miniCalendarPager?.setCurrentItem(
+                            miniCalendarIndex,
+                            if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
+                        )
                     }
                 }
             }
 
             // Handle selected day change in agendaPager (agenda / day views)
-            if (isResumed && binding.agendaPager.adapter != null) { // TODO ViewBinding NPE
+            if (binding?.agendaPager?.adapter != null) {
                 val startingDate = agendaPagerAdapter.startingDate
                 val startingPosition = agendaPagerAdapter.startingPosition
                 val selectedDayOffset = ChronoUnit.DAYS.between(startingDate, selectedDate).toInt()
                 val agendaIndex = startingPosition + selectedDayOffset
-                if (binding.agendaPager.currentItem != agendaIndex) {
-                    binding.agendaPager.post {
-                        if (isResumed) { // TODO ViewBinding NPE
-                            binding.agendaPager.setCurrentItem(agendaIndex, false)
-                        }
+                if (binding?.agendaPager?.currentItem != agendaIndex) {
+                    binding?.agendaPager?.post {
+                        binding?.agendaPager?.setCurrentItem(agendaIndex, false)
                     }
                 }
             }
