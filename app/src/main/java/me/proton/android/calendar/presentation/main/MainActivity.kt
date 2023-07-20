@@ -506,6 +506,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
                         val spotlightShown = showLastSpotlightDialog(
                             featureFlagViewModel.isHolidayCalendarEnabled(),
+                            calendarViewModel.hasHolidayCalendar(),
                             isCalendarLimitReached
                         ) {
                             when (it) {

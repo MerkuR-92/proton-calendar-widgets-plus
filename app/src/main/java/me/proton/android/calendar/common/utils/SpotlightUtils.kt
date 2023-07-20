@@ -105,6 +105,7 @@ object SpotlightUtils {
 
     fun Activity.showLastSpotlightDialog(
         isHolidayCalendarEnabled: Boolean,
+        hasHolidayCalendar: Boolean,
         calendarLimitReached: Boolean,
         positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null
     ): Boolean {
@@ -203,6 +204,10 @@ object SpotlightUtils {
             }
             HOLIDAY_CALENDAR_VERSION_CODE -> {
                 if (!isHolidayCalendarEnabled) return false
+                if (hasHolidayCalendar) {
+                    setLastSpotlightShown(BuildConfig.VERSION_CODE)
+                    return false
+                }
                 // Holiday calendar
                 val content = getHolidayCalendarDialogContent(calendarLimitReached)
                 this.displaySpotlightDialog(
