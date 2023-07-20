@@ -209,8 +209,12 @@ object ProtonUtilsImpl : ProtonUtils {
                     } ?: emptyList()
                 // If we don't have a country tag or didn't find a match, use the Locale language tag.
                 calendarsMatchingCountryCode.ifEmpty {
-                    calendarsMatchingTimeZone.filter {
-                        it.languageCode.equalsNoCase(defaultLanguageCode)
+                    val calendarsMatchingLanguageCode =
+                        calendarsMatchingTimeZone.filter {
+                            it.languageCode.equalsNoCase(defaultLanguageCode)
+                        }
+                    calendarsMatchingLanguageCode.ifEmpty {
+                        calendarsMatchingTimeZone
                     }
                 }
             } else calendarsMatchingTimeZone
@@ -218,7 +222,7 @@ object ProtonUtilsImpl : ProtonUtils {
         // Get the calendar matching the default language
         val matchingDefaultHolidayCalendar = calendarsMatchingCode.firstOrNull {
             it.languageCode.equals(defaultLanguageCode, ignoreCase = true)
-        } ?: calendarsMatchingCode.firstOrNull()
+        } ?: calendarsMatchingCode.minByOrNull { it.language }
 
         return matchingDefaultHolidayCalendar
     }
