@@ -49,15 +49,6 @@ class ProtonCalendarApplication : Application() {
             Timber.plant(SentryTree())
         }
 
-        // hack for android.database.sqlite.SQLiteBlobTooBigException: Row too big to fit into CursorWindow
-        try {
-            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
-            field.isAccessible = true
-            field.set(null, 5 * 1024 * 1024) // 5 MB
-        } catch (e: Exception) {
-            logger.e("exception setting cursor window size", e)
-        }
-
         ShowNotificationUseCase.createNotificationChannels(this)
 
         forceUpdateViewModel.forceUpdate.observe(ProcessLifecycleOwner.get()) {

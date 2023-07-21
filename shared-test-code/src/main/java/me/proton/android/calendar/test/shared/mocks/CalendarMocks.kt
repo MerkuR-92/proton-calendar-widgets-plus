@@ -5,11 +5,9 @@ import biweekly.property.Trigger
 import biweekly.util.Duration
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.data.entity.*
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Notification
-import me.proton.core.util.kotlin.serializeToJson
 import me.proton.core.util.kotlin.toBoolean
 
 object CalendarMocks {
