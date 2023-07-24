@@ -340,7 +340,7 @@
     <string name="snack_ics_missing_uid_error">Tapahtumalta puuttuu UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Tähän tiliin liitettyä aktiivista henkilökohtaista kalenteria ei ole</string>
     <string name="snack_ics_no_active_calendar_error">Tähän tiliin liitettyä aktiivista kalenteria ei ole</string>
-    <string name="snack_ics_unsupported_duration_error">Duration (kesto) -tietuetta ei tueta</string>
+    <string name="snack_ics_unsupported_duration_error">Kestoa ei tunnisteta</string>
     <string name="snack_ics_too_many_events_error">Useita tapahtumia ei vielä tueta</string>
     <string name="snack_ics_no_events_error">Kalenteri ei sisällä tapahtumia</string>
     <string name="snack_ics_invalid_error">Kutsu on virheellinen</string>
@@ -362,7 +362,7 @@
     <string name="update_timezone_dialog_message">Järjestelmäsi aikavyöhykkeeksi näyttää vaihtuneen %1$s. Haluatko päivittää aikavyöhykeasetuksesi?</string>
     <string name="update_timezone_dialog_confirmation">Päivitä</string>
     <string name="update_timezone_dialog_cancel">Peru</string>
-    <string name="contacts_permission_dialog_title">Sallitaanko Proton Calendarin käyttää yhteystietoja?</string>
+    <string name="contacts_permission_dialog_title">Sallitaanko yhteystietojen käyttö?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar tarvitsee laitteesi yhteystietojen käyttöoikeuden helpottaakseen niiden lisäämistä tapahtumiin.</string>
     <string name="contacts_permission_dialog_allow">Kyllä</string>
     <string name="contacts_permission_dialog_open_settings">Avaa Asetukset</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalenterin salausta ei voitu purkaa</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Vain tarkastelu</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Luo kalenteri</string>
     <string name="calendar_form_update_title">Muokkaa kalenteria</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Mitä uutta</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Ohita</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Kuukausinäkymä</string>
     <string name="spotlight_dialog_month_view_description">Näe yleiskatsaus tapahtumistasi uudesta kuukausinäkymästä. Vaihda näkymää valikosta.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Lisää tapahtumia muista sovelluksista suoraan Proton Calendariin.\n\n• Luo ja hallinnoi sinulle jaettujen kalenterien tapahtumia.\n\n• Aseta oletusnäkymä, jonka haluat nähdä avatessasi sovelluksen.\n\n• 13 uutta kieltä.</string>
     <string name="spotlight_dialog_wipe_search_title">Haku on poistettu sen parantamiseksi</string>
     <string name="spotlight_dialog_wipe_search_description">Poistamme kokeellisen hakutoiminnon Proton Calendar Betasta, koska haluamme tehdä siitä sinulle hyödyllisemmän ja luotettavamman. Tämä saattaa kestää muutaman sekunnin.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Juhlapäivät ovat täällä!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Myönnä käyttöoikeus</string>
     <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Google Kalenteriin ja myönnä Protonille tietojesi käyttöoikeus.</string>

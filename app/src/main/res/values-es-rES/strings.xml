@@ -6,11 +6,11 @@
     <string name="default_user_display_name">(sin nombre)</string>
     <string name="toast_copied_to_clipboard">Copiado al portapapeles</string>
     <!-- DELETE EVENT DIALOG -->
-    <string name="dialog_title_delete_event">Eliminar evento</string>
-    <string name="dialog_title_delete_recurring_event">Eliminar evento recurrente</string>
+    <string name="dialog_title_delete_event">Eliminar el evento</string>
+    <string name="dialog_title_delete_recurring_event">Eliminar el evento recurrente</string>
     <string name="dialog_description_delete_event">¿Quieres eliminar este evento?</string>
     <string name="dialog_description_delete_recurring_event">¿Quieres eliminar todos los eventos de la serie?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event">Este evento ha sido actualizado por el organizador. ¿Quieres eliminar este evento?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event">El organizador ha actualizado este evento. ¿Deseas eliminarlo?</string>
     <string name="dialog_button_delete">Eliminar</string>
     <string name="dialog_button_cancel">Cancelar</string>
     <string name="dialog_button_continue">Continuar</string>
@@ -40,7 +40,7 @@
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
     <string name="action_remove">Eliminar</string>
-    <string name="action_leave">Abandonar</string>
+    <string name="action_leave">Salir</string>
     <string name="action_recreate">Limpiar</string>
     <string name="action_today">Hoy</string>
     <string name="action_create_event">Crear evento</string>
@@ -162,7 +162,7 @@
     <string name="search_settings_dialog_toggle_on_title">¿Descargar los calendarios a este dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Esto es necesario para que puedas realizar búsquedas.</string>
     <string name="search_onboarding_header">¿Quiere buscar en su calendario?</string>
-    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto tomará un momento y, mientras tanto, podrá seguir usando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto llevará un momento y, mientras tanto, podrá seguir utilizando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="search_onboarding_action_download_calendars">Descargar calendarios</string>
     <string name="search_onboarding_action_pause">Pausar</string>
     <string name="search_onboarding_action_resume">Reanudar</string>
@@ -354,7 +354,7 @@
     <string name="snack_app_link_import_error">Autenticación cancelada</string>
     <string name="snack_notification_already_added">La notificación ya ha sido añadida.</string>
     <string name="snack_opening_ics">Abriendo evento…</string>
-    <string name="snack_invite_in_shared_calendar_error">No se pueden crear invitaciones en un calendario compartido.</string>
+    <string name="snack_invite_in_shared_calendar_error">No se pueden crear invitaciones en un calendario compartido</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe.</string>
     <string name="error_occurrence_does_not_exist">La ocurrencia no existe.</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">No se ha podido descifrar el calendario.</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Solo lectura</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">de %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Crear calendario</string>
     <string name="calendar_form_update_title">Editar calendario</string>
@@ -443,7 +444,7 @@
     <string name="calendar_form_language">Idioma</string>
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones de eventos</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos de todo el día</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos diarios</string>
     <string name="calendar_form_add_notification">Añadir notificación</string>
     <string name="calendar_form_default_email">Dirección de correo electrónico</string>
     <string name="calendar_form_default_email_value_error">Error al cargar el correo electrónico por defecto</string>
@@ -524,9 +525,10 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Omitir</string>
     <string name="spotlight_dialog_confirmation_button">Aceptar</string>
     <string name="spotlight_dialog_month_view_title">Vista de mes</string>
-    <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas usando el menú.</string>
+    <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas utilizando el menú.</string>
     <string name="spotlight_dialog_easy_switch_description">Importar eventos y otros datos de Google Calendar a Proton Calendar es más fácil que nunca. Nuestro importador Easy Switch te guiará con cada paso.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Iniciar importación</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ahora no</string>
@@ -544,9 +546,12 @@
     <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importar eventos a tu calenario desde ficheros en tu teléfono.\n\n• Añadir reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Características del calendario</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que hayan sido compartidos con usted.\n\n• Defina la vista por defecto que quiera ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que se hayan compartido con usted.\n\n• Defina la vista por defecto que quiera ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">Búsqueda eliminada para mejorarla</string>
-    <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
+    <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y fiable. Esto puede llevar unos segundos.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Calendario de festivos</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nAñade los días festivos de cualquier país a tu calendario.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo actualmente estás al límite del calendario, para añadir un calendario de días festivos, necesitarás eliminar un calendario existente primero.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>
@@ -558,7 +563,7 @@
     <string name="import_assistant_error">Error al recuperar los datos</string>
     <string name="import_assistant_data_gathering_error">Error al recoger los datos</string>
     <string name="import_assistant_update_import_error">Error al actualizar la importación. Inténtalo de nuevo más tarde.</string>
-    <string name="import_assistant_update_import_wrong_account_error">Cuenta equivocada: inicia sesión con la cuenta que usas para la importación del calendario.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Cuenta equivocada: inicia sesión con la cuenta que utilizas para la importación del calendario.</string>
     <string name="import_assistant_start_import_error">Error al iniciar la importación. Inténtalo de nuevo más tarde.</string>
     <string name="import_assistant_delete_import_success">Se ha eliminado el registro de importación.</string>
     <string name="import_assistant_delete_import_error">Error al eliminar la importación. Inténtalo de nuevo más tarde.</string>
@@ -575,7 +580,7 @@
     <string name="import_assistant_merge_calendar_header">Combinar con uno existente</string>
     <string name="import_assistant_in_progress_title">Importación en progreso</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Importando datos de %1s a %2s.</string>
-    <string name="import_assistant_in_progress_redirect">Comprobar el progreso</string>
+    <string name="import_assistant_in_progress_redirect">Verificar el progreso</string>
     <string name="import_assistant_in_progress_sub_description">Las importaciones grandes pueden llevar varios días. Te informaremos cuando la importación haya terminado. Puedes cerrar esta ventana.</string>
     <string name="import_assistant_guide_subtitle">Pásate a la privacidad. Sin esfuerzo y de forma segura.</string>
     <string name="import_assistant_guide_description">Mueve tus eventos y otros datos de Google a Proton. El importador Easy Switch te guía paso a paso y cifra tus datos mientras los mueve.</string>

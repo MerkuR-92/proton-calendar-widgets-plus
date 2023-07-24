@@ -19,9 +19,9 @@
     <string name="dialog_button_download">İndir</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu etkinliği silmek ister misiniz?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz devre dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz devre dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">Bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilecek. Bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">Davet edilen adresten e-posta gönderemeyeceğiniz için bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
@@ -78,7 +78,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">%1$s (%2$s) zamanına kadar</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">İptal edildi</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Devre dışı)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Kullanımdan kaldırılmış)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d evet</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d belki</string>
@@ -171,7 +171,7 @@
     <string name="search_onboarding_progress_header_completed">İndirme tamamlandı</string>
     <string name="search_onboarding_progress_header_paused">Takvimlerin indirilmesi duraklatıldı</string>
     <string name="search_onboarding_progress_header_error">Takvimler indirilirken sorun çıktı</string>
-    <string name="search_spotlight_activation_snack">Takvimde arama etkinleştirildi</string>
+    <string name="search_spotlight_activation_snack">Takvimde arama özelliği açıldı</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Bildirim ekle</string>
     <string name="event_text_description">Açıklama</string>
@@ -256,7 +256,7 @@
     <string name="nav_view_calendars">Takvimlerim</string>
     <string name="nav_view_subscribed_calendars">Abone olunmuş takvimler</string>
     <string name="nav_view_other_calendars">Diğer takvimler</string>
-    <string name="nav_view_disabled_calendars">%1$s (devre dışı)</string>
+    <string name="nav_view_disabled_calendars">%1$s (kullanımdan kaldırılmış)</string>
     <string name="nav_view_not_synced_calendars">%1$s (eşitlenmemiş)</string>
     <string name="nav_view_syncing_calendars">%1$s (eşitleniyor)</string>
     <string name="nav_view_more">Diğer</string>
@@ -344,7 +344,7 @@
     <string name="snack_ics_too_many_events_error">Henüz birden çok etkinlik desteklenmiyor</string>
     <string name="snack_ics_no_events_error">Bu takvimde herhangi bir etkinlik yok</string>
     <string name="snack_ics_invalid_error">Bu davet geçersiz</string>
-    <string name="snack_ics_disabled_calendar_error">Bu etkinliği güncellemek için bu takvimle bağlantılı adresi yeniden etkinleştirin</string>
+    <string name="snack_ics_disabled_calendar_error">Bu etkinliği güncellemek için bu takvimle bağlantılı adresi yeniden kullanıma alın</string>
     <string name="snack_ics_event_deleted_error">Etkinlik artık takviminizde değil</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s davetinizi kabul etti</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s davetinizi kesin olmamakla birlikte kabul etti</string>
@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Hafta numaraları görüntülensin</string>
     <string name="settings_auto_invites_title">Davetler takvime eklensin ve bekliyor olarak işaretlensin</string>
     <string name="settings_search_title">Takvimlerde arama</string>
-    <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Etkinleştirilmesi, uygulamayı kararsız hale getirebilir.</string>
+    <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Açılması, uygulamayı kararsız hale getirebilir.</string>
     <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
     <string name="settings_alternative_routing_subtitle">Bu seçenek ile, Proton sitelerinin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yöneltmesini dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
     <string name="settings_value_placeholder">Seçmek için dokunun</string>
@@ -422,7 +422,7 @@
     <string name="settings_subscribed_calendars">Abone olunmuş takvimler</string>
     <string name="settings_other_calendars">Diğer takvimler</string>
     <string name="settings_calendar_default" comment="Default calendar">Varsayılan</string>
-    <string name="settings_calendar_disabled" comment="Disabled calendar">Devre dışı</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Kullanımdan kaldırılmış</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Eşitlenmemiş</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">Eşitleniyor</string>
     <string name="settings_calendar_subscribed_invalid_ics">Takvim biçimi desteklenmiyor</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Takvimin şifresi çözülemedi</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Yalnızca görüntüleme</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">kimden: %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Takvim ekle</string>
     <string name="calendar_form_update_title">Takvimi düzenle</string>
@@ -493,13 +494,13 @@
     <string name="bootstrap_error_some_calendars_failed_title">Takvimler hazırlanırken sorun çıktı</string>
     <string name="bootstrap_error_some_calendars_failed_message">Şu takvimler kurulamadı</string>
     <string name="bootstrap_error_no_active_calendar_title">Bu hesap ile ilişkilendirilmiş etkin bir kişisel takvim bulunamadı.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Bir takvimin nasıl etkinleştirileceğini öğrenmek için <a href="https://proton.me/support">bilgi bankasına</a> bakabilirsiniz</string>
+    <string name="bootstrap_error_no_active_calendar_message">Bir takvimin nasıl kullanıma alınacağını öğrenmek için <a href="https://proton.me/support">bilgi bankasına</a> bakabilirsiniz</string>
     <string name="bootstrap_error_store_quota_reached_message">Kullanılabilecek depolama alanı kalmadı.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Ayrıntılı bilgi alın</string>
     <string name="bootstrap_error_reset_needed_title">Takvim anahtarlarını sıfırla</string>
     <string name="bootstrap_error_reset_needed_message">Parolanızı sıfırladınız ve şu takvimlere bağlı etkinliklerin şifresi çözülemedi. Abone olunmuş takvimler birkaç dakika sonra yeniden eşitlenecek.</string>
-    <string name="bootstrap_error_update_passphrase_title">Takvim anahtarlarını yeniden etkinleştir</string>
-    <string name="bootstrap_error_update_passphrase_message">Anahtarlarınızı yeniden etkinleştirdiniz ve şu takvimlere bağlı etkinliklerin şifresi artık çözülebilir.</string>
+    <string name="bootstrap_error_update_passphrase_title">Takvim anahtarlarını yeniden kullanıma al</string>
+    <string name="bootstrap_error_update_passphrase_message">Anahtarlarınızı yeniden kullanıma aldınız ve artık şu takvimlere bağlı etkinliklerin şifresi çözülebilir.</string>
     <string name="bootstrap_error_continue_button">İlerle</string>
     <string name="splash_after_login_init">Takvimler hazırlanıyor</string>
     <string name="splash_init">Etkinliklerin şifresi çözülüyor</string>
@@ -524,10 +525,11 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Yenilikler</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Atla</string>
     <string name="spotlight_dialog_confirmation_button">Tamam</string>
     <string name="spotlight_dialog_month_view_title">Aylık görünüm</string>
     <string name="spotlight_dialog_month_view_description">Yeni aylık görünümümüzle etkinliklerinizin genel görünümüne bakın. Görünümler arasında geçiş yapmak için menüyü kullanın.</string>
-    <string name="spotlight_dialog_easy_switch_description">Etkinlikleri ve diğer verileri Google Takvim üzerinden Proton Calendar üzerine aktarmak her zamankinden daha kolay. Easy Switch içe aktarma yardımcımız her adımda size yol gösterir.</string>
+    <string name="spotlight_dialog_easy_switch_description">Etkinlikleri ve diğer verileri Google Takvim üzerinden Proton Calendar üzerine aktarmak her zamankinden daha kolay. Easy Switch içe aktarma yardımcımız her adımda size yol gösterecek.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">İçe aktarmayı başlat</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Şimdi değil</string>
     <string name="spotlight_dialog_auto_invites_title">Davetleri kolayca onaylayın</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Diğer uygulamalardaki etkinlikleri doğrudan Proton Calendar içine ekleyin.\n\n• Sizinle paylaşılan takvimlerde etkinlikler oluşturun ve yönetin.\n\n• Uygulamayı açılışında görmek istediğiniz varsayılan görünümü ayarlayın.\n\n• 13 yeni dilde daha kullanılabilir.</string>
     <string name="spotlight_dialog_wipe_search_title">İyileştirmek için aramayı kaldırdık</string>
     <string name="spotlight_dialog_wipe_search_description">Deneysel arama özelliğini daha kullanışlı ve güvenilir yapmak istediğimiz için Proton Calendar Beta sürümünden kaldırıyoruz. Bu işlem birkaç saniye sürebilir.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Resmi tatiller burada!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nİstediğiniz ülkenin resmi tatillerini takviminize ekleyin.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nTakvim sayısı sınırına ulaşmış olduğunuzdan yeni bir tatil takvimi eklemek için önce var olan bir takvimi kaldırmanız gerekir.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>

@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Календарь невозможно было расшифровать</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Только просмотр</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Создать календарь</string>
     <string name="calendar_form_update_title">Редактировать календарь</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Что нового</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Skip</string>
     <string name="spotlight_dialog_confirmation_button">ОК</string>
     <string name="spotlight_dialog_month_view_title">Просмотр месяца</string>
     <string name="spotlight_dialog_month_view_description">Получите обзор событий с помощью нового просмотра месяца. Переключайтесь между просмотрами с помощью меню.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Добавляйте события напрямую в Proton Calendar из других приложений.\n\n• Создавайте и управляйте событиями в календарях, которыми с вами поделились.\n\n• Устанавливайте вид по умолчанию, который вы хотите видеть при открытии приложения\n\n• Доступно 13 новых языков.</string>
     <string name="spotlight_dialog_wipe_search_title">Убрали поиск, чтобы сделать его лучше</string>
     <string name="spotlight_dialog_wipe_search_description">Мы удаляем функцию экспериментального поиска из Proton Calendar Beta, так как мы хотим сделать его полезнее и надежнее для вас. Это может занять несколько секунд.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>

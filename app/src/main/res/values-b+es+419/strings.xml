@@ -340,7 +340,7 @@
     <string name="snack_ics_missing_uid_error">Falta el UID del evento</string>
     <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta</string>
     <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta</string>
-    <string name="snack_ics_unsupported_duration_error">La propiedad de duración no es compatible</string>
+    <string name="snack_ics_unsupported_duration_error">No se reconoce esta duración.</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento</string>
     <string name="snack_ics_invalid_error">Esta invitación es inválida</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">No se pudo descifrar el calendario</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Solo lectura</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">de %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Crear calendario</string>
     <string name="calendar_form_update_title">Editar calendario</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novedades</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Omitir</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Vista de mes</string>
     <string name="spotlight_dialog_month_view_description">Obtenga una vista general de sus eventos con nuestra nueva vista de mes. Cambie entre vistas usando el menú.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras apps.\n\n• Cree y gestione eventos en calendarios que han sido compartidos con usted.\n\n• Defina la vista predeterminada que desea ver al abrir la app.\n\n• 13 idiomas nuevos disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">Búsqueda eliminada para mejorarla</string>
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nAñada los días festivos de cualquier país a su calendario.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nComo actualmente está al límite del calendario, para añadir un calendario de días festivos, necesitará eliminar un calendario existente primero.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para iniciar la importación, inicie sesión en Google Calendar y permita el acceso de Proton a sus datos.</string>

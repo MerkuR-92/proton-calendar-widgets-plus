@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Не атрымалася расшыфраваць каляндар</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Толькі прагляд</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">ад %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Стварэнне календара</string>
     <string name="calendar_form_update_title">Рэдагаваць каляндар</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Што новага</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Прапусціць</string>
     <string name="spotlight_dialog_confirmation_button">Добра</string>
     <string name="spotlight_dialog_month_view_title">Прагляд месяца</string>
     <string name="spotlight_dialog_month_view_description">Атрымайце агляд падзей с дапамогай нашага новага прагляду месяца. Пераключайцеся паміж праглядамі выкарыстоўваючы меню.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Дадавайце падзеі непасрэдна ў Proton Calendar з іншых праграм.\n\n• Стварайце і кіруйце падзеямі ў календарах, якія абагулілі з вамі.\n\n• Задавайце менавіта той прадвызначаны выгляд, які вы хочаце бачыць пры адкрыцці праграмы.\n\n• Даступна 13 новых моў.</string>
     <string name="spotlight_dialog_wipe_search_title">Мы выдалілі пошукавы радок</string>
     <string name="spotlight_dialog_wipe_search_description">Адбываецца выдаленне эксперыментальнага пошуку з Proton Calendar Beta па прычыне таго, што мы хочам зрабіць яго больш карысным і надзейным для вас. Гэта можа заняць некалькі секунд.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Дзяржаўныя святы знаходзяцца тут!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nДадайце дзяржаўныя святы любой краіны ў свой каляндар.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nПаколькі вы амаль дасягнулі абмежавання па календары, каб дадаць святы, вам неабходна спачатку выдаліць наяўны каляндар.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
     <string name="dialog_google_auth_description">Для пачатку імпартавання, увайдзіце ў Google Calendar і дазвольце Proton атрымаць доступ да вашых даных.</string>

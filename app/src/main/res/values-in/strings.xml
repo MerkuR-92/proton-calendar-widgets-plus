@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalender tidak dapat didekripsi</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Hanya lihat</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Buat kalender</string>
     <string name="calendar_form_update_title">Ubah kalender</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Apa yang baru</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Lewati</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Tampilan bulanan</string>
     <string name="spotlight_dialog_month_view_description">Dapatkan ulasan acara Anda secara terperinci melalui mode tampilan bulanan baru kami. Anda dapat beralih dari dan ke mode tampilan lainnya melalui menu yang ada.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
     <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>

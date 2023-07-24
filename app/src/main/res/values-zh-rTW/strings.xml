@@ -50,7 +50,7 @@
     <string name="agenda_loading_events">正在載入活動…</string>
     <string name="agenda_loading_events_error">載入活動時發生錯誤</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ 另 %1$d 人</string>
+    <string name="day_view_all_day_more">+ 另有 %1$d 等數量</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">全日</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -149,9 +149,9 @@
     <string name="invite_change_calendar_disclaimer">無法修改與邀請函相關的行事曆。</string>
     <string name="change_calendar_recurring_disclaimer">尚無法變更定期行程的行事曆。</string>
     <!-- SEARCH -->
-    <string name="search_hint_input_field">您在找什麼？</string>
+    <string name="search_hint_input_field">您正在找什麼呢？</string>
     <string name="search_empty_results_title">查無結果</string>
-    <string name="search_empty_results_subtitle">嘗試其他字詞，例如 Eric、網路研討會、讀書會。</string>
+    <string name="search_empty_results_subtitle">嘗試換用其它字詞，例如：Eric、網路研討會、讀書會... 等</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">正在下載行事曆 (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">剩餘時間：%1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">正在計算剩餘時間……</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">行事曆無法解密</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">僅能檢視</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">起始於%1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">創建行事曆</string>
     <string name="calendar_form_update_title">編輯行事曆</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">最新消息</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">跳過</string>
     <string name="spotlight_dialog_confirmation_button">確定</string>
     <string name="spotlight_dialog_month_view_title">月份檢視</string>
     <string name="spotlight_dialog_month_view_description">在我們新的月份檢視取得您活動的概覽。使用選單在檢視模式間切換。</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• 從其他應用程式直接在 Proton 行事曆新增活動\n\n• 建立並管理行事曆上共享的活動\n\n• 設定開啟此應用程式想要的預設畫面\n\n• 新增 13 種語言.</string>
     <string name="spotlight_dialog_wipe_search_title">已移除試驗性搜索功能以提升服務品質</string>
     <string name="spotlight_dialog_wipe_search_description">為了提升 Proton Calendar 體驗版的服務與可靠性，我們正在移除試驗性的搜索功能。這可能需要幾秒鐘。</string>
+    <string name="spotlight_dialog_holiday_calendar_title">公眾假期登場 !</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>

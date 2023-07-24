@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Не вдалося розшифрувати календар</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Лише перегляд</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">від %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Створити календар</string>
     <string name="calendar_form_update_title">Редагувати календар</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Що нового</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Пропустити</string>
     <string name="spotlight_dialog_confirmation_button">Гаразд</string>
     <string name="spotlight_dialog_month_view_title">Перегляд місяця</string>
     <string name="spotlight_dialog_month_view_description">Оглядайте ваші події у нашому новому поданні на місяць. Перемикайте вигляд за допомогою меню.</string>
@@ -545,8 +547,11 @@
     <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функції календаря</string>
     <string name="spotlight_dialog_calendar_provider_description">• Додавайте події безпосередньо до Proton Calendar з інших програм.\n\n• Створюйте події та керуйте ними в календарях, до яких вам надано спільний доступ.\n\n• Налаштуйте типовий вигляд після відкриття програми.\n\n• Доступно 13 нових мов.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_title">Пошук видалено, щоб поліпшити його</string>
+    <string name="spotlight_dialog_wipe_search_description">Ми знову видаляємо можливості експериментального пошуку з Proton Calendar Beta, оскільки ми хочемо зробити його кориснішим і надійнішим для вас. Це може зайняти кілька секунд.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Державні свята вже тут!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Більше не потрібно призначати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nДодайте державні свята будь-якої країни до свого календаря.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Більше не потрібно планувати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nОскільки ви зараз на межі календаря, щоб додати календар відпусток, вам потрібно спочатку видалити наявний календар.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
