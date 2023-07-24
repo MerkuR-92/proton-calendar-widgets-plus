@@ -499,11 +499,13 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 if (binding?.miniCalendarPager?.currentItem != miniCalendarIndex) {
                     // smooth-scroll only when switching between adjacent months
                     binding?.miniCalendarPager?.post {
-                        val currentItem = binding?.miniCalendarPager?.currentItem
-                        binding?.miniCalendarPager?.setCurrentItem(
-                            miniCalendarIndex,
-                            if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
-                        )
+                        if (isResumed) { // TODO Temporary fix for NPE in getViewBinding
+                            val currentItem = binding?.miniCalendarPager?.currentItem
+                            binding?.miniCalendarPager?.setCurrentItem(
+                                miniCalendarIndex,
+                                if (currentItem != null) Math.abs(currentItem - miniCalendarIndex) == 1 else false
+                            )
+                        }
                     }
                 }
             }
@@ -516,7 +518,9 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 val agendaIndex = startingPosition + selectedDayOffset
                 if (binding?.agendaPager?.currentItem != agendaIndex) {
                     binding?.agendaPager?.post {
-                        binding?.agendaPager?.setCurrentItem(agendaIndex, false)
+                        if (isResumed) { // TODO Temporary fix for NPE in getViewBinding
+                            binding?.agendaPager?.setCurrentItem(agendaIndex, false)
+                        }
                     }
                 }
             }
