@@ -203,6 +203,7 @@ dependencies {
     implementation(libs.core.user)
     implementation(libs.core.userSettings)
     implementation(libs.core.utilAndroidDagger)
+    implementation(libs.core.utilAndroidSentry)
     implementation(libs.core.utilKotlin)
     implementation(libs.core.challenge)
     implementation(libs.core.challengePresentation)
