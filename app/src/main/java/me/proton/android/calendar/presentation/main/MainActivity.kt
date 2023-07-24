@@ -506,6 +506,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
                         val spotlightShown = showLastSpotlightDialog(
                             featureFlagViewModel.isHolidayCalendarEnabled(),
+                            calendarViewModel.hasHolidayCalendar(),
                             isCalendarLimitReached
                         ) {
                             when (it) {
@@ -560,7 +561,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
                 } else if (newEventIntent != null) {
 
-                    safeNavigateToDialogFragment(Navigation.Deeplink.toEventCreate(LocalDate.now(), ICalUtilsImpl.generateEventStartTime(ZoneId.systemDefault())))
+                    val start = ICalUtilsImpl.generateEventStart(ZoneId.systemDefault())
+                    safeNavigateToDialogFragment(Navigation.Deeplink.toEventCreate(start.toLocalDate(), start.toLocalTime()))
 
                 } else if (showDayIntent != null && showDayIntent.data != null) {
 

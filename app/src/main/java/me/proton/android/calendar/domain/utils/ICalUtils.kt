@@ -22,6 +22,7 @@ import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -84,7 +85,7 @@ interface ICalUtils {
      */
     fun mergeICalendars(left: ICalendar, right: ICalendar) : ICalendar
     fun createNewVEvent(): VEvent
-    fun generateEventStartTime(timeZoneId: ZoneId): LocalTime
+    fun generateEventStart(timeZoneId: ZoneId): LocalDateTime
 
     /**
      * Generates Proton UID for new ICalendar components.
