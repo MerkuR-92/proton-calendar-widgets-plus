@@ -6,6 +6,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -79,6 +80,12 @@ class CalendarListener @Inject constructor(
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         super.onDelete(config, keys)
 
-        keys.map { calendarsRepository.deleteCalendarById(it) }
+        keys.map {
+            val calendar = calendarsRepository.selectCalendar(it)
+            // For holiday and shared calendars, we rely on member delete event
+            if (calendar?.type != Calendar.CalendarType.HOLIDAY.value && calendar?.isSharedWithMe == false) {
+                calendarsRepository.deleteCalendarById(it)
+            }
+        }
     }
 }
