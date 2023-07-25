@@ -485,7 +485,7 @@
     <string name="add_holiday_calendar_country_search_hint">Search for a country</string>
     <string name="holiday_calendar_form_picker_title">Country</string>
     <string name="holiday_calendar_time_zone_based">Based on your time zone</string>
-    <string name="holiday_calendar_already_exists">Holiday calendar already exists</string>
+    <string name="holiday_calendar_already_exists">Holiday calendar is already added.</string>
     <string name="holiday_calendar_value_placeholder">Select country</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
