@@ -47,6 +47,7 @@ import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.FetchCachedViewsEventsUseCase
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
+import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
@@ -167,6 +168,7 @@ val useCaseModule = module {
     factory<LeaveManagedCalendarUseCase> { LeaveManagedCalendarUseCase(get(), get(), get()) }
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(

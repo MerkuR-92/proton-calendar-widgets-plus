@@ -26,7 +26,8 @@ class UseCaseWorker @AssistedInject constructor(
     private val updateUserSettingsUseCase: UpdateUserSettingsUseCase,
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
-    private val fetchCachedViewsEventsUseCase: FetchCachedViewsEventsUseCase
+    private val fetchCachedViewsEventsUseCase: FetchCachedViewsEventsUseCase,
+    private val fixCalendarsUseCase: FixCalendarsUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -48,6 +49,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = UpdateParticipationStatusUseCase.WORKER_ID_SINGLE_EDIT
             const val FETCH_PUBLIC_KEYS = FetchPublicKeysUseCase.WORKER_ID
             const val FETCH_CACHED_VIEWS_EVENTS = FetchCachedViewsEventsUseCase.WORKER_ID
+            const val FIX_CALENDARS = FixCalendarsUseCase.WORKER_ID
         }
     }
 
@@ -101,6 +103,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT = "UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT"
             const val FETCH_PUBLIC_KEYS = "FETCH_PUBLIC_KEYS"
             const val FETCH_CACHED_VIEWS_EVENTS = "FETCH_CACHED_VIEWS_EVENTS"
+            const val FIX_CALENDARS = "FIX_CALENDARS"
         }
     }
 
@@ -209,6 +212,9 @@ class UseCaseWorker @AssistedInject constructor(
                     LocalDate.ofEpochDay(selectedDateEpochDay),
                     timeZoneId
                 )
+            }
+            UseCaseId.FIX_CALENDARS -> {
+                fixCalendarsUseCase.execute(userId)
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")
