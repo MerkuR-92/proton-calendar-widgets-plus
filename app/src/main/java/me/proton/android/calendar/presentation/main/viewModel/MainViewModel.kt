@@ -30,6 +30,8 @@ import me.proton.android.calendar.domain.api.FeedbackApi
 import me.proton.android.calendar.domain.usecase.*
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
+import me.proton.core.contact.domain.entity.ContactEmail
+import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
@@ -51,6 +53,7 @@ class MainViewModel @Inject constructor(
     private val workManager: WorkManager,
     private val reviewManager: ReviewManager,
     private val resetLocalEventDatabaseUseCase: ResetLocalEventDatabaseUseCase,
+    private val contactEmailsRepository: ContactRepository,
     private val calendarsRepository: CalendarsRepository
 ) : AndroidViewModel(application) {
 
@@ -294,5 +297,9 @@ class MainViewModel @Inject constructor(
 
     suspend fun clearLocalEventsDatabase() {
         calendarsRepository.deleteAllEvents()
+    }
+
+    suspend fun getProtonContacts(userId: UserId): List<ContactEmail> {
+        return contactEmailsRepository.getAllContacts(userId).map { it.contactEmails }.flatten()
     }
 }
