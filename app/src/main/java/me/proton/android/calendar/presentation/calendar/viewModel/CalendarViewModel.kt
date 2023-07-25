@@ -1326,12 +1326,22 @@ class CalendarViewModel @Inject constructor(
         return database.managedHolidayCalendarDao().hasCalendar()
     }
 
-    suspend fun fixCalendars() {
+    suspend fun fixCalendars(): LiveData<Operation.State> {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel fetchEvents")
-            return
-        }
-        fixCalendarsUseCase.execute(userId)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FIX_CALENDARS,
+                    UseCaseWorker.INPUT_USER_ID to userId?.id
+                )
+            )
+            .build()
+
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FIX_CALENDARS, ExistingWorkPolicy.REPLACE, work).state
     }
 }

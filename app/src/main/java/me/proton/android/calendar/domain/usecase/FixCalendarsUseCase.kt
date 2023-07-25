@@ -25,7 +25,23 @@ class FixCalendarsUseCase @Inject constructor(
     private val valueStoreProvider: ValueStoreProvider
 ): UseCase {
 
+    companion object {
+        const val WORKER_ID = "FIX_CALENDARS"
+    }
+
     suspend fun execute(userId: UserId): UseCase.Result {
+        // Try to get addresses
+        val userAddresses = userAddressManager.getAddressesOrNull(userId)
+            ?: run {
+                // Force refresh if userAddresses are null
+                logger.i("FixCalendarsUseCase, userAddresses were null, calling getAddressesOrNull with refresh true")
+                userAddressManager.getAddressesOrNull(userId, refresh = true)
+            } ?: run {
+                // If user addresses are still null, log and return
+                logger.e("FixCalendarsUseCase, userAddresses are null")
+                return UseCase.Result.Error("FixCalendarsUseCase, userAddresses are null")
+            }
+
         val calendarEntities = database.calendarsDao().selectCalendars(userId.id)
         val calendarsToBootstrap = arrayListOf<CalendarEntity>()
         calendarEntities.forEach { calendarEntity ->
@@ -62,15 +78,6 @@ class FixCalendarsUseCase @Inject constructor(
                 calendarsToBootstrap.add(calendarEntity)
                 return@forEach
             }
-        }
-
-        // Try to get addresses and force refresh if null
-        val userAddresses = userAddressManager.getAddressesOrNull(userId)
-            ?: userAddressManager.getAddressesOrNull(userId, refresh = true)
-        if (userAddresses == null) {
-            // If user addresses are still null, log and return
-            logger.e("FixCalendarsUseCase, userAddresses are null")
-            return UseCase.Result.Error("FixCalendarsUseCase, userAddresses are null")
         }
 
         // Retry bootstrap for calendars with missing data
