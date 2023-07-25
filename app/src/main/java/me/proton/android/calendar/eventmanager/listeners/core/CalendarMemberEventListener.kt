@@ -107,18 +107,24 @@ class CalendarMemberEventListener @Inject constructor(
         // Get user addresses emails to compare with members email
         var addresses: List<UserAddress>? = null
         keys.forEach {
-            val member = calendarsRepository.selectMemberById(it)
+            val calendarId = calendarsRepository.selectMemberById(it)?.calendarId
             // We first delete Member
             calendarsRepository.deleteMemberById(it)
-            member?.let {
-                if (member.addressId.isNullOrEmpty() && addresses.isNullOrEmpty()) {
-                    // Only get addresses from DB if we need them because of missing addressId field
+            calendarId?.let {
+                if (addresses.isNullOrEmpty()) {
                     addresses = userAddressManager.getAddressesOrNull(config.userId)
                 }
-                val memberAddress = calendarsRepository.getAddressForMember(config.userId, member.addressId, member.id, member.canonicalEmail, addresses)
-                if (memberAddress != null) {
-                    // If member belongs to user, delete the calendar linked to it
-                    calendarsRepository.deleteCalendarById(member.calendarId)
+
+                // Check that member is last user member for that calendar
+                addresses?.let { addresses ->
+                    // Get all members for that calendar
+                    val calendarMembers = calendarsRepository.selectCalendarMembers(calendarId)
+                    // Find the member that belongs to the current user
+                    val userMember = calendarsRepository.getUserMember(addresses, calendarMembers)
+                    // If user member doesn't exists, safely delete calendar
+                    if (userMember == null) {
+                        calendarsRepository.deleteCalendarById(calendarId)
+                    }
                 }
             }
         }

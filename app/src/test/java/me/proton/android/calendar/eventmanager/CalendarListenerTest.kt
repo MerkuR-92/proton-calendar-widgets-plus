@@ -9,6 +9,8 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
+import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -189,13 +191,47 @@ class CalendarListenerTest {
     }
 
     @Test
-    fun `onDelete just removes the calendar`() {
+    fun `onDelete normal calendar`() {
         runBlocking {
             val ids = listOf("calendar_id")
+
+            coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()
+            )
 
             listener.onDelete(config, ids)
 
             coVerify(exactly = 1) { calendarsRepository.deleteCalendarById(any()) }
+        }
+    }
+
+    @Test
+    fun `onDelete holiday calendar`() {
+        runBlocking {
+            val ids = listOf("calendar_id")
+
+            coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 2, 127, 30, emptyList(), emptyList()
+            )
+
+            listener.onDelete(config, ids)
+
+            coVerify(exactly = 0) { calendarsRepository.deleteCalendarById(any()) }
+        }
+    }
+
+    @Test
+    fun `onDelete shared calendar`() {
+        runBlocking {
+            val ids = listOf("calendar_id")
+
+            coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 32, 30, emptyList(), emptyList()
+            )
+
+            listener.onDelete(config, ids)
+
+            coVerify(exactly = 0) { calendarsRepository.deleteCalendarById(any()) }
         }
     }
 
