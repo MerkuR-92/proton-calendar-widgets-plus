@@ -1719,6 +1719,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
             holidayCalendarFeatureFlag ?: return@Observer
         })
+
+        lifecycleScope.launch {
+            calendarViewModel.fixCalendars()
+        }
     }
 
     private fun refreshCalendarsWithMissingFields(calendars: List<Calendar>) {

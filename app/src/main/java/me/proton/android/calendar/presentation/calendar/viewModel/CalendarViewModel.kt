@@ -70,15 +70,18 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
+import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
@@ -135,6 +138,7 @@ class CalendarViewModel @Inject constructor(
     private val database: AppDatabase,
     private val json: Json,
     private val workManager: WorkManager,
+    private val fixCalendarsUseCase: FixCalendarsUseCase
 ) : AndroidViewModel(application) {
 
     private var viewModelJob = Job() // TODO extract this to superclass
@@ -1320,5 +1324,14 @@ class CalendarViewModel @Inject constructor(
 
     suspend fun hasHolidayCalendar(): Boolean {
         return database.managedHolidayCalendarDao().hasCalendar()
+    }
+
+    suspend fun fixCalendars() {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            return
+        }
+        fixCalendarsUseCase.execute(userId)
     }
 }
