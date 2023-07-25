@@ -88,7 +88,7 @@
     <string name="event_attendee_organizer">Organisator</string>
     <string name="event_attendee_optional">Optioneel</string>
     <string name="event_attendee_is_current_user">U</string>
-    <string name="event_answer_attending">Aanwezig?</string>
+    <string name="event_answer_attending">Deelnemen?</string>
     <string name="event_answer_yes">Ja</string>
     <string name="event_answer_no">Nee</string>
     <string name="event_answer_maybe">Misschien</string>
@@ -253,7 +253,7 @@
     <string name="event_add_participants_dialog_cancel">Annuleren</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s is geannuleerd.</string>
     <!-- NAVIGATION VIEW   -->
-    <string name="nav_view_calendars">Mijn agenda</string>
+    <string name="nav_view_calendars">Mijn agenda\'s</string>
     <string name="nav_view_subscribed_calendars">Geabonneerde agenda\'s</string>
     <string name="nav_view_other_calendars">Andere agenda\'s</string>
     <string name="nav_view_disabled_calendars">%1$s (Uitgeschakeld)</string>
@@ -404,9 +404,9 @@
     <string name="settings_week_start_title">Start van de Week</string>
     <string name="settings_time_format_title">Tijdnotatie</string>
     <string name="settings_week_numbers_title">Weeknummers weergeven</string>
-    <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als wachtend</string>
+    <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als in afwachting</string>
     <string name="settings_search_title">Agenda\'s doorzoeken</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">Downloadt agenda-inhoud en slaat deze op uw apparaat op zodat u deze kunt doorzoeken. Als u deze functie uitschakelt, wordt de gedownloade inhoud verwijderd. \n\nZoeken is een experimentele bètafunctie. Als je deze inschakelt, kan de app onstabiel worden.</string>
     <string name="settings_alternative_routing_title">Alternatieve routing toestaan</string>
     <string name="settings_alternative_routing_subtitle">In het geval dat Proton-sites worden geblokkeerd, stelt deze instelling de app in staat om alternatieve netwerkroutering te proberen om Proton te bereiken, wat nuttig kan zijn voor het omzeilen van firewalls of netwerkproblemen. We raden aan deze instelling aan te houden voor een grotere betrouwbaarheid.</string>
     <string name="settings_value_placeholder">Tik om te selecteren</string>
@@ -419,7 +419,7 @@
     <string name="settings_general_info_calendar_layout">layout agenda</string>
     <string name="settings_calendars">Mijn agenda\'s</string>
     <string name="settings_calendars_empty">Geen agenda\'s gevonden</string>
-    <string name="settings_subscribed_calendars">Abonneer op agenda\'s</string>
+    <string name="settings_subscribed_calendars">Geabonneerde agenda\'s</string>
     <string name="settings_other_calendars">Andere agenda\'s</string>
     <string name="settings_calendar_default" comment="Default calendar">Standaard</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Uitgeschakeld</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Agenda kon niet ontcijferd worden</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Alleen bekijken</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">van: %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Agenda aanmaken</string>
     <string name="calendar_form_update_title">Agenda bijwerken</string>
@@ -443,7 +444,7 @@
     <string name="calendar_form_language">Taal</string>
     <string name="calendar_form_default_event_duration">Duur van de afspraak</string>
     <string name="calendar_form_default_event_notifications">Afspraakmeldingen</string>
-    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Hele-dag afspraakmeldingen</string>
     <string name="calendar_form_add_notification">Melding toevoegen</string>
     <string name="calendar_form_default_email">E-mailadres</string>
     <string name="calendar_form_default_email_value_error">Kan standaard e-mail niet laden</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Wat is er nieuw</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Overslaan</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Maandweergave</string>
     <string name="spotlight_dialog_month_view_description">Krijg een overzicht van uw afspraken met onze nieuwe maandweergave. Wissel tussen weergaves met het menu.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
     <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn hier!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>

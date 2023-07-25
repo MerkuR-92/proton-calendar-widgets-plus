@@ -406,7 +406,7 @@
     <string name="settings_week_numbers_title">Vis ugenumre</string>
     <string name="settings_auto_invites_title">Tilføj invitationer til kalender og markér som afventende</string>
     <string name="settings_search_title">Søg i kalendere</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">Downloader og gemmer kalenderindhold på din enhed, så du kan søge i det. Hvis du slår dette fra, fjernes det downloadede indhold.\n\nSøgning er en eksperimentel beta-funktion. Hvis du aktiverer den, kan appen blive ustabil.</string>
     <string name="settings_alternative_routing_title">Tillad alternativ routing</string>
     <string name="settings_alternative_routing_subtitle">Hvis Proton-websteder er blokeret giver denne indstilling appen mulighed for at prøve alternativ netværksrouting for at nå Proton, hvilket kan være nyttige til at omgå firewalls eller ved netværksproblemer. Vi anbefaler at holde denne indstilling slået til for større pålidelighed.</string>
     <string name="settings_value_placeholder">Tryk for at vælge</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalender kunne ikke dekrypteres</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Kun visning</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">fra %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Opret kalender</string>
     <string name="calendar_form_update_title">Rediger kalender</string>
@@ -443,7 +444,7 @@
     <string name="calendar_form_language">Sprog</string>
     <string name="calendar_form_default_event_duration">Begivenhedsvarighed</string>
     <string name="calendar_form_default_event_notifications">Begivenhedsnotifikationer</string>
-    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notifikationer for heldagsbegivenheder</string>
     <string name="calendar_form_add_notification">Tilføj notifikation</string>
     <string name="calendar_form_default_email">E-mailadresse</string>
     <string name="calendar_form_default_email_value_error">Kunne ikke indlæse standard e-mail</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Nyheder</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Spring over</string>
     <string name="spotlight_dialog_confirmation_button">Ok</string>
     <string name="spotlight_dialog_month_view_title">Månedsvisning</string>
     <string name="spotlight_dialog_month_view_description">Få en oversigt over dine begivenheder med vores nye månedsvisning. Skift mellem visninger ved hjælp af menuen.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Tilføj begivenheder direkte til Proton Calendar fra andre apps.\n\n• Opret og administrer begivenheder i kalendere der er blevet delt med dig.\n\n• Indstil den standardvisning, du vil se, når du åbner appen.\n\n• 13 nye sprog tilgængelige.</string>
     <string name="spotlight_dialog_wipe_search_title">Søgning fjernet for at gøre den bedre</string>
     <string name="spotlight_dialog_wipe_search_description">Vi fjerner den eksperimentelle søgefunktion fra Proton Calendar Beta, da vi ønsker at gøre den mere nyttig og pålidelig for dig. Dette kan tage nogle sekunder.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Så er helligdagene her!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nTilføj et hvilket som helst lands helligdage til din kalender.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nEftersom du i øjeblikket er på grænsen for antal kalendere, skal du først fjerne en eksisterende kalender for at tilføje en feriekalender.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>
     <string name="dialog_google_auth_description">For at starte importen skal du logge ind på Google Kalender og give Proton adgang til dine data.</string>

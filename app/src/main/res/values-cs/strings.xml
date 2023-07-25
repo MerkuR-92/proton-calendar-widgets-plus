@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalendář se nepodařilo dešifrovat</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Pouze zobrazení</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">od %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Vytvořit kalendář</string>
     <string name="calendar_form_update_title">Upravit kalendář</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Co je nového</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Přeskočit</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Měsíční zobrazení</string>
     <string name="spotlight_dialog_month_view_description">Získejte přehled svých událostí s naším novým měsíčním zobrazením. Přepínejte mezi zobrazeními v menu.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Přidejte události přímo do Proton Calendar z jiných aplikací.\n\n• Vytvořte a spravujte události v kalendářích, které byly sdíleny s vámi.\n\n• Nastavte výchozí zobrazení, které chcete vidět po otevření aplikace\n\n• K dispozici je 13 nových jazyků.</string>
     <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Státní svátky jsou tady!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>

@@ -145,33 +145,33 @@
     <string name="event_text_attendees_none">არცერთი</string>
     <string name="event_text_calendar">კალენდარი</string>
     <string name="event_text_timezone_start">დროის სარტყელი</string>
-    <string name="invite_in_shared_calendar_disclaimer">მოსაწვევების გაგზავნა მხოლოდ პირადი კალენდარების შიგნითაა შესაძლებელი.</string>
+    <string name="invite_in_shared_calendar_disclaimer">მოსაწვევების გაგზავნა მხოლოდ პირადი კალენდრების შიგნითაა შესაძლებელი.</string>
     <string name="invite_change_calendar_disclaimer">მოსაწვევებზე მიმაგრებული კალენდარის ჩასწორება შეუძლებელია.</string>
-    <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდარის შეცვლა ჯერჯერობით შეუძლებელია.</string>
+    <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდრის შეცვლა ჯერჯერობით შეუძლებელია.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>
     <string name="search_empty_results_subtitle">სცადეთ სხვა პირობა. მაგ: მარიამი, დაბადების დღე, ვებინარი, კლუბის ქირაობა.</string>
-    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">კალენდარების გადმოწერა (%1$s)</string>
+    <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">კალენდრების გადმოწერა (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">დარჩენილი დრო: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">დარჩენილი დროის გამოთვლა…</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">თითქმის დასრულდა</string>
     <string name="search_downloading_pause">გადმოწერის შეჩერება</string>
     <string name="search_settings_dialog_toggle_off_title">წავშალო ყველა გადმოწერილი კალენდარი?</string>
-    <string name="search_settings_dialog_toggle_off_text">ძებნისთვის კალენდარების თავიდან გადმოწერა მოგიწევთ.</string>
-    <string name="search_settings_dialog_toggle_on_title">გადმოვწერო კალენდარები ამ მოწყობილობაზე?</string>
+    <string name="search_settings_dialog_toggle_off_text">ძებნისთვის კალენდრების თავიდან გადმოწერა მოგიწევთ.</string>
+    <string name="search_settings_dialog_toggle_on_title">გადმოვწერო კალენდრები ამ მოწყობილობაზე?</string>
     <string name="search_settings_dialog_toggle_on_text">ეს ძებნისთვის აუცილებელია.</string>
     <string name="search_onboarding_header">გნებავთ, კალენდარში მოძებნოთ?</string>
-    <string name="search_onboarding_text">ჯერ თქვენი კალენდარების დაშიფრული ასლი უნდა გადმოიწეროთ. ამას დიდი დრო არ სჭირდება და თან შეგიძლიათ, ამ დროს აპლიკაციაც გაოიყენოთ. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
+    <string name="search_onboarding_text">ჯერ თქვენი კალენდრების დაშიფრული ასლი უნდა გადმოიწეროთ. ამას დიდი დრო არ სჭირდება და თან შეგიძლიათ, ამ დროს აპლიკაციაც გაოიყენოთ. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
     <string name="search_onboarding_action_download_calendars">კალენდრების გადმოწერა</string>
     <string name="search_onboarding_action_pause">შეჩერება</string>
     <string name="search_onboarding_action_resume">გაგრძელება</string>
     <string name="search_onboarding_action_retry">თავიდან</string>
-    <string name="search_onboarding_progress_header_ongoing">კალენდარების გადმოწერა…</string>
+    <string name="search_onboarding_progress_header_ongoing">კალენდრების გადმოწერა…</string>
     <string name="search_onboarding_progress_header_completed">გადმოწერა დასრულდა</string>
-    <string name="search_onboarding_progress_header_paused">კალენდარების გადმოწერა შეჩერებულია</string>
-    <string name="search_onboarding_progress_header_error">კალენდარების გადმოწერის შეცდომა</string>
-    <string name="search_spotlight_activation_snack">კალენდარის ძებნა ჩაირთო</string>
+    <string name="search_onboarding_progress_header_paused">კალენდრების გადმოწერა შეჩერებულია</string>
+    <string name="search_onboarding_progress_header_error">კალენდრების გადმოწერის შეცდომა</string>
+    <string name="search_spotlight_activation_snack">კალენდრის ძებნა ჩაირთო</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">შეტყობინების დამატება</string>
     <string name="event_text_description">აღწერა</string>
@@ -315,7 +315,7 @@
     <string name="snack_update_default_calendar">ნაგულისხმები კალენდარი განახლებულია</string>
     <string name="snack_update_default_calendar_error">ნაგულისხმები კალენდრის განახლების შეცდომა. მოგვიანებით სცადეთ</string>
     <string name="snack_calendar_init_error">კალენდრის ინფორმაციის ჩატვირთვის შეცდომა</string>
-    <string name="snack_holiday_calendar_init_error">დასვენებების კალენდარის ინფორმაციის ჩატვირთვის შეცდომა</string>
+    <string name="snack_holiday_calendar_init_error">დასვენებების კალენდრის ინფორმაციის ჩატვირთვის შეცდომა</string>
     <string name="snack_update_calendar_error">კალენდრის ინფორმაციის განახლების შეცდომა. მოგვიანებით სცადეთ</string>
     <string name="snack_update_calendar_settings_error">კალენდრის ინფორმაციის განახლების შეცდომა. მოგვიანებით სცადეთ</string>
     <string name="snack_update_calendar_success">კალენდარი განახლდა</string>
@@ -323,7 +323,7 @@
     <string name="snack_add_calendar_success">კალენდარი დამატებულია</string>
     <string name="snack_calendar_saving">კალენდრის შენახვა</string>
     <string name="snack_create_calendar_error">კალენდრის შექმნის შეცდომა. მოგვიანებით სცადეთ</string>
-    <string name="snack_add_calendar_error">კალენდარის დამატების შეცდომა. მოგვიანებით სცადეთ</string>
+    <string name="snack_add_calendar_error">კალენდრის დამატების შეცდომა. მოგვიანებით სცადეთ</string>
     <string name="snack_create_calendar_settings_error">კალენდარი შეიქმნა, მაგრამ გარკვეული ინფორმაცია არ განახლდა, გთხოვთ, სცადოთ მოგვიანებით</string>
     <string name="snack_ics_default_error">კალენდრის გახსნის შეცდომა</string>
     <string name="snack_ics_event_not_found_error">მოვლენა ნაპოვნი არაა</string>
@@ -339,7 +339,7 @@
     <string name="snack_ics_reply_party_crasher_error">მონაწილეები, რომლებიც ორგანიზატორმა არ მიიწვია, არ შეიძლება დაემატოს</string>
     <string name="snack_ics_missing_uid_error">მოვლენას UID-ი აკლია</string>
     <string name="snack_ics_no_active_personal_calendar_error">ამ ანგარიშთან აქტიური პირადი კალენდარი არ არსებობს</string>
-    <string name="snack_ics_no_active_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური კალენდარები არ არსებობს</string>
+    <string name="snack_ics_no_active_calendar_error">ამ ანგარიშთან დაკავშირებული აქტიური კალენდრები არ არსებობს</string>
     <string name="snack_ics_unsupported_duration_error">ხანგრძლივობის თვისება მხარდაუჭერელია</string>
     <string name="snack_ics_too_many_events_error">მრავალმოვლენიანობა ჯერ მხარდაჭერილი არაა</string>
     <string name="snack_ics_no_events_error">ეს კალენდარი არც ერთ მოვლენა არ შეიცავს</string>
@@ -377,7 +377,7 @@
     <string name="notification_channel_alarms">მოვლენის გაფრთხილებები</string>
     <string name="notification_channel_sync">კალენდრის სინქრონიზაცია</string>
     <string name="notification_channel_calendar_fetch">კალენდრების გამოთხოვა</string>
-    <string name="notification_sync">კალენდარების სინქრონიზაცია…</string>
+    <string name="notification_sync">კალენდრების სინქრონიზაცია…</string>
     <string name="notification_text_today">დღეს</string>
     <string name="notification_text_today_part_time">დღეს %1$s</string>
     <string name="notification_text_tomorrow">ხვალ</string>
@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">კალენდრის დაშიფვრა შეუძლებელია</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">მხოლოდ დათვალიერებისათვის</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">%1$s-გან</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">კალენდრის შექმნა</string>
     <string name="calendar_form_update_title">კალენდრის ჩასწორება</string>
@@ -452,7 +453,7 @@
     <string name="calendar_form_description_hint">კალენდარის აღწერის დამატება</string>
     <string name="add_calendar_text">კალენდრის დამატება</string>
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">დამატება</string>
-    <string name="create_calendar_limit_reached">თქვენ მიაღწიეთ კალენდარების მაქსიმალურ რაოდენობას.</string>
+    <string name="create_calendar_limit_reached">თქვენ მიაღწიეთ კალენდრების მაქსიმალურ რაოდენობას.</string>
     <string name="create_calendar_limit_reached_title">მეტი კალენდრის დამატება შეუძლებელია</string>
     <string name="create_calendar_limit_reached_paid_description">თქვენ მიაღწიეთ თქვენს გეგმაში ხელმისაწვდომი 25 კალენდრის მაქსიმალურ რაოდენობას.\n\nახალი კალენდრის დასამატებლად წაშალეთ არსებული.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">სანამ თქვენი ტრიფის ლიმიტს (25 კალენდარი) მიაღწევთ, ერთი პირადი კალენდარი მაინც უნდა გქონდეთ.</string>
@@ -463,34 +464,34 @@
     <string name="delete_calendar_dialog_title">კალენდრის წაშლა</string>
     <string name="delete_calendar_dialog_message">დარწმუნებული ბრძანდებით, რომ გნებავთ ამ კალენდრის წაშლა?</string>
     <string name="remove_calendar_dialog_title">კალენდრის წაშლა</string>
-    <string name="remove_calendar_dialog_message">დარწმუნებული ბრძანდებით, რომ გნებავთ ამ კალენდარის წაშლა?</string>
+    <string name="remove_calendar_dialog_message">დარწმუნებული ბრძანდებით, რომ გნებავთ ამ კალენდრის წაშლა?</string>
     <string name="leave_calendar_dialog_title">კალენდრიდან გასვლა</string>
     <string name="leave_calendar_dialog_message">თუ ამ კალენდარს დატოვებთ, მისი კიდევ ერთხელ სანახავად მფლობელისთვის ნებართვის თხოვნა თავიდან მოგიწევთ.</string>
     <string name="delete_default_calendar_dialog_message">დარწმუნებული ხართ, რომ გსურთ ამ კალენდრის წაშლა? \"%1$s \" იქნება მითითებული, როგორც ნაგულისხმები კალენდარი.</string>
     <string name="delete_calendar_snack_deleted">კალენდარი წაშლილია</string>
     <string name="remove_calendar_snack_removed">კალენდარი წაშლილია</string>
     <string name="delete_calendar_snack_error">კალენდრის წაშლის შეცდომა</string>
-    <string name="remove_calendar_snack_error">კალენდარის წაშლის შეცდომა</string>
-    <string name="leave_calendar_snack_error">კალენდარიდან გასვლის შეცდომა</string>
+    <string name="remove_calendar_snack_error">კალენდრის წაშლის შეცდომა</string>
+    <string name="leave_calendar_snack_error">კალენდრიდან გასვლის შეცდომა</string>
     <string name="delete_calendar_snack_error_password_confirmation">პაროლის დადასტურების შეცდომა</string>
     <string name="recreate_calendar_dialog_title">კალენდრის გასუფთავება</string>
     <string name="recreate_calendar_dialog_message">ეს ქმედება წაშლის ყველა მოვლენას და მოწვეულ მომხმარებლებს.\in\დარწმუნებული ხართ, რომ გსურთ ამ კალენდრის გასუფთავება?</string>
-    <string name="recreate_calendar_snack_error">კალენდარის გასუფთავების შეცდომა</string>
+    <string name="recreate_calendar_snack_error">კალენდრის გასუფთავების შეცდომა</string>
     <string name="recreate_calendar_snack_deleted">კალენდარი გასუფთავდა</string>
     <string name="recreate_calendar_snack_clearing">კალენდრის გასუფთავება…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">დასვენებების კალენდარის დამატება</string>
+    <string name="add_holiday_calendar_title">დასვენებების კალენდრის დამატება</string>
     <string name="holiday_calendar_title">დასვენებების კალენდარი</string>
     <string name="add_holiday_calendar_country_search_hint">ქვეყნის ძებნა</string>
     <string name="holiday_calendar_form_picker_title">ქვეყანა</string>
-    <string name="holiday_calendar_time_zone_based">თქვენს დროის სარტყელზე დაყრდნობით</string>
+    <string name="holiday_calendar_time_zone_based">თქვენი დროის სარტყელზე დაყრდნობით</string>
     <string name="holiday_calendar_already_exists">დასვენებების კალენდარი უკვე არსებობს</string>
     <string name="holiday_calendar_value_placeholder">აირჩიეთ ქვეყანა</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">დიახ</string>
     <string name="bootstrap_error_no_calendar_title">ამ ანგარიშთან დაკავშირებული კალენდრები არ არსებობს.</string>
     <string name="bootstrap_error_no_calendar_message">იმისათვის, რომ შეიქმნათ, ეწვიეთ <a href="https://calendar.proton.me">calendar.proton.me</a></string>
-    <string name="bootstrap_error_some_calendars_failed_title">კალენდარების მომზადების შეცდომა</string>
+    <string name="bootstrap_error_some_calendars_failed_title">კალენდრების მომზადების შეცდომა</string>
     <string name="bootstrap_error_some_calendars_failed_message">შემდეგი კალენდრები მორგებული არაა</string>
     <string name="bootstrap_error_no_active_calendar_title">ამ ანგარიშთან დაკავშირებული აქტური პირადი კალენდრები არ არსებობს.</string>
     <string name="bootstrap_error_no_active_calendar_message">იმისათვის, რომ ისწავლოთ კალენდრის გააქტიურება ეწვიეთ ჩვენს <a href="https://proton.me/support"> ცოდნის ბაზა </a></string>
@@ -501,7 +502,7 @@
     <string name="bootstrap_error_update_passphrase_title">კალენდრის გასაღებების რეაქტივაცია</string>
     <string name="bootstrap_error_update_passphrase_message">თქვენ ხელახლა გაააქტიურეთ თქვენი გასაღებები და მოვლენები, რომლებიც დაკავშირებულია შემდეგ კალენდრებთან, ახლა შეიძლება გაშიფრული იყოს.</string>
     <string name="bootstrap_error_continue_button">გაგრძელება</string>
-    <string name="splash_after_login_init">კალენდარების მომზადება</string>
+    <string name="splash_after_login_init">კალენდრების მომზადება</string>
     <string name="splash_init">მოვლენების გაშიფვრა</string>
     <string name="default_calendar_name">ჩემი კალენდარი</string>
     <!-- FEEDBACK DIALOG -->
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">სიახლეები</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">გამოტოვება</string>
     <string name="spotlight_dialog_confirmation_button">დიახ</string>
     <string name="spotlight_dialog_month_view_title">თვის ხედი</string>
     <string name="spotlight_dialog_month_view_description">მიიღეთ თქვენი მოვლენების მიმოხილვა ჩვენი ახალი თვის ხედით. ხედებს შორის მენიუს საშუალებით გადაერთეთ.</string>
@@ -538,15 +540,18 @@
     <string name="spotlight_v5_dialog_rebranding_title">განახლებული Proton-ი, გაერთიანებული დაცვა</string>
     <string name="spotlight_v5_dialog_rebranding_description">წარმოგიდგენთ Proton-ის განახლებულ იერს. ბევრი სერვისი, ერთი მისია. მოგესალმებით ინტერნეტში, სადაც კონფიდენციალობა ნაგულისხმებია. <a href="https://proton.me/news/updated-proton">გაიგეთ მეტი</a></string>
     <string name="spotlight_dialog_week_view_title">მეტი ნახვის პარამეტრი</string>
-    <string name="spotlight_dialog_week_view_description">• წარმოგიდგენთ კალენდარების <b>3 დღიან</b> და <b> ერთკვირიან</b> ხედებს. აირჩიეთ თქვენთვის სასურველი ხედი <b>მენიუში</b>.\n\n• დღის ბადეში მწკრივების სიმაღლის გასწორება ორი თითის გასმით შეგიძლიათ.</string>
+    <string name="spotlight_dialog_week_view_description">• წარმოგიდგენთ კალენდრების <b>3 დღიან</b> და <b> ერთკვირიან</b> ხედებს. აირჩიეთ თქვენთვის სასურველი ხედი <b>მენიუში</b>.\n\n• დღის ბადეში მწკრივების სიმაღლის გასწორება ორი თითის გასმით შეგიძლიათ.</string>
     <string name="spotlight_dialog_search_title">მოვლენების ძებნა</string>
     <string name="spotlight_dialog_search_description">ჩვენი ახალი ძებნის ფუნქციებით თქვენს მოვლენებს უფრო ადვილად იპოვით. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
     <string name="spotlight_dialog_import_title">მოვლენების დამატების მეტი გზა</string>
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
-    <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდარებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდრებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
     <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">დასვენებაა!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>
@@ -569,7 +574,7 @@
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">შემოტანა, როგორც</string>
     <string name="import_assistant_new_calendar_badge">ახალი</string>
     <string name="import_assistant_merge_calendar_badge">შერწყმული</string>
-    <string name="import_assistant_creating_calendars">ახალი კალენდარების შექმნა</string>
+    <string name="import_assistant_creating_calendars">ახალი კალენდრების შექმნა</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">თითქმის მივედით…</string>
     <string name="import_assistant_new_calendar_header">ახლის შექმნა</string>
     <string name="import_assistant_merge_calendar_header">არსებულთან შერწყმა</string>
@@ -613,7 +618,7 @@
     <string name="import_assistant_sign_in_in_progress">შესვლის პროცესი უკვე მიმდინარეობს</string>
     <string name="import_assistant_in_progress_error_snack">შემოტანა ჯერ კიდევ მიმდინარეობს</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">შემოვიტანო, როგორც მარტივი მოვლენა?</string>
+    <string name="import_event_disclaimer_dialog_title">შემოვიტანო მარტივი მოვლენის სახით?</string>
     <string name="import_event_disclaimer_dialog_description">\nშემოტანილი მოსაწვევები გამოჩნდება Proton Calendar-ში, როგორც მარტივი ღონისძიებები <b>ორგანიზატორის</b> და <b>მონაწილის</b> დეტალების გარეშე.\n\nმოვლენის განახლებების მისაღებად და მონაწილეების სანახავად, სთხოვეთ ორგანიზატორებს, მოგიწვიონ თქვენი Proton ელფოსტის გამოყენებით. მისამართი.</string>
     <string name="import_event_disclaimer_dialog_positive">შემოტანა</string>
     <!--  STRING PLURALS  -->
@@ -622,8 +627,8 @@
         <item quantity="other">კალენდრები</item>
     </plurals>
     <plurals name="import_assistant_import_button">
-        <item quantity="one">%1$d კალენდარის შემოტანა</item>
-        <item quantity="other">%1$d კალენდარის შემოტანა</item>
+        <item quantity="one">%1$d კალენდრის შემოტანა</item>
+        <item quantity="other">%1$d კალენდრის შემოტანა</item>
     </plurals>
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
         <item quantity="one">%1$d მიმდინარე შემოტანა</item>

@@ -433,6 +433,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalendarz nie może zostać odszyfrowany</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Tylko do odczytu</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">od %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Utwórz kalendarz</string>
     <string name="calendar_form_update_title">Edytuj kalendarz</string>
@@ -524,6 +525,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Co nowego</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_skip">Pomiń</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Widok miesiąca</string>
     <string name="spotlight_dialog_month_view_description">Uzyskaj podsumowanie swoich wydarzeń dzięki nowemu widokowi miesiąca. Przełącz się między widokami za pomocą menu.</string>
@@ -547,6 +549,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Dodawaj wydarzenia do Proton Calendar z innych aplikacji.\n\n• Twórz i zarządzaj wydarzeniami w udostępnionych kalendarzach.\n\n• Wybierz domyślny widok aplikacji.\n\n• 13 nowych języków aplikacji.</string>
     <string name="spotlight_dialog_wipe_search_title">Wyszukiwanie zostało usunięte</string>
     <string name="spotlight_dialog_wipe_search_description">Usuwamy eksperymentalną funkcję wyszukiwania z Proton Calendar, ponieważ chcemy uczynić ją bardziej użyteczną i niezawodną. To może zająć kilka sekund.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Święta są tutaj!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Koniec z planowaniem spotkań, kiedy inni mają wolne lub zapominaniem o zaplanowaniu długiego weekend.\n\nDodaj święta krajowe do swojego kalendarza.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Koniec z planowaniem spotkań, kiedy inni mają wolne lub zapominaniem o zaplanowaniu długiego weekend.\n\nZ powodu przekroczonego limitu maksymalnej liczby kalendarzy, usuń obecny kalendarz, aby dodać kalendarz świąt.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Przyznaj dostęp</string>
     <string name="dialog_google_auth_description">Aby rozpocząć proces importowania, zaloguj się do Kalendarza Google i zezwól usłudze Proton na dostęp do danych.</string>
