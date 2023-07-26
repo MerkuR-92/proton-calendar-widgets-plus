@@ -96,6 +96,7 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
 import java.time.Instant
@@ -397,6 +398,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun countCalendars(): Int {
         return database.calendarsDao().countCalendars()
+    }
+
+    override suspend fun hasHolidayCalendars(userId: String): Boolean {
+        return database.calendarsDao().selectHolidayCalendars(userId).isNotEmpty()
     }
 
     override suspend fun clearSearchDatabase() {

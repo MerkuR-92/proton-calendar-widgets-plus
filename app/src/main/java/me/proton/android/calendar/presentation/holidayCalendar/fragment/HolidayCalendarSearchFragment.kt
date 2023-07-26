@@ -20,6 +20,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKey
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
+import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.databinding.FragmentHolidayCalendarFormBinding
@@ -158,6 +159,10 @@ class HolidayCalendarSearchFragment : BaseDialogFragment<FragmentHolidayCalendar
     }
 
     private fun setupSearch() {
+        // Focus on search field when opening the view and show keyboard
+        binding.holidayCalendarSearchInput.requestFocus()
+        requireContext().showKeyboard()
+
         binding.holidayCalendarSearchInput.onTextChange { rawQuery ->
 
             binding.holidayCalendarSearchClear.root.visibleOrGone(rawQuery.isNotBlank())

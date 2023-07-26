@@ -61,7 +61,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
@@ -70,12 +69,10 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
-import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -1322,8 +1319,17 @@ class CalendarViewModel @Inject constructor(
         calendarsRepository.refreshManagedHolidayCalendars(userId)
     }
 
-    suspend fun hasHolidayCalendar(): Boolean {
+    suspend fun hasManagedHolidayCalendarListInDb(): Boolean {
         return database.managedHolidayCalendarDao().hasCalendar()
+    }
+
+    suspend fun hasHolidayCalendars(): Boolean {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel hasHolidayCalendars")
+            return false
+        }
+        return calendarsRepository.hasHolidayCalendars(userId.id)
     }
 
     suspend fun fixCalendars(): LiveData<Operation.State> {

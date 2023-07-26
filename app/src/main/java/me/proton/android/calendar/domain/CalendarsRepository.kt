@@ -47,6 +47,8 @@ interface CalendarsRepository {
     // calendars
     suspend fun countCalendars(): Int
 
+    suspend fun hasHolidayCalendars(userId: String): Boolean
+
     suspend fun selectCalendarEntity(calendarId: String): CalendarEntity?
 
     suspend fun selectCalendar(calendarId: String): Calendar?

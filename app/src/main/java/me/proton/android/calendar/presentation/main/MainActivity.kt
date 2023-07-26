@@ -506,7 +506,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
                         val spotlightShown = showLastSpotlightDialog(
                             featureFlagViewModel.isHolidayCalendarEnabled(),
-                            calendarViewModel.hasHolidayCalendar(),
+                            calendarViewModel.hasHolidayCalendars(),
                             isCalendarLimitReached
                         ) {
                             when (it) {
@@ -655,7 +655,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
 
                 lifecycleScope.launch {
-                    if (!calendarViewModel.hasHolidayCalendar()) {
+                    if (!calendarViewModel.hasManagedHolidayCalendarListInDb()) {
                         accountViewModel.getPrimaryUserId()?.let {
                             calendarViewModel.initManagedHolidayCalendar(it)
                         }
