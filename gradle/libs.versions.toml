@@ -44,7 +44,7 @@ junit = "4.13.2"
 kotlin-stdlib = "1.6.21"
 desugar = "2.0.2"
 dagger = "2.46.1"
-core = "13.0.0"
+core = "14.0.1"
 fusion = "0.9.52"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
@@ -125,6 +125,7 @@ core-user-domain = { module = "me.proton.core:user-domain", version.ref = "core"
 core-user-data = { module = "me.proton.core:user-data", version.ref = "core" }
 core-userSettings = { module = "me.proton.core:user-settings", version.ref = "core" }
 core-utilAndroidDagger = { module = "me.proton.core:util-android-dagger", version.ref = "core" }
+core-utilAndroidSentry = { module = "me.proton.core:util-android-sentry", version.ref = "core" }
 core-utilKotlin = { module = "me.proton.core:util-kotlin", version.ref = "core" }
 
 # Gradle

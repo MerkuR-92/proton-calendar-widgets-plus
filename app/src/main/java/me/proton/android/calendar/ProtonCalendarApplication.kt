@@ -2,16 +2,14 @@ package me.proton.android.calendar
 
 import android.app.Application
 import android.content.Context
-import android.database.CursorWindow
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.logger.LoggerImpl
+import me.proton.android.calendar.common.logger.AppLogger
 import me.proton.android.calendar.common.logger.SentryIntegration
-import me.proton.android.calendar.common.logger.SentryTree
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.domain.Logger
@@ -19,10 +17,10 @@ import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
+import me.proton.core.util.android.sentry.TimberLogger
 import me.proton.core.util.kotlin.CoreLogger
 import timber.log.Timber
 import timber.log.Timber.DebugTree
-import java.lang.reflect.Field
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -41,21 +39,13 @@ class ProtonCalendarApplication : Application() {
         super.onCreate()
         MainInitializer.init(this)
 
-        CoreLogger.set(LoggerImpl)
+        // Forward Core Logs to Timber, using TimberLogger.
+        CoreLogger.set(TimberLogger)
+
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         } else {
             SentryIntegration.initSentry(this, defaultSharedPreferencesProvider.sharedPreferences)
-            Timber.plant(SentryTree())
-        }
-
-        // hack for android.database.sqlite.SQLiteBlobTooBigException: Row too big to fit into CursorWindow
-        try {
-            val field: Field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
-            field.isAccessible = true
-            field.set(null, 5 * 1024 * 1024) // 5 MB
-        } catch (e: Exception) {
-            logger.e("exception setting cursor window size", e)
         }
 
         ShowNotificationUseCase.createNotificationChannels(this)
