@@ -40,10 +40,12 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.validateEmail
 import me.proton.android.calendar.databinding.FragmentEventFormAttendeesBinding
+import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.AddAttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import org.koin.core.KoinComponent
 
 class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttendeesBinding>(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
@@ -56,12 +58,16 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val eventViewModel: EventViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
 
     private val _searchAttendeeList: MutableLiveData<List<Attendee>> = MutableLiveData()
     private val searchAttendeeList: LiveData<List<Attendee>> = _searchAttendeeList
 
     private lateinit var attendeeListAdapter: AddAttendeeListAdapter
     private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
+
+    private val protonContacts: ArrayList<Attendee> = arrayListOf()
 
     private var contactsAccessGranted = false
 
@@ -82,6 +88,15 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch {
+            accountViewModel.getPrimaryUserId()?.let {
+                val contacts = mainViewModel.getProtonContacts(it)
+                protonContacts.addAll(
+                    contacts.map { Attendee(it.name, it.email) }
+                )
+            }
+        }
 
         dialogAppbar.visibleOrGone(false)
         binding.eventFormAttendeesDone.toolbarActionText.text = getString(R.string.action_done)
@@ -307,23 +322,30 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
     }
 
     override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor) {
-        if(data.isBeforeFirst) {
+        if (data.isBeforeFirst) {
             val attendees = data.getAttendeeList()
-            if (attendees.isNotEmpty()) {
-                _searchAttendeeList.postValue(attendees)
-            } else {
-                // If no results in contacts, suggest email
-                val query = binding.eventFormAttendeesSearchInput.text
-                val searchResult =
-                    when {
-                        validateEmail(query) -> {
-                            val participant = Attendee("", query.toString())
-                            listOf(participant)
+            val query = binding.eventFormAttendeesSearchInput.text
+            val deviceList =
+                attendees.ifEmpty {
+                    // If no results in contacts, suggest email
+                    val searchResult =
+                        when {
+                            validateEmail(query) -> {
+                                val participant = Attendee("", query.toString())
+                                listOf(participant)
+                            }
+
+                            else -> listOf()
                         }
-                        else -> listOf()
-                    }
-                _searchAttendeeList.postValue(searchResult)
+                    searchResult
+                }
+            val protonList = protonContacts.filter {
+                it.commonName.contains(query.toString(), ignoreCase = true)
+                        || it.extractEmail()?.contains(query.toString(), ignoreCase = true) == true
             }
+            _searchAttendeeList.postValue(
+                deviceList.plus(protonList).distinctBy { it.extractEmail() }.sortedBy { it.commonName }
+            )
         }
     }
 
