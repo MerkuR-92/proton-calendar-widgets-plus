@@ -211,16 +211,15 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     // Each item in the adapter is one day
                     calendarViewModel.selectedDateTime.value?.let { currentDateTime ->
                         val currentDate = currentDateTime.first
-                        val start = ICalUtilsImpl.generateEventStart(timeZoneId)
                         requireActivity().findNavController(R.id.nav_host_fragment_container_view)
                             .navigate(
                                 Navigation.Deeplink.toEventCreate(
-                                    if (currentViewMode == ViewMode.MONTH
-                                        && currentDate.month == LocalDate.now().month
-                                        && currentDate.year == LocalDate.now().year) {
-                                        currentDate.withDayOfMonth(1)
-                                    } else start.toLocalDate(),
-                                    start.toLocalTime()
+                                    if (currentViewMode == ViewMode.MONTH) {
+                                        if (currentDate.month == LocalDate.now().month && currentDate.year == LocalDate.now().year) {
+                                            ICalUtilsImpl.generateEventStart(timeZoneId).toLocalDate()
+                                        } else currentDate.withDayOfMonth(1)
+                                    } else currentDate,
+                                    ICalUtilsImpl.generateEventStart(timeZoneId).toLocalTime()
                                 )
                             )
                     }
