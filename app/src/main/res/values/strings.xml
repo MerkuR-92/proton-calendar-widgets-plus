@@ -147,6 +147,7 @@
     <string name="event_text_timezone_start">Time zone</string>
     <string name="invite_in_shared_calendar_disclaimer">Sending invitations is available only within personal calendars.</string>
     <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
+    <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">What are you looking for?</string>

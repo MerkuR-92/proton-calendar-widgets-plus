@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
@@ -30,6 +31,7 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CONTACTS_SEARCH_QUERY
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
@@ -57,7 +59,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
     override val layoutResourceId = R.layout.fragment_event_form_attendees
     override val isScrollable = false
 
-    private val navigationArguments: EventFormFragmentArgs by navArgs()
+    private val navigationArguments: EventFormAttendeesFragmentArgs by navArgs()
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val eventViewModel: EventViewModel by activityViewModels()
@@ -69,12 +71,15 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
     private lateinit var attendeeListAdapter: AddAttendeeListAdapter
     private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
+    private lateinit var toolbarTitle: TextView
 
     private val protonContacts: ArrayList<ContactEmail> = arrayListOf()
     private val cachedProtonContacts: ArrayList<Attendee> = arrayListOf()
     private val cachedDeviceContacts: ArrayList<Attendee> = arrayListOf()
 
     private var contactsAccessGranted = false
+
+    private var readOnly = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -119,7 +124,27 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
             }
         }
 
-        dialogAppbar.visibleOrGone(false)
+        readOnly = navigationArguments.readOnly
+        if (readOnly) {
+            // Hide search
+            binding.eventFormAttendeesSearchIcon.visibleOrGone(false)
+            binding.eventFormAttendeesSearchInput.visibleOrGone(false)
+            // Hide done button
+            binding.eventFormAttendeesDone.root.visibleOrGone(false)
+            // Display disclaimer
+            binding.eventFormAttendeesReadOnlyDisclaimer.visibleOrGone(true)
+            // Display toolbar and set title
+            dialogAppbar.visibleOrGone(true)
+            toolbarTitle = toolbar.findViewById(R.id.dialog_toolbar_title)
+            toolbarTitle.text = getString(R.string.event_text_attendees)
+        } else {
+            binding.eventFormAttendeesSearchIcon.visibleOrGone(true)
+            binding.eventFormAttendeesSearchInput.visibleOrGone(true)
+            binding.eventFormAttendeesDone.root.visibleOrGone(true)
+            binding.eventFormAttendeesReadOnlyDisclaimer.visibleOrGone(false)
+            dialogAppbar.visibleOrGone(false)
+        }
+
         binding.eventFormAttendeesDone.toolbarActionText.text = getString(R.string.action_done)
         binding.eventFormAttendeesListHeader.text = getString(R.string.event_text_participants, 0, ATTENDEE_MAX_ALLOWED)
 
@@ -201,7 +226,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.eventFormAttendeesList.layoutManager = attendeesLayoutManager
-        attendeeListAdapter = AddAttendeeListAdapter(false) {
+        attendeeListAdapter = AddAttendeeListAdapter(searchList = false, readOnly = readOnly) {
             eventViewModel.handleAttendee(it, addAttendee = false)
         }
         (binding.eventFormAttendeesList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -209,7 +234,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
         val searchAttendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.eventFormAttendeesSearchList.layoutManager = searchAttendeesLayoutManager
-        searchAttendeeListAdapter = AddAttendeeListAdapter(true) {
+        searchAttendeeListAdapter = AddAttendeeListAdapter(searchList = true, readOnly = readOnly) {
             addAttendee(it)
         }
         (binding.eventFormAttendeesSearchList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -269,8 +294,10 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
             }
         })
 
-        binding.eventFormAttendeesSearchInput.requestFocus()
-        requireContext().showKeyboard()
+        if (!readOnly) {
+            binding.eventFormAttendeesSearchInput.requestFocus()
+            requireContext().showKeyboard()
+        }
     }
 
     private fun addAttendee(attendee: Attendee) {

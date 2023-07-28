@@ -88,18 +88,35 @@
 
         <TextView
             android:id="@+id/event_form_attendees_list_header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="false"
+            tools:text="Participants (1/100)"
             style="@style/Text.DefaultSmall.Weak"
             android:layout_marginTop="@dimen/spacing_large"
-            android:layout_marginStart="@dimen/default_margin_text_start"
-            android:layout_marginBottom="@dimen/spacing_element_small"/>
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
+
+        <TextView
+            android:id="@+id/event_form_attendees_read_only_disclaimer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            style="@style/Text.DefaultSmall.Weak"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/invite_change_attendees_disclaimer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_attendees_list_header"
+            />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/event_form_attendees_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             android:animateLayoutChanges="false"
             android:overScrollMode="never"
             tools:listitem="@layout/item_add_attendee"

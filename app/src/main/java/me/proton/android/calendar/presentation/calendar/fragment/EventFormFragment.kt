@@ -39,6 +39,7 @@ import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_CHIP_ALLOWED
 import me.proton.android.calendar.common.FragmentArguments.DEFAULT_NOTIFICATIONS_TYPE_ARG
 import me.proton.android.calendar.common.FragmentArguments.IS_ALL_DAY_ARG
+import me.proton.android.calendar.common.FragmentArguments.READ_ONLY_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
@@ -107,7 +108,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             // We navigate even though contacts permission is not granted
-            findNavController().navigate(R.id.nav_event_form_attendees)
+            navigateToAttendees()
         }
 
     override fun onBackPressedCustom() {
@@ -677,7 +678,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         val chip = chipViewBinding.root
         chip.text = title
         chip.setOnSingleClickListener {
-            navigateToAttendees()
+            checkNavigationToAttendees()
         }
         binding.eventFormParticipantChipGroup.addView(chip)
     }
@@ -818,7 +819,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
         binding.eventFormParticipantPress.root.setOnSingleClickListener {
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
-                navigateToAttendees()
+                checkNavigationToAttendees()
             }
         }
     }
@@ -835,7 +836,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         editor.apply()
     }
 
-    private fun navigateToAttendees() {
+    private fun checkNavigationToAttendees() {
         requireActivity().clearFocusAndHideKeyboard(view)
 
         if (!eventViewModel.isChangingAttendeesAllowed()) {
@@ -848,7 +849,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 requireContext(),
                 Manifest.permission.READ_CONTACTS
             ) == PackageManager.PERMISSION_GRANTED -> {
-                findNavController().navigate(R.id.nav_event_form_attendees)
+                navigateToAttendees()
             }
             shouldShowRequestPermissionRationale(Manifest.permission.READ_CONTACTS)
                     && shouldShowContactsPermissionsDialog() -> {
@@ -859,8 +860,19 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     Manifest.permission.READ_CONTACTS)
             }
             else -> {
-                findNavController().navigate(R.id.nav_event_form_attendees)
+                navigateToAttendees()
             }
+        }
+    }
+
+    private fun navigateToAttendees() {
+        lifecycleScope.launch {
+            val event = eventViewModel.eventLiveData.value!!
+            val readOnly = event.isAnInvitation && !navigationArguments.eventId.isNullOrEmpty() // TODO Update once we allow editing attendees for invitations
+            val bundle = Bundle().apply {
+                putBoolean(READ_ONLY_ARG, readOnly)
+            }
+            findNavController().navigate(R.id.nav_event_form_attendees, bundle)
         }
     }
 
@@ -890,10 +902,10 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 }
             }
             .setNegativeButton(R.string.contacts_permission_dialog_cancel) { _, _ ->
-                findNavController().navigate(R.id.nav_event_form_attendees)
+                navigateToAttendees()
             }
             .setOnCancelListener {
-                findNavController().navigate(R.id.nav_event_form_attendees)
+                navigateToAttendees()
             }
             .setOnDismissListener {
                 if (dialogCheckboxBinding.dialogCheckbox.isChecked) {

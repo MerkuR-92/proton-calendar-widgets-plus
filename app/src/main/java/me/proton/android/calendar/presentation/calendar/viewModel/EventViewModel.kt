@@ -1379,18 +1379,6 @@ class EventViewModel @Inject constructor(
             // Allow saving with no edition if creating an event
             if (eventId.isNullOrEmpty() || hasEventBeenEdited()) {
 
-                // Check if event wasn't changed to invitation shortly before saving
-                val isApiEventAnInvitation = isApiEventAnInvitation()
-                if (!isEventNew() && isApiEventAnInvitation != false) {
-                    eventFormSnackState.value = EventSnackState.DisplaySnack(
-                        resourceProvider.provideString(
-                            if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
-                            else R.string.snack_event_edit_with_attendees_error
-                        )
-                    )
-                    return
-                }
-
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving
 
