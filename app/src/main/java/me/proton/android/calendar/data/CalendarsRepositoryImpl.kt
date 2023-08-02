@@ -96,7 +96,6 @@ import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
-import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
 import java.time.Instant
@@ -508,36 +507,27 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCalendars(userId: UserId): Boolean {
-        val calendarsResponse = calendarsApi.getCalendars(userId)
-        return if (calendarsResponse !is ApiResponse.Success) {
-            logger.e("error getting calendars from API in CalendarsRepositoryImpl")
-            false
-        } else {
-            calendarsResponse.data.calendars.forEach {
+        val calendarsResponse = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)
+        return if (calendarsResponse != null) {
+            calendarsResponse.calendars.forEach {
                 // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
                 persistCalendar(userId.id, it)
             }
             true
-        }
+        } else false
     }
 
     override suspend fun refreshCalendars(userId: UserId, calendarIds: List<String>) {
         val calendars = arrayListOf<CalendarEntity>()
         val members = hashMapOf<String, MemberEntity>()
         calendarIds.forEach {
-            val calendarResponse = calendarsApi.getCalendar(userId, it)
-            if (calendarResponse !is ApiResponse.Success) {
-                // We log but ignore the error
-                logger.e("error getting calendar from API in CalendarsRepositoryImpl")
-            } else {
-                calendars.add(calendarResponse.data.calendar)
+            val calendarResponse = calendarsApi.getCalendar(userId, it).valueOrNullAndLogErrors(logger)
+            if (calendarResponse != null) {
+                calendars.add(calendarResponse.calendar)
                 // Get members for calendar
-                val memberListResponse = calendarsApi.getMemberList(userId, it)
-                if (memberListResponse !is ApiResponse.Success) {
-                    // We log but ignore the error
-                    logger.e("error getting member from API in CalendarsRepositoryImpl")
-                } else {
-                    memberListResponse.data.members.firstOrNull()?. let { memberEntity ->
+                val memberListResponse = calendarsApi.getMemberList(userId, it).valueOrNullAndLogErrors(logger)
+                if (memberListResponse != null) {
+                    memberListResponse.members.firstOrNull()?. let { memberEntity ->
                         members[it] = memberEntity
                     }
                 }
@@ -594,23 +584,11 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>? {
-        val membersResponse = calendarsApi.getMemberList(userId, calendarId)
-        return if (membersResponse !is ApiResponse.Success) {
-            logger.e("error getting members from API in CalendarsRepositoryImpl")
-            null
-        } else {
-            membersResponse.data.members
-        }
+        return calendarsApi.getMemberList(userId, calendarId).valueOrNullAndLogErrors(logger)?.members
     }
 
     private suspend fun fetchCalendarSettings(userId: UserId, calendarId: String): CalendarSettingsEntity? {
-        val settingsResponse = calendarsApi.getCalendarSettings(userId, calendarId)
-        return if (settingsResponse !is ApiResponse.Success) {
-            logger.e("error getting CalendarSettings from API in CalendarsRepositoryImpl")
-            null
-        } else {
-            settingsResponse.data.calendarSettings
-        }
+        return calendarsApi.getCalendarSettings(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendarSettings
     }
 
     override suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar? {

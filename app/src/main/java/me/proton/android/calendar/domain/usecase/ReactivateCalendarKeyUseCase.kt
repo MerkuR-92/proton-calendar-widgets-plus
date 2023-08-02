@@ -6,6 +6,7 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.ReenableKeyApiRequest
 import me.proton.android.calendar.data.api.ReenableKeyApiResponse
+import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -104,12 +105,14 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
                     val newlyEncryptedCalendarKey = decryptedCalendarKey.lock(decryptedMemberPrimaryPassphrase.toByteArray()) ?: return@members
 
                     // Post newly encrypted Calendar key
-                    reenableKeyResponses.add(calendarsApi.reenableKey(
+                    val reenableKeyApiResponse = calendarsApi.reenableKey(
                         userId,
                         calendarId,
                         calendarKey.id,
                         ReenableKeyApiRequest(newlyEncryptedCalendarKey.armor())
-                    ))
+                    )
+                    reenableKeyApiResponse.valueOrNullAndLogErrors(logger)
+                    reenableKeyResponses.add(reenableKeyApiResponse)
 
                     // Break calendar member for each
                     return@keys
