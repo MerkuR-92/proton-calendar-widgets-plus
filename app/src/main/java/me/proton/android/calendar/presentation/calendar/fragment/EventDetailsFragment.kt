@@ -114,7 +114,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
         } else {
             findNavController().navigateUp()
         }
-        mainViewModel.triggerPlayStoreRatingFlow.update { true }
+        mainViewModel.triggerMainViewActions.update { true }
     }
 
     override fun onBackPressedCustom() {

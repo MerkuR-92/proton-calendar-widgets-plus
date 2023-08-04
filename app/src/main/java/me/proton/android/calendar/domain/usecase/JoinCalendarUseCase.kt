@@ -118,6 +118,7 @@ class JoinCalendarUseCase @Inject constructor(
                 }
             }
             is ApiResponse.Error -> {
+                if (joinCalendarResponse.httpCode == 503) calendarsRepository.pingServer(userId)
                 logger.e("api error join calendar: $joinCalendarResponse")
                 UseCase.Result.Error(joinCalendarResponse.error)
             }

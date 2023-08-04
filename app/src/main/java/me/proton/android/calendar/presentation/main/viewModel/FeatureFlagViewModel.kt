@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import me.proton.android.calendar.common.FETCH_FEATURE_FLAG_INTERVAL_SECONDS
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.accountmanager.domain.AccountManager
@@ -21,6 +22,7 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.presentation.viewmodel.ViewModelResult
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,15 +37,21 @@ class FeatureFlagViewModel @Inject constructor(
 
     var holidayCalendarFeatureFlag: LiveData<Boolean> = MutableLiveData()
 
+    private var lastFetchMs = 0L
+
     fun prefetchGlobal() {
         val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
         featureFlagManager.prefetch(null, featureIds)
     }
 
-    fun prefetchForCurrentUser() = accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
-        val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
-        featureFlagManager.prefetch(userId, featureIds)
-    }.launchIn(viewModelScope)
+    fun prefetchForCurrentUser() {
+        if (System.currentTimeMillis().minus(lastFetchMs) <= TimeUnit.SECONDS.toMillis(FETCH_FEATURE_FLAG_INTERVAL_SECONDS)) return
+        accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
+            val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
+            featureFlagManager.prefetch(userId, featureIds)
+            lastFetchMs = System.currentTimeMillis()
+        }.launchIn(viewModelScope)
+    }
 
     /**
      * Use this init method to initialize the remote feature flags we want to observe.
@@ -60,8 +68,14 @@ class FeatureFlagViewModel @Inject constructor(
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
         val userId = requireNotNull(accountManager.getPrimaryUserId().first())
-        val featureFlagValue = featureFlagManager.get(userId, calendarFeatureFlag.featureId)?.value
-        return featureFlagValue ?: calendarFeatureFlag.fallbackValue
+        return featureFlagManager.getOrDefault(
+            userId,
+            calendarFeatureFlag.featureId,
+            FeatureFlag.default(
+                calendarFeatureFlag.featureId.id,
+                calendarFeatureFlag.fallbackValue
+            )
+        ).value
     }
 
     private suspend fun getFeatureFlag(calendarFeatureFlag: CalendarFeatureFlag): FeatureFlag {
@@ -88,6 +102,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {
         return isFeatureEnabled(CalendarFeatureFlag.RatingAndroidCalendar)
+    }
+
+    suspend fun isServerDownBannerEnabled(): Boolean {
+        return isFeatureEnabled(CalendarFeatureFlag.CalendarAndroidServerDownBanner)
     }
 
     suspend fun reportPlayStoreRatingFlowStarted() {

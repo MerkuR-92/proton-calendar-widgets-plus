@@ -32,6 +32,7 @@ class LeaveManagedCalendarUseCase @Inject constructor(
                 return UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
+                if (leaveCalendarResponse.httpCode == 503) calendarsRepository.pingServer(userId)
                 logger.e("api error join calendar: $leaveCalendarResponse")
                 UseCase.Result.Error(leaveCalendarResponse.error)
             }

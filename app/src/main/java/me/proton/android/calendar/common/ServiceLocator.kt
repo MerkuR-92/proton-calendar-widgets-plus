@@ -19,6 +19,7 @@ import me.proton.android.calendar.data.api.ImporterApiImpl
 import me.proton.android.calendar.data.api.MailSettingsApiImpl
 import me.proton.android.calendar.data.api.ServerEventsApiImpl
 import me.proton.android.calendar.data.api.SettingsApiImpl
+import me.proton.android.calendar.data.api.TestsApiImpl
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.di.CalendarsModule_ProvideKotlinxJsonFactory
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -36,6 +37,7 @@ import me.proton.android.calendar.domain.api.ImporterApi
 import me.proton.android.calendar.domain.api.MailSettingsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.usecase.BootstrapAllCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
@@ -119,6 +121,7 @@ val networkModule = module {
     single<MailSettingsApi> { MailSettingsApiImpl(get()) }
     single<FeedbackApi> { FeedbackApiImpl(get()) }
     single<ImporterApi> { ImporterApiImpl(get()) }
+    single<TestsApi> { TestsApiImpl(get()) }
 }
 
 val repositoryModule = module {

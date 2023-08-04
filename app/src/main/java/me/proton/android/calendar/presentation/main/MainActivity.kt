@@ -28,9 +28,11 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -58,6 +60,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.BuildConfig
@@ -80,6 +83,7 @@ import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.PLAY_STORE_RATING_DELAY
 import me.proton.android.calendar.common.RC_CREATE_IMPORT_SIGN_IN
 import me.proton.android.calendar.common.SEARCH_VERSION_CODE
+import me.proton.android.calendar.common.SERVER_DOWN_BANNER_DURATION_SECONDS
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
@@ -124,6 +128,7 @@ import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
+import me.proton.core.presentation.utils.errorSnack
 import me.proton.core.util.kotlin.takeIfNotEmpty
 import me.proton.core.util.kotlin.toBooleanOrFalse
 import org.koin.core.KoinComponent
@@ -131,6 +136,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -159,8 +165,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private val plansViewModel: PlansViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
     private val featureFlagViewModel: FeatureFlagViewModel by viewModels()
+
     private lateinit var userCalendarListAdapter: CalendarListAdapter
     private lateinit var otherCalendarListAdapter: CalendarListAdapter
+
+    private lateinit var shouldDisplayServerDownBannerLiveData: LiveData<Boolean>
 
     private var otherCalendars: List<Calendar>? = null
     private var calendarSubscriptions: List<CalendarSubscriptionEntity>? = null
@@ -259,6 +268,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 handleAccountState(this, state)
             }
         }
+        featureFlagViewModel.prefetchForCurrentUser()
     }
 
     override fun onStart() {
@@ -478,6 +488,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Ready -> {
 
+                handleDisplayServerDownBanner()
+
                 featureFlagViewModel.prefetchForCurrentUser()
 
                 lifecycleScope.launch {
@@ -661,9 +673,12 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         }
                     }
 
-                    mainViewModel.triggerPlayStoreRatingFlow.collect { triggerPlayStoreRatingFlow ->
-                        if (!triggerPlayStoreRatingFlow) return@collect
+                    mainViewModel.triggerMainViewActions.collect { triggerMainViewActions ->
+                        if (!triggerMainViewActions) return@collect
                         handlePlayStoreRatingFlow()
+                        handleDisplayServerDownBanner()
+                        // Clear value
+                        mainViewModel.triggerMainViewActions.update { false }
                     }
                 }
             }
@@ -675,6 +690,39 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
             AccountViewModel.State.Initial -> Unit
             AccountViewModel.State.StepNeeded -> Unit // handled by core
+        }
+    }
+
+    private fun handleDisplayServerDownBanner() {
+        if (this::shouldDisplayServerDownBannerLiveData.isInitialized && shouldDisplayServerDownBannerLiveData.hasActiveObservers()) {
+            shouldDisplayServerDownBannerLiveData.removeObservers(this@MainActivity)
+        }
+        shouldDisplayServerDownBannerLiveData = calendarViewModel.shouldDisplayServerDownBanner()
+        shouldDisplayServerDownBannerLiveData.observe(this@MainActivity) { shouldDisplayServerDownBanner ->
+            lifecycleScope.launch {
+                val isServerDownBannerEnabled = featureFlagViewModel.isServerDownBannerEnabled()
+                val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
+                // We only display the banner if the user is in the main view
+                if (shouldDisplayServerDownBanner && isServerDownBannerEnabled && currentViewIsCalendar) {
+                    withStarted {
+                        this@MainActivity.findViewById<View>(android.R.id.content).errorSnack(
+                            getString(R.string.snack_down_banner),
+                            getString(R.string.snack_down_banner_action),
+                            actionOnClick = {
+                                // Open Proton status page
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://status.proton.me/")
+                                )
+                                startActivity(browserIntent)
+                            },
+                            length = TimeUnit.SECONDS.toMillis(SERVER_DOWN_BANNER_DURATION_SECONDS).toInt()
+                        )
+                        // Clear value so we don't show it everytime user opens the main view
+                        calendarViewModel.hideServerDownBanner()
+                    }
+                }
+            }
         }
     }
 
@@ -1768,7 +1816,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     override fun onBackPressed() {
-
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START)
         } else if (returnToView == ViewMode.MONTH && CalendarFeatureFlag.MonthView.fallbackValue) {
