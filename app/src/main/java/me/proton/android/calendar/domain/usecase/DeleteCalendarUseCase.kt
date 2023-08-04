@@ -79,6 +79,9 @@ class DeleteCalendarUseCase @Inject constructor(
             is DeleteCalendarOption.Delete -> {
                 val deleteCalendarResponse = calendarsApi.deleteCalendar(userId, deleteOption.calendarId)
 
+                if (deleteCalendarResponse is ApiResponse.Error && deleteCalendarResponse.httpCode == 503) {
+                    calendarsRepository.pingServer(userId)
+                }
                 if (deleteCalendarResponse is ApiResponse.Error && deleteCalendarResponse.httpCode == 403 && deleteCalendarResponse.errorCode == 403) {
                     return UseCase.Result.InvalidParams("DeleteCalendarUseCase: password confirmation failed")
                 }

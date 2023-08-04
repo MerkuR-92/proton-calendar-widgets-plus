@@ -11,6 +11,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     // Remote flags
     CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, false),
     RatingAndroidCalendar(FeatureId("RatingAndroidCalendar"), false, false),
+    CalendarAndroidServerDownBanner(FeatureId("CalendarAndroidServerDownBanner"), false, false),
 
     // Local only flag (unknown to remote API)
     // Enabled

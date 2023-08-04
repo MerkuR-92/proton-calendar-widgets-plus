@@ -1350,4 +1350,12 @@ class CalendarViewModel @Inject constructor(
 
         return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FIX_CALENDARS, ExistingWorkPolicy.REPLACE, work).state
     }
+
+    fun shouldDisplayServerDownBanner(): LiveData<Boolean> {
+        return calendarsRepository.getDisplayServerDownBannerFlow().asLiveData(Dispatchers.Default)
+    }
+
+    fun hideServerDownBanner() {
+        return calendarsRepository.hideServerDownBanner()
+    }
 }

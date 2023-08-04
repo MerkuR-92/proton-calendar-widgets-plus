@@ -89,6 +89,10 @@ abstract class CalendarsBindModule {
 
     @Binds
     @Singleton
+    abstract fun bindTestsApi(testsApi: TestsApiImpl): TestsApi
+
+    @Binds
+    @Singleton
     abstract fun bindServerEventsApi(serverEventsApiImpl: ServerEventsApiImpl): ServerEventsApi
 
     @Binds

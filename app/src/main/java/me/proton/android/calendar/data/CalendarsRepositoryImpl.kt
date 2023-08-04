@@ -41,6 +41,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.PING_INTERVAL_SECONDS
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
@@ -79,6 +80,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -90,6 +92,7 @@ import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
@@ -105,6 +108,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.time.temporal.TemporalAdjusters
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.ceil
 
@@ -117,6 +121,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
+    private val testsApi: TestsApi,
     private val json: Json,
     private val widgetRefresher: WidgetRefresher,
     private val eventDecryptor: EventDecryptor,
@@ -124,7 +129,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
     private val userManager: UserManager,
     private val userAddressManager: UserAddressManager,
-    private val accountManager: AccountManager
+    private val accountManager: AccountManager,
+    private val networkManager: NetworkManager
 ) : CalendarsRepository {
 
     private val DEBOUNCE_EXPANDING_EVENTS_ON_FETCH = Duration.ofMillis(1000)
@@ -175,6 +181,9 @@ class CalendarsRepositoryImpl @Inject constructor(
     // cache for SkeletonEvents
     private val skeletonEventsCache = mutableMapOf<CalendarsRepository.EventsWindow, List<SkeletonEvent>>()
     private val skeletonEventsCacheMutex = Mutex()
+
+    private val displayServerDownBannerFlow = MutableStateFlow(false)
+    private var lastPingMs: Long = 0L
 
     private val allCalendarsFlow =
         database.calendarsDao().flowCalendars().joinToCalendars(database, json).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
@@ -240,7 +249,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCalendarsFlags(userId: UserId) {
-        val remoteMembers = calendarsApi.getAllMembers(userId).valueOrNullAndLogErrors(logger)
+        val remoteMembers = calendarsApi.getAllMembers(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
 
         remoteMembers?.members?.forEach {
             if (hasCalendar(it.calendarId)) {
@@ -330,6 +339,9 @@ class CalendarsRepositoryImpl @Inject constructor(
                     updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
                     fetchedWindows.add(fetchWindow)
                 }
+            } else {
+                // If this failed, we make sure servers are up with a ping
+                pingServer(fetchWindow.userId)
             }
 
             fetchingState.value = CalendarsRepository.FetchingState.Finished
@@ -507,7 +519,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun refreshCalendars(userId: UserId): Boolean {
-        val calendarsResponse = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)
+        val calendarsResponse = calendarsApi.getCalendars(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
         return if (calendarsResponse != null) {
             calendarsResponse.calendars.forEach {
                 // TODO do boostrap for subscribed calendars to get calendar subscription extra properties
@@ -521,11 +533,11 @@ class CalendarsRepositoryImpl @Inject constructor(
         val calendars = arrayListOf<CalendarEntity>()
         val members = hashMapOf<String, MemberEntity>()
         calendarIds.forEach {
-            val calendarResponse = calendarsApi.getCalendar(userId, it).valueOrNullAndLogErrors(logger)
+            val calendarResponse = calendarsApi.getCalendar(userId, it).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
             if (calendarResponse != null) {
                 calendars.add(calendarResponse.calendar)
                 // Get members for calendar
-                val memberListResponse = calendarsApi.getMemberList(userId, it).valueOrNullAndLogErrors(logger)
+                val memberListResponse = calendarsApi.getMemberList(userId, it).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
                 if (memberListResponse != null) {
                     memberListResponse.members.firstOrNull()?. let { memberEntity ->
                         members[it] = memberEntity
@@ -552,7 +564,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>? = calendarsApi.getCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+    override suspend fun fetchCalendarEntities(userId: UserId): List<CalendarEntity>? =
+        calendarsApi.getCalendars(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendars
 
     override suspend fun fetchMembersToCalendarEntities(
         userId: UserId,
@@ -584,27 +597,27 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchMembers(userId: UserId, calendarId: String): List<MemberEntity>? {
-        return calendarsApi.getMemberList(userId, calendarId).valueOrNullAndLogErrors(logger)?.members
+        return calendarsApi.getMemberList(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.members
     }
 
     private suspend fun fetchCalendarSettings(userId: UserId, calendarId: String): CalendarSettingsEntity? {
-        return calendarsApi.getCalendarSettings(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendarSettings
+        return calendarsApi.getCalendarSettings(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendarSettings
     }
 
     override suspend fun fetchCalendar(userId: UserId, calendarId: String): Calendar? {
 
-        val fetchedCalendar = calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar ?: return null
-        val fetchedMember = calendarsApi.getMemberList(userId, calendarId).valueOrNullAndLogErrors(logger)?.members?.firstOrNull() ?: return null
-        val fetchedCalendarSettings = calendarsApi.getCalendarSettings(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendarSettings ?: return null
+        val fetchedCalendar = calendarsApi.getCalendar(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendar ?: return null
+        val fetchedMember = calendarsApi.getMemberList(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.members?.firstOrNull() ?: return null
+        val fetchedCalendarSettings = calendarsApi.getCalendarSettings(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendarSettings ?: return null
 
         return Calendar.from(fetchedCalendar, fetchedMember, fetchedCalendarSettings, json)
     }
 
     override suspend fun fetchCalendarEntity(userId: UserId, calendarId: String): CalendarEntity? =
-        calendarsApi.getCalendar(userId, calendarId).valueOrNullAndLogErrors(logger)?.calendar
+        calendarsApi.getCalendar(userId, calendarId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendar
 
     override suspend fun fetchManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
-        calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+        calendarsApi.getManagedHolidayCalendars(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendars
 
     override suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
         database.managedHolidayCalendarDao().selectAll()
@@ -617,7 +630,7 @@ class CalendarsRepositoryImpl @Inject constructor(
      * @return the fetched list of managed holiday calendar.
      */
     override suspend fun refreshManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? {
-        val managedHolidayCalendars = calendarsApi.getManagedHolidayCalendars(userId).valueOrNullAndLogErrors(logger)?.calendars
+        val managedHolidayCalendars = calendarsApi.getManagedHolidayCalendars(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendars
         managedHolidayCalendars?.forEach {
             database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))
         }
@@ -1660,6 +1673,34 @@ class CalendarsRepositoryImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun <T : Any> ApiResponse<T>.pingServerIfNeeded(userId: UserId): ApiResponse<T> {
+        if (this is ApiResponse.Error
+            && this.httpCode == 503
+            && networkManager.isConnectedToNetwork()
+            && System.currentTimeMillis().minus(lastPingMs) >= TimeUnit.SECONDS.toMillis(PING_INTERVAL_SECONDS)) {
+            displayServerDownBannerFlow.value = testsApi.pingServer(userId) !is ApiResponse.Success
+            lastPingMs = System.currentTimeMillis()
+        }
+
+        return this
+    }
+
+    override suspend fun pingServer(userId: UserId) {
+        if (networkManager.isConnectedToNetwork()
+            && System.currentTimeMillis().minus(lastPingMs) >= TimeUnit.SECONDS.toMillis(PING_INTERVAL_SECONDS)) {
+            displayServerDownBannerFlow.value = testsApi.pingServer(userId) !is ApiResponse.Success
+            lastPingMs = System.currentTimeMillis()
+        }
+    }
+
+    override fun getDisplayServerDownBannerFlow(): Flow<Boolean> {
+        return displayServerDownBannerFlow
+    }
+
+    override fun hideServerDownBanner() {
+        displayServerDownBannerFlow.value = false
     }
 }
 

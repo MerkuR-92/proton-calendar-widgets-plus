@@ -188,7 +188,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             //  to navigate manually
             findNavController().navigate(Navigation.Deeplink.toMonth())
         }
-        mainViewModel.triggerPlayStoreRatingFlow.update { true }
+        mainViewModel.triggerMainViewActions.update { true }
     }
 
     private fun displayDiscardChangesConfirmationDialog(callback: DialogInterface.OnClickListener) {

@@ -28,6 +28,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
+import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
@@ -36,6 +37,7 @@ import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
@@ -49,6 +51,7 @@ import java.util.*
 internal class CalendarRepositoryTest {
 
     private val calendarsApiMock: CalendarsApi = mockk()
+    private val testsApiMock: TestsApi = mockk()
 
     private lateinit var appDatabaseMock: AppDatabase
 
@@ -62,6 +65,7 @@ internal class CalendarRepositoryTest {
     private val userManagerMock: UserManager = mockk()
     private val userAddressManagerMock: UserAddressManager = mockk()
     private val accountManagerMock: AccountManager = mockk()
+    private val networkManagerMock: NetworkManager = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -366,6 +370,7 @@ internal class CalendarRepositoryTest {
             fetchEventsUseCaseMock,
             updateAlarmsUseCaseMock,
             calendarsApiMock,
+            testsApiMock,
             json,
             calendarWidgetRefresherMock,
             eventDecryptorMock,
@@ -373,7 +378,8 @@ internal class CalendarRepositoryTest {
             indexEventForSearchUseCaseMock,
             userManagerMock,
             userAddressManagerMock,
-            accountManagerMock
+            accountManagerMock,
+            networkManagerMock
         )
     }
 

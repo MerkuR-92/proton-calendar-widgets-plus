@@ -268,7 +268,10 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                     UseCase.Result.Error("HandleDeleteUseCase: there were errors when deleting events ${syncError?.response?.code} ${syncError?.response?.error}", userErrorMessage = syncError?.response?.error)
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.error}")
+            is ApiResponse.Error -> {
+                if (syncResponse.httpCode == 503) calendarsRepository.pingServer(userId)
+                UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.error}")
+            }
             is ApiResponse.Exception -> UseCase.Result.Error("HandleDeleteUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
         }
     }
@@ -288,11 +291,20 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         } ?: return UseCase.Result.InvalidParams("HandleDeleteUseCase: event $eventId could not be transformed")
 
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, event.uid, 0, 100) // TODO paging
-        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) eventsSharingUidResponse.data.events.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-            eventDecryptor.decrypt(it)
+        val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) {
+            eventsSharingUidResponse.data.events.mapNotNull {
+                if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                    eventDecryptor.decrypt(it)
+                } else {
+                    transformEventUseCase.execute(it)
+                }
+            }
         } else {
-            transformEventUseCase.execute(it)
-        } } else return UseCase.Result.Error("error fetching events sharing UID")
+            if (eventsSharingUidResponse is ApiResponse.Error && eventsSharingUidResponse.httpCode == 503) {
+                calendarsRepository.pingServer(userId)
+            }
+            return UseCase.Result.Error("error fetching events sharing UID")
+        }
 
         // we need to manually delete all "single-edited" events with RecurrenceID after just-deleted occurrence
         val eventsToDelete = eventsSharingUid.filter {

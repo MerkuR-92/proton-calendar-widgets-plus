@@ -107,6 +107,12 @@ const val HOLIDAY_CALENDAR_VERSION_CODE = 223
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
+const val PING_INTERVAL_SECONDS = 30L
+const val PING_TIMEOUT_SECONDS = 3
+const val SERVER_DOWN_BANNER_DURATION_SECONDS = 10L
+
+const val FETCH_FEATURE_FLAG_INTERVAL_SECONDS = 30L
+
 val SPOTLIGHT_VERSION_CODES = arrayListOf(
     MONTH_VIEW_VERSION_CODE, // Month view (0.30.3)
     REBRANDING_VERSION_CODE, // Rebranding (2.0.2)

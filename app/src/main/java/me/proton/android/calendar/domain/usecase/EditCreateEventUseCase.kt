@@ -438,7 +438,10 @@ class EditCreateEventUseCase @Inject constructor(
                     UseCase.Result.Success(eventsToInsertOrUpdate.map { it.id })
                 }
             }
-            is ApiResponse.Error -> UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.error}")
+            is ApiResponse.Error -> {
+                if (syncResponse.httpCode == 503) calendarsRepository.pingServer(userId)
+                UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.error}")
+            }
             is ApiResponse.Exception -> UseCase.Result.Error("EditCreateEventUseCase: error in sync events: ${syncResponse.exception.message ?: "(no exception message)"}")
         }
 

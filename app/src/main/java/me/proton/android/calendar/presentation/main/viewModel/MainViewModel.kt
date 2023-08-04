@@ -61,7 +61,9 @@ class MainViewModel @Inject constructor(
 
     val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
 
-    val triggerPlayStoreRatingFlow = MutableStateFlow(false)
+    // Used to notify us that user is back on the main view so we can trigger actions there
+    // Workaround to imitate onResume behavior since that callback will not be called when we use DialogFragment
+    val triggerMainViewActions = MutableStateFlow(false)
 
     /**
      * Try to open maps with event location.

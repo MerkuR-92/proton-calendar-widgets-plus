@@ -58,7 +58,10 @@ class CreateCalendarUseCase @Inject constructor(
 
                 handleCalendarCreated(userId, createCalendarApiResponse.data.calendar, address)
             }
-            is ApiResponse.Error -> UseCase.Result.Error("CreateCalendarUseCase: error creating calendar: ${createCalendarApiResponse.error}")
+            is ApiResponse.Error -> {
+                if (createCalendarApiResponse.httpCode == 503) calendarsRepository.pingServer(userId)
+                UseCase.Result.Error("CreateCalendarUseCase: error creating calendar: ${createCalendarApiResponse.error}")
+            }
             is ApiResponse.Exception -> UseCase.Result.Error("CreateCalendarUseCase: error creating calendar: ${createCalendarApiResponse.exception.message ?: "(no exception message)"}")
         }
     }

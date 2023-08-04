@@ -357,6 +357,12 @@ interface CalendarsRepository {
 
     fun getUserMember(userAddresses: List<UserAddress>, members: List<MemberEntity>): MemberEntity?
 
+    suspend fun <T : Any> ApiResponse<T>.pingServerIfNeeded(userId: UserId): ApiResponse<T>
+    suspend fun pingServer(userId: UserId)
+
+    fun getDisplayServerDownBannerFlow(): Flow<Boolean>
+    fun hideServerDownBanner()
+
     val fetchingState: Flow<FetchingState>
 
     sealed class FetchingState {

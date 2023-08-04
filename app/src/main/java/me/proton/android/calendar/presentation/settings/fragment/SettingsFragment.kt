@@ -85,7 +85,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
 
     override fun onBackPressedCustom() {
         findNavController().navigateUp()
-        mainViewModel.triggerPlayStoreRatingFlow.update { true }
+        mainViewModel.triggerMainViewActions.update { true }
     }
 
     override fun onNavigationIconClicked(): Boolean {
