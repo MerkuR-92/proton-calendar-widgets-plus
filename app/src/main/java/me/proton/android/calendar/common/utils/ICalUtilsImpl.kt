@@ -426,11 +426,13 @@ object ICalUtilsImpl : ICalUtils {
         setSequence(0)
     }
 
-    override fun generateEventStart(timeZoneId: ZoneId): LocalDateTime {
-        val now = ZonedDateTime.now(timeZoneId)
-        return if (now.toLocalTime().toSecondOfDay() > TimeUnit.HOURS.toSeconds(23) + TimeUnit.MINUTES.toSeconds(30)) {
-            now.plusDays(1).toLocalDate().atStartOfDay()
-        } else now.plusMinutes(30L - (now.minute % 30)).toLocalDateTime()
+    override fun generateEventStart(timeZoneId: ZoneId, selectedDate: LocalDate?): LocalDateTime {
+        val startDate = selectedDate?.let {
+            ZonedDateTime.of(selectedDate, LocalTime.now(timeZoneId), timeZoneId)
+        } ?: ZonedDateTime.now(timeZoneId)
+        return if (startDate.toLocalTime().toSecondOfDay() > TimeUnit.HOURS.toSeconds(23) + TimeUnit.MINUTES.toSeconds(30)) {
+            startDate.plusDays(1).toLocalDate().atStartOfDay()
+        } else startDate.plusMinutes(30L - (startDate.minute % 30)).toLocalDateTime()
     }
 
     /**
