@@ -103,7 +103,7 @@
     <string name="event_change_answer_recurring_title">განმეორებადი მოვლენის განახლება</string>
     <string name="event_change_answer_recurring_description">გსურთ შეცვალოთ თქვენი პასუხი ამ სერიის ყველა მოვლენაზე?</string>
     <string name="event_change_answer_recurring_overwrite_description">გნებავთ თქვენი პასუხი ამ სერიების ყველა მოვლენისთვის შეცვალოთ?\nორგანიზატორის მიერ ადრე განახლებული თქვენი ზოგიერთი პასუხი დაიკარგება.</string>
-    <string name="event_change_answer_recurring_single_edit_description">მოვლენა განახლდა ორგანიზატორის მიერ. გნებავთ თქვენი პასუხის შეცვლა მხოლოდ ამ სერიებში მოხდენების შესახებ?</string>
+    <string name="event_change_answer_recurring_single_edit_description">მოვლენა განახლდა ორგანიზატორის მიერ. გნებავთ თქვენი პასუხის შეცვლა, მხოლოდ, ამ სერიებში მოხდენების შესახებ?</string>
     <string name="event_change_answer_recurring_cancel">გაუქმება</string>
     <string name="event_change_answer_recurring_confirm">განახლება</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s დაეთანხმა თქვენს მოსაწვევს %2$s</string>
@@ -112,8 +112,8 @@
     <string name="event_organizer_send_prefs_error_title">ორგანიზატორის ინფორმირება შეუძლებელია</string>
     <string name="event_organizer_send_prefs_message_accepted_title">ორგანიზატორის გაფრთხილება მოსაწვევის დასტურის შესახებ შეუძლებელია</string>
     <string name="event_organizer_send_prefs_message_declined_title">ორგანიზატორის გაფრთხილება მოსაწვევის უარყოფის შესახებ შეუძლებელია</string>
-    <string name="event_organizer_send_prefs_message_tentative_title">ორგანიზატორს არ შეიძლება ეცნობოს, რომ თქვენ სავარაუდოდ მიიღეთ მოწვევა</string>
-    <string name="event_organizer_send_prefs_message_default_title">ორგანიზატორს არ შეიძლება ეცნობოს, რომ თქვენ უპასუხეთ მოწვევას</string>
+    <string name="event_organizer_send_prefs_message_tentative_title">ორგანიზატორს არ შეიძლება, ეცნობოს, რომ თქვენ სავარაუდოდ მიიღეთ მოწვევა</string>
+    <string name="event_organizer_send_prefs_message_default_title">ორგანიზატორს არ შეიძლება, ეცნობოს, რომ თქვენ უპასუხეთ მოწვევას</string>
     <string name="event_organizer_send_prefs_button_title">დიახ</string>
     <string name="event_attendees_send_prefs_error_title">მონაწილეების გაფრთხილება შეუძლებელია</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">მონაწილეების გაფრთხილება თქვეი ცვლილებების შესახებ შეუძლებელია:\n\n• %1$s\n\nმაინც გნებავთ გაგრძელება?</string>
@@ -334,7 +334,7 @@
     <string name="snack_ics_unsupported_counter_error">მოვლენის გადადება ამჟამად მხარდაჭერილი არაა</string>
     <string name="snack_ics_unsupported_refresh_error">მოვლენის განახლება ამჟამად მხარდაჭერილი არაა</string>
     <string name="snack_ics_unsupported_publish_error">მოვლენის შემოტანა ამჟამად მხარდაჭერილი არაა</string>
-    <string name="snack_ics_unsupported_single_edit_reply_error">ჩვენ მხოლოდ მხარს ვუჭერთ პასუხს სერიის ყველა მოვლენაზე ამ მომენტისთვის</string>
+    <string name="snack_ics_unsupported_single_edit_reply_error">ჩვენ, მხოლოდ, მხარს ვუჭერთ პასუხს სერიის ყველა მოვლენაზე ამ მომენტისთვის</string>
     <string name="snack_ics_party_crasher_error">ელფოსტის თქვენი მისამართი მონაწილეთა სიაში არაა</string>
     <string name="snack_ics_reply_party_crasher_error">მონაწილეები, რომლებიც ორგანიზატორმა არ მიიწვია, არ შეიძლება დაემატოს</string>
     <string name="snack_ics_missing_uid_error">მოვლენას UID-ი აკლია</string>
@@ -352,9 +352,11 @@
     <string name="snack_app_link_invalid">არასწორი ბმული მოვლენამდე</string>
     <string name="snack_app_link_error">მოვლენის გახსნის შეცდომა</string>
     <string name="snack_app_link_import_error">ავთენტიკაცია გაუქმებულია</string>
-    <string name="snack_notification_already_added">გაფრთხილება უკვე დამატებული</string>
+    <string name="snack_notification_already_added">გაფრთხილება უკვე დამატებულია</string>
     <string name="snack_opening_ics">მოვლენის გახსნა…</string>
     <string name="snack_invite_in_shared_calendar_error">გაზიარებულ კალენდარში მოსაწვევების შექმნა აკრძალულია</string>
+    <string name="snack_down_banner">Proton-ის სერვერები გამორთულია. დეტალებისთვის იხილეთ სტატუსის გვერდი.</string>
+    <string name="snack_down_banner_action">სტატუსის გვერდის გახსნა</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
@@ -392,7 +394,7 @@
     <string name="bug_report_discard_changes_confirm">მოცილება</string>
     <!-- Settings -->
     <string name="settings_theme_title">თემა</string>
-    <string name="settings_theme_info">ეს პარამეტრი გავლენას ახდენს მხოლოდ Proton Calendar-ის აპის გამოჩენაზე ამ მოწყობილობაზე. აპლიკაცია განახლდება თემის შეცვლის შემდეგ.</string>
+    <string name="settings_theme_info">ეს პარამეტრი გავლენას ახდენს, მხოლოდ, Proton Calendar-ის აპის გამოჩენაზე ამ მოწყობილობაზე. აპლიკაცია განახლდება თემის შეცვლის შემდეგ.</string>
     <string name="settings_timezone_title">დროის სარტყელი</string>
     <string name="settings_language_title">აპის ენა</string>
     <string name="settings_language_default">ავტო-ძებნა</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">ქვეყნის ძებნა</string>
     <string name="holiday_calendar_form_picker_title">ქვეყანა</string>
     <string name="holiday_calendar_time_zone_based">თქვენი დროის სარტყელზე დაყრდნობით</string>
-    <string name="holiday_calendar_already_exists">დასვენებების კალენდარი უკვე არსებობს</string>
+    <string name="holiday_calendar_already_exists">ეს დასვენების კალენდარი უკვე დამატებულია.</string>
     <string name="holiday_calendar_value_placeholder">აირჩიეთ ქვეყანა</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">დიახ</string>
@@ -547,7 +549,7 @@
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
     <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდრებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
+    <string name="spotlight_dialog_wipe_search_title">ძებნა მოვაცილეთ, რათა ის უკეთესი გავხადოთ</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
     <string name="spotlight_dialog_holiday_calendar_title">დასვენებაა!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
@@ -563,7 +565,7 @@
     <string name="import_assistant_error">მონაცემების გამოთხოვის შეცდომა</string>
     <string name="import_assistant_data_gathering_error">მონაცემების შეგროვების შეცდომა</string>
     <string name="import_assistant_update_import_error">შემოტანის განახლების შეცდომა. მოგვიანებით სცადეთ.</string>
-    <string name="import_assistant_update_import_wrong_account_error">არასწორი ანგარიში. გთხოვთ შეხვიდეთ ანგარიშზე, რომელიც კალენდრის იმპორტისთვის გამოიყენეთ.</string>
+    <string name="import_assistant_update_import_wrong_account_error">არასწორი ანგარიში. გთხოვთ, შეხვიდეთ ანგარიშზე, რომელიც კალენდრის იმპორტისთვის გამოიყენეთ.</string>
     <string name="import_assistant_start_import_error">შემოტანის დაწყების შეცდომა. მოგვიანებით სცადეთ.</string>
     <string name="import_assistant_delete_import_success">შემოტანის ჩანაწერი წაშლილია</string>
     <string name="import_assistant_delete_import_error">შემოტანის წაშლის შეცდომა. მოგვიანებით სცადეთ.</string>
@@ -582,7 +584,7 @@
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">მონაცემების შეტანა %1s-დან %2s-ში.</string>
     <string name="import_assistant_in_progress_redirect">პროგრესის შემოწმება</string>
     <string name="import_assistant_in_progress_sub_description">დიდი ზომის შემოტანას რამდენიმე დღეც კი შეიძლება დასჭირდეს. ჩვენ შეგატყობინებთ, როცა შემოტანა დასრულდება. ფანჯარა შეგიძლიათ დახუროთ.</string>
-    <string name="import_assistant_guide_subtitle">გახდით უფრო კონფიდენციალური. დაუძაბავად და უსაფრთხოდ.</string>
+    <string name="import_assistant_guide_subtitle">გახდით უფრო კონფიდენციალური. მარტივად და უსაფრთხოდ.</string>
     <string name="import_assistant_guide_description">გადაიტანეთ თქვენი მოვლენები და სხვა მონაცემები Google-დან Proton-მდე. ჩვენი ადვილად გადართვის პროგრამა გაგიძღვებათ შემოტანის თითოეულ ნაბიჯზე. ის ასევე შიფრავს ყველაფერს, რაზეც მუშაობს.</string>
     <string name="import_assistant_new_import">ახალი შემოტანა</string>
     <string name="import_assistant_previous_import">წინა შემოტანები</string>
@@ -655,8 +657,8 @@
         <item quantity="other">კალენდრის ლიმიტის გამო ყველა შემოტანილი კალენდრისთვის ახალი კალენდრების შექმნა შეუძლებელია.\n • გააუქმეთ მინიმუმ %1$d კალენდრები</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020 ან\n • საჭირო იქნება მინიმუმ %1$d არსებულ კალენდართან შერწყმა.</item>
-        <item quantity="other">\u0020 ან\n • საჭირო იქნება მინიმუმ %1$d არსებულ კალენდართან შერწყმა.</item>
+        <item quantity="one">\u0020 ან\n • საჭირო იქნება, მინიმუმ, %1$d არსებულ კალენდართან შერწყმა.</item>
+        <item quantity="other">\u0020 ან\n • საჭირო იქნება, მინიმუმ, %1$d არსებულ კალენდართან შერწყმა.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">წამი</item>

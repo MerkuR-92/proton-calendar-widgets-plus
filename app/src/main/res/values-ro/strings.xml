@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Notificarea a fost deja actualizată.</string>
     <string name="snack_opening_ics">Se deschide evenimentul…</string>
     <string name="snack_invite_in_shared_calendar_error">Crearea de invitații la un calendar partajat nu este permisă.</string>
+    <string name="snack_down_banner">Serverele Proton nu sunt funcționale. Vizitați pagina noastră de stare pentru detalii.</string>
+    <string name="snack_down_banner_action">Deschidere pagină stare</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
     <string name="error_occurrence_does_not_exist">Căutarea nu există.</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Căutare țară</string>
     <string name="holiday_calendar_form_picker_title">Țara</string>
     <string name="holiday_calendar_time_zone_based">Pe baza fusului orar</string>
-    <string name="holiday_calendar_already_exists">Calendarul sărbătorilor există deja.</string>
+    <string name="holiday_calendar_already_exists">Acest calendar cu sărbători este deja adăugat.</string>
     <string name="holiday_calendar_value_placeholder">Selectare țară</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

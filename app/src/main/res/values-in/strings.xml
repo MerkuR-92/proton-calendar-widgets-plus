@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Pemberitahuan sudah ditambahkan</string>
     <string name="snack_opening_ics">Membuka acara…</string>
     <string name="snack_invite_in_shared_calendar_error">Pembuatan alamat pada kalender bersama tidak diperkenankan</string>
+    <string name="snack_down_banner">Server Proton sedang down. Kunjungi halaman status kami untuk rincian selengkapnya.</string>
+    <string name="snack_down_banner_action">Buka halaman status</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
     <string name="error_occurrence_does_not_exist">Peristiwa ini tidak ada</string>
@@ -433,7 +435,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalender tidak dapat didekripsi</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Hanya lihat</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">dari %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Buat kalender</string>
     <string name="calendar_form_update_title">Ubah kalender</string>
@@ -444,7 +446,7 @@
     <string name="calendar_form_language">Bahasa</string>
     <string name="calendar_form_default_event_duration">Durasi acara</string>
     <string name="calendar_form_default_event_notifications">Pemberitahuan acara</string>
-    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notifikasi acara sepanjang hari</string>
     <string name="calendar_form_add_notification">Tambahkan pemberitahuan</string>
     <string name="calendar_form_default_email">Alamat email</string>
     <string name="calendar_form_default_email_value_error">Gagal memuat email bawaan</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Cari negara</string>
     <string name="holiday_calendar_form_picker_title">Negara</string>
     <string name="holiday_calendar_time_zone_based">Berdasarkan zona waktu Anda</string>
-    <string name="holiday_calendar_already_exists">Kalender hari libur telah ada</string>
+    <string name="holiday_calendar_already_exists">This holiday calendar is already added.</string>
     <string name="holiday_calendar_value_placeholder">Pilih negara</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -549,7 +551,7 @@
     <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
     <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
     <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Liburan umum telah hadir!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
     <!-- Import -->

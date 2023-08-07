@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
     <string name="snack_opening_ics">Afspraak wordt geopend…</string>
     <string name="snack_invite_in_shared_calendar_error">Uitnodigingen maken in een gedeelde agenda is niet toegestaan</string>
+    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -433,7 +435,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Agenda kon niet ontcijferd worden</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Alleen bekijken</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">van: %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">van %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Agenda aanmaken</string>
     <string name="calendar_form_update_title">Agenda bijwerken</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Zoek een land</string>
     <string name="holiday_calendar_form_picker_title">Land</string>
     <string name="holiday_calendar_time_zone_based">Gebaseerd op uw tijdzone</string>
-    <string name="holiday_calendar_already_exists">Feestdagenagenda bestaat al</string>
+    <string name="holiday_calendar_already_exists">Deze Feestdagenagenda is al toegevoegd.</string>
     <string name="holiday_calendar_value_placeholder">Selecteer land</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -547,10 +549,10 @@
     <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
     <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_title">Zoekopdracht verwijderd om het te verbeteren</string>
+    <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Kalender Beta, omdat we het meer bruikbaar en betrouwbaar voor je willen maken. Dit duurt slechts enkele seconden.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn hier!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>

@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Abrindo evento…</string>
     <string name="snack_invite_in_shared_calendar_error">Não é permitido criar convites num calendário partilhado</string>
+    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Pesquisar por um país.</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">Com base no seu fuso horário</string>
-    <string name="holiday_calendar_already_exists">O calendário de feriados já existe.</string>
+    <string name="holiday_calendar_already_exists">Este calendário de feriados já está adicionado.</string>
     <string name="holiday_calendar_value_placeholder">Selecione o país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Aceitar</string>

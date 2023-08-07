@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Powiadomienia zostały już dodane</string>
     <string name="snack_opening_ics">Otwieranie wydarzenia…</string>
     <string name="snack_invite_in_shared_calendar_error">Tworzenie zaproszeń w udostępnionym kalendarzu nie jest dozwolone</string>
+    <string name="snack_down_banner">Serwery Proton są niedostępne. Odwiedź naszą stronę statusu, aby poznać szczegóły.</string>
+    <string name="snack_down_banner_action">Otwórz stronę statusu</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Wydarzenie nie istnieje</string>
     <string name="error_occurrence_does_not_exist">Powtórzenie nie istnieje</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Szukaj kraju</string>
     <string name="holiday_calendar_form_picker_title">Kraj</string>
     <string name="holiday_calendar_time_zone_based">Na podstawie strefy czasowej</string>
-    <string name="holiday_calendar_already_exists">Kalendarz świąt już istnieje</string>
+    <string name="holiday_calendar_already_exists">Ten kalendarz świąt został już dodany.</string>
     <string name="holiday_calendar_value_placeholder">Wybierz kraj</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -563,7 +565,7 @@
     <string name="import_assistant_error">Pobieranie danych nie powiodło się</string>
     <string name="import_assistant_data_gathering_error">Pobieranie danych nie powiodło się</string>
     <string name="import_assistant_update_import_error">Nie udało się zaktualizować importowania. Spróbuj ponownie później.</string>
-    <string name="import_assistant_update_import_wrong_account_error">Złe konto. Zaloguj się na konto, z którego chcesz wyeksportować kalendarz.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Złe konto. Zaloguj się do konta, z którego chcesz wyeksportować kalendarz.</string>
     <string name="import_assistant_start_import_error">Nie udało się rozpocząć importowania. Spróbuj ponownie później.</string>
     <string name="import_assistant_delete_import_success">Rekord importu został usunięty</string>
     <string name="import_assistant_delete_import_error">Nie udało się usunąć importowania. Spróbuj ponownie później.</string>
@@ -596,7 +598,7 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Wstrzymano</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Niepowodzenie</string>
     <string name="import_assistant_status_paused_lost_connection_title">Połączenie z kontem Google zostało utracone</string>
-    <string name="import_assistant_status_paused_lost_connection_description">Aby kontynuować proces importowania, kliknij przycisk Połącz ponownie, zaloguj się na konto Google i przyznaj usłudze Proton dostęp do danych.</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Aby kontynuować proces importowania, kliknij przycisk Połącz ponownie, zaloguj się do konta Google i przyznaj usłudze Proton dostęp do danych.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Połącz ponownie</string>
     <string name="import_assistant_status_paused_storage_full_title">Przestrzeń dyskowa jest pełna</string>
     <string name="import_assistant_status_paused_storage_full_description">Nie masz wystarczającej przestrzeni dyskowej, aby zakończyć proces importowania kalendarza. Zwolnij część miejsca lub dodaj dodatkową przestrzeń dyskową, a następnie wróć tutaj, aby wznowić proces importowania.</string>

@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Уведомление уже было добавлено</string>
     <string name="snack_opening_ics">Открытие события…</string>
     <string name="snack_invite_in_shared_calendar_error">Создание приглашений в общем календаре не разрешается</string>
+    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">События не существует</string>
     <string name="error_occurrence_does_not_exist">Повтор не существует</string>
@@ -433,7 +435,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Календарь невозможно было расшифровать</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Только просмотр</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">от: %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Создать календарь</string>
     <string name="calendar_form_update_title">Редактировать календарь</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Искать страну</string>
     <string name="holiday_calendar_form_picker_title">Страна</string>
     <string name="holiday_calendar_time_zone_based">На основе вашего часового пояса</string>
-    <string name="holiday_calendar_already_exists">Календарь праздников уже существует</string>
+    <string name="holiday_calendar_already_exists">Этот календарь выходных дней уже добавлен.</string>
     <string name="holiday_calendar_value_placeholder">Выберите страну</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">ОК</string>
@@ -525,7 +527,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Что нового</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
-    <string name="spotlight_dialog_skip">Skip</string>
+    <string name="spotlight_dialog_skip">Пропустить</string>
     <string name="spotlight_dialog_confirmation_button">ОК</string>
     <string name="spotlight_dialog_month_view_title">Просмотр месяца</string>
     <string name="spotlight_dialog_month_view_description">Получите обзор событий с помощью нового просмотра месяца. Переключайтесь между просмотрами с помощью меню.</string>
@@ -549,9 +551,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Добавляйте события напрямую в Proton Calendar из других приложений.\n\n• Создавайте и управляйте событиями в календарях, которыми с вами поделились.\n\n• Устанавливайте вид по умолчанию, который вы хотите видеть при открытии приложения\n\n• Доступно 13 новых языков.</string>
     <string name="spotlight_dialog_wipe_search_title">Убрали поиск, чтобы сделать его лучше</string>
     <string name="spotlight_dialog_wipe_search_description">Мы удаляем функцию экспериментального поиска из Proton Calendar Beta, так как мы хотим сделать его полезнее и надежнее для вас. Это может занять несколько секунд.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Государственные праздники здесь!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Бывает, что случайно планируйте встречи, когда все отдыхают, или забывайте запланировать поездку на долгие выходные?\n\nДобавьте государственные праздники любой страны в свой календарь.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больше не назначайте встречи, когда все отсутствуют, или не забывайте планировать долгие выходные.\n\nПоскольку у вас уже максимальное количество календарей, чтобы добавить календарь праздников, вам необходимо сначала удалить существующий календарь.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>

@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Upozornění již bylo přidáno</string>
     <string name="snack_opening_ics">Otevírání události…</string>
     <string name="snack_invite_in_shared_calendar_error">Vytváření pozvánek ve sdíleném kalendáři není povoleno</string>
+    <string name="snack_down_banner">Servery Protonu jsou mimo provoz. Podrobnosti naleznete na naší stavové stránce.</string>
+    <string name="snack_down_banner_action">Otevřít stavovou stránku</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Událost neexistuje</string>
     <string name="error_occurrence_does_not_exist">Výskyt události neexistuje</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Hledat zemi</string>
     <string name="holiday_calendar_form_picker_title">Země</string>
     <string name="holiday_calendar_time_zone_based">Na základě vašeho časového pásma</string>
-    <string name="holiday_calendar_already_exists">Kalendář svátků již existuje</string>
+    <string name="holiday_calendar_already_exists">Tento kalendář svátků je již přidán.</string>
     <string name="holiday_calendar_value_placeholder">Vyberte zemi</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -547,11 +549,11 @@
     <string name="spotlight_dialog_import_description">Importovat události do vašeho kalendáře ze souborů na vašem teleofnu.\n\n• Přidat rezervace výletů přímo z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkce kalendáře</string>
     <string name="spotlight_dialog_calendar_provider_description">• Přidejte události přímo do Proton Calendar z jiných aplikací.\n\n• Vytvořte a spravujte události v kalendářích, které byly sdíleny s vámi.\n\n• Nastavte výchozí zobrazení, které chcete vidět po otevření aplikace\n\n• K dispozici je 13 nových jazyků.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_title">Vyhledávání odstraněno pro zlepšení</string>
+    <string name="spotlight_dialog_wipe_search_description">Odstraňujeme experimentální vyhledávání z Proton Calendar Beta, protože chceme, aby byl pro vás užitečnější a spolehlivější. To může trvat několik sekund.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Státní svátky jsou tady!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Už nemusíte plánovat schůzky v době, kdy mají všichni volno, ani zapomínat naplánovat prodloužený víkend.\n\nPřidejte si do kalendáře státní svátky v jakékoli zemi.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žádné plánování schůzek v době, kdy mají všichni volno, nebo zapomínání na plánování prodlouženého víkendu.\n\nPro přidání prázdninového kalendáře budete muset nejprve odstranit stávající kalendář, protože v současné době máte omezený počet kalendářů.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>

@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">La notifica è già stata aggiunta</string>
     <string name="snack_opening_ics">Apertura evento…</string>
     <string name="snack_invite_in_shared_calendar_error">Non è consentito invitare partecipanti in un calendario condiviso</string>
+    <string name="snack_down_banner">I server Proton non funzionano. Visita la nostra pagina di stato per i dettagli.</string>
+    <string name="snack_down_banner_action">Apri la pagina di stato</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'evento non esiste</string>
     <string name="error_occurrence_does_not_exist">L\'occorrenza non esiste</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Cerca un paese</string>
     <string name="holiday_calendar_form_picker_title">Paese</string>
     <string name="holiday_calendar_time_zone_based">In base al fuso orario</string>
-    <string name="holiday_calendar_already_exists">Il calendario dei giorni festivi esiste già.</string>
+    <string name="holiday_calendar_already_exists">Questo calendario delle festività è già stato aggiunto.</string>
     <string name="holiday_calendar_value_placeholder">Seleziona un paese</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -618,7 +620,7 @@
     <string name="import_assistant_sign_in_in_progress">È già in corso una procedura di accesso</string>
     <string name="import_assistant_in_progress_error_snack">C\'è ancora un\'importazione in corso</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Importare come evento semplice?</string>
+    <string name="import_event_disclaimer_dialog_title">Importare come evento senza i dettagli?</string>
     <string name="import_event_disclaimer_dialog_description">\nGli inviti importati appariranno in Proton Calendar come eventi semplici, senza i dettagli sull\'<b>organizzatore</b> e i <b>partecipanti</b>.\n\n Per ricevere gli aggiornamenti sugli eventi e visualizzare i partecipanti, chiedi agli organizzatori di invitarti utilizzando il tuo indirizzo email Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importa</string>
     <!--  STRING PLURALS  -->

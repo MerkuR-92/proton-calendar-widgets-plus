@@ -92,12 +92,12 @@
     <string name="event_answer_yes">Sim</string>
     <string name="event_answer_no">Não</string>
     <string name="event_answer_maybe">Talvez</string>
-    <string name="event_decryption_error_dialog_title">Falha ao descriptografar o evento</string>
-    <string name="event_decryption_error_dialog_message">Falha ao descriptografar o conteúdo do evento.</string>
+    <string name="event_decryption_error_dialog_title">Erro ao descriptografar o evento</string>
+    <string name="event_decryption_error_dialog_message">Erro ao descriptografar o conteúdo do evento.</string>
     <string name="event_decryption_error_dialog_confirmation">Excluir evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Excluir eventos</string>
     <string name="event_decryption_error_dialog_close">Fechar</string>
-    <string name="event_signature_verification_failure">A verificação da assinatura do evento falhou. <a href="https://proton.me/support/what-is-a-digital-signature">Saiba mais</a></string>
+    <string name="event_signature_verification_failure">Não foi possível verificar a assinatura do evento. <a href="https://proton.me/support/what-is-a-digital-signature">Saiba mais</a></string>
     <string name="event_signature_verification_in_progress">Verificação da assinatura do evento em progresso.</string>
     <string name="event_signature_verification_network_error">A verificação da assinatura do evento foi interrompida por um erro. <a href="">Tente novamente</a></string>
     <string name="event_change_answer_recurring_title">Atualizar evento recorrente</string>
@@ -123,9 +123,9 @@
     <string name="event_send_prefs_error_address_disabled">este endereço não existe</string>
     <string name="event_send_prefs_error_getting_contact">não foi possível obter os dados do contato</string>
     <string name="event_send_prefs_error_network">erro de rede</string>
-    <string name="event_send_prefs_trusted_keys_invalid">chaves confiáveis estão inválidas</string>
-    <string name="event_send_prefs_public_keys_invalid">chaves confiáveis estão inválidas</string>
-    <string name="event_send_prefs_trusted_keys_signature_invalid">assinatura do contato inválida</string>
+    <string name="event_send_prefs_trusted_keys_invalid">As chaves de confiança não são válidas.</string>
+    <string name="event_send_prefs_public_keys_invalid">As chaves de confiança não são válidas.</string>
+    <string name="event_send_prefs_trusted_keys_signature_invalid">a assinatura do contato não é válida.</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Novo evento</string>
@@ -307,7 +307,7 @@
     <string name="snack_add_self_as_participant">Auto convite não permitido</string>
     <string name="snack_maximum_participants_reached">O número máximo de participantes foi atingido.</string>
     <string name="snack_add_participant_error">Erro ao adicionar o participante</string>
-    <string name="snack_add_participant_invalid_email">E-mail inválido</string>
+    <string name="snack_add_participant_invalid_email">O e-mail não é válido.</string>
     <string name="snack_change_attendee_answer_error">Erro ao enviar resposta. Tente novamente mais tarde</string>
     <string name="snack_network_error">Erro de rede. Tente novamente mais tarde.</string>
     <string name="snack_import_event_signed_out">Você precisa iniciar a sessão para importar eventos</string>
@@ -329,7 +329,7 @@
     <string name="snack_ics_event_not_found_error">Evento não encontrado</string>
     <string name="snack_ics_create_error">Erro ao criar o evento</string>
     <string name="snack_ics_parsing_error">Erro ao ler calendário</string>
-    <string name="snack_ics_unsupported_method_error">Este tipo de evento ainda não é suportado</string>
+    <string name="snack_ics_unsupported_method_error">Esta categoria de evento ainda não é suportado.</string>
     <string name="snack_ics_unsupported_add_error">A adição de ocorrências a um evento não é suportada no momento</string>
     <string name="snack_ics_unsupported_counter_error">A reprogramação de eventos não é suportada no momento</string>
     <string name="snack_ics_unsupported_refresh_error">A atualização de eventos não é suportada no momento</string>
@@ -343,18 +343,20 @@
     <string name="snack_ics_unsupported_duration_error">A propriedade de duração não é compatível</string>
     <string name="snack_ics_too_many_events_error">Vários eventos ainda não são suportados</string>
     <string name="snack_ics_no_events_error">Este calendário não contém nenhum evento</string>
-    <string name="snack_ics_invalid_error">Este convite é inválido</string>
+    <string name="snack_ics_invalid_error">Este convite não é válido.</string>
     <string name="snack_ics_disabled_calendar_error">Reative o endereço vinculado a este calendário para atualizar este evento</string>
     <string name="snack_ics_event_deleted_error">O evento não existe mais em seu calendário</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s aceitou o seu convite</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s aceitou provisoriamente o seu convite</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s recusou seu convite</string>
-    <string name="snack_app_link_invalid">Link inválido para o evento</string>
+    <string name="snack_app_link_invalid">O link para o evento não é válido.</string>
     <string name="snack_app_link_error">Erro ao abrir evento</string>
     <string name="snack_app_link_import_error">Autenticação cancelada</string>
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Abrindo evento…</string>
     <string name="snack_invite_in_shared_calendar_error">A criação de convites em um calendário compartilhado não é permitida</string>
+    <string name="snack_down_banner">Os servidores Proton estão indisponíveis. Visite nossa página de status para obter detalhes.</string>
+    <string name="snack_down_banner_action">Abrir página de status</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -447,7 +449,7 @@
     <string name="calendar_form_default_all_day_event_notifications">Notificação de eventos de dia inteiro</string>
     <string name="calendar_form_add_notification">Adicionar notificação</string>
     <string name="calendar_form_default_email">Endereço de e-mail</string>
-    <string name="calendar_form_default_email_value_error">Falha ao carregar e-mail padrão</string>
+    <string name="calendar_form_default_email_value_error">Erro ao carregar e-mail padrão</string>
     <string name="calendar_form_name_hint">Adicione o nome do calendário</string>
     <string name="calendar_form_name_required_error">Nome obrigatório</string>
     <string name="calendar_form_description_hint">Adicionar uma descrição do calendário</string>
@@ -473,7 +475,7 @@
     <string name="delete_calendar_snack_error">Erro ao excluir o calendário</string>
     <string name="remove_calendar_snack_error">Erro ao remover o calendário</string>
     <string name="leave_calendar_snack_error">Erro ao sair do calendário</string>
-    <string name="delete_calendar_snack_error_password_confirmation">Falha na confirmação de senha</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Erro na confirmação de senha</string>
     <string name="recreate_calendar_dialog_title">Limpar calendário</string>
     <string name="recreate_calendar_dialog_message">Esta ação removerá todos os eventos e usuários convidados.\n\nTem certeza de que deseja limpar este calendário?</string>
     <string name="recreate_calendar_snack_error">Erro ao limpar calendário</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Pesquisar por país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">Com base no seu fuso horário</string>
-    <string name="holiday_calendar_already_exists">Calendário de feriado já existe</string>
+    <string name="holiday_calendar_already_exists">Esse calendário de feriados já está adicionado.</string>
     <string name="holiday_calendar_value_placeholder">Selecionar país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -547,7 +549,7 @@
     <string name="spotlight_dialog_import_description">• Importe eventos para seu calendário a partir de arquivos do seu telefone.\n\n• Adicione reserva de viagens diretamente do Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Recursos do calendário</string>
     <string name="spotlight_dialog_calendar_provider_description">• Adicione eventos diretamente ao Proton Calendar a partir de outros aplicativos.\n\n• Crie e gerencie eventos em calendários compartilhados com você.\n\n• Defina a visualização padrão que deseja observar ao abrir o aplicativo.\n\n• 13 novos idiomas disponíveis.</string>
-    <string name="spotlight_dialog_wipe_search_title">Pesquisa removida para a melhorar</string>
+    <string name="spotlight_dialog_wipe_search_title">Pesquisa removida para melhorar</string>
     <string name="spotlight_dialog_wipe_search_description">Estamos removendo o recurso de pesquisa experimental do Proton Calendar Beta, pois desejamos entregar uma experiência mais prática e confiável pata você. Isso pode demorar alguns segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Os feriados públicos estão aqui!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de agendar reuniões quando todos estão de folga ou esquecer de planejar a viagem do feriadão.\n\n Adicione os feriados de qualquer país ao seu calendário.</string>
@@ -561,16 +563,16 @@
     <string name="import_assistant_summary_title">Resumo da importação</string>
     <string name="import_assistant_summary_customize_import">Importação personalizada</string>
     <string name="import_assistant_error">Erro ao buscar dados</string>
-    <string name="import_assistant_data_gathering_error">Falha na coleta de dados</string>
-    <string name="import_assistant_update_import_error">Falha ao atualizar a importação. Tente novamente mais tarde.</string>
+    <string name="import_assistant_data_gathering_error">Erro na coleta de dados</string>
+    <string name="import_assistant_update_import_error">Erro ao atualizar a importação. Tente novamente mais tarde.</string>
     <string name="import_assistant_update_import_wrong_account_error">Conta errada. Inicie sessão com a conta que você usou para a importação do calendário.</string>
-    <string name="import_assistant_start_import_error">Falha ao iniciar a importação. Tente novamente mais tarde.</string>
+    <string name="import_assistant_start_import_error">Erro ao iniciar a importação. Tente novamente mais tarde.</string>
     <string name="import_assistant_delete_import_success">Importação de registro excluído</string>
-    <string name="import_assistant_delete_import_error">Falha ao excluir a importação. Tente novamente mais tarde.</string>
-    <string name="import_assistant_cancel_import_error">Falha ao cancelar a importação. Tente novamente mais tarde.</string>
-    <string name="import_assistant_resume_import_error">Falha ao retomar a importação. Tente novamente mais tarde.</string>
-    <string name="import_assistant_create_calendar_error">Falha ao criar um ou mais calendários</string>
-    <string name="import_assistant_start_import_empty_error">Falha ao iniciar a importação, não há calendários para importar</string>
+    <string name="import_assistant_delete_import_error">Erro ao excluir a importação. Tente novamente mais tarde.</string>
+    <string name="import_assistant_cancel_import_error">Erro ao cancelar a importação. Tente novamente mais tarde.</string>
+    <string name="import_assistant_resume_import_error">Erro ao retomar a importação. Tente novamente mais tarde.</string>
+    <string name="import_assistant_create_calendar_error">Erro ao criar um ou mais calendários</string>
+    <string name="import_assistant_start_import_empty_error">Erro ao iniciar a importação, não há calendários para importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importar como</string>
     <string name="import_assistant_new_calendar_badge">Novo</string>
     <string name="import_assistant_merge_calendar_badge">Mesclado</string>
@@ -594,7 +596,7 @@
     <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Cancelado</string>
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Cancelando</string>
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Em pausa</string>
-    <string name="import_assistant_status_failed" comment="Context: The import has failed">Falhou</string>
+    <string name="import_assistant_status_failed" comment="Context: The import has failed">Erro</string>
     <string name="import_assistant_status_paused_lost_connection_title">A conexão com o Google foi perdida</string>
     <string name="import_assistant_status_paused_lost_connection_description">Para continuar a importação, toque em Reconectar, inicie sessão no Google e conceda ao Proton acesso aos seus dados do Google novamente.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
