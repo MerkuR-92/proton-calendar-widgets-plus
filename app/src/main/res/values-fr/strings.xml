@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">La notification est déjà ajoutée.</string>
     <string name="snack_opening_ics">Ouverture de l\'événement…</string>
     <string name="snack_invite_in_shared_calendar_error">Vous ne pouvez pas créer des invitations dans un calendrier partagé.</string>
+    <string name="snack_down_banner">Les serveurs de Proton sont en panne. Consultez notre page d\'état pour plus de détails.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas.</string>
     <string name="error_occurrence_does_not_exist">L\'occurrence n\'existe pas.</string>
@@ -409,7 +411,7 @@
     <string name="settings_search_subtitle">Télécharge et stocke le contenu du calendrier sur votre appareil pour permettre les recherches. Si vous désactivez cette fonction, le contenu téléchargé sera supprimé.\n\nLa recherche est une fonctionnalité expérimentale de la version bêta. L\'activer peut rendre l\'application instable.</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un autre routage réseau pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de garder ce paramètre activé pour plus de fiabilité.</string>
-    <string name="settings_value_placeholder">Tapotez pour sélectionner</string>
+    <string name="settings_value_placeholder">Appuyez pour sélectionner</string>
     <string name="settings_general_title">Général</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s…</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Recherchez un pays</string>
     <string name="holiday_calendar_form_picker_title">Pays</string>
     <string name="holiday_calendar_time_zone_based">Selon votre fuseau horaire</string>
-    <string name="holiday_calendar_already_exists">Le calendrier de jours fériés existe déjà.</string>
+    <string name="holiday_calendar_already_exists">Ce calendrier des jours fériés est déjà ajouté.</string>
     <string name="holiday_calendar_value_placeholder">Sélectionnez un pays</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -551,7 +553,7 @@
     <string name="spotlight_dialog_wipe_search_description">Nous retirons la fonctionnalité expérimentale de recherche de la version bêta de Proton Calendar parce que nous voulons la rendre plus pratique et plus fiable. Cette opération peut prendre quelques secondes.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Les jours fériés sont arrivés !</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nAjoutez les jours fériés de n\'importe quel pays à votre calendrier.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est terminé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord supprimer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord supprimer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>

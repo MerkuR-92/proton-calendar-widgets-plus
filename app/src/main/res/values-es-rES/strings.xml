@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">La notificación ya ha sido añadida.</string>
     <string name="snack_opening_ics">Abriendo evento…</string>
     <string name="snack_invite_in_shared_calendar_error">No se pueden crear invitaciones en un calendario compartido</string>
+    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe.</string>
     <string name="error_occurrence_does_not_exist">La ocurrencia no existe.</string>
@@ -485,8 +487,8 @@
     <string name="add_holiday_calendar_country_search_hint">Búsqueda por país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">Basado en su zona horaria</string>
-    <string name="holiday_calendar_already_exists">El calendario de días festivos ya existe</string>
-    <string name="holiday_calendar_value_placeholder">Seleccione un país</string>
+    <string name="holiday_calendar_already_exists">Este calendario de días festivos ya está añadido.</string>
+    <string name="holiday_calendar_value_placeholder">Seleccionar un país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Aceptar</string>
     <string name="bootstrap_error_no_calendar_title">No hay ningún calendario asociado con esta cuenta.</string>
@@ -618,7 +620,7 @@
     <string name="import_assistant_sign_in_in_progress">Ya hay un proceso de inicio de sesión en curso</string>
     <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">¿Importar como evento simple?</string>
+    <string name="import_event_disclaimer_dialog_title">¿Importar el evento sin detalles?</string>
     <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones del evento y ver los participantes, pide a los organizadores que te inviten utilizando tu dirección de correo electrónico Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
     <!--  STRING PLURALS  -->

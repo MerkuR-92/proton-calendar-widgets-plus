@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Апавяшчэнне ўжо было дададзена</string>
     <string name="snack_opening_ics">Адкрыццё падзеі…</string>
     <string name="snack_invite_in_shared_calendar_error">Стварэнне запрашэнняў у абагуленым календары забаронена</string>
+    <string name="snack_down_banner">Серверы Proton недаступны. Наведайце нашу старонку статусу для падрабязнасцяў.</string>
+    <string name="snack_down_banner_action">Адкрыць старонку статусу</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Падзея не існуе</string>
     <string name="error_occurrence_does_not_exist">Паўтарэння не існуе</string>
@@ -407,7 +409,7 @@
     <string name="settings_auto_invites_title">Дадаваць запрашэнні ў каляндар і пазначаць іх як запрашэнні, якія чакаюць разгляду</string>
     <string name="settings_search_title">Пошук календароў</string>
     <string name="settings_search_subtitle">Спампоўвае і захоўвае змест календара на вашу прыладу для пошуку. Выключэнне гэтай функцыі прывядзе да выдалення спампаванага змесціва.\n\nФункцыя пошуку ў цяперашні момант знаходзіцца ў стадыі эксперыментальнага бэта-тэсціравання. Яе ўключэнне можа стаць прычынай нестабільнай працы праграмы.</string>
-    <string name="settings_alternative_routing_title">Дазваляць альтэрнатыўную маршрутызацыю</string>
+    <string name="settings_alternative_routing_title">Дазволіць альтэрнатыўную маршрутызацыю</string>
     <string name="settings_alternative_routing_subtitle">У выпадку блакіроўкі сайтаў Proton гэта налада дазваляе праграме скарыстацца альтэрнатыўнай сеткавай маршрутызацыяй, каб атрымаць доступ да Proton, што можа быць карысным для абыходу міжсеткавых экранаў або праблем з сеткай. Для большай надзейнасці мы рэкамендуем пакінуць гэту наладу актыўнай.</string>
     <string name="settings_value_placeholder">Націсніце, каб выбраць</string>
     <string name="settings_general_title">Агульныя</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Пошук краіны</string>
     <string name="holiday_calendar_form_picker_title">Краіна</string>
     <string name="holiday_calendar_time_zone_based">На падставе вашага часавага пояса</string>
-    <string name="holiday_calendar_already_exists">Каляндар са святамі ўжо існуе</string>
+    <string name="holiday_calendar_already_exists">Каляндар са святамі ўжо дадзены.</string>
     <string name="holiday_calendar_value_placeholder">Выберыце краіну</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Добра</string>

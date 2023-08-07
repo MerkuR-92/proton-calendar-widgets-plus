@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">通知已加入</string>
     <string name="snack_opening_ics">開啟事件……</string>
     <string name="snack_invite_in_shared_calendar_error">不允許在分享的行事曆中建立邀請</string>
+    <string name="snack_down_banner">Proton伺服器目前關閉。請參考狀態頁面獲得詳細資料。</string>
+    <string name="snack_down_banner_action">開啟狀態頁面。</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">此活動不存在</string>
     <string name="error_occurrence_does_not_exist">行程不存在</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">搜尋國家</string>
     <string name="holiday_calendar_form_picker_title">國家</string>
     <string name="holiday_calendar_time_zone_based">依據您的時區</string>
-    <string name="holiday_calendar_already_exists">已存在節日行事曆</string>
+    <string name="holiday_calendar_already_exists">已新增此節日行事曆。</string>
     <string name="holiday_calendar_value_placeholder">選擇國家</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">確定</string>

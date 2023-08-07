@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Bildirim zaten eklenmiş</string>
     <string name="snack_opening_ics">Etkinlik açılıyor…</string>
     <string name="snack_invite_in_shared_calendar_error">Paylaşılmış bir takvim için davet oluşturulmasına izin verilmiyor</string>
+    <string name="snack_down_banner">Proton sunucuları çalışmıyor. Ayrıntılı bilgi almak için durum sayfamıza bakın.</string>
+    <string name="snack_down_banner_action">Durum sayfasını aç</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Ülke ara</string>
     <string name="holiday_calendar_form_picker_title">Ülke</string>
     <string name="holiday_calendar_time_zone_based">Saat diliminize göre</string>
-    <string name="holiday_calendar_already_exists">Tatil takvimi zaten var</string>
+    <string name="holiday_calendar_already_exists">Bu tatil takvimi zaten eklenmiş.</string>
     <string name="holiday_calendar_value_placeholder">Ülke seçin</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Tamam</string>
@@ -555,8 +557,8 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>
-    <string name="import_assistant_prepare_import_error">İçe aktarma işlemine hazırlanırken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
-    <string name="import_assistant_prepare_import">İçe aktarma işlemine hazırlanıyor</string>
+    <string name="import_assistant_prepare_import_error">İçe aktarma işlemine hazırlanılırken sorun çıktı. Lütfen bir süre sonra yeniden deneyin</string>
+    <string name="import_assistant_prepare_import">İçe aktarma işlemine hazırlanılıyor</string>
     <string name="import_assistant_gathering_data_loader_title">Verileriniz toplanıyor</string>
     <string name="import_assistant_summary_title">İçe aktarma özeti</string>
     <string name="import_assistant_summary_customize_import">İçe aktarmayı özelleştir</string>
@@ -583,7 +585,7 @@
     <string name="import_assistant_in_progress_redirect">İlerlemeyi görüntüle</string>
     <string name="import_assistant_in_progress_sub_description">Büyük boyutlu içe aktarımların tamamlanması bir kaç gün sürebilir. İşlem tamamlandığında size bilgi vereceğiz. Bu sayfayı kapatabilirsiniz.</string>
     <string name="import_assistant_guide_subtitle">Gizliliğe geçin. Kolay ve güvenli bir şekilde.</string>
-    <string name="import_assistant_guide_description">Etkinliklerinizi ve diğer verilerinizi Google üzerinden Proton üzerine aktarın. Easy Switch içe aktarım yardımcısı, her adımda size yol gösterir ve aktarım sırasında verilerinizi şifreler.</string>
+    <string name="import_assistant_guide_description">Etkinliklerinizi ve diğer verilerinizi Google üzerinden Proton üzerine aktarın. Easy Switch içe aktarma yardımcısı, her adımda size yol gösterir ve aktarma sırasında verilerinizi şifreler.</string>
     <string name="import_assistant_new_import">Yeni içe aktarma</string>
     <string name="import_assistant_previous_import">Önceki içe aktarmalar</string>
     <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>

@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Az emlékeztető már hozzá van adva</string>
     <string name="snack_opening_ics">Esemény megnyitása…</string>
     <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
+    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
+    <string name="snack_down_banner_action">Open status page</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
@@ -406,7 +408,7 @@
     <string name="settings_week_numbers_title">Hetek sorszámának megjelenítése</string>
     <string name="settings_auto_invites_title">Adja a meghívókat a naptárhoz és állítsa be őket függőnek</string>
     <string name="settings_search_title">Keresés a naptárakban</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">Beállítások_keresés_felirat</string>
     <string name="settings_alternative_routing_title">Alternatív útválasztás engedélyezése</string>
     <string name="settings_alternative_routing_subtitle">Ha a Proton szolgáltatásai le vannak tiltva, ezzel a beállítással az alkalmazás alternatív hálózati útvonalakat próbál meg használni, ami hasznos lehet tűzfalak megkerüléséhez vagy hálózati problémák megoldásához. Javasolt ezt a beállítást bekapcsolva a tartani nagyobb megbízhatóság érdekében.</string>
     <string name="settings_value_placeholder">Koppintson a kiválasztáshoz</string>
@@ -433,7 +435,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">A naptár visszafejtése nem sikerült</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Csak megtekintés</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">feladó %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Naptár létrehozása</string>
     <string name="calendar_form_update_title">Naptár szerkesztése</string>
@@ -444,7 +446,7 @@
     <string name="calendar_form_language">Nyelv</string>
     <string name="calendar_form_default_event_duration">Esemény időtartama</string>
     <string name="calendar_form_default_event_notifications">Esemény értesítései</string>
-    <string name="calendar_form_default_all_day_event_notifications">All-day event notifications</string>
+    <string name="calendar_form_default_all_day_event_notifications">Egész napos esemény értesítések</string>
     <string name="calendar_form_add_notification">Emlékeztető hozzáadása</string>
     <string name="calendar_form_default_email">E-mail cím</string>
     <string name="calendar_form_default_email_value_error">Az alapértelmezett e-mail betöltse nem sikerült</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Ország keresése</string>
     <string name="holiday_calendar_form_picker_title">Ország</string>
     <string name="holiday_calendar_time_zone_based">A jelenlegi időzóna alapján</string>
-    <string name="holiday_calendar_already_exists">Már van munkaszüneti naptár</string>
+    <string name="holiday_calendar_already_exists">Ez az ünnepnapok naptár már hozzá lett adva.</string>
     <string name="holiday_calendar_value_placeholder">Válasszon országot</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -525,7 +527,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Újdonságok</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
-    <string name="spotlight_dialog_skip">Skip</string>
+    <string name="spotlight_dialog_skip">Kihagyás</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Havi nézet</string>
     <string name="spotlight_dialog_month_view_description">Tekintse át az eseményeit, az új havi nézettel. A menüvel válthat a nézetek közt.</string>
@@ -547,11 +549,11 @@
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
     <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_wipe_search_title">Keresés eltávolítva hogy jobbá tegyük</string>
+    <string name="spotlight_dialog_wipe_search_description">Eltávolítjuk a kísérleti keresési lehetőséget a Proton Calendar Béta változatából, mivel szeretnénk, ha az még hasznosabb és megbízhatóbb lenne a számodra. Ez néhány másodpercet vehet igénybe.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Itt vannak a munkaszüneti napok!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Nem kell többé megbeszéléseket ütemezni, amikor mindenki szabadnapos, vagy elfelejteni a hosszú hétvégi kiruccanást.\n\nAdd hozzá bármely ország munkaszüneti napjait a naptáradhoz.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem kell többé megbeszéléseket ütemeznie, amikor mindenki szabadnapos, vagy elfelejtenie egy hosszú hétvégi kirándulást.\n\nMivel jelenleg a naptárhatárnál tartasz, az ünnepi naptár hozzáadásához először el kell távolítanod egy meglévő naptárat.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -739,9 +741,9 @@
         <item translatable="false"/>
         <item>utolsó</item>
         <item>utolsó előtti</item>
-        <item>third to last</item>
-        <item>fourth to last</item>
-        <item>fifth to last</item>
+        <item>harmadik az utolsóhoz</item>
+        <item>negyedik az utolsóhoz</item>
+        <item>ötödik az utolsóhoz</item>
     </string-array>
     <string-array name="app_themes">
         <item>Világos</item>

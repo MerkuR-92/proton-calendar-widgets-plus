@@ -70,7 +70,7 @@
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s %2$s</string>
     <string name="event_recurrence_none">Ei toistu</string>
     <string name="event_recurrence_daily">Päivittäin</string>
-    <string name="event_recurrence_weekly">Viikottain</string>
+    <string name="event_recurrence_weekly">Viikoittain</string>
     <string name="event_recurrence_monthly">Kuukausittain</string>
     <string name="event_recurrence_yearly">Vuosittain</string>
     <string name="event_recurrence_weekly_on_all_days">kaikkina päivinä</string>
@@ -315,7 +315,7 @@
     <string name="snack_update_default_calendar">Oletuskalenteri vaihdettiin</string>
     <string name="snack_update_default_calendar_error">Virhe vaihdettaessa oletuskalenteria. Yritä myöhemmin uudelleen</string>
     <string name="snack_calendar_init_error">Virhe ladattaessa kalenterin tietoja</string>
-    <string name="snack_holiday_calendar_init_error">Virhe ladattaessa arkipyhäkalenterin tietoja</string>
+    <string name="snack_holiday_calendar_init_error">Virhe ladattaessa yleisten vapaapäivien tietoja</string>
     <string name="snack_update_calendar_error">Virhe päivitettäessä kalenterin tietoja. Yritä myöhemmin uudelleen</string>
     <string name="snack_update_calendar_settings_error">Virhe päivitettäessä joitakin kalenterin tietoja. Yritä myöhemmin uudelleen</string>
     <string name="snack_update_calendar_success">Kalenteri päivitettiin</string>
@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Ilmoitus on jo lisätty</string>
     <string name="snack_opening_ics">Tapahtumaa avataan…</string>
     <string name="snack_invite_in_shared_calendar_error">Kutsujen luontia ei sallita jaetussa kalenterissa</string>
+    <string name="snack_down_banner">Protonin palvelimet ovat poissa käytöstä. Käy tilasivullamme saadaksesi lisätietoja.</string>
+    <string name="snack_down_banner_action">Avaa tilasivu</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Tapahtumaa ei ole olemassa</string>
     <string name="error_occurrence_does_not_exist">Tapahtumakertaa ei ole olemassa</string>
@@ -362,7 +364,7 @@
     <string name="update_timezone_dialog_message">Järjestelmäsi aikavyöhykkeeksi näyttää vaihtuneen %1$s. Haluatko päivittää aikavyöhykeasetuksesi?</string>
     <string name="update_timezone_dialog_confirmation">Päivitä</string>
     <string name="update_timezone_dialog_cancel">Peru</string>
-    <string name="contacts_permission_dialog_title">Sallitaanko yhteystietojen käyttö?</string>
+    <string name="contacts_permission_dialog_title">Saako Proton Calendar käyttää yhteystietoja?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar tarvitsee laitteesi yhteystietojen käyttöoikeuden helpottaakseen niiden lisäämistä tapahtumiin.</string>
     <string name="contacts_permission_dialog_allow">Kyllä</string>
     <string name="contacts_permission_dialog_open_settings">Avaa Asetukset</string>
@@ -433,7 +435,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Kalenterin salausta ei voitu purkaa</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Vain tarkastelu</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">from %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">omistaja: %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Luo kalenteri</string>
     <string name="calendar_form_update_title">Muokkaa kalenteria</string>
@@ -480,12 +482,12 @@
     <string name="recreate_calendar_snack_deleted">Kalenteri tyhjennettiin</string>
     <string name="recreate_calendar_snack_clearing">Kalenteria tyhjennetään…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">Lisää arkipyhäkalenteri</string>
-    <string name="holiday_calendar_title">Arkipyhäkalenteri</string>
+    <string name="add_holiday_calendar_title">Lisää yleiset vapaapäivät</string>
+    <string name="holiday_calendar_title">Yleiset vapaapäivät</string>
     <string name="add_holiday_calendar_country_search_hint">Etsi maata</string>
     <string name="holiday_calendar_form_picker_title">Maa</string>
     <string name="holiday_calendar_time_zone_based">Perustuu aikavyöhykkeeseesi</string>
-    <string name="holiday_calendar_already_exists">Arkipyhäkalenteri on jo olemassa</string>
+    <string name="holiday_calendar_already_exists">Tämä vapaapäiväkalenteri on jo lisätty.</string>
     <string name="holiday_calendar_value_placeholder">Valitse maa</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -549,9 +551,9 @@
     <string name="spotlight_dialog_calendar_provider_description">• Lisää tapahtumia muista sovelluksista suoraan Proton Calendariin.\n\n• Luo ja hallinnoi sinulle jaettujen kalenterien tapahtumia.\n\n• Aseta oletusnäkymä, jonka haluat nähdä avatessasi sovelluksen.\n\n• 13 uutta kieltä.</string>
     <string name="spotlight_dialog_wipe_search_title">Haku on poistettu sen parantamiseksi</string>
     <string name="spotlight_dialog_wipe_search_description">Poistamme kokeellisen hakutoiminnon Proton Calendar Betasta, koska haluamme tehdä siitä sinulle hyödyllisemmän ja luotettavamman. Tämä saattaa kestää muutaman sekunnin.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Juhlapäivät ovat täällä!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Yleiset vapaapäivät ovat täällä!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ei enää vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nKoska olet jo saavuttanut kalenterien enimmäismäärän, on jokin nykyisistä kalentereista poistettava yleisten vapaapäivien lisäämiseksi.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Myönnä käyttöoikeus</string>
     <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Google Kalenteriin ja myönnä Protonille tietojesi käyttöoikeus.</string>

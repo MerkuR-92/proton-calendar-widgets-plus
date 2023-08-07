@@ -186,7 +186,7 @@
     <string name="event_alarm_partial_day_3">30 minutter</string>
     <string name="event_alarm_partial_day_4">1 time</string>
     <string name="event_alarm_partial_day_5">1 uge</string>
-    <string name="event_alarm_all_day_1">samme dag kl. $%1$s</string>
+    <string name="event_alarm_all_day_1">samme dag kl. %1$s</string>
     <string name="event_alarm_all_day_2">1 dag før kl. %1$s</string>
     <string name="event_alarm_all_day_3">1 uge før kl. %1$s</string>
     <string name="event_alarm_all_day_4">3 uger før kl. %1$s</string>
@@ -233,8 +233,8 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation til en begivenhed med start den %1$s kl. %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation til en begivenhed den %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation til en begivenhed med start den %1$s</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annullering af en begivenhed med start den $%1$s kl. %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annullering af en begivenhed den $%1$s</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annullering af en begivenhed med start %1$s kl. %2$s %3$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annullering af en begivenhed %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annullering af en begivenhed med start %1$s</string>
     <string name="event_send_invite_mail_body">Du er inviteret til %1$s\nHvornår: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hele dagen)</string>
@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Påmindelsen er allerede blevet tilføjet</string>
     <string name="snack_opening_ics">Åbner begivenhed…</string>
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tilladt at oprette invitationer i en delt kalender</string>
+    <string name="snack_down_banner">Proton-serverne er nede. Besøg vores statusside for detaljer.</string>
+    <string name="snack_down_banner_action">Åbn statusside</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Søg efter land</string>
     <string name="holiday_calendar_form_picker_title">Land</string>
     <string name="holiday_calendar_time_zone_based">Baseret på din tidszone</string>
-    <string name="holiday_calendar_already_exists">Helligdagskalender findes allerede</string>
+    <string name="holiday_calendar_already_exists">Helligdagskalenderen er allerede tilføjet.</string>
     <string name="holiday_calendar_value_placeholder">Vælg land</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">Ok</string>

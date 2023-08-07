@@ -224,7 +224,7 @@
     <string name="event_recurring_update_this_cancel">Avbryt</string>
     <string name="event_recurring_update_this_confirm">Uppdatera</string>
     <string name="event_allow_contacts_title">Tillåt Proton Calendar att komma åt dina kontakter?</string>
-    <string name="event_allow_contacts_description">Proton Calendar needs access to your contacts to provide you with autocompletion</string>
+    <string name="event_allow_contacts_description">Proton Calendar behöver åtkomst till dina kontakter för att ge dig autokomplettering</string>
     <string name="event_allow_contacts_cancel">Neka</string>
     <string name="event_allow_contacts_confirm">Tillåt</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Sv: Inbjudan för en händelse som börjar den %1$s kl. %2$s %3$s</string>
@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Aviseringen har redan lagts till</string>
     <string name="snack_opening_ics">Öppnar händelse…</string>
     <string name="snack_invite_in_shared_calendar_error">Det är inte tillåtet att skapa inbjudningar i en delad kalender</string>
+    <string name="snack_down_banner">Proton-servrar är nere. Besök vår statussida för mer information.</string>
+    <string name="snack_down_banner_action">Öppna statussida</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Händelsen finns inte</string>
     <string name="error_occurrence_does_not_exist">Förekomsten finns inte</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Sök efter ett land</string>
     <string name="holiday_calendar_form_picker_title">Land</string>
     <string name="holiday_calendar_time_zone_based">Baserat på din tidszon</string>
-    <string name="holiday_calendar_already_exists">Helgdagskalender finns redan</string>
+    <string name="holiday_calendar_already_exists">Denna helgdagskalender är redan tillagd.</string>
     <string name="holiday_calendar_value_placeholder">Välj land</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -548,7 +550,7 @@
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
     <string name="spotlight_dialog_calendar_provider_description">• Lägg till händelser direkt i Proton Calendar från andra appar.\n\n• Skapa och hantera händelser i kalendrar som har delats med dig.\n\n• Ställ in standardvyn du vill se när du öppnar appen.\n\n• 13 nya språk tillgängliga.</string>
     <string name="spotlight_dialog_wipe_search_title">Sök borttaget för att göra det bättre</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_description">Vi tar bort den experimentella sökmöjligheten från Proton Calendar Beta eftersom vi vill göra den mer användbar och tillförlitlig för dig. Detta kan ta några sekunder.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Allmänna helgdagar är här!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nLägg till ett lands allmänna helgdagar i din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nEftersom du för närvarande har nått kalendergränsen måste du först ta bort en befintlig kalender för att lägga till en semesterkalender.</string>
@@ -619,7 +621,7 @@
     <string name="import_assistant_in_progress_error_snack">Det pågår fortfarande en import</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Importera som en enkel händelse?</string>
-    <string name="import_event_disclaimer_dialog_description">\nImporterade inbjudningar visas i Proton Calendar som enkla händelser utan information om <b>organisatör</b> och <b>deltagare</b>.\n\nFör att få händelseuppdateringar och se deltagare, be organistören att bjuda in dig med din e-postadress från Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nImporterade inbjudningar visas i Proton Calendar som enkla händelser utan information om <b>organisatör</b> och <b>deltagare</b>.\n\nFör att få händelseuppdateringar och se deltagare, be organisatören att bjuda in dig med din e-postadress från Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importera</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">

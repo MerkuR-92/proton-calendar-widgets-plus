@@ -355,6 +355,8 @@
     <string name="snack_notification_already_added">Die Benachrichtigung wurde bereits hinzugefügt</string>
     <string name="snack_opening_ics">Termin wird geöffnet…</string>
     <string name="snack_invite_in_shared_calendar_error">Das Erstellen von Einladungen in einem geteilten Kalender ist nicht erlaubt.</string>
+    <string name="snack_down_banner">Die Proton-Server sind ausgefallen. Besuche unsere Statusseite für Details.</string>
+    <string name="snack_down_banner_action">Statusseite öffnen</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Termin existiert nicht</string>
     <string name="error_occurrence_does_not_exist">Wiederholung existiert nicht</string>
@@ -485,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Nach einem Land suchen</string>
     <string name="holiday_calendar_form_picker_title">Land</string>
     <string name="holiday_calendar_time_zone_based">Basierend auf deiner Zeitzone</string>
-    <string name="holiday_calendar_already_exists">Feiertagskalender existiert bereits</string>
+    <string name="holiday_calendar_already_exists">Dieser Feiertagskalender wurde bereits hinzugefügt.</string>
     <string name="holiday_calendar_value_placeholder">Land wählen</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -551,7 +553,7 @@
     <string name="spotlight_dialog_wipe_search_description">Wir entfernen die experimentelle Suchfunktion aus der Betaversion von Proton Calendar, um sie für dich noch nützlicher und zuverlässiger zu machen. Dies kann einige Sekunden dauern.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Die Feiertage sind da!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben, oder vergessen, einen langen Wochenendausflug zu planen.\n\nFüge die Feiertage eines beliebigen Landes deinem Kalender hinzu.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben, oder vergessen, einen langen Wochenendausflug zu planen.\n\nDa du derzeit das Kalenderlimit erreicht hast, musst du zunächst einen bestehenden Kalender entfernen, um einen neuen Ferienkalender hinzuzufügen.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben oder vergessen, einen langen Wochenendausflug zu planen.\n\nDa du derzeit das Kalenderlimit erreicht hast, musst du zunächst einen bestehenden Kalender entfernen, um einen neuen Ferienkalender hinzuzufügen.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>
