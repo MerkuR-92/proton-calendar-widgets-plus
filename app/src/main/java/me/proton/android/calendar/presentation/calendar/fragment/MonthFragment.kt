@@ -97,6 +97,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
@@ -211,15 +212,21 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     // Each item in the adapter is one day
                     calendarViewModel.selectedDateTime.value?.let { currentDateTime ->
                         val currentDate = currentDateTime.first
+                        val initStartDateTime =
+                            if (currentViewMode == ViewMode.MONTH) {
+                                if (currentDate.month == LocalDate.now(timeZoneId).month && currentDate.year == LocalDate.now(timeZoneId).year) {
+                                    ICalUtilsImpl.generateEventStart(timeZoneId)
+                                } else ZonedDateTime.of(currentDate.withDayOfMonth(1), LocalTime.of(8, 0), timeZoneId).toLocalDateTime()
+                            } else if (currentDate == LocalDate.now(timeZoneId)) {
+                                ICalUtilsImpl.generateEventStart(timeZoneId, currentDate)
+                            } else {
+                                ZonedDateTime.of(currentDate, LocalTime.of(8, 0), timeZoneId).toLocalDateTime()
+                            }
                         requireActivity().findNavController(R.id.nav_host_fragment_container_view)
                             .navigate(
                                 Navigation.Deeplink.toEventCreate(
-                                    if (currentViewMode == ViewMode.MONTH) {
-                                        if (currentDate.month == LocalDate.now().month && currentDate.year == LocalDate.now().year) {
-                                            ICalUtilsImpl.generateEventStart(timeZoneId).toLocalDate()
-                                        } else ICalUtilsImpl.generateEventStart(timeZoneId, currentDate.withDayOfMonth(1)).toLocalDate()
-                                    } else ICalUtilsImpl.generateEventStart(timeZoneId, currentDate).toLocalDate(),
-                                    ICalUtilsImpl.generateEventStart(timeZoneId).toLocalTime()
+                                    initStartDate = initStartDateTime.toLocalDate(),
+                                    initStartTime = initStartDateTime.toLocalTime()
                                 )
                             )
                     }
