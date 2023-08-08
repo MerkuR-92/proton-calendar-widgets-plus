@@ -53,7 +53,7 @@ class FixCalendarsUseCase @Inject constructor(
             }.map {
                 it.privateKey
             }.takeIfNotEmpty() ?: run {
-                logger.e("FixCalendarsUseCase, calendarKey was null")
+                logger.i("FixCalendarsUseCase, calendarKey was null")
                 calendarsToBootstrap.add(calendarEntity)
                 return@forEach
             }
@@ -64,7 +64,7 @@ class FixCalendarsUseCase @Inject constructor(
             }.firstOrNull {
                 it.isActive
             } ?: run {
-                logger.e("FixCalendarsUseCase, calendarPassphrase was null")
+                logger.i("FixCalendarsUseCase, calendarPassphrase was null")
                 calendarsToBootstrap.add(calendarEntity)
                 return@forEach
             }
@@ -74,7 +74,7 @@ class FixCalendarsUseCase @Inject constructor(
                 ValueSet.CALENDAR_PASSPHRASE,
                 calendarPassphrase.id
             ) ?: run {
-                logger.e("FixCalendarsUseCase, keyPassphrase was null")
+                logger.i("FixCalendarsUseCase, keyPassphrase was null")
                 calendarsToBootstrap.add(calendarEntity)
                 return@forEach
             }
@@ -87,7 +87,11 @@ class FixCalendarsUseCase @Inject constructor(
             coroutineScope {
                 calendarsToBootstrap.map {
                     async {
-                        bootstrapCalendarUseCase.executeBootstrap(it, userId, timezone, userAddresses)
+                        when (val bootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, userId, timezone, userAddresses)) {
+                            is UseCase.Result.Success<*> -> logger.i("FixCalendarsUseCase successfully fixed calendar")
+                            is UseCase.Result.InvalidParams -> logger.i("FixCalendarsUseCase failed to fix calendar ${bootstrapResult.message}")
+                            is UseCase.Result.Error -> logger.i("FixCalendarsUseCase failed to fix calendar ${bootstrapResult.message}")
+                        }
                     }
                 }.awaitAll()
             }

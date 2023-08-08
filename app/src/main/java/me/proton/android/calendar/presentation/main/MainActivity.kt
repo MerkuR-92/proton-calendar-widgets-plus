@@ -529,10 +529,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 HOLIDAY_CALENDAR_VERSION_CODE -> {
                                     if (isCalendarLimitReached) {
                                         // Open calendar settings view
-                                        navController.navigate(R.id.action_nav_calendar_to_nav_settings)
+                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_settings)
                                     } else {
                                         // Open holiday calendar form
-                                        navController.navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
+                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
                                     }
                                 }
                             }

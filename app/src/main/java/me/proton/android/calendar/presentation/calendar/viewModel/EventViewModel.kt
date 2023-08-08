@@ -1309,10 +1309,10 @@ class EventViewModel @Inject constructor(
         updateCalendarUseCase.executeUpdateDisplayFromDb(userId, calendar.id)
     }
 
-    suspend fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
+    fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
-            attendee.commonName = ""
+            attendee.commonName = attendee.commonName ?: ""
             attendee.rsvp = true
             attendee.participationLevel = ParticipationLevel.REQUIRED
             attendee.participationStatus = ParticipationStatus.NEEDS_ACTION

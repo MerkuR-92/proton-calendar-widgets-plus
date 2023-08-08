@@ -85,7 +85,7 @@ interface ICalUtils {
      */
     fun mergeICalendars(left: ICalendar, right: ICalendar) : ICalendar
     fun createNewVEvent(): VEvent
-    fun generateEventStart(timeZoneId: ZoneId): LocalDateTime
+    fun generateEventStart(timeZoneId: ZoneId, selectedDate: LocalDate? = null): LocalDateTime
 
     /**
      * Generates Proton UID for new ICalendar components.

@@ -217,8 +217,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                                     if (currentViewMode == ViewMode.MONTH) {
                                         if (currentDate.month == LocalDate.now().month && currentDate.year == LocalDate.now().year) {
                                             ICalUtilsImpl.generateEventStart(timeZoneId).toLocalDate()
-                                        } else currentDate.withDayOfMonth(1)
-                                    } else currentDate,
+                                        } else ICalUtilsImpl.generateEventStart(timeZoneId, currentDate.withDayOfMonth(1)).toLocalDate()
+                                    } else ICalUtilsImpl.generateEventStart(timeZoneId, currentDate).toLocalDate(),
                                     ICalUtilsImpl.generateEventStart(timeZoneId).toLocalTime()
                                 )
                             )
