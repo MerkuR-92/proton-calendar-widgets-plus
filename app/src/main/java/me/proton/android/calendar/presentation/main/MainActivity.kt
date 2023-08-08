@@ -516,27 +516,33 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     } else {
                         // Display spotlight dialog if needed
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
-                        val spotlightShown = showLastSpotlightDialog(
-                            featureFlagViewModel.isHolidayCalendarEnabled(),
-                            calendarViewModel.hasHolidayCalendars(),
-                            isCalendarLimitReached
-                        ) {
-                            when (it) {
-                                SEARCH_VERSION_CODE -> {
-                                    searchViewModel.enableCalendarDownload()
-                                    displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
-                                }
-                                HOLIDAY_CALENDAR_VERSION_CODE -> {
-                                    if (isCalendarLimitReached) {
-                                        // Open calendar settings view
-                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_settings)
-                                    } else {
-                                        // Open holiday calendar form
-                                        safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
+                        val isHolidayCalendarEnabled = featureFlagViewModel.isHolidayCalendarEnabled()
+                        val hasHolidayCalendars = calendarViewModel.hasHolidayCalendars()
+                        val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
+                        val spotlightShown =
+                            if (currentViewIsCalendar) {
+                                showLastSpotlightDialog(
+                                    isHolidayCalendarEnabled,
+                                    hasHolidayCalendars,
+                                    isCalendarLimitReached
+                                ) {
+                                    when (it) {
+                                        SEARCH_VERSION_CODE -> {
+                                            searchViewModel.enableCalendarDownload()
+                                            displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+                                        }
+                                        HOLIDAY_CALENDAR_VERSION_CODE -> {
+                                            if (isCalendarLimitReached) {
+                                                // Open calendar settings view
+                                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_settings)
+                                            } else {
+                                                // Open holiday calendar form
+                                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                        }
+                            } else false
 
                         // Make sure we don't overlap spotlight and play store rating dialogs
                         if (!spotlightShown) {
