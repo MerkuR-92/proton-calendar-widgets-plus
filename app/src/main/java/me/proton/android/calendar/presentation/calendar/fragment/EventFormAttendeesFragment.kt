@@ -181,9 +181,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
         val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         binding.eventFormAttendeesList.layoutManager = attendeesLayoutManager
         attendeeListAdapter = AddAttendeeListAdapter(false) {
-            lifecycleScope.launch {
-                eventViewModel.handleAttendee(it, addAttendee = false)
-            }
+            eventViewModel.handleAttendee(it, addAttendee = false)
         }
         (binding.eventFormAttendeesList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         binding.eventFormAttendeesList.adapter = attendeeListAdapter
