@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -13,7 +14,10 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
+import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.util.TimeZone
@@ -32,7 +36,9 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val userAddressManager: UserAddressManager,
     private val userSettingsRepository: UserSettingsRepository,
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
-    private val joinCalendarUseCase: JoinCalendarUseCase
+    private val joinCalendarUseCase: JoinCalendarUseCase,
+    private val accountManager: AccountManager,
+    private val featureFlagManager: FeatureFlagManager
 ): UseCase {
 
     suspend fun execute(
@@ -97,32 +103,49 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             }
 
             // Make sure user doesn't have any holiday calendar already
-            if (!allCalendarEntities.any { it.isHolidayCalendar } && !defaultLanguageCode.isNullOrEmpty() && !defaultCountryCode.isNullOrEmpty()) {
-                val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
-                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let { holidayCalendars ->
-                    // Get calendars matching the default time zone
-                    val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
-                        holidayCalendars,
-                        primaryTimeZone,
-                        defaultLanguageCode,
-                        defaultCountryCode
-                    )
+            if (!allCalendarEntities.any { it.isHolidayCalendar }
+                && !defaultLanguageCode.isNullOrEmpty()
+                && defaultCountryCode != null) {
 
-                    // If holiday calendar already exists, leave the fields empty
-                    matchingDefaultHolidayCalendar?.let { holidayCalendar ->
-                        val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
-                            userId,
-                            holidayCalendar,
-                            defaultHolidayCalendarColor,
-                            arrayListOf()
+                // Fetch the holiday calendar feature flag value
+                val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
+                featureFlagManager.prefetch(userId, featureIds)
+                val isAutoAddHolidayEnabled = featureFlagManager.getOrDefault(
+                    userId,
+                    CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.featureId,
+                    FeatureFlag.default(
+                        CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.featureId.id,
+                        CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.fallbackValue
+                    )
+                ).value
+
+                if (isAutoAddHolidayEnabled) {
+                    val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
+                    calendarsRepository.refreshManagedHolidayCalendars(userId)?.let { holidayCalendars ->
+                        // Get calendars matching the default time zone
+                        val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
+                            holidayCalendars,
+                            primaryTimeZone,
+                            defaultLanguageCode,
+                            defaultCountryCode
                         )
 
-                        if (joinCalendarResult !is UseCase.Result.Success<*>) {
-                            logger.e("BootstrapCalendarsUseCase: error unable to join holiday calendar for user")
+                        // If holiday calendar already exists, leave the fields empty
+                        matchingDefaultHolidayCalendar?.let { holidayCalendar ->
+                            val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
+                                userId,
+                                holidayCalendar,
+                                defaultHolidayCalendarColor,
+                                arrayListOf()
+                            )
+
+                            if (joinCalendarResult !is UseCase.Result.Success<*>) {
+                                logger.e("BootstrapCalendarsUseCase: error unable to join holiday calendar for user")
+                            }
                         }
+                    } ?: run {
+                        logger.e("BootstrapCalendarsUseCase: error failed to fetch holiday calendars for user")
                     }
-                } ?: run {
-                    logger.e("BootstrapCalendarsUseCase: error failed to fetch holiday calendars for user")
                 }
             }
 
