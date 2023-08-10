@@ -95,7 +95,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
         lifecycleScope.launch {
             accountViewModel.getPrimaryUserId()?.let {
-                val contacts = mainViewModel.getProtonContacts(it)
+                val contacts = mainViewModel.getProtonContacts(it) ?: emptyList()
                 protonContacts.addAll(contacts)
                 cachedProtonContacts.addAll(
                     contacts.map { Attendee(it.name, it.email) }

@@ -301,7 +301,12 @@ class MainViewModel @Inject constructor(
         calendarsRepository.deleteAllEvents()
     }
 
-    suspend fun getProtonContacts(userId: UserId): List<ContactEmail> {
-        return contactEmailsRepository.getAllContacts(userId).map { it.contactEmails }.flatten()
+    suspend fun getProtonContacts(userId: UserId): List<ContactEmail>? {
+        return runCatching {
+            contactEmailsRepository.getAllContactEmails(userId)
+        }.getOrElse {
+            logger.e("Exception in MainViewModel.getProtonContacts: ${it.message}", it)
+            null
+        }
     }
 }

@@ -525,7 +525,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             lifecycleScope.launch {
                 val protonContacts = ArrayList<ContactEmail>()
                 accountViewModel.getPrimaryUserId()?.let {
-                    protonContacts.addAll(mainViewModel.getProtonContacts(it))
+                    protonContacts.addAll(mainViewModel.getProtonContacts(it) ?: emptyList())
                 }
 
                 ProtonUtilsImpl.matchAttendeesWithContacts(
