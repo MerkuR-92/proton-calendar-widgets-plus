@@ -37,6 +37,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.validateEmail
 import me.proton.android.calendar.databinding.FragmentEventFormAttendeesBinding
@@ -46,6 +47,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.core.contact.domain.entity.ContactEmail
 import org.koin.core.KoinComponent
 
 class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttendeesBinding>(), KoinComponent, LoaderManager.LoaderCallbacks<Cursor> {
@@ -67,7 +69,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
     private lateinit var attendeeListAdapter: AddAttendeeListAdapter
     private lateinit var searchAttendeeListAdapter: AddAttendeeListAdapter
 
-    private val protonContacts: ArrayList<Attendee> = arrayListOf()
+    private val protonContacts: ArrayList<ContactEmail> = arrayListOf()
+    private val cachedProtonContacts: ArrayList<Attendee> = arrayListOf()
+    private val cachedDeviceContacts: ArrayList<Attendee> = arrayListOf()
 
     private var contactsAccessGranted = false
 
@@ -92,9 +96,22 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
         lifecycleScope.launch {
             accountViewModel.getPrimaryUserId()?.let {
                 val contacts = mainViewModel.getProtonContacts(it)
-                protonContacts.addAll(
+                protonContacts.addAll(contacts)
+                cachedProtonContacts.addAll(
                     contacts.map { Attendee(it.name, it.email) }
                 )
+
+                if (!attendeeListAdapter.currentList.isNullOrEmpty()) {
+                    attendeeListAdapter.submitList(
+                        ProtonUtilsImpl.matchAttendeesWithContacts(
+                            attendeeListAdapter.currentList,
+                            cachedDeviceContacts,
+                            protonContacts
+                        )
+                    ) {
+                        binding.eventFormAttendeesList.smoothScrollToPosition(0)
+                    }
+                }
             }
         }
 
@@ -195,7 +212,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
         binding.eventFormAttendeesSearchList.adapter = searchAttendeeListAdapter
 
         searchAttendeeList.observe(viewLifecycleOwner) { searchAttendeeList ->
-            searchAttendeeListAdapter.submitList(searchAttendeeList.sortedBy { it.commonName })
+            searchAttendeeListAdapter.submitList(searchAttendeeList)
             // TODO Try to find a way to refresh the highlighted text and icons visibility without calling notifyDataSetChanged
             searchAttendeeListAdapter.notifyDataSetChanged()
         }
@@ -231,7 +248,13 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
                 val scrollUp = attendeeList.size > attendeeListAdapter.currentList.size
 
-                attendeeListAdapter.submitList(attendeeList) {
+                attendeeListAdapter.submitList(
+                    ProtonUtilsImpl.matchAttendeesWithContacts(
+                        attendeeList,
+                        cachedDeviceContacts,
+                        protonContacts
+                    )
+                ) {
                     if (scrollUp) binding.eventFormAttendeesList.smoothScrollToPosition(0) // Scroll up top to new attendee
                 }
 
@@ -337,12 +360,13 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
                         }
                     searchResult
                 }
-            val protonList = protonContacts.filter {
+            val protonList = cachedProtonContacts.filter {
                 it.commonName.contains(query.toString(), ignoreCase = true)
                         || it.extractEmail()?.contains(query.toString(), ignoreCase = true) == true
             }
+            cachedDeviceContacts.addAll(deviceList)
             _searchAttendeeList.postValue(
-                deviceList.plus(protonList).distinctBy { it.extractEmail() }.sortedBy { it.commonName }
+                deviceList.plus(protonList).groupBy { it.extractEmail() }.flatMap { it.value.sortedBy { it.commonName } }
             )
         }
     }

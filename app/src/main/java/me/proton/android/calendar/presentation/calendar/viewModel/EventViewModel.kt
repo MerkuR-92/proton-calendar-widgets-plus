@@ -107,7 +107,9 @@ import me.proton.core.user.domain.entity.User
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
+import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.filterNullValues
+import me.proton.core.util.kotlin.removeFirst
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
 import java.time.LocalDate
@@ -118,33 +120,7 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import javax.inject.Inject
-import kotlin.collections.ArrayList
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.any
-import kotlin.collections.emptyList
-import kotlin.collections.emptyMap
-import kotlin.collections.filter
-import kotlin.collections.find
-import kotlin.collections.first
-import kotlin.collections.firstOrNull
-import kotlin.collections.flatMap
-import kotlin.collections.getOrNull
-import kotlin.collections.hashMapOf
-import kotlin.collections.indexOfFirst
-import kotlin.collections.isNotEmpty
-import kotlin.collections.isNullOrEmpty
-import kotlin.collections.lastIndex
-import kotlin.collections.listOf
-import kotlin.collections.listOfNotNull
-import kotlin.collections.map
-import kotlin.collections.mapNotNull
-import kotlin.collections.mapOf
-import kotlin.collections.mapValues
-import kotlin.collections.mutableListOf
 import kotlin.collections.set
-import kotlin.collections.toList
-import kotlin.collections.toTypedArray
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -1312,7 +1288,7 @@ class EventViewModel @Inject constructor(
     fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
-            attendee.commonName = attendee.commonName ?: ""
+            attendee.commonName = ""
             attendee.rsvp = true
             attendee.participationLevel = ParticipationLevel.REQUIRED
             attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
@@ -1326,7 +1302,7 @@ class EventViewModel @Inject constructor(
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
         } else {
-            event.iCalEvent.attendees.remove(attendee)
+            event.iCalEvent.attendees.removeFirst { it.extractEmail()?.equalsNoCase(attendee.extractEmail()) == true }
             if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
                 // TODO Update this once we allow editing events that have attendees
                 event.iCalEvent.organizer = null

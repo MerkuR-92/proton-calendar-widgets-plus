@@ -2,16 +2,19 @@ package me.proton.android.calendar.common.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import biweekly.property.Attendee
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarSettings
 import me.proton.android.calendar.common.PROTON_MAIL_DOMAINS
 import me.proton.android.calendar.common.PROTON_MAIL_SHORT_DOMAIN
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getLocaleForFormatting
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
+import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.InputValidationResult
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.takeIfNotEmpty
@@ -225,6 +228,32 @@ object ProtonUtilsImpl : ProtonUtils {
         } ?: calendarsMatchingCode.minByOrNull { it.language }
 
         return matchingDefaultHolidayCalendar
+    }
+
+    override fun matchAttendeesWithContacts(
+        attendees: List<Attendee>,
+        deviceContacts: List<Attendee>,
+        protonContacts: List<ContactEmail>
+    ): List<Attendee> {
+        return attendees.map { attendee ->
+            val protonContact = protonContacts.filter {
+                it.email.equalsNoCase(attendee.extractEmail())
+            }.minByOrNull {
+                // Take the contact with the lowest Order value
+                it.order
+            }
+            val deviceContact = deviceContacts.find {
+                it.extractEmail()?.equalsNoCase(attendee.extractEmail()) == true
+            }
+            // Take the entry that has a name, with priority on Proton contact
+            if (protonContact != null && protonContact.name.isNotEmpty()) {
+                Attendee(protonContact.name, protonContact.email)
+            } else if (deviceContact != null && !deviceContact.commonName.isNullOrEmpty()) {
+                deviceContact
+            } else {
+                attendee
+            }
+        }
     }
 }
 
