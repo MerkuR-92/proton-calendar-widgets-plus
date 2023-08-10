@@ -2,8 +2,10 @@ package me.proton.android.calendar.domain.utils
 
 import android.content.Context
 import android.content.DialogInterface
+import biweekly.property.Attendee
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.core.contact.domain.entity.ContactEmail
 import java.time.LocalDate
 
 interface ProtonUtils {
@@ -27,4 +29,10 @@ interface ProtonUtils {
         defaultLanguageCode: String,
         defaultCountryCode: String
     ): ManagedHolidayCalendarEntity?
+
+    fun matchAttendeesWithContacts(
+        attendees: List<Attendee>,
+        deviceContacts: List<Attendee>,
+        protonContacts: List<ContactEmail>
+    ): List<Attendee>
 }

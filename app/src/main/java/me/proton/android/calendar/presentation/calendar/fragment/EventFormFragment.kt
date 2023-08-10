@@ -47,6 +47,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKey
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.formattedTimeZoneToId
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
+import me.proton.android.calendar.common.utils.AndroidUtils.getDeviceContacts
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
@@ -59,6 +60,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatEnd
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.databinding.FragmentEventFormBinding
 import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
@@ -71,6 +73,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.clearText
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
@@ -518,12 +521,25 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             displayAlarms()
 
             binding.eventFormParticipantChipGroup.removeAllViews()
-            event.iCalEvent.attendees.take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
-                val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
-                chipTitle?.let {
-                    addAttendeeChip(chipTitle)
+
+            lifecycleScope.launch {
+                val protonContacts = ArrayList<ContactEmail>()
+                accountViewModel.getPrimaryUserId()?.let {
+                    protonContacts.addAll(mainViewModel.getProtonContacts(it))
+                }
+
+                ProtonUtilsImpl.matchAttendeesWithContacts(
+                    event.iCalEvent.attendees,
+                    requireContext().getDeviceContacts() ?: emptyList(),
+                    protonContacts
+                ).take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
+                    val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
+                    chipTitle?.let {
+                        addAttendeeChip(chipTitle)
+                    }
                 }
             }
+
             if (!event.iCalEvent.attendees.isNullOrEmpty()) {
                 addAttendeeChip(getString(R.string.event_current_user_organizer))
 

@@ -1,11 +1,13 @@
 package me.proton.android.calendar.common.utils
 
+import android.Manifest
 import android.animation.ValueAnimator
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -16,6 +18,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -59,6 +62,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.BindingAdapter
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationStatus
+import biweekly.property.Attendee
 import biweekly.util.DayOfWeek
 import biweekly.util.Frequency
 import biweekly.util.Recurrence
@@ -1402,5 +1406,41 @@ object AndroidUtils {
     fun String.ellipsize(maxLength: Int): String {
         if (this.length <= maxLength) return this
         return this.substring(0, maxLength - 1).plus("…")
+    }
+
+    fun Context.getDeviceContacts(): ArrayList<Attendee>? {
+        val contactsAccessGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!contactsAccessGranted) return null
+        val deviceContacts = ArrayList<Attendee>()
+        val uri = ContactsContract.CommonDataKinds.Email.CONTENT_URI
+        val cursor = this.contentResolver.query(
+            uri,
+            arrayOf(
+                ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY,
+                ContactsContract.CommonDataKinds.Email.ADDRESS,
+                ContactsContract.CommonDataKinds.Email.DATA
+            ),
+            null,
+            null,
+            ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY + " ASC"
+        ) ?: return null
+        cursor.moveToFirst()
+        while (!cursor.isAfterLast) {
+            val contactEmailColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+            val contactNameColumnIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Email.DISPLAY_NAME_PRIMARY)
+            val contactEmail = cursor.getString(contactEmailColumnIndex)
+            val contactName = cursor.getString(contactNameColumnIndex)
+            val contact = Attendee(
+                contactName,
+                contactEmail
+            )
+            deviceContacts.add(contact)
+            cursor.moveToNext()
+        }
+        cursor.close()
+        return deviceContacts
     }
 }

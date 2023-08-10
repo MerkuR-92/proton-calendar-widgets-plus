@@ -42,6 +42,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
+import me.proton.android.calendar.common.utils.AndroidUtils.getDeviceContacts
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.getParticipationStatusPriorityValue
 import me.proton.android.calendar.common.utils.AndroidUtils.getText
@@ -56,6 +57,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.matchAttendeesWithContacts
 import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
@@ -67,6 +69,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
+import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.util.kotlin.nullIfBlank
@@ -758,7 +761,19 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                             getParticipationStatusPriorityValue(participationStatus)
                         }
                     })
-                attendeeListAdapter.submitList(sortedAttendeeList)
+
+                val protonContacts = ArrayList<ContactEmail>()
+                accountViewModel.getPrimaryUserId()?.let {
+                    protonContacts.addAll(mainViewModel.getProtonContacts(it))
+                }
+
+                attendeeListAdapter.submitList(
+                    matchAttendeesWithContacts(
+                        sortedAttendeeList,
+                        requireContext().getDeviceContacts() ?: emptyList(),
+                        protonContacts
+                    )
+                )
 
                 // Reset LayoutParams
                 eventAttendeeList.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
