@@ -388,7 +388,7 @@ class EventViewModel @Inject constructor(
     private suspend fun initializeDefaultCalendar(): InitResult {
         // Get default calendar
         val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let {
-            calendarsRepository.selectCalendar(it)
+            calendarsRepository.selectCalendar(it) ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: failed to select default calendar")
         } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
 
         // Load settings for given calendar id and stores them in calendarSettings

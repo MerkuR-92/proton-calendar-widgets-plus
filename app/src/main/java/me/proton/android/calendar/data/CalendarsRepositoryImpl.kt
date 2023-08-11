@@ -1576,21 +1576,23 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String? {
         // Get user calendar settings default calendar id or fallback to first sorted personal active user calendar id
-        return getDefaultCalendarId(userId)
-            ?: run {
-                if (allowShared) {
-                    val sortedActiveUserCalendars = sortPersonalCalendars(selectActiveUserCalendars(userId), null)
-                    sortedActiveUserCalendars.firstOrNull {
-                        it.isOwner // First try to get a personal calendar
-                    }?.id ?: sortedActiveUserCalendars.firstOrNull {
-                        it.allowEditEvents // Fallback to a writable calendar
-                    }?.id
-                } else {
-                    sortPersonalCalendars(selectActiveUserCalendars(userId), null).firstOrNull {
-                        it.isOwner
-                    }?.id
-                }
+        val defaultCalendarId = getDefaultCalendarId(userId)
+        return if (!defaultCalendarId.isNullOrEmpty() && hasCalendar(defaultCalendarId)) {
+            defaultCalendarId
+        } else {
+            if (allowShared) {
+                val sortedActiveUserCalendars = sortPersonalCalendars(selectActiveUserCalendars(userId), null)
+                sortedActiveUserCalendars.firstOrNull {
+                    it.isOwner // First try to get a personal calendar
+                }?.id ?: sortedActiveUserCalendars.firstOrNull {
+                    it.allowEditEvents // Fallback to a writable calendar
+                }?.id
+            } else {
+                sortPersonalCalendars(selectActiveUserCalendars(userId), null).firstOrNull {
+                    it.isOwner
+                }?.id
             }
+        }
     }
 
     override suspend fun getDefaultCalendarId(userId: String): String? {
