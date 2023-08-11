@@ -120,7 +120,7 @@ class SyncAlarmsUseCase @Inject constructor(
                     alarmsResponse.data.alarms.forEach { alarmEntity ->
                         logger.v("alarm: ${alarmEntity}")
 
-                        if (!calendarsRepository.hasCalendar(alarmEntity.calendarId))           {
+                        if (!calendarsRepository.hasCalendar(alarmEntity.calendarId)) {
                             // Calendar doesn't exist locally, silently fail
                             logger.e("SyncAlarmsUseCase: calendar doesn't exist in DB, can't insert alarm")
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
