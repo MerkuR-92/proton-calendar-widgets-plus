@@ -134,9 +134,9 @@ class SyncAlarmsUseCase @Inject constructor(
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                 is ApiResponse.Error -> {
-                                    return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
+                                    logger.i("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
                                 }
-                                is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
+                                is ApiResponse.Exception -> logger.i("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
                             }
                         } else {
                             safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
