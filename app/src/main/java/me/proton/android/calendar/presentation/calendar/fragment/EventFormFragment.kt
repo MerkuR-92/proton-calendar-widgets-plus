@@ -24,6 +24,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -528,14 +529,16 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     protonContacts.addAll(mainViewModel.getProtonContacts(it) ?: emptyList())
                 }
 
-                ProtonUtilsImpl.matchAttendeesWithContacts(
-                    event.iCalEvent.attendees,
-                    requireContext().getDeviceContacts() ?: emptyList(),
-                    protonContacts
-                ).take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
-                    val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
-                    chipTitle?.let {
-                        addAttendeeChip(chipTitle)
+                withStarted {
+                    ProtonUtilsImpl.matchAttendeesWithContacts(
+                        event.iCalEvent.attendees,
+                        requireContext().getDeviceContacts() ?: emptyList(),
+                        protonContacts
+                    ).take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
+                        val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
+                        chipTitle?.let {
+                            addAttendeeChip(chipTitle)
+                        }
                     }
                 }
             }

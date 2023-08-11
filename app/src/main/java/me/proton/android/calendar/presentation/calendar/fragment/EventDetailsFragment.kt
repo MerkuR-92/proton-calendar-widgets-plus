@@ -19,6 +19,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -767,45 +768,47 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     protonContacts.addAll(mainViewModel.getProtonContacts(it) ?: emptyList())
                 }
 
-                attendeeListAdapter.submitList(
-                    matchAttendeesWithContacts(
-                        sortedAttendeeList,
-                        requireContext().getDeviceContacts() ?: emptyList(),
-                        protonContacts
+                withStarted {
+                    attendeeListAdapter.submitList(
+                        matchAttendeesWithContacts(
+                            sortedAttendeeList,
+                            requireContext().getDeviceContacts() ?: emptyList(),
+                            protonContacts
+                        )
                     )
-                )
 
-                // Reset LayoutParams
-                eventAttendeeList.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
-                eventAttendeeList.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
+                    // Reset LayoutParams
+                    eventAttendeeList.layoutParams.width = RecyclerView.LayoutParams.MATCH_PARENT
+                    eventAttendeeList.layoutParams.height = RecyclerView.LayoutParams.WRAP_CONTENT
 
-                if (attendeesListHeight == null) {
-                    if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
-                        eventAttendeeList.visibleOrGone(true)
-                        rotateArrowUpward(eventAttendeesButton, 0)
-                    } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
-                        eventAttendeeList.visibleOrGone(false)
-                        eventAttendeesButton.visibleOrGone(false)
-                        eventAttendeesPress.root.visibleOrGone(false)
-                        return@launch
+                    if (attendeesListHeight == null) {
+                        if (attendeeListAdapter.itemCount <= ATTENDEE_AUTO_EXPAND_LIMIT && sortedAttendeeList.isNotEmpty()) {
+                            eventAttendeeList.visibleOrGone(true)
+                            rotateArrowUpward(eventAttendeesButton, 0)
+                        } else if (sortedAttendeeList.isEmpty() && organizerAttendee != null) {
+                            eventAttendeeList.visibleOrGone(false)
+                            eventAttendeesButton.visibleOrGone(false)
+                            eventAttendeesPress.root.visibleOrGone(false)
+                            return@withStarted
+                        }
                     }
-                }
 
-                // Reset view height
-                attendeesListHeight = null
+                    // Reset view height
+                    attendeesListHeight = null
 
-                eventAttendeesPress.root.setOnClickListener {
-                    if (eventAttendeeList.isVisible) {
-                        // Save expanded view height only once
-                        val height = collapse(eventAttendeeList).first
-                        if (attendeesListHeight == null) attendeesListHeight = height
-                        rotateArrowDownward(eventAttendeesButton)
-                    } else {
-                        // TODO: Workaround for special case where desired height is not properly calculated.
-                        //  Passing 0 skips the animation.
-                        //  It means that List with more than 5 items will not have expand animation on first expand.
-                        expand(eventAttendeeList, height = attendeesListHeight ?: 0)
-                        rotateArrowUpward(eventAttendeesButton)
+                    eventAttendeesPress.root.setOnClickListener {
+                        if (eventAttendeeList.isVisible) {
+                            // Save expanded view height only once
+                            val height = collapse(eventAttendeeList).first
+                            if (attendeesListHeight == null) attendeesListHeight = height
+                            rotateArrowDownward(eventAttendeesButton)
+                        } else {
+                            // TODO: Workaround for special case where desired height is not properly calculated.
+                            //  Passing 0 skips the animation.
+                            //  It means that List with more than 5 items will not have expand animation on first expand.
+                            expand(eventAttendeeList, height = attendeesListHeight ?: 0)
+                            rotateArrowUpward(eventAttendeesButton)
+                        }
                     }
                 }
             }
