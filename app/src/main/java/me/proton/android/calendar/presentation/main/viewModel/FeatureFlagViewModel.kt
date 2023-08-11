@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -67,7 +68,7 @@ class FeatureFlagViewModel @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
-        val userId = requireNotNull(accountManager.getPrimaryUserId().first())
+        val userId = accountManager.getPrimaryUserId().firstOrNull() ?: return false
         return featureFlagManager.getOrDefault(
             userId,
             calendarFeatureFlag.featureId,
@@ -79,14 +80,15 @@ class FeatureFlagViewModel @Inject constructor(
     }
 
     private suspend fun getFeatureFlag(calendarFeatureFlag: CalendarFeatureFlag): FeatureFlag {
-        val userId = requireNotNull(accountManager.getPrimaryUserId().first())
+        val defaultFeatureFlag = FeatureFlag.default(
+            calendarFeatureFlag.featureId.id,
+            calendarFeatureFlag.fallbackValue
+        )
+        val userId = accountManager.getPrimaryUserId().firstOrNull() ?: return defaultFeatureFlag
         return featureFlagManager.getOrDefault(
             userId,
             calendarFeatureFlag.featureId,
-            FeatureFlag.default(
-                calendarFeatureFlag.featureId.id,
-                calendarFeatureFlag.fallbackValue
-            )
+            defaultFeatureFlag
         )
     }
 
