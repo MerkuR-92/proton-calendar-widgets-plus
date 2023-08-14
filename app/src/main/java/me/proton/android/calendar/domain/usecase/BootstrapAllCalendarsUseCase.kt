@@ -121,7 +121,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
                 if (isAutoAddHolidayEnabled) {
                     val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
-                    calendarsRepository.refreshManagedHolidayCalendars(userId)?.let { holidayCalendars ->
+                    calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let { holidayCalendars ->
                         // Get calendars matching the default time zone
                         val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
                             holidayCalendars,

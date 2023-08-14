@@ -622,19 +622,19 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun getManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? =
         database.managedHolidayCalendarDao().selectAll()
 
-    override suspend fun getManagedHolidayCalendar(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
+    override suspend fun getManagedHolidayCalendarById(userId: UserId, calendarId: String): ManagedHolidayCalendarEntity? =
         database.managedHolidayCalendarDao().selectById(calendarId)
 
     /**
      * Fetches the managed holiday calendar list from BE, persists it in DB if non null.
      * @return the fetched list of managed holiday calendar.
      */
-    override suspend fun refreshManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? {
-        val managedHolidayCalendars = calendarsApi.getManagedHolidayCalendars(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)?.calendars
+    override suspend fun refreshVisibleManagedHolidayCalendars(userId: UserId): List<ManagedHolidayCalendarEntity>? {
+        val managedHolidayCalendars = fetchManagedHolidayCalendars(userId)
         managedHolidayCalendars?.forEach {
             database.managedHolidayCalendarDao().updateOrInsert(it.copy(fkUserId = userId.id))
         }
-        return managedHolidayCalendars
+        return managedHolidayCalendars?.filter { it.hidden == false }
     }
 
     override suspend fun isCalendarDisplayUpToDate(calendarId: String, newDisplay: Int): Boolean {

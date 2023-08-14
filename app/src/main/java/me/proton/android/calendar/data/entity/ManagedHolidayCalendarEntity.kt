@@ -42,6 +42,8 @@ data class ManagedHolidayCalendarEntity(
     val passphrase: String,
     @SerialName("SessionKey")
     val sessionKey: JsonObject,
+    @SerialName("Hidden")
+    val hidden: Boolean?,
     @NonNull
     @kotlinx.serialization.Transient
     val fkUserId: String = ""
