@@ -16,6 +16,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
@@ -95,21 +96,23 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
 
         lifecycleScope.launch {
             accountViewModel.getPrimaryUserId()?.let {
-                val contacts = mainViewModel.getProtonContacts(it)
+                val contacts = mainViewModel.getProtonContacts(it) ?: emptyList()
                 protonContacts.addAll(contacts)
                 cachedProtonContacts.addAll(
                     contacts.map { Attendee(it.name, it.email) }
                 )
 
                 if (!attendeeListAdapter.currentList.isNullOrEmpty()) {
-                    attendeeListAdapter.submitList(
-                        ProtonUtilsImpl.matchAttendeesWithContacts(
-                            attendeeListAdapter.currentList,
-                            cachedDeviceContacts,
-                            protonContacts
-                        )
-                    ) {
-                        binding.eventFormAttendeesList.smoothScrollToPosition(0)
+                    withStarted {
+                        attendeeListAdapter.submitList(
+                            ProtonUtilsImpl.matchAttendeesWithContacts(
+                                attendeeListAdapter.currentList,
+                                cachedDeviceContacts,
+                                protonContacts
+                            )
+                        ) {
+                            binding.eventFormAttendeesList.smoothScrollToPosition(0)
+                        }
                     }
                 }
             }

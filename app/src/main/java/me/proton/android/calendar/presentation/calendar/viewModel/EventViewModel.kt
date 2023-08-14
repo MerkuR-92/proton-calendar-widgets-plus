@@ -388,7 +388,7 @@ class EventViewModel @Inject constructor(
     private suspend fun initializeDefaultCalendar(): InitResult {
         // Get default calendar
         val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let {
-            calendarsRepository.selectCalendar(it)
+            calendarsRepository.selectCalendar(it) ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: failed to select default calendar")
         } ?: return InitResult.Error.InitDefaultCalendarError("EventViewModel: no active calendars for user")
 
         // Load settings for given calendar id and stores them in calendarSettings
@@ -433,24 +433,14 @@ class EventViewModel @Inject constructor(
         val newVEvent = newICalendar.events.first()
 
         // If there is no requested start date, we take today
-        var startDate =
+        val startDate =
             if (initStartDate != null) LocalDate.parse(initStartDate)
             else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
 
         // If there is no requested start time, we calculate it according to "now"
         val startTime =
             if (initStartTime != null) LocalTime.parse(initStartTime)
-            else {
-                val newStartDate = ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong()).toLocalDate()
-                if (newStartDate != startDate) {
-                    startDate = newStartDate
-                }
-                ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
-                    .truncatedTo(ChronoUnit.HOURS)
-                    .toLocalTime()
-            }
+            else ZonedDateTime.of(startDate, LocalTime.of(8, 0), ZoneId.of(eventTimeZoneId)).toLocalTime()
 
         var endDate =
             if (initEndDate != null) LocalDate.parse(initEndDate)

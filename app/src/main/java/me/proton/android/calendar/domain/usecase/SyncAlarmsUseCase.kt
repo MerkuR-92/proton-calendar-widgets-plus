@@ -120,7 +120,7 @@ class SyncAlarmsUseCase @Inject constructor(
                     alarmsResponse.data.alarms.forEach { alarmEntity ->
                         logger.v("alarm: ${alarmEntity}")
 
-                        if (!calendarsRepository.hasCalendar(alarmEntity.calendarId))           {
+                        if (!calendarsRepository.hasCalendar(alarmEntity.calendarId)) {
                             // Calendar doesn't exist locally, silently fail
                             logger.e("SyncAlarmsUseCase: calendar doesn't exist in DB, can't insert alarm")
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
@@ -134,9 +134,9 @@ class SyncAlarmsUseCase @Inject constructor(
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get
                                 is ApiResponse.Error -> {
-                                    return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
+                                    logger.i("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.errorCode}, ${event.error}")
                                 }
-                                is ApiResponse.Exception -> return UseCase.Result.Error("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
+                                is ApiResponse.Exception -> logger.i("SyncAlarmsUseCase: could not fetch missing event for alarm: ${event.exception}")
                             }
                         } else {
                             safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
