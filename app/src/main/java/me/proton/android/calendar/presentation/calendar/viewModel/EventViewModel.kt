@@ -433,24 +433,14 @@ class EventViewModel @Inject constructor(
         val newVEvent = newICalendar.events.first()
 
         // If there is no requested start date, we take today
-        var startDate =
+        val startDate =
             if (initStartDate != null) LocalDate.parse(initStartDate)
             else ZonedDateTime.now(ZoneId.of(eventTimeZoneId)).toLocalDate()
 
         // If there is no requested start time, we calculate it according to "now"
         val startTime =
             if (initStartTime != null) LocalTime.parse(initStartTime)
-            else {
-                val newStartDate = ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong()).toLocalDate()
-                if (newStartDate != startDate) {
-                    startDate = newStartDate
-                }
-                ZonedDateTime.now(ZoneId.of(eventTimeZoneId))
-                    .plusMinutes(this.calendarSettings.defaultEventDuration.toLong())
-                    .truncatedTo(ChronoUnit.HOURS)
-                    .toLocalTime()
-            }
+            else ZonedDateTime.of(startDate, LocalTime.of(8, 0), ZoneId.of(eventTimeZoneId)).toLocalTime()
 
         var endDate =
             if (initEndDate != null) LocalDate.parse(initEndDate)
