@@ -356,7 +356,7 @@
     <string name="snack_opening_ics">Ouverture de l\'événement…</string>
     <string name="snack_invite_in_shared_calendar_error">Vous ne pouvez pas créer des invitations dans un calendrier partagé.</string>
     <string name="snack_down_banner">Les serveurs de Proton sont en panne. Consultez notre page d\'état pour plus de détails.</string>
-    <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_down_banner_action">Ouvrir la page d\'état</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas.</string>
     <string name="error_occurrence_does_not_exist">L\'occurrence n\'existe pas.</string>

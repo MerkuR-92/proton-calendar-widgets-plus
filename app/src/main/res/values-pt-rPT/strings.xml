@@ -355,8 +355,8 @@
     <string name="snack_notification_already_added">A notificação já foi adicionada</string>
     <string name="snack_opening_ics">Abrindo evento…</string>
     <string name="snack_invite_in_shared_calendar_error">Não é permitido criar convites num calendário partilhado</string>
-    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
-    <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_down_banner">Os servidores Proton estão indisponíveis. Visite a nossa página de status para obter detalhes.</string>
+    <string name="snack_down_banner_action">Abrir a página de status</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>

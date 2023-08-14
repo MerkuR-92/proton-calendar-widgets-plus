@@ -355,8 +355,8 @@
     <string name="snack_notification_already_added">Az emlékeztető már hozzá van adva</string>
     <string name="snack_opening_ics">Esemény megnyitása…</string>
     <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
-    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
-    <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_down_banner">A Proton szerverek leálltak. A részletekért látogasson el a státusz oldalunkra.</string>
+    <string name="snack_down_banner_action">Státusz oldal megtekintése</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
