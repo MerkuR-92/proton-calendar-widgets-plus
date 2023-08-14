@@ -355,8 +355,8 @@
     <string name="snack_notification_already_added">Уведомление уже было добавлено</string>
     <string name="snack_opening_ics">Открытие события…</string>
     <string name="snack_invite_in_shared_calendar_error">Создание приглашений в общем календаре не разрешается</string>
-    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
-    <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_down_banner">Серверы Proton не работают. Посетите нашу статус-страницу, чтобы узнать детали.</string>
+    <string name="snack_down_banner_action">Открыть страницу состояния</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">События не существует</string>
     <string name="error_occurrence_does_not_exist">Повтор не существует</string>

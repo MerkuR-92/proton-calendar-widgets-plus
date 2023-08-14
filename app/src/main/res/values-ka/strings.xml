@@ -25,9 +25,9 @@
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">ამ მოვლენის ორგანიზატორს ეცნობება, რომ თქვენ უარყავით მოწვევა. გსურთ, წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">ამ მოვლენის ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან არ შეგიძლიათ ელფოსტის გაგზავნა მოწვეული მისამართიდან. მაინც გსურთ წაშალოთ ეს მოვლენა?</string>
-    <string name="dialog_description_delete_recurring_event_as_attendee">ორგანიზატორი ამ სერიის მოვლენების ეცნობება, რომ თქვენ უარჰყავით მოწვევა. გსურთ, წაშალოთ ამ სერიის ყველა მოვლენა?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">ორგანიზატორი ამ სერიის მოვლენების ეცნობება, რომ თქვენ უარყავით მოწვევა. გსურთ, წაშალოთ ამ სერიის ყველა მოვლენა?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">მოვლენის ამ სერიის ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან არ შეგიძლიათ ელფოსტის გაგზავნა მოწვეული მისამართიდან. მაინც გსურთ ამ სერიის ყველა მოვლენის წაშლა?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">ეს მოვლენა განახლდა. ორგანიზატორს ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე. გსურთ წაშალოთ ეს მოვლენა?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">ეს მოვლენა განახლდა. ორგანიზატორს ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე. გსურთ, წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">ეს მოვლენა განახლდა. ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან ვერ გაგზავნით ელფოსტას მოწვეული მისამართიდან. გსურთ წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">ორგანიზატორის მიერ ადრე განახლებული მოვლენები ინახება, მაგრამ თქვენი პასუხები დაიკარგება</string>
@@ -116,7 +116,7 @@
     <string name="event_organizer_send_prefs_message_default_title">ორგანიზატორს არ შეიძლება, ეცნობოს, რომ თქვენ უპასუხეთ მოწვევას</string>
     <string name="event_organizer_send_prefs_button_title">დიახ</string>
     <string name="event_attendees_send_prefs_error_title">მონაწილეების გაფრთხილება შეუძლებელია</string>
-    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">მონაწილეების გაფრთხილება თქვეი ცვლილებების შესახებ შეუძლებელია:\n\n• %1$s\n\nმაინც გნებავთ გაგრძელება?</string>
+    <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">მონაწილეების გაფრთხილება თქვენი ცვლილებების შესახებ შეუძლებელია:\n\n• %1$s\n\nმაინც გნებავთ გაგრძელება?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">შეუძლებელია შემდეგი მონაწილეების გაფრთხილება თქვენი ცვლილებების შესახებ:\n\n• %1$s\n\nმაინც გნებავთ, გააგრძელოთ?</string>
     <string name="event_attendees_send_prefs_error_confirm">გაგრძელება</string>
     <string name="event_attendees_send_prefs_error_cancel">გაუქმება</string>
@@ -361,7 +361,7 @@
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
     <string name="update_timezone_dialog_title">დროის სარტყელი შეიცვალა</string>
-    <string name="update_timezone_dialog_message">თქვენი სისტემის დროის ზონა, როგორც ჩანს, შეიცვალა %1$s. გსურთ განაახლოთ თქვენი დროის ზონის პარამეტრი?</string>
+    <string name="update_timezone_dialog_message">თქვენი სისტემის დროის ზონა, როგორც ჩანს, შეიცვალა %1$s. გსურთ, განაახლოთ თქვენი დროის ზონის პარამეტრი?</string>
     <string name="update_timezone_dialog_confirmation">განახლება</string>
     <string name="update_timezone_dialog_cancel">გაუქმება</string>
     <string name="contacts_permission_dialog_title">მისცემთ Proton Calendar-ს წვდომას თქვენს კონტაქტებზე?</string>
@@ -408,7 +408,7 @@
     <string name="settings_week_numbers_title">კვირის ნომრის ჩვენება</string>
     <string name="settings_auto_invites_title">მოსაწვევების კალენდარში დამატება და მომლოდინედ მონიშვნა</string>
     <string name="settings_search_title">კალენდრების ძებნა</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">გადმოწერს და დაიმახსოვრებს კალენდრის შემცველობას თქვენს მოწყობილობაზე, რათა მასში ძებნა შეგეძლოთ. ამის გაორთვა გადმოწერილ შემცველობას წაშლის.\n\nძებნა ექსპერიმენტული, ბეტა ფუნქციაა. მისმა ჩართვამ შეიძლება აპლიკაცია არასტაბილური გახადოს.</string>
     <string name="settings_alternative_routing_title">ალტერნატიული რაუტინგის ჩართვა</string>
     <string name="settings_alternative_routing_subtitle">იმ შემთხვევაში, თუ Proton-ის საიტები დაბლოკილია, ეს პარამეტრი აპს საშუალებას აძლევს, Proton-მდე მისასვლელად ქსელის ალტერნატიული რაუტინგი სცადოს, რაც შეიძლება, სასარგებლო იყოს ბრანდმაუერის ან ქსელის პრობლემების გვერდის ავლით. მეტი საიმედოობისთვის გირჩევთ, ჩართოთ ეს პარამეტრი.</string>
     <string name="settings_value_placeholder">მოსანიშნად დაატყაპუნეთ</string>
@@ -496,7 +496,7 @@
     <string name="bootstrap_error_some_calendars_failed_title">კალენდრების მომზადების შეცდომა</string>
     <string name="bootstrap_error_some_calendars_failed_message">შემდეგი კალენდრები მორგებული არაა</string>
     <string name="bootstrap_error_no_active_calendar_title">ამ ანგარიშთან დაკავშირებული აქტური პირადი კალენდრები არ არსებობს.</string>
-    <string name="bootstrap_error_no_active_calendar_message">იმისათვის, რომ ისწავლოთ კალენდრის გააქტიურება ეწვიეთ ჩვენს <a href="https://proton.me/support"> ცოდნის ბაზა </a></string>
+    <string name="bootstrap_error_no_active_calendar_message">იმისათვის, რომ ისწავლოთ კალენდრის გააქტიურება, ეწვიეთ ჩვენს <a href="https://proton.me/support"> ცოდნის ბაზას </a></string>
     <string name="bootstrap_error_store_quota_reached_message">მეტი საცავის სივრცე ხელმიუწვდომელია.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">გაიგეთ მეტი</string>
     <string name="bootstrap_error_reset_needed_title">კალენდრის გასაღებების თავიდან დაყენება</string>
@@ -535,7 +535,7 @@
     <string name="spotlight_dialog_easy_switch_positive_button">შემოტანის დაწყება</string>
     <string name="spotlight_dialog_easy_switch_negative_button">არა ახლა</string>
     <string name="spotlight_dialog_auto_invites_title">ადვილად დაეთანხმეთ მოსაწვევებს</string>
-    <string name="spotlight_dialog_auto_invites_description">ახლა მოსაწვევები თქვენ კალენდარში, როგორც დარჩენილი მოვლენები, ისე გამოჩნდება. საპასუხოდ, მოსაწვევი უბრალოდ გახსენით. \n\n მის სამართავად პარამეტრებში გადადადით.</string>
+    <string name="spotlight_dialog_auto_invites_description">ახლა მოსაწვევები თქვენს კალენდარში, როგორც დარჩენილი მოვლენები, ისე გამოჩნდება. საპასუხოდ, მოსაწვევი უბრალოდ გახსენით. \n\n მის სამართავად პარამეტრებში გადადადით.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">შემდეგი</string>
     <string name="spotlight_v5_dialog_got_it_button">გავიგე</string>
     <string name="spotlight_v5_dialog_learn_more_button">გაიგეთ მეტი</string>
@@ -550,10 +550,10 @@
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
     <string name="spotlight_dialog_calendar_provider_description">• დაამატეთ მოვლენები პირდაპირ Proton Calendar-ში სხვა აპებიდან.\n\n• შექმენით და მართეთ მოვლენები კალენდრებში, რომლებიც გაგიზიარეს.\n\n• დააყენეთ ხედი, რომელიც გნებავთ, აპის გახსნის დროს დაინახოთ.\n\n• ხელმისაწვდომია 13 ახალი ენა.</string>
     <string name="spotlight_dialog_wipe_search_title">ძებნა მოვაცილეთ, რათა ის უკეთესი გავხადოთ</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_description">Proton Calendar Beta-დან ექსპერიმენტული ძებნის ფუნქცია წაიშლება, რადგან ჩვენ ის უფრო გამოსადეგი და სანდო გვინდა, გავხადოთ. ამას რამდენიმე წუთი შეიძლება, დასჭირდეს.</string>
     <string name="spotlight_dialog_holiday_calendar_title">დასვენებაა!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და გეგმების დავიწყება გრძელი დასვენების დღეებისთვის.\n\nდაამატეთ ნებისმიერი ქვეყნის დასვენების დღე თქვენს კალენდარში.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და ნუ დაივიწყებთ გრძელი დასვენებების შესახებ.\n\nრადგან თქვენი კალენდარი თითქმის სავსეა, იმისათვის, რომ დასვენების დღე დაამატოთ, ჯერ არსებული უნდა წაშალოთ.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>
@@ -583,7 +583,7 @@
     <string name="import_assistant_in_progress_title">მიმდინარეობს შემოტანა</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">მონაცემების შეტანა %1s-დან %2s-ში.</string>
     <string name="import_assistant_in_progress_redirect">პროგრესის შემოწმება</string>
-    <string name="import_assistant_in_progress_sub_description">დიდი ზომის შემოტანას რამდენიმე დღეც კი შეიძლება დასჭირდეს. ჩვენ შეგატყობინებთ, როცა შემოტანა დასრულდება. ფანჯარა შეგიძლიათ დახუროთ.</string>
+    <string name="import_assistant_in_progress_sub_description">დიდი ზომის შემოტანას რამდენიმე დღეც კი შეიძლება, დასჭირდეს. ჩვენ შეგატყობინებთ, როცა შემოტანა დასრულდება. ფანჯარა შეგიძლიათ, დახუროთ.</string>
     <string name="import_assistant_guide_subtitle">გახდით უფრო კონფიდენციალური. მარტივად და უსაფრთხოდ.</string>
     <string name="import_assistant_guide_description">გადაიტანეთ თქვენი მოვლენები და სხვა მონაცემები Google-დან Proton-მდე. ჩვენი ადვილად გადართვის პროგრამა გაგიძღვებათ შემოტანის თითოეულ ნაბიჯზე. ის ასევე შიფრავს ყველაფერს, რაზეც მუშაობს.</string>
     <string name="import_assistant_new_import">ახალი შემოტანა</string>

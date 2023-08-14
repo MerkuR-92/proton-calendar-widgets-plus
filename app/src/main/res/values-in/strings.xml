@@ -487,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Cari negara</string>
     <string name="holiday_calendar_form_picker_title">Negara</string>
     <string name="holiday_calendar_time_zone_based">Berdasarkan zona waktu Anda</string>
-    <string name="holiday_calendar_already_exists">This holiday calendar is already added.</string>
+    <string name="holiday_calendar_already_exists">Kalender liburan ini telah ditambahkan.</string>
     <string name="holiday_calendar_value_placeholder">Pilih negara</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

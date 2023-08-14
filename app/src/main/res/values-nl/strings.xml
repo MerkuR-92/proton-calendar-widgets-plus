@@ -355,8 +355,8 @@
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>
     <string name="snack_opening_ics">Afspraak wordt geopend…</string>
     <string name="snack_invite_in_shared_calendar_error">Uitnodigingen maken in een gedeelde agenda is niet toegestaan</string>
-    <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
-    <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_down_banner">Proton servers zijn down. Bezoek onze status pagina voor informatie.</string>
+    <string name="snack_down_banner_action">Open status pagina</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -550,8 +550,8 @@
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
     <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
     <string name="spotlight_dialog_wipe_search_title">Zoekopdracht verwijderd om het te verbeteren</string>
-    <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Kalender Beta, omdat we het meer bruikbaar en betrouwbaar voor je willen maken. Dit duurt slechts enkele seconden.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn hier!</string>
+    <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Clendar Beta, omdat we het bruikbaarder en betrouwbaarder willen maken. Dit duurt slechts enkele seconden.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
     <!-- Import -->

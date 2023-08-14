@@ -355,7 +355,7 @@
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
     <string name="snack_opening_ics">Відкриття події…</string>
     <string name="snack_invite_in_shared_calendar_error">Створення запрошень у спільному календарі не дозволено</string>
-    <string name="snack_down_banner">Сервери Proton не працюють. Відвідайте нашу сторінку статусу для отримання детальної інформації.</string>
+    <string name="snack_down_banner">Сервери Proton не працюють. Відвідайте нашу сторінку стану, щоб переглянути подробиці.</string>
     <string name="snack_down_banner_action">Відкрити сторінку стану</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
@@ -408,7 +408,7 @@
     <string name="settings_week_numbers_title">Показати номери тижнів</string>
     <string name="settings_auto_invites_title">Додати запрошення до календаря та додати його в чергу</string>
     <string name="settings_search_title">Пошук календарів</string>
-    <string name="settings_search_subtitle">Завантажує і зберігає вміст календаря на вашому пристрої для пошуку. Вимкнення цієї функції призведе до видалення завантаженого вмісту.\n\nПошук - це експериментальна бета-версія. Ввімкнення цієї функції може призвести до нестабільної роботи застосунку.</string>
+    <string name="settings_search_subtitle">Завантажує і зберігає вміст календаря на вашому пристрої для пошуку. Вимкнення цієї функції призведе до вилучення завантаженого вмісту.\n\nПошук – це експериментальна функція, ввімкнення якої може спричинити нестабільну роботу програми.</string>
     <string name="settings_alternative_routing_title">Дозволити альтернативну маршрутизацію</string>
     <string name="settings_alternative_routing_subtitle">У випадку блокування сайтів Proton, цей параметр дозволяє програмі спробувати альтернативний мережевий маршрут для доступу до Proton, що може бути корисним для обходу мережевих екранів чи мережевих проблем. Рекомендовано увімкнути цей параметр для більшої надійності.</string>
     <string name="settings_value_placeholder">Торкніться, щоб вибрати</string>
@@ -550,10 +550,10 @@
     <string name="spotlight_dialog_calendar_provider_title">Функції календаря</string>
     <string name="spotlight_dialog_calendar_provider_description">• Додавайте події безпосередньо до Proton Calendar з інших програм.\n\n• Створюйте події та керуйте ними в календарях, до яких вам надано спільний доступ.\n\n• Налаштуйте типовий вигляд після відкриття програми.\n\n• Доступно 13 нових мов.</string>
     <string name="spotlight_dialog_wipe_search_title">Пошук вилучено, щоб поліпшити його</string>
-    <string name="spotlight_dialog_wipe_search_description">Ми знову видаляємо можливості експериментального пошуку з Proton Calendar Beta, оскільки ми хочемо зробити його кориснішим і надійнішим для вас. Це може зайняти кілька секунд.</string>
+    <string name="spotlight_dialog_wipe_search_description">Ми вилучаємо експериментальну функцію пошуку з Proton Calendar Beta, оскільки хочемо, щоб він був кориснішим і надійнішим. Це може тривати кілька секунд.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Державні свята вже тут!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Більше не потрібно призначати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nДодайте державні свята будь-якої країни до свого календаря.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Більше не потрібно планувати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nОскільки ви зараз на межі календаря, щоб додати календар відпусток, вам потрібно спочатку видалити наявний календар.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Більше не потрібно планувати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nОскільки ви досягли обмеження доступних календарів, щоб додати календар свят, потрібно спершу вилучити будь-який інший календар.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>

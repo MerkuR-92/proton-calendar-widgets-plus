@@ -550,7 +550,7 @@
     <string name="spotlight_dialog_calendar_provider_title">Recursos do calendário</string>
     <string name="spotlight_dialog_calendar_provider_description">• Adicione eventos diretamente ao Proton Calendar a partir de outros aplicativos.\n\n• Crie e gerencie eventos em calendários compartilhados com você.\n\n• Defina a visualização padrão que deseja observar ao abrir o aplicativo.\n\n• 13 novos idiomas disponíveis.</string>
     <string name="spotlight_dialog_wipe_search_title">Pesquisa removida para melhorar</string>
-    <string name="spotlight_dialog_wipe_search_description">Estamos removendo o recurso de pesquisa experimental do Proton Calendar Beta, pois desejamos entregar uma experiência mais prática e confiável pata você. Isso pode demorar alguns segundos.</string>
+    <string name="spotlight_dialog_wipe_search_description">Estamos removendo o recurso de pesquisa experimental do Proton Calendar Beta, pois desejamos entregar uma experiência mais prática e confiável para você. Isso pode demorar alguns segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Os feriados públicos estão aqui!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de agendar reuniões quando todos estão de folga ou esquecer de planejar a viagem do feriadão.\n\n Adicione os feriados de qualquer país ao seu calendário.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Chega de agendar reuniões quando todos estão de folga ou esquecer de planejar a viagem do feriadão.\n\n Como atualmente você está no limite do calendário, para adicionar feriados, primeiro será necessário remover um calendário existente.</string>
