@@ -36,9 +36,15 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
 
     companion object {
         const val BOOTSTRAP_CALENDARS = "BOOTSTRAP_CALENDARS"
+        const val BOOTSTRAP_ALL_CALENDARS = "BOOTSTRAP_ALL_CALENDARS"
     }
 
-    suspend fun executeBootstrap(calendarEntity: CalendarEntity, userId: UserId, displayTimeZoneId: String, addresses: List<UserAddress>? = null): UseCase.Result {
+    suspend fun executeBootstrap(
+        calendarEntity: CalendarEntity,
+        userId: UserId,
+        displayTimeZoneId: String,
+        addresses: List<UserAddress>? = null
+    ): UseCase.Result {
         when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
             is ApiResponse.Success -> {
                 logger.v("got successful bootstrap response for calendar ${calendarEntity.id}")
@@ -135,6 +141,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                         val executeBootstrapResult = executeBootstrap(calendarEntity, userId, timezone)
                         // We don't want the result to be blocking
                         executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                        if (executeBootstrapResult !is UseCase.Result.Success<*>) failedBootstraps.add(it)
                     } ?: run {
                         logger.i("BootstrapCalendarUseCase failed to select calendar to bootstrap from DB")
                         failedBootstraps.add(it)
@@ -146,8 +153,36 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
         return if (failedBootstraps.isEmpty()) {
             UseCase.Result.Success<Unit>()
         } else {
+            logger.i("BootstrapCalendarUseCase executeCalendarsBootstrap failed to bootstrap some calendars")
             UseCase.Result.Error("BootstrapCalendarUseCase executeCalendarsBootstrap failed to bootstrap some calendars")
         }
     }
 
+    suspend fun executeAllCalendarsBootstrap(userId: UserId): UseCase.Result {
+        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+            ?: ZoneId.systemDefault().id
+
+        val allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId)
+            ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
+
+        val failedBootstraps = arrayListOf<String>()
+        coroutineScope {
+            allCalendarEntities.map { calendarEntity ->
+                async {
+                    // TODO Test this without fetchEvents to see if we somehow already refresh current views events
+                    val executeBootstrapResult = executeBootstrap(calendarEntity, userId, timezone)
+                    // We don't want the result to be blocking
+                    executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                    if (executeBootstrapResult !is UseCase.Result.Success<*>) failedBootstraps.add(calendarEntity.id)
+                }
+            }.awaitAll()
+        }
+
+        return if (failedBootstraps.isEmpty()) {
+            UseCase.Result.Success<Unit>()
+        } else {
+            logger.i("BootstrapCalendarUseCase executeAllCalendarsBootstrap failed to bootstrap some calendars")
+            UseCase.Result.Error("BootstrapCalendarUseCase executeAllCalendarsBootstrap failed to bootstrap some calendars")
+        }
+    }
 }

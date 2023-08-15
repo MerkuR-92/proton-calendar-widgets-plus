@@ -1,11 +1,10 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.CalendarMembersEvents
@@ -33,8 +32,8 @@ class CalendarMemberEventListener @Inject constructor(
     override val order: Int = 2
     override val type: Type = Type.Core
 
-    private val membersWithIncompleteKeySetup: ArrayList<String> = arrayListOf()
-    private val deletedMemberIds: ArrayList<String> = arrayListOf()
+    private val membersWithIncompleteKeySetup: HashSet<String> = hashSetOf()
+    private val deletedMemberIds: HashSet<String> = hashSetOf()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -94,22 +93,16 @@ class CalendarMemberEventListener @Inject constructor(
         }
 
         // Launch worker to do key setup for members with incomplete setup flag
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MEMBERS_KEY_SETUP,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_MEMBER_IDS to membersWithIncompleteKeySetup
-                )
-            )
-            .build()
-
-        workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.MEMBERS_KEY_SETUP, ExistingWorkPolicy.APPEND, work).state
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MEMBERS_KEY_SETUP,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                UseCaseWorker.INPUT_MEMBER_IDS to membersWithIncompleteKeySetup.toTypedArray()
+            ),
+            UseCaseWorker.UniqueWorkNames.MEMBERS_KEY_SETUP,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
@@ -117,5 +110,10 @@ class CalendarMemberEventListener @Inject constructor(
 
         deletedMemberIds.clear()
         membersWithIncompleteKeySetup.clear()
+    }
+
+    override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+        // Nothing to do here since CalendarListener.resetAll will also delete members and do the bootstrap
     }
 }

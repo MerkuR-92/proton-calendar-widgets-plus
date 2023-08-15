@@ -1,7 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.SettingsApi
@@ -15,14 +14,18 @@ class RefreshCalendarUserSettingsUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val settingsApi: SettingsApi,
+    private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase
 ) {
+
+    companion object {
+        const val REFRESH_CALENDAR_USER_SETTINGS = "REFRESH_CALENDAR_USER_SETTINGS"
+    }
 
     suspend operator fun invoke(
         userId: UserId
     ): UseCase.Result {
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId)
-
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("RefreshCalendarUserSettingsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
@@ -32,7 +35,9 @@ class RefreshCalendarUserSettingsUseCase @Inject constructor(
             calendarUserSettingsResponse.data.calendarUserSettings
         )
 
-        return UseCase.Result.Success<CalendarUserSettingsEntity>(calendarUserSettingsResponse.data.calendarUserSettings)
+        calendarUserSettingsChangedUseCase.handlePrimaryTimezoneChange(userId.id)
+
+        return UseCase.Result.Success(calendarUserSettingsResponse.data.calendarUserSettings)
     }
 
 

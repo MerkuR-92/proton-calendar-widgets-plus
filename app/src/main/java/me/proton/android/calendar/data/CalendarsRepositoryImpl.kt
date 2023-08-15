@@ -248,18 +248,6 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshMembersFlags(userId: UserId) {
-        val remoteMembers = calendarsApi.getAllMembers(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
-
-        remoteMembers?.members?.forEach {
-            if (hasCalendar(it.calendarId)) {
-                persistMember(it)
-            } else {
-                logger.i("refreshCalendarsFlags: Member's Calendar doesn't exist locally")
-            }
-        }
-    }
-
     private fun removeDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
         // status at 1 means the address is active
 
@@ -508,6 +496,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         //  TODO make sure we have "flags" set!!!!!
         database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))
+    }
+
+    override suspend fun deleteCalendars(userId: String) {
+        database.calendarsDao().deleteCalendars(userId)
     }
 
     override suspend fun deleteCalendarById(id: String) {

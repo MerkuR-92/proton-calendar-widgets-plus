@@ -178,6 +178,41 @@ data class ServerCalendarEventsApiResponse(
     @SerialName("CalendarSubscriptions")
     val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null,
 )
+@Serializable
+data class CalendarEventsServerEvents(
+    @SerialName("CalendarEvents")
+    val calendarEvents: List<ServerEvent.EventsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarAlarmsEvents(
+    @SerialName("CalendarAlarms")
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarKeysEvents(
+    @SerialName("CalendarKeys")
+    val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>? = null
+)
+
+@Serializable
+data class CalendarPassphrasesEvents(
+    @SerialName("CalendarPassphrases")
+    val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>? = null
+)
+
+@Serializable
+data class CalendarSettingsEvents(
+    @SerialName("CalendarSettings")
+    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarSubscriptionsEvents(
+    @SerialName("CalendarSubscriptions")
+    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null
+)
 
 
 // TODO HANDLE ACTIONS AND CREATE TESTS FOR THAT!!!!!!!!!!!!!!!!!!

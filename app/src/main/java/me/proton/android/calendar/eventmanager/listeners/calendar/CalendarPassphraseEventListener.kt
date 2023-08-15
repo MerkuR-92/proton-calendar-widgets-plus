@@ -1,6 +1,6 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
+import me.proton.android.calendar.data.api.CalendarPassphrasesEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -13,7 +13,7 @@ import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
-import me.proton.core.util.kotlin.deserializeOrNull
+import me.proton.core.util.kotlin.deserialize
 import javax.inject.Inject
 
 class CalendarPassphraseEventListener @Inject constructor(
@@ -29,7 +29,7 @@ class CalendarPassphraseEventListener @Inject constructor(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, PassphraseEntity>>? {
-        return response.body.deserializeOrNull<ServerCalendarEventsApiResponse>()?.calendarPassphrases?.map {
+        return response.body.deserialize<CalendarPassphrasesEvents>().calendarPassphrases?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, it.passphrase)
         }
     }
@@ -39,11 +39,15 @@ class CalendarPassphraseEventListener @Inject constructor(
             logger.i("action CREATE/UPDATE for calendarPassphrase in deleted calendar")
             return
         }
-        entities.forEach { calendarsRepository.persistPassphrase(it) }
+        entities.forEach {
+            calendarsRepository.persistPassphrase(it)
+        }
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
-        keys.forEach { calendarsRepository.deletePassphraseById(it) }
+        keys.forEach {
+            calendarsRepository.deletePassphraseById(it)
+        }
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {

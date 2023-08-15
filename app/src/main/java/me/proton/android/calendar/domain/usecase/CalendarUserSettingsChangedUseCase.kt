@@ -1,12 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.util.*
 import javax.inject.Inject
 
 class CalendarUserSettingsChangedUseCase @Inject constructor(
@@ -14,6 +9,10 @@ class CalendarUserSettingsChangedUseCase @Inject constructor(
     private val database: AppDatabase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ) : UseCase {
+
+    companion object {
+        const val HANDLE_TIME_ZONE_CHANGE = "HANDLE_TIME_ZONE_CHANGE"
+    }
 
     suspend fun handlePrimaryTimezoneChange(userId: String): UseCase.Result {
         // get all all-day events

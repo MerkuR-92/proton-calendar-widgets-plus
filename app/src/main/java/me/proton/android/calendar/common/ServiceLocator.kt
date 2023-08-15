@@ -64,6 +64,7 @@ import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.RefreshMembersFlagsUseCase
 import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
@@ -162,7 +163,7 @@ val useCaseModule = module {
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get(), get()) }
     factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
     factory<CalendarSettingsChangedUseCase> { CalendarSettingsChangedUseCase(get(), get(), get(), get()) }
-    factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get()) }
+    factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
@@ -172,6 +173,7 @@ val useCaseModule = module {
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<RefreshMembersFlagsUseCase> { RefreshMembersFlagsUseCase(get(), get(), get()) }
 }
 
 fun coreModule(

@@ -1,6 +1,6 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
+import me.proton.android.calendar.data.api.CalendarAlarmsEvents
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
@@ -16,7 +16,7 @@ import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
-import me.proton.core.util.kotlin.deserializeOrNull
+import me.proton.core.util.kotlin.deserialize
 import javax.inject.Inject
 
 class CalendarAlarmEventListener @Inject constructor(
@@ -36,7 +36,7 @@ class CalendarAlarmEventListener @Inject constructor(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, EventAlarmEntity>>? {
-        return response.body.deserializeOrNull<ServerCalendarEventsApiResponse>()?.calendarAlarms?.map {
+        return response.body.deserialize<CalendarAlarmsEvents>().calendarAlarms?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, mapToAlarmEntity(it))
         }
     }

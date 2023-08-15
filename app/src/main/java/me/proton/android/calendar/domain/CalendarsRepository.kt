@@ -89,6 +89,8 @@ interface CalendarsRepository {
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
 
+    suspend fun deleteCalendars(userId: String)
+
     suspend fun deleteCalendarById(id: String)
 
     suspend fun refreshCalendars(userId: UserId): Boolean
@@ -214,8 +216,6 @@ interface CalendarsRepository {
     fun expandDbEvent(event: Event, allEvents: List<Event>, toDateTime: ZonedDateTime): List<Event>
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
-
-    suspend fun refreshMembersFlags(userId: UserId)
 
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself

@@ -9,7 +9,24 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import me.proton.android.calendar.common.WORKER_MAX_RETRY_COUNT
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
+import me.proton.android.calendar.domain.usecase.CalendarUserSettingsChangedUseCase
+import me.proton.android.calendar.domain.usecase.FetchCachedViewsEventsUseCase
+import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
+import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
+import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.KeySetupUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.RefreshMembersFlagsUseCase
+import me.proton.android.calendar.domain.usecase.SendBugReportUseCase
+import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpdateUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
+import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 
@@ -29,7 +46,11 @@ class UseCaseWorker @AssistedInject constructor(
     private val fetchCachedViewsEventsUseCase: FetchCachedViewsEventsUseCase,
     private val fixCalendarsUseCase: FixCalendarsUseCase,
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
-    private val keySetupUseCase: KeySetupUseCase
+    private val keySetupUseCase: KeySetupUseCase,
+    private val refreshMembersFlagsUseCase: RefreshMembersFlagsUseCase,
+    private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase,
+    private val calendarUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase,
+    private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -53,7 +74,12 @@ class UseCaseWorker @AssistedInject constructor(
             const val FETCH_CACHED_VIEWS_EVENTS = FetchCachedViewsEventsUseCase.WORKER_ID
             const val FIX_CALENDARS = FixCalendarsUseCase.WORKER_ID
             const val BOOTSTRAP_CALENDARS = BootstrapCalendarUseCase.BOOTSTRAP_CALENDARS
+            const val BOOTSTRAP_ALL_CALENDARS = BootstrapCalendarUseCase.BOOTSTRAP_ALL_CALENDARS
             const val MEMBERS_KEY_SETUP = KeySetupUseCase.MEMBERS_KEY_SETUP
+            const val REFRESH_MEMBERS_FLAGS = RefreshMembersFlagsUseCase.REFRESH_MEMBERS_FLAGS
+            const val GET_MINIMAL_CALENDAR_EVENTS = GetMinimalCalendarEventsUseCase.GET_MINIMAL_CALENDAR_EVENTS
+            const val HANDLE_TIME_ZONE_CHANGE = CalendarUserSettingsChangedUseCase.HANDLE_TIME_ZONE_CHANGE
+            const val REFRESH_CALENDAR_USER_SETTINGS = RefreshCalendarUserSettingsUseCase.REFRESH_CALENDAR_USER_SETTINGS
         }
     }
 
@@ -111,7 +137,12 @@ class UseCaseWorker @AssistedInject constructor(
             const val FETCH_CACHED_VIEWS_EVENTS = "FETCH_CACHED_VIEWS_EVENTS"
             const val FIX_CALENDARS = "FIX_CALENDARS"
             const val BOOTSTRAP_CALENDARS = "BOOTSTRAP_CALENDARS"
+            const val BOOTSTRAP_ALL_CALENDARS = "BOOTSTRAP_ALL_CALENDARS"
             const val MEMBERS_KEY_SETUP = "MEMBERS_KEY_SETUP"
+            const val REFRESH_MEMBERS_FLAGS = "REFRESH_MEMBERS_FLAGS"
+            const val GET_MINIMAL_CALENDAR_EVENTS = "GET_MINIMAL_CALENDAR_EVENTS"
+            const val HANDLE_TIME_ZONE_CHANGE = "HANDLE_TIME_ZONE_CHANGE"
+            const val REFRESH_CALENDAR_USER_SETTINGS = "REFRESH_CALENDAR_USER_SETTINGS"
         }
     }
 
@@ -228,9 +259,25 @@ class UseCaseWorker @AssistedInject constructor(
                 val calendarIds = inputData.getStringArray(INPUT_CALENDAR_IDS)?.toList() ?: return Result.failure()
                 bootstrapCalendarUseCase.executeCalendarsBootstrap(userId, calendarIds)
             }
+            UseCaseId.BOOTSTRAP_ALL_CALENDARS -> {
+                bootstrapCalendarUseCase.executeAllCalendarsBootstrap(userId)
+            }
             UseCaseId.MEMBERS_KEY_SETUP -> {
                 val memberIds = inputData.getStringArray(INPUT_MEMBER_IDS)?.toList() ?: return Result.failure()
                 keySetupUseCase.handleMembersWithIncompleteKeySetup(userId, memberIds)
+            }
+            UseCaseId.REFRESH_MEMBERS_FLAGS -> {
+                refreshMembersFlagsUseCase.invoke(userId)
+            }
+            UseCaseId.GET_MINIMAL_CALENDAR_EVENTS -> {
+                val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
+                getMinimalCalendarEventsUseCase.execute(userId, calendarId)
+            }
+            UseCaseId.HANDLE_TIME_ZONE_CHANGE -> {
+                calendarUserSettingsChangedUseCase.handlePrimaryTimezoneChange(userId.id)
+            }
+            UseCaseId.REFRESH_CALENDAR_USER_SETTINGS -> {
+                refreshCalendarUserSettingsUseCase.invoke(userId)
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

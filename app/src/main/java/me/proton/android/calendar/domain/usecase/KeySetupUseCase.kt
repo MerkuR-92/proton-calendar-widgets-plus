@@ -163,6 +163,7 @@ class KeySetupUseCase @Inject constructor(
         return if (failedKeySetups.isEmpty()) {
             UseCase.Result.Success<Unit>()
         } else {
+            logger.i("Failed to do key setup for some members")
             UseCase.Result.Error("Failed to do key setup for some members")
         }
     }

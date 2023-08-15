@@ -1,16 +1,16 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.CalendarsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
@@ -23,12 +23,13 @@ import javax.inject.Inject
 class CalendarListener @Inject constructor(
     database: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
-    private val workManager: WorkManager
-): CalendarBaseEventListener<String, CalendarEntity>(database) {
+    private val workManager: WorkManager,
+    private val logger: Logger
+    ): CalendarBaseEventListener<String, CalendarEntity>(database) {
     override val order: Int = 1
     override val type: Type = Type.Core
 
-    private val calendarsToBootstrap: ArrayList<String> = arrayListOf()
+    private val calendarsToBootstrap: HashSet<String> = hashSetOf()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -80,27 +81,47 @@ class CalendarListener @Inject constructor(
     override suspend fun onSuccess(config: EventManagerConfig) {
         super.onSuccess(config)
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap
-                )
-            )
-            .build()
-
-        workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS, ExistingWorkPolicy.APPEND, work).state
+        // Launch worker to bootstrap calendars
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap.toTypedArray()
+            ),
+            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
         super.onComplete(config)
 
         calendarsToBootstrap.clear()
+    }
+
+    override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+        logger.i("CalendarListener onResetAll")
+
+        // Wipe all calendars from DB
+        // Foreign keys on Calendar ID will also delete:
+        //  - Calendar Settings
+        //  - Passphrase
+        //  - CalendarKeys
+        //  - Members
+        // CalendarUserSettings and UserSettings will not be deleted
+        calendarsRepository.deleteCalendars(config.userId.id)
+
+        // Launch worker to bootstrap all calendars
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_ALL_CALENDARS,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id
+            ),
+            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_ALL_CALENDARS,
+            ExistingWorkPolicy.REPLACE,
+            NetworkType.CONNECTED
+        )
     }
 }

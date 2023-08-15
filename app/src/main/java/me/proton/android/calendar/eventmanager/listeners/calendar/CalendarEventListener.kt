@@ -1,16 +1,21 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.utils.isNotFound
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.CalendarEventsServerEvents
 import me.proton.android.calendar.data.api.EventApiResponse
-import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
@@ -21,7 +26,7 @@ import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
-import me.proton.core.util.kotlin.deserializeOrNull
+import me.proton.core.util.kotlin.deserialize
 import javax.inject.Inject
 
 class CalendarEventListener @Inject constructor(
@@ -31,6 +36,7 @@ class CalendarEventListener @Inject constructor(
     private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase,
     private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase,
     private val logger: Logger,
+    private val workManager: WorkManager
 ): CalendarBaseEventListener<String, ServerEvent.EventEntityMetadata>(db) {
     override val order: Int = 3
     override val type: Type = Type.Calendar
@@ -38,7 +44,7 @@ class CalendarEventListener @Inject constructor(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, ServerEvent.EventEntityMetadata>>? {
-        return response.body.deserializeOrNull<ServerCalendarEventsApiResponse>()?.calendarEvents?.map {
+        return response.body.deserialize<CalendarEventsServerEvents>().calendarEvents?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, it.event)
         }
     }
@@ -52,6 +58,7 @@ class CalendarEventListener @Inject constructor(
             logger.i("action CREATE for calendarEvent in deleted calendar")
             return
         }
+
         val entityIds = entities.map { it.id }
         delegate.onCreate(entityIds)
     }
@@ -72,8 +79,19 @@ class CalendarEventListener @Inject constructor(
     override suspend fun onResetAll(config: EventManagerConfig) {
         logger.i("CalendarEventListener onResetAll")
         calendarsRepository.deleteAllEvents(config.asCalendar().calendarId)
-        getMinimalCalendarEventsUseCase.execute(config.userId, config.asCalendar().calendarId)
         resetCalendarSearchUseCase.execute(config.userId, listOf(config.asCalendar().calendarId))
+
+        // Launch worker to fetch minimal events for calendar
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                UseCaseWorker.INPUT_CALENDAR_ID to config.asCalendar().calendarId
+            ),
+            UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
     }
 
     override suspend fun onSuccess(config: EventManagerConfig) {
@@ -86,9 +104,8 @@ class CalendarEventListener @Inject constructor(
 
 class CalendarEventListenerDelegate @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val widgetRefresher: WidgetRefresher,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ) {
 
     private var entities = emptyMap<String, EventEntity>()
