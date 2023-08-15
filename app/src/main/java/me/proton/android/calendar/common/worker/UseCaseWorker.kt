@@ -27,7 +27,9 @@ class UseCaseWorker @AssistedInject constructor(
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
     private val fetchCachedViewsEventsUseCase: FetchCachedViewsEventsUseCase,
-    private val fixCalendarsUseCase: FixCalendarsUseCase
+    private val fixCalendarsUseCase: FixCalendarsUseCase,
+    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
+    private val keySetupUseCase: KeySetupUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -50,6 +52,8 @@ class UseCaseWorker @AssistedInject constructor(
             const val FETCH_PUBLIC_KEYS = FetchPublicKeysUseCase.WORKER_ID
             const val FETCH_CACHED_VIEWS_EVENTS = FetchCachedViewsEventsUseCase.WORKER_ID
             const val FIX_CALENDARS = FixCalendarsUseCase.WORKER_ID
+            const val BOOTSTRAP_CALENDARS = BootstrapCalendarUseCase.BOOTSTRAP_CALENDARS
+            const val MEMBERS_KEY_SETUP = KeySetupUseCase.MEMBERS_KEY_SETUP
         }
     }
 
@@ -60,6 +64,8 @@ class UseCaseWorker @AssistedInject constructor(
         const val INPUT_USE_CASE_ID = "INPUT_USE_CASE_ID"
         const val INPUT_USER_ID = "INPUT_USER_ID"
         const val INPUT_CALENDAR_ID = "INPUT_CALENDAR_ID"
+        const val INPUT_CALENDAR_IDS = "INPUT_CALENDAR_IDS"
+        const val INPUT_MEMBER_IDS = "INPUT_MEMBER_IDS"
         const val INPUT_ALARM_EPOCH_SECONDS = "INPUT_ALARM_EPOCH_SECONDS"
         const val INPUT_PARTICIPATION_STATUS = "INPUT_PARTICIPATION_STATUS"
         const val INPUT_PRIMARY_TIMEZONE = "INPUT_PRIMARY_TIMEZONE"
@@ -104,6 +110,8 @@ class UseCaseWorker @AssistedInject constructor(
             const val FETCH_PUBLIC_KEYS = "FETCH_PUBLIC_KEYS"
             const val FETCH_CACHED_VIEWS_EVENTS = "FETCH_CACHED_VIEWS_EVENTS"
             const val FIX_CALENDARS = "FIX_CALENDARS"
+            const val BOOTSTRAP_CALENDARS = "BOOTSTRAP_CALENDARS"
+            const val MEMBERS_KEY_SETUP = "MEMBERS_KEY_SETUP"
         }
     }
 
@@ -215,6 +223,14 @@ class UseCaseWorker @AssistedInject constructor(
             }
             UseCaseId.FIX_CALENDARS -> {
                 fixCalendarsUseCase.execute(userId)
+            }
+            UseCaseId.BOOTSTRAP_CALENDARS -> {
+                val calendarIds = inputData.getStringArray(INPUT_CALENDAR_IDS)?.toList() ?: return Result.failure()
+                bootstrapCalendarUseCase.executeCalendarsBootstrap(userId, calendarIds)
+            }
+            UseCaseId.MEMBERS_KEY_SETUP -> {
+                val memberIds = inputData.getStringArray(INPUT_MEMBER_IDS)?.toList() ?: return Result.failure()
+                keySetupUseCase.handleMembersWithIncompleteKeySetup(userId, memberIds)
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")

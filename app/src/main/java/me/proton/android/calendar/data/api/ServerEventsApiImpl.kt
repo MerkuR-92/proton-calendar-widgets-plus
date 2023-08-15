@@ -127,6 +127,24 @@ data class ServerCoreEventsApiResponse(
     val calendarUserSettings: CalendarUserSettingsEntity? = null
 )
 
+@Serializable
+data class CalendarUserSettingsEvents(
+    @SerialName("CalendarUserSettings")
+    val calendarUserSettings: CalendarUserSettingsEntity? = null
+)
+
+@Serializable
+data class CalendarsEvents(
+    @SerialName("Calendars")
+    val calendars: List<ServerEvent.CalendarsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarMembersEvents(
+    @SerialName("CalendarMembers")
+    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null
+)
+
 fun ServerCalendarEventsApiResponse.toServerEventsApiResponse() = ServerEventsApiResponse(
     eventId = this.calendarModelEventId,
     refresh = this.refresh,

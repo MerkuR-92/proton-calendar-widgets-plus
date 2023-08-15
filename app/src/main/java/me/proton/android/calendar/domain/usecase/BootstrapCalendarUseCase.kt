@@ -1,5 +1,8 @@
 package me.proton.android.calendar.domain.usecase
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -30,6 +33,10 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     private val valueStoreProvider: ValueStoreProvider,
     private val widgetRefresher: WidgetRefresher
 ): UseCase {
+
+    companion object {
+        const val BOOTSTRAP_CALENDARS = "BOOTSTRAP_CALENDARS"
+    }
 
     suspend fun executeBootstrap(calendarEntity: CalendarEntity, userId: UserId, displayTimeZoneId: String, addresses: List<UserAddress>? = null): UseCase.Result {
         when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
@@ -113,6 +120,33 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
             is ApiResponse.Exception -> {
                 return UseCase.Result.Error("BootstrapCalendarsUseCase: api exception getting calendar bootstrap: $bootstrapResponse")
             }
+        }
+    }
+
+    suspend fun executeCalendarsBootstrap(userId: UserId, calendarIds: List<String>): UseCase.Result {
+        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
+            ?: ZoneId.systemDefault().id
+
+        val failedBootstraps = arrayListOf<String>()
+        coroutineScope {
+            calendarIds.map {
+                async {
+                    calendarsRepository.selectCalendarEntity(it)?.let { calendarEntity ->
+                        val executeBootstrapResult = executeBootstrap(calendarEntity, userId, timezone)
+                        // We don't want the result to be blocking
+                        executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
+                    } ?: run {
+                        logger.i("BootstrapCalendarUseCase failed to select calendar to bootstrap from DB")
+                        failedBootstraps.add(it)
+                    }
+                }
+            }.awaitAll()
+        }
+
+        return if (failedBootstraps.isEmpty()) {
+            UseCase.Result.Success<Unit>()
+        } else {
+            UseCase.Result.Error("BootstrapCalendarUseCase executeCalendarsBootstrap failed to bootstrap some calendars")
         }
     }
 

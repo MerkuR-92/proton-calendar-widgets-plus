@@ -4,7 +4,6 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
@@ -12,17 +11,12 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarKeyEventListener
 import me.proton.android.calendar.test.shared.mocks.calendarId
-import me.proton.android.calendar.test.shared.mocks.eventId
 import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
-import me.proton.core.eventmanager.domain.entity.Action
-import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.eventmanager.domain.extension.groupByAction
-import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -95,7 +89,7 @@ class CalendarKeyEventListenerTest {
                 )
             )
 
-            coVerify { calendarsRepository.refreshCalendarsFlags(any()) }
+            coVerify { calendarsRepository.refreshMembersFlags(any()) }
         }
     }
 

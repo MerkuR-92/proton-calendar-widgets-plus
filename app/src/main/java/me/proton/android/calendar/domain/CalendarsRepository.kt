@@ -215,7 +215,7 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
-    suspend fun refreshCalendarsFlags(userId: UserId)
+    suspend fun refreshMembersFlags(userId: UserId)
 
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself

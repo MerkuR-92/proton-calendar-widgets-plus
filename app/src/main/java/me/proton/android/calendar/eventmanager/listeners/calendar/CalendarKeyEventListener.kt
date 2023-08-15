@@ -47,6 +47,6 @@ class CalendarKeyEventListener @Inject constructor(
         val updatedItems = getActionMap(config)[Action.Create].orEmpty() + getActionMap(config)[Action.Update].orEmpty()
         if (updatedItems.isEmpty()) return
 
-        calendarsRepository.refreshCalendarsFlags(config.userId)
+        calendarsRepository.refreshMembersFlags(config.userId)
     }
 }

@@ -2,9 +2,13 @@ package me.proton.android.calendar.domain.usecase
 
 import com.google.crypto.tink.subtle.Base64
 import com.google.crypto.tink.subtle.Random
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.PassphraseApiRequest
 import me.proton.android.calendar.data.api.SetupKeyApiRequest
+import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Ciphertext
 import me.proton.android.calendar.domain.Crypto
@@ -26,6 +30,10 @@ class KeySetupUseCase @Inject constructor(
     private val cryptoContext: CryptoContext,
     private val calendarsRepository: CalendarsRepository
 ): UseCase {
+
+    companion object {
+        const val MEMBERS_KEY_SETUP = "MEMBERS_KEY_SETUP"
+    }
 
     suspend fun execute(userId: UserId, addressId: String, memberAddressKey: KeyHolderPrivateKey, calendarId: String, memberId: String) : UseCase.Result {
         // Generate a random 32 bytes passphrase
@@ -104,6 +112,58 @@ class KeySetupUseCase @Inject constructor(
             }
             is ApiResponse.Error -> UseCase.Result.Error("KeySetupUseCase: error in fetch members: ${memberListApiResponse.error}")
             is ApiResponse.Exception -> UseCase.Result.Error("KeySetupUseCase: error in fetch members: ${memberListApiResponse.exception.message ?: "(no exception message)"}")
+        }
+    }
+
+    suspend fun handleMembersWithIncompleteKeySetup(userId: UserId, memberIds: List<String>): UseCase.Result {
+        // Do handle incomplete keys on members if needed
+        val failedKeySetups = arrayListOf<String>()
+        coroutineScope {
+            memberIds.map {
+                async {
+                    val memberEntity = calendarsRepository.selectMemberById(it) ?: run {
+                        logger.e("handleMembersWithIncompleteKeySetup: failed to select member from DB")
+                        return@async
+                    }
+                    when (val keySetupResult = execute(userId, memberEntity.calendarId)) {
+                        is UseCase.Result.Success<*> -> {
+                            val fetchedMember = calendarsRepository.fetchMembers(userId, memberEntity.calendarId)?.firstOrNull()
+                            if (fetchedMember == null) {
+                                logger.e("handleMembersWithIncompleteKeySetup: error getting member from API after keySetupUseCase success")
+
+                                var calendarFlags = memberEntity.flags
+                                calendarFlags -= me.proton.android.calendar.data.entity.MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value
+                                // if calendar is inactive and no other error flags are set, make it active
+                                if (calendarFlags == 0) calendarFlags = MemberEntity.CalendarFlags.ACTIVE.value
+
+                                calendarsRepository.persistMember(
+                                    memberEntity.copy(flags = calendarFlags)
+                                )
+                            } else {
+                                calendarsRepository.persistMember(fetchedMember)
+                            }
+                        }
+                        is UseCase.Result.InvalidParams -> {
+                            logger.e("handleMembersWithIncompleteKeySetup: keySetupResult invalid params: ${keySetupResult.message}")
+                        }
+                        is UseCase.Result.Error -> {
+                            // Try and fetch the Member to check that the key setup wasn't done by another client in the meantime
+                            val fetchedMember = calendarsRepository.fetchMembers(userId, memberEntity.calendarId)?.firstOrNull()
+                            if (fetchedMember == null || fetchedMember.hasIncompleteKeySetup) {
+                                logger.e("handleMembersWithIncompleteKeySetup: keySetupResult error: ${keySetupResult.message}")
+                            } else {
+                                calendarsRepository.persistMember(fetchedMember)
+                            }
+                        }
+                    }
+                }
+            }.awaitAll()
+        }
+
+        return if (failedKeySetups.isEmpty()) {
+            UseCase.Result.Success<Unit>()
+        } else {
+            UseCase.Result.Error("Failed to do key setup for some members")
         }
     }
 }

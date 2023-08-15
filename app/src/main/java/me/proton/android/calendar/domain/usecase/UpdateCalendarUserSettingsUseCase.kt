@@ -30,7 +30,11 @@ class UpdateCalendarUserSettingsUseCase @Inject constructor(
             settingsApi.updateCalendarUserPrimaryTimezone(userId, primaryTimezone)
         ) {
             is ApiResponse.Success -> {
-                calendarUserSettingsChangedUseCase.execute(userId.id, updateCalendarUserPrimaryTimezoneResponse.data.calendarUserSettings)
+                calendarsRepository.persistCalendarUserSettings(
+                    userId.id,
+                    updateCalendarUserPrimaryTimezoneResponse.data.calendarUserSettings
+                )
+                calendarUserSettingsChangedUseCase.handlePrimaryTimezoneChange(userId.id)
             }
             is ApiResponse.Error -> {
                 logger.e("api error updating calendar user primary timezone: $updateCalendarUserPrimaryTimezoneResponse")

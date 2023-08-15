@@ -248,7 +248,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshCalendarsFlags(userId: UserId) {
+    override suspend fun refreshMembersFlags(userId: UserId) {
         val remoteMembers = calendarsApi.getAllMembers(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
 
         remoteMembers?.members?.forEach {

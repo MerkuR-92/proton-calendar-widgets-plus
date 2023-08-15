@@ -11,37 +11,19 @@ import javax.inject.Inject
 
 class CalendarUserSettingsChangedUseCase @Inject constructor(
     private val logger: Logger,
-    private val calendarsRepository: CalendarsRepository,
     private val database: AppDatabase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
-
 ) : UseCase {
 
-    suspend fun execute(userId: String, calendarUserSettings: CalendarUserSettingsEntity): UseCase.Result {
+    suspend fun handlePrimaryTimezoneChange(userId: String): UseCase.Result {
+        // get all all-day events
+        val events = database.eventsDao().selectAllDayOnly()
+        logger.v("all-day events: ${events.map { it.id }}")
 
-        val currentTimeZoneId = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
-
-        calendarsRepository.persistCalendarUserSettings(userId, calendarUserSettings)
-
-        handlePrimaryTimezone(userId, currentTimeZoneId, calendarUserSettings.primaryTimezone)
+        // 2. recalculate their alarms
+        updateAlarmsUseCase.execute(userId, events.map { it.id })
 
         return UseCase.Result.Success<Unit>()
-    }
-
-    private suspend fun handlePrimaryTimezone(userId: String, oldTimeZoneId: String?, newTimeZoneId: String) {
-
-        logger.v("settings timezone changed: $oldTimeZoneId -> ${newTimeZoneId}")
-
-        if (oldTimeZoneId == null || TimeZone.getTimeZone(oldTimeZoneId).rawOffset != TimeZone.getTimeZone(newTimeZoneId).rawOffset) {
-
-            // get all all-day events
-            val events = database.eventsDao().selectAllDayOnly()
-            logger.v("all-day events: ${events.map { it.id }}")
-
-            // 2. recalculate their alarms
-            updateAlarmsUseCase.execute(userId, events.map { it.id })
-        }
-
     }
 
 }
