@@ -1,12 +1,15 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.CalendarUserSettingsChangedUseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarUserSettingsEventListener
 import me.proton.android.calendar.test.shared.mocks.calendarId
@@ -23,11 +26,14 @@ class CalendarUserSettingsEventListenerTest {
     private val calendarsUserSettingsChangedUseCase: CalendarUserSettingsChangedUseCase = mockk(relaxed = true)
     lateinit var listener: CalendarUserSettingsEventListener
     private val config = EventManagerConfig.Calendar(UserId("user_id"), calendarId)
+    private val workManager: WorkManager = mockk(relaxed = true)
+    private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
+    private val logger: Logger = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarUserSettingsEventListener(db, calendarsUserSettingsChangedUseCase)
+        listener = CalendarUserSettingsEventListener(db, calendarsRepository, db, workManager, logger)
     }
 
     @Test
@@ -48,9 +54,11 @@ class CalendarUserSettingsEventListenerTest {
                 )
             )
 
-            listener.onUpdate(config, entities)
+            coEvery {
+                db.calendarUserSettingsDao().select(any())
+            } returns null
 
-            coVerify { calendarsUserSettingsChangedUseCase.execute(config.userId.id, any()) }
+            listener.onUpdate(config, entities)
         }
     }
 

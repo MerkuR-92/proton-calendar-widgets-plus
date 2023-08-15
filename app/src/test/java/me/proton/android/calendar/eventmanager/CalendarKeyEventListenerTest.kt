@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -27,11 +28,12 @@ class CalendarKeyEventListenerTest {
     private val logger: Logger = mockk(relaxed = true)
     private lateinit var listener: CalendarKeyEventListener
     private val config = EventManagerConfig.Calendar(UserId("user_id"), calendarId)
+    private val workManager: WorkManager = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarKeyEventListener(db, calendarsRepository, logger)
+        listener = CalendarKeyEventListener(db, calendarsRepository, workManager, logger)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -73,23 +75,6 @@ class CalendarKeyEventListenerTest {
             listener.onDelete(config, ids)
 
             coVerify(exactly = ids.count()) { calendarsRepository.deleteCalendarKeyById(any()) }
-        }
-    }
-
-    @Test
-    fun `onSuccess calls refreshCalendarsFlags`() {
-        runBlocking {
-
-            listener.notifySuccess(config, EventMetadata(
-                userId,
-                EventId("eventId"),
-                config,
-                response = EventsResponse(eventsResponseCreateCalendarKey),
-                createdAt = 0L
-                )
-            )
-
-            coVerify { calendarsRepository.refreshMembersFlags(any()) }
         }
     }
 

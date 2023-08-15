@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -37,6 +38,7 @@ class CalendarEventListenerTest {
     private val delegate: CalendarEventListenerDelegate = mockk(relaxed = true)
     private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase = mockk(relaxed = true)
     private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase = mockk(relaxed = true)
+    private val workManager: WorkManager = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
 
     private lateinit var listener: CalendarEventListener
@@ -52,6 +54,7 @@ class CalendarEventListenerTest {
             getMinimalCalendarEventsUseCase,
             resetCalendarSearchUseCase,
             logger,
+            workManager
         )
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
@@ -167,12 +170,10 @@ class CalendarEventListenerTest {
     fun `onResetAll deletes all events and fetches recent events`() {
         runBlocking {
             coEvery { calendarsRepository.deleteAllEvents(any()) } returns Unit
-            coEvery { getMinimalCalendarEventsUseCase.execute(any(), any()) } returns true
 
             listener.onResetAll(config)
 
             coVerify(exactly = 1) { calendarsRepository.deleteAllEvents(any()) }
-            coVerify(exactly = 1) { getMinimalCalendarEventsUseCase.execute(any(), any()) }
         }
     }
 }
@@ -192,7 +193,6 @@ class CalendarEventListenerDelegateTest {
     fun setup() {
         delegate = CalendarEventListenerDelegate(
             calendarsRepository,
-            fetchPublicKeysUseCase,
             widgetRefresher,
             updateAlarmsUseCase,
         )

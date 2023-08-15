@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -7,6 +8,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarUserAddressListener
 import me.proton.android.calendar.test.shared.mocks.addressId
 import me.proton.android.calendar.test.shared.mocks.userEmail
@@ -24,11 +26,13 @@ class CalendarUserAddressListenerTest {
     private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
     private lateinit var listener: CalendarUserAddressListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
+    private val workManager: WorkManager = mockk(relaxed = true)
+    private val logger: Logger = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarUserAddressListener(db, userAddressRepository, calendarsRepository)
+        listener = CalendarUserAddressListener(db, userAddressRepository, logger, workManager)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -62,7 +66,6 @@ class CalendarUserAddressListenerTest {
             listener.onUpdate(config, listOf(addressResponse))
 
             coVerify { userAddressRepository.updateAddresses(any()) }
-            coVerify { calendarsRepository.refreshMembersFlags(any()) }
         }
     }
 
