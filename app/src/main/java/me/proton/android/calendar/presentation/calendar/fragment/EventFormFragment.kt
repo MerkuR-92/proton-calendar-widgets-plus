@@ -218,6 +218,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     return@setOnSingleClickListener
                 }
 
+                if (!mainViewModel.isConnectedToNetwork) {
+                    view?.displaySnackBar(getString(R.string.snack_network_error))
+                    return@setOnSingleClickListener
+                }
+
                 lifecycleScope.launch {
                     eventViewModel.onSaveClick(
                         provideDisplayDialog(),

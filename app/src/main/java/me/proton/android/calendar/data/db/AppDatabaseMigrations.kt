@@ -462,11 +462,16 @@ object AppDatabaseMigrations {
         }
     }
 
-
     val MIGRATION_57_58 = object : Migration(57, 58) {
         override fun migrate(database: SupportSQLiteDatabase) {
             ContactDatabase.MIGRATION_1.migrate(database)
             EventMetadataDatabase.MIGRATION_1.migrate(database)
+        }
+    }
+
+    val MIGRATION_58_59 = object : Migration(58, 59) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.addTableColumn(TABLE_MANAGED_HOLIDAY_CALENDARS, "hidden", "INTEGER")
         }
     }
 }

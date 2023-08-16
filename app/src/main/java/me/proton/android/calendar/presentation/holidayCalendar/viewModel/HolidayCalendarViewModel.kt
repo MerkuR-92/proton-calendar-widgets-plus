@@ -145,12 +145,12 @@ class HolidayCalendarViewModel @Inject constructor(
         _calendar = calendar
 
         // Init managed holiday calendars with DB data
-        getManagedHolidayCalendars()?.let { holidayCalendars ->
+        getVisibleManagedHolidayCalendars()?.let { holidayCalendars ->
             _holidayCalendars.value = holidayCalendars
 
             val managedHolidayCalendar = holidayCalendars.firstOrNull { it.calendarId == calendarId } ?: run {
                 // If we failed to find a match with the DB list, refresh the list from remote and retry
-                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
                     _holidayCalendars.value = it
                     fetchedHolidayCalendars = true
                     it.firstOrNull { holidayCalendar -> holidayCalendar.calendarId == calendarId }
@@ -180,7 +180,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
 
         if (!fetchedHolidayCalendars) {
-            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+            calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
                 _holidayCalendars.value = it
                 fetchedHolidayCalendars = true
             }
@@ -210,7 +210,7 @@ class HolidayCalendarViewModel @Inject constructor(
         val primaryTimezone = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id) ?: ZoneId.systemDefault().id
 
         // Init managed holiday calendars with DB data
-        getManagedHolidayCalendars()?.let { holidayCalendars ->
+        getVisibleManagedHolidayCalendars()?.let { holidayCalendars ->
             if (holidayCalendars.isEmpty()) {
                 logger.e("ManagedHolidayCalendars were empty in HolidayCalendarViewModel initCreateHolidayCalendar")
                 displayInitErrorSnack(returnToSettings)
@@ -221,7 +221,7 @@ class HolidayCalendarViewModel @Inject constructor(
 
             if (!autoDetectHolidayCalendar(userId, holidayCalendars, primaryTimezone, defaultLanguageCode, defaultCountryCode)) {
                 // If we failed to find a match with the DB list, refresh the list from remote and retry
-                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
                     _holidayCalendars.value = it
                     fetchedHolidayCalendars = true
                     autoDetectHolidayCalendar(userId, it, primaryTimezone, defaultLanguageCode, defaultCountryCode)
@@ -235,7 +235,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
 
         if (!fetchedHolidayCalendars) {
-            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+            calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
                 _holidayCalendars.value = it
                 fetchedHolidayCalendars = true
             }
@@ -607,19 +607,18 @@ class HolidayCalendarViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getManagedHolidayCalendars(): List<ManagedHolidayCalendarEntity>? {
+    private suspend fun getVisibleManagedHolidayCalendars(): List<ManagedHolidayCalendarEntity>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
-        val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)
-        return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
+        val dbVisibleManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)?.filter { it.hidden == false }
+        return if (dbVisibleManagedHolidayCalendars.isNullOrEmpty()) {
             fetchedHolidayCalendars = true
-            calendarsRepository.fetchManagedHolidayCalendars(userId)
-        } else dbManagedHolidayCalendars
+            calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.filter { it.hidden == false }
+        } else dbVisibleManagedHolidayCalendars
     }
-
 
     private fun fetchCachedViewsEvents(
         userId: UserId,
