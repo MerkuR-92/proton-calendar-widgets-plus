@@ -604,10 +604,6 @@ data class ResetInfoApiResponse(
 data class ResetInfoCalendar(
     @SerialName("ID")
     val id: String,
-    @SerialName("Name")
-    val name: String,
-    @SerialName("Description")
-    val description: String,
     @SerialName("Members")
     val members: Map<String, String>
 )
