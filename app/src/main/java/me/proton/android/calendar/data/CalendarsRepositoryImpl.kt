@@ -1577,7 +1577,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun getDefaultCalendarIdWithFallback(userId: String, allowShared: Boolean): String? {
         // Get user calendar settings default calendar id or fallback to first sorted personal active user calendar id
         val defaultCalendarId = getDefaultCalendarId(userId)
-        return if (!defaultCalendarId.isNullOrEmpty() && hasCalendar(defaultCalendarId)) {
+        val calendar = defaultCalendarId?.let {
+            selectCalendar(defaultCalendarId)
+        }
+        return if (calendar != null && calendar.isActive && (allowShared || calendar.isOwner)) {
             defaultCalendarId
         } else {
             if (allowShared) {
