@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain
 
 import biweekly.property.RecurrenceId
 import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
@@ -252,6 +253,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarKeyById(id: String)
 
+    suspend fun deleteCalendarKeyByCalendarId(calendarId: String)
+
     // passphrases
     suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity>
 
@@ -329,7 +332,8 @@ interface CalendarsRepository {
 
     suspend fun getDefaultCalendarId(userId: String): String?
 
-    // event alarms
+    suspend fun fetchEventAlarms(userId: UserId, calendarId: String, eventId: String): ApiResponse<AlarmsApiResponse>
+
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
 
     // event alarms
@@ -351,7 +355,7 @@ interface CalendarsRepository {
 
     suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
-    suspend fun deleteAllEventAlarms(calendarId: String)
+    suspend fun deleteAllEventAlarmsByCalendar(calendarId: String)
 
     suspend fun getAddressForMember(
         userId: UserId,

@@ -56,6 +56,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalen
 import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
+import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
@@ -1430,12 +1431,15 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) {
-        logger.d("persisting calendar key: $calendarKey")
-        database.calendarKeysDao().insert(calendarKey)
+        database.calendarKeysDao().updateOrInsert(calendarKey)
     }
 
     override suspend fun deleteCalendarKeyById(id: String) {
         database.calendarKeysDao().deleteById(id)
+    }
+
+    override suspend fun deleteCalendarKeyByCalendarId(calendarId: String) {
+        database.calendarKeysDao().deleteByCalendarId(calendarId)
     }
 
     override suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity> {
@@ -1610,6 +1614,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarUserSettingsDao().selectCalendarUserDefaultCalendarId(userId)
     }
 
+    override suspend fun fetchEventAlarms(userId: UserId, calendarId: String, eventId: String): ApiResponse<AlarmsApiResponse> {
+        return calendarsApi.getEventAlarms(userId, calendarId, eventId)
+    }
+
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {
         return database.eventAlarmsDao().selectByEventId(eventId)
     }
@@ -1618,8 +1626,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.eventAlarmsDao().select(eventAlarmId)
     }
 
-    override suspend fun deleteAllEventAlarms(calendarId: String) {
-        database.eventAlarmsDao().deleteAll(calendarId)
+    override suspend fun deleteAllEventAlarmsByCalendar(calendarId: String) {
+        database.eventAlarmsDao().deleteAllByCalendar(calendarId)
     }
 
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {

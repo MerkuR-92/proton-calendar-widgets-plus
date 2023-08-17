@@ -15,6 +15,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events")
     abstract suspend fun selectEvents(): List<EventEntity>
 
+    @Query("SELECT * FROM events WHERE calendarId = :calendarId")
+    abstract fun selectEventsByCalendar(calendarId: String): List<EventEntity>
+
     @Transaction
     @Query("SELECT * FROM events WHERE id = :eventId AND calendarId = :calendarId")
     abstract suspend fun selectEvent(eventId: String, calendarId: String): EventEntity?
@@ -45,9 +48,6 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Query("SELECT * FROM events WHERE calendarId IN (:calendarIds)")
     abstract suspend fun selectEvents(calendarIds: List<String>): List<EventEntity>
-
-    @Query("SELECT * FROM events WHERE calendarId = :calendarId")
-    abstract fun selectEvents(calendarId: String): Flow<List<EventEntity>>
 
     @Query("SELECT * FROM events WHERE id = :id")
     abstract fun selectByIdFlow(id: String): Flow<EventEntity?>

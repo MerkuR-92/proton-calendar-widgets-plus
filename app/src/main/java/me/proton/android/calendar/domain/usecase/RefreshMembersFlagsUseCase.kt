@@ -29,6 +29,7 @@ class RefreshMembersFlagsUseCase @Inject constructor(
                 calendarsRepository.persistMember(it)
             } else {
                 logger.i("RefreshMembersFlags: Member's Calendar doesn't exist locally")
+                // TODO Should we fetch and bootstrap calendar if that happens ? Check Sentry if log appeared
             }
         }
 

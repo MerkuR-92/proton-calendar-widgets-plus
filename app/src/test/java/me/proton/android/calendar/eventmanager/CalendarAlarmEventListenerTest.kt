@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isFalse
 import io.mockk.clearAllMocks
@@ -38,6 +39,7 @@ class CalendarAlarmEventListenerTest {
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase = mockk(relaxed = true)
     private val handleAlarmsUseCase: HandleAlarmsUseCase = mockk(relaxed = true)
     private val syncAlarmsUseCase: SyncAlarmsUseCase = mockk(relaxed = true)
+    private val workManager: WorkManager = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
 
     private lateinit var listener: CalendarAlarmEventListener
@@ -50,8 +52,7 @@ class CalendarAlarmEventListenerTest {
             db,
             calendarsRepository,
             safePersistEventAlarmUseCase,
-            handleAlarmsUseCase,
-            syncAlarmsUseCase,
+            workManager,
             logger
         )
     }
@@ -62,27 +63,6 @@ class CalendarAlarmEventListenerTest {
             val result = listener.deserializeEvents(config, EventsResponse(eventsResponse))
 
             assertThat(result.isNullOrEmpty()).isFalse()
-        }
-    }
-
-    @Test
-    fun `onPrepare downloads missing events for upcoming or past alarms`() {
-        runBlocking {
-            coEvery { calendarsRepository.hasEvent(any(), any()) } returns false
-            coEvery { calendarsRepository.fetchEventById(any(), any(), any()) } returns ApiResponse.Success(
-                EventApiResponse(createEventEntity("event_id_1"))
-            )
-            val alarms = listOf(
-                createAlarmEntity("alarm_id_1", Instant.now()),
-                createAlarmEntity("alarm_id_2", Instant.MIN),
-                createAlarmEntity("alarm_id_3", Instant.now().plus(Duration.ofDays(30))),
-                createAlarmEntity("alarm_id_4", Instant.MAX),
-                createAlarmEntity("alarm_id_5", Instant.now().plus(Duration.ofDays(31))),
-            )
-
-            listener.onPrepare(config, alarms)
-
-            coVerify(exactly = 5) { calendarsRepository.fetchEventById(any(), any(), any()) }
         }
     }
 
@@ -113,37 +93,7 @@ class CalendarAlarmEventListenerTest {
         runBlocking {
             listener.onResetAll(config)
 
-            coVerify { calendarsRepository.deleteAllEventAlarms(any()) }
-        }
-    }
-
-    @Test
-    fun `onFailure selects the current events for the calendar and updates their alarms`() {
-        runBlocking {
-            coEvery { syncAlarmsUseCase.execute(any(), any()) } returns UseCase.Result.Success<Unit>()
-
-            listener.onFailure(config)
-
-            coVerify { syncAlarmsUseCase.execute(any(), any()) }
-        }
-    }
-
-    @Test
-    fun `onSuccess post-process the alarms calling HandleAlarmsUseCase`() {
-        runBlocking {
-
-            listener.notifySuccess(
-                config,
-                EventMetadata(
-                    userId = userId,
-                    eventId = EventId(eventId),
-                    config = config,
-                    createdAt = 0,
-                    response = EventsResponse(eventsResponse)
-                )
-            )
-
-            coVerify { handleAlarmsUseCase.execute(any()) }
+            coVerify { calendarsRepository.deleteAllEventAlarmsByCalendar(any()) }
         }
     }
 

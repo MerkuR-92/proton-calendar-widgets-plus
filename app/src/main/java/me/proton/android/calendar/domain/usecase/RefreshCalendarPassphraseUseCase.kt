@@ -28,7 +28,6 @@ class RefreshCalendarPassphraseUseCase @Inject constructor(
 
         val calendarActivePassphraseResponse = calendarsApi.getActivePassphrase(userId, calendarId)
         if (calendarActivePassphraseResponse !is ApiResponse.Success) {
-            logger.e("RefreshCalendarPassphrasesUseCase: error getting calendar active passphrase from API: $calendarActivePassphraseResponse")
             return UseCase.Result.Error("RefreshCalendarPassphrasesUseCase: error getting calendar active passphrase from API: $calendarActivePassphraseResponse")
         }
 
@@ -38,13 +37,7 @@ class RefreshCalendarPassphraseUseCase @Inject constructor(
         calendarsRepository.persistCalendarPassphrase(calendarPassphrase)
 
         // Cache calendar passphrase
-        when (val result = cacheCalendarPassphraseUseCase.execute(userId, calendarId)) {
-            is UseCase.Result.InvalidParams -> logger.e("RefreshCalendarPassphrasesUseCase calendar passphrase caching InvalidParams: ${result.message}")
-            is UseCase.Result.Error -> logger.e("RefreshCalendarPassphrasesUseCase calendar passphrase caching Error: ${result.message}")
-            else -> {}
-        }
-
-        return UseCase.Result.Success(calendarPassphrase)
+        return cacheCalendarPassphraseUseCase.execute(userId, calendarId)
     }
 
 

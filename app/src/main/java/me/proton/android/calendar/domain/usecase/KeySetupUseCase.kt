@@ -125,6 +125,7 @@ class KeySetupUseCase @Inject constructor(
                         logger.e("handleMembersWithIncompleteKeySetup: failed to select member from DB")
                         return@async
                     }
+                    if (!memberEntity.hasIncompleteKeySetup) return@async
                     when (val keySetupResult = execute(userId, memberEntity.calendarId)) {
                         is UseCase.Result.Success<*> -> {
                             val fetchedMember = calendarsRepository.fetchMembers(userId, memberEntity.calendarId)?.firstOrNull()
@@ -132,7 +133,7 @@ class KeySetupUseCase @Inject constructor(
                                 logger.e("handleMembersWithIncompleteKeySetup: error getting member from API after keySetupUseCase success")
 
                                 var calendarFlags = memberEntity.flags
-                                calendarFlags -= me.proton.android.calendar.data.entity.MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value
+                                calendarFlags -= MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value
                                 // if calendar is inactive and no other error flags are set, make it active
                                 if (calendarFlags == 0) calendarFlags = MemberEntity.CalendarFlags.ACTIVE.value
 
@@ -150,6 +151,7 @@ class KeySetupUseCase @Inject constructor(
                             // Try and fetch the Member to check that the key setup wasn't done by another client in the meantime
                             val fetchedMember = calendarsRepository.fetchMembers(userId, memberEntity.calendarId)?.firstOrNull()
                             if (fetchedMember == null || fetchedMember.hasIncompleteKeySetup) {
+                                failedKeySetups.add(memberEntity.id)
                                 logger.e("handleMembersWithIncompleteKeySetup: keySetupResult error: ${keySetupResult.message}")
                             } else {
                                 calendarsRepository.persistMember(fetchedMember)
@@ -163,7 +165,6 @@ class KeySetupUseCase @Inject constructor(
         return if (failedKeySetups.isEmpty()) {
             UseCase.Result.Success<Unit>()
         } else {
-            logger.i("Failed to do key setup for some members")
             UseCase.Result.Error("Failed to do key setup for some members")
         }
     }

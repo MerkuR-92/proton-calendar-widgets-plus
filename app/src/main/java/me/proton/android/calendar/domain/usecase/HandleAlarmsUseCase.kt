@@ -29,7 +29,7 @@ class HandleAlarmsUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val WORKER_ID = "HANDLE_ALARMS"
+        const val HANDLE_ALARMS = "HANDLE_ALARMS"
     }
 
     suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null): UseCase.Result {

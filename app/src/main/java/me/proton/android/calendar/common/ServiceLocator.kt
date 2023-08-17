@@ -52,6 +52,7 @@ import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
@@ -63,6 +64,8 @@ import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSubscriptionUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
@@ -168,6 +171,8 @@ val useCaseModule = module {
     factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<RefreshCalendarSettingsUseCase> { RefreshCalendarSettingsUseCase(get(), get(), get(), get()) }
     factory<RefreshCalendarSubscriptionUseCase> { RefreshCalendarSubscriptionUseCase(get(), get(), get()) }
+    factory<RefreshCalendarPassphraseUseCase> { RefreshCalendarPassphraseUseCase(get(), get(), get(), get()) }
+    factory<RefreshCalendarKeysUseCase> { RefreshCalendarKeysUseCase(get(), get(), get()) }
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
@@ -178,6 +183,7 @@ val useCaseModule = module {
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<RefreshMembersFlagsUseCase> { RefreshMembersFlagsUseCase(get(), get(), get()) }
+    factory<HandleAlarmsWithMissingEventUseCase> { HandleAlarmsWithMissingEventUseCase(get(), get(), get(), get()) }
 }
 
 fun coreModule(

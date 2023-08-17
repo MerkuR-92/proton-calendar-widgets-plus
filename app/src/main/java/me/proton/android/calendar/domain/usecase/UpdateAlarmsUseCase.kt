@@ -6,6 +6,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.onlyDisplayType
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
@@ -27,16 +28,39 @@ class UpdateAlarmsUseCase @Inject constructor(
     }
 
     suspend fun execute(userId: String, eventIds: List<String>): UseCase.Result {
+        val dbEvents = eventIds.mapNotNull {
+            database.eventsDao().selectById(it) ?: run {
+                logger.e("could not get dbOriginalEvent in UpdateAlarmsUseCase")
+                null
+            }
+        }
 
+        return handleAlarms(userId, dbEvents)
+    }
+
+    suspend fun execute(userId: String, calendarId: String, updateAllDayAlarms: Boolean, updatePartDayAlarms: Boolean): UseCase.Result {
+        val dbEvents =
+            if (updateAllDayAlarms && updatePartDayAlarms) {
+                database.eventsDao().selectEventsByCalendar(calendarId)
+            } else if (updateAllDayAlarms) {
+                database.eventsDao().selectAllDayOnly(calendarId)
+            } else if (updatePartDayAlarms) {
+                database.eventsDao().selectPartDayOnly(calendarId)
+            }
+            else emptyList()
+
+        return handleAlarms(userId, dbEvents)
+    }
+
+    private suspend fun handleAlarms(userId: String, dbEvents: List<EventEntity>): UseCase.Result {
         val primaryTimezone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
         val fromZonedDateTime = if (primaryTimezone == null) {
             logger.e("no primary timezone in UpdateAlarmsUseCase")
             ZonedDateTime.now(ZoneId.systemDefault())
         } else ZonedDateTime.now(ZoneId.of(primaryTimezone))
 
-        val eventChains = eventIds.mapNotNull {
-            val dbOriginalEvent = database.eventsDao().selectById(it)
-            val originalEvent = dbOriginalEvent?.let { eventEntity ->
+        val eventChains = dbEvents.mapNotNull { dbEvent ->
+            val originalEvent = dbEvent.let { eventEntity ->
                 if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
@@ -44,10 +68,7 @@ class UpdateAlarmsUseCase @Inject constructor(
                 }
             }
 
-            if (dbOriginalEvent == null) {
-                logger.e("could not get dbOriginalEvent in UpdateAlarmsUseCase")
-                null
-            } else if (originalEvent == null) {
+            if (originalEvent == null) {
                 logger.e("could not transform event in UpdateAlarmsUseCase")
                 null
             } else {
@@ -80,5 +101,4 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         return handleAlarmsUseCase.execute(UserId(userId))
     }
-
 }

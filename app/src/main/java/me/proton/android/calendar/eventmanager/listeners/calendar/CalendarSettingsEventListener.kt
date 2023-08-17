@@ -27,14 +27,14 @@ class CalendarSettingsEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val logger: Logger,
-    private val workManager: WorkManager,
-    private val database: AppDatabase
+    private val workManager: WorkManager
 ): CalendarBaseEventListener<String, CalendarSettingsEntity>(db) {
     override val order: Int = 4
     override val type: Type = Type.Calendar
 
-    // Map of calendarIds and a list of eventIds
-    private val updateEventsAlarms: HashMap<String, List<String>> = hashMapOf()
+    // Set of calendarIds for which alarms need to be updated
+    private val updateAllDayEventsAlarms: HashSet<String> = hashSetOf()
+    private val updatePartDayEventsAlarms: HashSet<String> = hashSetOf()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -64,11 +64,11 @@ class CalendarSettingsEventListener @Inject constructor(
             calendarsRepository.persistCalendarSettings(newCalendarSettings)
 
             if (currentPartDayAlarms?.isTheSameAs(newPartDayAlarms) == false) {
-                updateEventsAlarms[newCalendarSettings.calendarId] = database.eventsDao().selectPartDayOnly(newCalendarSettings.calendarId).map { it.id }
+                updatePartDayEventsAlarms.add(newCalendarSettings.calendarId)
             }
 
             if (currentFullDayAlarms?.isTheSameAs(newFullDayAlarms) == false) {
-                updateEventsAlarms[newCalendarSettings.calendarId] = database.eventsDao().selectAllDayOnly(newCalendarSettings.calendarId).map { it.id }
+                updateAllDayEventsAlarms.add(newCalendarSettings.calendarId)
             }
         }
     }
@@ -76,13 +76,16 @@ class CalendarSettingsEventListener @Inject constructor(
     override suspend fun onSuccess(config: EventManagerConfig) {
         super.onSuccess(config)
 
-        updateEventsAlarms.forEach {
-            // Launch worker to update alarms of given events
+        val calendarIds = updateAllDayEventsAlarms.plus(updatePartDayEventsAlarms)
+        calendarIds.forEach { calendarId ->
+            // Launch worker to update alarms of calendar
             workManager.enqueueWorkHelper(
                 workDataOf(
                     UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_ALARMS,
                     UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_EVENT_IDS to it.value.toTypedArray()
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
+                    UseCaseWorker.INPUT_UPDATE_ALL_DAY_ALARMS to updateAllDayEventsAlarms.contains(calendarId),
+                    UseCaseWorker.INPUT_UPDATE_PART_DAY_ALARMS to updatePartDayEventsAlarms.contains(calendarId)
                 ),
                 UseCaseWorker.UniqueWorkNames.UPDATE_ALARMS,
                 ExistingWorkPolicy.APPEND,
@@ -94,7 +97,8 @@ class CalendarSettingsEventListener @Inject constructor(
     override suspend fun onComplete(config: EventManagerConfig) {
         super.onComplete(config)
 
-        updateEventsAlarms.clear()
+        updateAllDayEventsAlarms.clear()
+        updatePartDayEventsAlarms.clear()
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {

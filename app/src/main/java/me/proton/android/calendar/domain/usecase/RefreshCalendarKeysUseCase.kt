@@ -11,14 +11,14 @@ import javax.inject.Inject
 /**
  * Fetches from API and saves CalendarUserSettings in DB.
  */
-class RefreshCalendarSubscriptionUseCase @Inject constructor(
+class RefreshCalendarKeysUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
     private val calendarsApi: CalendarsApi
 ) {
 
     companion object {
-        const val REFRESH_CALENDAR_SUBSCRIPTION = "REFRESH_CALENDAR_SUBSCRIPTION"
+        const val REFRESH_CALENDAR_KEYS = "REFRESH_CALENDAR_KEYS"
     }
 
     suspend operator fun invoke(
@@ -26,17 +26,19 @@ class RefreshCalendarSubscriptionUseCase @Inject constructor(
         calendarId: String
     ): UseCase.Result {
 
-        val calendarSubscriptionResponse = calendarsApi.getCalendarSubscription(userId, calendarId)
-        if (calendarSubscriptionResponse !is ApiResponse.Success) {
-            return UseCase.Result.Error("RefreshCalendarSubscriptionUseCase: error getting calendar subscription from API: $calendarSubscriptionResponse")
+        val calendarKeysResponse = calendarsApi.getKeys(userId, calendarId)
+        if (calendarKeysResponse !is ApiResponse.Success) {
+            return UseCase.Result.Error("RefreshCalendarKeysUseCase: error getting calendar keys from API: $calendarKeysResponse")
         }
 
-        val calendarSubscription = calendarSubscriptionResponse.data.calendarSubscription
+        val calendarKeys = calendarKeysResponse.data.keys
 
-        // Persist new settings in DB
-        calendarsRepository.persistCalendarSubscription(calendarSubscription)
+        // Persist new keys in DB
+        calendarKeys.forEach {
+            calendarsRepository.persistCalendarKey(it)
+        }
 
-        return UseCase.Result.Success(calendarSubscription)
+        return UseCase.Result.Success(calendarKeys)
     }
 
 

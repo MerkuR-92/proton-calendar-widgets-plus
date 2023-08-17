@@ -16,7 +16,9 @@ import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSubscriptionUseCase
@@ -57,7 +59,9 @@ class UseCaseWorker @AssistedInject constructor(
     private val refreshCalendarSettingsUseCase: RefreshCalendarSettingsUseCase,
     private val refreshCalendarSubscriptionUseCase: RefreshCalendarSubscriptionUseCase,
     private val refreshCalendarPassphraseUseCase: RefreshCalendarPassphraseUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    private val refreshCalendarKeysUseCase: RefreshCalendarKeysUseCase,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val handleAlarmsWithMissingEventUseCase: HandleAlarmsWithMissingEventUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -65,8 +69,8 @@ class UseCaseWorker @AssistedInject constructor(
     class UseCaseId {
         companion object {
             // const val SYNC_SERVER_EVENTS = "SYNC_SERVER_EVENTS" deprecated, don't remove this comment
-            const val SYNC_ALARMS = SyncAlarmsUseCase.WORKER_ID
-            const val HANDLE_ALARMS = HandleAlarmsUseCase.WORKER_ID
+            const val SYNC_ALARMS = SyncAlarmsUseCase.SYNC_ALARMS
+            const val HANDLE_ALARMS = HandleAlarmsUseCase.HANDLE_ALARMS
             const val UPDATE_CALENDAR_LIST = UpdateCalendarUseCase.WORKER_LIST_ID
             const val SEND_BUG_REPORT = SendBugReportUseCase.WORKER_ID
             const val UPDATE_PRIMARY_TIMEZONE = UpdateCalendarUserSettingsUseCase.WORKER_ID_TZ
@@ -90,7 +94,9 @@ class UseCaseWorker @AssistedInject constructor(
             const val REFRESH_CALENDAR_SETTINGS = RefreshCalendarSettingsUseCase.REFRESH_CALENDAR_SETTINGS
             const val REFRESH_CALENDAR_SUBSCRIPTION = RefreshCalendarSubscriptionUseCase.REFRESH_CALENDAR_SUBSCRIPTION
             const val REFRESH_CALENDAR_PASSPHRASE = RefreshCalendarPassphraseUseCase.REFRESH_CALENDAR_PASSPHRASE
+            const val REFRESH_CALENDAR_KEYS = RefreshCalendarKeysUseCase.REFRESH_CALENDAR_KEYS
             const val UPDATE_ALARMS = UpdateAlarmsUseCase.UPDATE_ALARMS
+            const val HANDLE_ALARMS_WITH_MISSING_EVENT = HandleAlarmsWithMissingEventUseCase.HANDLE_ALARMS_WITH_MISSING_EVENT
         }
     }
 
@@ -112,10 +118,14 @@ class UseCaseWorker @AssistedInject constructor(
         const val INPUT_TIME_FORMAT = "INPUT_TIME_FORMAT"
         const val INPUT_WEEK_START = "INPUT_WEEK_START"
         const val INPUT_EVENT_UID = "INPUT_EVENT_UID"
-        const val INPUT_EVENT_IDS = "INPUT_EVENT_IDS"
+        const val INPUT_EVENT_ID = "INPUT_EVENT_ID"
+        const val INPUT_ALARM_IDS = "INPUT_ALARM_IDS"
         const val INPUT_USER_EMAILS = "INPUT_USER_EMAILS"
         const val INPUT_DATE = "INPUT_DATE"
         const val INPUT_TIME_ZONE_ID = "INPUT_TIME_ZONE_ID"
+        const val INPUT_FORCE_SYNC_ALARMS = "INPUT_FORCE_SYNC_ALARMS"
+        const val INPUT_UPDATE_ALL_DAY_ALARMS = "INPUT_UPDATE_ALL_DAY_ALARMS"
+        const val INPUT_UPDATE_PART_DAY_ALARMS = "INPUT_UPDATE_PART_DAY_ALARMS"
 
         // Bug Report
         const val INPUT_OS_NAME = "INPUT_OS_NAME"
@@ -158,7 +168,9 @@ class UseCaseWorker @AssistedInject constructor(
             const val REFRESH_CALENDAR_SETTINGS = "REFRESH_CALENDAR_SETTINGS"
             const val REFRESH_CALENDAR_SUBSCRIPTION = "REFRESH_CALENDAR_SUBSCRIPTION"
             const val REFRESH_CALENDAR_PASSPHRASE = "REFRESH_CALENDAR_PASSPHRASE"
+            const val REFRESH_CALENDAR_KEYS = "REFRESH_CALENDAR_KEYS"
             const val UPDATE_ALARMS = "UPDATE_ALARMS"
+            const val HANDLE_ALARMS_WITH_MISSING_EVENT = "HANDLE_ALARMS_WITH_MISSING_EVENT"
         }
     }
 
@@ -170,7 +182,8 @@ class UseCaseWorker @AssistedInject constructor(
         val useCaseId = inputData.getString(INPUT_USE_CASE_ID)
         val useCaseResult = when (useCaseId) {
             UseCaseId.SYNC_ALARMS -> {
-                syncAlarmsUseCase.execute(userId)
+                val forceSyncAlarms = inputData.getBoolean(INPUT_FORCE_SYNC_ALARMS, false)
+                syncAlarmsUseCase.execute(userId, forceSyncAlarms)
             }
             UseCaseId.HANDLE_ALARMS -> {
                 val alarmEpochSeconds = if (inputData.hasKeyWithValueOfType<Long>(INPUT_ALARM_EPOCH_SECONDS)) {
@@ -307,18 +320,25 @@ class UseCaseWorker @AssistedInject constructor(
                 val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
                 refreshCalendarPassphraseUseCase.invoke(userId, calendarId)
             }
+            UseCaseId.REFRESH_CALENDAR_KEYS -> {
+                val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
+                refreshCalendarKeysUseCase.invoke(userId, calendarId)
+            }
             UseCaseId.UPDATE_ALARMS -> {
-                val eventIds = inputData.getStringArray(INPUT_EVENT_IDS)?.toList() ?: return Result.failure()
-                updateAlarmsUseCase.execute(userId.id, eventIds)
+                val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
+                val updateAllDayAlarms = inputData.getBoolean(INPUT_UPDATE_ALL_DAY_ALARMS, false)
+                val updatePartDayAlarms = inputData.getBoolean(INPUT_UPDATE_PART_DAY_ALARMS, false)
+                updateAlarmsUseCase.execute(userId.id, calendarId, updateAllDayAlarms, updatePartDayAlarms)
+            }
+            UseCaseId.HANDLE_ALARMS_WITH_MISSING_EVENT -> {
+                val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
+                val eventId = inputData.getString(INPUT_EVENT_ID) ?: return Result.failure()
+                handleAlarmsWithMissingEventUseCase.invoke(userId, calendarId, eventId)
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")
             }
         }
-
-        // updating progress for the UI
-//        val progressUpdate = workDataOf("progress_key" to 100)
-//        this.setProgressAsync(progressUpdate)
 
         return when (useCaseResult) {
             is UseCase.Result.Success<*> -> {

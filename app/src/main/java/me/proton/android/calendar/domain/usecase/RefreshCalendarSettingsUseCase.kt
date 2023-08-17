@@ -31,7 +31,6 @@ class RefreshCalendarSettingsUseCase @Inject constructor(
 
         val calendarSettingsResponse = calendarsApi.getCalendarSettings(userId, calendarId)
         if (calendarSettingsResponse !is ApiResponse.Success) {
-            logger.e("RefreshCalendarSettingsUseCase: error getting calendar settings from API: $calendarSettingsResponse")
             return UseCase.Result.Error("RefreshCalendarSettingsUseCase: error getting calendar settings from API: $calendarSettingsResponse")
         }
 

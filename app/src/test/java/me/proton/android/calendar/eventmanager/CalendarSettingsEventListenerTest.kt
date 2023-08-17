@@ -32,7 +32,7 @@ class CalendarSettingsEventListenerTest {
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarSettingsEventListener(db, calendarsRepository, logger, workManager, db)
+        listener = CalendarSettingsEventListener(db, calendarsRepository, logger, workManager)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 

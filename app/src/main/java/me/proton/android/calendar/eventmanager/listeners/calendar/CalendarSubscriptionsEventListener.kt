@@ -56,16 +56,19 @@ class CalendarSubscriptionsEventListener @Inject constructor(
         // Wipe calendar subscriptions from DB
         calendarsRepository.deleteCalendarSubscriptionByCalendarId(calendarId)
 
-        // Launch worker to refresh calendar subscriptions
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_SUBSCRIPTION,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ),
-            UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_SUBSCRIPTION,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        // Make sure we only do this for subscribed calendars
+        if (calendarsRepository.selectCalendar(calendarId)?.isSubscribed == true) {
+            // Launch worker to refresh calendar subscriptions
+            workManager.enqueueWorkHelper(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_SUBSCRIPTION,
+                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId
+                ),
+                UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_SUBSCRIPTION,
+                ExistingWorkPolicy.REPLACE,
+                NetworkType.CONNECTED
+            )
+        }
     }
 }

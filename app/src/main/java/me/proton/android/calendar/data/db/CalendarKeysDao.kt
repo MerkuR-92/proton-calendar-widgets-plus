@@ -22,4 +22,7 @@ abstract class CalendarKeysDao : BaseDao<CalendarKeyEntity> {
     @Query("DELETE FROM calendar_keys WHERE id = :id")
     abstract suspend fun deleteById(id: String)
 
+    @Query("DELETE FROM calendar_keys WHERE calendarId = :calendarId")
+    abstract suspend fun deleteByCalendarId(calendarId: String)
+
 }

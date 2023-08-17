@@ -493,7 +493,7 @@ class EditCreateEventUseCase @Inject constructor(
         val calendarPrivateKeys = calendarKeys.filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar")
         val calendarPassphraseList = calendarsRepository.selectCalendarPassphrases(calendarId)
 
-        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar")
+        if (calendarPassphraseList.isEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar")
 
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no valid cached Calendar Passphrase")

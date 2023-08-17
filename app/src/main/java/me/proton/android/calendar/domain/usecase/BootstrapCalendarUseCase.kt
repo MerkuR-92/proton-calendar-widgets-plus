@@ -181,7 +181,6 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
         return if (failedBootstraps.isEmpty()) {
             UseCase.Result.Success<Unit>()
         } else {
-            logger.i("BootstrapCalendarUseCase executeAllCalendarsBootstrap failed to bootstrap some calendars")
             UseCase.Result.Error("BootstrapCalendarUseCase executeAllCalendarsBootstrap failed to bootstrap some calendars")
         }
     }
