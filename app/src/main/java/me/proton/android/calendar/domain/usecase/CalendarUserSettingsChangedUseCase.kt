@@ -17,7 +17,6 @@ class CalendarUserSettingsChangedUseCase @Inject constructor(
     suspend fun handlePrimaryTimezoneChange(userId: String): UseCase.Result {
         // get all all-day events
         val events = database.eventsDao().selectAllDayOnly()
-        logger.v("all-day events: ${events.map { it.id }}")
 
         // 2. recalculate their alarms
         updateAlarmsUseCase.execute(userId, events.map { it.id })

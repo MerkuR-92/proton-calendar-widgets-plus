@@ -1426,7 +1426,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {
-        return database.calendarKeysDao().select(calendarId)//.distinctUntilChanged()
+        return database.calendarKeysDao().select(calendarId)
     }
 
     override suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) {
@@ -1438,16 +1438,20 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarKeysDao().deleteById(id)
     }
 
-    override suspend fun selectPassphrases(calendarId: String): List<PassphraseEntity> {
+    override suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity> {
         return database.passphrasesDao().select(calendarId)
     }
 
-    override suspend fun persistPassphrase(passphrase: PassphraseEntity) {
-        database.passphrasesDao().insert(passphrase)
+    override suspend fun persistCalendarPassphrase(calendarPassphrase: PassphraseEntity) {
+        database.passphrasesDao().insert(calendarPassphrase)
     }
 
-    override suspend fun deletePassphraseById(id: String) {
+    override suspend fun deleteCalendarPassphraseById(id: String) {
         database.passphrasesDao().deleteById(id)
+    }
+
+    override suspend fun deleteCalendarPassphrases(calendarId: String) {
+        database.passphrasesDao().deleteByCalendarId(calendarId)
     }
 
     override suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity> {
@@ -1494,6 +1498,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarSettingsDao().deleteById(id)
     }
 
+    override suspend fun deleteCalendarSettingsByCalendarId(calendarId: String) {
+        database.calendarSettingsDao().deleteByCalendarId(calendarId)
+    }
+
     override suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity? {
         return database.calendarSubscriptionDao().select(calendarId)
     }
@@ -1510,8 +1518,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarSubscriptionDao().updateOrInsert(calendarSubscription)
     }
 
-    override suspend fun deleteCalendarSubscriptionById(id: String) {
-        database.calendarSubscriptionDao().deleteById(id)
+    override suspend fun deleteCalendarSubscriptionByCalendarId(calendarId: String) {
+        database.calendarSubscriptionDao().deleteByCalendarId(calendarId)
     }
 
     override suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity? {

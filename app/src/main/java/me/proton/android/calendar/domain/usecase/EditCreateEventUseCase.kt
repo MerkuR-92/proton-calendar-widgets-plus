@@ -488,9 +488,10 @@ class EditCreateEventUseCase @Inject constructor(
 
     private suspend fun getCalendarKey(userId: String, calendarId: String): UseCase.Result {
 
-        val calendarPrimaryPrivateKey = database.calendarKeysDao().select(calendarId).firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar")
-        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar")
-        val calendarPassphraseList = database.passphrasesDao().select(calendarId)
+        val calendarKeys = calendarsRepository.selectCalendarKeys(calendarId)
+        val calendarPrimaryPrivateKey = calendarKeys.firstOrNull { it.isActiveAndPrimary }?.privateKey ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there is no active primary key for calendar")
+        val calendarPrivateKeys = calendarKeys.filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no active keys for calendar")
+        val calendarPassphraseList = calendarsRepository.selectCalendarPassphrases(calendarId)
 
         if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("EditCreateEventUseCase: there are no passphrase for calendar")
 

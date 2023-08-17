@@ -27,17 +27,22 @@ class RefreshCalendarUserSettingsUseCase @Inject constructor(
 
         val calendarUserSettingsResponse = settingsApi.getCalendarUserSettings(userId)
         if (calendarUserSettingsResponse !is ApiResponse.Success) {
+            logger.e("RefreshCalendarUserSettingsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
             return UseCase.Result.Error("RefreshCalendarUserSettingsUseCase: error getting calendar user settings from API: $calendarUserSettingsResponse")
         }
 
+        val calendarUserSettings = calendarUserSettingsResponse.data.calendarUserSettings
+
+        // Persist new settings in DB
         calendarsRepository.persistCalendarUserSettings(
             userId.id,
-            calendarUserSettingsResponse.data.calendarUserSettings
+            calendarUserSettings
         )
 
+        // Apply the change to event alarms if time zone changed
         calendarUserSettingsChangedUseCase.handlePrimaryTimezoneChange(userId.id)
 
-        return UseCase.Result.Success(calendarUserSettingsResponse.data.calendarUserSettings)
+        return UseCase.Result.Success(calendarUserSettings)
     }
 
 

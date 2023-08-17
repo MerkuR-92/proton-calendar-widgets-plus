@@ -71,15 +71,21 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onCreateOrUpdate(config: EventManagerConfig, entities: List<EventAlarmEntity>) {
         safePersistEventAlarmUseCase.invoke(
+            //  We keep alarms that have no event and send them to worker
             entities.filter { !invalidAlarmIds.contains(it.id) }
         )
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
-        keys.forEach { calendarsRepository.deleteEventAlarmById(it) }
+        keys.forEach {
+            calendarsRepository.deleteEventAlarmById(it)
+        }
     }
 
     override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+
+        // We wipe the alarms from the DB
         calendarsRepository.deleteAllEventAlarms(config.asCalendar().calendarId)
     }
 

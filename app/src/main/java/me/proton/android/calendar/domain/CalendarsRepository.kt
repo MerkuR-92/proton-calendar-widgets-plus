@@ -253,11 +253,13 @@ interface CalendarsRepository {
     suspend fun deleteCalendarKeyById(id: String)
 
     // passphrases
-    suspend fun selectPassphrases(calendarId: String): List<PassphraseEntity>
+    suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity>
 
-    suspend fun persistPassphrase(passphrase: PassphraseEntity) // calendarId is already there
+    suspend fun persistCalendarPassphrase(calendarPassphrase: PassphraseEntity)
 
-    suspend fun deletePassphraseById(id: String)
+    suspend fun deleteCalendarPassphraseById(id: String)
+
+    suspend fun deleteCalendarPassphrases(calendarId: String)
 
     // members
     suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
@@ -279,6 +281,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarSettingsById(id: String)
 
+    suspend fun deleteCalendarSettingsByCalendarId(calendarId: String)
+
     // calendar subscription
     suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity?
 
@@ -288,7 +292,7 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) // calendarId is already there
 
-    suspend fun deleteCalendarSubscriptionById(id: String)
+    suspend fun deleteCalendarSubscriptionByCalendarId(calendarId: String)
 
     // calendar user settings
     suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity?

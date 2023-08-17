@@ -19,11 +19,14 @@ class UpdateAlarmsUseCase @Inject constructor(
     private val database: AppDatabase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val transformEventUseCase: TransformEventUseCase,
-    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
-    private val json: Json
+    private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase
 ) {
 
-    suspend fun execute(userId: String, eventIds: List<String>) {
+    companion object {
+        const val UPDATE_ALARMS = "UPDATE_ALARMS"
+    }
+
+    suspend fun execute(userId: String, eventIds: List<String>): UseCase.Result {
 
         val primaryTimezone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
         val fromZonedDateTime = if (primaryTimezone == null) {
@@ -31,15 +34,15 @@ class UpdateAlarmsUseCase @Inject constructor(
             ZonedDateTime.now(ZoneId.systemDefault())
         } else ZonedDateTime.now(ZoneId.of(primaryTimezone))
 
-        logger.v("executing UpdateAlarmsUseCase")
-
         val eventChains = eventIds.mapNotNull {
             val dbOriginalEvent = database.eventsDao().selectById(it)
-            val originalEvent = dbOriginalEvent?.let { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptor.decrypt(it)
-            } else {
-                transformEventUseCase.execute(it)
-            } }
+            val originalEvent = dbOriginalEvent?.let { eventEntity ->
+                if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                    eventDecryptor.decrypt(eventEntity)
+                } else {
+                    transformEventUseCase.execute(eventEntity)
+                }
+            }
 
             if (dbOriginalEvent == null) {
                 logger.e("could not get dbOriginalEvent in UpdateAlarmsUseCase")
@@ -54,29 +57,28 @@ class UpdateAlarmsUseCase @Inject constructor(
 
         eventChains.forEach {
 
-            val transformedChain = it.second.mapNotNull { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptor.decrypt(it)
-            } else {
-                transformEventUseCase.execute(it)
-            } }
+            val transformedChain = it.second.mapNotNull { eventEntity ->
+                if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
+                    eventDecryptor.decrypt(eventEntity)
+                } else {
+                    transformEventUseCase.execute(eventEntity)
+                }
+            }
 
             val upcomingAlarms = ICalUtilsImpl.calculateUpcomingAlarmEntities(transformedChain, fromZonedDateTime, "TODO").onlyDisplayType()
 
             if (transformedChain.isEmpty()) {
-                logger.v("transformedChain for event ${it.first.id} in UpdateAlarmsUseCase is empty")
                 return@forEach
             }
 
-            transformedChain.forEach {
-                database.eventAlarmsDao().deleteAllByEventId(it.id)
+            transformedChain.forEach { event ->
+                database.eventAlarmsDao().deleteAllByEventId(event.id)
             }
 
             safePersistEventAlarmUseCase.invoke(upcomingAlarms)
-
         }
 
-        handleAlarmsUseCase.execute(UserId(userId))
-
+        return handleAlarmsUseCase.execute(UserId(userId))
     }
 
 }

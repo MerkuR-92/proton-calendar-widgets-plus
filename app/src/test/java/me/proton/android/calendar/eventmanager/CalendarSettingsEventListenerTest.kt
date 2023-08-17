@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,15 +24,15 @@ class CalendarSettingsEventListenerTest {
 
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk(relaxed = true)
-    private val calendarSettingsChangedUseCase: CalendarSettingsChangedUseCase = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
+    private val workManager: WorkManager = mockk(relaxed = true)
     private lateinit var listener: CalendarSettingsEventListener
     private val config = EventManagerConfig.Calendar(UserId("user_id"), calendarId)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarSettingsEventListener(db, calendarsRepository, logger, calendarSettingsChangedUseCase)
+        listener = CalendarSettingsEventListener(db, calendarsRepository, logger, workManager, db)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -44,8 +45,6 @@ class CalendarSettingsEventListenerTest {
             )
 
             listener.onCreateOrUpdate(config, entities)
-
-            coVerify(exactly = entities.count()) { calendarSettingsChangedUseCase.execute(any(), any()) }
         }
     }
 

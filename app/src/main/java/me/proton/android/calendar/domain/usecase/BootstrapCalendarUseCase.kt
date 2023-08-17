@@ -56,7 +56,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                     } else if (calendarEntity.isSubscribed && bootstrapResponse.data.calendarSubscriptionEntity == null) {
                         logger.e("BootstrapCalendarsUseCase: calendarSubscriptionEntity was null")
                     }
-                    persistPassphrase(bootstrapResponse.data.passphrase)
+                    persistCalendarPassphrase(bootstrapResponse.data.passphrase)
                     bootstrapResponse.data.keys.forEach { persistCalendarKey(it) }
                     bootstrapResponse.data.members.forEach { persistMember(it) }
                 }
