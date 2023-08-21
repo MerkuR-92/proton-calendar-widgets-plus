@@ -169,10 +169,6 @@ val useCaseModule = module {
     factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
     factory<CalendarSettingsChangedUseCase> { CalendarSettingsChangedUseCase(get(), get(), get(), get()) }
     factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get(), get()) }
-    factory<RefreshCalendarSettingsUseCase> { RefreshCalendarSettingsUseCase(get(), get(), get(), get()) }
-    factory<RefreshCalendarSubscriptionUseCase> { RefreshCalendarSubscriptionUseCase(get(), get(), get()) }
-    factory<RefreshCalendarPassphraseUseCase> { RefreshCalendarPassphraseUseCase(get(), get(), get(), get()) }
-    factory<RefreshCalendarKeysUseCase> { RefreshCalendarKeysUseCase(get(), get(), get()) }
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }
@@ -182,8 +178,6 @@ val useCaseModule = module {
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<RefreshMembersFlagsUseCase> { RefreshMembersFlagsUseCase(get(), get(), get()) }
-    factory<HandleAlarmsWithMissingEventUseCase> { HandleAlarmsWithMissingEventUseCase(get(), get(), get(), get()) }
 }
 
 fun coreModule(
