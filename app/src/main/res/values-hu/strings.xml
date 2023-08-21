@@ -408,7 +408,7 @@
     <string name="settings_week_numbers_title">Hetek sorszámának megjelenítése</string>
     <string name="settings_auto_invites_title">Adja a meghívókat a naptárhoz és állítsa be őket függőnek</string>
     <string name="settings_search_title">Keresés a naptárakban</string>
-    <string name="settings_search_subtitle">Beállítások_keresés_felirat</string>
+    <string name="settings_search_subtitle">Letölti és az eszközön tárolja a naptár tartalmát, hogy kereshető legyen. Kikapcsolása törli a letöltött tartalmat.\n\nA keresés egy kísérleti fázisban lévő lehetőség. A bekapcsolása instabillá teheti az alkalmazást.</string>
     <string name="settings_alternative_routing_title">Alternatív útválasztás engedélyezése</string>
     <string name="settings_alternative_routing_subtitle">Ha a Proton szolgáltatásai le vannak tiltva, ezzel a beállítással az alkalmazás alternatív hálózati útvonalakat próbál meg használni, ami hasznos lehet tűzfalak megkerüléséhez vagy hálózati problémák megoldásához. Javasolt ezt a beállítást bekapcsolva a tartani nagyobb megbízhatóság érdekében.</string>
     <string name="settings_value_placeholder">Koppintson a kiválasztáshoz</string>
@@ -487,7 +487,7 @@
     <string name="add_holiday_calendar_country_search_hint">Ország keresése</string>
     <string name="holiday_calendar_form_picker_title">Ország</string>
     <string name="holiday_calendar_time_zone_based">A jelenlegi időzóna alapján</string>
-    <string name="holiday_calendar_already_exists">Ez az ünnepnapok naptár már hozzá lett adva.</string>
+    <string name="holiday_calendar_already_exists">Ez a munkaszüneti naptár már hozzáadásra került.</string>
     <string name="holiday_calendar_value_placeholder">Válasszon országot</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -549,11 +549,11 @@
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
     <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
-    <string name="spotlight_dialog_wipe_search_title">Keresés eltávolítva hogy jobbá tegyük</string>
-    <string name="spotlight_dialog_wipe_search_description">Eltávolítjuk a kísérleti keresési lehetőséget a Proton Calendar Béta változatából, mivel szeretnénk, ha az még hasznosabb és megbízhatóbb lenne a számodra. Ez néhány másodpercet vehet igénybe.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Itt vannak a munkaszüneti napok!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">Nem kell többé megbeszéléseket ütemezni, amikor mindenki szabadnapos, vagy elfelejteni a hosszú hétvégi kiruccanást.\n\nAdd hozzá bármely ország munkaszüneti napjait a naptáradhoz.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem kell többé megbeszéléseket ütemeznie, amikor mindenki szabadnapos, vagy elfelejtenie egy hosszú hétvégi kirándulást.\n\nMivel jelenleg a naptárhatárnál tartasz, az ünnepi naptár hozzáadásához először el kell távolítanod egy meglévő naptárat.</string>
+    <string name="spotlight_dialog_wipe_search_title">Keresés eltávolítva, hogy jobbá tegyük</string>
+    <string name="spotlight_dialog_wipe_search_description">Eltávolítjuk a kísérleti keresési lehetőséget a Proton Calendar Béta változatából, mivel szeretnénk, ha az még hasznosabb és megbízhatóbb legyen. Ez néhány másodpercet vehet igénybe.</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nBármely ország munkaszüneti napjait hozzáadhatja a naptárhoz.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nMivel jelenleg az elérhető összes naptára használatban van, a munkaszüneti naptár hozzáadásához először el kell távolítania egy meglévő naptárat.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -741,9 +741,9 @@
         <item translatable="false"/>
         <item>utolsó</item>
         <item>utolsó előtti</item>
-        <item>harmadik az utolsóhoz</item>
-        <item>negyedik az utolsóhoz</item>
-        <item>ötödik az utolsóhoz</item>
+        <item>az utolsó előtt kettővel</item>
+        <item>az utolsó előtt hárommal</item>
+        <item>az utolsó előtt néggyel</item>
     </string-array>
     <string-array name="app_themes">
         <item>Világos</item>

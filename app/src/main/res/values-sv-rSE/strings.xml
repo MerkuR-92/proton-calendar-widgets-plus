@@ -372,7 +372,7 @@
     <string name="dialog_title_calendar_picker">Kalender</string>
     <string name="import_from_google_title">Importera från Google</string>
     <string name="notifications_permission_dialog_title">Tillåt Proton Calendar att visa aviseringar?</string>
-    <string name="notifications_permission_dialog_message">Proton Calendar behöver tillstånd för att visa aviseringar för kommande händelser.</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar behöver tillstånd för att visa dig aviseringar om kommande händelser.</string>
     <string name="notifications_permission_dialog_open_settings">Öppna inställningar</string>
     <string name="notifications_permission_dialog_cancel">Neka</string>
     <!-- NOTIFICATIONS -->
@@ -598,7 +598,7 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Pausad</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Misslyckades</string>
     <string name="import_assistant_status_paused_lost_connection_title">Anslutning till Google förlorades</string>
-    <string name="import_assistant_status_paused_lost_connection_description">För att fortsätta importera tryck på Återanslut, logga in till Google och ge Proton åtkomst till dina Googleuppgifter igen.</string>
+    <string name="import_assistant_status_paused_lost_connection_description">För att fortsätta importen, tryck på “Återanslut“, logga in på Google och bevilja Proton åtkomst till din Google-uppgifter igen.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Anslut igen</string>
     <string name="import_assistant_status_paused_storage_full_title">Ditt lagringsutrymme är fullt</string>
     <string name="import_assistant_status_paused_storage_full_description">Ditt Proton-konto har inte tillräckligt med lagringsutrymme för att slutföra denna kalenderimport. Frigör utrymme eller lägg till mer lagringsutrymme och kom sedan tillbaka hit för att återuppta.</string>

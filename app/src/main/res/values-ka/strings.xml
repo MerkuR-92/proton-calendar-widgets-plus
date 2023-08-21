@@ -24,11 +24,11 @@
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">თქვენი მისამართი გამორთულია. გაუქმების ელფოსტის გაგზავნა შეუძლებელია მოვლენის მონაწილეებისთვის. მაინც გსურთ ამ სერიის ყველა მოვლენის წაშლა?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">ამ მოვლენის ორგანიზატორს ეცნობება, რომ თქვენ უარყავით მოწვევა. გსურთ, წაშალოთ ეს მოვლენა?</string>
-    <string name="dialog_description_delete_single_event_as_attendee_disabled">ამ მოვლენის ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან არ შეგიძლიათ ელფოსტის გაგზავნა მოწვეული მისამართიდან. მაინც გსურთ წაშალოთ ეს მოვლენა?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">ამ მოვლენის ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან არ შეგიძლიათ, ელფოსტის გაგზავნა მოწვეული მისამართიდან. მაინც გსურთ, წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee">ორგანიზატორი ამ სერიის მოვლენების ეცნობება, რომ თქვენ უარყავით მოწვევა. გსურთ, წაშალოთ ამ სერიის ყველა მოვლენა?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">მოვლენის ამ სერიის ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან არ შეგიძლიათ ელფოსტის გაგზავნა მოწვეული მისამართიდან. მაინც გსურთ ამ სერიის ყველა მოვლენის წაშლა?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">ეს მოვლენა განახლდა. ორგანიზატორს ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე. გსურთ, წაშალოთ ეს მოვლენა?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">ეს მოვლენა განახლდა. ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან ვერ გაგზავნით ელფოსტას მოწვეული მისამართიდან. გსურთ წაშალოთ ეს მოვლენა?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">ეს მოვლენა განახლდა. ორგანიზატორს არ ეცნობება, რომ თქვენ უარს ამბობთ მოწვევაზე, რადგან ვერ გაგზავნით ელფოსტას მოწვეული მისამართიდან. გსურთ, წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">ორგანიზატორის მიერ ადრე განახლებული მოვლენები ინახება, მაგრამ თქვენი პასუხები დაიკარგება</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">ორგანიზატორის მიერ ადრე განახლებული მოვლენები ინახება</string>
@@ -162,7 +162,7 @@
     <string name="search_settings_dialog_toggle_on_title">გადმოვწერო კალენდრები ამ მოწყობილობაზე?</string>
     <string name="search_settings_dialog_toggle_on_text">ეს ძებნისთვის აუცილებელია.</string>
     <string name="search_onboarding_header">გნებავთ, კალენდარში მოძებნოთ?</string>
-    <string name="search_onboarding_text">ჯერ თქვენი კალენდრების დაშიფრული ასლი უნდა გადმოიწეროთ. ამას დიდი დრო არ სჭირდება და თან შეგიძლიათ, ამ დროს აპლიკაციაც გაოიყენოთ. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
+    <string name="search_onboarding_text">ჯერ თქვენი კალენდრების დაშიფრული ასლი უნდა გადმოიწეროთ. ამას დიდი დრო არ სჭირდება და თან შეგიძლიათ, ამ დროს აპლიკაციაც გამოიყენოთ. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
     <string name="search_onboarding_action_download_calendars">კალენდრების გადმოწერა</string>
     <string name="search_onboarding_action_pause">შეჩერება</string>
     <string name="search_onboarding_action_resume">გაგრძელება</string>
@@ -408,7 +408,7 @@
     <string name="settings_week_numbers_title">კვირის ნომრის ჩვენება</string>
     <string name="settings_auto_invites_title">მოსაწვევების კალენდარში დამატება და მომლოდინედ მონიშვნა</string>
     <string name="settings_search_title">კალენდრების ძებნა</string>
-    <string name="settings_search_subtitle">გადმოწერს და დაიმახსოვრებს კალენდრის შემცველობას თქვენს მოწყობილობაზე, რათა მასში ძებნა შეგეძლოთ. ამის გაორთვა გადმოწერილ შემცველობას წაშლის.\n\nძებნა ექსპერიმენტული, ბეტა ფუნქციაა. მისმა ჩართვამ შეიძლება აპლიკაცია არასტაბილური გახადოს.</string>
+    <string name="settings_search_subtitle">გადმოწერს და დაიმახსოვრებს კალენდრის შემცველობას თქვენს მოწყობილობაზე, რათა მასში ძებნა შეგეძლოთ. ამის გამორთვა გადმოწერილ შემცველობას წაშლის.\n\nძებნა ექსპერიმენტული, ბეტა ფუნქციაა. მისმა ჩართვამ შეიძლება, აპლიკაცია არასტაბილური გახადოს.</string>
     <string name="settings_alternative_routing_title">ალტერნატიული რაუტინგის ჩართვა</string>
     <string name="settings_alternative_routing_subtitle">იმ შემთხვევაში, თუ Proton-ის საიტები დაბლოკილია, ეს პარამეტრი აპს საშუალებას აძლევს, Proton-მდე მისასვლელად ქსელის ალტერნატიული რაუტინგი სცადოს, რაც შეიძლება, სასარგებლო იყოს ბრანდმაუერის ან ქსელის პრობლემების გვერდის ავლით. მეტი საიმედოობისთვის გირჩევთ, ჩართოთ ეს პარამეტრი.</string>
     <string name="settings_value_placeholder">მოსანიშნად დაატყაპუნეთ</string>
@@ -500,7 +500,7 @@
     <string name="bootstrap_error_store_quota_reached_message">მეტი საცავის სივრცე ხელმიუწვდომელია.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">გაიგეთ მეტი</string>
     <string name="bootstrap_error_reset_needed_title">კალენდრის გასაღებების თავიდან დაყენება</string>
-    <string name="bootstrap_error_reset_needed_message">თქვენ ახლახანს ძალით შეცვალეთ პაროლი და ამიტომ მოვლენები, მიბმულები შემდეგ კალენდრებთან, შეუძლებელია, გაიშიფროს. ყველა აქტიური გამოწერილი კალენდრის სინქრონიზაცია კიდევ ერთხელ რამდენიმე წუთში მოხდება.</string>
+    <string name="bootstrap_error_reset_needed_message">თქვენ ახლახან გადააყენეთ პაროლი და ამიტომ მოვლენები, მიბმული შემდეგ კალენდრებთან, შეუძლებელია, გაიშიფროს. ყველა აქტიური გამოწერილი კალენდრის სინქრონიზაცია, კიდევ ერთხელ, რამდენიმე წუთში მოხდება.</string>
     <string name="bootstrap_error_update_passphrase_title">კალენდრის გასაღებების რეაქტივაცია</string>
     <string name="bootstrap_error_update_passphrase_message">თქვენ ხელახლა გაააქტიურეთ თქვენი გასაღებები და მოვლენები, რომლებიც დაკავშირებულია შემდეგ კალენდრებთან, ახლა შეიძლება გაშიფრული იყოს.</string>
     <string name="bootstrap_error_continue_button">გაგრძელება</string>
@@ -540,7 +540,7 @@
     <string name="spotlight_v5_dialog_got_it_button">გავიგე</string>
     <string name="spotlight_v5_dialog_learn_more_button">გაიგეთ მეტი</string>
     <string name="spotlight_v5_dialog_rebranding_title">განახლებული Proton-ი, გაერთიანებული დაცვა</string>
-    <string name="spotlight_v5_dialog_rebranding_description">წარმოგიდგენთ Proton-ის განახლებულ იერს. ბევრი სერვისი, ერთი მისია. მოგესალმებით ინტერნეტში, სადაც კონფიდენციალობა ნაგულისხმებია. <a href="https://proton.me/news/updated-proton">გაიგეთ მეტი</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">წარმოგიდგენთ Proton-ის განახლებულ იერს. ბევრი სერვისი, ერთი მისია. მოგესალმებით ინტერნეტში, სადაც კონფიდენციალობა ნაგულისხმევია. <a href="https://proton.me/news/updated-proton">გაიგეთ მეტი</a></string>
     <string name="spotlight_dialog_week_view_title">მეტი ნახვის პარამეტრი</string>
     <string name="spotlight_dialog_week_view_description">• წარმოგიდგენთ კალენდრების <b>3 დღიან</b> და <b> ერთკვირიან</b> ხედებს. აირჩიეთ თქვენთვის სასურველი ხედი <b>მენიუში</b>.\n\n• დღის ბადეში მწკრივების სიმაღლის გასწორება ორი თითის გასმით შეგიძლიათ.</string>
     <string name="spotlight_dialog_search_title">მოვლენების ძებნა</string>
@@ -621,7 +621,7 @@
     <string name="import_assistant_in_progress_error_snack">შემოტანა ჯერ კიდევ მიმდინარეობს</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">შემოვიტანო მარტივი მოვლენის სახით?</string>
-    <string name="import_event_disclaimer_dialog_description">\nშემოტანილი მოსაწვევები გამოჩნდება Proton Calendar-ში, როგორც მარტივი ღონისძიებები <b>ორგანიზატორის</b> და <b>მონაწილის</b> დეტალების გარეშე.\n\nმოვლენის განახლებების მისაღებად და მონაწილეების სანახავად, სთხოვეთ ორგანიზატორებს, მოგიწვიონ თქვენი Proton ელფოსტის გამოყენებით. მისამართი.</string>
+    <string name="import_event_disclaimer_dialog_description">\nშემოტანილი მოსაწვევები გამოჩნდება Proton Calendar-ში, როგორც მარტივი ღონისძიებები <b>ორგანიზატორის</b> და <b>მონაწილის</b> დეტალების გარეშე.\n\nმოვლენის განახლებების მისაღებად და მონაწილეების სანახავად სთხოვეთ ორგანიზატორებს, მიგიწვიონ თქვენი Proton ელფოსტის მისამართის გამოყენებით.</string>
     <string name="import_event_disclaimer_dialog_positive">შემოტანა</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">

@@ -100,12 +100,12 @@
     <string name="event_signature_verification_failure">De verificatie van de afspraakhandtekening is mislukt. <a href="https://proton.me/support/what-is-a-digital-signature">Meer informatie</a></string>
     <string name="event_signature_verification_in_progress">De verificatie van de afspraakhandtekening is bezig.</string>
     <string name="event_signature_verification_network_error">De verificatie van de afspraakhandtekening werd afgebroken door een fout. <a href="">Probeer opnieuw</a></string>
-    <string name="event_change_answer_recurring_title">Terugkerende afspraak updaten</string>
+    <string name="event_change_answer_recurring_title">Terugkerende afspraak bijwerken</string>
     <string name="event_change_answer_recurring_description">Wilt u uw antwoord wijzigen voor alle afspraken in de serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Wilt u uw antwoord wijzigen voor alle afspraken in deze serie?\nSommige antwoorden op voorvallen die eerder zijn bijgewerkt door de organisator zullen verloren gaan.</string>
     <string name="event_change_answer_recurring_single_edit_description">Deze afspraak is bijgewerkt door de organisator. Wilt u uw antwoord wijzigen alleen voor deze herhaling in deze serie?</string>
     <string name="event_change_answer_recurring_cancel">Annuleren</string>
-    <string name="event_change_answer_recurring_confirm">Updaten</string>
+    <string name="event_change_answer_recurring_confirm">Bijwerken</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s geaccepteerd</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s heeft uw uitnodiging aan %2$s geweigerd</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s onder voorbehoud geaccepteerd</string>
@@ -362,7 +362,7 @@
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
     <string name="update_timezone_dialog_title">Tijdzone gewijzigd</string>
     <string name="update_timezone_dialog_message">Uw systeemtijdzone lijkt te zijn veranderd naar %1$s. Wilt u uw voorkeur voor de tijdzone bijwerken?</string>
-    <string name="update_timezone_dialog_confirmation">Updaten</string>
+    <string name="update_timezone_dialog_confirmation">Bijwerken</string>
     <string name="update_timezone_dialog_cancel">Annuleer</string>
     <string name="contacts_permission_dialog_title">Proton Calendar toegang geven tot uw contactpersonen?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar heeft toegang nodig tot uw telefooncontacten om u te helpen deze gemakkelijk toe te voegen aan uw afspraken.</string>
@@ -550,7 +550,7 @@
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
     <string name="spotlight_dialog_calendar_provider_description">• Voeg rechtstreeks afspraken toe in Proton Calendar van andere apps.\n\n• Maak en beheer afspraken in agenda\'s die met u gedeeld zijn.\n\n• Stel de standaard weergave in die u wilt zien als u de app opent.\n\n• 13 nieuwe talen beschikbaar.</string>
     <string name="spotlight_dialog_wipe_search_title">Zoekopdracht verwijderd om het te verbeteren</string>
-    <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Clendar Beta, omdat we het bruikbaarder en betrouwbaarder willen maken. Dit duurt slechts enkele seconden.</string>
+    <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Calendar Beta, omdat we het bruikbaarder en betrouwbaarder willen maken. Dit duurt slechts enkele seconden.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
@@ -564,7 +564,7 @@
     <string name="import_assistant_summary_customize_import">Importeren aanpassen</string>
     <string name="import_assistant_error">Fout bij het ophalen van gegevens</string>
     <string name="import_assistant_data_gathering_error">Verzameling van gegevens mislukt</string>
-    <string name="import_assistant_update_import_error">Het updaten van de import is mislukt. Probeer later nog eens.</string>
+    <string name="import_assistant_update_import_error">Het bijwerken van de import is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_update_import_wrong_account_error">Verkeerde account. Log in met het account die u heeft gebruikt voor het importeren van de agenda.</string>
     <string name="import_assistant_start_import_error">Het starten van importeren is mislukt. Probeer later nog eens.</string>
     <string name="import_assistant_delete_import_success">Import record verwijderd</string>

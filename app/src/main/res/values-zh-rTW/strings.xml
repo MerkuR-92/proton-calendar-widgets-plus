@@ -153,25 +153,25 @@
     <string name="search_empty_results_title">查無結果</string>
     <string name="search_empty_results_subtitle">嘗試換用其它字詞，例如：Eric、網路研討會、讀書會... 等</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">正在下載行事曆 (%1$s)</string>
-    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">剩餘時間：%1$s</string>
-    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">正在計算剩餘時間……</string>
-    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">幾乎完成了</string>
+    <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">尚待時間：%1$s</string>
+    <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">正在估算仍須等待時間……</string>
+    <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">即將完成</string>
     <string name="search_downloading_pause">暫停下載</string>
     <string name="search_settings_dialog_toggle_off_title">移除所有已下載的行事曆？</string>
-    <string name="search_settings_dialog_toggle_off_text">若您想要搜尋，您必須再次下載您的行事曆。</string>
+    <string name="search_settings_dialog_toggle_off_text">若需進行搜尋，您必須再次下載所有行事曆。</string>
     <string name="search_settings_dialog_toggle_on_title">下載行事曆至此裝置？</string>
     <string name="search_settings_dialog_toggle_on_text">若您要搜尋，這是必要的。</string>
     <string name="search_onboarding_header">想要搜尋您的行事曆？</string>
-    <string name="search_onboarding_text">您必須先下載您行事曆的加密副本。這只需要一點時間，您可以繼續使用該應用程式。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
+    <string name="search_onboarding_text">首先，您需要下載行事曆的加密副本。這僅需耗時一點時間，您可持續免中斷使用應用程式。<a href="https://proton.me/support/calendar-search">了解更多</a></string>
     <string name="search_onboarding_action_download_calendars">下載行事曆</string>
     <string name="search_onboarding_action_pause">暫停</string>
     <string name="search_onboarding_action_resume">繼續</string>
     <string name="search_onboarding_action_retry">重試</string>
-    <string name="search_onboarding_progress_header_ongoing">正在下載行事曆……</string>
+    <string name="search_onboarding_progress_header_ongoing">正在下載行事曆…</string>
     <string name="search_onboarding_progress_header_completed">下載完成</string>
-    <string name="search_onboarding_progress_header_paused">下載行事曆已暫停</string>
+    <string name="search_onboarding_progress_header_paused">已暫停下載行事曆</string>
     <string name="search_onboarding_progress_header_error">下載行事曆發生錯誤</string>
-    <string name="search_spotlight_activation_snack">行事曆搜尋已啟用</string>
+    <string name="search_spotlight_activation_snack">已啟用行事曆搜尋</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">加入通知</string>
     <string name="event_text_description">說明</string>
@@ -227,15 +227,15 @@
     <string name="event_allow_contacts_description">Proton Calendar 需要存取您的聯絡人以便為您提供自動完成</string>
     <string name="event_allow_contacts_cancel">婉拒</string>
     <string name="event_allow_contacts_confirm">允許</string>
-    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">回覆：誠邀自 %1$s，%2$s %3$s 撥冗出席</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">回覆：誠邀 %1$s 撥冗出席</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">回覆：誠邀自 %1$s 起撥冗出席</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">誠邀自 %1$s，%2$s %3$s 撥冗出席</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">誠邀 %1$s 撥冗出席</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">誠邀自 %1$s 起撥冗出席</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">取消在 %1$s 於 %2$s %3$s 開始的活動</string>
-    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">原訂 %1$s 一事取消</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">原訂自 %1$s 起一事取消</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">回覆：誠摯邀請您參與 %1$s 在 %2$s %3$s 開展的活動</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">回覆：誠摯邀請您參與訂於 %1$s 的活動</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">回覆：誠摯邀請您參與 %1$s 開展的活動</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">誠摯邀請您參與 %1$s 在 %2$s %3$s 開展的活動</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">誠摯邀請您參與訂於 %1$s 的活動</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">誠摯邀請您參與 %1$s 開展的活動</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">行程取消致歉函：原 %1$s 在 %2$s %3$s 開展的活動已取消</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">行程取消致歉函：原訂 %1$s 的活動已取消</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">行程取消致歉函：原 %1$s 開展的活動已取消</string>
     <string name="event_send_invite_mail_body">謹邀請閣下出席 %1$s，詳情如下：\n時間：%2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (全日）</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -255,7 +255,7 @@
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">我的行事曆</string>
     <string name="nav_view_subscribed_calendars">已訂購授權的行事曆</string>
-    <string name="nav_view_other_calendars">其他行事曆</string>
+    <string name="nav_view_other_calendars">其它行事曆</string>
     <string name="nav_view_disabled_calendars">%1$s (已停用)</string>
     <string name="nav_view_not_synced_calendars">%1$s (未同步)</string>
     <string name="nav_view_syncing_calendars">%1$s (同步中)</string>
@@ -286,7 +286,7 @@
     <string name="snack_event_saving">正在儲存活動</string>
     <string name="snack_event_deleting">正在刪除活動</string>
     <string name="snack_event_changing_answer">正在更新回答</string>
-    <string name="snack_event_part_stat_updated">已更新參與狀態。</string>
+    <string name="snack_event_part_stat_updated">已更新出席狀態。</string>
     <string name="snack_event_updated">活動已更新</string>
     <string name="snack_event_updated_error_failed_mail">邀請傳送失敗</string>
     <string name="snack_event_updated_error">更新活動時發生錯誤</string>
@@ -299,11 +299,11 @@
     <string name="snack_event_init_error">初始化新活動時發生錯誤</string>
     <string name="snack_event_calendar_error">切換行事曆時發生錯誤</string>
     <string name="snack_event_maximum_alarm_reached_error">已達到通知的數量上限</string>
-    <string name="snack_send_bug_report_success">意見已傳送，感謝您的回饋</string>
-    <string name="snack_send_bug_report_error">傳送意見時發生錯誤，請稍後再試</string>
-    <string name="snack_send_bug_report_description_empty">請提供您回報的描述</string>
+    <string name="snack_send_bug_report_success">問題通報完成，謝謝您的意見反饋</string>
+    <string name="snack_send_bug_report_error">問題通報時發生錯誤，請稍後再試</string>
+    <string name="snack_send_bug_report_description_empty">請盡可能詳細描述您要通報的問題</string>
     <string name="snack_create_event_no_active_personal_calendar">您需要一個使用中的個人行事曆來創建活動</string>
-    <string name="snack_create_event_no_active_calendar">您需要一個作用中的行事曆以建立事件</string>
+    <string name="snack_create_event_no_active_calendar">您需要有使用中的行事曆方可創建的各項行程</string>
     <string name="snack_add_self_as_participant">不允許自我邀請</string>
     <string name="snack_maximum_participants_reached">已達到參與者人數上限。</string>
     <string name="snack_add_participant_error">加入參與者時發生錯誤</string>
@@ -320,10 +320,10 @@
     <string name="snack_update_calendar_settings_error">更新部分行事曆資訊時發生錯誤，請稍後再試</string>
     <string name="snack_update_calendar_success">行事曆已更新</string>
     <string name="snack_create_calendar_success">行事曆已創建</string>
-    <string name="snack_add_calendar_success">行事曆已新增</string>
+    <string name="snack_add_calendar_success">已加入行事曆</string>
     <string name="snack_calendar_saving">正在儲存行事曆</string>
     <string name="snack_create_calendar_error">創建行事曆時發生錯誤，請稍後再試</string>
-    <string name="snack_add_calendar_error">新增行事曆時發生錯誤，請稍後再試</string>
+    <string name="snack_add_calendar_error">加入行事曆時發生錯誤，請稍後再試</string>
     <string name="snack_create_calendar_settings_error">行事曆已創建，惟部分資訊未更新，請稍後再試</string>
     <string name="snack_ics_default_error">開啟行事曆時發生錯誤</string>
     <string name="snack_ics_event_not_found_error">找不到活動</string>
@@ -338,8 +338,8 @@
     <string name="snack_ics_party_crasher_error">您的電郵不在參與者清單中</string>
     <string name="snack_ics_reply_party_crasher_error">無法加入召集人未有邀請的參與者</string>
     <string name="snack_ics_missing_uid_error">此活動遺失 UID</string>
-    <string name="snack_ics_no_active_personal_calendar_error">無任何與此帳號關聯的作用中個人行事曆</string>
-    <string name="snack_ics_no_active_calendar_error">無任何與此帳號關聯的作用中行事曆</string>
+    <string name="snack_ics_no_active_personal_calendar_error">現在未有與此帳號關聯且仍使用中的個人行事曆</string>
+    <string name="snack_ics_no_active_calendar_error">現在未有與此帳號關聯且仍使用中的行事曆</string>
     <string name="snack_ics_unsupported_duration_error">不支援持續時間屬性</string>
     <string name="snack_ics_too_many_events_error">尚未支援多重活動</string>
     <string name="snack_ics_no_events_error">此行事曆不包含任何活動</string>
@@ -353,8 +353,8 @@
     <string name="snack_app_link_error">開啟活動時發生錯誤</string>
     <string name="snack_app_link_import_error">驗證已取消</string>
     <string name="snack_notification_already_added">通知已加入</string>
-    <string name="snack_opening_ics">開啟事件……</string>
-    <string name="snack_invite_in_shared_calendar_error">不允許在分享的行事曆中建立邀請</string>
+    <string name="snack_opening_ics">開啟行程…</string>
+    <string name="snack_invite_in_shared_calendar_error">無法在共享行事曆中創建邀請函</string>
     <string name="snack_down_banner">Proton伺服器目前關閉。請參考狀態頁面獲得詳細資料。</string>
     <string name="snack_down_banner_action">開啟狀態頁面。</string>
     <!-- Dialogs -->
@@ -378,7 +378,7 @@
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">活動通知</string>
     <string name="notification_channel_sync">行事曆同步</string>
-    <string name="notification_channel_calendar_fetch">正在擷取行事曆</string>
+    <string name="notification_channel_calendar_fetch">正在提取行事曆</string>
     <string name="notification_sync">正在同步行事曆…</string>
     <string name="notification_text_today">今天</string>
     <string name="notification_text_today_part_time">今天，於 %1$s</string>
@@ -387,9 +387,9 @@
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s，於 %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">主旨</string>
-    <string name="bug_report_hint_description">請詳述遇到的問題，若有錯誤訊息，也請您一併附上。</string>
+    <string name="bug_report_hint_description">請詳細描述發現的問題，若有出現任何錯誤訊息，還請您一併附上進行通報。</string>
     <string name="bug_report_discard_changes_title">未儲存的變更</string>
-    <string name="bug_report_discard_changes_description">表單中有未儲存的項目。您確定要捨棄嗎？</string>
+    <string name="bug_report_discard_changes_description">表單中有未儲存的項目。您確定要放棄變更嗎？</string>
     <string name="bug_report_discard_changes_cancel">繼續撰寫</string>
     <string name="bug_report_discard_changes_confirm">捨棄</string>
     <!-- Settings -->
@@ -398,8 +398,8 @@
     <string name="settings_timezone_title">時區</string>
     <string name="settings_language_title">應用程式語言</string>
     <string name="settings_language_default">自動偵測</string>
-    <string name="settings_default_view_title">預設檢視</string>
-    <string name="settings_default_view_default">最後查看</string>
+    <string name="settings_default_view_title">預設的檢視樣板</string>
+    <string name="settings_default_view_default">上次的檢視樣板</string>
     <string name="settings_update_timezone_title">詢問是否更新時區設定</string>
     <string name="settings_update_timezone_subtitle">若系統時區與目前時區設定不符，將詢問您是否更新。</string>
     <string name="settings_update_timezone_checkbox">下次無需再詢問</string>
@@ -408,12 +408,12 @@
     <string name="settings_week_numbers_title">顯示週次</string>
     <string name="settings_auto_invites_title">加入邀請函至行事曆，同時標記為待辦事項。</string>
     <string name="settings_search_title">搜尋行事曆</string>
-    <string name="settings_search_subtitle">下載並將行事曆儲存在您的裝置上以供搜尋。將此關閉將會移除已下載的內容。\n\n搜尋是實驗性的體驗版功能。啟用該功能會讓應用程式不穩定。</string>
+    <string name="settings_search_subtitle">下載並將行事曆儲存在您的裝置上以供搜尋。關閉此功能會移除下載的內容。\n\n搜尋是實驗性的體驗版功能。啟用後有可能會導致應用程式不穩定。</string>
     <string name="settings_alternative_routing_title">允許替代路由</string>
     <string name="settings_alternative_routing_subtitle">萬一 Proton 網站遭到封鎖，此設定允許此應用程式嘗試以替代網路路由連接 Proton，這或有助繞過防火牆或網路問題。建議保持此設定開啟，有備無患。</string>
     <string name="settings_value_placeholder">輕觸以選取</string>
     <string name="settings_general_title">一般</string>
-    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s等。</string>
+    <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s 等。</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s、%2$s</string>
     <string name="settings_general_info_theme">佈景主題</string>
     <string name="settings_general_info_language">語言</string>
@@ -422,7 +422,7 @@
     <string name="settings_calendars">我的行事曆</string>
     <string name="settings_calendars_empty">找不到任何行事曆</string>
     <string name="settings_subscribed_calendars">已訂購授權的行事曆</string>
-    <string name="settings_other_calendars">其他行事曆</string>
+    <string name="settings_other_calendars">其它行事曆</string>
     <string name="settings_calendar_default" comment="Default calendar">預設值</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">已停用</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">未同步</string>
@@ -434,68 +434,68 @@
     <string name="settings_calendar_subscribed_last_sync_old">距離上次更新已超過了12小時以上</string>
     <string name="settings_calendar_subscribed_not_decrypted">行事曆無法解密</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
-    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">僅能檢視</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">起始於%1$s</string>
+    <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">僅供檢視</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">所有人 %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">創建行事曆</string>
     <string name="calendar_form_update_title">編輯行事曆</string>
     <string name="calendar_form_save">儲存</string>
     <string name="calendar_form_name">名稱</string>
-    <string name="calendar_form_description">描述</string>
+    <string name="calendar_form_description">描述說明</string>
     <string name="calendar_form_color">行事曆色彩</string>
     <string name="calendar_form_language">語言</string>
     <string name="calendar_form_default_event_duration">活動持續時間</string>
     <string name="calendar_form_default_event_notifications">活動通知</string>
-    <string name="calendar_form_default_all_day_event_notifications">全日行程通知</string>
+    <string name="calendar_form_default_all_day_event_notifications">全日行程的通知</string>
     <string name="calendar_form_add_notification">加入通知</string>
     <string name="calendar_form_default_email">電郵位址</string>
     <string name="calendar_form_default_email_value_error">無法載入預設電郵</string>
     <string name="calendar_form_name_hint">加入行事曆名稱</string>
     <string name="calendar_form_name_required_error">必須填寫名稱</string>
-    <string name="calendar_form_description_hint">新增行事曆描述</string>
+    <string name="calendar_form_description_hint">加入行事曆的描述說明</string>
     <string name="add_calendar_text">加入行事曆</string>
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">加入</string>
-    <string name="create_calendar_limit_reached">您已達到行事曆數目上限。</string>
-    <string name="create_calendar_limit_reached_title">無法新增更多行事曆</string>
-    <string name="create_calendar_limit_reached_paid_description">您已達到方案中可用的最多 25 個行事曆。\n\n要新增行事曆，請先移除既有的。</string>
-    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">在達到 25 個行事曆的方案限制前，您必須擁有至少一個個人行事曆。</string>
+    <string name="create_calendar_limit_reached">您已用鑿行事曆組的上限。</string>
+    <string name="create_calendar_limit_reached_title">無法再加入任一組行事曆</string>
+    <string name="create_calendar_limit_reached_paid_description">您已用鑿方案中包含的 25 個行事曆。\n\n若需加入新的行事曆，請先移除既有的行事曆。</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_paid_description">您必須先有個人行事曆，接續才會使用方案中包含的 25 組行事曆</string>
     <string name="create_calendar_limit_reached_manage">管理行事曆</string>
-    <string name="create_calendar_limit_reached_free_description">您已達到方案中可用的最多 3 個行事曆。\n\n要新增行事曆，請先移除既有的。</string>
-    <string name="create_mandatory_personal_calendar_limit_reached_free_description">在達到 3 個行事曆的方案限制前，您必須擁有至少一個個人行事曆。</string>
+    <string name="create_calendar_limit_reached_free_description">您已用鑿方案中包含的 3 個行事曆。\n\n請先行移除既存的行事曆後，才可加入新的。</string>
+    <string name="create_mandatory_personal_calendar_limit_reached_free_description">您必須先有個人行事曆，接續才會使用方案中包含的 3 組行事曆</string>
     <string name="create_calendar_limit_reached_error">錯誤</string>
     <string name="delete_calendar_dialog_title">刪除行事曆</string>
     <string name="delete_calendar_dialog_message">您確定要刪除此日曆？</string>
     <string name="remove_calendar_dialog_title">移除行事曆</string>
     <string name="remove_calendar_dialog_message">請問您確定要移除此行事曆？</string>
-    <string name="leave_calendar_dialog_title">離開行事曆</string>
-    <string name="leave_calendar_dialog_message">如果您離開此行事曆，您必須詢問擁有者才能再次加入。</string>
+    <string name="leave_calendar_dialog_title">退出行事曆</string>
+    <string name="leave_calendar_dialog_message">如果您退出此行事曆，爾後需再請擁有者協助才能加入。</string>
     <string name="delete_default_calendar_dialog_message">您確定要刪除此行事曆嗎？「%1$s」將會被設定為預設的行事曆。</string>
     <string name="delete_calendar_snack_deleted">行事曆已刪除</string>
     <string name="remove_calendar_snack_removed">已移除行事曆</string>
     <string name="delete_calendar_snack_error">刪除行事曆時發生錯誤</string>
     <string name="remove_calendar_snack_error">移除行事曆時發生錯誤</string>
-    <string name="leave_calendar_snack_error">離開行事曆時發生錯誤</string>
+    <string name="leave_calendar_snack_error">退出行事曆時發生錯誤</string>
     <string name="delete_calendar_snack_error_password_confirmation">密碼驗證失敗</string>
     <string name="recreate_calendar_dialog_title">清除行事曆</string>
-    <string name="recreate_calendar_dialog_message">此動作將會移除所有事件與被邀請的使用者。\n\n您確定您想要清除此行事曆嗎？</string>
+    <string name="recreate_calendar_dialog_message">此操作會移除所有行程與已邀請的使用者。\n\n您確定您想要清除此行事曆嗎？</string>
     <string name="recreate_calendar_snack_error">清除行事曆時發生錯誤</string>
     <string name="recreate_calendar_snack_deleted">已清除行事曆</string>
-    <string name="recreate_calendar_snack_clearing">正在清除行事曆……</string>
+    <string name="recreate_calendar_snack_clearing">正在清除行事曆…</string>
     <!-- Holiday calendar form -->
     <string name="add_holiday_calendar_title">加入節日行事曆</string>
     <string name="holiday_calendar_title">節日行事曆</string>
-    <string name="add_holiday_calendar_country_search_hint">搜尋國家</string>
+    <string name="add_holiday_calendar_country_search_hint">以國家名稱搜尋</string>
     <string name="holiday_calendar_form_picker_title">國家</string>
-    <string name="holiday_calendar_time_zone_based">依據您的時區</string>
-    <string name="holiday_calendar_already_exists">已新增此節日行事曆。</string>
+    <string name="holiday_calendar_time_zone_based">依據您現在的時區</string>
+    <string name="holiday_calendar_already_exists">已新增此節日行事曆</string>
     <string name="holiday_calendar_value_placeholder">選擇國家</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">確定</string>
     <string name="bootstrap_error_no_calendar_title">無任何與此帳號關聯的行事曆。</string>
-    <string name="bootstrap_error_no_calendar_message">要設定新的行事曆，請造訪<a href="https://calendar.proton.me">calendar.proton.me</a></string>
+    <string name="bootstrap_error_no_calendar_message">設定您專屬的新行事曆，請造訪<a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">準備行事曆時發生錯誤</string>
     <string name="bootstrap_error_some_calendars_failed_message">無法設立以下行事曆</string>
-    <string name="bootstrap_error_no_active_calendar_title">無任何與此帳號關聯的使用中個人行事曆。</string>
+    <string name="bootstrap_error_no_active_calendar_title">現在未有與此帳號關聯且仍使用中的個人行事曆.</string>
     <string name="bootstrap_error_no_active_calendar_message">要了解如何啟用行事曆，請造訪我們的<a href="https://proton.me/support">知識庫</a></string>
     <string name="bootstrap_error_store_quota_reached_message">儲存空間不足。</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">了解更多</string>
@@ -534,7 +534,7 @@
     <string name="spotlight_dialog_easy_switch_description">將活動與其他資料從 Google 行事曆匯入 Proton Calendar 比以往更簡單了。我們的 Easy Switch 匯入程式將指導您完成每一步。</string>
     <string name="spotlight_dialog_easy_switch_positive_button">開始匯入</string>
     <string name="spotlight_dialog_easy_switch_negative_button">稍後再說</string>
-    <string name="spotlight_dialog_auto_invites_title">簡單地同意邀請</string>
+    <string name="spotlight_dialog_auto_invites_title">輕鬆容易地接受邀請函</string>
     <string name="spotlight_dialog_auto_invites_description">現在，邀請會在您的行事曆中以擱置中行程的方式顯示。只要開啟行程回應就可以了。\n\n若要管理此操作，請前往設定。</string>
     <string name="spotlight_dialog_auto_invites_positive_button">下一步</string>
     <string name="spotlight_v5_dialog_got_it_button">了解</string>
@@ -545,13 +545,13 @@
     <string name="spotlight_dialog_week_view_description">• 引入<b>三天</b>與<b>週</b>行事曆檢視。在<b>選單</b>中選取您的偏好檢視方式。\n\n• 使用兩根手指合攏來放大或縮小以調整日期網格中的列高度。</string>
     <string name="spotlight_dialog_search_title">搜尋行程</string>
     <string name="spotlight_dialog_search_description">使用我們的新搜尋功能輕鬆找到您正在尋找的行程。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
-    <string name="spotlight_dialog_import_title">更多新增事件的方式</string>
+    <string name="spotlight_dialog_import_title">更多其它加入行程的方法</string>
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
     <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>
     <string name="spotlight_dialog_calendar_provider_description">• 從其他應用程式直接在 Proton 行事曆新增活動\n\n• 建立並管理行事曆上共享的活動\n\n• 設定開啟此應用程式想要的預設畫面\n\n• 新增 13 種語言.</string>
     <string name="spotlight_dialog_wipe_search_title">已移除試驗性搜索功能以提升服務品質</string>
-    <string name="spotlight_dialog_wipe_search_description">為了提升 Proton Calendar 體驗版的服務與可靠性，我們正在移除試驗性的搜索功能。這可能需要幾秒鐘。</string>
-    <string name="spotlight_dialog_holiday_calendar_title">公眾假期登場 !</string>
+    <string name="spotlight_dialog_wipe_search_description">Proton 致力於帶給您更好用更可靠的行事曆，因此我們會將體驗版的內容移除。此操作可能會佔用數秒鐘。</string>
+    <string name="spotlight_dialog_holiday_calendar_title">公定假日在這兒</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
     <!-- Import -->
