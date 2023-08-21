@@ -408,7 +408,7 @@
     <string name="settings_week_numbers_title">Tampilkan nomor pekan</string>
     <string name="settings_auto_invites_title">Tambah undangan ke kalender dan tandai sebagai menunggu balasan</string>
     <string name="settings_search_title">Cari kalender</string>
-    <string name="settings_search_subtitle">Downloads and stores calendar content on your device for searching. Turning this off will remove downloaded content.\n\nSearch is an experimental beta feature. Enabling it may make the app unstable.</string>
+    <string name="settings_search_subtitle">Mengunduh dan menyimpan konten kalender di perangkat Anda untuk pencarian. Mematikan fitur ini akan menghapus konten yang terunduh.\n\nPencarian adalah fitur beta eksperimental. Mengaktifkannya dapat membuat aplikasi tidak stabil.</string>
     <string name="settings_alternative_routing_title">Izinkan pengalihan lalu lintas alternatif</string>
     <string name="settings_alternative_routing_subtitle">Apabila situs Proton diblokir, pengaturan ini akan memungkinkan aplikasi kami untuk dapat terhubung dengan Proton melalui lalu lintas jaringan alternatif, yang dapat berguna untuk melewati hadangan firewall atau masalah jaringan. Kami sarankan agar pengaturan ini selalu aktif untuk koneksi yang lebih andal.</string>
     <string name="settings_value_placeholder">Ketuk untuk memilih</string>
@@ -549,11 +549,11 @@
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>
     <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
-    <string name="spotlight_dialog_wipe_search_title">Search removed to make it better</string>
-    <string name="spotlight_dialog_wipe_search_description">We\’re removing the experimental search capability from Proton Calendar Beta, as we want to make it more useful and reliable to you. This may take a few seconds.</string>
+    <string name="spotlight_dialog_wipe_search_title">Pencarian dihapus untuk membuatnya lebih baik</string>
+    <string name="spotlight_dialog_wipe_search_description">Kami menghilangkan kemampuan pencarian eksperimental dari Proton Calendar Beta, dalam upaya meningkatkannya supaya lebih berguna dan andal bagi Anda. Ini dapat membutuhkan beberapa detik.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Liburan umum telah hadir!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Tidak ada penjadwalan pertemuan ketika semuanya libur atau lupa merencanakan liburan akhir pekan yang panjang.\n\nTambahkan liburan publik negara mana pun ke kalender Anda.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Tidak ada lagi pertemuan yang dijadwalkan ketika semuanya sedang libur atau melupakan untuk merencanakan liburan akhir pekan yang panjang.\n\nKarena Anda saat ini berada di batas kalender, untuk menambahkan kalender liburan, Anda harus menghapus kalender yang sudah ada terlebih dahulu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>

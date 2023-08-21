@@ -254,7 +254,7 @@
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было отменено.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мои календари</string>
-    <string name="nav_view_subscribed_calendars">Подписанные календари</string>
+    <string name="nav_view_subscribed_calendars">Подписки на календари</string>
     <string name="nav_view_other_calendars">Другие календари</string>
     <string name="nav_view_disabled_calendars">%1$s (Отключён)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Не синхронизирован)</string>
@@ -421,7 +421,7 @@
     <string name="settings_general_info_calendar_layout">вид календаря</string>
     <string name="settings_calendars">Мои календари</string>
     <string name="settings_calendars_empty">Календари не найдены</string>
-    <string name="settings_subscribed_calendars">Подписанные календари</string>
+    <string name="settings_subscribed_calendars">Подписки на календари</string>
     <string name="settings_other_calendars">Другие календари</string>
     <string name="settings_calendar_default" comment="Default calendar">По умолчанию</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Отключен</string>
