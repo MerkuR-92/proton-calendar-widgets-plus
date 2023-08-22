@@ -114,10 +114,12 @@ class HolidayCalendarSearchFragment : BaseDialogFragment<FragmentHolidayCalendar
         holidayCalendarViewModel.holidayCalendars.observe(viewLifecycleOwner) { holidayCalendars ->
             holidayCalendars ?: return@observe
 
+            // We only show visible calendars
+            val visibleHolidayCalendars = holidayCalendars.filter { it.hidden == false }
             lifecycleScope.launch {
                 val primaryTimeZoneId = calendarViewModel.getCalendarUserSettingsPrimaryTimezone() ?: ZoneId.systemDefault().id
                 holidayCalendarList.clear()
-                holidayCalendarList.addAll(holidayCalendars.toHolidayItems(primaryTimeZoneId))
+                holidayCalendarList.addAll(visibleHolidayCalendars.toHolidayItems(primaryTimeZoneId))
                 holidayCalendarListAdapter.submitList(holidayCalendarList)
             }
         }

@@ -39,7 +39,8 @@ class FixCalendarsUseCase @Inject constructor(
             } ?: run {
                 // If user addresses are still null, log and return
                 logger.e("FixCalendarsUseCase, userAddresses are null")
-                return UseCase.Result.Error("FixCalendarsUseCase, userAddresses are null")
+                // We use InvalidParams because we don't want the worker to keep retrying this
+                return UseCase.Result.InvalidParams("FixCalendarsUseCase, userAddresses are null")
             }
 
         val calendarEntities = database.calendarsDao().selectCalendars(userId.id)

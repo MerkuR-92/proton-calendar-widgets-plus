@@ -133,7 +133,7 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
     override fun DayOfWeek.format(firstLetter: Boolean): String {
         val locale = getLocaleForFormatting()
-        val edgeCaseAbbreviation = locale.language == "ca"
+        val edgeCaseAbbreviation = locale.language == "ca" || locale.language == "zh"
         val textStyle = if (!firstLetter) TextStyle.FULL else if (edgeCaseAbbreviation) TextStyle.SHORT else TextStyle.NARROW
         val formatted = this.getDisplayName(
             textStyle,
