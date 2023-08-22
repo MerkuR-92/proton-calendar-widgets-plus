@@ -145,12 +145,12 @@ class HolidayCalendarViewModel @Inject constructor(
         _calendar = calendar
 
         // Init managed holiday calendars with DB data
-        getVisibleManagedHolidayCalendars()?.let { holidayCalendars ->
+        getManagedHolidayCalendars(showHidden = true)?.let { holidayCalendars ->
             _holidayCalendars.value = holidayCalendars
 
             val managedHolidayCalendar = holidayCalendars.firstOrNull { it.calendarId == calendarId } ?: run {
                 // If we failed to find a match with the DB list, refresh the list from remote and retry
-                calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
+                calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
                     _holidayCalendars.value = it
                     fetchedHolidayCalendars = true
                     it.firstOrNull { holidayCalendar -> holidayCalendar.calendarId == calendarId }
@@ -180,7 +180,7 @@ class HolidayCalendarViewModel @Inject constructor(
         }
 
         if (!fetchedHolidayCalendars) {
-            calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let {
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
                 _holidayCalendars.value = it
                 fetchedHolidayCalendars = true
             }
@@ -210,7 +210,7 @@ class HolidayCalendarViewModel @Inject constructor(
         val primaryTimezone = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id) ?: ZoneId.systemDefault().id
 
         // Init managed holiday calendars with DB data
-        getVisibleManagedHolidayCalendars()?.let { holidayCalendars ->
+        getManagedHolidayCalendars(showHidden = false)?.let { holidayCalendars ->
             if (holidayCalendars.isEmpty()) {
                 logger.e("ManagedHolidayCalendars were empty in HolidayCalendarViewModel initCreateHolidayCalendar")
                 displayInitErrorSnack(returnToSettings)
@@ -285,7 +285,15 @@ class HolidayCalendarViewModel @Inject constructor(
     }
 
     fun getLanguages(): List<String> {
-        return _holidayCalendars.value?.filter { it.country == _country.value }?.map { it.language } ?: emptyList()
+        val languages = _holidayCalendars.value?.filter {
+            it.country == _country.value && it.hidden == false
+        }?.map {
+            it.language
+        } ?: emptyList()
+        return language.value?.let {
+            // Add already selected language for cases where user edit hidden calendar
+            languages.plus(it).distinct()
+        } ?: languages.distinct()
     }
 
     fun hasBeenEdited(): Boolean {
@@ -607,17 +615,23 @@ class HolidayCalendarViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getVisibleManagedHolidayCalendars(): List<ManagedHolidayCalendarEntity>? {
+    private suspend fun getManagedHolidayCalendars(showHidden: Boolean): List<ManagedHolidayCalendarEntity>? {
         val userId = userId.value
         if (userId == null) {
             logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
-        val dbVisibleManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)?.filter { it.hidden == false }
-        return if (dbVisibleManagedHolidayCalendars.isNullOrEmpty()) {
+        val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)?.let {
+            if (showHidden) it
+            else it.filter { it.hidden == false }
+        }
+        return if (dbManagedHolidayCalendars.isNullOrEmpty()) {
             fetchedHolidayCalendars = true
-            calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.filter { it.hidden == false }
-        } else dbVisibleManagedHolidayCalendars
+            calendarsRepository.refreshManagedHolidayCalendars(userId)?.let {
+                if (showHidden) it
+                else it.filter { it.hidden == false }
+            }
+        } else dbManagedHolidayCalendars
     }
 
     private fun fetchCachedViewsEvents(
