@@ -57,6 +57,8 @@ android {
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         resourceConfigurations.addAll(Config.resourceConfigurations)
 
+        buildConfigField("String", "ACCOUNT_SENTRY_DSN", null.toBuildConfigValue())
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
@@ -100,6 +102,9 @@ android {
 
             val sentryDsn = System.getenv("SENTRY_DSN_NEW")
             buildConfigField("String", "SENTRY_DSN_NEW", sentryDsn.toBuildConfigValue())
+
+            val accountSentryDsn = System.getenv("ACCOUNT_SENTRY_DSN")
+            buildConfigField("String", "ACCOUNT_SENTRY_DSN", accountSentryDsn.toBuildConfigValue())
         }
         debug {
             buildConfigField("String", "SENTRY_DSN_NEW", null.toBuildConfigValue())
