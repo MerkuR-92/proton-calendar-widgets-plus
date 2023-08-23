@@ -1436,67 +1436,134 @@ class EventViewModel @Inject constructor(
         timeFormatIs24Hour: Boolean
     ) {
 
-        val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
-        if (showSaveOptionPicker && !eventId.isNullOrEmpty()) {
-            val singleEditsInfo = getSingleEditsInfo()
-
-            // Display Add Participants Dialog (adding attendees to an existing event)
-            uiScope.launch {
-                displayDialog.alertDialog(
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_title),
-                    resourceProvider.provideString(
-                        if (hasExDates() || singleEditsInfo?.hasSingleEdit == true) R.string.event_add_participants_overwrite_dialog_description
-                        else R.string.event_add_participants_dialog_description
-                    ),
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
-                    object: BaseDialogFragment.DialogListener {
-                        override fun onPositive(selectedItem: Int) {
-                            coroutineScope.launch {
-                                saveEventWithAttendeesSendPreferences(
-                                    displayDialog,
-                                    true,
-                                    occurrenceNumber,
-                                    timeFormatIs24Hour
-                                )
+        if (dbEvent == null || dbEvent?.iCalEvent?.attendees.isNullOrEmpty()) {
+            // Create an event with attendees / add attendees to an event
+            val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
+            if (showSaveOptionPicker && !eventId.isNullOrEmpty()) {
+                // Create a recurring event with attendees / add attendees to a recurring event
+                val singleEditsInfo = getSingleEditsInfo()
+                // Display Add Participants Dialog (adding attendees to an existing event)
+                uiScope.launch {
+                    displayDialog.alertDialog(
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_title),
+                        resourceProvider.provideString(
+                            if (hasExDates() || singleEditsInfo?.hasSingleEdit == true) R.string.event_add_participants_overwrite_dialog_description
+                            else R.string.event_add_participants_dialog_description
+                        ),
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
+                        object: BaseDialogFragment.DialogListener {
+                            override fun onPositive(selectedItem: Int) {
+                                coroutineScope.launch {
+                                    saveEventWithAttendeesSendPreferences(
+                                        displayDialog,
+                                        true,
+                                        occurrenceNumber,
+                                        timeFormatIs24Hour
+                                    )
+                                }
                             }
+                            override fun onNegative() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onCancel() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onDismiss() {}
                         }
-                        override fun onNegative() { eventFormState.value = EventState.Idle
+                    )
+                }
+            } else {
+                // Create a single event with attendees / add attendees to a single event
+                // Display Send Invitation Dialog
+                uiScope.launch {
+                    displayDialog.alertDialog(
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_title),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_description),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
+                        object: BaseDialogFragment.DialogListener {
+                            override fun onPositive(selectedItem: Int) {
+                                coroutineScope.launch {
+                                    saveEventWithAttendeesSendPreferences(
+                                        displayDialog,
+                                        false,
+                                        occurrenceNumber,
+                                        timeFormatIs24Hour
+                                    )
+                                }
+                            }
+                            override fun onNegative() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onCancel() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onDismiss() {}
                         }
-                        override fun onCancel() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onDismiss() {}
-                    }
-                )
+                    )
+                }
             }
         } else {
+            // Update existing invitation
+            // Changes not requiring email update
+            //  Start / end or time zone if it doesn't change UTC time
+            //  Notifications
+            //  Calendar
 
-            // Display Send Invitation Dialog (create an event with attendees / add attendees to a single event)
-            uiScope.launch {
-                displayDialog.alertDialog(
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_title),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_description),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
-                    object: BaseDialogFragment.DialogListener {
-                        override fun onPositive(selectedItem: Int) {
-                            coroutineScope.launch {
-                                saveEventWithAttendeesSendPreferences(
-                                    displayDialog,
-                                    false,
-                                    occurrenceNumber,
-                                    timeFormatIs24Hour
-                                )
+            // Changes requiring email update
+            //  Title
+            //  Description
+            //  Location
+            //  Start / end or time zone if it changes UTC time
+            //  Recurrence rule
+            if (dbEvent?.summary != event.summary
+                || dbEvent?.description != event.description
+                || dbEvent?.location != event.location
+                || dbEvent?.getStart(dbEvent?.defaultTimeZone ?: eventTimeZoneId) != event.getStart(event.defaultTimeZone ?: eventTimeZoneId)
+                || dbEvent?.getEnd(dbEvent?.defaultTimeZone ?: eventTimeZoneId) != event.getEnd(event.defaultTimeZone ?: eventTimeZoneId)
+                || dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule) {
+                // Send an email update
+                // TODO
+            } else {
+                // Do not send an email update
+                if (event.isRecurring()) {
+                    // Display edit all events dialog
+                    uiScope.launch {
+                        displayDialog.alertDialog(
+                            resourceProvider.provideString(R.string.update_recurring_event),
+                            resourceProvider.provideString(R.string.update_recurring_all_events),
+                            resourceProvider.provideString(R.string.dialog_button_update),
+                            resourceProvider.provideString(R.string.dialog_button_cancel),
+                            object: BaseDialogFragment.DialogListener {
+                                override fun onPositive(selectedItem: Int) {
+                                    coroutineScope.launch {
+                                        // Save event
+                                        handleSave(
+                                            EventEditDeleteOption.ALL_EVENTS,
+                                            occurrenceNumber,
+                                            timeFormatIs24Hour,
+                                            mapOf(),
+                                            sendEmailUpdate = false
+                                        )
+                                    }
+                                }
+                                override fun onNegative() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onCancel() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onDismiss() {}
                             }
-                        }
-                        override fun onNegative() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onCancel() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onDismiss() {}
+                        )
                     }
-                )
+                } else {
+                    // Save event
+                    handleSave(
+                        null,
+                        occurrenceNumber = 1,
+                        timeFormatIs24Hour,
+                        mapOf(),
+                        sendEmailUpdate = false
+                    )
+                }
             }
+
         }
     }
 
@@ -1794,7 +1861,8 @@ class EventViewModel @Inject constructor(
         editOption: EventEditDeleteOption? = null,
         occurrenceNumber: Int,
         timeFormatIs24Hours: Boolean,
-        sendPreferences: Map<Email, SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>,
+        sendEmailUpdate: Boolean = true
     ) {
 
         // Post saving event value to true to trigger loading state
@@ -1813,7 +1881,8 @@ class EventViewModel @Inject constructor(
             eventTimeZoneId,
             userId,
             rruleManuallyEdited,
-            isCreate
+            isCreate,
+            sendEmailUpdate
         )
 
         handleSaveResult.ifSuccessAndLogErrors(logger) {}

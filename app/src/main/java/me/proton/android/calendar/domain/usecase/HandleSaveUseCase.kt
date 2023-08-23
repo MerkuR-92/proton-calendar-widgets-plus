@@ -61,7 +61,8 @@ class HandleSaveUseCase @Inject constructor(
         eventTimeZoneId: String,
         userId: UserId,
         rruleManuallyEdited: Boolean,
-        isCreate: Boolean
+        isCreate: Boolean,
+        sendEmailUpdate: Boolean
     ): UseCase.Result {
 
         if (event.isAllDay()) {
@@ -139,7 +140,7 @@ class HandleSaveUseCase @Inject constructor(
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
-        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
+        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && sendEmailUpdate) {
             editEventWithAttendees(
                 userId,
                 newEvent,

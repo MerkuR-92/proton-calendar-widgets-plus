@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Close</string>
     <string name="dialog_button_remove">Remove</string>
     <string name="dialog_button_download">Download</string>
+    <string name="dialog_button_update">Update</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">A cancellation email will be sent to the event participants. Would you like to delete this event?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Your address is disabled. A cancellation email cannot be sent to the event participants. Would you like to delete this event anyway?</string>
@@ -149,6 +150,8 @@
     <string name="invite_change_calendar_disclaimer">It is not possible to modify the calendar associated with invitations.</string>
     <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Changing calendar for recurring event is not yet possible.</string>
+    <string name="update_recurring_event">Update recurring event</string>
+    <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">What are you looking for?</string>
     <string name="search_empty_results_title">No results found</string>
