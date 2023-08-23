@@ -474,4 +474,11 @@ object AppDatabaseMigrations {
             database.addTableColumn(TABLE_MANAGED_HOLIDAY_CALENDARS, "hidden", "INTEGER")
         }
     }
+
+    val MIGRATION_59_60 = object : Migration(59, 60) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            UserDatabase.MIGRATION_3.migrate(database)
+            AccountDatabase.MIGRATION_6.migrate(database)
+        }
+    }
 }
