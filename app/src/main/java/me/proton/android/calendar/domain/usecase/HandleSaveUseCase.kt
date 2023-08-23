@@ -62,7 +62,7 @@ class HandleSaveUseCase @Inject constructor(
         userId: UserId,
         rruleManuallyEdited: Boolean,
         isCreate: Boolean,
-        sendEmailUpdate: Boolean
+        sendEmailUpdate: Boolean?
     ): UseCase.Result {
 
         if (event.isAllDay()) {
@@ -139,15 +139,15 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
-
-        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && sendEmailUpdate) {
+        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && (sendEmailUpdate == null || sendEmailUpdate == true)) {
             editEventWithAttendees(
                 userId,
                 newEvent,
                 isCreate,
                 sendPreferences,
                 event.defaultTimeZone!!,
-                timeFormatIs24Hours
+                timeFormatIs24Hours,
+                sendEmailUpdate
             )
         } else if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
             createEventWithAttendees(
@@ -635,7 +635,8 @@ class HandleSaveUseCase @Inject constructor(
         isCreate: Boolean,
         sendPreferences: Map<Email, SendPreferences>,
         defaultTimeZone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendEmailUpdate: Boolean?
     ): UseCase.Result {
         val sendEmailResult = sendEmailUseCase.sendInviteToAttendees(
             userId,
@@ -644,7 +645,8 @@ class HandleSaveUseCase @Inject constructor(
             newEvent,
             sendPreferences,
             defaultTimeZone,
-            timeFormatIs24Hours
+            timeFormatIs24Hours,
+            sendEmailUpdate
         )
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
