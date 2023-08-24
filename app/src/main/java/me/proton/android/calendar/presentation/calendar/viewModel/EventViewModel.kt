@@ -1667,10 +1667,15 @@ class EventViewModel @Inject constructor(
                                 override fun onPositive(selectedItem: Int) {
                                     coroutineScope.launch {
 
-                                        // Remove attendees whom emails were invalid
-                                        eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
-                                            sendPreferencesResults.emailErrors.any { emailError ->
-                                                attendee.extractEmail() == emailError.key
+                                        if (sendEmailUpdate == true) {
+                                            // In case of edit of an invitation, participants that have errors in
+                                            // send preferences are not removed from the event.
+                                        } else {
+                                            // Remove attendees whom emails were invalid
+                                            eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
+                                                sendPreferencesResults.emailErrors.any { emailError ->
+                                                    attendee.extractEmail() == emailError.key
+                                                }
                                             }
                                         }
 
@@ -2014,7 +2019,7 @@ class EventViewModel @Inject constructor(
                     // Display invitation failed to be sent snack
                     eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(
-                            R.string.snack_event_updated_error_failed_mail
+                            R.string.snack_update_event_error_failed_mail
                         )
                     )
                 }

@@ -300,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Participation status updated.</string>
     <string name="snack_event_updated">Event updated</string>
     <string name="snack_event_updated_error_failed_mail">Invitation failed to be sent</string>
+    <string name="snack_update_event_error_failed_mail">Update failed</string>
     <string name="snack_event_updated_error">Error updating event</string>
     <string name="snack_event_created">Event created</string>
     <string name="snack_event_created_failed_mail">Event created but invitation failed to be sent</string>

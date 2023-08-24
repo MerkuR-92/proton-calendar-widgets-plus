@@ -172,7 +172,15 @@ class SendEmailUseCase @Inject constructor(
 
         val attachmentBytes = ics.toByteArray()
 
-        val attendeeEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }
+        val attendeeEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }.filter { attendeeEmail ->
+            if (sendEmailUpdate == true) {
+                // In case of edit of an invitation, participants that have errors in
+                // send preferences are not removed from the event. We need to filter them out here.
+                sendPreferences.keys.any { email ->
+                    attendeeEmail == email
+                }
+            } else false
+        }
 
         val sendEmailArguments = SendEmailDirect.Arguments(
             mailContent.first,

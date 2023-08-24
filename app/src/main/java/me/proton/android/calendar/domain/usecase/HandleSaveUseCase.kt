@@ -638,16 +638,22 @@ class HandleSaveUseCase @Inject constructor(
         timeFormatIs24Hours: Boolean,
         sendEmailUpdate: Boolean?
     ): UseCase.Result {
-        val sendEmailResult = sendEmailUseCase.sendInviteToAttendees(
-            userId,
-            newEvent,
-            isCreate,
-            newEvent,
-            sendPreferences,
-            defaultTimeZone,
-            timeFormatIs24Hours,
-            sendEmailUpdate
-        )
+        val sendEmailResult =
+            if (sendEmailUpdate == true && sendPreferences.isEmpty()) {
+                // When editing an invitation, we still update the event if no participants can be notified.
+                UseCase.Result.Success<Unit>()
+            } else {
+                sendEmailUseCase.sendInviteToAttendees(
+                    userId,
+                    newEvent,
+                    isCreate,
+                    newEvent,
+                    sendPreferences,
+                    defaultTimeZone,
+                    timeFormatIs24Hours,
+                    sendEmailUpdate
+                )
+            }
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
         if (sendEmailResult is UseCase.Result.Error) {
