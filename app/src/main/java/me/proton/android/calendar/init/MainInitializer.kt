@@ -36,6 +36,7 @@ class MainInitializer : Initializer<Unit> {
 
     override fun dependencies() = listOf(
         KoinInitializer::class.java,
+        FeatureFlagInitializer::class.java,
         AccountStateHandlerInitializer::class.java,
         CalendarEventManagerInitializer::class.java,
         CryptoValidatorInitializer::class.java,
