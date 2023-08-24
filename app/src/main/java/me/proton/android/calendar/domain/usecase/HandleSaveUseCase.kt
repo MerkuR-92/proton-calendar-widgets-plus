@@ -139,6 +139,7 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
+
         return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && (sendEmailUpdate == null || sendEmailUpdate == true)) {
             editEventWithAttendees(
                 userId,

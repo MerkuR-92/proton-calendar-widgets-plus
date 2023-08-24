@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CONTACTS_SEARCH_QUERY
 import me.proton.android.calendar.common.FormValidation.ATTENDEE_MAX_ALLOWED
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils.clearFocusAndHideKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.onTextChange
