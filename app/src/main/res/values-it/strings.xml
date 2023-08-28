@@ -162,7 +162,7 @@
     <string name="search_settings_dialog_toggle_on_title">Scaricare i calendari su questo dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Questo è necessario per poter effettuare la ricerca.</string>
     <string name="search_onboarding_header">Hai bisogno di cercare nel tuo calendario?</string>
-    <string name="search_onboarding_text">Per iniziare, è necessario scaricare una copia cifrata dei tuoi calendari. Questa operazione richiederà solo pochi istanti e potrai continuare a utilizzare l\'applicazione. <a href="https://proton.me/support/calendar-search">Scopri di più</a></string>
+    <string name="search_onboarding_text">Per iniziare, è necessario scaricare una copia crittografata dei tuoi calendari. Questa operazione richiederà solo pochi istanti e potrai continuare a utilizzare l\'applicazione. <a href="https://proton.me/support/calendar-search">Scopri di più</a></string>
     <string name="search_onboarding_action_download_calendars">Scarica i calendari</string>
     <string name="search_onboarding_action_pause">Pausa</string>
     <string name="search_onboarding_action_resume">Riprendi</string>
