@@ -414,6 +414,8 @@ class ItemMiniCalendarFragment : Fragment() {
         // Apply styles to month mini calendar
         if (selectedMiniCalendarItem != newSelectedMiniCalendarItem && firstDayOfTheMonth.month == selectedDate.month) {
 
+            if (!isResumed) return // TODO ViewBinding NPE
+
             val selectedMiniCalendarItem = selectedMiniCalendarItem
             if (selectedMiniCalendarItem != null && selectedMiniCalendarItem >= 0) {
 

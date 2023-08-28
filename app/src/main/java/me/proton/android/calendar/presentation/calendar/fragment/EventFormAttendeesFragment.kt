@@ -102,7 +102,8 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
                     contacts.map { Attendee(it.name, it.email) }
                 )
 
-                if (!attendeeListAdapter.currentList.isNullOrEmpty()) {
+                if (this@EventFormAttendeesFragment::attendeeListAdapter.isInitialized
+                    && attendeeListAdapter.currentList.isNotEmpty()) {
                     withStarted {
                         attendeeListAdapter.submitList(
                             ProtonUtilsImpl.matchAttendeesWithContacts(
