@@ -705,28 +705,29 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
         shouldDisplayServerDownBannerLiveData = calendarViewModel.shouldDisplayServerDownBanner()
         shouldDisplayServerDownBannerLiveData.observe(this@MainActivity) { shouldDisplayServerDownBanner ->
+            if (!shouldDisplayServerDownBanner) return@observe
             lifecycleScope.launch {
                 val isServerDownBannerEnabled = featureFlagViewModel.isServerDownBannerEnabled()
-                val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
-                // We only display the banner if the user is in the main view
-                if (shouldDisplayServerDownBanner && isServerDownBannerEnabled && currentViewIsCalendar) {
-                    withStarted {
-                        this@MainActivity.findViewById<View>(android.R.id.content).errorSnack(
-                            getString(R.string.snack_down_banner),
-                            getString(R.string.snack_down_banner_action),
-                            actionOnClick = {
-                                // Open Proton status page
-                                val browserIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://status.proton.me/")
-                                )
-                                startActivity(browserIntent)
-                            },
-                            length = TimeUnit.SECONDS.toMillis(SERVER_DOWN_BANNER_DURATION_SECONDS).toInt()
-                        )
-                        // Clear value so we don't show it everytime user opens the main view
-                        calendarViewModel.hideServerDownBanner()
-                    }
+                if (!isServerDownBannerEnabled) return@launch
+                withStarted {
+                    val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
+                    if (!currentViewIsCalendar) return@withStarted
+                    // We only display the banner if the user is in the main view
+                    this@MainActivity.findViewById<View>(android.R.id.content).errorSnack(
+                        getString(R.string.snack_down_banner),
+                        getString(R.string.snack_down_banner_action),
+                        actionOnClick = {
+                            // Open Proton status page
+                            val browserIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://status.proton.me/")
+                            )
+                            startActivity(browserIntent)
+                        },
+                        length = TimeUnit.SECONDS.toMillis(SERVER_DOWN_BANNER_DURATION_SECONDS).toInt()
+                    )
+                    // Clear value so we don't show it everytime user opens the main view
+                    calendarViewModel.hideServerDownBanner()
                 }
             }
         }
