@@ -527,7 +527,7 @@
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">最新消息</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
-    <string name="spotlight_dialog_skip">跳過</string>
+    <string name="spotlight_dialog_skip">略過</string>
     <string name="spotlight_dialog_confirmation_button">確定</string>
     <string name="spotlight_dialog_month_view_title">月份檢視</string>
     <string name="spotlight_dialog_month_view_description">在我們新的月份檢視取得您活動的概覽。使用選單在檢視模式間切換。</string>
