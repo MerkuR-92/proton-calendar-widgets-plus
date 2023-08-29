@@ -497,11 +497,19 @@ object IcsSurgeryUtils {
             // TODO Can we spot this parameter with some other method ? Trigger doesn't seem to be parsed by biweekly
             if (alarm.toString().contains("RELATED=[END]")) {
                 alarmsIterator.remove()
+                continue
+            }
+
+            // Alarms without trigger are discarded
+            if (alarm.trigger == null) {
+                alarmsIterator.remove()
+                continue
             }
 
             // Alarms with positive triggers (i.e. alarms that are triggered after the event started) are not supported
             if (alarm.trigger?.duration != null && alarm.trigger.duration.toMillis() > 0) {
                 alarmsIterator.remove()
+                continue
             }
 
             // Action is mandatory according to RFC.

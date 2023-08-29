@@ -316,6 +316,43 @@ internal class ImportIcsSurgeryUtilsTest {
             assertThat(event.alarms.size).isEqualTo(3)
             event.cleanAlarms()
             assertThat(event.alarms.size).isEqualTo(1)
+            assertThat(event.alarms.first().trigger).isNotNull()
+        }
+    }
+
+    @Test
+    fun `cleanAlarms VALARM with null TRIGGER`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:icalendar
+    CALSCALE:GREGORIAN
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    DTSTAMP:20210204T130756Z
+    DTSTART;TZID=Europe/Paris:20210223T090000
+    DTEND;TZID=Europe/Paris:20210223T094000
+    CLASS:PRIVATE
+    PRIORITY:2
+    SUMMARY:Test alarms
+    BEGIN:VALARM
+    ACTION:DISPLAY
+    END:VALARM
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanRawIcsResult = iCalString.cleanRawIcs()
+        assertThat(cleanRawIcsResult is IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).isTrue()
+        val cleanICalString = (cleanRawIcsResult as IcsSurgeryUtils.HandleIcsResult.RawParsingSuccessful).cleanICalString
+
+        val iCalendar = Biweekly.parse(cleanICalString).first()
+        assertThat(iCalendar).isNotNull()
+        iCalendar.events.forEach { event ->
+            assertThat(event.alarms.size).isEqualTo(1)
+            event.cleanAlarms()
+            assertThat(event.alarms.size).isEqualTo(0)
         }
     }
 
