@@ -84,6 +84,7 @@ val addressType = AddressType.Original
 
 const val currency = "EUR"
 const val credit = 50
+const val createdAtUtc = 1692883228263L
 const val usedSpace = 0L
 const val maxSpace = 3096L
 const val maxUpload = 3096L

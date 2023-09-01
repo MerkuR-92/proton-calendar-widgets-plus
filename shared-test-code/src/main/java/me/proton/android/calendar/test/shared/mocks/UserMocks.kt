@@ -48,6 +48,7 @@ object UserMocks {
             displayName = userDisplayName,
             currency = currency,
             credit = credit,
+            createdAtUtc = createdAtUtc,
             usedSpace = usedSpace,
             maxSpace = maxSpace,
             maxUpload = maxUpload,
