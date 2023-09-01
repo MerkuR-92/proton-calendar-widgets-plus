@@ -52,7 +52,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Success snack
@@ -91,7 +91,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -202,7 +203,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Edit option picker dialog
@@ -253,7 +254,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -314,7 +316,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Edit option picker dialog
@@ -372,7 +374,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -435,7 +438,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Edit option picker dialog
@@ -493,7 +496,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -556,7 +560,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Edit option picker dialog
@@ -624,7 +628,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = true,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -686,7 +691,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Send invitation dialog
@@ -734,7 +739,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -805,7 +811,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Send invitation dialog
@@ -854,7 +860,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -920,7 +927,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.HandleSave.EditSendEmail)
 
             // Send invitation dialog
@@ -988,7 +995,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = false
+                    isCreate = false,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -1063,7 +1071,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Success<Unit>()
 
             // Send invitation dialog
@@ -1131,7 +1139,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 )
             }
 
@@ -1205,7 +1214,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Handle save use case call with error (empty send prefs so failed to send mail)
             coEvery {
-                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
+                handleSaveUseCaseMock.handleSave(any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
             } returns UseCase.Result.Error("Failed to send mail", UseCase.Error.HandleSave.CreateSendEmail)
 
             // Send invitation dialog
@@ -1272,7 +1281,8 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 )
             }
 

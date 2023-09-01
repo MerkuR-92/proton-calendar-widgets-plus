@@ -1379,18 +1379,6 @@ class EventViewModel @Inject constructor(
             // Allow saving with no edition if creating an event
             if (eventId.isNullOrEmpty() || hasEventBeenEdited()) {
 
-                // Check if event wasn't changed to invitation shortly before saving
-                val isApiEventAnInvitation = isApiEventAnInvitation()
-                if (!isEventNew() && isApiEventAnInvitation != false) {
-                    eventFormSnackState.value = EventSnackState.DisplaySnack(
-                        resourceProvider.provideString(
-                            if (isApiEventAnInvitation == null) R.string.snack_event_updated_error
-                            else R.string.snack_event_edit_with_attendees_error
-                        )
-                    )
-                    return
-                }
-
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving
 
@@ -1448,66 +1436,188 @@ class EventViewModel @Inject constructor(
         timeFormatIs24Hour: Boolean
     ) {
 
-        val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
-        if (showSaveOptionPicker && !eventId.isNullOrEmpty()) {
-            val singleEditsInfo = getSingleEditsInfo()
-
-            // Display Add Participants Dialog (adding attendees to an existing event)
-            uiScope.launch {
-                displayDialog.alertDialog(
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_title),
-                    resourceProvider.provideString(
-                        if (hasExDates() || singleEditsInfo?.hasSingleEdit == true) R.string.event_add_participants_overwrite_dialog_description
-                        else R.string.event_add_participants_dialog_description
-                    ),
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
-                    resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
-                    object: BaseDialogFragment.DialogListener {
-                        override fun onPositive(selectedItem: Int) {
-                            coroutineScope.launch {
-                                saveEventWithAttendeesSendPreferences(
-                                    displayDialog,
-                                    true,
-                                    occurrenceNumber,
-                                    timeFormatIs24Hour
-                                )
+        if (dbEvent == null || dbEvent?.iCalEvent?.attendees.isNullOrEmpty()) {
+            // Create an event with attendees / add attendees to an event
+            val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
+            if (showSaveOptionPicker && !eventId.isNullOrEmpty()) {
+                // Create a recurring event with attendees / add attendees to a recurring event
+                val singleEditsInfo = getSingleEditsInfo()
+                // Display Add Participants Dialog (adding attendees to an existing event)
+                uiScope.launch {
+                    displayDialog.alertDialog(
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_title),
+                        resourceProvider.provideString(
+                            if (hasExDates() || singleEditsInfo?.hasSingleEdit == true) R.string.event_add_participants_overwrite_dialog_description
+                            else R.string.event_add_participants_dialog_description
+                        ),
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_confirm),
+                        resourceProvider.provideString(R.string.event_add_participants_dialog_cancel),
+                        object: BaseDialogFragment.DialogListener {
+                            override fun onPositive(selectedItem: Int) {
+                                coroutineScope.launch {
+                                    saveEventWithAttendeesSendPreferences(
+                                        displayDialog,
+                                        true,
+                                        occurrenceNumber,
+                                        timeFormatIs24Hour
+                                    )
+                                }
                             }
+                            override fun onNegative() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onCancel() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onDismiss() {}
                         }
-                        override fun onNegative() { eventFormState.value = EventState.Idle
+                    )
+                }
+            } else {
+                // Create a single event with attendees / add attendees to a single event
+                // Display Send Invitation Dialog
+                uiScope.launch {
+                    displayDialog.alertDialog(
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_title),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_description),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
+                        resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
+                        object: BaseDialogFragment.DialogListener {
+                            override fun onPositive(selectedItem: Int) {
+                                coroutineScope.launch {
+                                    saveEventWithAttendeesSendPreferences(
+                                        displayDialog,
+                                        false,
+                                        occurrenceNumber,
+                                        timeFormatIs24Hour
+                                    )
+                                }
+                            }
+                            override fun onNegative() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onCancel() { eventFormState.value = EventState.Idle
+                            }
+                            override fun onDismiss() {}
                         }
-                        override fun onCancel() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onDismiss() {}
-                    }
-                )
+                    )
+                }
             }
         } else {
+            // Update existing invitation
+            // Changes not requiring email update
+            //  Start / end or time zone if it doesn't change UTC time
+            //  Notifications
+            //  Calendar
 
-            // Display Send Invitation Dialog (create an event with attendees / add attendees to a single event)
-            uiScope.launch {
-                displayDialog.alertDialog(
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_title),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_description),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_confirm),
-                    resourceProvider.provideString(R.string.event_send_invite_dialog_cancel),
-                    object: BaseDialogFragment.DialogListener {
-                        override fun onPositive(selectedItem: Int) {
-                            coroutineScope.launch {
-                                saveEventWithAttendeesSendPreferences(
-                                    displayDialog,
-                                    false,
-                                    occurrenceNumber,
-                                    timeFormatIs24Hour
-                                )
+            // Changes requiring email update
+            //  Title
+            //  Description
+            //  Location
+            //  Start / end or time zone if it changes UTC time
+            //  Recurrence rule
+            if (dbEvent?.summary != event.summary
+                || dbEvent?.description != event.description
+                || dbEvent?.location != event.location
+                || dbEvent?.getStart(dbEvent?.defaultTimeZone ?: eventTimeZoneId) != event.getStart(event.defaultTimeZone ?: eventTimeZoneId)
+                || dbEvent?.getEnd(dbEvent?.defaultTimeZone ?: eventTimeZoneId) != event.getEnd(event.defaultTimeZone ?: eventTimeZoneId)
+                || dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule) {
+                // Send an email update
+                if (event.isRecurring()) {
+                    // Display update all events and send invitation Dialog
+                    uiScope.launch {
+                        displayDialog.alertDialog(
+                            resourceProvider.provideString(R.string.update_recurring_event),
+                            resourceProvider.provideString(R.string.update_recurring_invite_send_invitation),
+                            resourceProvider.provideString(R.string.dialog_button_update),
+                            resourceProvider.provideString(R.string.dialog_button_cancel),
+                            object: BaseDialogFragment.DialogListener {
+                                override fun onPositive(selectedItem: Int) {
+                                    coroutineScope.launch {
+                                        saveEventWithAttendeesSendPreferences(
+                                            displayDialog,
+                                            true,
+                                            occurrenceNumber,
+                                            timeFormatIs24Hour,
+                                            sendEmailUpdate = true
+                                        )
+                                    }
+                                }
+                                override fun onNegative() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onCancel() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onDismiss() {}
                             }
-                        }
-                        override fun onNegative() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onCancel() { eventFormState.value = EventState.Idle
-                        }
-                        override fun onDismiss() {}
+                        )
                     }
-                )
+                } else {
+                    // Display send invitation Dialog
+                    uiScope.launch {
+                        displayDialog.alertDialog(
+                            resourceProvider.provideString(R.string.update_event),
+                            resourceProvider.provideString(R.string.update_invite_send_invitation),
+                            resourceProvider.provideString(R.string.dialog_button_update),
+                            resourceProvider.provideString(R.string.dialog_button_cancel),
+                            object: BaseDialogFragment.DialogListener {
+                                override fun onPositive(selectedItem: Int) {
+                                    coroutineScope.launch {
+                                        saveEventWithAttendeesSendPreferences(
+                                            displayDialog,
+                                            false,
+                                            occurrenceNumber,
+                                            timeFormatIs24Hour,
+                                            sendEmailUpdate = true
+                                        )
+                                    }
+                                }
+                                override fun onNegative() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onCancel() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onDismiss() {}
+                            }
+                        )
+                    }
+                }
+            } else {
+                // Do not send an email update
+                if (event.isRecurring()) {
+                    // Display edit all events dialog
+                    uiScope.launch {
+                        displayDialog.alertDialog(
+                            resourceProvider.provideString(R.string.update_recurring_event),
+                            resourceProvider.provideString(R.string.update_recurring_all_events),
+                            resourceProvider.provideString(R.string.dialog_button_update),
+                            resourceProvider.provideString(R.string.dialog_button_cancel),
+                            object: BaseDialogFragment.DialogListener {
+                                override fun onPositive(selectedItem: Int) {
+                                    coroutineScope.launch {
+                                        // Save event
+                                        handleSave(
+                                            EventEditDeleteOption.ALL_EVENTS,
+                                            occurrenceNumber,
+                                            timeFormatIs24Hour,
+                                            mapOf(),
+                                            sendEmailUpdate = false
+                                        )
+                                    }
+                                }
+                                override fun onNegative() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onCancel() { eventFormState.value = EventState.Idle
+                                }
+                                override fun onDismiss() {}
+                            }
+                        )
+                    }
+                } else {
+                    // Save event
+                    handleSave(
+                        null,
+                        occurrenceNumber = 1,
+                        timeFormatIs24Hour,
+                        mapOf(),
+                        sendEmailUpdate = false
+                    )
+                }
             }
         }
     }
@@ -1519,7 +1629,8 @@ class EventViewModel @Inject constructor(
         displayDialog: BaseDialogFragment.DisplayDialog,
         isAddParticipantsToRecurring: Boolean,
         occurrenceNumber: Int,
-        timeFormatIs24Hour: Boolean
+        timeFormatIs24Hour: Boolean,
+        sendEmailUpdate: Boolean? = null
     ) {
         val attendeesEmails = eventLiveData.value?.iCalEvent?.attendees?.mapNotNull { it.extractEmail() }
         if (!attendeesEmails.isNullOrEmpty()) {
@@ -1556,10 +1667,15 @@ class EventViewModel @Inject constructor(
                                 override fun onPositive(selectedItem: Int) {
                                     coroutineScope.launch {
 
-                                        // Remove attendees whom emails were invalid
-                                        eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
-                                            sendPreferencesResults.emailErrors.any { emailError ->
-                                                attendee.extractEmail() == emailError.key
+                                        if (sendEmailUpdate == true) {
+                                            // In case of edit of an invitation, participants that have errors in
+                                            // send preferences are not removed from the event.
+                                        } else {
+                                            // Remove attendees whom emails were invalid
+                                            eventLiveData.value?.iCalEvent?.attendees?.removeIf { attendee ->
+                                                sendPreferencesResults.emailErrors.any { emailError ->
+                                                    attendee.extractEmail() == emailError.key
+                                                }
                                             }
                                         }
 
@@ -1570,7 +1686,8 @@ class EventViewModel @Inject constructor(
                                                 EventEditDeleteOption.ALL_EVENTS,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
-                                                sendPreferencesResults.sendPreferences
+                                                sendPreferencesResults.sendPreferences,
+                                                sendEmailUpdate
                                             )
                                         } else {
                                             // Create an event with attendees / Add attendees to a single event
@@ -1578,7 +1695,8 @@ class EventViewModel @Inject constructor(
                                                 displayDialog,
                                                 sendPreferencesResults.sendPreferences,
                                                 occurrenceNumber,
-                                                timeFormatIs24Hour
+                                                timeFormatIs24Hour,
+                                                sendEmailUpdate
                                             )
                                         }
                                     }
@@ -1601,7 +1719,8 @@ class EventViewModel @Inject constructor(
                         EventEditDeleteOption.ALL_EVENTS,
                         occurrenceNumber,
                         timeFormatIs24Hour,
-                        sendPreferencesResults.sendPreferences
+                        sendPreferencesResults.sendPreferences,
+                        sendEmailUpdate
                     )
                 } else {
                     // Create an event with attendees / Add attendees to a single event
@@ -1609,7 +1728,8 @@ class EventViewModel @Inject constructor(
                         displayDialog,
                         sendPreferencesResults.sendPreferences,
                         occurrenceNumber,
-                        timeFormatIs24Hour
+                        timeFormatIs24Hour,
+                        sendEmailUpdate
                     )
                 }
             }
@@ -1627,7 +1747,8 @@ class EventViewModel @Inject constructor(
         displayDialog: BaseDialogFragment.DisplayDialog,
         sendPreferences: Map<Email, SendPreferences>,
         occurrenceNumber: Int,
-        timeFormatIs24Hour: Boolean
+        timeFormatIs24Hour: Boolean,
+        sendEmailUpdate: Boolean? = null
     ) {
         val dbEvent = dbEvent // Immutable dbEvent
         val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
@@ -1652,7 +1773,8 @@ class EventViewModel @Inject constructor(
                 editOption,
                 occurrenceNumber = 1,
                 timeFormatIs24Hour,
-                sendPreferences
+                sendPreferences,
+                sendEmailUpdate
             )
         }
     }
@@ -1806,7 +1928,8 @@ class EventViewModel @Inject constructor(
         editOption: EventEditDeleteOption? = null,
         occurrenceNumber: Int,
         timeFormatIs24Hours: Boolean,
-        sendPreferences: Map<Email, SendPreferences>
+        sendPreferences: Map<Email, SendPreferences>,
+        sendEmailUpdate: Boolean? = null
     ) {
 
         // Post saving event value to true to trigger loading state
@@ -1825,7 +1948,8 @@ class EventViewModel @Inject constructor(
             eventTimeZoneId,
             userId,
             rruleManuallyEdited,
-            isCreate
+            isCreate,
+            sendEmailUpdate
         )
 
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
@@ -1895,7 +2019,7 @@ class EventViewModel @Inject constructor(
                     // Display invitation failed to be sent snack
                     eventFormSnackState.value = EventSnackState.DisplaySnack(
                         resourceProvider.provideString(
-                            R.string.snack_event_updated_error_failed_mail
+                            R.string.snack_update_event_error_failed_mail
                         )
                     )
                 }

@@ -74,7 +74,8 @@ internal class HandleSaveUseCaseTest {
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 ) is UseCase.Result.Success<*>
             )
 
@@ -109,7 +110,8 @@ internal class HandleSaveUseCaseTest {
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 ) is UseCase.Result.Success<*>
             )
 
@@ -144,7 +146,8 @@ internal class HandleSaveUseCaseTest {
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 ) is UseCase.Result.Success<*>
             )
 
@@ -183,7 +186,8 @@ internal class HandleSaveUseCaseTest {
                     eventTimeZoneId = defaultTimezone,
                     userId = userId,
                     rruleManuallyEdited = false,
-                    isCreate = true
+                    isCreate = true,
+                    sendEmailUpdate = null
                 ) is UseCase.Result.Success<*>
             )
 

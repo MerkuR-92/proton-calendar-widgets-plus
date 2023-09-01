@@ -138,10 +138,11 @@ class SendEmailUseCase @Inject constructor(
         editedEvent: Event? = null,
         sendPreferences: Map<Email, SendPreferences>,
         defaultTimeZone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendEmailUpdate: Boolean? = null
     ): UseCase.Result {
 
-        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE)
+        val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE, sendEmailUpdate = sendEmailUpdate)
 
         val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event")
 
@@ -170,7 +171,15 @@ class SendEmailUseCase @Inject constructor(
 
         val attachmentBytes = ics.toByteArray()
 
-        val attendeeEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }
+        val attendeeEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }.filter { attendeeEmail ->
+            if (sendEmailUpdate == true) {
+                // In case of edit of an invitation, participants that have errors in
+                // send preferences are not removed from the event. We need to filter them out here.
+                sendPreferences.keys.any { email ->
+                    attendeeEmail == email
+                }
+            } else true
+        }
 
         val sendEmailArguments = SendEmailDirect.Arguments(
             mailContent.first,
@@ -315,22 +324,29 @@ class SendEmailUseCase @Inject constructor(
         timeFormatIs24Hours: Boolean,
         mailType: MailType,
         newParticipationStatus: ParticipationStatus? = null,
-        userAttendeeEmail: String? = null
+        userAttendeeEmail: String? = null,
+        sendEmailUpdate: Boolean? = null
     ): Pair<String, String> {
         val eventCopy = Event.from(newEvent)
         return Pair(
             // Subject
-            getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, mailType),
+            getMailSubject(eventCopy, defaultTimeZone, timeFormatIs24Hours, mailType, sendEmailUpdate),
             // Body
             when (mailType) {
                 MailType.CANCELLATION -> getCancelMailBody(eventCopy.summary)
                 MailType.REPLY -> getReplyMailBody(newParticipationStatus, userAttendeeEmail, newEvent.summary)
-                MailType.INVITE -> getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours)
+                MailType.INVITE -> getInviteMailBody(eventCopy, defaultTimeZone, timeFormatIs24Hours, sendEmailUpdate)
             }
         )
     }
 
-    private fun getMailSubject(event: Event, timezone: String, timeFormatIs24Hours: Boolean, mailType: MailType): String {
+    private fun getMailSubject(
+        event: Event,
+        timezone: String,
+        timeFormatIs24Hours: Boolean,
+        mailType: MailType,
+        sendEmailUpdate: Boolean?
+    ): String {
         return if (!event.isAllDay()) {
             val dateTimeStart =
                 event.formatStart(timezone, timeFormatIs24Hours)
@@ -338,7 +354,10 @@ class SendEmailUseCase @Inject constructor(
                 when (mailType) {
                     MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_part_day
                     MailType.REPLY -> R.string.event_change_answer_mail_subject_part_day
-                    MailType.INVITE -> R.string.event_send_invite_mail_subject_part_day
+                    MailType.INVITE -> {
+                        if (sendEmailUpdate == true) R.string.event_send_update_invite_mail_subject_part_day
+                        else R.string.event_send_invite_mail_subject_part_day
+                    }
                 },
                 dateTimeStart.first,
                 dateTimeStart.second,
@@ -353,7 +372,10 @@ class SendEmailUseCase @Inject constructor(
                 when (mailType) {
                     MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_multiple_day
                     MailType.REPLY -> R.string.event_change_answer_mail_subject_multiple_day
-                    MailType.INVITE -> R.string.event_send_invite_mail_subject_multiple_day
+                    MailType.INVITE -> {
+                        if (sendEmailUpdate == true) R.string.event_send_update_invite_mail_subject_multiple_day
+                        else R.string.event_send_invite_mail_subject_multiple_day
+                    }
                 },
                 event.formatStart(
                     timezone,
@@ -365,7 +387,10 @@ class SendEmailUseCase @Inject constructor(
                 when (mailType) {
                     MailType.CANCELLATION -> R.string.event_send_cancel_mail_subject_all_day
                     MailType.REPLY -> R.string.event_change_answer_mail_subject_all_day
-                    MailType.INVITE -> R.string.event_send_invite_mail_subject_all_day
+                    MailType.INVITE -> {
+                        if (sendEmailUpdate == true) R.string.event_send_update_invite_mail_subject_all_day
+                        else R.string.event_send_invite_mail_subject_all_day
+                    }
                 },
                 event.formatStart(
                     timezone,
@@ -378,12 +403,14 @@ class SendEmailUseCase @Inject constructor(
     private fun getInviteMailBody(
         event: Event,
         timezone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendEmailUpdate: Boolean?
     ): String {
         val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
         val formattedDateEnd = event.formatEnd(timezone, timeFormatIs24Hours)
         var body = resourceProvider.provideString(
-            R.string.event_send_invite_mail_body,
+            if (sendEmailUpdate == true) R.string.event_send_update_invite_mail_body
+            else R.string.event_send_invite_mail_body,
             event.summary ?: resourceProvider.provideString(R.string.default_event_summary),
             if (event.isAllDay() && !event.spansSingleDay(true, timeZoneId = timezone)) {
                 resourceProvider.provideString(

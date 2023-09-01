@@ -61,7 +61,8 @@ class HandleSaveUseCase @Inject constructor(
         eventTimeZoneId: String,
         userId: UserId,
         rruleManuallyEdited: Boolean,
-        isCreate: Boolean
+        isCreate: Boolean,
+        sendEmailUpdate: Boolean?
     ): UseCase.Result {
 
         if (event.isAllDay()) {
@@ -139,14 +140,15 @@ class HandleSaveUseCase @Inject constructor(
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
-        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
+        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && (sendEmailUpdate == null || sendEmailUpdate == true)) {
             editEventWithAttendees(
                 userId,
                 newEvent,
                 isCreate,
                 sendPreferences,
                 event.defaultTimeZone!!,
-                timeFormatIs24Hours
+                timeFormatIs24Hours,
+                sendEmailUpdate
             )
         } else if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
             createEventWithAttendees(
@@ -634,17 +636,25 @@ class HandleSaveUseCase @Inject constructor(
         isCreate: Boolean,
         sendPreferences: Map<Email, SendPreferences>,
         defaultTimeZone: String,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        sendEmailUpdate: Boolean?
     ): UseCase.Result {
-        val sendEmailResult = sendEmailUseCase.sendInviteToAttendees(
-            userId,
-            newEvent,
-            isCreate,
-            newEvent,
-            sendPreferences,
-            defaultTimeZone,
-            timeFormatIs24Hours
-        )
+        val sendEmailResult =
+            if (sendEmailUpdate == true && sendPreferences.isEmpty()) {
+                // When editing an invitation, we still update the event if no participants can be notified.
+                UseCase.Result.Success<Unit>()
+            } else {
+                sendEmailUseCase.sendInviteToAttendees(
+                    userId,
+                    newEvent,
+                    isCreate,
+                    newEvent,
+                    sendPreferences,
+                    defaultTimeZone,
+                    timeFormatIs24Hours,
+                    sendEmailUpdate
+                )
+            }
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
 
         if (sendEmailResult is UseCase.Result.Error) {

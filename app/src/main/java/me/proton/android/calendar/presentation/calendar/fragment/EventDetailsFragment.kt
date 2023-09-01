@@ -393,13 +393,20 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
                 loadingAction.visibleOrGone(deletingEvent)
                 // TODO Remove attendees condition once edit attendees is implemented
-                buttonEdit.visibleOrGone(
-                    event.calendar.isActive &&
-                            !event.isAnInvitation &&
-                            !deletingEvent &&
-                            !event.calendar.isSubscribed &&
-                            event.calendar.allowEditEvents
-                )
+                lifecycleScope.launch {
+                    val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
+                    val allowEditInvitation = CalendarFeatureFlag.EditInvitationAsOrganizer.fallbackValue
+                            && event.isAnInvitation
+                            && event.calendar.isOwner
+                            && event.isUserOrganizer(canonicalUserEmails)
+                    buttonEdit.visibleOrGone(
+                        event.calendar.isActive &&
+                                !deletingEvent &&
+                                !event.calendar.isSubscribed &&
+                                event.calendar.allowEditEvents &&
+                                (!event.isAnInvitation || allowEditInvitation)
+                    )
+                }
 
                 val enableDeleteEvents = !deletingEvent &&
                         !event.calendar.isSubscribed &&

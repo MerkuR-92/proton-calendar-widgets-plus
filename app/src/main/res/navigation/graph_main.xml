@@ -276,7 +276,12 @@
     <dialog
         android:id="@+id/nav_event_form_attendees"
         android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormAttendeesFragment"
-        android:label="EventFormAttendeesFragment" />
+        android:label="EventFormAttendeesFragment">
+        <argument
+            android:name="readOnly"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
     <dialog
         android:id="@+id/nav_event_form_alarm"
         android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment"

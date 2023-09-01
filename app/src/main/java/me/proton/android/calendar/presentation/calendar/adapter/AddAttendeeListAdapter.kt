@@ -26,6 +26,7 @@ import me.proton.android.calendar.databinding.ItemAddAttendeeBinding
 
 class AddAttendeeListAdapter(
     private val searchList: Boolean = false,
+    private val readOnly: Boolean = false,
     private val clickListener: (Attendee) -> Unit
 ) : ListAdapter<Attendee, AddAttendeeListAdapter.ViewHolder>(AddAttendeeDiffCallback()) {
 
@@ -117,9 +118,16 @@ class AddAttendeeListAdapter(
             attendeeItemIconCheck.visibleOrGone(searchList && added)
             attendeeItemIconLoading.visibleOrGone(false)
 
-            attendeeItemIconDelete.visibleOrGone(!searchList && !isOrganizer)
-            attendeeItemIconDelete.setOnSingleClickListener {
-                if (!searchList) clickListener(attendee)
+            if (readOnly) {
+                attendeeItemIconDelete.visibleOrGone(false)
+                attendeeItemIconDelete.setOnSingleClickListener {
+                    // Do nothing
+                }
+            } else {
+                attendeeItemIconDelete.visibleOrGone(!searchList && !isOrganizer)
+                attendeeItemIconDelete.setOnSingleClickListener {
+                    if (!searchList) clickListener(attendee)
+                }
             }
 
             attendeeItemPress.visibleOrGone(searchList && !added)
