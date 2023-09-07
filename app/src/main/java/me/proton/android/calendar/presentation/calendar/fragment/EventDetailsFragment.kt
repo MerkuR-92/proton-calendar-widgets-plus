@@ -261,7 +261,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 launch {
                     eventViewModel.getSingleEditsInfo(calendarViewModel.getUserEmails())
                 }
-                calendarViewModel.getUserAddressesFlow()?.distinctUntilChanged()?.observe(viewLifecycleOwner) { userAddresses ->
+                calendarViewModel.observeUserAddresses()?.distinctUntilChanged()?.observe(viewLifecycleOwner) { userAddresses ->
                     userAddresses ?: return@observe
                     handleAttendeeAnswerViewVisibility(userAddresses)
                 } ?: run {
