@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Tanca</string>
     <string name="dialog_button_remove">Suprimeix</string>
     <string name="dialog_button_download">Descarrega</string>
+    <string name="dialog_button_update">Update</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">S\'enviarà un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">La vostra adreça està desactivada. No es pot enviar un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir l\'esdeveniment igualment?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Zona horària</string>
     <string name="invite_in_shared_calendar_disclaimer">L\'enviament d\'invitacions només està disponible en calendaris personals.</string>
     <string name="invite_change_calendar_disclaimer">No és possible modificar el calendari associat amb invitacions.</string>
+    <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
     <string name="change_calendar_recurring_disclaimer">El canvi de calendari per a un esdeveniment recurrent encara no està disponible.</string>
+    <string name="update_event">Update event</string>
+    <string name="update_invite_send_invitation">An invitation will be sent to the event participants.</string>
+    <string name="update_recurring_event">Update recurring event</string>
+    <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
+    <string name="update_recurring_invite_send_invitation">You will update all the events in this series. An invitation will be sent to the event participants.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Què esteu buscant?</string>
     <string name="search_empty_results_title">No s\'ha trobat cap resultat.</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitació a un esdeveniment que comença el %1$s a les %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitació a un esdeveniment el %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitació a un esdeveniment que comença el %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Update for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Update for an event on %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Update for an event starting on %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancel·lació d\'un esdeveniment que comença el %1$s a les %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancel·lació d\'un esdeveniment el %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancel·lació d\'un esdeveniment que comença el %1$s</string>
-    <string name="event_send_invite_mail_body">Heu estat convidat a %1$s\nQuan: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Heu estat convidat a %1$s\nQuan: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s has been updated\nWhen: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (tot el dia)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s - %4$s, %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">S\'ha actualitzat l\'estat de participació.</string>
     <string name="snack_event_updated">Esdeveniment actualitzat</string>
     <string name="snack_event_updated_error_failed_mail">No s\'ha pogut enviar la invitació.</string>
+    <string name="snack_update_event_error_failed_mail">Update failed</string>
     <string name="snack_event_updated_error">Error actualitzant l\'esdeveniment</string>
     <string name="snack_event_created">Esdeveniment creat</string>
     <string name="snack_event_created_failed_mail">S\'ha creat l\'esdeveniment, però no s\'ha pogut enviar la invitació.</string>

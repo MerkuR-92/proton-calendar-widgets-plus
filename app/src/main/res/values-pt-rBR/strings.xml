@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Fechar</string>
     <string name="dialog_button_remove">Remover</string>
     <string name="dialog_button_download">Baixar</string>
+    <string name="dialog_button_update">Atualizar</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Um e-mail de cancelamento será enviado aos participantes do evento. Gostaria de excluir este evento?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Seu endereço está desativado. Não é possível enviar um e-mail de cancelamento aos participantes do evento. Gostaria de excluir este evento mesmo assim?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Fuso horário</string>
     <string name="invite_in_shared_calendar_disclaimer">O envio de convites é disponível apenas entre calendários pessoais.</string>
     <string name="invite_change_calendar_disclaimer">Não é possível modificar o calendário associado com convites.</string>
+    <string name="invite_change_attendees_disclaimer">Ainda não é possível modificar os participantes associados aos convites.</string>
     <string name="change_calendar_recurring_disclaimer">Mudar o calendário para evento recorrente ainda não é possível.</string>
+    <string name="update_event">Atualizar evento</string>
+    <string name="update_invite_send_invitation">Um convite será enviado aos participantes do evento.</string>
+    <string name="update_recurring_event">Atualizar evento recorrente</string>
+    <string name="update_recurring_all_events">Você gostaria de atualizar todos os eventos desta série?</string>
+    <string name="update_recurring_invite_send_invitation">Você atualizará todos os eventos desta série. Um convite será enviado aos participantes do evento.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">O que você está procurando?</string>
     <string name="search_empty_results_title">Nenhum resultado encontrado</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Convite para um evento começando em %1$s ás %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Convite para um evento em %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Convite para um evento começando em %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Atualização para um evento dia %1$s às %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Atualização para um evento %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Atualização para um evento que começará %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancelamento de um evento começando em %1$s ás %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancelamento de um evento em %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancelamento de um evento começando em %1$s</string>
-    <string name="event_send_invite_mail_body">Você foi convidado para %1$s\nQuando: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Você foi convidado para %1$s\nQuando: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s foi atualizado\nQuando: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (o dia todo)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s às %2$s %3$s - %4$s às %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Status de participação atualizado.</string>
     <string name="snack_event_updated">Evento atualizado</string>
     <string name="snack_event_updated_error_failed_mail">O convite não foi enviado</string>
+    <string name="snack_update_event_error_failed_mail">Falha na atualização</string>
     <string name="snack_event_updated_error">Erro ao atualizar o evento</string>
     <string name="snack_event_created">Evento criado</string>
     <string name="snack_event_created_failed_mail">Evento criado, mas o convite não foi enviado</string>

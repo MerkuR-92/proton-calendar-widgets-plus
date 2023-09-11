@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Kapat</string>
     <string name="dialog_button_remove">Sil</string>
     <string name="dialog_button_download">İndir</string>
+    <string name="dialog_button_update">Update</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Saat dilimi</string>
     <string name="invite_in_shared_calendar_disclaimer">Yalnızca kişisel takvimlerden davet gönderilebilir.</string>
     <string name="invite_change_calendar_disclaimer">Davetler ile ilişkilendirilmiş takvim değiştirilemez.</string>
+    <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Yinelenen etkinlikler ile ilişkilendirilmiş takvim henüz değiştirilemez.</string>
+    <string name="update_event">Update event</string>
+    <string name="update_invite_send_invitation">An invitation will be sent to the event participants.</string>
+    <string name="update_recurring_event">Update recurring event</string>
+    <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
+    <string name="update_recurring_invite_send_invitation">You will update all the events in this series. An invitation will be sent to the event participants.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Ne aramıştınız?</string>
     <string name="search_empty_results_title">Herhangi bir sonuç bulunamadı</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%2$s%3$s tarihinde %1$s saatinde başlayan bir etkinlik daveti</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">%1$s zamanındaki etkinlik daveti</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">%1$s zamanında başlayan etkinlik daveti</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Update for an event starting on %1$s at %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Update for an event on %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Update for an event starting on %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%2$s%3$s tarihinde %1$s saatinde başlayan bir etkinliğin iptal bilgilendirmesi</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s zamanındaki bir etkinliğin iptal bilgilendirmesi</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s zamanında başlayan bir etkinliğin iptal bilgilendirmesi</string>
-    <string name="event_send_invite_mail_body">%1$s etkinliğine davetlisiniz\nZamanı: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s etkinliğine davetlisiniz\nZamanı: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s has been updated\nWhen: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (tüm gün)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s %2$s %3$s saatinde - %4$s %5$s %6$s saatinde</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Katılım durumu güncellendi.</string>
     <string name="snack_event_updated">Etkinlik güncellendi</string>
     <string name="snack_event_updated_error_failed_mail">Davet gönderilemedi</string>
+    <string name="snack_update_event_error_failed_mail">Update failed</string>
     <string name="snack_event_updated_error">Etkinlik güncellenirken sorun çıktı</string>
     <string name="snack_event_created">Etkinlik eklendi</string>
     <string name="snack_event_created_failed_mail">Etkinlik eklendi ancak davet gönderilemedi</string>

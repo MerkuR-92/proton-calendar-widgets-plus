@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Закрыць</string>
     <string name="dialog_button_remove">Выдаліць</string>
     <string name="dialog_button_download">Спампаваць</string>
+    <string name="dialog_button_update">Абнавіць</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Ліст пра скасаванне будзе адпраўлены ўдзельнікам падзеі. Ці хочаце вы выдаліць гэту падзею?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Ваш адрас адключаны. Немагчыма адправіць ліст са скасаваннем удзельнікам падзеі. Ці хочаце вы ўсё роўна выдаліць гэту падзею?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Часавы пояс</string>
     <string name="invite_in_shared_calendar_disclaimer">Адпраўка запрашэнняў даступна толькі ў асабістых календарах.</string>
     <string name="invite_change_calendar_disclaimer">Немагчыма змяніць каляндар, які звязаны з запрашэннямі.</string>
+    <string name="invite_change_attendees_disclaimer">Немагчыма змяніць удзельнікаў, якія звязаны з запрашэннямі.</string>
     <string name="change_calendar_recurring_disclaimer">Змяненне календара для перыядычных падзей пакуль немагчыма.</string>
+    <string name="update_event">Абнавіць падзею</string>
+    <string name="update_invite_send_invitation">Удзельнікам мерапрыемства будзе адпраўлена запрашэнне.</string>
+    <string name="update_recurring_event">Абнавіць перыядычную падзею</string>
+    <string name="update_recurring_all_events">Ці вы хочаце абнавіць усе падзеі ў гэтай серыі?</string>
+    <string name="update_recurring_invite_send_invitation">Вы абновіце ўсе падзеі ў гэтай серыі. Удзельнікам падзеі будзе адпраўлена запрашэнне.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Што вы шукаеце?</string>
     <string name="search_empty_results_title">Нічога не знойдзена</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Запрашэнне на падзею, якая пачынаецца ў %1$s а %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Запрашэнне на падзею ў %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрашэнне на падзею, якая пачынаецца ў %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Абнаўленне для падзеі, якая пачынаецца ў %1$s а %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Абнаўленне для падзеі ў %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Абнаўленне для падзеі, якая пачнецца ў %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Скасаванне падзеі, якая пачынаецца ў %1$s а %2$s%3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Скасаванне падзеі ў %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасаванне падзеі, якая пачынаецца ў %1$s</string>
-    <string name="event_send_invite_mail_body">Вас запрасілі на %1$s\nКалі: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Вас запрасілі на %1$s\nКалі: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s была абноўлена.\nКалі:%2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (увесь дзень)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s а %2$s%3$s — %4$s а %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Статус удзелу абноўлены.</string>
     <string name="snack_event_updated">Падзея абноўлена</string>
     <string name="snack_event_updated_error_failed_mail">Не ўдалося адправіць запрашэнне</string>
+    <string name="snack_update_event_error_failed_mail">Абнавіць не атрымалася</string>
     <string name="snack_event_updated_error">Памылка абнаўлення падзеі</string>
     <string name="snack_event_created">Падзея створана</string>
     <string name="snack_event_created_failed_mail">Падзея створана, але не ўдалося адправіць запрашэнне</string>

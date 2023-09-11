@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Fermer</string>
     <string name="dialog_button_remove">Supprimer</string>
     <string name="dialog_button_download">Télécharger</string>
+    <string name="dialog_button_update">Mettre à jour</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Un message d’annulation sera envoyé aux participants de l’événement. Voulez-vous supprimer cet événement ?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Votre adresse est désactivée. Un message d\'annulation ne peut donc pas être envoyé aux participants. Voulez-vous quand même supprimer cet événement ?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Fuseau horaire</string>
     <string name="invite_in_shared_calendar_disclaimer">Envoyer des invitations n\'est possible que dans les calendriers personnels.</string>
     <string name="invite_change_calendar_disclaimer">Il n\'est pas possible de modifier le calendrier associé aux invitations.</string>
+    <string name="invite_change_attendees_disclaimer">Il n\'est pas encore possible de modifier les participants liés aux invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Il n\'est pas encore possible de déplacer un événement récurrent dans un autre calendrier.</string>
+    <string name="update_event">Mettre à jour l\'événement</string>
+    <string name="update_invite_send_invitation">Une invitation sera envoyée aux participants.</string>
+    <string name="update_recurring_event">Mettre à jour l\'événement récurrent</string>
+    <string name="update_recurring_all_events">Voulez-vous mettre à jour tous les événements de cette série ?</string>
+    <string name="update_recurring_invite_send_invitation">Vous allez mettre à jour tous les événements de cette série. Une invitation sera envoyée aux participants.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Que recherchez-vous ?</string>
     <string name="search_empty_results_title">Aucun résultat n\'a été trouvé.</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation à un événement %1$s à %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation à un événement le %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation à un événement commençant %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Mise à jour d\'un événement qui commence %1$s à %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Mise à jour d\'un événement prévu %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Mise à jour d\'un événement qui commence %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annulation d’un événement %1$s à %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annulation d’un événement le %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulation d’un événement commençant %1$s</string>
-    <string name="event_send_invite_mail_body">Vous êtes invité à %1$s\nQuand : %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité à %1$s\nQuand : %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s a été mis à jour\nDate : %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toute la journée)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s à %2$s %3$s - %4$s à %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Le statut de participation a été mis à jour.</string>
     <string name="snack_event_updated">L\'événement a été mis à jour.</string>
     <string name="snack_event_updated_error_failed_mail">L\'invitation n\'a pas pu être envoyée.</string>
+    <string name="snack_update_event_error_failed_mail">La mise à jour n\'a pas abouti.</string>
     <string name="snack_event_updated_error">Une erreur s\'est produite pendant la mise à jour de l\'événement.</string>
     <string name="snack_event_created">L\'événement a été créé.</string>
     <string name="snack_event_created_failed_mail">L\'événement est créé, mais l\'invitation n\'a pas été envoyée.</string>
@@ -520,7 +532,7 @@
     <string name="calendar_widget_no_upcoming_events_today">Aucun événement n\'est prévu aujourd\'hui.</string>
     <string name="calendar_widget_loading_events">Chargement des événements…</string>
     <string name="calendar_widget_loading_events_error">Impossible de charger les événements</string>
-    <string name="calendar_widget_no_upcoming_events">Aucun évènement n\'est prévu.</string>
+    <string name="calendar_widget_no_upcoming_events">Aucun événement n\'est prévu.</string>
     <string name="calendar_widget_please_log_in">Connectez-vous pour voir vos événements.</string>
     <string name="calendar_widget_part_day_event_starts_at">Commence à %1$s</string>
     <string name="calendar_widget_part_day_event_ends_at">Se termine à %1$s</string>
@@ -545,8 +557,8 @@
     <string name="spotlight_dialog_week_view_description">• Voici les vues de calendrier <b>3 jours</b> et <b>Semaine</b>. Sélectionnez votre vue préférée dans le <b>menu</b>.\n\n• Ajustez la hauteur des lignes de la grille des jours en pinçant avec deux doigts pour faire un zoom avant ou arrière.</string>
     <string name="spotlight_dialog_search_title">Rechercher des événements</string>
     <string name="spotlight_dialog_search_description">Trouvez facilement l\'événement que vous recherchez avec notre nouvelle fonction de recherche. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
-    <string name="spotlight_dialog_import_title">Plus de façons d\'ajouter des évènements</string>
-    <string name="spotlight_dialog_import_description">• Importez des évènements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
+    <string name="spotlight_dialog_import_title">Plus de façons d\'ajouter des événements</string>
+    <string name="spotlight_dialog_import_description">• Importez des événements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fonctionnalités du calendrier</string>
     <string name="spotlight_dialog_calendar_provider_description">• Ajoutez des événements directement dans Proton Calendar à partir d\'autres applications.\n\n• Créez et gérez des événements dans les calendriers partagés avec vous.\n\n• Définissez l\'affichage par défaut que vous voulez à l\'ouverture de l\'application.\n\n• 13 nouvelles langues sont disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">Suppression de la fonction de recherche pour l\'améliorer</string>
