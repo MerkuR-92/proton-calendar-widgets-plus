@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Tutup</string>
     <string name="dialog_button_remove">Hapus</string>
     <string name="dialog_button_download">Unduh</string>
+    <string name="dialog_button_update">Perbarui</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Email pembatalan akan dikirim ke peserta acara. Apakah Anda ingin menghapus acara ini?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Alamat Anda sedang dinonaktifkan. Email pembatalan tidak akan dapat dikirim kepada para peserta acara. Apakah Anda tetap ingin menghapus acara ini?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Zona waktu</string>
     <string name="invite_in_shared_calendar_disclaimer">Pengiriman undangan hanya tersedia di dalam kalender personal.</string>
     <string name="invite_change_calendar_disclaimer">Kalender yang terhubung dengan undangan tidak dapat dimodifikasi.</string>
+    <string name="invite_change_attendees_disclaimer">Daftar partisipan yang terhubung dengan undangan saat ini belum dapat diubah.</string>
     <string name="change_calendar_recurring_disclaimer">Mengubah kalender untuk acara yang berulang saat ini tidak didukung.</string>
+    <string name="update_event">Perbarui acara</string>
+    <string name="update_invite_send_invitation">Undangan akan dikirim ke para peserta acara.</string>
+    <string name="update_recurring_event">Perbarui acara berulang</string>
+    <string name="update_recurring_all_events">Apakah Anda ingin memperbarui seluruh acara dalam rangkaian ini?</string>
+    <string name="update_recurring_invite_send_invitation">Anda akan memperbarui seluruh acara dalam rangkaian ini. Undangan akan dikirim kepada para peserta acara.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Apa yang Anda tunggu?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>
@@ -218,7 +225,7 @@
     <string name="event_discard_changes_description">Anda akan kehilangan semua perubahan yang belum disimpan.</string>
     <string name="event_discard_changes_cancel">Lanjutkan perubahan</string>
     <string name="event_discard_changes_confirm">Buang</string>
-    <string name="event_recurring_update_this_title">Suntung acara berulang</string>
+    <string name="event_recurring_update_this_title">Sunting acara berulang</string>
     <string name="event_recurring_update_this_description">Perubahan frekuensi akan hilang</string>
     <string name="event_recurring_update_all_description">Perubahan sebelumnya pada rangkaian ini akan hilang</string>
     <string name="event_recurring_update_this_cancel">Batal</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Undangan untuk acara yang dimulai pada tanggal $%1$s pukul %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Undangan untuk acara pada hari $%1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Undangan untuk acara yang dimulai pada hari $%1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Pembaruan untuk acara yang akan dimulai pada tanggal %1$s pukul %2$s%3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Pembaruan untuk acara pada hari %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Pembaruan untuk acara yang akan dimulai pada hari %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Pembatalan acara yang dimulai pada tanggal %1$s pukul %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Pembatalan acara pada hari $%1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Pembatalan acara yang akan dimulai pada hari $%1$s</string>
-    <string name="event_send_invite_mail_body">Anda diundang ke %1$s\nYang akan diselenggarakan pada: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Anda diundang ke %1$s\nYang akan diselenggarakan pada: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s telah diperbarui\nTanggal baru: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (seharian penuh)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s pukul %2$s %3$s - %4$s pukul %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Status keikutsertaan diperbarui.</string>
     <string name="snack_event_updated">Acara diperbarui</string>
     <string name="snack_event_updated_error_failed_mail">Undangan gagal dikirim</string>
+    <string name="snack_update_event_error_failed_mail">Pembaruan gagal</string>
     <string name="snack_event_updated_error">Kesalahan memperbarui acara</string>
     <string name="snack_event_created">Acara telah dibuat</string>
     <string name="snack_event_created_failed_mail">Acara dibuat namun undangan gagal dikirim</string>

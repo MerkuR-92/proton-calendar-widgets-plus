@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Stäng</string>
     <string name="dialog_button_remove">Ta bort</string>
     <string name="dialog_button_download">Ladda ner</string>
+    <string name="dialog_button_update">Uppdatera</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Ett e-postmeddelande att händelsen ställts in kommer skickas till evenemangsdeltagarna. Vill du ta bort denna händelse?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Din adress är inaktiverad. Ett e-postmeddelande för inställning av händelsen kan inte skickas till evenemangsdeltagarna. Vill du ändå ta bort denna händelse?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Tidszon</string>
     <string name="invite_in_shared_calendar_disclaimer">Att skicka inbjudningar är endast tillgängligt inom personliga kalendrar.</string>
     <string name="invite_change_calendar_disclaimer">Det är inte möjligt att ändra kalendern associerad med inbjudningar.</string>
+    <string name="invite_change_attendees_disclaimer">Det är ännu inte möjligt att ändra deltagare associerade med inbjudningar.</string>
     <string name="change_calendar_recurring_disclaimer">Ändra kalender för återkommande händelse är ännu inte möjligt.</string>
+    <string name="update_event">Uppdatera händelse</string>
+    <string name="update_invite_send_invitation">En inbjudan kommer att skickas till händelsens deltagare.</string>
+    <string name="update_recurring_event">Uppdatera återkommande händelse</string>
+    <string name="update_recurring_all_events">Vill du uppdatera alla händelser i denna serie?</string>
+    <string name="update_recurring_invite_send_invitation">Du kommer att uppdatera alla händelser i denna serie. En inbjudan kommer att skickas till händelsens deltagare.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Vad letar du efter?</string>
     <string name="search_empty_results_title">Inga resultat hittades</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Inbjudan för en händelse som börjar den %1$s kl. %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Inbjudan till en händelse den %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Inbjudan för en händelse som börjar den %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Uppdatering för en händelse som börjar den %1$s kl. %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Uppdatering av en händelse på %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Uppdatering av en händelse som börjar på %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Avbokning av en händelse som börjar %1$s kl. %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Avbokning av en händelse den %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Avbokning av en händelse som börjar den %1$s</string>
-    <string name="event_send_invite_mail_body">Du är inbjuden till %1$s\nNär: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Du är inbjuden till %1$s\nNär: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s har uppdaterats\nNär: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hela dagen)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s kl. %2$s %3$s - %4$s kl. %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Deltagandestatus uppdaterad.</string>
     <string name="snack_event_updated">Händelse uppdaterad</string>
     <string name="snack_event_updated_error_failed_mail">Inbjudan kunde inte skickas</string>
+    <string name="snack_update_event_error_failed_mail">Uppdatering misslyckades</string>
     <string name="snack_event_updated_error">Fel vid uppdatering av händelse</string>
     <string name="snack_event_created">Händelse skapad</string>
     <string name="snack_event_created_failed_mail">Händelse skapad men inbjudan misslyckades att skickas</string>

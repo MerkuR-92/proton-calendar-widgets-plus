@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Luk</string>
     <string name="dialog_button_remove">Fjern</string>
     <string name="dialog_button_download">Download</string>
+    <string name="dialog_button_update">Opdatér</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">En aflysningsmail vil blive sendt til deltagerne i arrangementet. Vil du slette denne begivenhed?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Din adresse er deaktiveret. En aflysningsmail kan ikke sendes til deltagerne i arrangementet. Vil du slette denne begivenhed alligevel?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Tidszone</string>
     <string name="invite_in_shared_calendar_disclaimer">Invitationer kan kun sendes mellem personlige kalendere.</string>
     <string name="invite_change_calendar_disclaimer">Det er ikke muligt at ændre kalenderen, der er knyttet til invitationer.</string>
+    <string name="invite_change_attendees_disclaimer">Det er endnu ikke muligt at ændre deltagere der er knyttet til invitationer.</string>
     <string name="change_calendar_recurring_disclaimer">Ændring af kalender for tilbagevendende begivenheder er endnu ikke muligt.</string>
+    <string name="update_event">Opdater begivenhed</string>
+    <string name="update_invite_send_invitation">En invitation vil blive sendt til begivenhedens deltagere.</string>
+    <string name="update_recurring_event">Opdater tilbagevendende begivenhed</string>
+    <string name="update_recurring_all_events">Vil du opdatere alle begivenheder i denne serie?</string>
+    <string name="update_recurring_invite_send_invitation">Du vil opdatere alle begivenheder i denne serie. En invitation vil blive sendt til deltagerne i arrangementet.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Hvad søger du?</string>
     <string name="search_empty_results_title">Ingen resultater fundet</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation til en begivenhed med start den %1$s kl. %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation til en begivenhed den %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation til en begivenhed med start den %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Opdatering til en begivenhed med start den %1$s kl. %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Opdatering til en begivenhed %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Opdatering til en begivenhed med start %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annullering af en begivenhed med start %1$s kl. %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annullering af en begivenhed %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annullering af en begivenhed med start %1$s</string>
-    <string name="event_send_invite_mail_body">Du er inviteret til %1$s\nHvornår: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Du er inviteret til %1$s\nHvornår: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s er blevet opdateret.\nHvornår: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (hele dagen)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s kl. %2$s %3$s - %4$s kl. %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Deltagelsesstatus opdateret.</string>
     <string name="snack_event_updated">Begivenhed opdateret</string>
     <string name="snack_event_updated_error_failed_mail">Invitation kunne ikke sendes</string>
+    <string name="snack_update_event_error_failed_mail">Opdatering mislykkedes</string>
     <string name="snack_event_updated_error">Fejl ved opdatering af begivenhed</string>
     <string name="snack_event_created">Begivenhed oprettet</string>
     <string name="snack_event_created_failed_mail">Begivenhed oprettet, men invitation blev ikke sendt</string>

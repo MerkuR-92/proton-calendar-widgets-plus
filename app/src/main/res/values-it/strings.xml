@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Chiudi</string>
     <string name="dialog_button_remove">Rimuovi</string>
     <string name="dialog_button_download">Scarica</string>
+    <string name="dialog_button_update">Aggiorna</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Verrà inviata una email di cancellazione ai partecipanti all\'evento. Vuoi eliminare questo evento?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Il tuo indirizzo è disabilitato. Una email di cancellazione non può essere inviata ai partecipanti all\'evento. Vuoi comunque eliminare questo evento?</string>
@@ -93,7 +94,7 @@
     <string name="event_answer_no">No</string>
     <string name="event_answer_maybe">Forse</string>
     <string name="event_decryption_error_dialog_title">Decriptazione evento non riuscita</string>
-    <string name="event_decryption_error_dialog_message">Decifratura del contenuto di questo evento non riuscita.</string>
+    <string name="event_decryption_error_dialog_message">Decriptazione del contenuto di questo evento non riuscita.</string>
     <string name="event_decryption_error_dialog_confirmation">Elimina evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Elimina eventi</string>
     <string name="event_decryption_error_dialog_close">Chiudi</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Fuso orario</string>
     <string name="invite_in_shared_calendar_disclaimer">L\'invio degli inviti è disponibile solo con i calendari personali.</string>
     <string name="invite_change_calendar_disclaimer">Non è possibile modificare il calendario associato agli inviti.</string>
+    <string name="invite_change_attendees_disclaimer">Non è ancora possibile modificare i partecipanti associati agli inviti.</string>
     <string name="change_calendar_recurring_disclaimer">Cambiare calendario per un evento ricorrente non è ancora possibile.</string>
+    <string name="update_event">Aggiorna evento</string>
+    <string name="update_invite_send_invitation">Un invito verrà inviato ai partecipanti dell\'evento.</string>
+    <string name="update_recurring_event">Aggiorna evento ricorrente</string>
+    <string name="update_recurring_all_events">Vuoi aggiornare tutti gli eventi in questa serie?</string>
+    <string name="update_recurring_invite_send_invitation">Aggiornerai tutti gli eventi di questa serie. Un invito verrà inviato ai partecipanti dell\'evento.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Che cosa stai cercando?</string>
     <string name="search_empty_results_title">Nessun risultato trovato</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invito per un evento che inizia il %1$s alle %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invito per un evento il %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invito per un evento che inizia il %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Aggiornamento per un evento che inizia il %1$s alle %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aggiornamento per un evento il %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aggiornamento per un evento che inizia il %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellazione di un evento che inizia il %1$s alle %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancellazione di un evento il %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancellazione di un evento che inizia il %1$s</string>
-    <string name="event_send_invite_mail_body">Sei invitato a %1$s\nQuando: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Sei invitato a %1$s\nQuando: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s è stato aggiornato.\nQuando: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (tutto il giorno)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s a %2$s %3$s - %4$s a %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Stato partecipazione aggiornato.</string>
     <string name="snack_event_updated">Evento aggiornato</string>
     <string name="snack_event_updated_error_failed_mail">Invito non riuscito</string>
+    <string name="snack_update_event_error_failed_mail">Aggiornamento non riuscito</string>
     <string name="snack_event_updated_error">Errore nell\'aggiornamento dell\'evento</string>
     <string name="snack_event_created">Evento creato</string>
     <string name="snack_event_created_failed_mail">Evento creato ma l\'invito non è stato inviato</string>
@@ -432,7 +444,7 @@
     <string name="settings_calendar_subscribed_not_accessible">Il link del calendario non è accessibile</string>
     <string name="settings_calendar_subscribed_tmp_not_accessible">Il link al calendario è temporaneamente inaccessibile</string>
     <string name="settings_calendar_subscribed_last_sync_old">Sono passate più di 12 ore dall\'ultimo aggiornamento</string>
-    <string name="settings_calendar_subscribed_not_decrypted">Impossibile decifrare il calendario</string>
+    <string name="settings_calendar_subscribed_not_decrypted">Impossibile decriptare il calendario</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Solo visualizzazione</string>
     <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">da %1$s</string>
@@ -467,15 +479,15 @@
     <string name="delete_calendar_dialog_message">Sei sicuro di voler eliminare questo calendario?</string>
     <string name="remove_calendar_dialog_title">Rimuovi calendario</string>
     <string name="remove_calendar_dialog_message">Sei sicuro di voler rimuovere questo calendario?</string>
-    <string name="leave_calendar_dialog_title">Abbandonare il calendario</string>
-    <string name="leave_calendar_dialog_message">Se abbandoni questo calendario dovrai richiedere al proprietario di partecipare nuovamente.</string>
+    <string name="leave_calendar_dialog_title">Abbandona il calendario</string>
+    <string name="leave_calendar_dialog_message">Se abbandoni questo calendario dovrai chiedere al proprietario per partecipare nuovamente.</string>
     <string name="delete_default_calendar_dialog_message">Sei sicuro di voler eliminare questo calendario? \"%1$s\" sarà impostato come calendario predefinito.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminato</string>
     <string name="remove_calendar_snack_removed">Calendario rimosso</string>
     <string name="delete_calendar_snack_error">Errore durante l\'eliminazione del calendario</string>
     <string name="remove_calendar_snack_error">Errore nella rimozione del calendario</string>
-    <string name="leave_calendar_snack_error">Errore nell\'abbandonare il calendario</string>
-    <string name="delete_calendar_snack_error_password_confirmation">Conferma password fallita</string>
+    <string name="leave_calendar_snack_error">Errore nell\'abbandono del calendario</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Conferma della password fallita</string>
     <string name="recreate_calendar_dialog_title">Cancella calendario</string>
     <string name="recreate_calendar_dialog_message">Questa azione rimuoverà tutti gli eventi e gli utenti invitati.\n\nSei sicuro di voler cancellare questo calendario?</string>
     <string name="recreate_calendar_snack_error">Errore durante la cancellazione del calendario</string>
@@ -500,12 +512,12 @@
     <string name="bootstrap_error_store_quota_reached_message">Non c\'è più spazio di archiviazione disponibile.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Per saperne di più</string>
     <string name="bootstrap_error_reset_needed_title">Reimposta le chiavi del calendario</string>
-    <string name="bootstrap_error_reset_needed_message">Hai reimpostato la password e gli eventi collegati ai seguenti calendari non possono essere decifrati. Tutti i calendari attivi a cui sei iscritto si sincronizzeranno di nuovo dopo pochi minuti.</string>
+    <string name="bootstrap_error_reset_needed_message">Hai reimpostato la password e gli eventi collegati ai seguenti calendari non possono essere decriptati. Tutti i calendari attivi a cui sei iscritto si sincronizzeranno di nuovo dopo pochi minuti.</string>
     <string name="bootstrap_error_update_passphrase_title">Riattiva le chiavi del calendario</string>
-    <string name="bootstrap_error_update_passphrase_message">Hai riattivato le tue chiavi e gli eventi collegati ai seguenti calendari possono ora essere decifrati.</string>
+    <string name="bootstrap_error_update_passphrase_message">Hai riattivato le tue chiavi e gli eventi collegati ai seguenti calendari possono ora essere decriptati.</string>
     <string name="bootstrap_error_continue_button">Continua</string>
     <string name="splash_after_login_init">Preparazione dei calendari</string>
-    <string name="splash_init">Decifrazione eventi</string>
+    <string name="splash_init">Decriptazione eventi in corso...</string>
     <string name="default_calendar_name">Il mio calendario</string>
     <!-- FEEDBACK DIALOG -->
     <string name="dialog_feedback_header">Dateci il vostro feedback</string>
@@ -577,7 +589,7 @@
     <string name="import_assistant_new_calendar_badge">Nuovo</string>
     <string name="import_assistant_merge_calendar_badge">Unito</string>
     <string name="import_assistant_creating_calendars">Creazione nuovi calendari</string>
-    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Già qui…</string>
+    <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Ci siamo quasi...</string>
     <string name="import_assistant_new_calendar_header">Crea nuovo</string>
     <string name="import_assistant_merge_calendar_header">Unisci con uno esistente</string>
     <string name="import_assistant_in_progress_title">Importazione in corso</string>

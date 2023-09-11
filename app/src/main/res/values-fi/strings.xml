@@ -17,6 +17,7 @@
     <string name="dialog_button_close">Sulje</string>
     <string name="dialog_button_remove">Poista</string>
     <string name="dialog_button_download">Lataa</string>
+    <string name="dialog_button_update">Päivitä</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Tapahtuman osallistujille lähetetään perumisilmoitus sähköpostitse. Haluatko poistaa tapahtuman?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Osoitteesi on poistettu käytöstä, eikä osallistujille sen vuoksi voida lähettää peruutusviestiä. Haluatko silti poistaa tapahtuman?</string>
@@ -147,7 +148,13 @@
     <string name="event_text_timezone_start">Aikavyöhyke</string>
     <string name="invite_in_shared_calendar_disclaimer">Kutsujen lähettäminen on mahdollista vain henkilökohtaisista kalentereista.</string>
     <string name="invite_change_calendar_disclaimer">Kutsuihin liitettyä kalenteria ei ole mahdollista muokata.</string>
+    <string name="invite_change_attendees_disclaimer">Kutsuihin liittyviä osallistujia ei ole vielä mahdollista muokata.</string>
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
+    <string name="update_event">Päivitä tapahtuma</string>
+    <string name="update_invite_send_invitation">Tapahtuman osallistujille lähetetään kutsu.</string>
+    <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
+    <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
+    <string name="update_recurring_invite_send_invitation">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään kutsu.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mitä etsit?</string>
     <string name="search_empty_results_title">Ei tuloksia</string>
@@ -233,10 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Kutsu %1$s klo %2$s %3$s alkavaan tapahtumaan</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Kutsu %1$s alkavaan tapahtumaan</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Kutsu %1$s alkavaan tapahtumaan</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Muutos %1$s klo %2$s %3$s alkavaan tapahtumaan</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Muutos %1$s ajoitettuun tapahtumaan</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Muutos %1$s alkavaan tapahtumaan</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%1$s klo %2$s %3$s alkavan tapahtuman peruutus</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s alkavan tapahtuman peruutus</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s alkavan tapahtuman peruutus</string>
-    <string name="event_send_invite_mail_body">Sinut on kutsuttu tapahtumaan %1$s\nAika: %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Sinut on kutsuttu tapahtumaan %1$s\nAika: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s on muuttunut.\nMilloin: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (koko päivä)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s – %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s klo %2$s %3$s – %4$s klo %5$s %6$s</string>
@@ -289,6 +300,7 @@
     <string name="snack_event_part_stat_updated">Osallistumistila päivitettiin</string>
     <string name="snack_event_updated">Tapahtuma päivitettiin</string>
     <string name="snack_event_updated_error_failed_mail">Kutsun lähetys epäonnistui</string>
+    <string name="snack_update_event_error_failed_mail">Päivitys epäonnistui</string>
     <string name="snack_event_updated_error">Virhe päivitettäessä tapahtumaa</string>
     <string name="snack_event_created">Tapahtuma luotiin</string>
     <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
