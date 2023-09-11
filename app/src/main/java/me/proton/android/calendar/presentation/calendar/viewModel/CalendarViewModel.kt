@@ -91,7 +91,6 @@ import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.domain.arch.mapSuccessValueOrNull
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
@@ -1014,16 +1013,16 @@ class CalendarViewModel @Inject constructor(
         return userAddressManager.getAddressesOrNull(userId)
     }
 
-    suspend fun getUserAddressesFlow(): LiveData<List<UserAddress>?>? {
+    suspend fun observeUserAddresses(): LiveData<List<UserAddress>>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
         return kotlin.runCatching {
-            userAddressManager.getAddressesFlow(userId).mapSuccessValueOrNull()?.asLiveData(Dispatchers.Default)
+            userAddressManager.observeAddresses(userId).asLiveData(Dispatchers.Default)
         }.getOrElse {
-            logger.e("CalendarViewModel getAddressesFlow threw exception ${it.message}", it)
+            logger.e("CalendarViewModel observeUserAddresses threw exception ${it.message}", it)
             null
         }
     }
