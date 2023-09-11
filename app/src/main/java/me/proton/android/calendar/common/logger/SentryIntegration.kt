@@ -32,7 +32,7 @@ object SentryIntegration {
     fun initSentry(app: Application, sharedPreferences: SharedPreferences) {
         val installationId = getInstallationId(sharedPreferences)
         initSentry(app, installationId)
-        initAccountSentry(app, installationId)
+//        initAccountSentry(app, installationId)
     }
 
     private fun initSentry(context: Context, installationId: String) {
@@ -55,21 +55,21 @@ object SentryIntegration {
         Sentry.setUser(User().apply { id = installationId } )
     }
 
-    private fun initAccountSentry(context: Context, installationId: String) {
-        val entryPoint = EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            SentryIntegration::class.java
-        )
-
-        entryPoint.accountSentryHubBuilder().invoke(
-            sentryDsn = BuildConfig.ACCOUNT_SENTRY_DSN.takeIf { !BuildConfig.DEBUG }.orEmpty(),
-            installationId = installationId
-        )
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    internal interface SentryIntegration {
-        fun accountSentryHubBuilder(): AccountSentryHubBuilder
-    }
+//    private fun initAccountSentry(context: Context, installationId: String) {
+//        val entryPoint = EntryPointAccessors.fromApplication(
+//            context.applicationContext,
+//            SentryIntegration::class.java
+//        )
+//
+//        entryPoint.accountSentryHubBuilder().invoke(
+//            sentryDsn = BuildConfig.ACCOUNT_SENTRY_DSN.takeIf { !BuildConfig.DEBUG }.orEmpty(),
+//            installationId = installationId
+//        )
+//    }
+//
+//    @EntryPoint
+//    @InstallIn(SingletonComponent::class)
+//    internal interface SentryIntegration {
+//        fun accountSentryHubBuilder(): AccountSentryHubBuilder
+//    }
 }
