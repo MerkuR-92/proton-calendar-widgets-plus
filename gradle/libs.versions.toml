@@ -117,6 +117,7 @@ core-test-android = { module = "me.proton.core:test-android", version.ref = "cor
 core-test-android-instrumented = { module = "me.proton.core:test-android-instrumented", version.ref = "core" }
 core-test-kotlin = { module = "me.proton.core:test-kotlin", version.ref = "core" }
 core-test-quark = { module = "me.proton.core:test-quark", version.ref = "core" }
+core-telemetry = { module = "me.proton.core:telemetry", version.ref = "core" }
 core-user = { module = "me.proton.core:user", version.ref = "core" }
 core-mailMessage = { module = "me.proton.core:mail-message", version.ref = "core" }
 core-mailSettings = { module = "me.proton.core:mail-settings", version.ref = "core" }

@@ -205,6 +205,7 @@ dependencies {
     implementation(libs.core.proguard.rules)
     implementation(libs.core.presentation)
     implementation(libs.core.push)
+    implementation(libs.core.telemetry)
     implementation(libs.core.user)
     implementation(libs.core.userSettings)
     implementation(libs.core.utilAndroidDagger)

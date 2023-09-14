@@ -56,6 +56,8 @@ import me.proton.core.payment.data.local.entity.GooglePurchaseEntity
 import me.proton.core.push.data.local.db.PushConverters
 import me.proton.core.push.data.local.db.PushDatabase
 import me.proton.core.push.data.local.db.PushEntity
+import me.proton.core.telemetry.data.db.TelemetryDatabase
+import me.proton.core.telemetry.data.entity.TelemetryEventEntity
 import me.proton.core.user.data.db.AddressDatabase
 import me.proton.core.user.data.db.UserConverters
 import me.proton.core.user.data.db.UserDatabase
@@ -101,6 +103,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         SelfAuditResultEntity::class,
         NotificationEntity::class,
         PushEntity::class,
+        TelemetryEventEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -152,7 +155,8 @@ abstract class AppDatabase :
     ObservabilityDatabase,
     KeyTransparencyDatabase,
     NotificationDatabase,
-    PushDatabase {
+    PushDatabase,
+    TelemetryDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -185,7 +189,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 60
+        const val version = 61
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -228,6 +232,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_57_58,
             AppDatabaseMigrations.MIGRATION_58_59,
             AppDatabaseMigrations.MIGRATION_59_60,
+            AppDatabaseMigrations.MIGRATION_60_61,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

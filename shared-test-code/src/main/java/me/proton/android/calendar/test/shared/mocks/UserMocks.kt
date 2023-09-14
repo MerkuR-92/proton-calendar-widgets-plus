@@ -37,6 +37,7 @@ object UserMocks {
             dateFormat = UserSettings.DateFormat.enumOf(dateFormat),
             timeFormat = UserSettings.TimeFormat.enumOf(timeFormat),
             earlyAccess = null,
+            telemetry = null
         )
     }
 
