@@ -18,6 +18,8 @@ import me.proton.android.calendar.eventmanager.listeners.core.CalendarUserSettin
 import me.proton.core.contact.data.ContactEmailEventListener
 import me.proton.core.contact.data.ContactEventListener
 import me.proton.core.eventmanager.domain.EventListener
+import me.proton.core.notification.data.NotificationEventListener
+import me.proton.core.push.data.PushEventListener
 import me.proton.core.user.data.UserEventListener
 import me.proton.core.usersettings.data.UserSettingsEventListener
 import javax.inject.Singleton
@@ -35,6 +37,8 @@ object EventManagerModule {
         userSettingsEventListener: UserSettingsEventListener,
         contactEventListener: ContactEventListener,
         contactEmailEventListener: ContactEmailEventListener,
+        notificationEventListener: NotificationEventListener,
+        pushEventListener: PushEventListener,
         // Custom Core listener
         userAddressEventListener: CalendarUserAddressListener,
         // Calendar only listeners in Core event loop
@@ -53,6 +57,8 @@ object EventManagerModule {
         userSettingsEventListener,
         contactEventListener,
         contactEmailEventListener,
+        notificationEventListener,
+        pushEventListener,
         userAddressEventListener,
         calendarListener,
         calendarMemberEventListener,
