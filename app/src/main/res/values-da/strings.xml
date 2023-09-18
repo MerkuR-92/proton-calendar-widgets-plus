@@ -20,7 +20,7 @@
     <string name="dialog_button_update">Opdatér</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">En aflysningsmail vil blive sendt til deltagerne i arrangementet. Vil du slette denne begivenhed?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Din adresse er deaktiveret. En aflysningsmail kan ikke sendes til deltagerne i arrangementet. Vil du slette denne begivenhed alligevel?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Din e-mail adresse er deaktiveret. En aflysningsmail kan derfor ikke sendes til deltagerne i arrangementet. Ønsker du at slette denne begivenhed?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">En aflysningsmail vil blive sendt til deltagerne i arrangementet. Vil du slette denne begivenhed?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Din adresse er deaktiveret. En aflysningsmail kan ikke sendes til deltagerne i arrangementet. Vil du slette denne begivenhed alligevel?</string>
     <!-- Delete as an attendee -->

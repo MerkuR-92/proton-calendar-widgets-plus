@@ -17,7 +17,7 @@
     <string name="dialog_button_close">დახურვა</string>
     <string name="dialog_button_remove">წაშლა</string>
     <string name="dialog_button_download">გადმოწერა</string>
-    <string name="dialog_button_update">Update</string>
+    <string name="dialog_button_update">განახლება</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">გაუქმების ელფოსტა გადაეგზავნება მოვლენის მონაწილეებს. გსურთ, წაშალოთ ეს მოვლენა?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">თქვენი მისამართი გამორთულია. გაუქმების ელფოსტის გაგზავნა შეუძლებელია მოვლენის მონაწილეებისთვის. მაინც გსურთ, წაშალოთ ეს მოვლენა?</string>
@@ -148,13 +148,13 @@
     <string name="event_text_timezone_start">დროის სარტყელი</string>
     <string name="invite_in_shared_calendar_disclaimer">მოსაწვევების გაგზავნა მხოლოდ პირადი კალენდრების შიგნითაა შესაძლებელი.</string>
     <string name="invite_change_calendar_disclaimer">მოსაწვევებზე მიმაგრებული კალენდარის ჩასწორება შეუძლებელია.</string>
-    <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
+    <string name="invite_change_attendees_disclaimer">მოსაწვევთან ასოცირებული წევრების ჩასწორება ჯერ შეუძლებელია.</string>
     <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდრის შეცვლა ჯერჯერობით შეუძლებელია.</string>
-    <string name="update_event">Update event</string>
-    <string name="update_invite_send_invitation">An invitation will be sent to the event participants.</string>
-    <string name="update_recurring_event">Update recurring event</string>
-    <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
-    <string name="update_recurring_invite_send_invitation">You will update all the events in this series. An invitation will be sent to the event participants.</string>
+    <string name="update_event">მოვლენის განახლება</string>
+    <string name="update_invite_send_invitation">მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_recurring_event">განმეორებადი მოვლენის განახლება</string>
+    <string name="update_recurring_all_events">გსურთ, განაახლოთ ამ სერიის ყველა მოვლენა?</string>
+    <string name="update_recurring_invite_send_invitation">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>
@@ -240,14 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">მოსაწვევი მოვლენაზე, რომელიც იწყება %1$s %2$s-ზე %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">მოსაწვევი მოვლენაზე, რომელიც იწყება %1$s-ზე</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">მოსაწვევი მოვლენაზე, რომელიც %1$s-ზე იწყება</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Update for an event starting on %1$s at %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Update for an event on %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Update for an event starting on %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">განახლება მოვლენისთვის, რომელიც იწყება %1$s %2$s-ზე %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">მოვლენის განახლება %1$s-ზე</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">მოვლენის განახლება, რომლის დაწყების დროა %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">მოვლენის გაუქმება, რომელიც იწყება %1$s %2$s-ზე %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">მოვლენის გაუქმება %1$s-ზე</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">იმ მოვლენის გაუქმება, %1$s-ზე რომ უნდა დაწყებულიყო</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">მიწვეული ხართ %1$s-ზე.\nროდის: %2$s</string>
-    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s has been updated\nWhen: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s განახლებულია.\nროდის: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (მთელი დღე)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s %2$s-ზე %3$s - %4$s %5$s-ზე %6$s</string>
@@ -300,7 +300,7 @@
     <string name="snack_event_part_stat_updated">დასწრების სტატუსი განახლდა.</string>
     <string name="snack_event_updated">მოვლენა განახლდა</string>
     <string name="snack_event_updated_error_failed_mail">მოსაწვევის გაგზავნის შეცდომა</string>
-    <string name="snack_update_event_error_failed_mail">Update failed</string>
+    <string name="snack_update_event_error_failed_mail">განახლება ვერ მოხერხდა</string>
     <string name="snack_event_updated_error">მოვლენის განახლების შეცდომა</string>
     <string name="snack_event_created">მოვლენა შეიქმნა</string>
     <string name="snack_event_created_failed_mail">მოვლენა შექმნილია, მაგრამ მოსაწვევის გაგზავნა შეუძლებელია</string>
