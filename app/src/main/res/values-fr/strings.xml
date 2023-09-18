@@ -545,7 +545,7 @@
     <string name="spotlight_dialog_month_view_description">Notre nouvelle vue mensuelle vous donne une vue d\'ensemble de vos événements. Passez d\'une vue à l\'autre dans le menu.</string>
     <string name="spotlight_dialog_easy_switch_description">Il est très facile d\'importer les événements et d\'autres données depuis Google Calendar vers Proton Calendar. Notre outil d\'importation Easy Switch vous guide à chaque étape.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Démarrer l\'importation</string>
-    <string name="spotlight_dialog_easy_switch_negative_button">Pas maintenant</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Plus tard</string>
     <string name="spotlight_dialog_auto_invites_title">Acceptez facilement les invitations</string>
     <string name="spotlight_dialog_auto_invites_description">Les invitations sont maintenant affichées dans votre calendrier comme des événements en attente. Pour répondre, il suffit d\'ouvrir un événement.\n\nRendez-vous dans les paramètres pour gérer cela.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Suivant</string>

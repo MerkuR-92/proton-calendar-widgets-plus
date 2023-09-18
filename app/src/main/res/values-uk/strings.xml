@@ -17,7 +17,7 @@
     <string name="dialog_button_close">Закрити</string>
     <string name="dialog_button_remove">Вилучити</string>
     <string name="dialog_button_download">Завантажити</string>
-    <string name="dialog_button_update">Update</string>
+    <string name="dialog_button_update">Оновити</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Лист про скасування буде надіслано всім учасникам події. Бажаєте видалити цю подію?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Ваша адреса вимкнена. Неможливо надіслати лист про скасування учасникам події. Бажаєте все одно видалити цю подію?</string>
@@ -148,13 +148,13 @@
     <string name="event_text_timezone_start">Часовий пояс</string>
     <string name="invite_in_shared_calendar_disclaimer">Надсилання запрошень можливе лише для особистих календарів.</string>
     <string name="invite_change_calendar_disclaimer">Неможливо змінити календар, пов\'язаний із запрошеннями.</string>
-    <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
+    <string name="invite_change_attendees_disclaimer">Неможливо змінити учасників, пов\'язаних із запрошеннями.</string>
     <string name="change_calendar_recurring_disclaimer">Зміна календаря для повторюваних подій поки що неможлива.</string>
-    <string name="update_event">Update event</string>
-    <string name="update_invite_send_invitation">An invitation will be sent to the event participants.</string>
-    <string name="update_recurring_event">Update recurring event</string>
-    <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
-    <string name="update_recurring_invite_send_invitation">You will update all the events in this series. An invitation will be sent to the event participants.</string>
+    <string name="update_event">Оновити подію</string>
+    <string name="update_invite_send_invitation">Запрошення буде надіслано учасникам події.</string>
+    <string name="update_recurring_event">Оновити повторювану подію</string>
+    <string name="update_recurring_all_events">Бажаєте оновити всі події у цій послідовності?</string>
+    <string name="update_recurring_invite_send_invitation">Ви оновите всі події у цій послідовності. Усім учасникам події буде надіслано запрошення.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Що ви шукаєте?</string>
     <string name="search_empty_results_title">Результатів не знайдено</string>
@@ -240,14 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Запрошення на подію – %1$s, %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Запрошення на подію – %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрошення на подію – %1$s</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Update for an event starting on %1$s at %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Update for an event on %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Update for an event starting on %1$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Оновлення для події, що починається %1$s о %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Оновлення для події %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Оновлення для події, що починається %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Скасування події – %1$s, %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Скасування події – %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасування події – %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Вас запрошено на %1$s\nКоли: %2$s</string>
-    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s has been updated\nWhen: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s було оновлено\nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s – %4$s, %5$s %6$s</string>
@@ -300,7 +300,7 @@
     <string name="snack_event_part_stat_updated">Стан участі оновлено.</string>
     <string name="snack_event_updated">Подію оновлено</string>
     <string name="snack_event_updated_error_failed_mail">Не вдалося надіслати запрошення</string>
-    <string name="snack_update_event_error_failed_mail">Update failed</string>
+    <string name="snack_update_event_error_failed_mail">Оновлення невдале</string>
     <string name="snack_event_updated_error">Помилка оновлення події</string>
     <string name="snack_event_created">Подію створено</string>
     <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>

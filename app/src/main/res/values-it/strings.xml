@@ -292,7 +292,7 @@
     <string name="snack_event_deleted_as_organizer">Cancellazione inviata e evento cancellato</string>
     <string name="snack_event_deleted_as_attendee">Risposta inviata e evento eliminato</string>
     <string name="snack_event_deleted_error">Errore nell\'eliminazione dell\'evento</string>
-    <string name="snack_event_deleted_as_organizer_error">Impossibile inviare l\'email di cancellazione, riprovare</string>
+    <string name="snack_event_deleted_as_organizer_error">Impossibile inviare l\'email di cancellazione. Per favore riprova</string>
     <string name="snack_event_opening_error">Errore nell\'apertura dell\'evento</string>
     <string name="snack_event_saving">Salvataggio evento</string>
     <string name="snack_event_deleting">Eliminazione evento</string>
@@ -487,7 +487,7 @@
     <string name="delete_calendar_snack_error">Errore durante l\'eliminazione del calendario</string>
     <string name="remove_calendar_snack_error">Errore nella rimozione del calendario</string>
     <string name="leave_calendar_snack_error">Errore nell\'abbandono del calendario</string>
-    <string name="delete_calendar_snack_error_password_confirmation">Conferma della password fallita</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Conferma della password non riuscita</string>
     <string name="recreate_calendar_dialog_title">Cancella calendario</string>
     <string name="recreate_calendar_dialog_message">Questa azione rimuoverà tutti gli eventi e gli utenti invitati.\n\nSei sicuro di voler cancellare questo calendario?</string>
     <string name="recreate_calendar_snack_error">Errore durante la cancellazione del calendario</string>
@@ -580,9 +580,9 @@
     <string name="import_assistant_update_import_wrong_account_error">Conto sbagliato. Accedi con l\'account utilizzato per l\'importazione del calendario.</string>
     <string name="import_assistant_start_import_error">Impossibile avviare l\'importazione, riprova più tardi.</string>
     <string name="import_assistant_delete_import_success">Record dell\'importazione eliminato</string>
-    <string name="import_assistant_delete_import_error">Cancellazione dell\'importazione fallita, si prega di riprovare più tardi.</string>
+    <string name="import_assistant_delete_import_error">Eliminazione dell\'importazione non riuscita. Riprova più tardi.</string>
     <string name="import_assistant_cancel_import_error">Annullamento dell\'importazione fallito, si prega di riprovare più tardi.</string>
-    <string name="import_assistant_resume_import_error">Ripristino dell\'importazione fallito, si prega di riprovare più tardi.</string>
+    <string name="import_assistant_resume_import_error">Impossibile riprendere l\'importazione. Riprova più tardi</string>
     <string name="import_assistant_create_calendar_error">Impossibile creare uno o più calendari</string>
     <string name="import_assistant_start_import_empty_error">Impossibile avviare l\'importazione, non ci sono calendari da importare</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa come</string>
@@ -613,7 +613,7 @@
     <string name="import_assistant_status_paused_lost_connection_description">Per continuare l\'importazione, tocca Riconnetti, accedi a Google e concedi nuovamente a Proton l\'accesso ai tuoi dati Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Riconnetti</string>
     <string name="import_assistant_status_paused_storage_full_title">Il tuo spazio di archiviazione è pieno</string>
-    <string name="import_assistant_status_paused_storage_full_description">Il tuo account Proton non ha spazio di archiviazione sufficiente per completare l\'importazione del calendario. Libera spazio o aggiungi altro spazio di archiviazione, quindi torna qui per Continuare.</string>
+    <string name="import_assistant_status_paused_storage_full_description">Il tuo account Proton non ha spazio di archiviazione sufficiente per completare l\'importazione del calendario. Libera spazio o aggiungi altro spazio di archiviazione, poi torna qui per riprendere.</string>
     <string name="import_assistant_status_paused_storage_full_button">Riprendi</string>
     <string name="import_assistant_delete_report_title">Rimuovere dalla lista?</string>
     <string name="import_assistant_delete_report_message">Non vedrai più questo record di importazione nella lista.</string>
