@@ -126,6 +126,9 @@ import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewMod
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
+import me.proton.core.notification.presentation.deeplink.DeeplinkManager
+import me.proton.core.notification.presentation.deeplink.HandleDeeplinkIntent
+import me.proton.core.notification.presentation.deeplink.onActivityCreate
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
 import me.proton.core.presentation.utils.errorSnack
@@ -147,6 +150,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private lateinit var navController: NavController
+
+    @Inject
+    lateinit var deeplinkManager: DeeplinkManager
 
     @Inject
     lateinit var logger: Logger
@@ -297,6 +303,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             )
         }
         super.onCreate(savedInstanceState)
+        deeplinkManager.onActivityCreate(this, savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
 
