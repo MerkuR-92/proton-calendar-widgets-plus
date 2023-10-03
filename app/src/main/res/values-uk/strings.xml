@@ -240,14 +240,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Запрошення на подію – %1$s, %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Запрошення на подію – %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрошення на подію – %1$s</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Оновлення для події, що починається %1$s о %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Оновлення для події, що починається %1$s %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Оновлення для події %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Оновлення для події, що починається %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Скасування події – %1$s, %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Скасування події – %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасування події – %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Вас запрошено на %1$s\nКоли: %2$s</string>
-    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s було оновлено\nКоли: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s було оновлено \nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s, %2$s %3$s – %4$s, %5$s %6$s</string>
@@ -300,7 +300,7 @@
     <string name="snack_event_part_stat_updated">Стан участі оновлено.</string>
     <string name="snack_event_updated">Подію оновлено</string>
     <string name="snack_event_updated_error_failed_mail">Не вдалося надіслати запрошення</string>
-    <string name="snack_update_event_error_failed_mail">Оновлення невдале</string>
+    <string name="snack_update_event_error_failed_mail">Не вдалося оновити</string>
     <string name="snack_event_updated_error">Помилка оновлення події</string>
     <string name="snack_event_created">Подію створено</string>
     <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>

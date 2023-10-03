@@ -441,8 +441,8 @@
     <string name="settings_calendar_syncing" comment="Calendar syncing">Synkronoidaan</string>
     <string name="settings_calendar_subscribed_invalid_ics">Kalenterin muotoa ei tueta</string>
     <string name="settings_calendar_subscribed_too_big">Kalenteri on liian suuri</string>
-    <string name="settings_calendar_subscribed_not_accessible">Kalenterin linkki ei ole tavoitettavissa</string>
-    <string name="settings_calendar_subscribed_tmp_not_accessible">Kalenterilinkki on tilapäisesti tavoittamattomissa</string>
+    <string name="settings_calendar_subscribed_not_accessible">Kalenterikytköstä ei tavoiteta</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">Kalenterikytkös on tilapäisesti tavoittamattomissa</string>
     <string name="settings_calendar_subscribed_last_sync_old">Edellisestä päivityksestä on yli 12 tuntia</string>
     <string name="settings_calendar_subscribed_not_decrypted">Kalenterin salausta ei voitu purkaa</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>

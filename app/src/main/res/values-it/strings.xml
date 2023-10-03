@@ -42,7 +42,7 @@
     <string name="action_delete">Elimina</string>
     <string name="action_remove">Elimina</string>
     <string name="action_leave">Abbandona</string>
-    <string name="action_recreate">Reset</string>
+    <string name="action_recreate">Cancella</string>
     <string name="action_today">Oggi</string>
     <string name="action_create_event">Crea evento</string>
     <string name="action_mark_default">Segna come predefinito</string>
@@ -51,7 +51,7 @@
     <string name="agenda_loading_events">Caricamento eventi…</string>
     <string name="agenda_loading_events_error">Errore durante il caricamento degli eventi</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d in più</string>
+    <string name="day_view_all_day_more">+ %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Tutto il giorno</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -98,7 +98,7 @@
     <string name="event_decryption_error_dialog_confirmation">Elimina evento</string>
     <string name="event_decryption_error_dialog_confirmation_recurring">Elimina eventi</string>
     <string name="event_decryption_error_dialog_close">Chiudi</string>
-    <string name="event_signature_verification_failure">La verifica della firma dell\'evento non è riuscita.<a href="https://proton.me/support/what-is-a-digital-signature">Per saperne di più</a></string>
+    <string name="event_signature_verification_failure">La verifica della firma dell\'evento non è riuscita.<a href="https://proton.me/support/what-is-a-digital-signature">Scopri di più</a></string>
     <string name="event_signature_verification_in_progress">È in corso la verifica della firma dell\'evento.</string>
     <string name="event_signature_verification_network_error">La verifica della firma dell\'evento è stata interrotta da un errore.<a href="">Riprova</a></string>
     <string name="event_change_answer_recurring_title">Aggiorna l\'evento ricorrente</string>
@@ -136,7 +136,7 @@
     <string name="event_text_add_participants">Aggiungi partecipanti</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Partecipanti (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Tu</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d in più</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d</string>
     <string name="event_text_switch_all_day">Tutto il giorno</string>
     <string name="event_text_date_start">Inizia</string>
     <string name="event_text_date_end">Finisce</string>
@@ -283,7 +283,7 @@
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
     <string name="nav_view_more_bug">Segnala un problema</string>
     <string name="nav_view_more_subscription">Abbonamento</string>
-    <string name="nav_view_more_logout">Esci</string>
+    <string name="nav_view_more_logout">Disconnetti</string>
     <string name="nav_view_more_login">Accedi</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
@@ -299,7 +299,7 @@
     <string name="snack_event_changing_answer">Aggiornamento risposta</string>
     <string name="snack_event_part_stat_updated">Stato partecipazione aggiornato.</string>
     <string name="snack_event_updated">Evento aggiornato</string>
-    <string name="snack_event_updated_error_failed_mail">Invito non riuscito</string>
+    <string name="snack_event_updated_error_failed_mail">Invio dell\'invito non riuscito</string>
     <string name="snack_update_event_error_failed_mail">Aggiornamento non riuscito</string>
     <string name="snack_event_updated_error">Errore nell\'aggiornamento dell\'evento</string>
     <string name="snack_event_created">Evento creato</string>
@@ -311,9 +311,9 @@
     <string name="snack_event_init_error">Errore nell\'inizializzare il nuovo evento</string>
     <string name="snack_event_calendar_error">Errore nel cambiare calendario</string>
     <string name="snack_event_maximum_alarm_reached_error">Hai raggiunto il numero massimo di notifiche</string>
-    <string name="snack_send_bug_report_success">Report inviato, grazie per il tuo feedback</string>
-    <string name="snack_send_bug_report_error">Errore durante l\'invio del rapporto, riprova più tardi</string>
-    <string name="snack_send_bug_report_description_empty">Fornisci una descrizione del tuo rapporto</string>
+    <string name="snack_send_bug_report_success">Segnalazione inviata, grazie per il tuo feedback</string>
+    <string name="snack_send_bug_report_error">Errore durante l\'invio della segnalazione. Riprova più tardi</string>
+    <string name="snack_send_bug_report_description_empty">Fornisci una descrizione della tua segnalazione</string>
     <string name="snack_create_event_no_active_personal_calendar">Hai bisogno di un calendario personale attivo per creare eventi</string>
     <string name="snack_create_event_no_active_calendar">Hai bisogno di un calendario attivo per creare eventi.</string>
     <string name="snack_add_self_as_participant">Auto-invito non consentito</string>
@@ -356,7 +356,7 @@
     <string name="snack_ics_too_many_events_error">Non sono ancora supportati eventi multipli</string>
     <string name="snack_ics_no_events_error">Questo calendario non contiene alcun evento</string>
     <string name="snack_ics_invalid_error">Questo invito non è valido</string>
-    <string name="snack_ics_disabled_calendar_error">Riattiva l\'indirizzo collegato a questo calendario per aggiornare questo evento</string>
+    <string name="snack_ics_disabled_calendar_error">Abilita nuovamente l\'indirizzo collegato a questo calendario per aggiornare questo evento</string>
     <string name="snack_ics_event_deleted_error">L\'evento non esiste più nel tuo calendario</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s ha accettato il tuo invito</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ha accettato provvisoriamente il tuo invito</string>
@@ -377,7 +377,7 @@
     <string name="update_timezone_dialog_confirmation">Aggiorna</string>
     <string name="update_timezone_dialog_cancel">Annulla</string>
     <string name="contacts_permission_dialog_title">Consentire a Proton Calendar di accedere ai propri contatti?</string>
-    <string name="contacts_permission_dialog_message">Proton Calendar ha bisogno di accedere ai contatti del telefono per aiutarti ad aggiungerli facilmente ai tuoi eventi.</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar ha bisogno dell\'accesso ai contatti del tuo telefono per aiutarti ad aggiungerli facilmente ai tuoi eventi.</string>
     <string name="contacts_permission_dialog_allow">Consenti</string>
     <string name="contacts_permission_dialog_open_settings">Apri Impostazioni</string>
     <string name="contacts_permission_dialog_cancel">Nega</string>
@@ -480,7 +480,7 @@
     <string name="remove_calendar_dialog_title">Rimuovi calendario</string>
     <string name="remove_calendar_dialog_message">Sei sicuro di voler rimuovere questo calendario?</string>
     <string name="leave_calendar_dialog_title">Abbandona il calendario</string>
-    <string name="leave_calendar_dialog_message">Se abbandoni questo calendario dovrai chiedere al proprietario per partecipare nuovamente.</string>
+    <string name="leave_calendar_dialog_message">Se abbandoni questo calendario sarà necessario chiedere al proprietario per unirti nuovamente.</string>
     <string name="delete_default_calendar_dialog_message">Sei sicuro di voler eliminare questo calendario? \"%1$s\" sarà impostato come calendario predefinito.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminato</string>
     <string name="remove_calendar_snack_removed">Calendario rimosso</string>
@@ -510,7 +510,7 @@
     <string name="bootstrap_error_no_active_calendar_title">Non ci sono calendari personali attivi associati a questo account.</string>
     <string name="bootstrap_error_no_active_calendar_message">Per sapere come attivare un calendario, visitate il nostro sito <a href="https://proton.me/support">conoscenze di base</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Non c\'è più spazio di archiviazione disponibile.</string>
-    <string name="bootstrap_error_store_quota_reached_learn_more">Per saperne di più</string>
+    <string name="bootstrap_error_store_quota_reached_learn_more">Scopri di più</string>
     <string name="bootstrap_error_reset_needed_title">Reimposta le chiavi del calendario</string>
     <string name="bootstrap_error_reset_needed_message">Hai reimpostato la password e gli eventi collegati ai seguenti calendari non possono essere decriptati. Tutti i calendari attivi a cui sei iscritto si sincronizzeranno di nuovo dopo pochi minuti.</string>
     <string name="bootstrap_error_update_passphrase_title">Riattiva le chiavi del calendario</string>
@@ -550,9 +550,9 @@
     <string name="spotlight_dialog_auto_invites_description">Ora gli inviti appaiono sul tuo calendario come eventi in attesa. Apri un evento per rispondere.\n\nPer gestirlo, vai alle impostazioni.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Prossimo</string>
     <string name="spotlight_v5_dialog_got_it_button">Ho capito</string>
-    <string name="spotlight_v5_dialog_learn_more_button">Per saperne di più</string>
+    <string name="spotlight_v5_dialog_learn_more_button">Scopri di più</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton Aggiornato, protezione unificata</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Presentazione del nuovo look di Proton. Ti diamo il benvenuto in un Internet in cui la privacy è l\'impostazione predefinita. <a href="https://proton.me/news/updated-proton">Per saperne di più</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Presentazione del nuovo look di Proton. Ti diamo il benvenuto in un Internet in cui la privacy è l\'impostazione predefinita. <a href="https://proton.me/news/updated-proton">Scopri di più</a></string>
     <string name="spotlight_dialog_week_view_title">Più opzioni di visualizzazione</string>
     <string name="spotlight_dialog_week_view_description">• Presentazione delle visualizzazioni del calendario in modalità <b>3 giorni</b> e in modalità <b>settimana</b>. Seleziona la tua visualizzazione preferita nel <b>menu</b>.\n\n• Regola l\'altezza delle righe della griglia del giorno, pizzicando con due dita per ingrandire o ridurre.</string>
     <string name="spotlight_dialog_search_title">Cerca eventi</string>
@@ -569,7 +569,7 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
-    <string name="import_assistant_prepare_import_error">Errore durante la preparazione dell\'importazione, si prega di riprovare più tardi</string>
+    <string name="import_assistant_prepare_import_error">Errore durante la preparazione dell\'importazione. Riprova più tardi</string>
     <string name="import_assistant_prepare_import">Preparazione dell\'importazione</string>
     <string name="import_assistant_gathering_data_loader_title">Raccolta dei tuoi dati</string>
     <string name="import_assistant_summary_title">Riepilogo dell\'importazione</string>
@@ -581,9 +581,9 @@
     <string name="import_assistant_start_import_error">Impossibile avviare l\'importazione, riprova più tardi.</string>
     <string name="import_assistant_delete_import_success">Record dell\'importazione eliminato</string>
     <string name="import_assistant_delete_import_error">Eliminazione dell\'importazione non riuscita. Riprova più tardi.</string>
-    <string name="import_assistant_cancel_import_error">Annullamento dell\'importazione fallito, si prega di riprovare più tardi.</string>
+    <string name="import_assistant_cancel_import_error">Annullamento dell\'importazione non riuscito. Riprova più tardi.</string>
     <string name="import_assistant_resume_import_error">Impossibile riprendere l\'importazione. Riprova più tardi</string>
-    <string name="import_assistant_create_calendar_error">Impossibile creare uno o più calendari</string>
+    <string name="import_assistant_create_calendar_error">Creazione di uno o più calendari non riuscito</string>
     <string name="import_assistant_start_import_empty_error">Impossibile avviare l\'importazione, non ci sono calendari da importare</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa come</string>
     <string name="import_assistant_new_calendar_badge">Nuovo</string>

@@ -2,7 +2,7 @@
 <resources>
     <string name="default_event_summary" comment="Event has no title">(tanpa judul)</string>
     <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
-    <string name="default_user_email">(tanpa alamat email)</string>
+    <string name="default_user_email">(tanpa alamat surel)</string>
     <string name="default_user_display_name">(tanpa nama)</string>
     <string name="toast_copied_to_clipboard">Disalin ke papan klip</string>
     <!-- DELETE EVENT DIALOG -->
@@ -19,17 +19,17 @@
     <string name="dialog_button_download">Unduh</string>
     <string name="dialog_button_update">Perbarui</string>
     <!-- Delete as an organizer -->
-    <string name="dialog_description_delete_event_as_organizer">Email pembatalan akan dikirim ke peserta acara. Apakah Anda ingin menghapus acara ini?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Alamat Anda sedang dinonaktifkan. Email pembatalan tidak akan dapat dikirim kepada para peserta acara. Apakah Anda tetap ingin menghapus acara ini?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer">Email pembatalan akan dikirimkan ke peserta acara. Apakah Anda ingin menghapus semua rangkaian acara ini?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Alamat Anda dinonaktifkan. Email pembatalan tidak dapat dikirimkan kepada peserta acara. Apakah Anda tetap ingin menghapus semua acara dalam rangkaian ini?</string>
+    <string name="dialog_description_delete_event_as_organizer">Surel pembatalan akan dikirim ke peserta acara. Apakah Anda ingin menghapus acara ini?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Alamat Anda sedang dinonaktifkan. Surel pembatalan tidak akan dapat dikirim kepada para peserta acara. Apakah Anda tetap ingin menghapus acara ini?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">Surel pembatalan akan dikirimkan ke peserta acara. Apakah Anda ingin menghapus semua rangkaian acara ini?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Alamat Anda dinonaktifkan. Surel pembatalan tidak dapat dikirimkan kepada peserta acara. Apakah Anda tetap ingin menghapus semua acara dalam rangkaian ini?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">Penyelenggara acara ini akan diberi tahu bahwa Anda menolak undangan. Apakah Anda ingin menghapus acara ini?</string>
-    <string name="dialog_description_delete_single_event_as_attendee_disabled">Penyelenggara acara ini tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan email dari alamat pengundang. Apakah Anda tetap ingin menghapus acara ini?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">Penyelenggara acara ini tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan surel dari alamat pengundang. Apakah Anda tetap ingin menghapus acara ini?</string>
     <string name="dialog_description_delete_recurring_event_as_attendee">Penyelenggara rangkaian acara ini akan diberi tahu bahwa Anda menolak undangan. Apakah Anda ingin menghapus seluruh rangkaian acara ini?</string>
-    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Penyelenggara rangkaian acara ini tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan email dari alamat yang diundang. Apakah Anda tetap ingin menghapus seluruh rangkaian acara ini?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Penyelenggara rangkaian acara ini tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan surel dari alamat yang diundang. Apakah Anda tetap ingin menghapus seluruh rangkaian acara ini?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Acara ini telah diperbarui. Penyelenggara akan diberi tahu bahwa Anda menolak undangan. Apakah Anda ingin menghapus acara ini?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Acara ini telah diperbarui. Penyelenggara tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan email dari alamat yang diundang. Apakah Anda ingin menghapus acara ini?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Acara ini telah diperbarui. Penyelenggara tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan surel dari alamat yang diundang. Apakah Anda ingin menghapus acara ini?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Kejadian yang sebelumnya diperbarui oleh penyelenggara akan disimpan, tetapi jawaban Anda akan hilang</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Kejadian yang sebelumnya diperbaru oleh penyelenggara akan disimpan</string>
@@ -57,15 +57,15 @@
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
     <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
     <string name="event_alarm_label_at_event_time">Pada saat acara</string>
-    <string name="event_alarm_label_at_event_time_by_email">Pada saat acara melalui email</string>
+    <string name="event_alarm_label_at_event_time_by_email">Pada saat acara melalui surel</string>
     <string name="event_alarm_label_on_the_same_day">Pada hari yang sama</string>
     <string name="event_alarm_label_before">%1$s sebelumnya</string>
     <string name="event_alarm_label">%1$s</string>
-    <string name="event_alarm_label_before_by_email">%1$s sebelumnya melalui email</string>
+    <string name="event_alarm_label_before_by_email">%1$s sebelumnya melalui surel</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s pada %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s pada %2$s melalui email</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s pada %2$s melalui surel</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s sebelumnya pada %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s sebelumnya pada %2$s melalui email</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s sebelumnya pada %2$s melalui surel</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s pada %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s pada hari %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s pada %2$s</string>
@@ -200,7 +200,7 @@
     <string name="event_alarm_at_time" comment="Example: at 15:00">pukul %1$s</string>
     <string name="event_alarm_action">Dikirim oleh</string>
     <string name="event_alarm_action_notification">pemberitahuan</string>
-    <string name="event_alarm_action_email">email</string>
+    <string name="event_alarm_action_email">surel</string>
     <string name="event_alarm_same_day">pada saat acara</string>
     <string name="event_recurrence_1">tidak berulang</string>
     <string name="event_recurrence_2">setiap hari</string>
@@ -292,7 +292,7 @@
     <string name="snack_event_deleted_as_organizer">Pembatalan dikirim dan acara dihapus</string>
     <string name="snack_event_deleted_as_attendee">Jawaban dikirim dan acara dihapus</string>
     <string name="snack_event_deleted_error">Kesalahan menghapus acara</string>
-    <string name="snack_event_deleted_as_organizer_error">Email pembatalan tidak dapat terkirim, mohon coba kembali</string>
+    <string name="snack_event_deleted_as_organizer_error">Surel pembatalan tidak dapat terkirim, mohon coba kembali</string>
     <string name="snack_event_opening_error">Kesalahan membuka acara</string>
     <string name="snack_event_saving">Menyimpan acara</string>
     <string name="snack_event_deleting">Menghapus acara</string>
@@ -319,7 +319,7 @@
     <string name="snack_add_self_as_participant">Tidak bisa mengundang diri sendiri</string>
     <string name="snack_maximum_participants_reached">Jumlah peserta telah mencapai batas maksimal.</string>
     <string name="snack_add_participant_error">Terjadi masalah saat menambah peserta</string>
-    <string name="snack_add_participant_invalid_email">Alamat email tidak valid</string>
+    <string name="snack_add_participant_invalid_email">Alamat surel tidak valid</string>
     <string name="snack_change_attendee_answer_error">Pengiriman jawaban gagal, mohon coba kembali</string>
     <string name="snack_network_error">Terjadi masalah jaringan, mohon coba kembali nanti</string>
     <string name="snack_import_event_signed_out">Anda harus masuk untuk mengimpor acara</string>
@@ -347,7 +347,7 @@
     <string name="snack_ics_unsupported_refresh_error">Pemuatan ulang acara untuk saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_publish_error">Impor acara untuk saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Kami saat ini hanya mendukung jawaban yang diperuntukkan bagi seluruh acara yang terdapat pada suatu rangkaian</string>
-    <string name="snack_ics_party_crasher_error">Alamat email Anda tidak ada dalam daftar peserta</string>
+    <string name="snack_ics_party_crasher_error">Alamat surel Anda tidak ada dalam daftar peserta</string>
     <string name="snack_ics_reply_party_crasher_error">Peserta yang tidak diundang oleh penyelenggara tidak bisa ditambahkan</string>
     <string name="snack_ics_missing_uid_error">UID acara ini hilang</string>
     <string name="snack_ics_no_active_personal_calendar_error">Tidak ada kalender personal aktif yang terhubung dengan akun ini</string>
@@ -460,8 +460,8 @@
     <string name="calendar_form_default_event_notifications">Pemberitahuan acara</string>
     <string name="calendar_form_default_all_day_event_notifications">Notifikasi acara sepanjang hari</string>
     <string name="calendar_form_add_notification">Tambahkan pemberitahuan</string>
-    <string name="calendar_form_default_email">Alamat email</string>
-    <string name="calendar_form_default_email_value_error">Gagal memuat email bawaan</string>
+    <string name="calendar_form_default_email">Alamat surel</string>
+    <string name="calendar_form_default_email_value_error">Gagal memuat surel bawaan</string>
     <string name="calendar_form_name_hint">Tambah nama kalender</string>
     <string name="calendar_form_name_required_error">Nama diperlukan</string>
     <string name="calendar_form_description_hint">Tambahkan deskripsi kalender</string>
@@ -633,7 +633,7 @@
     <string name="import_assistant_in_progress_error_snack">Masih ada impor yang berlangsung</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Impor sebagai acara sederhana?</string>
-    <string name="import_event_disclaimer_dialog_description">\nUndangan yang diimpor akan muncul pada Proton Calendar dalam bentuk acara sederhana <b>tanpa rincian penyelenggara</b> dan <b>peserta</b>.\n\nUntuk mendapatkan pembaruan seputar acara dan melihat daftar peserta, mintalah penyelenggara acara untuk mengundang Anda menggunakan alamat email Proton Anda.</string>
+    <string name="import_event_disclaimer_dialog_description">\nUndangan yang diimpor akan muncul pada Proton Calendar dalam bentuk acara sederhana <b>tanpa rincian penyelenggara</b> dan <b>peserta</b>.\n\nUntuk mendapatkan pembaruan seputar acara dan melihat daftar peserta, mintalah penyelenggara acara untuk mengundang Anda menggunakan alamat surel Proton Anda.</string>
     <string name="import_event_disclaimer_dialog_positive">Impor</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
