@@ -29,32 +29,22 @@ class HandleAlarmsUseCase @Inject constructor(
 ) {
 
     companion object {
-        const val WORKER_ID = "HANDLE_ALARMS"
+        const val HANDLE_ALARMS = "HANDLE_ALARMS"
     }
 
     suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null): UseCase.Result {
-        logger.v("executing HandleAlarmsUseCase, alarmEpochSeconds: $alarmEpochSeconds")
-
         val nowInstant = Instant.now()
-
-        val broadcastReceivedLateMinutes = if (alarmEpochSeconds != null) {
-            Duration.ofSeconds(nowInstant.epochSecond - alarmEpochSeconds).toMinutes()
-        } else 0
-
-        if (broadcastReceivedLateMinutes >= 5) {
-            //logger.i("HandleAlarmsUseCase executed ${broadcastReceivedLateMinutes} minutes later than scheduled")
-        }
 
         val lastHandledTimestamp =
             valueStoreProvider.provideValueStore(userId.id).getLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP)
-                ?: (alarmEpochSeconds ?: nowInstant.epochSecond) - 1 // if no alarms were ever shown, let's pretend we've shown all until 1 second ago
+                ?: ((alarmEpochSeconds
+                    ?: nowInstant.epochSecond) - 1) // if no alarms were ever shown, let's pretend we've shown all until 1 second ago
 
         val alarmsToDisplayNow =
             database.eventAlarmsDao().selectAllBetweenInclusive(lastHandledTimestamp + 1, nowInstant.epochSecond)
                 .filterOutDuplicates()
                 .filter { it.action == AlarmAction.DISPLAY.value }
 
-        logger.v("alarms to display at ${nowInstant}: ${alarmsToDisplayNow}")
         showNotificationUseCase.execute(alarmsToDisplayNow, userId.id)
 
         val maxAlarmOccurrenceSeconds =
@@ -62,22 +52,13 @@ class HandleAlarmsUseCase @Inject constructor(
         valueStoreProvider.provideValueStore(userId.id)
             .putLong(ValueKey.LAST_EVENT_ALARM_HANDLED_TIMESTAMP, maxAlarmOccurrenceSeconds)
 
-        val minAlarmOccurrenceSeconds =
-            alarmsToDisplayNow.minByOrNull { it.occurrence }?.occurrence ?: nowInstant.epochSecond
-        val minutesLate = ((nowInstant.epochSecond - minAlarmOccurrenceSeconds) / 60.0).roundToInt()
-        if (alarmsToDisplayNow.isNotEmpty() && minutesLate >= 5) {
-            //logger.i("missed alarms to display: ${alarmsToDisplayNow.size} after ~${minutesLate} minutes")
-        }
-
         // get next event alarms after currently shown and set system alarm to fire at that timestamp
         val alarmsToDisplayNext = database.eventAlarmsDao().selectUpcomingInclusive(maxAlarmOccurrenceSeconds + 1)
-        logger.v("alarmsToDisplayNext: ${alarmsToDisplayNext}")
         alarmsToDisplayNext.firstOrNull()?.let {
             rescheduleSystemAlarm(Instant.ofEpochSecond(it.occurrence))
         }
 
         return UseCase.Result.Success<Unit>()
-
     }
 
     private fun rescheduleSystemAlarm(atInstant: Instant) {
@@ -99,7 +80,6 @@ class HandleAlarmsUseCase @Inject constructor(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             logger.i("HandleAlarmsUseCase: can't schedule exact alarms")
         } else {
-            logger.d("HandleAlarmsUseCase setExactAndAllowWhileIdle next alarm at ${atInstant.atZone(ZoneId.systemDefault())}")
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atInstant.toEpochMilli(), pendingIntent)
         }
 

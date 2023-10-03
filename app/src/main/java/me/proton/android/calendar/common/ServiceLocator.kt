@@ -52,6 +52,7 @@ import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
@@ -63,7 +64,12 @@ import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarSubscriptionUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.RefreshMembersFlagsUseCase
 import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
@@ -142,7 +148,7 @@ val useCaseModule = module {
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<HandleAlarmsUseCase> { HandleAlarmsUseCase(get(), get(), get(), get(), get()) }
-    factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<UpdateAlarmsUseCase> { UpdateAlarmsUseCase(get(), get(), get(), get(), get(), get()) }
     factory<CreateCalendarUseCase> { CreateCalendarUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<RecreateCalendarUseCase> { RecreateCalendarUseCase(get(), get(), get(), get(), get()) }
     factory<KeySetupUseCase> { KeySetupUseCase(get(), get(), get(), get(), get()) }
@@ -150,7 +156,7 @@ val useCaseModule = module {
     factory<ShowNotificationUseCase> { ShowNotificationUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<SendBugReportUseCase> { SendBugReportUseCase(get(), get()) }
     factory<GetCanonicalEmailsUseCase> { GetCanonicalEmailsUseCase(get(), get()) }
-    factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get(), get()) }
+    factory<CalendarUserSettingsChangedUseCase> { CalendarUserSettingsChangedUseCase(get(), get(), get()) }
     factory<ReactivateCalendarKeyUseCase> { ReactivateCalendarKeyUseCase(get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUserSettingsUseCase> { UpdateCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<UpdateUserSettingsUseCase> { UpdateUserSettingsUseCase(get(), get(), get()) }
@@ -162,7 +168,7 @@ val useCaseModule = module {
     factory<UpdateCalendarSettingsUseCase> { UpdateCalendarSettingsUseCase(get(), get(), get(), get()) }
     factory<DeleteCalendarUseCase> { DeleteCalendarUseCase(get(), get(), get(), get()) }
     factory<CalendarSettingsChangedUseCase> { CalendarSettingsChangedUseCase(get(), get(), get(), get()) }
-    factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get()) }
+    factory<RefreshCalendarUserSettingsUseCase> { RefreshCalendarUserSettingsUseCase(get(), get(), get(), get()) }
     factory<SafePersistEventAlarmUseCase> { SafePersistEventAlarmUseCase(get(), get()) }
     factory<ObtainSendPreferencesUseCase> { ObtainSendPreferencesUseCase(get(), get(), get(), get(), get(), get()) }
     factory<ObtainPinnedKeysUseCase> { ObtainPinnedKeysUseCase(get(), get(), get(), get(), get()) }

@@ -1,31 +1,34 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import io.mockk.*
-import kotlinx.coroutines.flow.flowOf
+import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
-import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
-import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerDelegate
-import me.proton.android.calendar.test.shared.mocks.*
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.calendarKeyPacket
+import me.proton.android.calendar.test.shared.mocks.eventUid
+import me.proton.android.calendar.test.shared.mocks.sharedEventId
+import me.proton.android.calendar.test.shared.mocks.sharedKeyPacket
+import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.eventmanager.domain.extension.asCalendar
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -34,9 +37,10 @@ class CalendarEventListenerTest {
 
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk()
-    private val delegate: CalendarEventListenerDelegate = mockk(relaxed = true)
-    private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase = mockk(relaxed = true)
+    private val widgetRefresher: WidgetRefresher = mockk()
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase = mockk(relaxed = true)
     private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase = mockk(relaxed = true)
+    private val workManager: WorkManager = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
 
     private lateinit var listener: CalendarEventListener
@@ -48,10 +52,11 @@ class CalendarEventListenerTest {
         listener = CalendarEventListener(
             db,
             calendarsRepository,
-            delegate,
-            getMinimalCalendarEventsUseCase,
             resetCalendarSearchUseCase,
             logger,
+            workManager,
+            widgetRefresher,
+            updateAlarmsUseCase
         )
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
@@ -66,248 +71,13 @@ class CalendarEventListenerTest {
     }
 
     @Test
-    fun `onPrepare calls delegate's onPrepare`() {
-        runBlocking {
-            val metadata = listOf(createEventMetadata("id_1"))
-
-            listener.onPrepare(config, metadata)
-
-            coVerify(exactly = 1) { delegate.onPrepare(any(), any()) }
-        }
-    }
-
-    @Test
-    fun `onCreate calls delegate's onCreate if calendar is present`() {
-        runBlocking {
-            val capturedIds = slot<List<String>>()
-            coEvery { delegate.onCreate(capture(capturedIds)) } returns Unit
-            val metadata = listOf(createEventMetadata("id_1"))
-
-            listener.onCreate(config, metadata)
-
-            coVerify(exactly = 1) { delegate.onCreate(any()) }
-            assertThat(capturedIds.captured).isEqualTo(metadata.map { it.id })
-        }
-    }
-
-    @Test
-    fun `onCreate doesn't call delegate's onCreate if calendar is not present`() {
-        runBlocking {
-            coEvery { calendarsRepository.hasCalendar(any()) } returns false
-            val metadata = listOf(createEventMetadata("id_1"))
-
-            listener.onCreate(config, metadata)
-
-            coVerify(exactly = 0) { delegate.onCreate(any()) }
-            coVerify(exactly = 1) { logger.i(any()) }
-        }
-    }
-
-    @Test
-    fun `onUpdate calls delegate's onUpdate`() {
-        runBlocking {
-            val capturedIds = slot<List<String>>()
-            coEvery { delegate.onUpdate(capture(capturedIds)) } returns Unit
-            val metadata = listOf(createEventMetadata("id_1"))
-
-            listener.onUpdate(config, metadata)
-
-            coVerify(exactly = 1) { delegate.onUpdate(any()) }
-            assertThat(capturedIds.captured).isEqualTo(metadata.map { it.id })
-        }
-    }
-
-    @Test
-    fun `onUpdate doesn't call delegate's onUpdate if calendar is not present`() {
-        runBlocking {
-            coEvery { calendarsRepository.hasCalendar(any()) } returns false
-            val metadata = listOf(createEventMetadata("id_1"))
-
-            listener.onUpdate(config, metadata)
-
-            coVerify(exactly = 0) { delegate.onUpdate(any()) }
-            coVerify(exactly = 1) { logger.i(any()) }
-        }
-    }
-
-    @Test
-    fun `onDelete calls delegate's onDelete`() {
-        runBlocking {
-            val capturedIds = slot<List<String>>()
-            coEvery { delegate.onDelete(any(), capture(capturedIds)) } returns Unit
-            val ids = listOf("id_1")
-
-            listener.onDelete(config, ids)
-
-            coVerify(exactly = 1) { delegate.onDelete(any(), any()) }
-            assertThat(capturedIds.captured).isEqualTo(ids)
-        }
-    }
-
-    @Test
-    fun `onSuccess calls delegate's onSuccess with events that were either created or updated`() {
-        runBlocking {
-            val capturedIds = slot<List<String>>()
-            coEvery { delegate.onSuccess(any(), capture(capturedIds)) } returns Unit
-
-            listener.notifySuccess(config, EventMetadata(
-                userId,
-                EventId("eventId"),
-                config,
-                response = EventsResponse(eventsResponseWithCreateUpdateDelete),
-                createdAt = 0L
-            ))
-
-            coVerify(exactly = 1) { delegate.onSuccess(any(), any()) }
-            assertThat(capturedIds.captured).isEqualTo(listOf("id_1", "id_2"))
-        }
-    }
-
-    @Test
     fun `onResetAll deletes all events and fetches recent events`() {
         runBlocking {
             coEvery { calendarsRepository.deleteAllEvents(any()) } returns Unit
-            coEvery { getMinimalCalendarEventsUseCase.execute(any(), any()) } returns true
 
             listener.onResetAll(config)
 
             coVerify(exactly = 1) { calendarsRepository.deleteAllEvents(any()) }
-            coVerify(exactly = 1) { getMinimalCalendarEventsUseCase.execute(any(), any()) }
-        }
-    }
-}
-
-class CalendarEventListenerDelegateTest {
-
-    private val calendarsRepository: CalendarsRepository = mockk()
-    private val logger: Logger = mockk(relaxed = true)
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase = mockk(relaxed = true)
-    private val widgetRefresher: WidgetRefresher = mockk(relaxed = true)
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase = mockk(relaxed = true)
-
-    private lateinit var delegate: CalendarEventListenerDelegate
-    private val config = EventManagerConfig.Calendar(userId, calendarId)
-
-    @BeforeEach
-    fun setup() {
-        delegate = CalendarEventListenerDelegate(
-            calendarsRepository,
-            fetchPublicKeysUseCase,
-            widgetRefresher,
-            updateAlarmsUseCase,
-        )
-
-        coEvery { calendarsRepository.shouldFetchEvent(any()) } returns true
-        coEvery { calendarsRepository.fetchEventById(any(), any(), any()) } answers {
-            val id = args[2] as String
-            ApiResponse.Success(
-                EventApiResponse(createEventEntity(id))
-            )
-        }
-    }
-
-    @Test
-    fun `onPrepare fetches recent events to match the metadata`() {
-        runBlocking {
-            val metadata = listOf(
-                createEventMetadata("id_1"),
-                createEventMetadata("id_2"),
-                createEventMetadata("id_3"),
-            )
-
-            delegate.onPrepare(config, metadata)
-
-            coVerify(exactly = metadata.count()) { calendarsRepository.fetchEventById(any(), any(), any()) }
-        }
-    }
-
-    @Test
-    fun `onPrepare won't fetch very distant events`() {
-
-        runBlocking {
-            val metadata = listOf(
-                // Events that are very distant in time
-                createEventMetadata("id_1", startTime = 0L, endTime = 0L),
-                createEventMetadata("id_2", startTime = Instant.MAX.epochSecond, endTime = Instant.MAX.epochSecond),
-                // This is a valid event
-                createEventMetadata("id_3"),
-            )
-
-            coEvery { calendarsRepository.shouldFetchEvent(metadata[0]) } returns false
-            coEvery { calendarsRepository.shouldFetchEvent(metadata[1]) } returns false
-            coEvery { calendarsRepository.shouldFetchEvent(metadata[2]) } returns true
-
-            delegate.onPrepare(config, metadata)
-
-            coVerify(exactly = 1) { calendarsRepository.fetchEventById(any(), any(), any()) }
-        }
-    }
-
-    @Test
-    fun `onCreate persists events`() {
-        runBlocking {
-            coEvery { calendarsRepository.persistEvents(*anyVararg()) } returns Unit
-            val metadata = listOf(createEventMetadata("id_1"))
-            // Needed to populate the entity cache
-            delegate.onPrepare(config, metadata)
-
-            delegate.onCreate(metadata.map { it.id })
-
-            coVerify(exactly = 1) { calendarsRepository.persistEvents(*anyVararg()) }
-        }
-    }
-
-    @Test
-    fun `onUpdate persists events`() {
-        runBlocking {
-            coEvery { calendarsRepository.persistEvents(*anyVararg()) } returns Unit
-            val metadata = listOf(createEventMetadata("id_1"))
-            // Needed to populate the entity cache
-            delegate.onPrepare(config, metadata)
-
-            delegate.onUpdate(metadata.map { it.id })
-
-            coVerify(exactly = 1) { calendarsRepository.persistEvents(*anyVararg()) }
-        }
-    }
-
-    @Test
-    fun `onDelete deletes events`() {
-        runBlocking {
-            coEvery { calendarsRepository.deleteEventsById(any(), any()) } returns Unit
-
-            delegate.onDelete(config.asCalendar().calendarId, listOf(eventId))
-
-            coVerify(exactly = 1) { calendarsRepository.deleteEventsById(any(), any()) }
-        }
-    }
-
-    @Test
-    fun `onCompletion does event post-processing when ids are provided`() {
-        runBlocking {
-            val metadata = listOf(createEventMetadata("id_1"))
-            // Needed to populate the entity cache
-            delegate.onPrepare(config, metadata)
-
-            delegate.onSuccess(config, metadata.map { it.id })
-
-            //coVerify(exactly = 1) { fetchPublicKeysUseCase.execute(any(), any()) }
-            coVerify(exactly = 1) { updateAlarmsUseCase.execute(any(), any()) }
-            coVerify(exactly = 1) { widgetRefresher.refreshEventList() }
-        }
-    }
-
-    @Test
-    fun `onCompletion does not do event post-processing when no ids are provided`() {
-        runBlocking {
-            val metadata = listOf(createEventMetadata("id_1"))
-            // Needed to populate the entity cache
-            delegate.onPrepare(config, metadata)
-
-            delegate.onSuccess(config, emptyList())
-
-            //coVerify(exactly = 0) { fetchPublicKeysUseCase.execute(any(), any()) }
-            coVerify(exactly = 0) { widgetRefresher.refreshEventList() }
         }
     }
 }

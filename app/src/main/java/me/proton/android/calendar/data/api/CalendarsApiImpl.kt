@@ -135,6 +135,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/passphrases")
     suspend fun getPassphrases(@Path("calendarId") calendarId: String) : PassphrasesApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/passphrase")
+    suspend fun getActivePassphrase(@Path("calendarId") calendarId: String) : ActivePassphraseApiResponse
+
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/keys/{keyId}")
     suspend fun reenableKey(@Path("calendarId") calendarId: String, @Path("keyId") keyId: String, @Body body: ReenableKeyApiRequest) : ReenableKeyApiResponse
 
@@ -159,6 +162,11 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun getCalendarSettings(
         @Path("calendarId") calendarId: String
     ) : GetCalendarSettingsApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/subscription")
+    suspend fun getCalendarSubscription(
+        @Path("calendarId") calendarId: String
+    ) : GetCalendarSubscriptionApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/directory?Type=2") // The type ensures that only holiday calendars are returned.
     suspend fun getManagedHolidayCalendars() : GetHolidayCalendarsApiResponse
@@ -380,6 +388,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             getPassphrases(calendarId)
         }.toApiResponse()
 
+    override suspend fun getActivePassphrase(userId: UserId, calendarId: String): ApiResponse<ActivePassphraseApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getActivePassphrase(calendarId)
+        }.toApiResponse()
+
     override suspend fun updateParticipationStatus(
         userId: UserId,
         calendarId: String,
@@ -415,6 +428,13 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         calendarId: String
     ): ApiResponse<GetCalendarSettingsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getCalendarSettings(calendarId)
+    }.toApiResponse()
+
+    override suspend fun getCalendarSubscription(
+        userId: UserId,
+        calendarId: String
+    ): ApiResponse<GetCalendarSubscriptionApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getCalendarSubscription(calendarId)
     }.toApiResponse()
 
     override suspend fun getManagedHolidayCalendars(
@@ -745,6 +765,12 @@ data class PassphrasesApiResponse(
 )
 
 @Serializable
+data class ActivePassphraseApiResponse(
+    @SerialName("Passphrase")
+    val passphrase: PassphraseEntity,
+)
+
+@Serializable
 data class ReenableKeyApiResponse(
     @SerialName("Key")
     val calendarKey: CalendarKeyEntity
@@ -808,6 +834,12 @@ data class UpdateCalendarSettingsApiResponse(
 data class GetCalendarSettingsApiResponse(
     @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity
+)
+
+@Serializable
+data class GetCalendarSubscriptionApiResponse(
+    @SerialName("CalendarSubscription")
+    val calendarSubscription: CalendarSubscriptionEntity
 )
 
 @Serializable

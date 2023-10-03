@@ -97,7 +97,7 @@ class JoinCalendarUseCase @Inject constructor(
                 // Save Calendar Key
                 calendarsRepository.persistCalendarKey(calendarKeyEntity)
                 // Save passphrase
-                calendarsRepository.persistPassphrase(passphraseEntity)
+                calendarsRepository.persistCalendarPassphrase(passphraseEntity)
 
                 // cache Passphrase
                 val cachePassphraseResult =

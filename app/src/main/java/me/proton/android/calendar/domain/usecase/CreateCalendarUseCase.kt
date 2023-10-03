@@ -105,16 +105,12 @@ class CreateCalendarUseCase @Inject constructor(
 
                         // TODO use another server call to only get the active Passphrase
                         // fetch CalendarPassphrase from server
-                        val passphrases = calendarsApi.getPassphrases(userId, calendarEntity.id)
-                            .valueOrNullAndLogErrors(logger)?.passphrases?.takeIfNotEmpty()
+                        val passphraseEntity = calendarsApi.getActivePassphrase(userId, calendarEntity.id)
+                            .valueOrNullAndLogErrors(logger)?.passphrase
                             ?: return UseCase.Result.Error("CreateCalendarUseCase: could not fetch Calendar Passphrases")
 
-                        if (passphrases.size > 1) logger.e("CreateCalendarUseCase: got more than 1 CalendarPassphrases (${passphrases.size})")
-
-                        val passphraseEntity = passphrases.first()
-
                         // save Passphrase in DB
-                        calendarsRepository.persistPassphrase(passphraseEntity)
+                        calendarsRepository.persistCalendarPassphrase(passphraseEntity)
 
                         val fetchedMember = calendarsRepository.fetchMembers(userId, calendarEntity.id)?.firstOrNull()
                         if (fetchedMember != null) {

@@ -28,12 +28,10 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
 
     suspend fun execute(userId: UserId, calendarId: String) : UseCase.Result {
 
-        logger.v("executing CacheCalendarPassphraseUseCase, user $userId, calendar $calendarId")
-        
         val valueStore = valueStoreProvider.provideValueStore(userId.id)
 
         val member = calendarsRepository.selectCalendarUserMember(calendarId) ?: return UseCase.Result.InvalidParams("CacheCalendarPassphraseUseCase: member was null")
-        val calendarPassphrase = database.passphrasesDao().select(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
+        val calendarPassphrase = calendarsRepository.selectCalendarPassphrases(calendarId).map { it.toPassphrase(json) }.first { it.isActive }
         // Passphrase is linked to Calendar and is used by all CalendarKeys of that Calendar
 
         // TODO change to multiple members
@@ -71,7 +69,6 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         // we cache decrypted CalendarPassphrase under CalendarPassphraseId, but actually this is
         //  Passphrase for CalendarKey, not Calendar
         valueStore.putStringInSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id, plaintextPassphrase)
-        logger.v("success decrypting and storing passphrase for calendar $calendarId")
         return UseCase.Result.Success<Unit>()
     }
 

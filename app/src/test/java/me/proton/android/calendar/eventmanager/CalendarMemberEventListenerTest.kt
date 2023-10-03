@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import io.mockk.clearAllMocks
@@ -42,11 +43,12 @@ class CalendarMemberEventListenerTest {
     private val userAddressManager: UserAddressManager = mockk()
     lateinit var listener: CalendarMemberEventListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
+    private val workManager: WorkManager = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarMemberEventListener(db, calendarsRepository, logger, keySetupUseCase, userAddressManager)
+        listener = CalendarMemberEventListener(db, calendarsRepository, logger, userAddressManager, workManager)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -82,44 +84,6 @@ class CalendarMemberEventListenerTest {
             listener.onDelete(config, ids)
 
             coVerify(exactly = ids.count()) { calendarsRepository.deleteMemberById(any()) }
-        }
-    }
-
-    @Test
-    fun `handleIncompleteKeys executes key setup calendars needing it`() {
-        runBlocking {
-            val entities = listOf(
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value),
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
-            )
-            val events = entities.map { Event(Action.Create, "id", it) }
-            coEvery { keySetupUseCase.execute(any(), any()) } returns UseCase.Result.Success(Unit)
-            coEvery { calendarsRepository.fetchMembers(any(), any()) } returns listOf(entities.first())
-
-            listener.handleIncompleteKeys(config, events)
-
-            coVerify(exactly = 1) { keySetupUseCase.execute(any(), any()) }
-        }
-    }
-
-    @Test
-    fun `handleIncompleteKeys will remove the incomplete flag from a calendar and makes it active if it can't be fetched`() {
-        runBlocking {
-            val entities = listOf(
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value),
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
-                provideMemberEntity(flags = MemberEntity.CalendarFlags.ACTIVE.value),
-            )
-            val events = entities.map { Event(Action.Create, "id", it) }
-            coEvery { keySetupUseCase.execute(any(), any()) } returns UseCase.Result.Success(Unit)
-            coEvery { calendarsRepository.fetchMembers(any(), any()) } returns null
-
-            listener.handleIncompleteKeys(config, events)
-
-            coVerify(exactly = 1) { keySetupUseCase.execute(any(), any()) }
-            val createEvents = listener.getActionMap(config)[Action.Create].orEmpty()
-            assertThat(createEvents.filter { it.entity?.hasIncompleteKeySetup == true }.count()).isEqualTo(0)
         }
     }
 

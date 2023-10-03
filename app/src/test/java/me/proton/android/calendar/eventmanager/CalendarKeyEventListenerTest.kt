@@ -1,10 +1,10 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.spyk
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
@@ -12,17 +12,12 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarKeyEventListener
 import me.proton.android.calendar.test.shared.mocks.calendarId
-import me.proton.android.calendar.test.shared.mocks.eventId
 import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
-import me.proton.core.eventmanager.domain.entity.Action
-import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventId
 import me.proton.core.eventmanager.domain.entity.EventMetadata
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.eventmanager.domain.extension.groupByAction
-import org.junit.Ignore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -33,11 +28,12 @@ class CalendarKeyEventListenerTest {
     private val logger: Logger = mockk(relaxed = true)
     private lateinit var listener: CalendarKeyEventListener
     private val config = EventManagerConfig.Calendar(UserId("user_id"), calendarId)
+    private val workManager: WorkManager = mockk(relaxed = true)
 
     @BeforeEach
     fun setup() {
         clearAllMocks()
-        listener = CalendarKeyEventListener(db, calendarsRepository, logger)
+        listener = CalendarKeyEventListener(db, calendarsRepository, workManager, logger)
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }
 
@@ -79,23 +75,6 @@ class CalendarKeyEventListenerTest {
             listener.onDelete(config, ids)
 
             coVerify(exactly = ids.count()) { calendarsRepository.deleteCalendarKeyById(any()) }
-        }
-    }
-
-    @Test
-    fun `onSuccess calls refreshCalendarsFlags`() {
-        runBlocking {
-
-            listener.notifySuccess(config, EventMetadata(
-                userId,
-                EventId("eventId"),
-                config,
-                response = EventsResponse(eventsResponseCreateCalendarKey),
-                createdAt = 0L
-                )
-            )
-
-            coVerify { calendarsRepository.refreshCalendarsFlags(any()) }
         }
     }
 

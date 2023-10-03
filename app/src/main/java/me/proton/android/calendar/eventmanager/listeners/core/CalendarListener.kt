@@ -1,39 +1,41 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.annotation.VisibleForTesting
-import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
+import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.data.api.CalendarsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
-import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
-import me.proton.android.calendar.domain.usecase.KeySetupUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
-import me.proton.core.util.kotlin.deserializeOrNull
-import java.time.ZoneId
+import me.proton.core.util.kotlin.deserialize
 import javax.inject.Inject
 
 class CalendarListener @Inject constructor(
     database: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
-    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
-    private val logger: Logger,
-): CalendarBaseEventListener<String, CalendarEntity>(database) {
+    private val workManager: WorkManager,
+    private val logger: Logger
+    ): CalendarBaseEventListener<String, CalendarEntity>(database) {
     override val order: Int = 1
     override val type: Type = Type.Core
+
+    private val calendarsToBootstrap: HashSet<String> = hashSetOf()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, CalendarEntity>>? {
-        return response.body.deserializeOrNull<ServerCoreEventsApiResponse>()?.calendars?.map {
+        return response.body.deserialize<CalendarsEvents>().calendars?.map {
             Event(requireNotNull(Action.Companion.map[it.action]), it.id, it.calendar)
         }
     }
@@ -41,36 +43,23 @@ class CalendarListener @Inject constructor(
     override suspend fun onCreate(config: EventManagerConfig, entities: List<CalendarEntity>) {
         super.onCreate(config, entities)
 
-        val timezone = calendarsRepository.selectCalendarUserSettings(config.userId.id)?.primaryTimezone
-            ?: ZoneId.systemDefault().id
-
         entities.map {
-            val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, config.userId, timezone)
-            executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-
-            // If bootstraping failed, persist calendar manually
-            if (executeBootstrapResult !is UseCase.Result.Success<*>) {
-                calendarsRepository.persistCalendar(config.userId.id, it)
-            }
+            // We persist the calendar entity, bootstrap will be done in worker on success
+            calendarsRepository.persistCalendar(config.userId.id, it)
+            // Add id to the list of calendar to bootstrap in worker
+            calendarsToBootstrap.add(it.id)
         }
     }
 
     override suspend fun onUpdate(config: EventManagerConfig, entities: List<CalendarEntity>) {
         super.onUpdate(config, entities)
 
-        val timezone = calendarsRepository.selectCalendarUserSettings(config.userId.id)?.primaryTimezone
-            ?: ZoneId.systemDefault().id
-
         entities.map {
             if (calendarsRepository.selectCalendar(it.id) == null) {
-
-                val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, config.userId, timezone)
-                executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
-
-                // If bootstraping failed, persist calendar manually
-                if (executeBootstrapResult !is UseCase.Result.Success<*>) {
-                    calendarsRepository.persistCalendar(config.userId.id, it)
-                }
+                // We persist the calendar entity, bootstrap will be done in worker on success
+                calendarsRepository.persistCalendar(config.userId.id, it)
+                // Add id to the list of calendar to bootstrap in worker
+                calendarsToBootstrap.add(it.id)
             } else {
                 calendarsRepository.persistCalendar(config.userId.id, it)
             }
@@ -87,5 +76,52 @@ class CalendarListener @Inject constructor(
                 calendarsRepository.deleteCalendarById(it)
             }
         }
+    }
+
+    override suspend fun onSuccess(config: EventManagerConfig) {
+        super.onSuccess(config)
+
+        // Launch worker to bootstrap calendars
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap.toTypedArray()
+            ),
+            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
+    }
+
+    override suspend fun onComplete(config: EventManagerConfig) {
+        super.onComplete(config)
+
+        calendarsToBootstrap.clear()
+    }
+
+    override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+        logger.i("CalendarListener onResetAll")
+
+        // Wipe all calendars from DB
+        // Foreign keys on Calendar ID will also delete:
+        //  - Calendar Settings
+        //  - Passphrase
+        //  - CalendarKeys
+        //  - Members
+        // CalendarUserSettings and UserSettings will not be deleted
+        calendarsRepository.deleteCalendars(config.userId.id)
+
+        // Launch worker to bootstrap all calendars
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_ALL_CALENDARS,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id
+            ),
+            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_ALL_CALENDARS,
+            ExistingWorkPolicy.REPLACE,
+            NetworkType.CONNECTED
+        )
     }
 }

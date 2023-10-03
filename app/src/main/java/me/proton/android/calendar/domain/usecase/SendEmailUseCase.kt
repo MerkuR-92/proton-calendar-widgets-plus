@@ -274,9 +274,9 @@ class SendEmailUseCase @Inject constructor(
         val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties sharedEventID was null")
         val calendarId = eventEntity.calendarId
 
-        val calendarPrivateKeys = database.calendarKeysDao().select(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there are no active keys for calendar")
-        val calendarPassphraseList = database.passphrasesDao().select(calendarId)
-        if (calendarPassphraseList.isNullOrEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: there are no passphrase for calendar")
+        val calendarPrivateKeys = calendarsRepository.selectCalendarKeys(calendarId).filter { it.isActive }.map { it.privateKey }.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there are no active keys for calendar")
+        val calendarPassphraseList = calendarsRepository.selectCalendarPassphrases(calendarId)
+        if (calendarPassphraseList.isEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: there are no passphrase for calendar")
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
         val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase")
 

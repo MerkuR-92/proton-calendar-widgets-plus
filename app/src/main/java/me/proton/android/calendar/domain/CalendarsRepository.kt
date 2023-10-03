@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain
 
 import biweekly.property.RecurrenceId
 import kotlinx.coroutines.flow.Flow
+import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
@@ -88,6 +89,8 @@ interface CalendarsRepository {
     fun flowHolidayCalendars(userId: String): Flow<List<Calendar>>
 
     suspend fun persistCalendar(userId: String, calendar: CalendarEntity)
+
+    suspend fun deleteCalendars(userId: String)
 
     suspend fun deleteCalendarById(id: String)
 
@@ -215,8 +218,6 @@ interface CalendarsRepository {
 
     suspend fun selectEventEntity(eventId: String): EventEntity?
 
-    suspend fun refreshCalendarsFlags(userId: UserId)
-
     /**
      * Root Event is the original recurring event for single-edited event with RECURRENCE-ID. May be the event itself
      * if there is only one event with this UID.
@@ -252,12 +253,16 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarKeyById(id: String)
 
+    suspend fun deleteCalendarKeyByCalendarId(calendarId: String)
+
     // passphrases
-    suspend fun selectPassphrases(calendarId: String): List<PassphraseEntity>
+    suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity>
 
-    suspend fun persistPassphrase(passphrase: PassphraseEntity) // calendarId is already there
+    suspend fun persistCalendarPassphrase(calendarPassphrase: PassphraseEntity)
 
-    suspend fun deletePassphraseById(id: String)
+    suspend fun deleteCalendarPassphraseById(id: String)
+
+    suspend fun deleteCalendarPassphrases(calendarId: String)
 
     // members
     suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity>
@@ -279,6 +284,8 @@ interface CalendarsRepository {
 
     suspend fun deleteCalendarSettingsById(id: String)
 
+    suspend fun deleteCalendarSettingsByCalendarId(calendarId: String)
+
     // calendar subscription
     suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity?
 
@@ -288,7 +295,7 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarSubscription(calendarSubscription: CalendarSubscriptionEntity) // calendarId is already there
 
-    suspend fun deleteCalendarSubscriptionById(id: String)
+    suspend fun deleteCalendarSubscriptionByCalendarId(calendarId: String)
 
     // calendar user settings
     suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity?
@@ -325,7 +332,8 @@ interface CalendarsRepository {
 
     suspend fun getDefaultCalendarId(userId: String): String?
 
-    // event alarms
+    suspend fun fetchEventAlarms(userId: UserId, calendarId: String, eventId: String): ApiResponse<AlarmsApiResponse>
+
     suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>>
 
     // event alarms
@@ -347,7 +355,7 @@ interface CalendarsRepository {
 
     suspend fun deleteEventAlarmsByEventIdAndOccurrence(eventId: String, occurrence: Long)
 
-    suspend fun deleteAllEventAlarms(calendarId: String)
+    suspend fun deleteAllEventAlarmsByCalendar(calendarId: String)
 
     suspend fun getAddressForMember(
         userId: UserId,

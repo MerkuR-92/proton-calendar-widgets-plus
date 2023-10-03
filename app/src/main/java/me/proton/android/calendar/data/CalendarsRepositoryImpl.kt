@@ -56,6 +56,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalen
 import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.utils.isNotFound
+import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
@@ -245,18 +246,6 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         displayedEventsMutex.withLock {
             displayedEvents.value = events
-        }
-    }
-
-    override suspend fun refreshCalendarsFlags(userId: UserId) {
-        val remoteMembers = calendarsApi.getAllMembers(userId).pingServerIfNeeded(userId).valueOrNullAndLogErrors(logger)
-
-        remoteMembers?.members?.forEach {
-            if (hasCalendar(it.calendarId)) {
-                persistMember(it)
-            } else {
-                logger.i("refreshCalendarsFlags: Member's Calendar doesn't exist locally")
-            }
         }
     }
 
@@ -508,6 +497,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun persistCalendar(userId: String, calendar: CalendarEntity) {
         //  TODO make sure we have "flags" set!!!!!
         database.calendarsDao().updateOrInsert(calendar.copy(fkUserId = userId))
+    }
+
+    override suspend fun deleteCalendars(userId: String) {
+        database.calendarsDao().deleteCalendars(userId)
     }
 
     override suspend fun deleteCalendarById(id: String) {
@@ -1434,28 +1427,35 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun selectCalendarKeys(calendarId: String): List<CalendarKeyEntity> {
-        return database.calendarKeysDao().select(calendarId)//.distinctUntilChanged()
+        return database.calendarKeysDao().select(calendarId)
     }
 
     override suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) {
-        logger.d("persisting calendar key: $calendarKey")
-        database.calendarKeysDao().insert(calendarKey)
+        database.calendarKeysDao().updateOrInsert(calendarKey)
     }
 
     override suspend fun deleteCalendarKeyById(id: String) {
         database.calendarKeysDao().deleteById(id)
     }
 
-    override suspend fun selectPassphrases(calendarId: String): List<PassphraseEntity> {
+    override suspend fun deleteCalendarKeyByCalendarId(calendarId: String) {
+        database.calendarKeysDao().deleteByCalendarId(calendarId)
+    }
+
+    override suspend fun selectCalendarPassphrases(calendarId: String): List<PassphraseEntity> {
         return database.passphrasesDao().select(calendarId)
     }
 
-    override suspend fun persistPassphrase(passphrase: PassphraseEntity) {
-        database.passphrasesDao().insert(passphrase)
+    override suspend fun persistCalendarPassphrase(calendarPassphrase: PassphraseEntity) {
+        database.passphrasesDao().insert(calendarPassphrase)
     }
 
-    override suspend fun deletePassphraseById(id: String) {
+    override suspend fun deleteCalendarPassphraseById(id: String) {
         database.passphrasesDao().deleteById(id)
+    }
+
+    override suspend fun deleteCalendarPassphrases(calendarId: String) {
+        database.passphrasesDao().deleteByCalendarId(calendarId)
     }
 
     override suspend fun selectCalendarMembers(calendarId: String): List<MemberEntity> {
@@ -1502,6 +1502,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarSettingsDao().deleteById(id)
     }
 
+    override suspend fun deleteCalendarSettingsByCalendarId(calendarId: String) {
+        database.calendarSettingsDao().deleteByCalendarId(calendarId)
+    }
+
     override suspend fun selectCalendarSubscription(calendarId: String): CalendarSubscriptionEntity? {
         return database.calendarSubscriptionDao().select(calendarId)
     }
@@ -1518,8 +1522,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarSubscriptionDao().updateOrInsert(calendarSubscription)
     }
 
-    override suspend fun deleteCalendarSubscriptionById(id: String) {
-        database.calendarSubscriptionDao().deleteById(id)
+    override suspend fun deleteCalendarSubscriptionByCalendarId(calendarId: String) {
+        database.calendarSubscriptionDao().deleteByCalendarId(calendarId)
     }
 
     override suspend fun selectCalendarUserSettings(userId: String): CalendarUserSettingsEntity? {
@@ -1610,6 +1614,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarUserSettingsDao().selectCalendarUserDefaultCalendarId(userId)
     }
 
+    override suspend fun fetchEventAlarms(userId: UserId, calendarId: String, eventId: String): ApiResponse<AlarmsApiResponse> {
+        return calendarsApi.getEventAlarms(userId, calendarId, eventId)
+    }
+
     override suspend fun selectEventAlarms(eventId: String): Flow<List<EventAlarmEntity>> {
         return database.eventAlarmsDao().selectByEventId(eventId)
     }
@@ -1618,8 +1626,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.eventAlarmsDao().select(eventAlarmId)
     }
 
-    override suspend fun deleteAllEventAlarms(calendarId: String) {
-        database.eventAlarmsDao().deleteAll(calendarId)
+    override suspend fun deleteAllEventAlarmsByCalendar(calendarId: String) {
+        database.eventAlarmsDao().deleteAllByCalendar(calendarId)
     }
 
     override suspend fun selectUpcomingEventAlarms(timestampSeconds: Long): List<EventAlarmEntity> {

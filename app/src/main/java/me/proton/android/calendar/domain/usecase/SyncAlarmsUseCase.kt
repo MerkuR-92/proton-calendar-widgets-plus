@@ -25,7 +25,7 @@ class SyncAlarmsUseCase @Inject constructor(
 ): UseCase {
 
     companion object {
-        const val WORKER_ID = "SYNC_ALARMS"
+        const val SYNC_ALARMS = "SYNC_ALARMS"
     }
 
     private val ALARMS_CACHE_OVERLAP_WINDOW_SIZE = Duration.ofDays(3) // minimum time that has to pass after last sync

@@ -1,17 +1,21 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.utils.isNotFound
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.CalendarEventsServerEvents
 import me.proton.android.calendar.data.api.EventApiResponse
-import me.proton.android.calendar.data.api.ServerCalendarEventsApiResponse
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
-import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
@@ -21,118 +25,47 @@ import me.proton.core.eventmanager.domain.entity.Action
 import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
-import me.proton.core.util.kotlin.deserializeOrNull
+import me.proton.core.util.kotlin.deserialize
+import me.proton.core.util.kotlin.mapNotNullAsync
 import javax.inject.Inject
 
 class CalendarEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
-    private val delegate: CalendarEventListenerDelegate,
-    private val getMinimalCalendarEventsUseCase: GetMinimalCalendarEventsUseCase,
     private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase,
     private val logger: Logger,
+    private val workManager: WorkManager,
+    private val widgetRefresher: WidgetRefresher,
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ): CalendarBaseEventListener<String, ServerEvent.EventEntityMetadata>(db) {
     override val order: Int = 3
     override val type: Type = Type.Calendar
+
+    private var eventEntities = hashMapOf<String, EventEntity>()
+
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, ServerEvent.EventEntityMetadata>>? {
-        return response.body.deserializeOrNull<ServerCalendarEventsApiResponse>()?.calendarEvents?.map {
+        return response.body.deserialize<CalendarEventsServerEvents>().calendarEvents?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, it.event)
         }
     }
 
     override suspend fun onPrepare(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
-        delegate.onPrepare(config, entities)
-    }
-
-    override suspend fun onCreate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
-        if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
-            logger.i("action CREATE for calendarEvent in deleted calendar")
-            return
-        }
-        val entityIds = entities.map { it.id }
-        delegate.onCreate(entityIds)
-    }
-
-    override suspend fun onUpdate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
-        if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
-            logger.i("action UPDATE for calendarEvent in deleted calendar")
-            return
-        }
-        val entityIds = entities.map { it.id }
-        delegate.onUpdate(entityIds)
-    }
-
-    override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
-        delegate.onDelete(config.asCalendar().calendarId, keys)
-    }
-
-    override suspend fun onResetAll(config: EventManagerConfig) {
-        logger.i("CalendarEventListener onResetAll")
-        calendarsRepository.deleteAllEvents(config.asCalendar().calendarId)
-        getMinimalCalendarEventsUseCase.execute(config.userId, config.asCalendar().calendarId)
-        resetCalendarSearchUseCase.execute(config.userId, listOf(config.asCalendar().calendarId))
-    }
-
-    override suspend fun onSuccess(config: EventManagerConfig) {
-        val entityIds = getActionMap(config)[Action.Create]?.mapNotNull { it.entity?.id }.orEmpty() +
-                getActionMap(config)[Action.Update]?.mapNotNull { it.entity?.id }.orEmpty()
-
-        delegate.onSuccess(config, entityIds)
-    }
-}
-
-class CalendarEventListenerDelegate @Inject constructor(
-    private val calendarsRepository: CalendarsRepository,
-    private val fetchPublicKeysUseCase: FetchPublicKeysUseCase,
-    private val widgetRefresher: WidgetRefresher,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-) {
-
-    private var entities = emptyMap<String, EventEntity>()
-
-    suspend fun onPrepare(config: EventManagerConfig, eventsMetadata: List<ServerEvent.EventEntityMetadata>) {
         // Fetch any event not cached as the provided metadata is not enough to create entities
-        entities = eventsMetadata.filter { calendarsRepository.shouldFetchEvent(it) }
-            .mapNotNull { metadata ->
+        eventEntities.putAll(
+            entities.filter {
+                // We check if event modifyTime to see if it is up to date
+                // We always assume we should fetch recurring events for simplicity
+                // If not recurring, we fetch if event happens soon or if it is withing requested FetchWindows
+                calendarsRepository.shouldFetchEvent(it)
+            }.mapNotNullAsync { metadata ->
                 fetchEventEntity(config.userId, metadata)
-            }.associateBy { event -> event.id }
-    }
-
-    suspend fun onCreate(entityIds: List<String>) {
-        if (entityIds.isEmpty()) return
-        val entitiesToCreate = entityIds.mapNotNull { entities[it] }
-        onUpsert(entitiesToCreate)
-    }
-
-    suspend fun onUpdate(entityIds: List<String>) {
-        if (entityIds.isEmpty()) return
-        val entitiesToUpdate = entityIds.mapNotNull { entities[it] }
-        onUpsert(entitiesToUpdate)
-    }
-
-    private suspend fun onUpsert(entities: List<EventEntity>) {
-        calendarsRepository.persistEvents(*entities.toTypedArray())
-    }
-
-    suspend fun onDelete(calendarId: String, ids: List<String>) {
-        if (ids.isEmpty()) return
-
-        calendarsRepository.deleteEventsById(calendarId, ids)
-    }
-
-    suspend fun onSuccess(config: EventManagerConfig, entityIds: List<String>) {
-        val entitiesToPostProcess = entityIds.mapNotNull { entities[it] }
-        if (entitiesToPostProcess.isEmpty()) return
-        // Post process received events
-        // TODO We are not using the result of that use case for now
-        // fetchPublicKeysUseCase.execute(config.userId, entitiesToPostProcess)
-        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
-        widgetRefresher.refreshEventList()
-        // Clean cached entities
-        entities = emptyMap()
+            }.associateBy { event ->
+                event.id
+            }
+        )
     }
 
     private suspend fun fetchEventEntity(userId: UserId, response: ServerEvent.EventEntityMetadata): EventEntity? {
@@ -147,4 +80,77 @@ class CalendarEventListenerDelegate @Inject constructor(
         }
     }
 
+    override suspend fun onCreate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
+        if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
+            logger.i("action CREATE for calendarEvent in deleted calendar")
+            return
+        }
+
+        val entityIds = entities.map { it.id }
+        if (entityIds.isEmpty()) return
+        val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
+        calendarsRepository.persistEvents(*entitiesToCreate.toTypedArray())
+    }
+
+    override suspend fun onUpdate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
+        if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
+            logger.i("action UPDATE for calendarEvent in deleted calendar")
+            return
+        }
+        val entityIds = entities.map { it.id }
+        if (entityIds.isEmpty()) return
+        val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
+        calendarsRepository.persistEvents(*entitiesToUpdate.toTypedArray())
+    }
+
+    override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
+        if (keys.isEmpty()) return
+        calendarsRepository.deleteEventsById(config.asCalendar().calendarId, keys)
+    }
+
+    override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+
+        logger.i("CalendarEventListener onResetAll")
+
+        val userId = config.userId
+        val calendarId = config.asCalendar().calendarId
+
+        // Wipe the calendar events from DB
+        calendarsRepository.deleteAllEvents(calendarId)
+
+        // Wipe all the calendar search events from DB
+        resetCalendarSearchUseCase.execute(userId, listOf(calendarId))
+
+        // Launch worker to fetch minimal events for calendar
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
+                UseCaseWorker.INPUT_USER_ID to userId.id,
+                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
+            ),
+            UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
+    }
+
+    override suspend fun onSuccess(config: EventManagerConfig) {
+        // Get all the created or updated events ids
+        val entityIds = getActionMap(config)[Action.Create]?.mapNotNull {
+            it.entity?.id
+        }.orEmpty() + getActionMap(config)[Action.Update]?.mapNotNull {
+            it.entity?.id
+        }.orEmpty()
+
+        val entitiesToPostProcess = entityIds.mapNotNull { eventEntities[it] }
+        if (entitiesToPostProcess.isEmpty()) return
+
+        // Post process received events
+        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
+        widgetRefresher.refreshEventList()
+
+        // Clean cached entities
+        eventEntities.clear()
+    }
 }

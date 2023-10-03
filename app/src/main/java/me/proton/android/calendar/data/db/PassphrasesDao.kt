@@ -15,4 +15,7 @@ abstract class PassphrasesDao : BaseDao<PassphraseEntity> {
     @Query("DELETE FROM passphrases WHERE id = :id")
     abstract suspend fun deleteById(id: String)
 
+    @Query("DELETE FROM passphrases WHERE calendarId = :calendarId")
+    abstract suspend fun deleteByCalendarId(calendarId: String)
+
 }

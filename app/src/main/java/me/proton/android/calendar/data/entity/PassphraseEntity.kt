@@ -35,8 +35,6 @@ data class PassphraseEntity(
     val calendarId: String
 ) {
 
-//    lateinit var fkCalendarKeyId: String
-
     fun toPassphrase(json: Json): Passphrase {
         return Passphrase(
             id = this.id,

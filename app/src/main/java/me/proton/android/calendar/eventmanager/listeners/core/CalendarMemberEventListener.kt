@@ -1,14 +1,17 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.annotation.VisibleForTesting
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.api.ServerCoreEventsApiResponse
+import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.data.api.CalendarMembersEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.usecase.KeySetupUseCase
-import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
@@ -16,78 +19,28 @@ import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.util.kotlin.deserializeOrNull
+import me.proton.core.util.kotlin.deserialize
 import javax.inject.Inject
 
 class CalendarMemberEventListener @Inject constructor(
     db: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val logger: Logger,
-    private val keySetupUseCase: KeySetupUseCase,
-    private val userAddressManager: UserAddressManager
+    private val userAddressManager: UserAddressManager,
+    private val workManager: WorkManager
 ): CalendarBaseEventListener<String, MemberEntity>(db) {
     override val order: Int = 2
     override val type: Type = Type.Core
+
+    private val membersWithIncompleteKeySetup: HashSet<String> = hashSetOf()
+    private val deletedMemberIds: HashSet<String> = hashSetOf()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
         response: EventsResponse
     ): List<Event<String, MemberEntity>>? {
-        return response.body.deserializeOrNull<ServerCoreEventsApiResponse>()?.calendarMembers?.map {
+        return response.body.deserialize<CalendarMembersEvents>().calendarMembers?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, it.member)
-        }?.let { handleIncompleteKeys(config, it) }
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    internal suspend fun handleIncompleteKeys(
-        config: EventManagerConfig,
-        events: List<Event<String, MemberEntity>>
-    ): List<Event<String, MemberEntity>> {
-        // Try to complete key setup for calendar/member:
-        // - we use newly updated member fetched from API if it succeeds
-        // - we use member from server event if it fails, manually changing the flags
-        return events.map { event ->
-            val entity = event.entity ?: return@map event
-
-            // incomplete key setup flag is set, should only happen when newly created calendar wasn't setup properly
-            // by another frontend client
-            logger.d("handleIncompleteKeys member flags = ${entity.flags}")
-            val updatedCalendar = if (entity.hasIncompleteKeySetup) {
-                when (val result = keySetupUseCase.execute(config.userId, entity.calendarId)) {
-                    is UseCase.Result.Success<*> -> {
-                        val fetchedMember = calendarsRepository.fetchMembers(config.userId, entity.calendarId)?.firstOrNull()
-                        if (fetchedMember == null) {
-                            logger.e("CalendarMemberEventListener: error getting member from API after keySetupUseCase success")
-
-                            var calendarFlags = entity.flags
-                            calendarFlags -= MemberEntity.CalendarFlags.INCOMPLETE_SETUP.value
-                            // if calendar is inactive and no other error flags are set, make it active
-                            if (calendarFlags == 0) calendarFlags = MemberEntity.CalendarFlags.ACTIVE.value
-
-                            entity.copy(flags = calendarFlags)
-                        } else {
-                            fetchedMember
-                        }
-                    }
-                    is UseCase.Result.InvalidParams -> {
-                        logger.e("CalendarMemberEventListener: keySetupResult invalid params: ${result.message}")
-                        entity
-                    }
-                    is UseCase.Result.Error -> {
-                        // Try and fetch the Member to check that the key setup wasn't done by another client in the meantime
-                        val fetchedMember = calendarsRepository.fetchMembers(config.userId, entity.calendarId)?.firstOrNull()
-                        if (fetchedMember == null || fetchedMember.hasIncompleteKeySetup) {
-                            logger.e("CalendarMemberEventListener: keySetupResult error: ${result.message}")
-                            entity
-                        } else {
-                            fetchedMember
-                        }
-                    }
-                }
-            } else {
-                entity
-            }
-            event.copy(entity = updatedCalendar)
         }
     }
 
@@ -95,6 +48,8 @@ class CalendarMemberEventListener @Inject constructor(
         entities.forEach {
             if (calendarsRepository.hasCalendar(it.calendarId)) {
                 calendarsRepository.persistMember(it)
+                // Keep ids of members with flag incomplete setup so that we can call the use case in worker from onSuccess
+                if (it.hasIncompleteKeySetup) membersWithIncompleteKeySetup.add(it.id)
             } else {
                 logger.i("action CREATE/UPDATE for calendarMember ${it.id} in deleted calendar ${it.calendarId}")
             }
@@ -104,12 +59,20 @@ class CalendarMemberEventListener @Inject constructor(
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         super.onDelete(config, keys)
 
+        keys.forEach {
+            calendarsRepository.deleteMemberById(it)
+            // We keep the id so that we can check if calendar linked to that member needs to be deleted too
+            deletedMemberIds.add(it)
+        }
+    }
+
+    override suspend fun onSuccess(config: EventManagerConfig) {
+        super.onSuccess(config)
+
         // Get user addresses emails to compare with members email
         var addresses: List<UserAddress>? = null
-        keys.forEach {
+        deletedMemberIds.forEach {
             val calendarId = calendarsRepository.selectMemberById(it)?.calendarId
-            // We first delete Member
-            calendarsRepository.deleteMemberById(it)
             calendarId?.let {
                 if (addresses.isNullOrEmpty()) {
                     addresses = userAddressManager.getAddressesOrNull(config.userId)
@@ -128,5 +91,29 @@ class CalendarMemberEventListener @Inject constructor(
                 }
             }
         }
+
+        // Launch worker to do key setup for members with incomplete setup flag
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MEMBERS_KEY_SETUP,
+                UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                UseCaseWorker.INPUT_MEMBER_IDS to membersWithIncompleteKeySetup.toTypedArray()
+            ),
+            UseCaseWorker.UniqueWorkNames.MEMBERS_KEY_SETUP,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
+    }
+
+    override suspend fun onComplete(config: EventManagerConfig) {
+        super.onComplete(config)
+
+        deletedMemberIds.clear()
+        membersWithIncompleteKeySetup.clear()
+    }
+
+    override suspend fun onResetAll(config: EventManagerConfig) {
+        super.onResetAll(config)
+        // Nothing to do here since CalendarListener.resetAll will also delete members and do the bootstrap
     }
 }

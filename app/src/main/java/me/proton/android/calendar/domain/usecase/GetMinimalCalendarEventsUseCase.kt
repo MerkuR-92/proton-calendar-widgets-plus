@@ -20,10 +20,14 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
 ) {
 
+    companion object {
+        const val GET_MINIMAL_CALENDAR_EVENTS = "GET_MINIMAL_CALENDAR_EVENTS"
+    }
+
     /**
      * @return success or failure
      */
-    suspend fun execute(userId: UserId, calendarId: String): Boolean {
+    suspend fun execute(userId: UserId, calendarId: String): UseCase.Result {
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
             ?: ZoneId.systemDefault().id
         val zoneId = if (timezone.isBlank()) ZoneId.systemDefault() else ZoneId.of(timezone)
@@ -38,18 +42,19 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
 
         if (fetchEventsResult.first is UseCase.Result.Success<*>) {
             if (fetchEventsResult.second == null) {
-                logger.e("GetMinimalCalendarEventsUseCase: null event list when Sucess")
-                return false
+                logger.e("GetMinimalCalendarEventsUseCase: null event list when Success")
+                return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: null event list when Success")
             }
 
             fetchEventsResult.second?.let {
                 logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${it.size}")
                 calendarsRepository.persistEvents(*it.toTypedArray())
                 updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                return true
+                return UseCase.Result.Success<Unit>()
             }
         }
 
-        return false
+        logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
+        return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
     }
 }

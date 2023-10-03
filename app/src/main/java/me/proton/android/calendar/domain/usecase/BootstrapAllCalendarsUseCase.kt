@@ -51,23 +51,23 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         defaultCountryCode: String?
     ): UseCase.Result {
 
-        logger.v("executing BootstrapCalendarsUseCase")
+        logger.v("executing BootstrapAllCalendarsUseCase")
 
-        var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
+        var allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapAllCalendarsUseCase: error getting Calendar Entities from API")
         var allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities)
         val userCalendars = allCalendars.filterNot { it.isSubscribed }
 
         if (allCalendars.isNotEmpty() && allCalendars.any { it.isResetNeeded }) {
             // Always show confirmation dialog if a calendar has flag RESET_NEEDED
             return UseCase.Result.Error(
-                "BootstrapCalendarsUseCase: error reset needed for calendar",
+                "BootstrapAllCalendarsUseCase: error reset needed for calendar",
                 UseCase.Error.Bootstrap.ResetNeeded
             )
         } else if (userCalendars.isNotEmpty() &&
             userCalendars.firstOrNull { it.isActive || it.isDisabled || it.hasIncompleteKeySetup || it.hasUpdatePassphrase } == null
         ) {
             return UseCase.Result.Error(
-                "BootstrapCalendarsUseCase: error user has no active calendar",
+                "BootstrapAllCalendarsUseCase: error user has no active calendar",
                 UseCase.Error.Bootstrap.NoActiveCalendar
             )
         }
@@ -98,8 +98,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             }
 
             if (createDefaultCalendarResult !is UseCase.Result.Success<*>) {
-                logger.e("BootstrapCalendarsUseCase: error unable to create default calendar for user")
-                return UseCase.Result.Error("BootstrapCalendarsUseCase: error unable to create default calendar for user")
+                logger.e("BootstrapAllCalendarsUseCase: error unable to create default calendar for user")
+                return UseCase.Result.Error("BootstrapAllCalendarsUseCase: error unable to create default calendar for user")
             }
 
             // Make sure user doesn't have any holiday calendar already
@@ -140,11 +140,11 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                             )
 
                             if (joinCalendarResult !is UseCase.Result.Success<*>) {
-                                logger.e("BootstrapCalendarsUseCase: error unable to join holiday calendar for user")
+                                logger.e("BootstrapAllCalendarsUseCase: error unable to join holiday calendar for user")
                             }
                         }
                     } ?: run {
-                        logger.e("BootstrapCalendarsUseCase: error failed to fetch holiday calendars for user")
+                        logger.e("BootstrapAllCalendarsUseCase: error failed to fetch holiday calendars for user")
                     }
                 }
             }
@@ -173,7 +173,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
                 // Skip confirmation dialog if we just handled flag RESET_NEEDED
                 if (showConfirmationDialog) return UseCase.Result.Error(
-                    "BootstrapCalendarsUseCase: error update passphrase for calendar",
+                    "BootstrapAllCalendarsUseCase: error update passphrase for calendar",
                     UseCase.Error.Bootstrap.UpdatePassphrase
                 )
 
@@ -187,21 +187,21 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         if (redoGetCalendars) {
             // GET the calendar(entities) list again after creating default one or fixing incomplete setup
-            allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
+            allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("BootstrapAllCalendarsUseCase: error getting Calendar Entities from API in redoGetCalendars")
             allCalendars = calendarsRepository.fetchMembersToCalendarEntities(userId, allCalendarEntities)
 
             // Subscribed calendars do not count for those checks
             ownedUserCalendars = allCalendars.filterNot { it.isSubscribed && it.isOwner.not() }
             if (ownedUserCalendars.isEmpty()) {
-                logger.e("BootstrapCalendarsUseCase: still no calendar after creating default calendar")
+                logger.e("BootstrapAllCalendarsUseCase: still no calendar after creating default calendar")
                 return UseCase.Result.Error(
-                    "BootstrapCalendarsUseCase: error user has no calendar",
+                    "BootstrapAllCalendarsUseCase: error user has no calendar",
                     UseCase.Error.Bootstrap.NoCalendar
                 )
             } else if (ownedUserCalendars.none { it.isActive || it.isDisabled }) { // If has no active or disabled cals
-                logger.e("BootstrapCalendarsUseCase: still no active calendar after creating default calendar")
+                logger.e("BootstrapAllCalendarsUseCase: still no active calendar after creating default calendar")
                 return UseCase.Result.Error(
-                    "BootstrapCalendarsUseCase: error user has no active calendar",
+                    "BootstrapAllCalendarsUseCase: error user has no active calendar",
                     UseCase.Error.Bootstrap.NoActiveCalendar
                 )
             }
@@ -214,17 +214,17 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
 
         if (refreshedCalendarUserSettings == null) {
             refreshedCalendarUserSettingsResult.ifSuccessAndLogErrors(logger) {}
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting calendar user settings from API")
+            return UseCase.Result.Error("BootstrapAllCalendarsUseCase: error getting calendar user settings from API")
         }
 
         val userSettingsResponseException =
             kotlin.runCatching { userSettingsRepository.getUserSettings(userId, refresh = true) }.exceptionOrNull()
         if (userSettingsResponseException != null) {
             logger.e(
-                "BootstrapCalendarsUseCase: error getting user settings from API: ${userSettingsResponseException.message}",
+                "BootstrapAllCalendarsUseCase: error getting user settings from API: ${userSettingsResponseException.message}",
                 userSettingsResponseException
             )
-            return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting user settings from API: $userSettingsResponseException")
+            return UseCase.Result.Error("BootstrapAllCalendarsUseCase: error getting user settings from API: $userSettingsResponseException")
         }
 
         val failedCalendarIds = mutableListOf<String>()

@@ -1,5 +1,6 @@
 package me.proton.android.calendar.eventmanager
 
+import androidx.work.WorkManager
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isNull
@@ -8,6 +9,7 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.common.utils.toHexColor
@@ -24,16 +26,18 @@ import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventsResponse
+import org.junit.Assert
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class CalendarListenerTest {
 
     private val db: AppDatabase = mockk()
     private val calendarsRepository: CalendarsRepository = mockk()
     private val logger: Logger = mockk(relaxed = true)
-    private val bootstrapCalendarUseCase: BootstrapCalendarUseCase = mockk()
     private val json: Json = mockk()
+    private val workManager: WorkManager = mockk(relaxed = true)
 
     private lateinit var listener: CalendarListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
@@ -42,7 +46,7 @@ class CalendarListenerTest {
     fun setup() {
         clearAllMocks()
 
-        listener = CalendarListener(db, calendarsRepository, bootstrapCalendarUseCase, logger)
+        listener = CalendarListener(db, calendarsRepository, workManager, logger)
 
         coEvery { calendarsRepository.selectCalendarUserSettings(any()) } returns null
         coEvery { calendarsRepository.persistCalendar(any(), any()) } returns Unit
@@ -65,9 +69,9 @@ class CalendarListenerTest {
         runBlocking {
             val response = EventsResponse(brokenResponse)
 
-            val events = listener.deserializeEvents(config, response)
-
-            assertThat(events).isNull()
+            assertThrows<MissingFieldException> {
+                listener.deserializeEvents(config, response)
+            }
         }
     }
 
@@ -83,7 +87,7 @@ class CalendarListenerTest {
     }
 
     @Test
-    fun `onCreate starts calendar bootstraping`() {
+    fun `onCreate persist CalendarEntity`() {
         runBlocking {
             val entities = listOf(
                 CalendarEntity(
@@ -91,29 +95,9 @@ class CalendarListenerTest {
                     owner = null
                 ),
             )
-            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success(Unit)
 
             listener.onCreate(config, entities)
 
-            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
-            coVerify(exactly = 0) { calendarsRepository.persistCalendar(any(), any()) }
-        }
-    }
-
-    @Test
-    fun `If bootstraping in onCreate fails, the calendar is just persisted`() {
-        runBlocking {
-            val entities = listOf(
-                CalendarEntity(
-                    "calendar_id",
-                    owner = null
-                ),
-            )
-            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("error")
-
-            listener.onCreate(config, entities)
-
-            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }
@@ -151,7 +135,7 @@ class CalendarListenerTest {
     }
 
     @Test
-    fun `onUpdate calendar doesn't exist yet in db do bootstrap`() {
+    fun `onUpdate calendar doesn't exist yet in db do persist`() {
         runBlocking {
             val entities = listOf(
                 CalendarEntity(
@@ -161,12 +145,10 @@ class CalendarListenerTest {
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
-            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Success<Unit>()
 
             listener.onUpdate(config, entities)
 
-            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
-            coVerify(exactly = 0) { calendarsRepository.persistCalendar(any(), any()) }
+            coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }
 
@@ -181,11 +163,9 @@ class CalendarListenerTest {
             )
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns null
-            coEvery { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) } returns UseCase.Result.Error("Bootstrap failed")
 
             listener.onUpdate(config, entities)
 
-            coVerify(exactly = 1) { bootstrapCalendarUseCase.executeBootstrap(any(), any(), any()) }
             coVerify(exactly = 1) { calendarsRepository.persistCalendar(any(), any()) }
         }
     }

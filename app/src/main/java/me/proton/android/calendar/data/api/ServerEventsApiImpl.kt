@@ -127,6 +127,24 @@ data class ServerCoreEventsApiResponse(
     val calendarUserSettings: CalendarUserSettingsEntity? = null
 )
 
+@Serializable
+data class CalendarUserSettingsEvents(
+    @SerialName("CalendarUserSettings")
+    val calendarUserSettings: CalendarUserSettingsEntity? = null
+)
+
+@Serializable
+data class CalendarsEvents(
+    @SerialName("Calendars")
+    val calendars: List<ServerEvent.CalendarsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarMembersEvents(
+    @SerialName("CalendarMembers")
+    val calendarMembers: List<ServerEvent.MembersApiResponse>? = null
+)
+
 fun ServerCalendarEventsApiResponse.toServerEventsApiResponse() = ServerEventsApiResponse(
     eventId = this.calendarModelEventId,
     refresh = this.refresh,
@@ -159,6 +177,41 @@ data class ServerCalendarEventsApiResponse(
     val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null,
     @SerialName("CalendarSubscriptions")
     val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null,
+)
+@Serializable
+data class CalendarEventsServerEvents(
+    @SerialName("CalendarEvents")
+    val calendarEvents: List<ServerEvent.EventsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarAlarmsEvents(
+    @SerialName("CalendarAlarms")
+    val calendarAlarms: List<ServerEvent.AlarmsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarKeysEvents(
+    @SerialName("CalendarKeys")
+    val calendarKeys: List<ServerEvent.CalendarKeysApiResponse>? = null
+)
+
+@Serializable
+data class CalendarPassphrasesEvents(
+    @SerialName("CalendarPassphrases")
+    val calendarPassphrases: List<ServerEvent.PassphrasesApiResponse>? = null
+)
+
+@Serializable
+data class CalendarSettingsEvents(
+    @SerialName("CalendarSettings")
+    val calendarSettings: List<ServerEvent.CalendarSettingsApiResponse>? = null
+)
+
+@Serializable
+data class CalendarSubscriptionsEvents(
+    @SerialName("CalendarSubscriptions")
+    val calendarSubscriptions: List<ServerEvent.CalendarSubscriptionsApiResponse>? = null
 )
 
 

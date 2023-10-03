@@ -152,6 +152,11 @@ interface CalendarsApi {
     suspend fun getPassphrases(userId: UserId, calendarId: String): ApiResponse<PassphrasesApiResponse>
 
     /**
+     * Retrieves the active passphrase.
+     */
+    suspend fun getActivePassphrase(userId: UserId, calendarId: String): ApiResponse<ActivePassphraseApiResponse>
+
+    /**
      * Update the participation status of a given event attendee.
      */
     suspend fun updateParticipationStatus(userId: UserId, calendarId: String, eventId: String, attendeeId: String, status: Int, updateTime: Int? = null): ApiResponse<AttendeeApiResponse>
@@ -170,6 +175,11 @@ interface CalendarsApi {
      * Get calendar settings
      */
     suspend fun getCalendarSettings(userId: UserId, calendarId: String): ApiResponse<GetCalendarSettingsApiResponse>
+
+    /**
+     * Get calendar subscription
+     */
+    suspend fun getCalendarSubscription(userId: UserId, calendarId: String): ApiResponse<GetCalendarSubscriptionApiResponse>
 
     /**
      * Get holiday calendars
