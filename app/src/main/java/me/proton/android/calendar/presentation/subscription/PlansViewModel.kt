@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import me.proton.core.accountmanager.domain.AccountManager
+import me.proton.core.payment.domain.PaymentManager
 import me.proton.core.payment.presentation.PaymentsOrchestrator
 import me.proton.core.plan.presentation.PlansOrchestrator
 import me.proton.core.plan.presentation.onUpgradeResult
@@ -17,7 +18,8 @@ import javax.inject.Inject
 class PlansViewModel @Inject constructor(
     private val accountManager: AccountManager,
     private val plansOrchestrator: PlansOrchestrator,
-    private val paymentsOrchestrator: PaymentsOrchestrator
+    private val paymentsOrchestrator: PaymentsOrchestrator,
+    private val paymentManager: PaymentManager
 ) : ViewModel() {
 
     fun register(context: ComponentActivity) {
@@ -26,6 +28,10 @@ class PlansViewModel @Inject constructor(
     }
 
     private fun getPrimaryUserId() = accountManager.getPrimaryUserId()
+
+    suspend fun isSubscriptionFlowAvailable(): Boolean = getPrimaryUserId().first()?.let {
+        paymentManager.isSubscriptionAvailable(it)
+    } ?: false
 
     fun onPlansUpgradeClicked(context: ComponentActivity) {
         viewModelScope.launch {
