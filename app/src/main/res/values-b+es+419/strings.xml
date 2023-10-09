@@ -476,12 +476,12 @@
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">Necesita al menos un calendario personal antes de alcanzar el límite de 3 calendarios de su plan.</string>
     <string name="create_calendar_limit_reached_error">Error</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
-    <string name="delete_calendar_dialog_message">¿En verdad desea eliminar este calendario?</string>
+    <string name="delete_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario?</string>
     <string name="remove_calendar_dialog_title">Quitar calendario</string>
-    <string name="remove_calendar_dialog_message">¿En verdad desea quitar este calendario?</string>
+    <string name="remove_calendar_dialog_message">¿Está seguro de que quiere quitar este calendario?</string>
     <string name="leave_calendar_dialog_title">Abandonar calendario</string>
     <string name="leave_calendar_dialog_message">Si abandona este calendario, deberá preguntarle al propietario para unirse de nuevo.</string>
-    <string name="delete_default_calendar_dialog_message">¿En verdad desea eliminar este calendario? \"%1$s\" será establecido como predeterminado.</string>
+    <string name="delete_default_calendar_dialog_message">¿Está seguro de que quiere eliminar este calendario? \"%1$s\" será establecido como predeterminado.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
     <string name="remove_calendar_snack_removed">Calendario quitado</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
@@ -489,7 +489,7 @@
     <string name="leave_calendar_snack_error">Error al abandonar el calendario</string>
     <string name="delete_calendar_snack_error_password_confirmation">Error al confirmar la contraseña</string>
     <string name="recreate_calendar_dialog_title">Borrar calendario</string>
-    <string name="recreate_calendar_dialog_message">Esta acción eliminará todos los eventos y usuarios invitados.\n\n¿En verdad desea borrar este calendario?</string>
+    <string name="recreate_calendar_dialog_message">Esta acción eliminará todos los eventos y usuarios invitados.\n\n¿Está seguro de que quiere borrar este calendario?</string>
     <string name="recreate_calendar_snack_error">Error al borrar el calendario</string>
     <string name="recreate_calendar_snack_deleted">Calendario borrado</string>
     <string name="recreate_calendar_snack_clearing">Borrando calendario…</string>

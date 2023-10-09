@@ -421,8 +421,8 @@
     <string name="settings_auto_invites_title">Aggiungere gli inviti al calendario e segnarli come in attesa</string>
     <string name="settings_search_title">Ricerca calendari</string>
     <string name="settings_search_subtitle">Scarica e archivia i contenuti del calendario sul tuo dispositivo per la ricerca. La disattivazione rimuoverà i contenuti scaricati.\n\nLa ricerca è una funzione sperimentale beta. Abilitarla potrebbe rendere instabile l\'app.</string>
-    <string name="settings_alternative_routing_title">Consenti routing alternativo</string>
-    <string name="settings_alternative_routing_subtitle">Nel caso in cui i siti Proton siano bloccati, questa impostazione consente all\'app di provare l\'instradamento di rete alternativo per raggiungere Proton, che può essere utile per aggirare i firewall o problemi di rete. Consigliamo di mantenere questa impostazione per una maggiore affidabilità.</string>
+    <string name="settings_alternative_routing_title">Consenti percorso alternativo</string>
+    <string name="settings_alternative_routing_subtitle">Nel caso in cui i siti di Proton siano bloccati, questa impostazione consente all\'app di provare l\'indirizzamento di rete alternativo per raggiungere Proton, che potrebbe esser utile per evitare firewall o problemi di rete. Consigliamo di mantenere questa impostazione attiva per una maggiore affidabilità.</string>
     <string name="settings_value_placeholder">Tocca per selezionare</string>
     <string name="settings_general_title">Generale</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s etc.</string>
