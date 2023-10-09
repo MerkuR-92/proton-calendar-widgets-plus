@@ -478,7 +478,7 @@
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
     <string name="delete_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario?</string>
     <string name="remove_calendar_dialog_title">Eliminar calendario</string>
-    <string name="remove_calendar_dialog_message">¿De verdad desea eliminar este calendario?</string>
+    <string name="remove_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario?</string>
     <string name="leave_calendar_dialog_title">Abandonar calendario</string>
     <string name="leave_calendar_dialog_message">Si abandonas este calendario, deberás pedirle permiso al propietario para unirte de nuevo.</string>
     <string name="delete_default_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>

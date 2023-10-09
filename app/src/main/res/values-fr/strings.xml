@@ -224,7 +224,7 @@
     <string name="event_discard_changes_title">Abandonner les modifications ?</string>
     <string name="event_discard_changes_description">Vous perdrez toutes les modifications non enregistrées.</string>
     <string name="event_discard_changes_cancel">Continuer les modifications</string>
-    <string name="event_discard_changes_confirm">Supprimer</string>
+    <string name="event_discard_changes_confirm">Abandonner</string>
     <string name="event_recurring_update_this_title">Mettre à jour l\'événement récurrent</string>
     <string name="event_recurring_update_this_description">Les modifications de récurrence seront perdues.</string>
     <string name="event_recurring_update_all_description">Les modifications précédentes de cette série seront perdues.</string>
@@ -246,8 +246,8 @@
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annulation d’un événement %1$s à %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annulation d’un événement le %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulation d’un événement commençant %1$s</string>
-    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité à %1$s\nQuand : %2$s</string>
-    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s a été mis à jour\nDate : %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité(e) à %1$s.\nQuand : %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s a été mis à jour.\nQuand : %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toute la journée)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s à %2$s %3$s - %4$s à %5$s %6$s</string>

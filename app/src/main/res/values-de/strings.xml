@@ -347,7 +347,7 @@
     <string name="snack_ics_unsupported_refresh_error">Das Aktualisieren von Terminen wird derzeit nicht unterstützt</string>
     <string name="snack_ics_unsupported_publish_error">Terminimport wird derzeit nicht unterstützt</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Derzeit wird nur das Antworten auf alle Termine einer Serie unterstützt</string>
-    <string name="snack_ics_party_crasher_error">Deine E-Mail-Adresse ist nicht in der Teilnehmerliste</string>
+    <string name="snack_ics_party_crasher_error">Deine E-Mail-Adresse ist nicht in der Teilnehmerliste.</string>
     <string name="snack_ics_reply_party_crasher_error">Teilnehmer, die nicht vom Organisator eingeladen wurden, können nicht hinzugefügt werden</string>
     <string name="snack_ics_missing_uid_error">Dem Termin fehlt die UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Diesem Konto ist kein aktiver persönlicher Kalender zugeordnet.</string>

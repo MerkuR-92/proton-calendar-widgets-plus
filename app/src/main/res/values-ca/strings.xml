@@ -148,7 +148,7 @@
     <string name="event_text_timezone_start">Zona horària</string>
     <string name="invite_in_shared_calendar_disclaimer">L\'enviament d\'invitacions només està disponible en calendaris personals.</string>
     <string name="invite_change_calendar_disclaimer">No és possible modificar el calendari associat amb invitacions.</string>
-    <string name="invite_change_attendees_disclaimer">No és encara possible modificar els participants associats amb invitacions.</string>
+    <string name="invite_change_attendees_disclaimer">Encara no és possible modificar els participants associats amb invitacions.</string>
     <string name="change_calendar_recurring_disclaimer">El canvi de calendari per a un esdeveniment recurrent encara no està disponible.</string>
     <string name="update_event">Actualitza l\'esdeveniment</string>
     <string name="update_invite_send_invitation">S\'enviarà una invitació als participants de l\'esdeveniment.</string>
