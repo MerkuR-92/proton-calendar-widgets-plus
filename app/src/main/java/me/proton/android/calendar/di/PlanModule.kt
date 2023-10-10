@@ -38,7 +38,7 @@ object PlanModule {
 
     @Provides
     @SupportUpgradePaidPlans
-    fun provideSupportUpgradePaidPlans() = CalendarFeatureFlag.Payments.fallbackValue
+    fun provideSupportUpgradePaidPlans() = true
 
     @Provides
     @ProductOnlyPaidPlans
