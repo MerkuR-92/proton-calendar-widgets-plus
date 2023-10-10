@@ -1183,7 +1183,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             binding.drawerLayout.close()
         }
 
-        binding.navViewMainContent.navViewMoreSubscriptionLayout.visibleOrGone(CalendarFeatureFlag.Subscription.fallbackValue)
+        lifecycleScope.launch {
+            binding.navViewMainContent.navViewMoreSubscriptionLayout.visibleOrGone(
+                plansViewModel.isSubscriptionFlowAvailable()
+            )
+        }
         binding.navViewMainContent.navViewMoreSubscriptionPress.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
             binding.drawerLayout.close()

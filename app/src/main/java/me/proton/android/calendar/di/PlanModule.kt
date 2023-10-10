@@ -34,11 +34,11 @@ object PlanModule {
 
     @Provides
     @SupportSignupPaidPlans
-    fun provideSupportSignupPaidPlans() = CalendarFeatureFlag.Subscription.fallbackValue
+    fun provideSupportSignupPaidPlans() = CalendarFeatureFlag.Payments.fallbackValue
 
     @Provides
     @SupportUpgradePaidPlans
-    fun provideSupportUpgradePaidPlans() = CalendarFeatureFlag.Subscription.fallbackValue
+    fun provideSupportUpgradePaidPlans() = CalendarFeatureFlag.Payments.fallbackValue
 
     @Provides
     @ProductOnlyPaidPlans
