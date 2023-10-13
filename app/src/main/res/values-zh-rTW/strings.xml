@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">無法變動邀請函相關的參與人員</string>
     <string name="change_calendar_recurring_disclaimer">尚無法變更定期行程的行事曆。</string>
     <string name="update_event">更新行程</string>
-    <string name="update_invite_send_invitation">邀請函將傳送至活動參與人員</string>
+    <string name="update_invite_send_email">邀請函將傳送至活動參與人員</string>
     <string name="update_recurring_event">更新定期行程</string>
     <string name="update_recurring_all_events">請問您是否要更新這一系列的所有行程？</string>
-    <string name="update_recurring_invite_send_invitation">您將要更新此系列中全部的行程。邀請將會傳送給行程參與者。</string>
+    <string name="update_recurring_invite_send_email">您將要更新此系列中全部的行程。邀請將會傳送給行程參與者。</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">您正在找什麼呢？</string>
     <string name="search_empty_results_title">查無結果</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">傳送</string>
     <string name="event_send_invite_dialog_cancel">取消</string>
     <string name="event_add_participants_dialog_title">加入參與者</string>
-    <string name="event_add_participants_dialog_description">邀請將傳給此系列中全部活動的參與者。</string>
-    <string name="event_add_participants_overwrite_dialog_description">邀請將傳給此系列中全部活動的參與者。\n此系列中先前所作的修改將會消失。</string>
+    <string name="recurring_event_add_participants_dialog_description">邀請將傳給此系列中全部活動的參與者。</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">邀請將傳給此系列中全部活動的參與者。\n此系列中先前所作的修改將會消失。</string>
     <string name="event_add_participants_dialog_confirm">傳送</string>
     <string name="event_add_participants_dialog_cancel">取消</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s 已取消。</string>

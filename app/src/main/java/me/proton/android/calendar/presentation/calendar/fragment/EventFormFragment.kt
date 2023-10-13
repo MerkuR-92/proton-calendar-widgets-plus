@@ -867,12 +867,16 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
     private fun navigateToAttendees() {
         lifecycleScope.launch {
-            val event = eventViewModel.eventLiveData.value!!
-            val readOnly = event.isAnInvitation && !navigationArguments.eventId.isNullOrEmpty() // TODO Update once we allow editing attendees for invitations
-            val bundle = Bundle().apply {
-                putBoolean(READ_ONLY_ARG, readOnly)
+            if (CalendarFeatureFlag.EditAttendeesAsOrganizer.fallbackValue) {
+                findNavController().navigate(R.id.nav_event_form_attendees)
+            } else {
+                val event = eventViewModel.eventLiveData.value!!
+                val readOnly = event.isAnInvitation && !navigationArguments.eventId.isNullOrEmpty()
+                val bundle = Bundle().apply {
+                    putBoolean(READ_ONLY_ARG, readOnly)
+                }
+                findNavController().navigate(R.id.nav_event_form_attendees, bundle)
             }
-            findNavController().navigate(R.id.nav_event_form_attendees, bundle)
         }
     }
 

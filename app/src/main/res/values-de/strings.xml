@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Es ist noch nicht möglich, die mit Einladungen verbundenen Teilnehmer zu ändern.</string>
     <string name="change_calendar_recurring_disclaimer">Das Ändern des Kalenders für wiederkehrende Termine ist noch nicht möglich.</string>
     <string name="update_event">Termin aktualisieren</string>
-    <string name="update_invite_send_invitation">Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
+    <string name="update_invite_send_email">Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
     <string name="update_recurring_event">Terminserie aktualisieren</string>
     <string name="update_recurring_all_events">Möchtest du alle Termine dieser Serie aktualisieren?</string>
-    <string name="update_recurring_invite_send_invitation">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
+    <string name="update_recurring_invite_send_email">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Wonach suchst du?</string>
     <string name="search_empty_results_title">Keine Ergebnisse gefunden</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Senden</string>
     <string name="event_send_invite_dialog_cancel">Abbrechen</string>
     <string name="event_add_participants_dialog_title">Teilnehmer hinzufügen</string>
-    <string name="event_add_participants_dialog_description">Für alle Termine dieser Serie wird eine Einladung an neu hinzugefügte Teilnehmer gesendet.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Für alle Termine in dieser Serie wird eine Einladung an hinzugefügte Teilnehmer gesendet.\nVorherige Änderungen an dieser Terminserie gehen dabei verloren.</string>
+    <string name="recurring_event_add_participants_dialog_description">Für alle Termine dieser Serie wird eine Einladung an neu hinzugefügte Teilnehmer gesendet.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Für alle Termine in dieser Serie wird eine Einladung an hinzugefügte Teilnehmer gesendet.\nVorherige Änderungen an dieser Terminserie gehen dabei verloren.</string>
     <string name="event_add_participants_dialog_confirm">Senden</string>
     <string name="event_add_participants_dialog_cancel">Abbrechen</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s wurde abgesagt.</string>

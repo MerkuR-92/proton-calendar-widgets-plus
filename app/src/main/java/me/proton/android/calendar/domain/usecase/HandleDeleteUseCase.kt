@@ -337,8 +337,9 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
             val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
                 userId,
                 event,
-                attendees,
+                attendees.mapNotNull { it.extractEmail() },
                 sendPreferences,
+                event.defaultTimeZone!!,
                 timeFormatIs24Hours
             )
             sendCancellationResult.ifSuccessAndLogErrors(logger) { }

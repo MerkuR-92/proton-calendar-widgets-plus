@@ -90,7 +90,7 @@ internal class HandleDeleteUseCaseTest {
             )
         )
 
-        coEvery { sendEmailUseCaseMock.sendCancellationToAttendees(userId, any(), any(), any(), any())
+        coEvery { sendEmailUseCaseMock.sendCancellationToAttendees(userId, any(), any(), any(), any(), any())
         } returns UseCase.Result.Success<Unit>()
         coEvery { sendEmailUseCaseMock.sendReplyToOrganizer(userId, any(), any(), any(), any(), any(), any(), any(), any(), any(), any(), any())
         } returns UseCase.Result.Success<Unit>()

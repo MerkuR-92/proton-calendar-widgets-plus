@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Encara no és possible modificar els participants associats amb invitacions.</string>
     <string name="change_calendar_recurring_disclaimer">El canvi de calendari per a un esdeveniment recurrent encara no està disponible.</string>
     <string name="update_event">Actualitza l\'esdeveniment</string>
-    <string name="update_invite_send_invitation">S\'enviarà una invitació als participants de l\'esdeveniment.</string>
+    <string name="update_invite_send_email">S\'enviarà una invitació als participants de l\'esdeveniment.</string>
     <string name="update_recurring_event">Actualitza l\'esdeveniment recurrent</string>
     <string name="update_recurring_all_events">Voleu actualitzar tots els esdeveniments d\'aquesta sèrie?</string>
-    <string name="update_recurring_invite_send_invitation">Actualitzareu tots els esdeveniments d\'aquesta sèrie. S\'enviarà una invitació als participants de l\'esdeveniment.</string>
+    <string name="update_recurring_invite_send_email">Actualitzareu tots els esdeveniments d\'aquesta sèrie. S\'enviarà una invitació als participants de l\'esdeveniment.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Què esteu buscant?</string>
     <string name="search_empty_results_title">No s\'ha trobat cap resultat.</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Enviar</string>
     <string name="event_send_invite_dialog_cancel">Cancel·la</string>
     <string name="event_add_participants_dialog_title">Afegir participants</string>
-    <string name="event_add_participants_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.\nEs perdran les modificacions prèvies d\'aquesta sèrie.</string>
+    <string name="recurring_event_add_participants_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.\nEs perdran les modificacions prèvies d\'aquesta sèrie.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancel·la</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s s\'ha cancel·lat.</string>

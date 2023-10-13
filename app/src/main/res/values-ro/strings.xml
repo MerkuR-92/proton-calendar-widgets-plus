@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Încă nu este posibilă modificare participanților asociați la invitații.</string>
     <string name="change_calendar_recurring_disclaimer">Modificarea calendarului pentru evenimentele recurente nu este încă posibilă.</string>
     <string name="update_event">Actualizare eveniment</string>
-    <string name="update_invite_send_invitation">O invitație va fi trimisă participanților la eveniment.</string>
+    <string name="update_invite_send_email">O invitație va fi trimisă participanților la eveniment.</string>
     <string name="update_recurring_event">Actualizare eveniment recurent</string>
     <string name="update_recurring_all_events">Doriți actualizarea tuturor evenimentelor din serie?</string>
-    <string name="update_recurring_invite_send_invitation">Veți actualiza toate evenimentele din această serie. O invitație va fi trimisă participanților la eveniment.</string>
+    <string name="update_recurring_invite_send_email">Veți actualiza toate evenimentele din această serie. O invitație va fi trimisă participanților la eveniment.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Ce căutați?</string>
     <string name="search_empty_results_title">Nu s-au găsit rezultate.</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Trimitere</string>
     <string name="event_send_invite_dialog_cancel">Anulare</string>
     <string name="event_add_participants_dialog_title">Adăugare participanți</string>
-    <string name="event_add_participants_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
+    <string name="recurring_event_add_participants_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
     <string name="event_add_participants_dialog_confirm">Trimitere</string>
     <string name="event_add_participants_dialog_cancel">Anulare</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s a fost anulat.</string>

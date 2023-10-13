@@ -816,7 +816,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Send invitation dialog
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_title) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_title)
-            coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_description) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_description)
+            coEvery { resourceProviderMock.provideString(R.string.recurring_event_add_participants_dialog_description) } returns protonCalendarApplication.getString(R.string.recurring_event_add_participants_dialog_description)
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_confirm) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_confirm)
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_cancel) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_cancel)
 
@@ -867,7 +867,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Send invitation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_title) }
-            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_description) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.recurring_event_add_participants_dialog_description) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_confirm) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_cancel) }
 
@@ -932,7 +932,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Send invitation dialog
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_title) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_title)
-            coEvery { resourceProviderMock.provideString(R.string.event_add_participants_overwrite_dialog_description) } returns protonCalendarApplication.getString(R.string.event_add_participants_overwrite_dialog_description)
+            coEvery { resourceProviderMock.provideString(R.string.recurring_event_add_participants_overwrite_dialog_description) } returns protonCalendarApplication.getString(R.string.recurring_event_add_participants_overwrite_dialog_description)
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_confirm) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_confirm)
             coEvery { resourceProviderMock.provideString(R.string.event_add_participants_dialog_cancel) } returns protonCalendarApplication.getString(R.string.event_add_participants_dialog_cancel)
 
@@ -1002,7 +1002,7 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Send invitation dialog
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_title) }
-            verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_overwrite_dialog_description) }
+            verify(exactly = 1) { resourceProviderMock.provideString(R.string.recurring_event_add_participants_overwrite_dialog_description) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_confirm) }
             verify(exactly = 1) { resourceProviderMock.provideString(R.string.event_add_participants_dialog_cancel) }
 

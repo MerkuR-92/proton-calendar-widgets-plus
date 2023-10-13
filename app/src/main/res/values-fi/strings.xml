@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Kutsuihin liittyviä osallistujia ei ole vielä mahdollista muokata.</string>
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
-    <string name="update_invite_send_invitation">Tapahtuman osallistujille lähetetään kutsu.</string>
+    <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään kutsu.</string>
     <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
     <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
-    <string name="update_recurring_invite_send_invitation">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään kutsu.</string>
+    <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään kutsu.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mitä etsit?</string>
     <string name="search_empty_results_title">Ei tuloksia</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Lähetä</string>
     <string name="event_send_invite_dialog_cancel">Peru</string>
     <string name="event_add_participants_dialog_title">Lisää osallistujia</string>
-    <string name="event_add_participants_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.\nKetjun aiemmat muutokset menetetään.</string>
+    <string name="recurring_event_add_participants_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.\nKetjun aiemmat muutokset menetetään.</string>
     <string name="event_add_participants_dialog_confirm">Lähetä</string>
     <string name="event_add_participants_dialog_cancel">Peru</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s on peruttu.</string>

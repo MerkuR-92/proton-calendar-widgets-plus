@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Non è ancora possibile modificare i partecipanti associati agli inviti.</string>
     <string name="change_calendar_recurring_disclaimer">Cambiare calendario per un evento ricorrente non è ancora possibile.</string>
     <string name="update_event">Aggiorna evento</string>
-    <string name="update_invite_send_invitation">Un invito verrà inviato ai partecipanti dell\'evento.</string>
+    <string name="update_invite_send_email">Un invito verrà inviato ai partecipanti dell\'evento.</string>
     <string name="update_recurring_event">Aggiorna evento ricorrente</string>
     <string name="update_recurring_all_events">Vuoi aggiornare tutti gli eventi in questa serie?</string>
-    <string name="update_recurring_invite_send_invitation">Aggiornerai tutti gli eventi di questa serie. Un invito verrà inviato ai partecipanti dell\'evento.</string>
+    <string name="update_recurring_invite_send_email">Aggiornerai tutti gli eventi di questa serie. Un invito verrà inviato ai partecipanti dell\'evento.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Che cosa stai cercando?</string>
     <string name="search_empty_results_title">Nessun risultato trovato</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Invia</string>
     <string name="event_send_invite_dialog_cancel">Annulla</string>
     <string name="event_add_participants_dialog_title">Aggiungi partecipanti</string>
-    <string name="event_add_participants_dialog_description">Un invito sarà inviato ai partecipanti aggiunti per tutti gli eventi di questa serie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Verrà inviato un invito ai partecipanti aggiunti per tutti gli eventi di questa serie.\nLe modifiche precedenti di questa serie andranno perse.</string>
+    <string name="recurring_event_add_participants_dialog_description">Un invito sarà inviato ai partecipanti aggiunti per tutti gli eventi di questa serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Verrà inviato un invito ai partecipanti aggiunti per tutti gli eventi di questa serie.\nLe modifiche precedenti di questa serie andranno perse.</string>
     <string name="event_add_participants_dialog_confirm">Invia</string>
     <string name="event_add_participants_dialog_cancel">Annulla</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s è stato cancellato.</string>

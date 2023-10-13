@@ -180,7 +180,8 @@ object ICalUtilsImpl : ICalUtils {
                 val oldByDayOfWeek = ArrayList(iCalEvent.recurrenceRule.value.byDay.map { it.day })
                 if (oldDateTime != null) oldByDayOfWeek.remove(oldDateTime.dayOfWeek.toBiweeklyDayOfWeek())
                 if (!oldByDayOfWeek.contains(startWeekday)) oldByDayOfWeek.add(startWeekday)
-                iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(byDay = oldByDayOfWeek)
+                // Don't set BYDAY if happens WEEKLY on a single day
+                if (oldByDayOfWeek.size > 1) iCalEvent.recurrenceRule.value = iCalEvent.recurrenceRule.value.clone(byDay = oldByDayOfWeek)
             }
             Frequency.MONTHLY -> {
                 val rrule = iCalEvent.recurrenceRule.value

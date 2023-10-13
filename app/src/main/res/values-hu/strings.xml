@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">It is not yet possible to modify participants associated with invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Az ismétlődő esemény naptárának módosítása még nem lehetséges.</string>
     <string name="update_event">Update event</string>
-    <string name="update_invite_send_invitation">An invitation will be sent to the event participants.</string>
+    <string name="update_invite_send_email">An invitation will be sent to the event participants.</string>
     <string name="update_recurring_event">Update recurring event</string>
     <string name="update_recurring_all_events">Would you like to update all events in this series?</string>
-    <string name="update_recurring_invite_send_invitation">You will update all the events in this series. An invitation will be sent to the event participants.</string>
+    <string name="update_recurring_invite_send_email">You will update all the events in this series. An invitation will be sent to the event participants.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mit szeretne keresni?</string>
     <string name="search_empty_results_title">Nincs találat</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Küldés</string>
     <string name="event_send_invite_dialog_cancel">Mégsem</string>
     <string name="event_add_participants_dialog_title">Résztvevők hozzáadása</string>
-    <string name="event_add_participants_dialog_description">A sorozatban szereplő összes esemény hozzáadott résztvevőinek meghívó kerül elküldésre.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Meghívó kerül elküldésre a résztvevőknek, a sorozat összes eseményére.\nA sorozaton végzett korábbi módosítások elvesznek.</string>
+    <string name="recurring_event_add_participants_dialog_description">A sorozatban szereplő összes esemény hozzáadott résztvevőinek meghívó kerül elküldésre.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Meghívó kerül elküldésre a résztvevőknek, a sorozat összes eseményére.\nA sorozaton végzett korábbi módosítások elvesznek.</string>
     <string name="event_add_participants_dialog_confirm">Küldés</string>
     <string name="event_add_participants_dialog_cancel">Mégsem</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s törlésre került.</string>
