@@ -406,7 +406,7 @@
     <string name="bug_report_discard_changes_confirm">Адхіліць</string>
     <!-- Settings -->
     <string name="settings_theme_title">Тэма</string>
-    <string name="settings_theme_info">Гэты параметр уплывае толькі на знешні выгляд праграмы Proton Calendar на гэтай прыладзе. Праграма перазапусціцца пасля змянення тэмы.</string>
+    <string name="settings_theme_info">Гэты параметр уплывае толькі на вонкавы выгляд праграмы Proton Calendar на гэтай прыладзе. Праграма перазапусціцца пасля змянення тэмы.</string>
     <string name="settings_timezone_title">Часавы пояс</string>
     <string name="settings_language_title">Мова праграмы</string>
     <string name="settings_language_default">Аўтаматычнае вызначэнне</string>
