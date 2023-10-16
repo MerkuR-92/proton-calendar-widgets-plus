@@ -1470,10 +1470,10 @@ class EventViewModel @Inject constructor(
         occurrenceNumber: Int,
         timeFormatIs24Hour: Boolean
     ) {
+        val isAddParticipantsToRecurring = showSaveOptionPicker(dbEvent)
         if (dbEvent == null || dbEvent?.iCalEvent?.attendees.isNullOrEmpty()) {
             // Create an event with attendees / add attendees to an event
-            val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
-            if (showSaveOptionPicker && !eventId.isNullOrEmpty()) {
+            if (isAddParticipantsToRecurring && !eventId.isNullOrEmpty()) {
                 // Create a recurring event with attendees / add attendees to a recurring event
                 val singleEditsInfo = getSingleEditsInfo()
                 // Display Add Participants Dialog (adding attendees to an existing event)
@@ -1491,7 +1491,7 @@ class EventViewModel @Inject constructor(
                                 coroutineScope.launch {
                                     saveEventWithAttendeesSendPreferences(
                                         displayDialog,
-                                        true,
+                                        isAddParticipantsToRecurring,
                                         occurrenceNumber,
                                         timeFormatIs24Hour
                                     )
@@ -1519,7 +1519,7 @@ class EventViewModel @Inject constructor(
                                 coroutineScope.launch {
                                     saveEventWithAttendeesSendPreferences(
                                         displayDialog,
-                                        false,
+                                        isAddParticipantsToRecurring,
                                         occurrenceNumber,
                                         timeFormatIs24Hour
                                     )
@@ -1580,7 +1580,7 @@ class EventViewModel @Inject constructor(
                                             // Check send preferences for existing + added / removed attendees
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                true,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
                                                 sendEmailUpdate = true,
@@ -1609,7 +1609,7 @@ class EventViewModel @Inject constructor(
                                         coroutineScope.launch {
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                true,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
                                                 sendEmailUpdate = true
@@ -1654,7 +1654,7 @@ class EventViewModel @Inject constructor(
                                             // Check send preferences for existing + added / removed attendees
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                false,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
                                                 sendEmailUpdate = true,
@@ -1683,7 +1683,7 @@ class EventViewModel @Inject constructor(
                                         coroutineScope.launch {
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                false,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
                                                 sendEmailUpdate = true
@@ -1736,10 +1736,10 @@ class EventViewModel @Inject constructor(
                                             // Check send preferences for added / removed attendees
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                true,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber,
                                                 timeFormatIs24Hour,
-                                                sendEmailUpdate = false, // TODO CHECK VALUE
+                                                sendEmailUpdate = false,
                                                 notifyChangedAttendees = true
                                             )
                                         }
@@ -1816,10 +1816,10 @@ class EventViewModel @Inject constructor(
                                             // Check send preferences for added / removed attendees
                                             saveEventWithAttendeesSendPreferences(
                                                 displayDialog,
-                                                false,
+                                                isAddParticipantsToRecurring,
                                                 occurrenceNumber = 1,
                                                 timeFormatIs24Hour,
-                                                sendEmailUpdate = false, // TODO CHECK VALUE
+                                                sendEmailUpdate = false,
                                                 notifyChangedAttendees = true
                                             )
                                         }
