@@ -420,7 +420,7 @@
     <string name="settings_week_numbers_title">Mostrar los números de la semana</string>
     <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcar como pendiente</string>
     <string name="settings_search_title">Buscar en calendarios</string>
-    <string name="settings_search_subtitle">Descarga y almacena el contenido del calendario en tu dispositivo para búsquedas. Desactivar esta opción eliminará el contenido descargado.\n\nLa búsqueda es una función beta experimental. Habilitarla podría hacer la aplicación inestable.</string>
+    <string name="settings_search_subtitle">Descarga y almacena el contenido del calendario en tu dispositivo para realizar búsquedas. Si desactivas esta opción, se eliminará el contenido descargado.\n\nLa opción de búsqueda es una función beta experimental. Activarla puede hacer que la aplicación sea inestable.</string>
     <string name="settings_alternative_routing_title">Permitir el enrutamiento alternativo</string>
     <string name="settings_alternative_routing_subtitle">En caso de que los sitios de Proton estén bloqueados, esta configuración permite a la aplicación intentar un enrutamiento de red alternativo para llegar a Proton, lo que puede ser útil para evitar los cortafuegos o los problemas de red. Recomendamos mantener esta configuración activada para una mayor fiabilidad.</string>
     <string name="settings_value_placeholder">Tocar para seleccionar</string>

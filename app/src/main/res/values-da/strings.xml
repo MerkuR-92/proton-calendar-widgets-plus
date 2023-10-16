@@ -20,7 +20,7 @@
     <string name="dialog_button_update">Opdatér</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">En aflysningsmail vil blive sendt til deltagerne i arrangementet. Vil du slette denne begivenhed?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Din e-mail adresse er deaktiveret. En aflysningsmail kan derfor ikke sendes til deltagerne i arrangementet. Ønsker du at slette denne begivenhed?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Din adresse er deaktiveret. En aflysningsmail kan ikke sendes til deltagerne i arrangementet. Vil du slette denne begivenhed alligevel?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">En aflysningsmail vil blive sendt til deltagerne i arrangementet. Vil du slette denne begivenhed?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Din adresse er deaktiveret. En aflysningsmail kan ikke sendes til deltagerne i arrangementet. Vil du slette denne begivenhed alligevel?</string>
     <!-- Delete as an attendee -->
@@ -30,7 +30,7 @@
     <string name="dialog_description_delete_recurring_event_as_attendee_disabled">Arrangøren af denne serie af begivenheder vil ikke blive informeret om, at du afviser invitationen, da du ikke kan sende e-mails fra den inviterede adresse. Vil du alligevel slette alle begivenheder i denne serie?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Denne begivenhed er blevet opdateret. Arrangøren vil blive informeret om at du afslår invitationen. Vil du slette denne begivenhed?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Denne begivenhed er blevet opdateret. Arrangøren vil ikke blive underrettet om at du afslår invitationen, da du ikke kan sende e-mails fra den inviterede adresse. Vil du slette denne begivenhed?</string>
-    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s \n%2$s</string>
+    <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Forekomster som arrangøren tidligere har opdateret beholdes, men dine svar vil gå tabt</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Forekomster som arrangøren tidligere har opdateret vil blive bevaret</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Arrangøren kan ikke få besked om, at du afviser invitationen:\n\n• %1$s\n\nØnsker du alligevel at slette begivenheden?</string>

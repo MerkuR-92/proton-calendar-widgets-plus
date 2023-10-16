@@ -163,7 +163,7 @@
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Jäljellä oleva aika: %1$s</string>
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Arvioidaan jäljellä olevaa aikaa…</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">melkein valmis</string>
-    <string name="search_downloading_pause">Tauota lataus</string>
+    <string name="search_downloading_pause">Keskeytä lataus</string>
     <string name="search_settings_dialog_toggle_off_title">Poistetaanko kaikki ladatut kalenterit?</string>
     <string name="search_settings_dialog_toggle_off_text">Kalenterit on ladattava uudelleen, jos haluat etsiä niistä.</string>
     <string name="search_settings_dialog_toggle_on_title">Ladataanko kalenterit tälle laitteelle?</string>
@@ -171,12 +171,12 @@
     <string name="search_onboarding_header">Haluatko etsiä kalenteristasi?</string>
     <string name="search_onboarding_text">Ensin sinun on ladattava salattu kopio kalentereistasi. Tämä kestää vain hetken ja voit jatkaa sovelluksen käyttöä. <a href="https://proton.me/support/calendar-search">Lisätietoja</a></string>
     <string name="search_onboarding_action_download_calendars">Lataa kalenterit</string>
-    <string name="search_onboarding_action_pause">Tauota</string>
+    <string name="search_onboarding_action_pause">Keskeytä</string>
     <string name="search_onboarding_action_resume">Jatka</string>
     <string name="search_onboarding_action_retry">Yritä uudelleen</string>
     <string name="search_onboarding_progress_header_ongoing">Kalentereita ladataan…</string>
     <string name="search_onboarding_progress_header_completed">Lataus on valmis</string>
-    <string name="search_onboarding_progress_header_paused">Kalenterien lataus on tauotettu</string>
+    <string name="search_onboarding_progress_header_paused">Kalenterien lataus on keskeytetty</string>
     <string name="search_onboarding_progress_header_error">Virhe ladattaessa kalentereita</string>
     <string name="search_spotlight_activation_snack">Kalenterihaku on aktivointu</string>
     <!-- TODO Start Timezone / End Timezone? -->
@@ -607,7 +607,7 @@
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Valmis</string>
     <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Peruttu</string>
     <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Perutaan</string>
-    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Tauotettu</string>
+    <string name="import_assistant_status_paused" comment="Context: The import has been paused">Keskeytetty</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Epäonnistui</string>
     <string name="import_assistant_status_paused_lost_connection_title">Yhteys Googleen katosi</string>
     <string name="import_assistant_status_paused_lost_connection_description">Jatka tuontia napauttamalla \"Yhdistä uudelleen\", kirjaudu Googleen ja myönnä Protonille tietojesi käyttöoikeus uudelleen.</string>
