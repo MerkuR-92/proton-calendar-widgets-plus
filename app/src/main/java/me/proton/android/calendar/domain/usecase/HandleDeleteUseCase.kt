@@ -334,6 +334,8 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         // The attendees list contains those we successfully fetched send preferences for (only send an email for those, skip sending email if the list is empty)
         if (!isCalendarDisabled && attendees.isNotEmpty()) {
             // If address is disabled, cancellation can't be sent
+            // Bump sequence for the cancellation ics when deleting event with attendees
+            event.iCalEvent.setSequence((event.iCalEvent.sequence?.value ?: 0) + 1)
             val sendCancellationResult = sendEmailUseCase.sendCancellationToAttendees(
                 userId,
                 event,
