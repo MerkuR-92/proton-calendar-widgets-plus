@@ -95,8 +95,6 @@ internal class EditCreateEventUseCaseTest {
 
         with (calendarSplit.sharedPartToEncrypt.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
-            assertThat(this.created).isEqualTo(event.created)
-            assertThat(this.lastModified).isEqualTo(event.lastModified)
             assertThat(this.dateStart).isNull()
             assertThat(this.dateEnd).isNull()
             assertThat(this.description.value.toString()).isEqualTo("2 alarms, 30 minutes (display) and 2 hours (email) before")
@@ -106,16 +104,12 @@ internal class EditCreateEventUseCaseTest {
 
         with (calendarSplit.calendarPart!!.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
-            assertThat(this.created).isEqualTo(event.created)
-            assertThat(this.lastModified).isEqualTo(event.lastModified)
             assertThat(this.status).isEqualTo(Status.tentative())
             assertThat(this.transparency).isEqualTo(Transparency.transparent())
         }
 
         with (calendarSplit.calendarPartToEncrypt!!.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
-            assertThat(this.created).isEqualTo(event.created)
-            assertThat(this.lastModified).isEqualTo(event.lastModified)
             assertThat(this.comments.size).isEqualTo(2)
             assertThat(this.comments[0].value).isEqualTo("Comment no 1")
             assertThat(this.comments[1].value).isEqualTo("Comment no 2")
@@ -124,8 +118,6 @@ internal class EditCreateEventUseCaseTest {
 
         with (calendarSplit.personalPart!!.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
-            assertThat(this.created).isEqualTo(event.created)
-            assertThat(this.lastModified).isEqualTo(event.lastModified)
             assertThat(this.alarms.size).isEqualTo(2)
             assertThat(this.alarms[0].action.isDisplay).isTrue()
             assertThat(this.alarms[0].trigger.duration.minutes).isEqualTo(30)
@@ -135,8 +127,6 @@ internal class EditCreateEventUseCaseTest {
 
         with (calendarSplit.attendeesPart!!.events[0]) {
             assertThat(this.uid).isEqualTo(event.uid)
-            assertThat(this.created).isEqualTo(event.created)
-            assertThat(this.lastModified).isEqualTo(event.lastModified)
             assertThat(this.attendees.size).isEqualTo(1)
             assertThat(this.attendees[0].email).isEqualTo("john.doe@pm.me")
             assertThat(this.attendees[0].commonName).isEqualTo("John Doe")

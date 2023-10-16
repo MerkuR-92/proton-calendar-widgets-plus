@@ -310,8 +310,6 @@ object ICalUtilsImpl : ICalUtils {
             },
             sharedPartToEncrypt = VEvent().run {
                 setUid(originalEvent.uid)
-                setCreated(originalEvent.created)
-                setLastModified(originalEvent.lastModified)
                 setDateTimeStamp(originalEvent.dateTimeStamp)
                 setDescription(originalEvent.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
                 setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
@@ -321,8 +319,6 @@ object ICalUtilsImpl : ICalUtils {
             calendarPart = if (originalEvent.status != null || originalEvent.transparency != null) {
                 VEvent().run {
                     setUid(originalEvent.uid)
-                    setCreated(originalEvent.created)
-                    setLastModified(originalEvent.lastModified)
                     setDateTimeStamp(originalEvent.dateTimeStamp)
                     setStatus(originalEvent.status)
                     setTransparency(originalEvent.transparency)
@@ -332,8 +328,6 @@ object ICalUtilsImpl : ICalUtils {
             calendarPartToEncrypt = if (originalEvent.comments.isNotEmpty()) {
                 VEvent().run {
                     setUid(originalEvent.uid)
-                    setCreated(originalEvent.created)
-                    setLastModified(originalEvent.lastModified)
                     setDateTimeStamp(originalEvent.dateTimeStamp)
                     originalEvent.comments.forEach {
                         addComment(it)
@@ -345,8 +339,6 @@ object ICalUtilsImpl : ICalUtils {
             personalPart = if (originalEvent.alarms.isNotEmpty()) {
                 VEvent().run {
                     setUid(originalEvent.uid)
-                    setCreated(originalEvent.created)
-                    setLastModified(originalEvent.lastModified)
                     setDateTimeStamp(originalEvent.dateTimeStamp)
                     originalEvent.alarms.forEach {
                         addAlarm(it)
@@ -357,8 +349,6 @@ object ICalUtilsImpl : ICalUtils {
             attendeesPart = if (originalEvent.attendees.isNotEmpty()) {
                 VEvent().run {
                     setUid(originalEvent.uid)
-                    setCreated(originalEvent.created)
-                    setLastModified(originalEvent.lastModified)
                     setDateTimeStamp(originalEvent.dateTimeStamp)
                     originalEvent.attendees.forEach {
                         addAttendee(it)
