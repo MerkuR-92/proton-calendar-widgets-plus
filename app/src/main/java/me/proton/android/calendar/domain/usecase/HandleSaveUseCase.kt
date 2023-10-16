@@ -148,20 +148,24 @@ class HandleSaveUseCase @Inject constructor(
             !event.iCalEvent.attendees.map { it.extractEmail() }.contains(dbEventAttendee.extractEmail())
         } ?: emptyList()
 
-        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && (sendEmailUpdate == null || sendEmailUpdate == true)) {
+        return if (!isCreate && (!newEvent.iCalEvent.attendees.isNullOrEmpty() || !immutableOriginalDbEvent?.iCalEvent?.attendees.isNullOrEmpty()) && (sendEmailUpdate == null || sendEmailUpdate == true)) {
             // Update event and change attendees
             if (addedAttendees.isNotEmpty()) {
                 // Only keep attendees with valid send preferences
                 val addedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
                     addedAttendees.any { sendPrefs.key == it.extractEmail() }
                 }
-                notifyAddedAttendees(
+                val notifyAddedAttendeesResult = notifyAddedAttendees(
                     userId,
                     newEvent,
                     addedAttendeesToNotify,
                     event.defaultTimeZone!!,
                     timeFormatIs24Hours
                 )
+                if (notifyAddedAttendeesResult !is UseCase.Result.Success<*>) {
+                    // Send email to new attendees is blocking for that flow
+                    return notifyAddedAttendeesResult
+                }
             }
             if (removedAttendees.isNotEmpty()) {
                 immutableOriginalDbEvent?.let {
@@ -188,7 +192,9 @@ class HandleSaveUseCase @Inject constructor(
                 // Make sure the send prefs matches event's attendees.
                 existingAttendees.any { sendPrefs.key == it.extractEmail() }
             }
-            editEventWithAttendees(
+            // Update the event with attendee changes
+            if (attendeesToNotify.isEmpty()) editCreateEvent(userId, newEvent)
+            else editEventWithAttendees(
                 userId,
                 newEvent,
                 isCreate = false,
@@ -204,13 +210,17 @@ class HandleSaveUseCase @Inject constructor(
                 val addedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
                     addedAttendees.any { sendPrefs.key == it.extractEmail() }
                 }
-                notifyAddedAttendees(
+                val notifyAddedAttendeesResult = notifyAddedAttendees(
                     userId,
                     newEvent,
                     addedAttendeesToNotify,
                     event.defaultTimeZone!!,
                     timeFormatIs24Hours
                 )
+                if (notifyAddedAttendeesResult !is UseCase.Result.Success<*>) {
+                    // Send email to new attendees is blocking for that flow
+                    return notifyAddedAttendeesResult
+                }
             }
             if (removedAttendees.isNotEmpty()) {
                 immutableOriginalDbEvent?.let {
@@ -788,6 +798,26 @@ class HandleSaveUseCase @Inject constructor(
                 )
             }
         sendEmailResult.ifSuccessAndLogErrors(logger) { }
+
+        if (sendEmailResult is UseCase.Result.Error) {
+            return if (sendEmailResult.error == UseCase.Error.Crypto.UserAddressInvalidForEncryption) {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.Crypto.UserAddressInvalidForEncryption
+                )
+            } else {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.HandleSave.EditSendEmail
+                )
+            }
+        } else if (sendEmailResult is UseCase.Result.InvalidParams) {
+            return UseCase.Result.Error(
+                "HandleSaveUseCase: invalid params in send email: ${sendEmailResult.message}",
+                UseCase.Error.HandleSave.EditSendEmail
+            )
+        }
+
         return sendEmailResult
     }
 
@@ -817,6 +847,18 @@ class HandleSaveUseCase @Inject constructor(
                 )
             }
         sendCancellationResult.ifSuccessAndLogErrors(logger) { }
+
+        if (sendCancellationResult is UseCase.Result.Error) {
+            return UseCase.Result.Error(
+                "HandleSaveUseCase: notifyRemovedAttendees error in send email: ${sendCancellationResult.message}",
+                sendCancellationResult.error
+            )
+        } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+            return UseCase.Result.InvalidParams(
+                "HandleSaveUseCase: notifyRemovedAttendees invalid params in send email: ${sendCancellationResult.message}"
+            )
+        }
+
         return sendCancellationResult
     }
 

@@ -1389,7 +1389,8 @@ class EventViewModel @Inject constructor(
                         event.getSingleEditOriginalOccurrenceNumber(originalDbEvent!!, eventTimeZoneId) ?: occurrenceNumber
                     } else occurrenceNumber
 
-                if (eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty().not()) {
+                if (eventLiveData.value?.iCalEvent?.attendees.isNullOrEmpty().not()
+                    || dbEvent?.iCalEvent?.attendees.isNullOrEmpty().not()) {
 
                     // Handle edit / create for event with attendees
                     saveEventWithAttendees(
@@ -1435,6 +1436,31 @@ class EventViewModel @Inject constructor(
         dbEvent?.iCalEvent?.attendees?.map { it.extractEmail() }?.contains(eventAttendee.extractEmail()) == false
     }
 
+    private fun needSendAnEmailUpdate(
+        occurrenceNumber: Int
+    ): Boolean {
+        val eventTimeZone = event.defaultTimeZone ?: eventTimeZoneId
+        val dbEventTimeZone = dbEvent?.defaultTimeZone ?: eventTimeZoneId
+        // TODO SAME FOR SINGLE EDITS ?
+        val dateChanged =
+            if (dbEvent?.isRecurring() == true) {
+                // For recurring DB event we need to generate corresponding occurrence
+                val occurrence = dbEvent?.generateOccurrence(occurrenceNumber, dbEventTimeZone)
+                val adjustAllDayEndDate = if (dbEvent?.isAllDay() == true) 1L else 0L
+                occurrence?.startDateTime != event.getStart(eventTimeZone) ||
+                        occurrence.endDateTime.minusDays(adjustAllDayEndDate) != event.getEnd(eventTimeZone)
+            } else {
+                val adjustAllDayEndDate = if (dbEvent?.isAllDay() == true) 1L else 0L
+                dbEvent?.getStart(dbEventTimeZone) != event.getStart(eventTimeZone) ||
+                        dbEvent?.getEnd(dbEventTimeZone)?.minusDays(adjustAllDayEndDate) != event.getEnd(eventTimeZone)
+            }
+        return dbEvent?.summary != event.summary
+                || dbEvent?.description != event.description
+                || dbEvent?.location != event.location
+                || dateChanged
+                || dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
+    }
+
     /**
      * Show dialog notifying the user that an invitation will be sent to attendees
      */
@@ -1444,7 +1470,6 @@ class EventViewModel @Inject constructor(
         occurrenceNumber: Int,
         timeFormatIs24Hour: Boolean
     ) {
-
         if (dbEvent == null || dbEvent?.iCalEvent?.attendees.isNullOrEmpty()) {
             // Create an event with attendees / add attendees to an event
             val showSaveOptionPicker = showSaveOptionPicker(dbEvent)
@@ -1522,37 +1547,23 @@ class EventViewModel @Inject constructor(
             //  Location
             //  Start / end or time zone if it changes UTC time
             //  Recurrence rule
-            val eventTimeZone = event.defaultTimeZone ?: eventTimeZoneId
-            val dbEventTimeZone = dbEvent?.defaultTimeZone ?: eventTimeZoneId
-            // TODO SAME FOR SINGLE EDITS ?
-            val dateChanged =
-                if (dbEvent?.isRecurring() == true) {
-                    // For recurring DB event we need to generate corresponding occurrence
-                    val occurrence = dbEvent?.generateOccurrence(occurrenceNumber, dbEventTimeZone)
-                    val adjustAllDayEndDate = if (dbEvent?.isAllDay() == true) 1L else 0L
-                    occurrence?.startDateTime != event.getStart(eventTimeZone) ||
-                            occurrence.endDateTime.minusDays(adjustAllDayEndDate) != event.getEnd(eventTimeZone)
-                } else {
-                    dbEvent?.getStart(dbEventTimeZone) != event.getStart(eventTimeZone) ||
-                            dbEvent?.getEnd(dbEventTimeZone) != event.getEnd(eventTimeZone)
-                }
-            if (dbEvent?.summary != event.summary
-                || dbEvent?.description != event.description
-                || dbEvent?.location != event.location
-                || dateChanged
-                || dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
-            ) {
+            val addedAttendees = addedAttendees().isNotEmpty()
+            val removedAttendees = removedAttendees().isNotEmpty()
+            if (needSendAnEmailUpdate(occurrenceNumber)) {
                 // Send an email update
                 if (event.isRecurring()) {
-                    if (removedAttendees().isNotEmpty() || addedAttendees().isNotEmpty()) {
+                    if (removedAttendees || addedAttendees) {
                         // Display participants changes dialog
                         val message =
-                            if (removedAttendees().isNotEmpty() && addedAttendees().isNotEmpty()) {
+                            if (removedAttendees && addedAttendees) {
                                 // Add and remove participants
                                 resourceProvider.provideString(R.string.recurring_event_update_add_and_remove_participants_dialog_description)
-                            } else if (addedAttendees().isNotEmpty()) {
+                            } else if (addedAttendees) {
                                 // Add participants
                                 resourceProvider.provideString(R.string.recurring_event_update_add_participants_dialog_description)
+                            } else if (event.iCalEvent.attendees.isNullOrEmpty()) {
+                                // Remove all participants
+                                resourceProvider.provideString(R.string.recurring_event_update_remove_all_participants_dialog_description)
                             } else {
                                 // Remove participants
                                 resourceProvider.provideString(R.string.recurring_event_update_remove_participants_dialog_description)
@@ -1615,15 +1626,18 @@ class EventViewModel @Inject constructor(
                         }
                     }
                 } else {
-                    if (removedAttendees().isNotEmpty() || addedAttendees().isNotEmpty()) {
+                    if (removedAttendees || addedAttendees) {
                         // Display participants changes dialog
                         val message =
-                            if (removedAttendees().isNotEmpty() && addedAttendees().isNotEmpty()) {
+                            if (removedAttendees && addedAttendees) {
                                 // Add and remove participants
                                 resourceProvider.provideString(R.string.event_update_add_and_remove_participants_dialog_description)
-                            } else if (addedAttendees().isNotEmpty()) {
+                            } else if (addedAttendees) {
                                 // Add participants
                                 resourceProvider.provideString(R.string.event_update_add_participants_dialog_description)
+                            } else if (event.iCalEvent.attendees.isNullOrEmpty()) {
+                                // Remove all participants
+                                resourceProvider.provideString(R.string.event_update_remove_all_participants_dialog_description)
                             } else {
                                 // Remove participants
                                 resourceProvider.provideString(R.string.event_update_remove_participants_dialog_description)
@@ -1689,22 +1703,22 @@ class EventViewModel @Inject constructor(
             } else {
                 // Do not send an email update
                 if (event.isRecurring()) {
-                    if (removedAttendees().isNotEmpty() || addedAttendees().isNotEmpty()) {
+                    if (removedAttendees || addedAttendees) {
                         // Display participants changes dialog
                         var title = ""
                         var message = ""
                         var positiveButton = ""
-                        if (removedAttendees().isNotEmpty() && addedAttendees().isNotEmpty()) {
+                        if (removedAttendees && addedAttendees) {
                             // Add and remove participants
                             title = resourceProvider.provideString(R.string.event_save_changes)
                             message = resourceProvider.provideString(R.string.recurring_event_add_and_remove_participants_dialog_description)
                             positiveButton = resourceProvider.provideString(R.string.action_save)
-                        } else if (addedAttendees().isNotEmpty()) {
+                        } else if (addedAttendees) {
                             // Add participants
                             title = resourceProvider.provideString(R.string.event_add_participants_dialog_title)
                             message = resourceProvider.provideString(R.string.recurring_event_add_participants_dialog_description)
                             positiveButton = resourceProvider.provideString(R.string.action_add)
-                        } else if (removedAttendees().isNotEmpty()) {
+                        } else {
                             // Remove participants
                             title = resourceProvider.provideString(R.string.event_remove_participants_dialog_title)
                             message = resourceProvider.provideString(R.string.recurring_event_remove_participants_dialog_description)
@@ -1769,22 +1783,22 @@ class EventViewModel @Inject constructor(
                         }
                     }
                 } else {
-                    if (removedAttendees().isNotEmpty() || addedAttendees().isNotEmpty()) {
+                    if (removedAttendees || addedAttendees) {
                         // Display participants changes dialog
                         var title = ""
                         var message = ""
                         var positiveButton = ""
-                        if (removedAttendees().isNotEmpty() && addedAttendees().isNotEmpty()) {
+                        if (removedAttendees && addedAttendees) {
                             // Add and remove participants
                             title = resourceProvider.provideString(R.string.event_save_changes)
                             message = resourceProvider.provideString(R.string.event_add_and_remove_participants_dialog_description)
                             positiveButton = resourceProvider.provideString(R.string.action_save)
-                        } else if (addedAttendees().isNotEmpty()) {
+                        } else if (addedAttendees) {
                             // Add participants
                             title = resourceProvider.provideString(R.string.event_add_participants_dialog_title)
                             message = resourceProvider.provideString(R.string.event_add_participants_dialog_description)
                             positiveButton = resourceProvider.provideString(R.string.action_add)
-                        } else if (removedAttendees().isNotEmpty()) {
+                        } else if (removedAttendees) {
                             // Remove participants
                             title = resourceProvider.provideString(R.string.event_remove_participants_dialog_title)
                             message = resourceProvider.provideString(R.string.event_remove_participants_dialog_description)
@@ -2179,7 +2193,7 @@ class EventViewModel @Inject constructor(
             timeFormatIs24Hours,
             sendPreferences,
             eventCopy,
-            dbEvent, // TODO If Reccurring, send specific occurrence or root event ?
+            dbEvent, // TODO If Recurring, send specific occurrence or root event ?
             userSettings,
             eventTimeZoneId,
             userId,
@@ -2217,13 +2231,13 @@ class EventViewModel @Inject constructor(
             }
 
         // Handle save result
-        handleSaveResult(saveResult, userErrorMessage)
+        handleSaveResult(saveResult, occurrenceNumber, userErrorMessage)
     }
 
     /**
      * Handle save event result
      */
-    private suspend fun handleSaveResult(saveResult: SaveResult, userErrorMessage: String? = null) {
+    private suspend fun handleSaveResult(saveResult: SaveResult, occurrenceNumber: Int, userErrorMessage: String? = null) {
         if (eventLiveData.value?.isSyncedWithApi() == true) {
 
             // Save result for edit existing event
@@ -2239,13 +2253,60 @@ class EventViewModel @Inject constructor(
                     // Reset event form state
                     eventFormState.value = EventState.Idle
 
+                    val hasAttendees = !event.iCalEvent.attendees.isNullOrEmpty()
+                    val addedAttendees = addedAttendees().isNotEmpty()
+                    val removedAttendees = removedAttendees().isNotEmpty()
+                    val successMessage =
+                        if (hasAttendees || addedAttendees || removedAttendees) {
+                            val sentEmailUpdate = needSendAnEmailUpdate(occurrenceNumber)
+                            val isRecurring = event.isRecurring()
+                            val messageResId =
+                                if (addedAttendees && removedAttendees) {
+                                    // Add and remove attendees
+                                    if (isRecurring) R.string.success_snack_email_update_recurring
+                                    else R.string.success_snack_email_update
+                                } else if (addedAttendees) {
+                                    // Add attendees
+                                    if (isRecurring) {
+                                        if (sentEmailUpdate) R.string.success_snack_email_update_recurring
+                                        else R.string.success_snack_add_attendees_recurring
+                                    } else {
+                                        if (sentEmailUpdate) R.string.success_snack_email_update
+                                        else R.string.success_snack_add_attendees
+                                    }
+                                } else if (removedAttendees) {
+                                    // Remove attendees
+                                    if (isRecurring) {
+                                        if (sentEmailUpdate) R.string.success_snack_email_update_recurring
+                                        else R.string.success_snack_remove_attendees_recurring
+                                    } else {
+                                        if (sentEmailUpdate) R.string.success_snack_email_update
+                                        else R.string.success_snack_remove_attendees
+                                    }
+                                } else {
+                                    // No change in attendees
+                                    if (sentEmailUpdate) {
+                                        if (isRecurring) R.string.success_snack_email_update_recurring
+                                        else R.string.success_snack_email_update
+                                    } else {
+                                        if (isRecurring) R.string.snack_event_updated_recurring
+                                        else R.string.snack_event_updated
+                                    }
+                                }
+                            resourceProvider.provideString(messageResId)
+                        } else {
+                            // Normal event update success message
+                            resourceProvider.provideString(R.string.snack_event_updated)
+                        }
+
                     // Display event updated snack and return to month view with focus on the event's start date
                     eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
-                        resourceProvider.provideString(R.string.snack_event_updated),
+                        successMessage,
                         eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate(),
                         if (eventLiveData.value?.isAllDay() == false) eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalTime()
                         else null
                     )
+
                 }
                 SaveResult.EDIT_ERROR_SEND_MAIL -> {
 

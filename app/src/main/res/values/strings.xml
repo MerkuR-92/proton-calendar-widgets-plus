@@ -274,9 +274,17 @@
     <string name="event_update_add_participants_dialog_description">Existent and added participants will be notified.</string>
     <string name="recurring_event_update_add_participants_dialog_description">You will update all the events in this series. Existent and added participants will be notified.</string>
     <string name="event_update_remove_participants_dialog_description">Existent and removed participants will be notified.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Removed participants will be notified.</string>
     <string name="recurring_event_update_remove_participants_dialog_description">You will update all the events in this series. Existent and removed participants will be notified.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">You will update all the events in this series. Removed participants will be notified.</string>
     <string name="event_update_add_and_remove_participants_dialog_description">Existent, added and removed participants will be notified.</string>
     <string name="recurring_event_update_add_and_remove_participants_dialog_description">You will update all the events in this series. Existent, added and removed participants will be notified.</string>
+    <string name="success_snack_email_update_recurring">Participants notified and all events updated</string>
+    <string name="success_snack_email_update">Participants notified and event updated</string>
+    <string name="success_snack_add_attendees_recurring">Invitation sent and participants added to all events</string>
+    <string name="success_snack_add_attendees">Invitation sent and participants added</string>
+    <string name="success_snack_remove_attendees_recurring">Cancellation sent and participants removed from all events</string>
+    <string name="success_snack_remove_attendees">Cancellation sent and participants removed</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">My calendars</string>
     <string name="nav_view_subscribed_calendars">Subscribed calendars</string>
@@ -313,6 +321,7 @@
     <string name="snack_event_changing_answer">Updating answer</string>
     <string name="snack_event_part_stat_updated">Participation status updated.</string>
     <string name="snack_event_updated">Event updated</string>
+    <string name="snack_event_updated_recurring">All events updated</string>
     <string name="snack_event_updated_error_failed_mail">Invitation failed to be sent</string>
     <string name="snack_update_event_error_failed_mail">Update failed</string>
     <string name="snack_event_updated_error">Error updating event</string>
