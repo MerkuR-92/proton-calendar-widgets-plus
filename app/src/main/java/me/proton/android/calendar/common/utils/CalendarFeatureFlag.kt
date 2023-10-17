@@ -32,8 +32,9 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     WeekView(FeatureId("WeekView"), true, true),
     ImportIcs(FeatureId("ImportIcs"), true, true),
     EditingSharedCalendars(FeatureId("EditingSharedCalendars"), true, true),
-    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), true, true),
+    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), false, true),
     Payments(FeatureId("Subscription"), false, true),
+    EditAttendeesAsOrganizer(FeatureId("EditAttendeesAsOrganizer"), true, true),
 
     // Disabled
     ShowSignatureVerificationBadges(FeatureId("ShowSignatureVerificationBadges"), false, true),

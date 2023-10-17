@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Ainda não é possível modificar os participantes associados aos convites.</string>
     <string name="change_calendar_recurring_disclaimer">Ainda não é possível alterar o calendário para um evento recorrente.</string>
     <string name="update_event">Atualizar o evento</string>
-    <string name="update_invite_send_invitation">Será enviado um convite aos participantes do evento.</string>
+    <string name="update_invite_send_email">Será enviado um convite aos participantes do evento.</string>
     <string name="update_recurring_event">Atualizar o evento recorrente</string>
     <string name="update_recurring_all_events">Deseja atualizar todos os eventos nesta série?</string>
-    <string name="update_recurring_invite_send_invitation">Atualizará todos os eventos desta série. Os participantes receberão um convite.</string>
+    <string name="update_recurring_invite_send_email">Atualizará todos os eventos desta série. Os participantes receberão um convite.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">O que pesquisa?</string>
     <string name="search_empty_results_title">Nenhum resultado</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Enviar</string>
     <string name="event_send_invite_dialog_cancel">Cancelar</string>
     <string name="event_add_participants_dialog_title">Adicionar participantes</string>
-    <string name="event_add_participants_dialog_description">Será enviado um convite aos participantes adicionados para todos os eventos desta série.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Um convite será enviado para participantes adicionados para todos os eventos desta série.\nModificações anteriores nesta série serão perdidas.</string>
+    <string name="recurring_event_add_participants_dialog_description">Será enviado um convite aos participantes adicionados para todos os eventos desta série.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Um convite será enviado para participantes adicionados para todos os eventos desta série.\nModificações anteriores nesta série serão perdidas.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s foi cancelado.</string>

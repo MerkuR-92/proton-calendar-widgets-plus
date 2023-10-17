@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Det er endnu ikke muligt at ændre deltagere der er knyttet til invitationer.</string>
     <string name="change_calendar_recurring_disclaimer">Ændring af kalender for tilbagevendende begivenheder er endnu ikke muligt.</string>
     <string name="update_event">Opdater begivenhed</string>
-    <string name="update_invite_send_invitation">En invitation vil blive sendt til begivenhedens deltagere.</string>
+    <string name="update_invite_send_email">En invitation vil blive sendt til begivenhedens deltagere.</string>
     <string name="update_recurring_event">Opdater tilbagevendende begivenhed</string>
     <string name="update_recurring_all_events">Vil du opdatere alle begivenheder i denne serie?</string>
-    <string name="update_recurring_invite_send_invitation">Du vil opdatere alle begivenheder i denne serie. En invitation vil blive sendt til deltagerne i arrangementet.</string>
+    <string name="update_recurring_invite_send_email">Du vil opdatere alle begivenheder i denne serie. En invitation vil blive sendt til deltagerne i arrangementet.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Hvad søger du?</string>
     <string name="search_empty_results_title">Ingen resultater fundet</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Send</string>
     <string name="event_send_invite_dialog_cancel">Annullér</string>
     <string name="event_add_participants_dialog_title">Tilføj deltagere</string>
-    <string name="event_add_participants_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.\nTidligere ændringer af denne serie vil gå tabt.</string>
+    <string name="recurring_event_add_participants_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.\nTidligere ændringer af denne serie vil gå tabt.</string>
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Annullér</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s er blevet annulleret.</string>

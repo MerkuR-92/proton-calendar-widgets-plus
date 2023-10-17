@@ -172,13 +172,11 @@ class SendEmailUseCase @Inject constructor(
         val attachmentBytes = ics.toByteArray()
 
         val attendeeEmails = newEvent.iCalEvent.attendees.mapNotNull { it.extractEmail() }.filter { attendeeEmail ->
-            if (sendEmailUpdate == true) {
-                // In case of edit of an invitation, participants that have errors in
-                // send preferences are not removed from the event. We need to filter them out here.
-                sendPreferences.keys.any { email ->
-                    attendeeEmail == email
-                }
-            } else true
+            // In case of edit of an invitation, participants that have errors in
+            // send preferences are not removed from the event. We need to filter them out here.
+            sendPreferences.keys.any { email ->
+                attendeeEmail == email
+            }
         }
 
         val sendEmailArguments = SendEmailDirect.Arguments(
@@ -224,12 +222,13 @@ class SendEmailUseCase @Inject constructor(
     suspend fun sendCancellationToAttendees(
         userId: UserId,
         event: Event,
-        attendees: List<Attendee>,
+        attendeeEmails: List<String>,
         sendPreferences: Map<Email, SendPreferences>,
+        defaultTimeZone: String,
         timeFormatIs24Hours: Boolean
     ): UseCase.Result {
 
-        val mailContent = getEmailContent(event, event.defaultTimeZone!!, timeFormatIs24Hours, MailType.CANCELLATION)
+        val mailContent = getEmailContent(event, defaultTimeZone, timeFormatIs24Hours, MailType.CANCELLATION)
 
         val eventEntity = calendarsRepository.selectEventEntity(event.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees failed to select event entity")
         val sharedEventId = eventEntity.sharedEventId ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendCancellationToAttendees sharedEventID was null")
@@ -243,9 +242,6 @@ class SendEmailUseCase @Inject constructor(
         if (senderAddressResult !is UseCase.Result.Success<*>) return senderAddressResult
 
         val attachmentBytes = ics.toByteArray()
-
-        // Only use the attendees that had valid sendPreferences
-        val attendeeEmails = attendees.mapNotNull { it.extractEmail() }
 
         val sendEmailArguments = SendEmailDirect.Arguments(
             mailContent.first,

@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Немагчыма змяніць удзельнікаў, якія звязаны з запрашэннямі.</string>
     <string name="change_calendar_recurring_disclaimer">Змяненне календара для перыядычных падзей пакуль немагчыма.</string>
     <string name="update_event">Абнавіць падзею</string>
-    <string name="update_invite_send_invitation">Удзельнікам мерапрыемства будзе адпраўлена запрашэнне.</string>
+    <string name="update_invite_send_email">Удзельнікам мерапрыемства будзе адпраўлена запрашэнне.</string>
     <string name="update_recurring_event">Абнавіць перыядычную падзею</string>
     <string name="update_recurring_all_events">Ці хочаце вы абнавіць усе падзеі ў гэтай серыі?</string>
-    <string name="update_recurring_invite_send_invitation">Вы абновіце ўсе падзеі ў гэтай серыі. Удзельнікам падзеі будзе адпраўлена запрашэнне.</string>
+    <string name="update_recurring_invite_send_email">Вы абновіце ўсе падзеі ў гэтай серыі. Удзельнікам падзеі будзе адпраўлена запрашэнне.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Што вы шукаеце?</string>
     <string name="search_empty_results_title">Нічога не знойдзена</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Адправіць</string>
     <string name="event_send_invite_dialog_cancel">Скасаваць</string>
     <string name="event_add_participants_dialog_title">Дадаць удзельнікаў</string>
-    <string name="event_add_participants_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.\nПапярэднія змяненні ў гэтай серыі будуць страчаны.</string>
+    <string name="recurring_event_add_participants_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.\nПапярэднія змяненні ў гэтай серыі будуць страчаны.</string>
     <string name="event_add_participants_dialog_confirm">Адправіць</string>
     <string name="event_add_participants_dialog_cancel">Скасаваць</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было скасавана.</string>

@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Het is nog niet mogelijk de deelnemers te wijzigen die gekoppeld zijn met uitnodigingen.</string>
     <string name="change_calendar_recurring_disclaimer">Agenda\'s wijzigen voor terugkerende afspraken is nog niet mogelijk.</string>
     <string name="update_event">Gebeurtenis bijwerken</string>
-    <string name="update_invite_send_invitation">Een uitnodiging zal worden verzonden naar de deelnemers van de afspraken.</string>
+    <string name="update_invite_send_email">Een uitnodiging zal worden verzonden naar de deelnemers van de afspraken.</string>
     <string name="update_recurring_event">Terugkerende afspraak bijwerken</string>
     <string name="update_recurring_all_events">Wilt u alle afspraken in deze serie bijwerken?</string>
-    <string name="update_recurring_invite_send_invitation">U zal alle afspraken in deze serie bijwerken. Een uitnodiging zal worden verzonden naar de deelnemers van het evenement.</string>
+    <string name="update_recurring_invite_send_email">U zal alle afspraken in deze serie bijwerken. Een uitnodiging zal worden verzonden naar de deelnemers van het evenement.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Wat bent u naar op zoek?</string>
     <string name="search_empty_results_title">Geen resultaten</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Verzenden</string>
     <string name="event_send_invite_dialog_cancel">Annuleren</string>
     <string name="event_add_participants_dialog_title">Personen toevoegen</string>
-    <string name="event_add_participants_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers van alle afspraken in deze serie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers voor alle afspraken in deze serie.\nVorige wijzigingen in deze serie gaan verloren.</string>
+    <string name="recurring_event_add_participants_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers van alle afspraken in deze serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers voor alle afspraken in deze serie.\nVorige wijzigingen in deze serie gaan verloren.</string>
     <string name="event_add_participants_dialog_confirm">Verzenden</string>
     <string name="event_add_participants_dialog_cancel">Annuleren</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s is geannuleerd.</string>

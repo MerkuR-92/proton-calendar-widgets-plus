@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">მოსაწვევთან ასოცირებული წევრების ჩასწორება ჯერ შეუძლებელია.</string>
     <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდრის შეცვლა ჯერჯერობით შეუძლებელია.</string>
     <string name="update_event">მოვლენის განახლება</string>
-    <string name="update_invite_send_invitation">მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_invite_send_email">მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
     <string name="update_recurring_event">განმეორებადი მოვლენის განახლება</string>
     <string name="update_recurring_all_events">გსურთ, განაახლოთ ამ სერიის ყველა მოვლენა?</string>
-    <string name="update_recurring_invite_send_invitation">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_recurring_invite_send_email">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">გაგზავნა</string>
     <string name="event_send_invite_dialog_cancel">გაუქმება</string>
     <string name="event_add_participants_dialog_title">მონაწილეების დამატება</string>
-    <string name="event_add_participants_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.</string>
-    <string name="event_add_participants_overwrite_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.\nამ სერიის წინა ცვლილებები დაიკარგება.</string>
+    <string name="recurring_event_add_participants_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.\nამ სერიის წინა ცვლილებები დაიკარგება.</string>
     <string name="event_add_participants_dialog_confirm">გაგზავნა</string>
     <string name="event_add_participants_dialog_cancel">გაუქმება</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s გაუქმდა.</string>

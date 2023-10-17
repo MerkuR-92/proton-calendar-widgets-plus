@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Daftar partisipan yang terhubung dengan undangan saat ini belum dapat diubah.</string>
     <string name="change_calendar_recurring_disclaimer">Mengubah kalender untuk acara yang berulang saat ini tidak didukung.</string>
     <string name="update_event">Perbarui acara</string>
-    <string name="update_invite_send_invitation">Undangan akan dikirim ke para peserta acara.</string>
+    <string name="update_invite_send_email">Undangan akan dikirim ke para peserta acara.</string>
     <string name="update_recurring_event">Perbarui acara berulang</string>
     <string name="update_recurring_all_events">Apakah Anda ingin memperbarui seluruh acara dalam rangkaian ini?</string>
-    <string name="update_recurring_invite_send_invitation">Anda akan memperbarui seluruh acara dalam rangkaian ini. Undangan akan dikirim kepada para peserta acara.</string>
+    <string name="update_recurring_invite_send_email">Anda akan memperbarui seluruh acara dalam rangkaian ini. Undangan akan dikirim kepada para peserta acara.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Apa yang Anda tunggu?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Kirim</string>
     <string name="event_send_invite_dialog_cancel">Batal</string>
     <string name="event_add_participants_dialog_title">Tambah peserta</string>
-    <string name="event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.\nPerubahan sebelumnya pada rangkaian ini akan hilang.</string>
+    <string name="recurring_event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.\nPerubahan sebelumnya pada rangkaian ini akan hilang.</string>
     <string name="event_add_participants_dialog_confirm">Kirim</string>
     <string name="event_add_participants_dialog_cancel">Batal</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s telah dibatalkan.</string>

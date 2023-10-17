@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Пока невозможно изменить участников, связанных с приглашениями.</string>
     <string name="change_calendar_recurring_disclaimer">Изменение календаря для повторяющегося события пока невозможно.</string>
     <string name="update_event">Обновить событие</string>
-    <string name="update_invite_send_invitation">Участникам мероприятия будет отправлено приглашение.</string>
+    <string name="update_invite_send_email">Участникам мероприятия будет отправлено приглашение.</string>
     <string name="update_recurring_event">Обновить повторяющееся событие</string>
     <string name="update_recurring_all_events">Вы хотите обновить все события в этой серии?</string>
-    <string name="update_recurring_invite_send_invitation">Вы обновите все события в этой серии. Участникам события будет отправлено приглашение.</string>
+    <string name="update_recurring_invite_send_email">Вы обновите все события в этой серии. Участникам события будет отправлено приглашение.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Что вы ищете?</string>
     <string name="search_empty_results_title">Результатов не найдено</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Отправить</string>
     <string name="event_send_invite_dialog_cancel">Отменить</string>
     <string name="event_add_participants_dialog_title">Добавить участников</string>
-    <string name="event_add_participants_dialog_description">Приглашение будет отправлено добавленным участникам для всех событий этой серии.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Приглашение будет отправлено добавленным участникам для всех событий этой серии.\nПредыдущие изменения в этой серии будут потеряны.</string>
+    <string name="recurring_event_add_participants_dialog_description">Приглашение будет отправлено добавленным участникам для всех событий этой серии.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Приглашение будет отправлено добавленным участникам для всех событий этой серии.\nПредыдущие изменения в этой серии будут потеряны.</string>
     <string name="event_add_participants_dialog_confirm">Отправить</string>
     <string name="event_add_participants_dialog_cancel">Отменить</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было отменено.</string>

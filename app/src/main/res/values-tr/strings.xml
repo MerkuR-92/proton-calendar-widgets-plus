@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Henüz davetler ile ilişkilendirilmiş katılımcılar değiştirilemez.</string>
     <string name="change_calendar_recurring_disclaimer">Yinelenen etkinlikler ile ilişkilendirilmiş takvim henüz değiştirilemez.</string>
     <string name="update_event">Etkinliği güncelle</string>
-    <string name="update_invite_send_invitation">Etkinlik katılımcılarına bir davet gönderilecek.</string>
+    <string name="update_invite_send_email">Etkinlik katılımcılarına bir davet gönderilecek.</string>
     <string name="update_recurring_event">Yinelenen etkinliği güncelle</string>
     <string name="update_recurring_all_events">Bu dizideki tüm etkinlikleri güncellemek ister misiniz?</string>
-    <string name="update_recurring_invite_send_invitation">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Etkinlik katılımcılarına bir davet gönderilecek.</string>
+    <string name="update_recurring_invite_send_email">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Etkinlik katılımcılarına bir davet gönderilecek.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Ne aramıştınız?</string>
     <string name="search_empty_results_title">Herhangi bir sonuç bulunamadı</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Gönder</string>
     <string name="event_send_invite_dialog_cancel">İptal</string>
     <string name="event_add_participants_dialog_title">Katılımcı ekle</string>
-    <string name="event_add_participants_dialog_description">Eklenen katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Eklenen tüm katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.\nBu dizide daha önce yapılmış değişiklikler kaybolacak.</string>
+    <string name="recurring_event_add_participants_dialog_description">Eklenen katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Eklenen tüm katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.\nBu dizide daha önce yapılmış değişiklikler kaybolacak.</string>
     <string name="event_add_participants_dialog_confirm">Gönder</string>
     <string name="event_add_participants_dialog_cancel">İptal</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s iptal edildi.</string>

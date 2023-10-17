@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Nie można edytować uczestników powiązanych z zaproszeniami.</string>
     <string name="change_calendar_recurring_disclaimer">Zmiana kalendarza dla wydarzenia cyklicznego nie jest możliwa.</string>
     <string name="update_event">Zaktualizuj wydarzenie</string>
-    <string name="update_invite_send_invitation">Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
+    <string name="update_invite_send_email">Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
     <string name="update_recurring_event">Zaktualizuj wydarzenie cykliczne</string>
     <string name="update_recurring_all_events">Czy chcesz zaktualizować wszystkie wydarzenia w tej serii?</string>
-    <string name="update_recurring_invite_send_invitation">Zaktualizujesz wszystkie wydarzenia w tej serii. Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
+    <string name="update_recurring_invite_send_email">Zaktualizujesz wszystkie wydarzenia w tej serii. Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Czego szukasz?</string>
     <string name="search_empty_results_title">Nie znaleziono żadnych wyników</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Wyślij</string>
     <string name="event_send_invite_dialog_cancel">Anuluj</string>
     <string name="event_add_participants_dialog_title">Dodaj uczestników</string>
-    <string name="event_add_participants_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.\nPoprzednie zmiany w tej serii zostaną utracone.</string>
+    <string name="recurring_event_add_participants_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.\nPoprzednie zmiany w tej serii zostaną utracone.</string>
     <string name="event_add_participants_dialog_confirm">Wyślij</string>
     <string name="event_add_participants_dialog_cancel">Anuluj</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">Wydarzenie %1$s zostało anulowane.</string>

@@ -15,6 +15,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustOutgoingAllDa
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustStartEndTimeZones
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustToWeekStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isDateTimeTheSame
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
@@ -140,22 +141,116 @@ class HandleSaveUseCase @Inject constructor(
 
         // TODO make sure at least current day-of-week is in byDay list, when start date is changed but recurrence rule is not
 
-        return if (!isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty() && (sendEmailUpdate == null || sendEmailUpdate == true)) {
-            editEventWithAttendees(
+        val addedAttendees = event.iCalEvent.attendees.filter { eventAttendee ->
+            immutableOriginalDbEvent?.iCalEvent?.attendees?.map { it.extractEmail() }?.contains(eventAttendee.extractEmail()) == false
+        }
+        val removedAttendees = immutableOriginalDbEvent?.iCalEvent?.attendees?.filter { dbEventAttendee ->
+            !event.iCalEvent.attendees.map { it.extractEmail() }.contains(dbEventAttendee.extractEmail())
+        } ?: emptyList()
+
+        return if (!isCreate && (!newEvent.iCalEvent.attendees.isNullOrEmpty() || !immutableOriginalDbEvent?.iCalEvent?.attendees.isNullOrEmpty()) && (sendEmailUpdate == null || sendEmailUpdate == true)) {
+            // Update event and change attendees
+            if (addedAttendees.isNotEmpty()) {
+                // Only keep attendees with valid send preferences
+                val addedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
+                    addedAttendees.any { sendPrefs.key == it.extractEmail() }
+                }
+                val notifyAddedAttendeesResult = notifyAddedAttendees(
+                    userId,
+                    newEvent,
+                    addedAttendeesToNotify,
+                    event.defaultTimeZone!!,
+                    timeFormatIs24Hours
+                )
+                if (notifyAddedAttendeesResult !is UseCase.Result.Success<*>) {
+                    // Send email to new attendees is blocking for that flow
+                    return notifyAddedAttendeesResult
+                }
+            }
+            if (removedAttendees.isNotEmpty()) {
+                immutableOriginalDbEvent?.let {
+                    // Only keep attendees with valid send preferences
+                    val removedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
+                        removedAttendees.any { sendPrefs.key == it.extractEmail() }
+                    }
+                    notifyRemovedAttendees(
+                        userId,
+                        immutableOriginalDbEvent,
+                        removedAttendeesToNotify,
+                        event.defaultTimeZone!!,
+                        timeFormatIs24Hours
+                    )
+                } ?: run {
+                    logger.e("HandleSaveUseCase handleSave originalDbEvent was null for notifyRemovedAttendees")
+                }
+            }
+            val existingAttendees = newEvent.iCalEvent.attendees.filterNot { existingAttendee ->
+                // Remove newly added attendees from the list as we just sent them an invite earlier.
+                addedAttendees.any { it.extractEmail() == existingAttendee.extractEmail() }
+            }
+            val attendeesToNotify = sendPreferences.filter { sendPrefs ->
+                // Make sure the send prefs matches event's attendees.
+                existingAttendees.any { sendPrefs.key == it.extractEmail() }
+            }
+            // Update the event with attendee changes
+            if (attendeesToNotify.isEmpty()) editCreateEvent(userId, newEvent)
+            else editEventWithAttendees(
                 userId,
                 newEvent,
-                isCreate,
-                sendPreferences,
+                isCreate = false,
+                attendeesToNotify,
                 event.defaultTimeZone!!,
                 timeFormatIs24Hours,
                 sendEmailUpdate
             )
+        } else if (!isCreate && sendEmailUpdate == false && (addedAttendees.isNotEmpty() || removedAttendees.isNotEmpty())) {
+            // Just change attendees, no update for the existing event
+            if (addedAttendees.isNotEmpty()) {
+                // Only keep attendees with valid send preferences
+                val addedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
+                    addedAttendees.any { sendPrefs.key == it.extractEmail() }
+                }
+                val notifyAddedAttendeesResult = notifyAddedAttendees(
+                    userId,
+                    newEvent,
+                    addedAttendeesToNotify,
+                    event.defaultTimeZone!!,
+                    timeFormatIs24Hours
+                )
+                if (notifyAddedAttendeesResult !is UseCase.Result.Success<*>) {
+                    // Send email to new attendees is blocking for that flow
+                    return notifyAddedAttendeesResult
+                }
+            }
+            if (removedAttendees.isNotEmpty()) {
+                immutableOriginalDbEvent?.let {
+                    // Only keep attendees with valid send preferences
+                    val removedAttendeesToNotify = sendPreferences.filter { sendPrefs ->
+                        removedAttendees.any { sendPrefs.key == it.extractEmail() }
+                    }
+                    notifyRemovedAttendees(
+                        userId,
+                        immutableOriginalDbEvent,
+                        removedAttendeesToNotify,
+                        event.defaultTimeZone!!,
+                        timeFormatIs24Hours
+                    )
+                } ?: run {
+                    logger.e("HandleSaveUseCase handleSave originalDbEvent was null for notifyRemovedAttendees")
+                }
+            }
+            // Update the event with attendee changes
+            return editCreateEvent(userId, newEvent)
         } else if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
+            // Create event with attendees
+            val attendeesToNotify = sendPreferences.filter { sendPrefs ->
+                newEvent.iCalEvent.attendees.any { sendPrefs.key == it.extractEmail() }
+            }
             createEventWithAttendees(
                 userId,
                 newEvent,
-                isCreate,
-                sendPreferences,
+                isCreate = true,
+                attendeesToNotify,
                 event.defaultTimeZone!!,
                 timeFormatIs24Hours
             )
@@ -677,6 +772,94 @@ class HandleSaveUseCase @Inject constructor(
         }
 
         return editCreateEvent(userId, newEvent)
+    }
+
+    private suspend fun notifyAddedAttendees(
+        userId: UserId,
+        newEvent: Event,
+        sendPreferences: Map<Email, SendPreferences>,
+        defaultTimeZone: String,
+        timeFormatIs24Hours: Boolean,
+    ): UseCase.Result {
+        val sendEmailResult =
+            if (sendPreferences.isEmpty()) {
+                // When editing an invitation, we still update the event if no participants can be notified.
+                UseCase.Result.Success<Unit>()
+            } else {
+                sendEmailUseCase.sendInviteToAttendees(
+                    userId,
+                    newEvent,
+                    isCreate = false,
+                    newEvent,
+                    sendPreferences,
+                    defaultTimeZone,
+                    timeFormatIs24Hours,
+                    sendEmailUpdate = false
+                )
+            }
+        sendEmailResult.ifSuccessAndLogErrors(logger) { }
+
+        if (sendEmailResult is UseCase.Result.Error) {
+            return if (sendEmailResult.error == UseCase.Error.Crypto.UserAddressInvalidForEncryption) {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.Crypto.UserAddressInvalidForEncryption
+                )
+            } else {
+                UseCase.Result.Error(
+                    "HandleSaveUseCase: error in send email (edit with attendees): ${sendEmailResult.message}",
+                    UseCase.Error.HandleSave.EditSendEmail
+                )
+            }
+        } else if (sendEmailResult is UseCase.Result.InvalidParams) {
+            return UseCase.Result.Error(
+                "HandleSaveUseCase: invalid params in send email: ${sendEmailResult.message}",
+                UseCase.Error.HandleSave.EditSendEmail
+            )
+        }
+
+        return sendEmailResult
+    }
+
+    private suspend fun notifyRemovedAttendees(
+        userId: UserId,
+        originalEvent: Event,
+        sendPreferences: Map<Email, SendPreferences>,
+        newEventDefaultTimeZone: String,
+        timeFormatIs24Hours: Boolean,
+    ): UseCase.Result {
+        val sendCancellationResult =
+            if (sendPreferences.isEmpty()) {
+                // When editing an invitation, we still update the event if no participants can be notified.
+                UseCase.Result.Success<Unit>()
+            } else {
+                // Try to get original event time zone, if it fails use the updated event's time zone.
+                val defaultTimeZone = originalEvent.iCalendar.timezoneInfo?.getTimezone(
+                    originalEvent.iCalEvent.dateStart
+                )?.timeZone?.id ?: newEventDefaultTimeZone
+                sendEmailUseCase.sendCancellationToAttendees(
+                    userId,
+                    originalEvent,
+                    sendPreferences.keys.toList(),
+                    sendPreferences,
+                    defaultTimeZone,
+                    timeFormatIs24Hours
+                )
+            }
+        sendCancellationResult.ifSuccessAndLogErrors(logger) { }
+
+        if (sendCancellationResult is UseCase.Result.Error) {
+            return UseCase.Result.Error(
+                "HandleSaveUseCase: notifyRemovedAttendees error in send email: ${sendCancellationResult.message}",
+                sendCancellationResult.error
+            )
+        } else if (sendCancellationResult is UseCase.Result.InvalidParams) {
+            return UseCase.Result.InvalidParams(
+                "HandleSaveUseCase: notifyRemovedAttendees invalid params in send email: ${sendCancellationResult.message}"
+            )
+        }
+
+        return sendCancellationResult
     }
 
     private suspend fun createEventWithAttendees(

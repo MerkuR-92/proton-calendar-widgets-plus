@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">초대장과 관련된 참가자를 수정하는 것은 아직 불가능합니다.</string>
     <string name="change_calendar_recurring_disclaimer">반복되는 이벤트에 대한 캘린더의 변경이 아직 불가능 합니다.</string>
     <string name="update_event">이벤트 업데이트</string>
-    <string name="update_invite_send_invitation">이 이벤트 참가자들에게 초대가 전송됩니다.</string>
+    <string name="update_invite_send_email">이 이벤트 참가자들에게 초대가 전송됩니다.</string>
     <string name="update_recurring_event">반복 이벤트 업데이트</string>
     <string name="update_recurring_all_events">이 시리즈의 모든 이벤트를 삭제하시겠습니까?</string>
-    <string name="update_recurring_invite_send_invitation">이 시리즈의 모든 이벤트를 업데이트합니다. 초대가 이벤트 참가자들에게 전송됩니다.</string>
+    <string name="update_recurring_invite_send_email">이 시리즈의 모든 이벤트를 업데이트합니다. 초대가 이벤트 참가자들에게 전송됩니다.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">무엇을 찾고 있나요?</string>
     <string name="search_empty_results_title">결과를 찾을 수 없음</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">보내기</string>
     <string name="event_send_invite_dialog_cancel">취소</string>
     <string name="event_add_participants_dialog_title">참가자 추가</string>
-    <string name="event_add_participants_dialog_description">이 시리즈의 모든 이벤트에 추가된 참가자들에게 초대장이 전송됩니다.</string>
-    <string name="event_add_participants_overwrite_dialog_description">이 시리즈의 모든 이벤트에 대한 추가 참가자에게 초대장이 전송됩니다.\n이 시리즈에 대한 이전 수정 사항은 손실됩니다.</string>
+    <string name="recurring_event_add_participants_dialog_description">이 시리즈의 모든 이벤트에 추가된 참가자들에게 초대장이 전송됩니다.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">이 시리즈의 모든 이벤트에 대한 추가 참가자에게 초대장이 전송됩니다.\n이 시리즈에 대한 이전 수정 사항은 손실됩니다.</string>
     <string name="event_add_participants_dialog_confirm">보내기</string>
     <string name="event_add_participants_dialog_cancel">취소</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s가 취소되었습니다.</string>

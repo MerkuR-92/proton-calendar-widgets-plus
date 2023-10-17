@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Det är ännu inte möjligt att ändra deltagare associerade med inbjudningar.</string>
     <string name="change_calendar_recurring_disclaimer">Ändra kalender för återkommande händelse är ännu inte möjligt.</string>
     <string name="update_event">Uppdatera händelse</string>
-    <string name="update_invite_send_invitation">En inbjudan kommer att skickas till händelsens deltagare.</string>
+    <string name="update_invite_send_email">En inbjudan kommer att skickas till händelsens deltagare.</string>
     <string name="update_recurring_event">Uppdatera återkommande händelse</string>
     <string name="update_recurring_all_events">Vill du uppdatera alla händelser i denna serie?</string>
-    <string name="update_recurring_invite_send_invitation">Du kommer att uppdatera alla händelser i denna serie. En inbjudan kommer att skickas till händelsens deltagare.</string>
+    <string name="update_recurring_invite_send_email">Du kommer att uppdatera alla händelser i denna serie. En inbjudan kommer att skickas till händelsens deltagare.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Vad letar du efter?</string>
     <string name="search_empty_results_title">Inga resultat hittades</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Skicka</string>
     <string name="event_send_invite_dialog_cancel">Avbryt</string>
     <string name="event_add_participants_dialog_title">Lägg till deltagare</string>
-    <string name="event_add_participants_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.</string>
-    <string name="event_add_participants_overwrite_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.\nTidigare ändringar av denna serie kommer att gå förlorade.</string>
+    <string name="recurring_event_add_participants_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.\nTidigare ändringar av denna serie kommer att gå förlorade.</string>
     <string name="event_add_participants_dialog_confirm">Skicka</string>
     <string name="event_add_participants_dialog_cancel">Avbryt</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s har avbrutits.</string>

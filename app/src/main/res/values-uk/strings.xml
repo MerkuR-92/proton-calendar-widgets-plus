@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Неможливо змінити учасників, пов\'язаних із запрошеннями.</string>
     <string name="change_calendar_recurring_disclaimer">Зміна календаря для повторюваних подій поки що неможлива.</string>
     <string name="update_event">Оновити подію</string>
-    <string name="update_invite_send_invitation">Запрошення буде надіслано учасникам події.</string>
+    <string name="update_invite_send_email">Запрошення буде надіслано учасникам події.</string>
     <string name="update_recurring_event">Оновити повторювану подію</string>
     <string name="update_recurring_all_events">Бажаєте оновити всі події у цій послідовності?</string>
-    <string name="update_recurring_invite_send_invitation">Ви оновите всі події у цій послідовності. Усім учасникам події буде надіслано запрошення.</string>
+    <string name="update_recurring_invite_send_email">Ви оновите всі події у цій послідовності. Усім учасникам події буде надіслано запрошення.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Що ви шукаєте?</string>
     <string name="search_empty_results_title">Результатів не знайдено</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Надіслати</string>
     <string name="event_send_invite_dialog_cancel">Скасувати</string>
     <string name="event_add_participants_dialog_title">Додати учасників</string>
-    <string name="event_add_participants_dialog_description">Запрошення буде надіслано вказаним учасникам на всі події цієї серії.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Запрошення буде надіслано доданим учасникам на всі події цієї серії.\nПопередні зміни в цій серії будуть втрачені.</string>
+    <string name="recurring_event_add_participants_dialog_description">Запрошення буде надіслано вказаним учасникам на всі події цієї серії.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Запрошення буде надіслано доданим учасникам на всі події цієї серії.\nПопередні зміни в цій серії будуть втрачені.</string>
     <string name="event_add_participants_dialog_confirm">Надіслати</string>
     <string name="event_add_participants_dialog_cancel">Скасувати</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s було скасовано.</string>

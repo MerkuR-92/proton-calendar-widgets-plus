@@ -151,10 +151,10 @@
     <string name="invite_change_attendees_disclaimer">Účastníky spojené s pozvánkami není zatím možné upravovat.</string>
     <string name="change_calendar_recurring_disclaimer">Změna kalendáře pro opakující se událost zatím není možná.</string>
     <string name="update_event">Aktualizovat událost</string>
-    <string name="update_invite_send_invitation">Účastníkům události bude zaslána pozvánka.</string>
+    <string name="update_invite_send_email">Účastníkům události bude zaslána pozvánka.</string>
     <string name="update_recurring_event">Aktualizovat opakující se událost</string>
     <string name="update_recurring_all_events">Chcete aktualizovat všechny události v této sérii?</string>
-    <string name="update_recurring_invite_send_invitation">Aktualizujete všechny události v této sérii. Účastníkům události bude zaslána pozvánka.</string>
+    <string name="update_recurring_invite_send_email">Aktualizujete všechny události v této sérii. Účastníkům události bude zaslána pozvánka.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Co hledáte?</string>
     <string name="search_empty_results_title">Nebyly nalezeny žádné výsledky</string>
@@ -258,8 +258,8 @@
     <string name="event_send_invite_dialog_confirm">Odeslat</string>
     <string name="event_send_invite_dialog_cancel">Zrušit</string>
     <string name="event_add_participants_dialog_title">Přidat účastníky</string>
-    <string name="event_add_participants_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.</string>
-    <string name="event_add_participants_overwrite_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.\nPředchozí úpravy této série budou ztraceny.</string>
+    <string name="recurring_event_add_participants_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.\nPředchozí úpravy této série budou ztraceny.</string>
     <string name="event_add_participants_dialog_confirm">Odeslat</string>
     <string name="event_add_participants_dialog_cancel">Zrušit</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s byla zrušena.</string>
