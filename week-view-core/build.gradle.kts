@@ -12,7 +12,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
     }
 
     testOptions {
@@ -30,8 +29,6 @@ dependencies {
     implementation(libs.androidx.customview)
     implementation(libs.androidx.emoji)
     implementation(libs.androidx.startup)
-
-    coreLibraryDesugaring(libs.tools.desugar)
 
     testImplementation(libs.test.androidx.ext.junit)
     testImplementation(libs.test.androidx.testrunner)

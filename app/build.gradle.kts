@@ -4,7 +4,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
     id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
@@ -21,7 +21,7 @@ sonarqube {
     }
 }
 
-jacoco { toolVersion = "0.8.7" }
+jacoco { toolVersion = "0.8.8" }
 kapt { correctErrorTypes = true }
 
 android {
@@ -143,6 +143,12 @@ android {
     }
 }
 
+configurations {
+    // Remove duplicate classes (keep "org.jetbrains").
+    implementation.get().exclude(mapOf("group" to "com.intellij", "module" to "annotations"))
+    implementation.get().exclude(mapOf("group" to "org.intellij", "module" to "annotations"))
+}
+
 dependencies {
     coreLibraryDesugaring(libs.tools.desugar)
 
@@ -161,7 +167,6 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
-    implementation(libs.retrofit.coroutines)
     implementation(libs.retrofit.serialization.converter)
 
     // Shared preferences
@@ -320,10 +325,10 @@ val isGitlabCI: Boolean get() = !System.getenv("CI_SERVER_NAME").isNullOrEmpty()
 
 object Config {
     const val applicationId = "me.proton.android.calendar"
-    const val compileSdk = 33
+    const val compileSdk = 34
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
-    const val buildToolsVersion = "30.0.3"
+    const val buildToolsVersion = "34.0.0"
     const val targetSdk = 33
     const val versionCode = 251
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"

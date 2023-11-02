@@ -3,7 +3,7 @@ package me.proton.android.calendar.data.entity
 import androidx.annotation.NonNull
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
+import androidx.room.ForeignKey.Companion.CASCADE
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
