@@ -39,7 +39,6 @@ import me.proton.core.test.quark.data.User.Users
 import me.proton.core.util.kotlin.EMPTY_STRING
 import me.proton.core.util.kotlin.deserialize
 import me.proton.core.util.kotlin.deserializeList
-import me.proton.test.fusion.FusionConfig
 import me.proton.test.fusion.FusionConfig.targetContext
 import me.proton.test.fusion.ui.espresso.EspressoWaiter
 import me.proton.test.fusion.ui.espresso.wrappers.EspressoAssertions
@@ -48,6 +47,7 @@ import org.junit.Rule
 import org.junit.rules.RuleChain
 import java.util.TimeZone
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 open class BaseTest: EspressoWaiter {
 
@@ -108,7 +108,7 @@ open class BaseTest: EspressoWaiter {
                 .deserialize())
 
     fun <T : Robot> T.verify(
-        timeout: Duration = FusionConfig.commandTimeout,
+        timeout: Duration = 10000.milliseconds,
         block: T.() -> EspressoAssertions
     ): T = waitFor(timeout) { block() }
 
