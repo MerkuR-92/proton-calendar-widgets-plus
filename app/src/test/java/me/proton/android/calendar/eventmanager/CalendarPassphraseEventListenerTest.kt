@@ -99,19 +99,20 @@ class CalendarPassphraseEventListenerTest {
     fun `onComplete caches the created or update passphrases if present`() {
         runBlocking {
 
-            listener.notifyComplete(config, EventMetadata(
-                userId,
-                EventId("eventId"),
+            listener.notifyComplete(
                 config,
+                EventMetadata(
+                    userId = userId,
+                    eventId = EventId("eventId"),
+                    config = config,
+                    createdAt = 0L
+                ),
                 response = EventsResponse(eventsResponseWithPassphrases),
-                createdAt = 0L
-            )
             )
 
             coVerify(exactly = 1) { cacheCalendarPassphraseUseCase.execute(any(), any()) }
         }
     }
-
 }
 
 private const val eventsResponseWithPassphrases = """
