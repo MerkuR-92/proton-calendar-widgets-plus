@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <integer name="core_feature_event_manager_worker_immediate_minimum_initial_delay_seconds">5</integer>
     <bool name="core_feature_account_recovery_enabled">true</bool>
     <bool name="core_feature_notifications_enabled">true</bool>
     <!-- Show system Notification permission request dialog after login. -->
