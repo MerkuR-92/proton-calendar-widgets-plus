@@ -40,6 +40,7 @@
     <string name="action_done">Færdig</string>
     <string name="action_edit">Redigér</string>
     <string name="action_delete">Slet</string>
+    <string name="action_add">Tilføj</string>
     <string name="action_remove">Fjern</string>
     <string name="action_leave">Forlad</string>
     <string name="action_recreate">Ryd</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Det er endnu ikke muligt at ændre deltagere der er knyttet til invitationer.</string>
     <string name="change_calendar_recurring_disclaimer">Ændring af kalender for tilbagevendende begivenheder er endnu ikke muligt.</string>
     <string name="update_event">Opdater begivenhed</string>
-    <string name="update_invite_send_email">En invitation vil blive sendt til begivenhedens deltagere.</string>
+    <string name="update_invite_send_email">En invitationsopdatering vil blive sendt til begivenhedens deltagere.</string>
     <string name="update_recurring_event">Opdater tilbagevendende begivenhed</string>
     <string name="update_recurring_all_events">Vil du opdatere alle begivenheder i denne serie?</string>
-    <string name="update_recurring_invite_send_email">Du vil opdatere alle begivenheder i denne serie. En invitation vil blive sendt til deltagerne i arrangementet.</string>
+    <string name="update_recurring_invite_send_email">Du vil opdatere alle begivenheder i denne serie. En invitationsopdatering vil blive sendt til deltagerne i arrangementet.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Hvad søger du?</string>
     <string name="search_empty_results_title">Ingen resultater fundet</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Send</string>
     <string name="event_send_invite_dialog_cancel">Annullér</string>
     <string name="event_add_participants_dialog_title">Tilføj deltagere</string>
+    <string name="event_add_participants_dialog_description">En invitation vil blive sendt til tilføjede deltagere.</string>
     <string name="recurring_event_add_participants_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">En invitation vil blive sendt til tilføjede deltagere for alle begivenheder i denne serie.\nTidligere ændringer af denne serie vil gå tabt.</string>
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Annullér</string>
+    <string name="event_remove_participants_dialog_title">Fjern deltagere</string>
+    <string name="event_remove_participants_dialog_description">En aflysningsmail vil blive sendt til fjernede deltagere.</string>
+    <string name="recurring_event_remove_participants_dialog_description">En aflysningsmail vil blive sendt til fjernede deltagere for alle begivenheder i denne serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Tilføjede og fjernede deltagere vil blive underrettet.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Tilføjede og fjernede deltagere vil blive underrettet om alle begivenheder i denne serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s er blevet annulleret.</string>
+    <string name="event_save_changes">Gem ændringer</string>
+    <string name="event_update_add_participants_dialog_description">Eksisterende og tilføjede deltagere vil blive underrettet.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Du vil opdatere alle begivenheder i denne serie. Eksisterende og tilføjede deltagere vil blive underrettet.</string>
+    <string name="event_update_remove_participants_dialog_description">Eksisterende og fjernede deltagere vil blive underrettet.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Fjernede deltagere vil blive underrettet.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Du vil opdatere alle begivenheder i denne serie. Eksisterende og fjernede deltagere vil blive underrettet.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Du vil opdatere alle begivenheder i denne serie. Fjernede deltagere vil blive underrettet.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Eksisterende, tilføjede og fjernede deltagere vil blive underrettet.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Du vil opdatere alle begivenheder i denne serie. Eksisterende, tilføjede og fjernede deltagere vil blive underrettet.</string>
+    <string name="success_snack_email_update_recurring">Deltagere underrettet og alle begivenheder opdateret</string>
+    <string name="success_snack_email_update">Deltagere underrettet og begivenhed opdateret</string>
+    <string name="success_snack_add_attendees_recurring">Invitation sendt og deltagere tilføjet til alle begivenheder</string>
+    <string name="success_snack_add_attendees">Invitation sendt og deltagere tilføjet</string>
+    <string name="success_snack_remove_attendees_recurring">Aflysning sendt og deltagere fjernet fra alle begivenheder</string>
+    <string name="success_snack_remove_attendees">Aflysning sendt og deltagere fjernet</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mine kalendere</string>
     <string name="nav_view_subscribed_calendars">Kalenderabonnementer</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Opdaterer svar</string>
     <string name="snack_event_part_stat_updated">Deltagelsesstatus opdateret.</string>
     <string name="snack_event_updated">Begivenhed opdateret</string>
+    <string name="snack_event_updated_recurring">Alle begivenheder opdateret</string>
     <string name="snack_event_updated_error_failed_mail">Invitation kunne ikke sendes</string>
     <string name="snack_update_event_error_failed_mail">Opdatering mislykkedes</string>
     <string name="snack_event_updated_error">Fejl ved opdatering af begivenhed</string>

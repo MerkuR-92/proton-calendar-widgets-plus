@@ -40,6 +40,7 @@
     <string name="action_done">Gotowe</string>
     <string name="action_edit">Edytuj</string>
     <string name="action_delete">Usuń</string>
+    <string name="action_add">Dodaj</string>
     <string name="action_remove">Usuń</string>
     <string name="action_leave">Opuść</string>
     <string name="action_recreate">Wyczyść</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Nie można edytować uczestników powiązanych z zaproszeniami.</string>
     <string name="change_calendar_recurring_disclaimer">Zmiana kalendarza dla wydarzenia cyklicznego nie jest możliwa.</string>
     <string name="update_event">Zaktualizuj wydarzenie</string>
-    <string name="update_invite_send_email">Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
+    <string name="update_invite_send_email">Aktualizacja zaproszenia zostanie wysłana do uczestników wydarzenia.</string>
     <string name="update_recurring_event">Zaktualizuj wydarzenie cykliczne</string>
     <string name="update_recurring_all_events">Czy chcesz zaktualizować wszystkie wydarzenia w tej serii?</string>
-    <string name="update_recurring_invite_send_email">Zaktualizujesz wszystkie wydarzenia w tej serii. Zaproszenie zostanie wysłane do uczestników wydarzenia.</string>
+    <string name="update_recurring_invite_send_email">Zaktualizujesz wszystkie wydarzenia w tej serii. Aktualizacja zaproszenia zostanie wysłana do uczestników wydarzenia.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Czego szukasz?</string>
     <string name="search_empty_results_title">Nie znaleziono żadnych wyników</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Wyślij</string>
     <string name="event_send_invite_dialog_cancel">Anuluj</string>
     <string name="event_add_participants_dialog_title">Dodaj uczestników</string>
+    <string name="event_add_participants_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników.</string>
     <string name="recurring_event_add_participants_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Zaproszenie zostanie wysłane do dodanych uczestników wszystkich wydarzeń w tej serii.\nPoprzednie zmiany w tej serii zostaną utracone.</string>
     <string name="event_add_participants_dialog_confirm">Wyślij</string>
     <string name="event_add_participants_dialog_cancel">Anuluj</string>
+    <string name="event_remove_participants_dialog_title">Usuń uczestników</string>
+    <string name="event_remove_participants_dialog_description">Wiadomość o anulowaniu wydarzenia zostanie wysłana do usuniętych uczestników.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Wiadomość o anulowaniu wydarzenia zostanie wysłana do usuniętych uczestników wydarzeń w tej serii.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Dodani i usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Dodani i usunięci uczestnicy zostaną powiadomieni o wszystkich wydarzeniach w tej serii.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">Wydarzenie %1$s zostało anulowane.</string>
+    <string name="event_save_changes">Zapisz zmiany</string>
+    <string name="event_update_add_participants_dialog_description">Obecni i dodani uczestnicy zostaną powiadomieni.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Zaktualizujesz wszystkie wydarzenia w tej serii. Obecni i dodani uczestnicy zostaną powiadomieni.</string>
+    <string name="event_update_remove_participants_dialog_description">Obecni i usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Zaktualizujesz wszystkie wydarzenia w tej serii. Obecni i usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Zaktualizujesz wszystkie wydarzenia w tej serii. Usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Obecni, dodani i usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Zaktualizujesz wszystkie wydarzenia w tej serii. Obecni, dodani i usunięci uczestnicy zostaną powiadomieni.</string>
+    <string name="success_snack_email_update_recurring">Uczestnicy zostali powiadomieni. Wszystkie wydarzenia zostały zaktualizowane</string>
+    <string name="success_snack_email_update">Uczestnicy zostali powiadomieni. Wydarzenie zostało zaktualizowane</string>
+    <string name="success_snack_add_attendees_recurring">Zaproszenie zostało wysłane. Uczestnicy zostali dodani do wszystkich wydarzeń</string>
+    <string name="success_snack_add_attendees">Zaproszenie zostało wysłane. Uczestnicy zostali dodani</string>
+    <string name="success_snack_remove_attendees_recurring">Powiadomienie o anulowaniu wydarzeń zostało wysłane. Uczestnicy zostali usunięci ze wszystkich wydarzeń</string>
+    <string name="success_snack_remove_attendees">Powiadomienie o anulowaniu wydarzenia zostało wysłane. Uczestnicy zostali usunięci</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Moje kalendarze</string>
     <string name="nav_view_subscribed_calendars">Subskrybowane kalendarze</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Aktualizacja odpowiedzi</string>
     <string name="snack_event_part_stat_updated">Status uczestnictwa został zaktualizowany.</string>
     <string name="snack_event_updated">Wydarzenie zostało zaktualizowane</string>
+    <string name="snack_event_updated_recurring">Wszystkie wydarzenia zostały zaktualizowane</string>
     <string name="snack_event_updated_error_failed_mail">Wysłanie zaproszenia nie powiodło się</string>
     <string name="snack_update_event_error_failed_mail">Aktualizacja nie powiodła się</string>
     <string name="snack_event_updated_error">Wystąpił błąd podczas aktualizowania wydarzenia</string>

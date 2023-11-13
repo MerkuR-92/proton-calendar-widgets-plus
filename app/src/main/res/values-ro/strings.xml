@@ -40,6 +40,7 @@
     <string name="action_done">Gata</string>
     <string name="action_edit">Editare</string>
     <string name="action_delete">Ștergere</string>
+    <string name="action_add">Adăugare</string>
     <string name="action_remove">Eliminare</string>
     <string name="action_leave">Părăsire</string>
     <string name="action_recreate">Golire</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Încă nu este posibilă modificare participanților asociați la invitații.</string>
     <string name="change_calendar_recurring_disclaimer">Modificarea calendarului pentru evenimentele recurente nu este încă posibilă.</string>
     <string name="update_event">Actualizare eveniment</string>
-    <string name="update_invite_send_email">O invitație va fi trimisă participanților la eveniment.</string>
+    <string name="update_invite_send_email">O actualizare a invitației va fi trimisă participanților la eveniment.</string>
     <string name="update_recurring_event">Actualizare eveniment recurent</string>
     <string name="update_recurring_all_events">Doriți actualizarea tuturor evenimentelor din serie?</string>
-    <string name="update_recurring_invite_send_email">Veți actualiza toate evenimentele din această serie. O invitație va fi trimisă participanților la eveniment.</string>
+    <string name="update_recurring_invite_send_email">Veți actualiza toate evenimentele din această serie. O actualizare a invitației va fi trimisă participanților la eveniment.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Ce căutați?</string>
     <string name="search_empty_results_title">Nu s-au găsit rezultate.</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Trimitere</string>
     <string name="event_send_invite_dialog_cancel">Anulare</string>
     <string name="event_add_participants_dialog_title">Adăugare participanți</string>
+    <string name="event_add_participants_dialog_description">O invitație va fi trimisă participanților adăugați.</string>
     <string name="recurring_event_add_participants_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">O invitație va fi trimisă participanților adăugați pentru toate evenimentele din această serie.\nModificările anterioare pentru această serie vor fi pierdute.</string>
     <string name="event_add_participants_dialog_confirm">Trimitere</string>
     <string name="event_add_participants_dialog_cancel">Anulare</string>
+    <string name="event_remove_participants_dialog_title">Eliminare participanți</string>
+    <string name="event_remove_participants_dialog_description">Un e-mail de anulare va fi trimis participanților eliminați.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Un e-mail de anulare va fi trimis participanților la toate evenimentele din această serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Participanții adăugați și eliminați vor fi notificați.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Participanții adăugați și eliminați vor fi notificați cu privire la toate evenimentele din această serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s a fost anulat.</string>
+    <string name="event_save_changes">Salvare modificări</string>
+    <string name="event_update_add_participants_dialog_description">Participanții existenți și adăugați vor fi notificați.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Veți actualiza toate evenimentele din această serie. Participanții existenți și adăugați vor fi notificați.</string>
+    <string name="event_update_remove_participants_dialog_description">Participanții existenți și eliminați vor fi notificați.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Participanții eliminați vor fi notificați.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Veți actualiza toate evenimentele din această serie. Participanții existenți și eliminați vor fi notificați.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Veți actualiza toate evenimentele din această serie. Participanții eliminați vor fi notificați.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Participanții existenți, adăugați și eliminați vor fi notificați.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Veți actualiza toate evenimentele din această serie. Participanții existenți, adăugați și eliminați vor fi notificați.</string>
+    <string name="success_snack_email_update_recurring">Participanții au fost notificați și toate evenimentele au fost actualizate.</string>
+    <string name="success_snack_email_update">Participanții au fost notificați și evenimentul a fost actualizat.</string>
+    <string name="success_snack_add_attendees_recurring">Invitația a fost trimisă și participanții adăugați la toate evenimentele.</string>
+    <string name="success_snack_add_attendees">Invitația a fost trimisă și participanții adăugați.</string>
+    <string name="success_snack_remove_attendees_recurring">Anularea a fost trimisă și participanții eliminați din toate evenimentele.</string>
+    <string name="success_snack_remove_attendees">Anularea a fost trimisă și participanții eliminați.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Calendarele mele</string>
     <string name="nav_view_subscribed_calendars">Calendare abonate</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Se actualizează răspunsul</string>
     <string name="snack_event_part_stat_updated">Starea de participare s-a actualizat.</string>
     <string name="snack_event_updated">Eveniment actualizat</string>
+    <string name="snack_event_updated_recurring">Toate evenimentele sunt actualizate.</string>
     <string name="snack_event_updated_error_failed_mail">Invitația nu a putut fi trimisă</string>
     <string name="snack_update_event_error_failed_mail">Actualizare eșuată</string>
     <string name="snack_event_updated_error">Eroare la actualizarea evenimentului</string>

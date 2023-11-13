@@ -40,6 +40,7 @@
     <string name="action_done">მზადაა</string>
     <string name="action_edit">ჩასწორება</string>
     <string name="action_delete">წაშლა</string>
+    <string name="action_add">დამატება</string>
     <string name="action_remove">წაშლა</string>
     <string name="action_leave">გასვლა</string>
     <string name="action_recreate">გასუფთავება</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">მოსაწვევთან ასოცირებული წევრების ჩასწორება ჯერ შეუძლებელია.</string>
     <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდრის შეცვლა ჯერჯერობით შეუძლებელია.</string>
     <string name="update_event">მოვლენის განახლება</string>
-    <string name="update_invite_send_email">მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_invite_send_email">მოწვევის განახლება გადაეგზავნება მოვლენის მონაწილეებს.</string>
     <string name="update_recurring_event">განმეორებადი მოვლენის განახლება</string>
     <string name="update_recurring_all_events">გსურთ, განაახლოთ ამ სერიის ყველა მოვლენა?</string>
-    <string name="update_recurring_invite_send_email">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევა გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_recurring_invite_send_email">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევის განახლება გადაეგზავნება მოვლენის მონაწილეებს.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">გაგზავნა</string>
     <string name="event_send_invite_dialog_cancel">გაუქმება</string>
     <string name="event_add_participants_dialog_title">მონაწილეების დამატება</string>
+    <string name="event_add_participants_dialog_description">დამატებულ მონაწილეებს მოწვევა გადაეგზავნება.</string>
     <string name="recurring_event_add_participants_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">მოწვევა გადაეგზავნება დამატებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.\nამ სერიის წინა ცვლილებები დაიკარგება.</string>
     <string name="event_add_participants_dialog_confirm">გაგზავნა</string>
     <string name="event_add_participants_dialog_cancel">გაუქმება</string>
+    <string name="event_remove_participants_dialog_title">მონაწილეების წაშლა</string>
+    <string name="event_remove_participants_dialog_description">გაუქმების ელფოსტა გადაეგზავნება ამოღებულ მონაწილეებს.</string>
+    <string name="recurring_event_remove_participants_dialog_description">გაუქმების ელფოსტა გადაეგზავნება ამოღებულ მონაწილეებს ამ სერიის ყველა მოვლენისთვის.</string>
+    <string name="event_add_and_remove_participants_dialog_description">დამატებული და წაშლილი მონაწილეები გაფრთხილებული იქნებიან.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">დამატებულია და ამოღებულ მონაწილეებს ეცნობებათ ამ სერიის ყველა მოვლენის შესახებ.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s გაუქმდა.</string>
+    <string name="event_save_changes">ცვლილებების შენახვა</string>
+    <string name="event_update_add_participants_dialog_description">არსებულ და დამატებულ მონაწილეებს გაფრთხლება გაეგზავნებათ.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. არსებულ და დამატებულ მონაწილეებს ეცნობებათ.</string>
+    <string name="event_update_remove_participants_dialog_description">არსებულ და წაშლილ მონაწილეებს გაფრთხლება გაეგზავნებათ.</string>
+    <string name="event_update_remove_all_participants_dialog_description">წაშლილი მონაწილეები გაფრთხილებულ იქნებიან.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. არსებულ და წაშლილ მონაწილეებს ეცნობებათ.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. წაშლილ მონაწილეებს ეცნობებათ.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">არსებულ, დამატებულ და წაშლილ მონაწილეებს გაფრთხლება გაეგზავნებათ.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. დამატებულ, არსებულ და წაშლილ მონაწილეებს ეცნობებათ.</string>
+    <string name="success_snack_email_update_recurring">მონაწილეები გაფრთხილებულები არიან და ყველა მოვლენა განახლებულია</string>
+    <string name="success_snack_email_update">მონაწილეები გაფრთხილებულები არიან და მოვლენა განახლებულია</string>
+    <string name="success_snack_add_attendees_recurring">მოსაწვევი გაგზავნილია და მონაწილეებს დაემატა ყველა მოვლენა</string>
+    <string name="success_snack_add_attendees">მოსაწვევი გაგზავნილია, მონაწილეები კი დამატებული</string>
+    <string name="success_snack_remove_attendees_recurring">გაუქმება გაგზავნილია და დამსწრეები წაშლილია ყველა მოვლენიდან</string>
+    <string name="success_snack_remove_attendees">გაუქმება გაგზავნილია და დამსწრეები წაშლილია</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">ჩემი კალენდრები</string>
     <string name="nav_view_subscribed_calendars">გამოწერილი კალენდრები</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">პასუხის განახლება</string>
     <string name="snack_event_part_stat_updated">დასწრების სტატუსი განახლდა.</string>
     <string name="snack_event_updated">მოვლენა განახლდა</string>
+    <string name="snack_event_updated_recurring">ყველა მოვლენა განახლდა</string>
     <string name="snack_event_updated_error_failed_mail">მოსაწვევის გაგზავნის შეცდომა</string>
     <string name="snack_update_event_error_failed_mail">განახლება ვერ მოხერხდა</string>
     <string name="snack_event_updated_error">მოვლენის განახლების შეცდომა</string>

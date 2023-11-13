@@ -15,7 +15,7 @@
     <string name="dialog_button_cancel">İptal</string>
     <string name="dialog_button_continue">İlerle</string>
     <string name="dialog_button_close">Kapat</string>
-    <string name="dialog_button_remove">Sil</string>
+    <string name="dialog_button_remove">Kaldır</string>
     <string name="dialog_button_download">İndir</string>
     <string name="dialog_button_update">Güncelle</string>
     <!-- Delete as an organizer -->
@@ -40,6 +40,7 @@
     <string name="action_done">Tamam</string>
     <string name="action_edit">Düzenle</string>
     <string name="action_delete">Sil</string>
+    <string name="action_add">Ekle</string>
     <string name="action_remove">Kaldır</string>
     <string name="action_leave">Ayrıl</string>
     <string name="action_recreate">Temizle</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Henüz davetler ile ilişkilendirilmiş katılımcılar değiştirilemez.</string>
     <string name="change_calendar_recurring_disclaimer">Yinelenen etkinlikler ile ilişkilendirilmiş takvim henüz değiştirilemez.</string>
     <string name="update_event">Etkinliği güncelle</string>
-    <string name="update_invite_send_email">Etkinlik katılımcılarına bir davet gönderilecek.</string>
+    <string name="update_invite_send_email">Etkinlik katılımcılarına bir davet güncellemesi gönderilecek.</string>
     <string name="update_recurring_event">Yinelenen etkinliği güncelle</string>
     <string name="update_recurring_all_events">Bu dizideki tüm etkinlikleri güncellemek ister misiniz?</string>
-    <string name="update_recurring_invite_send_email">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Etkinlik katılımcılarına bir davet gönderilecek.</string>
+    <string name="update_recurring_invite_send_email">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Etkinlik katılımcılarına bir davet güncellemesi gönderilecek.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Ne aramıştınız?</string>
     <string name="search_empty_results_title">Herhangi bir sonuç bulunamadı</string>
@@ -164,7 +165,7 @@
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Kalan süre hesaplanıyor…</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">neredeyse hazır</string>
     <string name="search_downloading_pause">İndirmeyi duraklat</string>
-    <string name="search_settings_dialog_toggle_off_title">İndirilmiş tüm takvimler silinsin mi?</string>
+    <string name="search_settings_dialog_toggle_off_title">İndirilmiş tüm takvimler kaldırılsın mı?</string>
     <string name="search_settings_dialog_toggle_off_text">Arama yapmak isterseniz tüm takvimlerinizi yeniden indirmeniz gerekecek.</string>
     <string name="search_settings_dialog_toggle_on_title">Takvimler bu aygıta indirilsin mi?</string>
     <string name="search_settings_dialog_toggle_on_text">Arama yapabilmek için bu işlem gereklidir.</string>
@@ -243,9 +244,9 @@
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%2$s%3$s tarihinde %1$s saatinde başlayan bir etkinlik için güncelleme</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">%1$s zamanındaki etkinlik için güncelleme</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">%1$s zamanında başlayan etkinlik için güncelleme</string>
-    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%2$s%3$s tarihinde %1$s saatinde başlayan bir etkinliğin iptal bilgilendirmesi</string>
-    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s zamanındaki bir etkinliğin iptal bilgilendirmesi</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s zamanında başlayan bir etkinliğin iptal bilgilendirmesi</string>
+    <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%2$s%3$s tarihinde %1$s saatinde başlayan bir etkinliğin iptal bildirimi</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s zamanındaki bir etkinliğin iptal bildirimi</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s zamanında başlayan bir etkinliğin iptal bildirimi</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s etkinliğine davetlisiniz\nZamanı: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s güncellendi\nZamanı: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (tüm gün)</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Gönder</string>
     <string name="event_send_invite_dialog_cancel">İptal</string>
     <string name="event_add_participants_dialog_title">Katılımcı ekle</string>
+    <string name="event_add_participants_dialog_description">Eklenen katılımcılara bir davet gönderilecek.</string>
     <string name="recurring_event_add_participants_dialog_description">Eklenen katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Eklenen tüm katılımcılara bu dizideki tüm etkinlikler için bir davet gönderilecek.\nBu dizide daha önce yapılmış değişiklikler kaybolacak.</string>
     <string name="event_add_participants_dialog_confirm">Gönder</string>
     <string name="event_add_participants_dialog_cancel">İptal</string>
+    <string name="event_remove_participants_dialog_title">Katılımcıları kaldır</string>
+    <string name="event_remove_participants_dialog_description">Kaldırılan katılımcılara bir iptal bildirimi e-postası gönderilecek.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Kaldırılan katılımcılara bu dizideki tüm etkinlikler için bir iptal bildirimi gönderilecek.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Eklenen ve kaldırılan katılımcılara bildirim gönderilecek.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Bu dizideki tüm etkinlikler eklenen ve kaldırılan katılımcılara bildirilecek.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s iptal edildi.</string>
+    <string name="event_save_changes">Değişiklikleri kaydet</string>
+    <string name="event_update_add_participants_dialog_description">Var olan ve eklenen katılımcılara bildirim gönderilecek.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Değişiklikler var olan ve eklenen katılımcılara bildirilecek.</string>
+    <string name="event_update_remove_participants_dialog_description">Var olan ve kaldırılan katılımcılara bildirim gönderilecek.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Kaldırılan katılımcılara bildirim gönderilecek.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Değişiklikler var olan ve kaldırılan katılımcılara bildirilecek.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Değişiklikler kaldırılan katılımcılara bildirilecek.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Var olan, eklenen ve kaldırılan katılımcılara bildirim gönderilecek.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Bu dizideki tüm etkinlikleri güncelleyeceksiniz. Değişiklikler var olan, eklenen ve kaldırılan katılımcılara bildirilecek.</string>
+    <string name="success_snack_email_update_recurring">Katılımcılara bildirim gönderildi ve değişiklikler kaydedildi</string>
+    <string name="success_snack_email_update">Katılımcılara bildirim gönderildi ve değişiklikler kaydedildi</string>
+    <string name="success_snack_add_attendees_recurring">Davet gönderildi ve katılımcılar tüm etkinliklere eklendi</string>
+    <string name="success_snack_add_attendees">Davet gönderildi ve katılımcılar eklendi</string>
+    <string name="success_snack_remove_attendees_recurring">İptal bildirimi gönderildi ve katılımcılar tüm etkinlliklerden kaldırıldı</string>
+    <string name="success_snack_remove_attendees">İptal bildirimi gönderildi ve katılımcılar kaldırıldı</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Takvimlerim</string>
     <string name="nav_view_subscribed_calendars">Abone olunmuş takvimler</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Yanıt güncelleniyor</string>
     <string name="snack_event_part_stat_updated">Katılım durumu güncellendi.</string>
     <string name="snack_event_updated">Etkinlik güncellendi</string>
+    <string name="snack_event_updated_recurring">Tüm etkinlikler güncellendi</string>
     <string name="snack_event_updated_error_failed_mail">Davet gönderilemedi</string>
     <string name="snack_update_event_error_failed_mail">Güncellenemedi</string>
     <string name="snack_event_updated_error">Etkinlik güncellenirken sorun çıktı</string>
@@ -469,10 +492,10 @@
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">Ekle</string>
     <string name="create_calendar_limit_reached">Eklenebilecek en fazla takvim sayısı sınırına ulaştınız.</string>
     <string name="create_calendar_limit_reached_title">Başka takvim eklenemez</string>
-    <string name="create_calendar_limit_reached_paid_description">Tarifenizle kullanılabilecek olan en fazla 25 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi silin.</string>
+    <string name="create_calendar_limit_reached_paid_description">Tarifenizle kullanılabilecek olan en fazla 25 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi kaldırın.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">25 takvimlik tarife sınırınıza ulaşmadan önce en az bir kişisel takviminiz olmalıdır.</string>
     <string name="create_calendar_limit_reached_manage">Takvim yönetimi</string>
-    <string name="create_calendar_limit_reached_free_description">Tarifenizle kullanılabilecek olan en fazla 3 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi silin.</string>
+    <string name="create_calendar_limit_reached_free_description">Tarifenizle kullanılabilecek olan en fazla 3 takvim sayısına ulaştınız.\n\nYeni bir takvim eklemek için var olan bir takvimi kaldırın.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">3 takvimlik tarife sınırınıza ulaşmadan önce en az bir kişisel takviminiz olmalıdır.</string>
     <string name="create_calendar_limit_reached_error">Hata</string>
     <string name="delete_calendar_dialog_title">Takvimi sil</string>
@@ -489,7 +512,7 @@
     <string name="leave_calendar_snack_error">Takvimden ayrılırken sorun çıktı</string>
     <string name="delete_calendar_snack_error_password_confirmation">Parola doğrulanamadı</string>
     <string name="recreate_calendar_dialog_title">Takvimi temizle</string>
-    <string name="recreate_calendar_dialog_message">Bu işlem, tüm etkinlikleri ve davet edilen kullanıcıları silecek.\n\nBu takvimi temizlemek istediğinize emin misiniz?</string>
+    <string name="recreate_calendar_dialog_message">Bu işlem, tüm etkinlikleri ve davet edilen kullanıcıları kaldıracak.\n\nBu takvimi temizlemek istediğinize emin misiniz?</string>
     <string name="recreate_calendar_snack_error">Takvim temizlenirken sorun çıktı</string>
     <string name="recreate_calendar_snack_deleted">Takvim temizlendi</string>
     <string name="recreate_calendar_snack_clearing">Takvim temizleniyor…</string>

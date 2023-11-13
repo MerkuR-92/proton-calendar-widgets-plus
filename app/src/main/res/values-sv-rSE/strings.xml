@@ -40,6 +40,7 @@
     <string name="action_done">Klar</string>
     <string name="action_edit">Redigera</string>
     <string name="action_delete">Ta bort</string>
+    <string name="action_add">Lägg till</string>
     <string name="action_remove">Ta bort</string>
     <string name="action_leave">Lämna</string>
     <string name="action_recreate">Rensa</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Det är ännu inte möjligt att ändra deltagare associerade med inbjudningar.</string>
     <string name="change_calendar_recurring_disclaimer">Ändra kalender för återkommande händelse är ännu inte möjligt.</string>
     <string name="update_event">Uppdatera händelse</string>
-    <string name="update_invite_send_email">En inbjudan kommer att skickas till händelsens deltagare.</string>
+    <string name="update_invite_send_email">En inbjudningsuppdatering kommer att skickas till händelsens deltagare.</string>
     <string name="update_recurring_event">Uppdatera återkommande händelse</string>
     <string name="update_recurring_all_events">Vill du uppdatera alla händelser i denna serie?</string>
-    <string name="update_recurring_invite_send_email">Du kommer att uppdatera alla händelser i denna serie. En inbjudan kommer att skickas till händelsens deltagare.</string>
+    <string name="update_recurring_invite_send_email">Du kommer uppdatera alla händelser i denna serie. En inbjudningsuppdatering kommer att skickas till händelsens deltagare.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Vad letar du efter?</string>
     <string name="search_empty_results_title">Inga resultat hittades</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Skicka</string>
     <string name="event_send_invite_dialog_cancel">Avbryt</string>
     <string name="event_add_participants_dialog_title">Lägg till deltagare</string>
+    <string name="event_add_participants_dialog_description">En inbjudan kommer att skickas till tillagda deltagare.</string>
     <string name="recurring_event_add_participants_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">En inbjudan kommer att skickas till tillagda deltagare för alla händelser i denna serie.\nTidigare ändringar av denna serie kommer att gå förlorade.</string>
     <string name="event_add_participants_dialog_confirm">Skicka</string>
     <string name="event_add_participants_dialog_cancel">Avbryt</string>
+    <string name="event_remove_participants_dialog_title">Ta bort deltagare</string>
+    <string name="event_remove_participants_dialog_description">Ett avbokningsmeddelande kommer att skickas till borttagna deltagare.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Ett e-postmeddelande kommer skickas till alla borttagna deltagare i denna serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Tillagda och borttagna deltagare kommer att aviseras.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Tillagda och borttagna deltagare kommer att aviseras om alla händelser i denna serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s har avbrutits.</string>
+    <string name="event_save_changes">Spara ändringar</string>
+    <string name="event_update_add_participants_dialog_description">Befintliga och tillagda deltagare kommer att aviseras.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Du kommer att uppdatera alla händelser i denna serie. Befintliga och tillagda deltagare kommer att aviseras.</string>
+    <string name="event_update_remove_participants_dialog_description">Befintliga och borttagna deltagare kommer att aviseras.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Borttagna deltagare kommer att aviseras.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Du kommer att uppdatera alla händelser i denna serie. Befintliga och borttagna deltagare kommer att aviseras.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Du kommer att uppdatera alla händelser i denna serie. Borttagna deltagare kommer att aviseras.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Befintliga, tillagda och borttagna deltagare kommer att aviseras.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Du kommer att uppdatera alla händelser i denna serie. Befintliga, tillagda och borttagna deltagare kommer att aviseras.</string>
+    <string name="success_snack_email_update_recurring">Deltagare aviserade och alla händelser uppdaterade</string>
+    <string name="success_snack_email_update">Deltagarna aviserade och händelse uppdaterad</string>
+    <string name="success_snack_add_attendees_recurring">Inbjudan skickad och deltagare tillagda till alla händelser</string>
+    <string name="success_snack_add_attendees">Inbjudan skickad och deltagare tillagda</string>
+    <string name="success_snack_remove_attendees_recurring">Avbokning skickad och deltagare borttagna från alla händelser</string>
+    <string name="success_snack_remove_attendees">Avbokning skickad och deltagare borttagna</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mina kalendrar</string>
     <string name="nav_view_subscribed_calendars">Prenumererade kalendrar</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Uppdaterar svar</string>
     <string name="snack_event_part_stat_updated">Deltagandestatus uppdaterad.</string>
     <string name="snack_event_updated">Händelse uppdaterad</string>
+    <string name="snack_event_updated_recurring">Alla händelser uppdaterade</string>
     <string name="snack_event_updated_error_failed_mail">Inbjudan kunde inte skickas</string>
     <string name="snack_update_event_error_failed_mail">Uppdatering misslyckades</string>
     <string name="snack_event_updated_error">Fel vid uppdatering av händelse</string>
@@ -669,8 +692,8 @@
         <item quantity="other">Kan inte skapa nya kalendrar för alla importerade kalendrar på grund av kalendergränsen.\n • Avmarkera minst %1$d kalendrar</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020or\n • Slå samman minst %1$d kalender med befintliga Proton-kalendrar.</item>
-        <item quantity="other">\u0020or\n • Slå samman minst %1$d kalendrar med befintliga Proton-kalendrar.</item>
+        <item quantity="one">\u0020eller\n • Slå samman minst %1$d kalender med befintliga Proton-kalendrar.</item>
+        <item quantity="other">\u0020eller\n • Slå samman minst %1$d kalendrar med befintliga Proton-kalendrar.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">sekund</item>

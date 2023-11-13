@@ -40,6 +40,7 @@
     <string name="action_done">Selesai</string>
     <string name="action_edit">Sunting</string>
     <string name="action_delete">Hapus</string>
+    <string name="action_add">Tambah</string>
     <string name="action_remove">Hapus</string>
     <string name="action_leave">Tinggalkan</string>
     <string name="action_recreate">Kosongkan</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Daftar partisipan yang terhubung dengan undangan saat ini belum dapat diubah.</string>
     <string name="change_calendar_recurring_disclaimer">Mengubah kalender untuk acara yang berulang saat ini tidak didukung.</string>
     <string name="update_event">Perbarui acara</string>
-    <string name="update_invite_send_email">Undangan akan dikirim ke para peserta acara.</string>
+    <string name="update_invite_send_email">Perubahan undangan akan dikirim ke peserta acara.</string>
     <string name="update_recurring_event">Perbarui acara berulang</string>
     <string name="update_recurring_all_events">Apakah Anda ingin memperbarui seluruh acara dalam rangkaian ini?</string>
-    <string name="update_recurring_invite_send_email">Anda akan memperbarui seluruh acara dalam rangkaian ini. Undangan akan dikirim kepada para peserta acara.</string>
+    <string name="update_recurring_invite_send_email">Anda akan memperbarui semua acara dalam rangkaian ini. Perubahan undangan akan dikirim ke peserta acara.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Apa yang Anda tunggu?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Kirim</string>
     <string name="event_send_invite_dialog_cancel">Batal</string>
     <string name="event_add_participants_dialog_title">Tambah peserta</string>
-    <string name="recurring_event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.</string>
+    <string name="event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan.</string>
+    <string name="recurring_event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua rangkaian acara ini.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.\nPerubahan sebelumnya pada rangkaian ini akan hilang.</string>
     <string name="event_add_participants_dialog_confirm">Kirim</string>
     <string name="event_add_participants_dialog_cancel">Batal</string>
+    <string name="event_remove_participants_dialog_title">Hapus peserta</string>
+    <string name="event_remove_participants_dialog_description">Surel pembatalan akan dikirim kepada para peserta yang dihapus.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Surel pembatalan akan dikirim kepada para peserta yang dihapus untuk seluruh acara pada rangkaian ini.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Peserta yang ditambahkan dan dihapus akan diberi tahu.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Peserta yang ditambahkan dan dihapus akan diberi tahu tentang semua rangkaian acara ini.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s telah dibatalkan.</string>
+    <string name="event_save_changes">Simpan perubahan</string>
+    <string name="event_update_add_participants_dialog_description">Peserta yang sudah ada atau yang ditambahkan akan diberi tahu.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Anda akan memperbarui seluruh acara yang terdapat pada rangkaian ini. Peserta yang telah ada dan yang akan ditambahkan akan diberi tahu akan perubahan ini.</string>
+    <string name="event_update_remove_participants_dialog_description">Peserta yang sudah ada dan yang dihapus akan diberi tahu.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Peserta yang dihapus akan diberi tahu.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Anda akan memperbarui semua rangkaian acara ini. Peserta yang sudah ada dan yang dihapus akan diberi tahu.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Anda akan memperbarui semua rangkaian acara ini. Peserta yang dihapus akan diberi tahu.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Peserta yang sudah ada, ditambahkan, dan dihapus akan diberi tahu.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Anda akan memperbarui semua rangkaian acara. Peserta yang sudah ada, yang ditambahkan, dan dihapus akan diberi tahu.</string>
+    <string name="success_snack_email_update_recurring">Peserta diberi tahu dan semua acara berhasil diperbarui</string>
+    <string name="success_snack_email_update">Peserta diberi tahu dan acara berhasil diperbarui</string>
+    <string name="success_snack_add_attendees_recurring">Undangan terkirim dan peserta berhasil ditambahkan ke semua acara</string>
+    <string name="success_snack_add_attendees">Undangan dikirim dan peserta berhasil ditambahkan</string>
+    <string name="success_snack_remove_attendees_recurring">Pembatalan terkirim dan peserta berhasil dihapus dari semua acara</string>
+    <string name="success_snack_remove_attendees">Pembatalan dikirim dan peserta berhasil dihapus</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Kalender saya</string>
     <string name="nav_view_subscribed_calendars">Kalender langganan</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Memperbarui jawaban</string>
     <string name="snack_event_part_stat_updated">Status keikutsertaan diperbarui.</string>
     <string name="snack_event_updated">Acara diperbarui</string>
+    <string name="snack_event_updated_recurring">Semua acara berhasil diperbarui</string>
     <string name="snack_event_updated_error_failed_mail">Undangan gagal dikirim</string>
     <string name="snack_update_event_error_failed_mail">Pembaruan gagal</string>
     <string name="snack_event_updated_error">Kesalahan memperbarui acara</string>
@@ -373,7 +396,7 @@
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
     <string name="error_occurrence_does_not_exist">Peristiwa ini tidak ada</string>
     <string name="update_timezone_dialog_title">Zona waktu telah diubah</string>
-    <string name="update_timezone_dialog_message">Zona waktu sistem Anda sepertinya berubah menjadi $%1$s. Apakah Anda ingin memperbarui preferensi zona waktu Anda?</string>
+    <string name="update_timezone_dialog_message">Zona waktu sistem Anda sepertinya telah diubah menjadi %1$s. Apakah Anda ingin memperbarui preferensi zona waktu Anda?</string>
     <string name="update_timezone_dialog_confirmation">Perbarui</string>
     <string name="update_timezone_dialog_cancel">Batal</string>
     <string name="contacts_permission_dialog_title">Izinkan Kalender Proton mengakses kontak Anda?</string>
@@ -487,7 +510,7 @@
     <string name="delete_calendar_snack_error">Terjadi masalah saat menghapus kalender</string>
     <string name="remove_calendar_snack_error">Terjadi kesalahan saat menghapus kalender</string>
     <string name="leave_calendar_snack_error">Terjadi kesalahan saat meninggalkan kalender</string>
-    <string name="delete_calendar_snack_error_password_confirmation">Konfirmasi sandi gagal</string>
+    <string name="delete_calendar_snack_error_password_confirmation">Konfirmasi kata sandi gagal</string>
     <string name="recreate_calendar_dialog_title">Kosongkan isi kalender</string>
     <string name="recreate_calendar_dialog_message">Tindakan ini akan menghapus seluruh daftar acara dan pengguna yang diundang.\n\nApakah Anda yakin untuk mengosongkan isi kalender ini?</string>
     <string name="recreate_calendar_snack_error">Terdapat kesalahan dalam mengosongkan isi kalender</string>

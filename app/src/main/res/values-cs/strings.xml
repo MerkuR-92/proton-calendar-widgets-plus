@@ -40,6 +40,7 @@
     <string name="action_done">Hotovo</string>
     <string name="action_edit">Upravit</string>
     <string name="action_delete">Smazat</string>
+    <string name="action_add">Přidat</string>
     <string name="action_remove">Odstranit</string>
     <string name="action_leave">Opustit</string>
     <string name="action_recreate">Vyčistit</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Účastníky spojené s pozvánkami není zatím možné upravovat.</string>
     <string name="change_calendar_recurring_disclaimer">Změna kalendáře pro opakující se událost zatím není možná.</string>
     <string name="update_event">Aktualizovat událost</string>
-    <string name="update_invite_send_email">Účastníkům události bude zaslána pozvánka.</string>
+    <string name="update_invite_send_email">Účastníkům události bude odeslána aktualizace pozvánky.</string>
     <string name="update_recurring_event">Aktualizovat opakující se událost</string>
     <string name="update_recurring_all_events">Chcete aktualizovat všechny události v této sérii?</string>
-    <string name="update_recurring_invite_send_email">Aktualizujete všechny události v této sérii. Účastníkům události bude zaslána pozvánka.</string>
+    <string name="update_recurring_invite_send_email">Budete aktualizovat všechny události v této sérii. Účastníkům události bude odeslána aktualizace pozvánky.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Co hledáte?</string>
     <string name="search_empty_results_title">Nebyly nalezeny žádné výsledky</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Odeslat</string>
     <string name="event_send_invite_dialog_cancel">Zrušit</string>
     <string name="event_add_participants_dialog_title">Přidat účastníky</string>
-    <string name="recurring_event_add_participants_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.</string>
+    <string name="event_add_participants_dialog_description">Přidaným účastníkům bude odeslána pozvánka.</string>
+    <string name="recurring_event_add_participants_dialog_description">Přidaným účastníkům bude odeslána pozvánka na všechny události v této sérii.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Pozvánka bude zaslána přidaným účastníkům pro všechny události v této sérii.\nPředchozí úpravy této série budou ztraceny.</string>
     <string name="event_add_participants_dialog_confirm">Odeslat</string>
     <string name="event_add_participants_dialog_cancel">Zrušit</string>
+    <string name="event_remove_participants_dialog_title">Odebrat účastníky</string>
+    <string name="event_remove_participants_dialog_description">Odebraným účastníkům bude zaslán e-mail o zrušení účasti.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Odebraným účastníkům bude zaslán e-mail o zrušení všech akcí v této sérii.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Přidaní a odebraní účastníci budou upozorněni.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Přidaní a odebraní účastníci budou upozorněni na všechny události v této sérii.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s byla zrušena.</string>
+    <string name="event_save_changes">Uložit změny</string>
+    <string name="event_update_add_participants_dialog_description">Existující a přidaní účastníci budou upozorněni.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Budete aktualizovat všechny události v této sérii. Existující i nově přidaní účastníci budou upozorněni.</string>
+    <string name="event_update_remove_participants_dialog_description">Existující a odebraní účastníci budou upozorněni.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Odebraní účastníci budou upozorněni.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Budete aktualizovat všechny události v této sérii. Existující a odebraní účastníci budou upozorněni.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Aktualizujete všechny události v této sérii. Odebraní účastníci budou upozorněni.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Existující, přidaní a odebraní účastníci budou upozorněni.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Budete aktualizovat všechny události v této sérii. Existující, nově přidaní a odebraní účastníci budou upozorněni.</string>
+    <string name="success_snack_email_update_recurring">Účastníci byli upozorněni a všechny události aktualizovány</string>
+    <string name="success_snack_email_update">Účastníci byli upozorněni a událost aktualizována</string>
+    <string name="success_snack_add_attendees_recurring">Pozvánka odeslána a účástníci přidání ke všem událostem</string>
+    <string name="success_snack_add_attendees">Pozvánka byla odeslána a účastníci přidáni</string>
+    <string name="success_snack_remove_attendees_recurring">Zrušení odesláno a účastníci byli odebrání ze všech událostí</string>
+    <string name="success_snack_remove_attendees">Zrušení odesláno a účastníci odebráni</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mé kalendáře</string>
     <string name="nav_view_subscribed_calendars">Odebírané kalendáře</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Aktualizace odpovědi</string>
     <string name="snack_event_part_stat_updated">Stav účasti byl aktualizován.</string>
     <string name="snack_event_updated">Událost byla aktualizována</string>
+    <string name="snack_event_updated_recurring">Všechny události byly aktualizovány</string>
     <string name="snack_event_updated_error_failed_mail">Pozvánku se nepodařilo odeslat</string>
     <string name="snack_update_event_error_failed_mail">Aktualizace selhala</string>
     <string name="snack_event_updated_error">Chyba při aktualizaci události</string>

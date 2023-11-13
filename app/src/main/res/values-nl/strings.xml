@@ -40,6 +40,7 @@
     <string name="action_done">Klaar</string>
     <string name="action_edit">Bewerk</string>
     <string name="action_delete">Verwijder</string>
+    <string name="action_add">Toevoegen</string>
     <string name="action_remove">Verwijder</string>
     <string name="action_leave">Verlaten</string>
     <string name="action_recreate">Wissen</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Het is nog niet mogelijk de deelnemers te wijzigen die gekoppeld zijn met uitnodigingen.</string>
     <string name="change_calendar_recurring_disclaimer">Agenda\'s wijzigen voor terugkerende afspraken is nog niet mogelijk.</string>
     <string name="update_event">Gebeurtenis bijwerken</string>
-    <string name="update_invite_send_email">Een uitnodiging zal worden verzonden naar de deelnemers van de afspraken.</string>
+    <string name="update_invite_send_email">Een uitnodigingsupdate zal worden verzonden naar de deelnemers van de gebeurtenissen.</string>
     <string name="update_recurring_event">Terugkerende afspraak bijwerken</string>
     <string name="update_recurring_all_events">Wilt u alle afspraken in deze serie bijwerken?</string>
-    <string name="update_recurring_invite_send_email">U zal alle afspraken in deze serie bijwerken. Een uitnodiging zal worden verzonden naar de deelnemers van het evenement.</string>
+    <string name="update_recurring_invite_send_email">U zult alle gebeurtenissen in deze serie bijwerken. Een bijgewerkte uitnodiging zal worden verzonden naar de deelnemers van het evenement.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Wat bent u naar op zoek?</string>
     <string name="search_empty_results_title">Geen resultaten</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Verzenden</string>
     <string name="event_send_invite_dialog_cancel">Annuleren</string>
     <string name="event_add_participants_dialog_title">Personen toevoegen</string>
+    <string name="event_add_participants_dialog_description">Een uitnodiging zal worden verzonden aan toegevoegde deelnemers.</string>
     <string name="recurring_event_add_participants_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers van alle afspraken in deze serie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Er wordt een uitnodiging gestuurd naar toegevoegde deelnemers voor alle afspraken in deze serie.\nVorige wijzigingen in deze serie gaan verloren.</string>
     <string name="event_add_participants_dialog_confirm">Verzenden</string>
     <string name="event_add_participants_dialog_cancel">Annuleren</string>
+    <string name="event_remove_participants_dialog_title">Deelnemers verwijderen</string>
+    <string name="event_remove_participants_dialog_description">Een annuleringsmail wordt verzonden naar de verwijderde deelnemers.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Een annuleringsmail wordt verzonden naar verwijderde deelnemers voor alle afspraken in deze serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Toegevoegde en verwijderde deelnemers worden op de hoogte gebracht.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Toegevoegde en verwijderde deelnemers zullen op de hoogte worden gebracht van alle afspraken in deze serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s is geannuleerd.</string>
+    <string name="event_save_changes">Wijzigingen opslaan</string>
+    <string name="event_update_add_participants_dialog_description">Bestaande en toegevoegde deelnemers worden op de hoogte gebracht.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">U zal alle afspraken in deze serie bijwerken. Bestaande en toegevoegde deelnemers zullen op de hoogte worden gesteld.</string>
+    <string name="event_update_remove_participants_dialog_description">Bestaande en verwijderde deelnemers worden op de hoogte gebracht.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Verwijderde deelnemers zullen op de hoogte worden gebracht.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">U zult alle afspraken in deze serie bijwerken. Bestaande en verwijderde deelnemers zullen op de hoogte worden gebracht.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">U zult alle afspraken in deze serie bijwerken. Verwijderde deelnemers zullen hiervan op de hoogte worden gebracht.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Bestaande, toegevoegde en verwijderde deelnemers zullen op de hoogte worden gebracht.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">U zult alle afspraken in deze serie bijwerken. Bestaande en verwijderde deelnemers zullen hiervan op de hoogte worden gesteld.</string>
+    <string name="success_snack_email_update_recurring">Deelnemers ingelicht en alle afspraken bijgewerkt</string>
+    <string name="success_snack_email_update">Deelnemers op de hoogte gebracht en afspraak bijgewerkt</string>
+    <string name="success_snack_add_attendees_recurring">Uitnodiging verstuurd en deelnemers toegevoegd aan alle afspraken</string>
+    <string name="success_snack_add_attendees">Uitnodiging verstuurd en deelnemers toegevoegd</string>
+    <string name="success_snack_remove_attendees_recurring">Annulering verstuurd en de deelnemers zijn verwijderd uit alle afspraken</string>
+    <string name="success_snack_remove_attendees">Annulering verstuurd en deelnemers zijn verwijderd</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mijn agenda\'s</string>
     <string name="nav_view_subscribed_calendars">Geabonneerde agenda\'s</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Antwoord bijwerken</string>
     <string name="snack_event_part_stat_updated">Deelnamestatus bijgewerkt.</string>
     <string name="snack_event_updated">Afspraak bijgewerkt</string>
+    <string name="snack_event_updated_recurring">Alle afspraken bijgewerkt</string>
     <string name="snack_event_updated_error_failed_mail">Uitnodiging kon niet verzonden worden</string>
     <string name="snack_update_event_error_failed_mail">Update mislukt</string>
     <string name="snack_event_updated_error">Fout bij bijwerken afspraak</string>

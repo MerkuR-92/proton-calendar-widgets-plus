@@ -40,6 +40,7 @@
     <string name="action_done">Гатова</string>
     <string name="action_edit">Рэдагаваць</string>
     <string name="action_delete">Выдаліць</string>
+    <string name="action_add">Дадаць</string>
     <string name="action_remove">Выдаліць</string>
     <string name="action_leave">Выйсці</string>
     <string name="action_recreate">Ачысціць</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Немагчыма змяніць удзельнікаў, якія звязаны з запрашэннямі.</string>
     <string name="change_calendar_recurring_disclaimer">Змяненне календара для перыядычных падзей пакуль немагчыма.</string>
     <string name="update_event">Абнавіць падзею</string>
-    <string name="update_invite_send_email">Удзельнікам мерапрыемства будзе адпраўлена запрашэнне.</string>
+    <string name="update_invite_send_email">Удзельнікам мерапрыемства будзе адпраўлена абнаўленне запрашэння.</string>
     <string name="update_recurring_event">Абнавіць перыядычную падзею</string>
     <string name="update_recurring_all_events">Ці хочаце вы абнавіць усе падзеі ў гэтай серыі?</string>
-    <string name="update_recurring_invite_send_email">Вы абновіце ўсе падзеі ў гэтай серыі. Удзельнікам падзеі будзе адпраўлена запрашэнне.</string>
+    <string name="update_recurring_invite_send_email">Вы абновіце ўсе падзеі ў гэтай серыі. Удзельнікам падзеі будзе адпраўлена абноўленае запрашэнне.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Што вы шукаеце?</string>
     <string name="search_empty_results_title">Нічога не знойдзена</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Адправіць</string>
     <string name="event_send_invite_dialog_cancel">Скасаваць</string>
     <string name="event_add_participants_dialog_title">Дадаць удзельнікаў</string>
+    <string name="event_add_participants_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне.</string>
     <string name="recurring_event_add_participants_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Дададзеным удзельнікам будзе адпраўлена запрашэнне на ўсе падзеі ў гэтай серыі.\nПапярэднія змяненні ў гэтай серыі будуць страчаны.</string>
     <string name="event_add_participants_dialog_confirm">Адправіць</string>
     <string name="event_add_participants_dialog_cancel">Скасаваць</string>
+    <string name="event_remove_participants_dialog_title">Выдаліць удзельнікаў</string>
+    <string name="event_remove_participants_dialog_description">Ліст пра скасаванне будзе адпраўлены выдаленым удзельнікам.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Ліст пра скасаванне будзе адпраўлены выдаленым удзельнікам для ўсіх падзей у гэтай серыі.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне пра ўсе падзеі ў гэтай серыі.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было скасавана.</string>
+    <string name="event_save_changes">Захаваць змены</string>
+    <string name="event_update_add_participants_dialog_description">Існуючыя і дададзеныя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Вы абновіце ўсе падзеі ў гэтай серыі. Існуючыя і дададзеныя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="event_update_remove_participants_dialog_description">Існуючыя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Вы абновіце ўсе падзеі ў гэтай серыі. Існуючыя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Вы абновіце ўсе падзеі ў гэтай серыі. Выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Існуючыя, дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнні.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Вы абновіце ўсе падзеі ў гэтай серыі. Існуючыя, дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
+    <string name="success_snack_email_update_recurring">Удзельнікі атрымалі апавяшчэнне і ўсе падзеі абноўлены</string>
+    <string name="success_snack_email_update">Удзельнікі атрымалі апавяшчэнне і падзея абноўлена</string>
+    <string name="success_snack_add_attendees_recurring">Запрашэнне адпраўлена і ўдзельнікі дададзены да ўсіх падзей</string>
+    <string name="success_snack_add_attendees">Запрашэнне адпраўлена і ўдзельнікі дададзены</string>
+    <string name="success_snack_remove_attendees_recurring">Скасаванне адпраўлена і ўдзельнікі выдалены з усіх падзей</string>
+    <string name="success_snack_remove_attendees">Скасаванне адпраўлена і ўдзельнікі выдалены</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Мае календары</string>
     <string name="nav_view_subscribed_calendars">Падпісаныя календары</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Абнаўленне адказу</string>
     <string name="snack_event_part_stat_updated">Статус удзелу абноўлены.</string>
     <string name="snack_event_updated">Падзея абноўлена</string>
+    <string name="snack_event_updated_recurring">Усе падзеі абноўлены</string>
     <string name="snack_event_updated_error_failed_mail">Не ўдалося адправіць запрашэнне</string>
     <string name="snack_update_event_error_failed_mail">Збой абнаўлення</string>
     <string name="snack_event_updated_error">Памылка абнаўлення падзеі</string>
@@ -435,7 +458,7 @@
     <string name="settings_calendars_empty">Календары не знойдзены</string>
     <string name="settings_subscribed_calendars">Падпісаныя календары</string>
     <string name="settings_other_calendars">Іншыя календары</string>
-    <string name="settings_calendar_default" comment="Default calendar">Прадвызначана</string>
+    <string name="settings_calendar_default" comment="Default calendar">Прадвызначаны</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Адключана</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Не сінхранізавана</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">Сінхранізацыя</string>

@@ -20,9 +20,9 @@
     <string name="dialog_button_update">Actualizar</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Se enviará un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar este evento?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Tu dirección está deshabilitada. No se puede enviar un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar este evento de todos modos?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Tu dirección está desactivada. No se puede enviar un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar este evento de todos modos?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">Se enviará un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar todos los eventos de esta serie?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Tu dirección está deshabilitada. No se puede enviar un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar todos los eventos de esta serie de todos modos?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Tu dirección está desactivada. No se puede enviar un correo electrónico de cancelación a los participantes del evento. ¿Quieres eliminar todos los eventos de esta serie de todos modos?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">Se notificará al organizador de esta serie de eventos de que rechazas la invitación. ¿Quieres eliminar este evento de todos modos?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">El organizador de este evento no será notificado de que rechazas la invitación porque no puedes enviar correos electrónicos desde la dirección invitada. ¿Quieres eliminar este evento de todos modos?</string>
@@ -40,6 +40,7 @@
     <string name="action_done">Hecho</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="action_add">Añadir</string>
     <string name="action_remove">Eliminar</string>
     <string name="action_leave">Abandonar</string>
     <string name="action_recreate">Limpiar</string>
@@ -79,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">hasta el %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancelado</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitado)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s &lt;i&gt;(Desactivado)&lt;/i&gt;]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d quizás</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Aún no es posible modificar los participantes asociados a invitaciones.</string>
     <string name="change_calendar_recurring_disclaimer">Todavía no es posible cambiar el calendario de un evento periódico.</string>
     <string name="update_event">Actualizar el evento</string>
-    <string name="update_invite_send_email">Se enviará una invitación a los participantes del evento.</string>
+    <string name="update_invite_send_email">Se enviará una actualización de la invitación a los participantes del evento.</string>
     <string name="update_recurring_event">Actualizar el evento recurrente</string>
     <string name="update_recurring_all_events">¿Quieres actualizar todos los eventos de esta serie?</string>
-    <string name="update_recurring_invite_send_email">Actualizarás todos los eventos de esta serie. Se enviará una invitación a los participantes del evento.</string>
+    <string name="update_recurring_invite_send_email">Actualizarás todos los eventos de esta serie. Se enviará una actualización de invitación a los participantes del evento.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">¿Qué estás buscando?</string>
     <string name="search_empty_results_title">No se han encontrado resultados.</string>
@@ -258,16 +259,37 @@
     <string name="event_send_invite_dialog_confirm">Enviar</string>
     <string name="event_send_invite_dialog_cancel">Cancelar</string>
     <string name="event_add_participants_dialog_title">Añadir participantes</string>
+    <string name="event_add_participants_dialog_description">Se enviará una invitación a los participantes añadidos.</string>
     <string name="recurring_event_add_participants_dialog_description">Se enviará una invitación a los participantes añadidos para todos los eventos de esta serie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Se enviará una invitación a los participantes añadidos para todos los eventos de esta serie.\nLas modificaciones anteriores de esta serie se perderán.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
+    <string name="event_remove_participants_dialog_title">Eliminar los participantes</string>
+    <string name="event_remove_participants_dialog_description">Se enviará un correo eléctronico de cancelación a los participantes eliminados.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes eliminados para todos los eventos de esta serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y eliminados.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y eliminados de todos los eventos de esta serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s ha sido cancelado.</string>
+    <string name="event_save_changes">Guardar los cambios</string>
+    <string name="event_update_add_participants_dialog_description">Se notificarán a los participantes existentes y añadidos.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes y añadidos.</string>
+    <string name="event_update_remove_participants_dialog_description">Se notificarán a los participantes existentes y eliminados.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Se notificarán a los participantes eliminados.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes y eliminados.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes eliminados.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Se notificarán a los participantes existentes, añadidos y eliminados.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes, añadidos y eliminados.</string>
+    <string name="success_snack_email_update_recurring">Los participantes han sido notificados y todos los eventos han sido actualizados.</string>
+    <string name="success_snack_email_update">Los participantes han sido notificados y el evento ha sido actualizado.</string>
+    <string name="success_snack_add_attendees_recurring">La invitación ha sido enviada y los participantes han sido añadidos a todos los eventos.</string>
+    <string name="success_snack_add_attendees">La invitación ha sido enviada y los participantes han sido añadidos.</string>
+    <string name="success_snack_remove_attendees_recurring">Se ha enviado la cancelación y se han eliminado los participantes de todos los eventos.</string>
+    <string name="success_snack_remove_attendees">Se ha enviado la cancelación y se han eliminado los participantes.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mis calendarios</string>
     <string name="nav_view_subscribed_calendars">Calendarios suscritos</string>
     <string name="nav_view_other_calendars">Otros calendarios</string>
-    <string name="nav_view_disabled_calendars">%1$s (deshabilitado)</string>
+    <string name="nav_view_disabled_calendars">%1$s (desactivado)</string>
     <string name="nav_view_not_synced_calendars">%1$s (no sincronizado)</string>
     <string name="nav_view_syncing_calendars">%1$s (sincronizando)</string>
     <string name="nav_view_more">Más</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Actualizando respuesta</string>
     <string name="snack_event_part_stat_updated">Estado de la participación actualizado.</string>
     <string name="snack_event_updated">Evento actualizado</string>
+    <string name="snack_event_updated_recurring">Se han actualizado todos los eventos.</string>
     <string name="snack_event_updated_error_failed_mail">Error al enviar la invitación</string>
     <string name="snack_update_event_error_failed_mail">Error al actualizar</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
@@ -356,7 +379,7 @@
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles.</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento.</string>
     <string name="snack_ics_invalid_error">Esta invitación no es válida.</string>
-    <string name="snack_ics_disabled_calendar_error">Rehabilita la dirección vinculada a este calendario para actualizar este evento.</string>
+    <string name="snack_ics_disabled_calendar_error">Reactiva la dirección vinculada a este calendario para actualizar este evento.</string>
     <string name="snack_ics_event_deleted_error">El evento ya no existe en tu calendario.</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s ha aceptado tu invitación.</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ha aceptado provisionalmente tu invitación.</string>
@@ -436,7 +459,7 @@
     <string name="settings_subscribed_calendars">Calendarios suscritos</string>
     <string name="settings_other_calendars">Otros calendarios</string>
     <string name="settings_calendar_default" comment="Default calendar">Por defecto</string>
-    <string name="settings_calendar_disabled" comment="Disabled calendar">Deshabilitado</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Desactivado</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">No sincronizado</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">Sincronizando</string>
     <string name="settings_calendar_subscribed_invalid_ics">Formato de calendario no compatible</string>
@@ -541,7 +564,7 @@
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_skip">Omitir</string>
     <string name="spotlight_dialog_confirmation_button">Aceptar</string>
-    <string name="spotlight_dialog_month_view_title">Vista de mes</string>
+    <string name="spotlight_dialog_month_view_title">Vista mensual</string>
     <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas utilizando el menú.</string>
     <string name="spotlight_dialog_easy_switch_description">Importar eventos y otros datos de Google Calendar a Proton Calendar es más fácil que nunca. Nuestro importador Easy Switch te guiará con cada paso.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Iniciar importación</string>
