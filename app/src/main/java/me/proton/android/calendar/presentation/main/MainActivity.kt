@@ -1184,9 +1184,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         lifecycleScope.launch {
-            binding.navViewMainContent.navViewMoreSubscriptionLayout.visibleOrGone(
-                plansViewModel.isSubscriptionFlowAvailable()
-            )
+            plansViewModel.isSubscriptionFlowAvailable().collect {
+                binding.navViewMainContent.navViewMoreSubscriptionLayout.visibleOrGone(it)
+            }
         }
         binding.navViewMainContent.navViewMoreSubscriptionPress.setOnSingleClickListener {
             plansViewModel.onCurrentPlanClicked(this)
