@@ -4,7 +4,9 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.payment.domain.PaymentManager
@@ -29,9 +31,9 @@ class PlansViewModel @Inject constructor(
 
     private fun getPrimaryUserId() = accountManager.getPrimaryUserId()
 
-    suspend fun isSubscriptionFlowAvailable(): Boolean = getPrimaryUserId().first()?.let {
-        paymentManager.isSubscriptionAvailable(it)
-    } ?: false
+    fun isSubscriptionFlowAvailable(): Flow<Boolean> = getPrimaryUserId().map {
+        it != null && paymentManager.isSubscriptionAvailable(it)
+    }
 
     fun onPlansUpgradeClicked(context: ComponentActivity) {
         viewModelScope.launch {
