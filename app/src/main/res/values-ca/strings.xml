@@ -40,6 +40,7 @@
     <string name="action_done">Fet</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Elimina</string>
+    <string name="action_add">Afegeix</string>
     <string name="action_remove">Suprimeix</string>
     <string name="action_leave">Deixa</string>
     <string name="action_recreate">Neteja</string>
@@ -148,13 +149,13 @@
     <string name="event_text_timezone_start">Zona horària</string>
     <string name="invite_in_shared_calendar_disclaimer">L\'enviament d\'invitacions només està disponible en calendaris personals.</string>
     <string name="invite_change_calendar_disclaimer">No és possible modificar el calendari associat amb invitacions.</string>
-    <string name="invite_change_attendees_disclaimer">Encara no és possible modificar els participants associats amb invitacions.</string>
+    <string name="invite_change_attendees_disclaimer">No és encara possible modificar els participants associats amb invitacions.</string>
     <string name="change_calendar_recurring_disclaimer">El canvi de calendari per a un esdeveniment recurrent encara no està disponible.</string>
     <string name="update_event">Actualitza l\'esdeveniment</string>
-    <string name="update_invite_send_email">S\'enviarà una invitació als participants de l\'esdeveniment.</string>
+    <string name="update_invite_send_email">S\'enviarà una actualització de la invitació als participants de l\'esdeveniment.</string>
     <string name="update_recurring_event">Actualitza l\'esdeveniment recurrent</string>
     <string name="update_recurring_all_events">Voleu actualitzar tots els esdeveniments d\'aquesta sèrie?</string>
-    <string name="update_recurring_invite_send_email">Actualitzareu tots els esdeveniments d\'aquesta sèrie. S\'enviarà una invitació als participants de l\'esdeveniment.</string>
+    <string name="update_recurring_invite_send_email">Actualitzareu tots els esdeveniments d\'aquesta sèrie. S\'enviarà una actualització de la invitació als participants de l\'esdeveniment.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Què esteu buscant?</string>
     <string name="search_empty_results_title">No s\'ha trobat cap resultat.</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Enviar</string>
     <string name="event_send_invite_dialog_cancel">Cancel·la</string>
     <string name="event_add_participants_dialog_title">Afegir participants</string>
+    <string name="event_add_participants_dialog_description">S\'enviarà una invitació als participants afegits.</string>
     <string name="recurring_event_add_participants_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.\nEs perdran les modificacions prèvies d\'aquesta sèrie.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancel·la</string>
+    <string name="event_remove_participants_dialog_title">Suprimeix els participants</string>
+    <string name="event_remove_participants_dialog_description">S\'enviarà un correu electrònic de cancel·lació als participants suprimits.</string>
+    <string name="recurring_event_remove_participants_dialog_description">S\'enviarà un correu de cancel·lació als participants suprimits per a tots els esdeveniments d\'aquesta sèrie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Els participants afegits i els suprimits seran notificats.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Els participants afegits i els suprimits seran notificats de tots els esdeveniments d\'aquesta sèrie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s s\'ha cancel·lat.</string>
+    <string name="event_save_changes">Desa els canvis</string>
+    <string name="event_update_add_participants_dialog_description">Els participants existents i els afegits seran notificats.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els afegits seran notificats.</string>
+    <string name="event_update_remove_participants_dialog_description">Els participants existents i els suprimits seran notificats.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Els participants suprimits seran notificats.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els suprimits seran notificats.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants suprimits seran notificats.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Els participants existents, els afegits i els suprimits seran notificats.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents, els afegits i els suprimits seran notificats.</string>
+    <string name="success_snack_email_update_recurring">S\'ha notificat als participants i s\'han actualitzat tots els esdeveniments.</string>
+    <string name="success_snack_email_update">S\'ha notificat als participants i s\'ha actualitzat l\'esdeveniment.</string>
+    <string name="success_snack_add_attendees_recurring">S\'ha enviat la invitació i s\'han afegit els participants a tots els esdeveniments.</string>
+    <string name="success_snack_add_attendees">S\'ha enviat la invitació i s\'han afegit els participants.</string>
+    <string name="success_snack_remove_attendees_recurring">S\'ha enviat la cancel·lació i s\'han suprimit els participants de tots els esdeveniments.</string>
+    <string name="success_snack_remove_attendees">S\'ha enviat la cancel·lació i s\'han suprimit els participants.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Els meus calendaris</string>
     <string name="nav_view_subscribed_calendars">Calendaris subscrits</string>
@@ -299,8 +321,9 @@
     <string name="snack_event_changing_answer">Actualitzant la resposta</string>
     <string name="snack_event_part_stat_updated">S\'ha actualitzat l\'estat de participació.</string>
     <string name="snack_event_updated">Esdeveniment actualitzat</string>
+    <string name="snack_event_updated_recurring">S\'han actualitzat tots els esdeveniments.</string>
     <string name="snack_event_updated_error_failed_mail">No s\'ha pogut enviar la invitació.</string>
-    <string name="snack_update_event_error_failed_mail">Error en l\'actualització</string>
+    <string name="snack_update_event_error_failed_mail">No s\'ha pogut actualitzar</string>
     <string name="snack_event_updated_error">Error actualitzant l\'esdeveniment</string>
     <string name="snack_event_created">Esdeveniment creat</string>
     <string name="snack_event_created_failed_mail">S\'ha creat l\'esdeveniment, però no s\'ha pogut enviar la invitació.</string>
@@ -596,7 +619,7 @@
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">S\'estan important dades de %1s a %2s.</string>
     <string name="import_assistant_in_progress_redirect">Comprova el progrés</string>
     <string name="import_assistant_in_progress_sub_description">Les importacions grans poden trigar dies. Us avisarem quan la importació hagi acabat. Podeu tancar aquesta finestra.</string>
-    <string name="import_assistant_guide_subtitle">Feu el canvi a la privacitat de manera fàcil i segura.</string>
+    <string name="import_assistant_guide_subtitle">Feu el canvi a la privacitat. De manera fàcil i segura.</string>
     <string name="import_assistant_guide_description">Moveu els vostres esdeveniments i altres dades de Google a Proton. L\'importador Easy Switch us guiarà durant tot el procés i encriptarà la informació a mesura que es mou.</string>
     <string name="import_assistant_new_import">Nova importació</string>
     <string name="import_assistant_previous_import">Importacions anteriors</string>
@@ -610,7 +633,7 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">En pausa</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Error</string>
     <string name="import_assistant_status_paused_lost_connection_title">Connexió amb Google perduda</string>
-    <string name="import_assistant_status_paused_lost_connection_description">Per a continuar amb la importació, toqueu Reconnecta, inicieu la sessió a Google i doneu permís a Proton per accedir a les dades de Google un altre cop.</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Per a continuar amb la importació, toqueu Reconnecta, inicieu la sessió a Google i doneu permís a Proton per a tornar a accedir a les dades de Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnecta</string>
     <string name="import_assistant_status_paused_storage_full_title">L\'emmagatzematge és ple.</string>
     <string name="import_assistant_status_paused_storage_full_description">El vostre compte de Proton no té prou emmagatzematge per a finalitzar la importació d\'aquest calendari. Allibereu espai o afegiu més emmagatzematge. Després, torneu aquí per a continuar.</string>

@@ -40,6 +40,7 @@
     <string name="action_done">完成</string>
     <string name="action_edit">編輯</string>
     <string name="action_delete">刪除</string>
+    <string name="action_add">新增</string>
     <string name="action_remove">移除</string>
     <string name="action_leave">離開</string>
     <string name="action_recreate">清除</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">無法變動邀請函相關的參與人員</string>
     <string name="change_calendar_recurring_disclaimer">尚無法變更定期行程的行事曆。</string>
     <string name="update_event">更新行程</string>
-    <string name="update_invite_send_email">邀請函將傳送至活動參與人員</string>
+    <string name="update_invite_send_email">邀請更新將發送給各事件參與者。</string>
     <string name="update_recurring_event">更新定期行程</string>
     <string name="update_recurring_all_events">請問您是否要更新這一系列的所有行程？</string>
-    <string name="update_recurring_invite_send_email">您將要更新此系列中全部的行程。邀請將會傳送給行程參與者。</string>
+    <string name="update_recurring_invite_send_email">您即將更新此一系列中全部事件。邀請更新將發送給各事件參與者。</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">您正在找什麼呢？</string>
     <string name="search_empty_results_title">查無結果</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">傳送</string>
     <string name="event_send_invite_dialog_cancel">取消</string>
     <string name="event_add_participants_dialog_title">加入參與者</string>
+    <string name="event_add_participants_dialog_description">邀請將傳送給已新增的參與者。</string>
     <string name="recurring_event_add_participants_dialog_description">邀請將傳給此系列中全部活動的參與者。</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">邀請將傳給此系列中全部活動的參與者。\n此系列中先前所作的修改將會消失。</string>
     <string name="event_add_participants_dialog_confirm">傳送</string>
     <string name="event_add_participants_dialog_cancel">取消</string>
+    <string name="event_remove_participants_dialog_title">移除參與者</string>
+    <string name="event_remove_participants_dialog_description">取消電子郵件將傳送給已移除的參與者。</string>
+    <string name="recurring_event_remove_participants_dialog_description">取消電子郵件將傳送給此一系列中全部事件的已移除參與者。</string>
+    <string name="event_add_and_remove_participants_dialog_description">已加入及已移除的參與者將獲通知。</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">已加入及已移除的參與者將獲通知此一系列中的全部事件。</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s 已取消。</string>
+    <string name="event_save_changes">儲存變更</string>
+    <string name="event_update_add_participants_dialog_description">現有及已加入的參與者將獲通知。</string>
+    <string name="recurring_event_update_add_participants_dialog_description">您即將更新此一系列中全部事件。現有及已加入的參與者將獲通知。</string>
+    <string name="event_update_remove_participants_dialog_description">現有及已移除的參與者將獲通知。</string>
+    <string name="event_update_remove_all_participants_dialog_description">已移除的參與者將獲通知。</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">您即將更新此一系列中全部事件。現有及已移除的參與者將獲通知。</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">您即將更新此一系列中全部事件。已移除的參與者將獲通知。</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">現有、已加入及已移除的參與者將獲通知。</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">您即將更新此一系列中全部事件。現有、已加入及已移除的參與者將獲通知。</string>
+    <string name="success_snack_email_update_recurring">參與者已通知，並且已更新全部事件</string>
+    <string name="success_snack_email_update">參與者已通知，並且已更新事件</string>
+    <string name="success_snack_add_attendees_recurring">邀請已送出，並且已加入參與者到全部事件</string>
+    <string name="success_snack_add_attendees">邀請已送出，並且已加入參與者</string>
+    <string name="success_snack_remove_attendees_recurring">取消已送出，並且已從全部事件中移除參與者</string>
+    <string name="success_snack_remove_attendees">取消已送出，並且已移除參與者</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">我的行事曆</string>
     <string name="nav_view_subscribed_calendars">已訂購授權的行事曆</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">正在更新回答</string>
     <string name="snack_event_part_stat_updated">已更新出席狀態。</string>
     <string name="snack_event_updated">活動已更新</string>
+    <string name="snack_event_updated_recurring">所有活動已更新</string>
     <string name="snack_event_updated_error_failed_mail">邀請傳送失敗</string>
     <string name="snack_update_event_error_failed_mail">更新失敗</string>
     <string name="snack_event_updated_error">更新活動時發生錯誤</string>

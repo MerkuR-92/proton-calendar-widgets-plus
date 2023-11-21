@@ -40,6 +40,7 @@
     <string name="action_done">Fertig</string>
     <string name="action_edit">Bearbeiten</string>
     <string name="action_delete">Löschen</string>
+    <string name="action_add">Hinzufügen</string>
     <string name="action_remove">Entfernen</string>
     <string name="action_leave">Verlassen</string>
     <string name="action_recreate">Leeren</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Es ist noch nicht möglich, die mit Einladungen verbundenen Teilnehmer zu ändern.</string>
     <string name="change_calendar_recurring_disclaimer">Das Ändern des Kalenders für wiederkehrende Termine ist noch nicht möglich.</string>
     <string name="update_event">Termin aktualisieren</string>
-    <string name="update_invite_send_email">Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
+    <string name="update_invite_send_email">Ein aktualisiertes Einladungsschreiben wird an die Teilnehmer des Termins gesendet.</string>
     <string name="update_recurring_event">Terminserie aktualisieren</string>
     <string name="update_recurring_all_events">Möchtest du alle Termine dieser Serie aktualisieren?</string>
-    <string name="update_recurring_invite_send_email">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Eine Einladung wird an die Teilnehmer des Termins gesendet.</string>
+    <string name="update_recurring_invite_send_email">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Vorhandene und entfernte Teilnehmer werden darüber informiert.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Wonach suchst du?</string>
     <string name="search_empty_results_title">Keine Ergebnisse gefunden</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Senden</string>
     <string name="event_send_invite_dialog_cancel">Abbrechen</string>
     <string name="event_add_participants_dialog_title">Teilnehmer hinzufügen</string>
+    <string name="event_add_participants_dialog_description">Eine Einladung wird an die hinzugefügten Teilnehmer gesendet.</string>
     <string name="recurring_event_add_participants_dialog_description">Für alle Termine dieser Serie wird eine Einladung an neu hinzugefügte Teilnehmer gesendet.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Für alle Termine in dieser Serie wird eine Einladung an hinzugefügte Teilnehmer gesendet.\nVorherige Änderungen an dieser Terminserie gehen dabei verloren.</string>
     <string name="event_add_participants_dialog_confirm">Senden</string>
     <string name="event_add_participants_dialog_cancel">Abbrechen</string>
+    <string name="event_remove_participants_dialog_title">Teilnehmer entfernen</string>
+    <string name="event_remove_participants_dialog_description">Eine Absage-E-Mail wird an die entfernten Teilnehmer gesendet.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Für alle Termine dieser Serie wird eine Absage-E-Mail an die entfernten Teilnehmer gesendet.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Hinzugefügte und entfernte Teilnehmer werden darüber informiert.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Hinzugefügte und entfernte Teilnehmer werden über alle Termine in dieser Serie benachrichtigt.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s wurde abgesagt.</string>
+    <string name="event_save_changes">Änderungen speichern</string>
+    <string name="event_update_add_participants_dialog_description">Vorhandene und hinzugefügte Teilnehmer werden benachrichtigt.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Vorhandene und hinzugefügte Teilnehmer werden darüber informiert.</string>
+    <string name="event_update_remove_participants_dialog_description">Vorhandene und entfernte Teilnehmer werden benachrichtigt.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Entfernte Teilnehmer werden benachrichtigt.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Vorhandene und entfernte Teilnehmer werden darüber informiert.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Entfernte Teilnehmer werden darüber informiert.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Vorhandene, hinzugefügte und entfernte Teilnehmer werden benachrichtigt.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Du bist dabei, alle Termine in dieser Serie zu aktualisieren. Vorhandene, hinzugefügte und entfernte Teilnehmer werden darüber informiert.</string>
+    <string name="success_snack_email_update_recurring">Teilnehmer benachrichtigt und alle Termine aktualisiert.</string>
+    <string name="success_snack_email_update">Teilnehmer benachrichtigt und Termin aktualisiert.</string>
+    <string name="success_snack_add_attendees_recurring">Einladung gesendet und Teilnehmer zu allen Terminen hinzugefügt.</string>
+    <string name="success_snack_add_attendees">Einladung gesendet und Teilnehmer hinzugefügt.</string>
+    <string name="success_snack_remove_attendees_recurring">Absage gesendet und Teilnehmer aus allen Terminen entfernt.</string>
+    <string name="success_snack_remove_attendees">Absage gesendet und Teilnehmer entfernt.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Meine Kalender</string>
     <string name="nav_view_subscribed_calendars">Abonnierte Kalender</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Antwort wird aktualisiert</string>
     <string name="snack_event_part_stat_updated">Teilnahmestatus aktualisiert.</string>
     <string name="snack_event_updated">Termin aktualisiert</string>
+    <string name="snack_event_updated_recurring">Alle Termine aktualisiert</string>
     <string name="snack_event_updated_error_failed_mail">Einladung konnte nicht gesendet werden</string>
     <string name="snack_update_event_error_failed_mail">Aktualisierung fehlgeschlagen</string>
     <string name="snack_event_updated_error">Fehler beim Aktualisieren des Termins</string>
@@ -347,7 +370,7 @@
     <string name="snack_ics_unsupported_refresh_error">Das Aktualisieren von Terminen wird derzeit nicht unterstützt</string>
     <string name="snack_ics_unsupported_publish_error">Terminimport wird derzeit nicht unterstützt</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Derzeit wird nur das Antworten auf alle Termine einer Serie unterstützt</string>
-    <string name="snack_ics_party_crasher_error">Deine E-Mail-Adresse ist nicht in der Teilnehmerliste.</string>
+    <string name="snack_ics_party_crasher_error">Deine E-Mail ist nicht auf der Teilnehmerliste.</string>
     <string name="snack_ics_reply_party_crasher_error">Teilnehmer, die nicht vom Organisator eingeladen wurden, können nicht hinzugefügt werden</string>
     <string name="snack_ics_missing_uid_error">Dem Termin fehlt die UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">Diesem Konto ist kein aktiver persönlicher Kalender zugeordnet.</string>

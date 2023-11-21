@@ -40,6 +40,7 @@
     <string name="action_done">Terminé</string>
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
+    <string name="action_add">Ajouter</string>
     <string name="action_remove">Supprimer</string>
     <string name="action_leave">Quitter</string>
     <string name="action_recreate">Supprimer le contenu</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Il n\'est pas encore possible de modifier les participants liés aux invitations.</string>
     <string name="change_calendar_recurring_disclaimer">Il n\'est pas encore possible de déplacer un événement récurrent dans un autre calendrier.</string>
     <string name="update_event">Mettre à jour l\'événement</string>
-    <string name="update_invite_send_email">Une invitation sera envoyée aux participants.</string>
+    <string name="update_invite_send_email">Une mise à jour de l\'invitation sera envoyée aux participants.</string>
     <string name="update_recurring_event">Mettre à jour l\'événement récurrent</string>
     <string name="update_recurring_all_events">Voulez-vous mettre à jour tous les événements de cette série ?</string>
-    <string name="update_recurring_invite_send_email">Vous allez mettre à jour tous les événements de cette série. Une invitation sera envoyée aux participants.</string>
+    <string name="update_recurring_invite_send_email">Vous allez mettre à jour tous les événements de cette série. Une mise à jour de l\'invitation sera envoyée aux participants.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Que recherchez-vous ?</string>
     <string name="search_empty_results_title">Aucun résultat n\'a été trouvé.</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Envoyer</string>
     <string name="event_send_invite_dialog_cancel">Annuler</string>
     <string name="event_add_participants_dialog_title">Ajouter des participants</string>
+    <string name="event_add_participants_dialog_description">Une invitation sera envoyée aux participants ajoutés.</string>
     <string name="recurring_event_add_participants_dialog_description">Une invitation sera envoyée aux participants ajoutés pour tous les événements de cette série.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Une invitation sera envoyée aux participants ajoutés pour tous les événements de cette série.\nLes modifications précédentes de cette série seront perdues.</string>
     <string name="event_add_participants_dialog_confirm">Envoyer</string>
     <string name="event_add_participants_dialog_cancel">Annuler</string>
+    <string name="event_remove_participants_dialog_title">Supprimer des participants</string>
+    <string name="event_remove_participants_dialog_description">Un message d’annulation sera envoyé aux participants supprimés.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Un message d\'annulation sera envoyé aux participants supprimés pour tous les événements de cette série.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Les participants ajoutés et supprimés seront informés.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Les participants ajoutés et supprimés seront informés de tous les événements de cette série.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s a été annulé.</string>
+    <string name="event_save_changes">Enregistrer les modifications</string>
+    <string name="event_update_add_participants_dialog_description">Les participants existants et ajoutés seront informés.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants et ajoutés seront informés.</string>
+    <string name="event_update_remove_participants_dialog_description">Les participants existants et supprimés seront informés.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Les participants supprimés seront informés.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants et supprimés seront informés.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants supprimés seront informés.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Les participants existants, ajoutés et supprimés seront informés.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants, ajoutés et supprimés seront informés.</string>
+    <string name="success_snack_email_update_recurring">Les participants ont été informés et tous les événements ont été mis à jour.</string>
+    <string name="success_snack_email_update">Les participants ont été informés et l\'événement a été mis à jour.</string>
+    <string name="success_snack_add_attendees_recurring">L\'invitation a été envoyée et les participants ont été ajoutés à tous les événements.</string>
+    <string name="success_snack_add_attendees">L\'invitation a été envoyée et les participants ont été ajoutés.</string>
+    <string name="success_snack_remove_attendees_recurring">L\'annulation a été envoyée et les participants ont été supprimés de tous les événements.</string>
+    <string name="success_snack_remove_attendees">L\'annulation a été envoyée et les participants ont été supprimés.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mes calendriers</string>
     <string name="nav_view_subscribed_calendars">Calendriers souscrits</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">L\'événement est en cours de mise à jour.</string>
     <string name="snack_event_part_stat_updated">Le statut de participation a été mis à jour.</string>
     <string name="snack_event_updated">L\'événement a été mis à jour.</string>
+    <string name="snack_event_updated_recurring">Tous les événements ont été mis à jour.</string>
     <string name="snack_event_updated_error_failed_mail">L\'invitation n\'a pas pu être envoyée.</string>
     <string name="snack_update_event_error_failed_mail">La mise à jour n\'a pas abouti.</string>
     <string name="snack_event_updated_error">Une erreur s\'est produite pendant la mise à jour de l\'événement.</string>

@@ -40,6 +40,7 @@
     <string name="action_done">Valmis</string>
     <string name="action_edit">Muokkaa</string>
     <string name="action_delete">Poista</string>
+    <string name="action_add">Lisää</string>
     <string name="action_remove">Poista</string>
     <string name="action_leave">Poistu</string>
     <string name="action_recreate">Tyhjennä</string>
@@ -151,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">Kutsuihin liittyviä osallistujia ei ole vielä mahdollista muokata.</string>
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
-    <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään kutsu.</string>
+    <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään kutsupäivitys.</string>
     <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
     <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
-    <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään kutsu.</string>
+    <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään kutsupäivitys.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mitä etsit?</string>
     <string name="search_empty_results_title">Ei tuloksia</string>
@@ -258,11 +259,32 @@
     <string name="event_send_invite_dialog_confirm">Lähetä</string>
     <string name="event_send_invite_dialog_cancel">Peru</string>
     <string name="event_add_participants_dialog_title">Lisää osallistujia</string>
+    <string name="event_add_participants_dialog_description">Lisätyille osallistujille lähetetään kutsu.</string>
     <string name="recurring_event_add_participants_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Lisätyille osallistujille lähetetään kutsu ketjun kaikkiin tapahtumiin.\nKetjun aiemmat muutokset menetetään.</string>
     <string name="event_add_participants_dialog_confirm">Lähetä</string>
     <string name="event_add_participants_dialog_cancel">Peru</string>
+    <string name="event_remove_participants_dialog_title">Poista osallistujia</string>
+    <string name="event_remove_participants_dialog_description">Poistetuille osallistujille lähetetään perumisilmoitus sähköpostitse.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Poistetuille osallistujille lähetetään perumisilmoitus ketjun kaikkiin tapahtumiin sähköpostitse.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Lisätyille ja poistetuille osallistujille ilmoitetaan.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Lisätyille ja poistetuille osallistujille ilmoitetaan ketjun kaikista tapahtumista.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s on peruttu.</string>
+    <string name="event_save_changes">Tallenna muutokset</string>
+    <string name="event_update_add_participants_dialog_description">Nykyisille ja lisätyille osallistujille ilmoitetaan.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Nykyisille ja lisätyille osallistujille ilmoitetaan.</string>
+    <string name="event_update_remove_participants_dialog_description">Nykyisille ja poistetuille osallistujille ilmoitetaan.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Poistetuille osallistujille ilmoitetaan.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Nykyisille ja poistetuille osallistujille ilmoitetaan.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Poistetuille osallistujille ilmoitetaan.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Nykyisille, lisätyille ja poistetuille osallistujille ilmoitetaan.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Nykyisille, lisätyille ja poistetuille osallistujille ilmoitetaan.</string>
+    <string name="success_snack_email_update_recurring">Osallistuijille ilmoitettiin ja ketjun kaikki tapahtumat päivitettiin</string>
+    <string name="success_snack_email_update">Osallistuijille ilmoitettiin ja tapahtuma päivitettiin</string>
+    <string name="success_snack_add_attendees_recurring">Kutsu lähetettiin ja osallistujat lisättiin kaikkiin tapahtumiin</string>
+    <string name="success_snack_add_attendees">Kutsu lähetettiin ja osallistujat lisättiin</string>
+    <string name="success_snack_remove_attendees_recurring">Peruutus lähetettiin ja osallistujat poistettiin kaikista tapahtumista</string>
+    <string name="success_snack_remove_attendees">Peruutus lähetettiin ja osallistujat poistettiin</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Omat kalenterit</string>
     <string name="nav_view_subscribed_calendars">Tilatut kalenterit</string>
@@ -299,6 +321,7 @@
     <string name="snack_event_changing_answer">Päivitetään vastausta</string>
     <string name="snack_event_part_stat_updated">Osallistumistila päivitettiin</string>
     <string name="snack_event_updated">Tapahtuma päivitettiin</string>
+    <string name="snack_event_updated_recurring">Kaikki tapahtumat päivitettiin</string>
     <string name="snack_event_updated_error_failed_mail">Kutsun lähetys epäonnistui</string>
     <string name="snack_update_event_error_failed_mail">Päivitys epäonnistui</string>
     <string name="snack_event_updated_error">Virhe päivitettäessä tapahtumaa</string>
