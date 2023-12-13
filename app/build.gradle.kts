@@ -201,6 +201,7 @@ dependencies {
     implementation(libs.core.network)
     implementation(libs.core.observability)
     implementation(libs.core.payment)
+    implementation(libs.core.paymentIap)
     implementation(libs.core.plan)
     implementation(libs.core.proguard.rules)
     implementation(libs.core.presentation)
