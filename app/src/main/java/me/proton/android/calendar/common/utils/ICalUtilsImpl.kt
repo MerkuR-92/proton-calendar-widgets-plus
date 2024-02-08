@@ -393,6 +393,7 @@ object ICalUtilsImpl : ICalUtils {
                 // We use setProperty to avoid having duplicates, but we need to use addProperty for Attendees
                 // to properly add multiple ones
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
+                else if (iCalProperty::class == ExceptionDates::class) left.events.first().addProperty(iCalProperty)
                 else if (iCalProperty::class == DateTimeStamp::class) {
                     // Take latest DateTimeStamp
                     val leftDateTimeStamp = left.events.first().getProperty(DateTimeStamp::class.java)?.value
