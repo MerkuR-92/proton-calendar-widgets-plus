@@ -781,7 +781,6 @@ val aliasesTimezonesMap: Map<String, String> = mapOf(
     "Etc/GMT-0" to "UTC",
     "Etc/GMT0" to "UTC",
     "GMT" to "UTC",
-    "UTC" to "UTC",
     "Antarctica/McMurdo" to "Pacific/Auckland",
     "Pacific/Saipan" to "Pacific/Guam",
     "Pacific/Midway" to "Pacific/Pago_Pago",
