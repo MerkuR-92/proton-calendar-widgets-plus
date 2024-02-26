@@ -37,6 +37,7 @@ object UserMocks {
             dateFormat = UserSettings.DateFormat.enumOf(dateFormat),
             timeFormat = UserSettings.TimeFormat.enumOf(timeFormat),
             earlyAccess = null,
+            deviceRecovery = null,
             telemetry = null,
             crashReports = null
         )
@@ -49,6 +50,7 @@ object UserMocks {
             name = userName,
             displayName = userDisplayName,
             currency = currency,
+            type = userType,
             credit = credit,
             createdAtUtc = createdAtUtc,
             usedSpace = usedSpace,
