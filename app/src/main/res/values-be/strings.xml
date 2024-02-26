@@ -584,7 +584,7 @@
     <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функцыі календара</string>
     <string name="spotlight_dialog_calendar_provider_description">• Дадавайце падзеі непасрэдна ў Proton Calendar з іншых праграм.\n\n• Стварайце і кіруйце падзеямі ў календарах, якія абагулілі з вамі.\n\n• Задавайце менавіта той прадвызначаны выгляд, які вы хочаце бачыць пры адкрыцці праграмы.\n\n• Даступна 13 новых моў.</string>
-    <string name="spotlight_dialog_wipe_search_title">Мы выдалілі пошукавы радок</string>
+    <string name="spotlight_dialog_wipe_search_title">Пошук выдалены, каб зрабіць яго лепш</string>
     <string name="spotlight_dialog_wipe_search_description">Адбываецца выдаленне эксперыментальнага пошуку з Proton Calendar Beta па прычыне таго, што мы хочам зрабіць яго больш карысным і надзейным для вас. Гэта можа заняць некалькі секунд.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Дзяржаўныя святы знаходзяцца тут!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nДадайце дзяржаўныя святы любой краіны ў свой каляндар.</string>

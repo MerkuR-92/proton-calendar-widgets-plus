@@ -6,10 +6,10 @@
     <string name="default_user_display_name">(nessun nome)</string>
     <string name="toast_copied_to_clipboard">Copiato negli appunti</string>
     <!-- DELETE EVENT DIALOG -->
-    <string name="dialog_title_delete_event">Elimina evento</string>
+    <string name="dialog_title_delete_event">Elimina l\'evento</string>
     <string name="dialog_title_delete_recurring_event">Elimina l\'evento ricorrente</string>
-    <string name="dialog_description_delete_event">Vuoi cancellare questo evento?</string>
-    <string name="dialog_description_delete_recurring_event">Vuoi cancellare tutti gli eventi della serie?</string>
+    <string name="dialog_description_delete_event">Vuoi eliminare questo evento?</string>
+    <string name="dialog_description_delete_recurring_event">Vuoi eliminare tutti gli eventi della serie?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event">Questo evento è stato aggiornato dall\'organizzatore. Vuoi eliminare questo evento?</string>
     <string name="dialog_button_delete">Elimina</string>
     <string name="dialog_button_cancel">Annulla</string>
@@ -45,33 +45,33 @@
     <string name="action_leave">Abbandona</string>
     <string name="action_recreate">Cancella</string>
     <string name="action_today">Oggi</string>
-    <string name="action_create_event">Crea evento</string>
+    <string name="action_create_event">Crea un evento</string>
     <string name="action_mark_default">Segna come predefinito</string>
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">Nessun evento</string>
-    <string name="agenda_loading_events">Caricamento eventi…</string>
-    <string name="agenda_loading_events_error">Errore durante il caricamento degli eventi</string>
+    <string name="agenda_loading_events">Caricamento degli eventi in corso</string>
+    <string name="agenda_loading_events_error">Errore nel caricamento degli eventi</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
     <string name="day_view_all_day_more">+ %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Tutto il giorno</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
     <string name="event_time_period_spanning_many_days" comment="Example: Monday 12 January - Tuesday 13 January">%1$s \u2013\n%2$s</string>
-    <string name="event_alarm_label_at_event_time">All’ora dell’evento</string>
+    <string name="event_alarm_label_at_event_time">Al momento dell\'evento</string>
     <string name="event_alarm_label_at_event_time_by_email">Al momento dell\'evento via email</string>
     <string name="event_alarm_label_on_the_same_day">Lo stesso giorno</string>
     <string name="event_alarm_label_before">%1$s prima</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s prima via email</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s alle %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s a %2$s via email</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s alle %2$s via email</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s prima alle %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s prima alle %2$s via email</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s il %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s il giorno %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s ogni %2$s</string>
     <string name="event_recurrence_none">Nessuna ripetizione</string>
-    <string name="event_recurrence_daily">Giornaliero</string>
+    <string name="event_recurrence_daily">Giornaliera</string>
     <string name="event_recurrence_weekly">Settimanale</string>
     <string name="event_recurrence_monthly">Mensile</string>
     <string name="event_recurrence_yearly">Annuale</string>
@@ -199,7 +199,7 @@
     <string name="event_alarm_all_day_3">1 settimana prima alle %1$s</string>
     <string name="event_alarm_all_day_4">3 settimane prima alle %1$s</string>
     <string name="event_alarm_at_time" comment="Example: at 15:00">a %1$s</string>
-    <string name="event_alarm_action">Inviato da</string>
+    <string name="event_alarm_action">Invia tramite</string>
     <string name="event_alarm_action_notification">notifica</string>
     <string name="event_alarm_action_email">email</string>
     <string name="event_alarm_same_day">il giorno</string>
@@ -235,12 +235,12 @@
     <string name="event_allow_contacts_description">Proton Calendar ha bisogno di accedere ai tuoi contatti per fornirti il completamento automatico</string>
     <string name="event_allow_contacts_cancel">Nega</string>
     <string name="event_allow_contacts_confirm">Consenti</string>
-    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invito per un evento che inizia il %1$s alle %2$s %3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invito per un evento il %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invito per un evento che inizia il %1$s</string>
-    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invito per un evento che inizia il %1$s alle %2$s %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invito per un evento il %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invito per un evento che inizia il %1$s</string>
+    <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invito per un evento che inizia %1$s alle %2$s %3$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invito per un evento %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invito per un evento che inizia %1$s</string>
+    <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invito per un evento che inizia %1$s alle %2$s %3$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invito per un evento %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invito per un evento che inizia %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Aggiornamento per un evento che inizia il %1$s alle %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aggiornamento per un evento il %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aggiornamento per un evento che inizia il %1$s</string>
@@ -283,7 +283,7 @@
     <string name="success_snack_email_update">Partecipanti notificati e evento aggiornato</string>
     <string name="success_snack_add_attendees_recurring">Invito spedito e partecipanti aggiunti a tutti gli eventi</string>
     <string name="success_snack_add_attendees">Invito spedito e partecipanti aggiunti</string>
-    <string name="success_snack_remove_attendees_recurring">Annullamento inviato e partecipanti rimossi da tutti gli eventi</string>
+    <string name="success_snack_remove_attendees_recurring">Cancellazione inviata e partecipanti rimossi da tutti gli eventi</string>
     <string name="success_snack_remove_attendees">Annullamento inviato e partecipanti rimossi</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">I miei calendari</string>
@@ -429,19 +429,19 @@
     <string name="bug_report_discard_changes_confirm">Scarta</string>
     <!-- Settings -->
     <string name="settings_theme_title">Tema</string>
-    <string name="settings_theme_info">Questa impostazione influisce solo sull\'aspetto dell\'app Proton Calendar su questo dispositivo. L\'app si riavvierà dopo aver cambiato il tema.</string>
+    <string name="settings_theme_info">Questa impostazione influisce solo sull\'aspetto dell\'app Proton Calendar su questo dispositivo. L\'app verrà riavviata dopo aver cambiato il tema.</string>
     <string name="settings_timezone_title">Fuso orario</string>
-    <string name="settings_language_title">Lingua dell\'app</string>
+    <string name="settings_language_title">Lingua dell\'applicazione</string>
     <string name="settings_language_default">Riconoscimento automatico</string>
     <string name="settings_default_view_title">Visualizzazione predefinita</string>
     <string name="settings_default_view_default">Ultima visualizzazione</string>
-    <string name="settings_update_timezone_title">Richiedi di aggiornare l\'impostazione del fuso orario</string>
+    <string name="settings_update_timezone_title">Chiedi di aggiornare il fuso orario</string>
     <string name="settings_update_timezone_subtitle">Se il fuso orario di sistema non corrisponde all\'attuale impostazione del fuso orario, ti verrà chiesto di aggiornarlo.</string>
     <string name="settings_update_timezone_checkbox">Non chiedermelo più</string>
     <string name="settings_week_start_title">Inizio della settimana</string>
     <string name="settings_time_format_title">Formato dell\'orario</string>
     <string name="settings_week_numbers_title">Mostra i numeri delle settimane</string>
-    <string name="settings_auto_invites_title">Aggiungere gli inviti al calendario e segnarli come in attesa</string>
+    <string name="settings_auto_invites_title">Aggiungi gli inviti al calendario e segnali come in attesa</string>
     <string name="settings_search_title">Ricerca calendari</string>
     <string name="settings_search_subtitle">Scarica e archivia i contenuti del calendario sul tuo dispositivo per la ricerca. La disattivazione rimuoverà i contenuti scaricati.\n\nLa ricerca è una funzione sperimentale beta. Abilitarla potrebbe rendere instabile l\'app.</string>
     <string name="settings_alternative_routing_title">Consenti percorso alternativo</string>
@@ -564,7 +564,7 @@
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_skip">Salta</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
-    <string name="spotlight_dialog_month_view_title">Vista mensile</string>
+    <string name="spotlight_dialog_month_view_title">Visualizzazione mensile</string>
     <string name="spotlight_dialog_month_view_description">Ottieni una panoramica dei tuoi eventi con la nostra nuova vista del mese. Passa da una visualizzazione all\'altra utilizzando il menu.</string>
     <string name="spotlight_dialog_easy_switch_description">L\'importazione di eventi e altri dati da Google Calendar a Proton Calendar è più facile che mai. Il nostro importatore Easy Switch ti guiderà in ogni fase del processo.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Avvia importazione</string>
