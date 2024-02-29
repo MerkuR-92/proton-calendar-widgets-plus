@@ -20,9 +20,9 @@
     <string name="dialog_button_update">Güncelle</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu etkinliği silmek ister misiniz?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanım dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz kullanım dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">Bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilecek. Bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">Davet edilen adresten e-posta gönderemeyeceğiniz için bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">%1$s (%2$s) zamanına kadar</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">İptal edildi</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Kullanımdan kaldırılmış)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(kullanım dışı)</i>]]></string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d evet</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d belki</string>
@@ -289,7 +289,7 @@
     <string name="nav_view_calendars">Takvimlerim</string>
     <string name="nav_view_subscribed_calendars">Abone olunmuş takvimler</string>
     <string name="nav_view_other_calendars">Diğer takvimler</string>
-    <string name="nav_view_disabled_calendars">%1$s (kullanımdan kaldırılmış)</string>
+    <string name="nav_view_disabled_calendars">%1$s (kullanım dışı)</string>
     <string name="nav_view_not_synced_calendars">%1$s (eşitlenmemiş)</string>
     <string name="nav_view_syncing_calendars">%1$s (eşitleniyor)</string>
     <string name="nav_view_more">Diğer</string>
@@ -407,7 +407,7 @@
     <string name="dialog_title_calendar_picker">Takvim</string>
     <string name="import_from_google_title">Google üzerinden içe aktar</string>
     <string name="notifications_permission_dialog_title">Proton Calendar bildirimleri görüntülensin mi?</string>
-    <string name="notifications_permission_dialog_message">Proton Calendar yaklaşan etkinlik bildirimlerini gösterebilmek için izninizi istiyor.</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar yaklaşan etkinlik bildirimlerini görüntüleyebilmek için izninizi istiyor.</string>
     <string name="notifications_permission_dialog_open_settings">Ayarları aç</string>
     <string name="notifications_permission_dialog_cancel">Reddet</string>
     <!-- NOTIFICATIONS -->
@@ -445,7 +445,7 @@
     <string name="settings_search_title">Takvimlerde arama</string>
     <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Açılması, uygulamayı kararsız hale getirebilir.</string>
     <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
-    <string name="settings_alternative_routing_subtitle">Bu seçenek ile, Proton sitelerinin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yöneltmesini dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
+    <string name="settings_alternative_routing_subtitle">Açıldığında, uygulama Proton sitelerinin engellenmiş olması durumunda Proton ağına erişmek için alternatif ağ yöneltmesini dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
     <string name="settings_value_placeholder">Seçmek için dokunun</string>
     <string name="settings_general_title">Genel</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s vb.</string>
@@ -459,7 +459,7 @@
     <string name="settings_subscribed_calendars">Abone olunmuş takvimler</string>
     <string name="settings_other_calendars">Diğer takvimler</string>
     <string name="settings_calendar_default" comment="Default calendar">Varsayılan</string>
-    <string name="settings_calendar_disabled" comment="Disabled calendar">Kullanımdan kaldırılmış</string>
+    <string name="settings_calendar_disabled" comment="Disabled calendar">Kullanım dışı</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Eşitlenmemiş</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">Eşitleniyor</string>
     <string name="settings_calendar_subscribed_invalid_ics">Takvim biçimi desteklenmiyor</string>

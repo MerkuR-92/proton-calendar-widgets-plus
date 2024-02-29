@@ -15,7 +15,7 @@
     <string name="dialog_button_cancel">Annuler</string>
     <string name="dialog_button_continue">Continuer</string>
     <string name="dialog_button_close">Fermer</string>
-    <string name="dialog_button_remove">Supprimer</string>
+    <string name="dialog_button_remove">Retirer</string>
     <string name="dialog_button_download">Télécharger</string>
     <string name="dialog_button_update">Mettre à jour</string>
     <!-- Delete as an organizer -->
@@ -41,9 +41,9 @@
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_add">Ajouter</string>
-    <string name="action_remove">Supprimer</string>
+    <string name="action_remove">Retirer</string>
     <string name="action_leave">Quitter</string>
-    <string name="action_recreate">Supprimer le contenu</string>
+    <string name="action_recreate">Effacer</string>
     <string name="action_today">Aujourd\'hui</string>
     <string name="action_create_event">Créer un événement</string>
     <string name="action_mark_default">Définir par défaut</string>
@@ -165,7 +165,7 @@
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">Estimation du temps restant en cours</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">presque terminé</string>
     <string name="search_downloading_pause">Suspendre le téléchargement</string>
-    <string name="search_settings_dialog_toggle_off_title">Supprimer tous les calendriers téléchargés ?</string>
+    <string name="search_settings_dialog_toggle_off_title">Retirer tous les calendriers téléchargés ?</string>
     <string name="search_settings_dialog_toggle_off_text">Vous devrez à nouveau télécharger vos calendriers si vous voulez faire des recherches.</string>
     <string name="search_settings_dialog_toggle_on_title">Télécharger les calendriers sur cet appareil ?</string>
     <string name="search_settings_dialog_toggle_on_text">Ceci est nécessaire pour que vous puissiez faire des recherches.</string>
@@ -247,7 +247,7 @@
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annulation d’un événement %1$s à %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annulation d’un événement le %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulation d’un événement commençant %1$s</string>
-    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité(e) à %1$s.\nQuand : %2$s</string>
+    <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité à %1$s.\nQuand : %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s a été mis à jour.\nQuand : %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toute la journée)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
@@ -264,27 +264,27 @@
     <string name="recurring_event_add_participants_overwrite_dialog_description">Une invitation sera envoyée aux participants ajoutés pour tous les événements de cette série.\nLes modifications précédentes de cette série seront perdues.</string>
     <string name="event_add_participants_dialog_confirm">Envoyer</string>
     <string name="event_add_participants_dialog_cancel">Annuler</string>
-    <string name="event_remove_participants_dialog_title">Supprimer des participants</string>
-    <string name="event_remove_participants_dialog_description">Un message d’annulation sera envoyé aux participants supprimés.</string>
-    <string name="recurring_event_remove_participants_dialog_description">Un message d\'annulation sera envoyé aux participants supprimés pour tous les événements de cette série.</string>
-    <string name="event_add_and_remove_participants_dialog_description">Les participants ajoutés et supprimés seront informés.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Les participants ajoutés et supprimés seront informés de tous les événements de cette série.</string>
+    <string name="event_remove_participants_dialog_title">Retirer des participants</string>
+    <string name="event_remove_participants_dialog_description">Un message d’annulation sera envoyé aux participants retirés.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Un message d\'annulation sera envoyé aux participants retirés pour tous les événements de cette série.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Les participants ajoutés et retirés seront informés.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Les participants ajoutés et retirés seront informés de tous les événements de cette série.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s a été annulé.</string>
     <string name="event_save_changes">Enregistrer les modifications</string>
     <string name="event_update_add_participants_dialog_description">Les participants existants et ajoutés seront informés.</string>
     <string name="recurring_event_update_add_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants et ajoutés seront informés.</string>
-    <string name="event_update_remove_participants_dialog_description">Les participants existants et supprimés seront informés.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Les participants supprimés seront informés.</string>
-    <string name="recurring_event_update_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants et supprimés seront informés.</string>
-    <string name="recurring_event_update_remove_all_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants supprimés seront informés.</string>
-    <string name="event_update_add_and_remove_participants_dialog_description">Les participants existants, ajoutés et supprimés seront informés.</string>
-    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants, ajoutés et supprimés seront informés.</string>
+    <string name="event_update_remove_participants_dialog_description">Les participants existants et retirés seront informés.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Les participants retirés seront informés.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants et retirés seront informés.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants retirés seront informés.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Les participants existants, ajoutés et retirés seront informés.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Vous allez mettre à jour tous les événements de cette série. Les participants existants, ajoutés et retirés seront informés.</string>
     <string name="success_snack_email_update_recurring">Les participants ont été informés et tous les événements ont été mis à jour.</string>
     <string name="success_snack_email_update">Les participants ont été informés et l\'événement a été mis à jour.</string>
     <string name="success_snack_add_attendees_recurring">L\'invitation a été envoyée et les participants ont été ajoutés à tous les événements.</string>
     <string name="success_snack_add_attendees">L\'invitation a été envoyée et les participants ont été ajoutés.</string>
-    <string name="success_snack_remove_attendees_recurring">L\'annulation a été envoyée et les participants ont été supprimés de tous les événements.</string>
-    <string name="success_snack_remove_attendees">L\'annulation a été envoyée et les participants ont été supprimés.</string>
+    <string name="success_snack_remove_attendees_recurring">L\'annulation a été envoyée et les participants ont été retirés de tous les événements.</string>
+    <string name="success_snack_remove_attendees">L\'annulation a été envoyée et les participants ont été retirés.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mes calendriers</string>
     <string name="nav_view_subscribed_calendars">Calendriers souscrits</string>
@@ -443,10 +443,10 @@
     <string name="settings_week_numbers_title">Afficher les numéros de semaine</string>
     <string name="settings_auto_invites_title">Ajouter des invitations au calendrier et les marquer comme en attente</string>
     <string name="settings_search_title">Rechercher des calendriers</string>
-    <string name="settings_search_subtitle">Télécharge et stocke le contenu du calendrier sur votre appareil pour permettre les recherches. Si vous désactivez cette fonction, le contenu téléchargé sera supprimé.\n\nLa recherche est une fonctionnalité expérimentale de la version bêta. L\'activer peut rendre l\'application instable.</string>
+    <string name="settings_search_subtitle">Télécharge et stocke le contenu du calendrier sur votre appareil pour permettre les recherches. Si vous désactivez cette fonction, le contenu téléchargé sera retiré.\n\nLa recherche est une fonctionnalité expérimentale de la version bêta. L\'activer peut rendre l\'application instable.</string>
     <string name="settings_alternative_routing_title">Autoriser le routage alternatif</string>
     <string name="settings_alternative_routing_subtitle">En cas de blocage des sites Proton, ce paramètre permet à l\'application d\'essayer un autre routage réseau pour atteindre Proton, ce qui peut être utile pour contourner les pare-feux ou les problèmes de réseau. Nous vous recommandons de garder ce paramètre activé pour plus de fiabilité.</string>
-    <string name="settings_value_placeholder">Appuyez pour sélectionner</string>
+    <string name="settings_value_placeholder">Appuyez pour sélectionner.</string>
     <string name="settings_general_title">Général</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s…</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
@@ -492,30 +492,30 @@
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">Ajouter</string>
     <string name="create_calendar_limit_reached">Vous avez atteint le nombre maximum de calendriers.</string>
     <string name="create_calendar_limit_reached_title">Il n\'est pas possible d\'ajouter d\'autres calendriers.</string>
-    <string name="create_calendar_limit_reached_paid_description">Vous avez atteint le nombre maximum de 25 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en supprimer un existant.</string>
+    <string name="create_calendar_limit_reached_paid_description">Vous avez atteint le nombre maximum de 25 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en retirer un existant.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Vous devez avoir au moins un calendrier personnel avant d\'atteindre la limite de 25 calendriers de votre abonnement.</string>
     <string name="create_calendar_limit_reached_manage">Gérer les calendriers</string>
-    <string name="create_calendar_limit_reached_free_description">Vous avez atteint le nombre maximum de 3 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en supprimer un existant.</string>
+    <string name="create_calendar_limit_reached_free_description">Vous avez atteint le nombre maximum de 3 calendriers disponibles dans votre abonnement.\n\nPour ajouter un nouveau calendrier, vous devez en retirer un existant.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">Vous devez avoir au moins un calendrier personnel avant d\'atteindre la limite de 3 calendriers de votre abonnement.</string>
     <string name="create_calendar_limit_reached_error">Erreur</string>
     <string name="delete_calendar_dialog_title">Supprimer le calendrier</string>
     <string name="delete_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ?</string>
-    <string name="remove_calendar_dialog_title">Supprimer le calendrier</string>
-    <string name="remove_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ?</string>
+    <string name="remove_calendar_dialog_title">Retirer le calendrier</string>
+    <string name="remove_calendar_dialog_message">Voulez-vous vraiment retirer ce calendrier ?</string>
     <string name="leave_calendar_dialog_title">Quitter le calendrier </string>
     <string name="leave_calendar_dialog_message">Si vous quittez ce calendrier, vous devrez à nouveau demander au propriétaire de le rejoindre.</string>
     <string name="delete_default_calendar_dialog_message">Voulez-vous vraiment supprimer ce calendrier ? « %1$s » deviendra votre calendrier par défaut.</string>
     <string name="delete_calendar_snack_deleted">Le calendrier a été supprimé.</string>
-    <string name="remove_calendar_snack_removed">Le calendrier a été supprimé.</string>
+    <string name="remove_calendar_snack_removed">Le calendrier a été retiré.</string>
     <string name="delete_calendar_snack_error">Une erreur s\'est produite pendant la suppression du calendrier.</string>
     <string name="remove_calendar_snack_error">Une erreur s\'est produite pendant la suppression du calendrier.</string>
     <string name="leave_calendar_snack_error">Une erreur s\'est produite en quittant le calendrier.</string>
     <string name="delete_calendar_snack_error_password_confirmation">Le mot de passe n\'a pas pu être confirmé.</string>
-    <string name="recreate_calendar_dialog_title">Supprimer le contenu du calendrier</string>
-    <string name="recreate_calendar_dialog_message">Cette action supprimera tous les événements et les utilisateurs invités. \n\nVoulez-vous vraiment supprimer le contenu de ce calendrier ?</string>
-    <string name="recreate_calendar_snack_error">Une erreur s\'est produite pendant la suppression du contenu du calendrier.</string>
-    <string name="recreate_calendar_snack_deleted">Le contenu du calendrier a été supprimé.</string>
-    <string name="recreate_calendar_snack_clearing">Suppression du contenu du calendrier…</string>
+    <string name="recreate_calendar_dialog_title">Effacer le calendrier</string>
+    <string name="recreate_calendar_dialog_message">Cette action retirera tous les événements et les utilisateurs invités. \n\nVoulez-vous vraiment effacer ce calendrier ?</string>
+    <string name="recreate_calendar_snack_error">Une erreur s\'est produite lors de l\'effacement du calendrier.</string>
+    <string name="recreate_calendar_snack_deleted">Le calendrier a été effacé.</string>
+    <string name="recreate_calendar_snack_clearing">L\'effacement du calendrier est en cours.</string>
     <!-- Holiday calendar form -->
     <string name="add_holiday_calendar_title">Ajouter un calendrier de jours fériés</string>
     <string name="holiday_calendar_title">Calendrier de jours fériés</string>
@@ -523,7 +523,7 @@
     <string name="holiday_calendar_form_picker_title">Pays</string>
     <string name="holiday_calendar_time_zone_based">Selon votre fuseau horaire</string>
     <string name="holiday_calendar_already_exists">Ce calendrier des jours fériés est déjà ajouté.</string>
-    <string name="holiday_calendar_value_placeholder">Sélectionnez un pays</string>
+    <string name="holiday_calendar_value_placeholder">Sélectionnez un pays.</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Aucun calendrier n\'est associé à ce compte.</string>
@@ -584,11 +584,11 @@
     <string name="spotlight_dialog_import_description">• Importez des événements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fonctionnalités du calendrier</string>
     <string name="spotlight_dialog_calendar_provider_description">• Ajoutez des événements directement dans Proton Calendar à partir d\'autres applications.\n\n• Créez et gérez des événements dans les calendriers partagés avec vous.\n\n• Définissez l\'affichage par défaut que vous voulez à l\'ouverture de l\'application.\n\n• 13 nouvelles langues sont disponibles.</string>
-    <string name="spotlight_dialog_wipe_search_title">Suppression de la fonction de recherche pour l\'améliorer</string>
+    <string name="spotlight_dialog_wipe_search_title">La recherche a été retirée en vue de l\'améliorer.</string>
     <string name="spotlight_dialog_wipe_search_description">Nous retirons la fonctionnalité expérimentale de recherche de la version bêta de Proton Calendar parce que nous voulons la rendre plus pratique et plus fiable. Cette opération peut prendre quelques secondes.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Les jours fériés sont arrivés !</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nAjoutez les jours fériés de n\'importe quel pays à votre calendrier.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord supprimer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord retirer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
@@ -638,9 +638,9 @@
     <string name="import_assistant_status_paused_storage_full_title">Votre espace de stockage est plein.</string>
     <string name="import_assistant_status_paused_storage_full_description">Votre compte Proton n\'a pas assez d\'espace de stockage pour terminer cette importation de calendrier. Libérez de l\'espace ou ajoutez-en, puis revenez ici pour reprendre.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reprendre</string>
-    <string name="import_assistant_delete_report_title">Supprimer de la liste ?</string>
+    <string name="import_assistant_delete_report_title">Retirer de la liste ?</string>
     <string name="import_assistant_delete_report_message">Vous ne verrez plus l’enregistrement de cette importation dans la liste.</string>
-    <string name="import_assistant_delete_report_positive_button">Supprimer</string>
+    <string name="import_assistant_delete_report_positive_button">Retirer</string>
     <string name="import_assistant_delete_report_negative_button">Conserver</string>
     <string name="import_assistant_cancel_import_title">L\'importation n\'est pas complète.</string>
     <string name="import_assistant_cancel_import_message">Si vous annulez cette importation, vous ne pourrez pas la reprendre. Proton a sauvegardé toute la progression dans votre compte. Annuler quand même ?</string>

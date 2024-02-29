@@ -152,10 +152,10 @@
     <string name="invite_change_attendees_disclaimer">მოსაწვევთან ასოცირებული წევრების ჩასწორება ჯერ შეუძლებელია.</string>
     <string name="change_calendar_recurring_disclaimer">განმეორებადი მოვლენისთვის კალენდრის შეცვლა ჯერჯერობით შეუძლებელია.</string>
     <string name="update_event">მოვლენის განახლება</string>
-    <string name="update_invite_send_email">მოწვევის განახლება გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_invite_send_email">მოწვევის განახლება გადაეგზავნებათ მოვლენის მონაწილეებს.</string>
     <string name="update_recurring_event">განმეორებადი მოვლენის განახლება</string>
     <string name="update_recurring_all_events">გსურთ, განაახლოთ ამ სერიის ყველა მოვლენა?</string>
-    <string name="update_recurring_invite_send_email">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევის განახლება გადაეგზავნება მოვლენის მონაწილეებს.</string>
+    <string name="update_recurring_invite_send_email">თქვენ განაახლებთ ამ სერიის ყველა მოვლენას. მოწვევის განახლება გადაეგზავნებათ მოვლენის მონაწილეებს.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">რას ეძებთ?</string>
     <string name="search_empty_results_title">შედეგების გარეშე</string>

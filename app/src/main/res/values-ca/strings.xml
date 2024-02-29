@@ -15,7 +15,7 @@
     <string name="dialog_button_cancel">Cancel·la</string>
     <string name="dialog_button_continue">Continua</string>
     <string name="dialog_button_close">Tanca</string>
-    <string name="dialog_button_remove">Suprimeix</string>
+    <string name="dialog_button_remove">Esborra</string>
     <string name="dialog_button_download">Descarrega</string>
     <string name="dialog_button_update">Actualitza</string>
     <!-- Delete as an organizer -->
@@ -41,7 +41,7 @@
     <string name="action_edit">Editar</string>
     <string name="action_delete">Elimina</string>
     <string name="action_add">Afegeix</string>
-    <string name="action_remove">Suprimeix</string>
+    <string name="action_remove">Esborra</string>
     <string name="action_leave">Deixa</string>
     <string name="action_recreate">Neteja</string>
     <string name="action_today">Avui</string>
@@ -71,10 +71,10 @@
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el dia %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s el %2$s</string>
     <string name="event_recurrence_none">No es repeteix</string>
-    <string name="event_recurrence_daily">Diàriament</string>
-    <string name="event_recurrence_weekly">Setmanalment</string>
-    <string name="event_recurrence_monthly">Mensualment</string>
-    <string name="event_recurrence_yearly">Anualment</string>
+    <string name="event_recurrence_daily">Cada dia</string>
+    <string name="event_recurrence_weekly">Cada setmana</string>
+    <string name="event_recurrence_monthly">Cada mes</string>
+    <string name="event_recurrence_yearly">Cada any</string>
     <string name="event_recurrence_weekly_on_all_days">tots els dies</string>
     <string name="event_recurrence_until" comment="Event happens regularly until a date">fins el %1$s</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">fins el %1$s (%2$s)</string>
@@ -165,7 +165,7 @@
     <string name="search_downloading_time_remaining_unknown" comment="Example: Calculating time remaining… / Downloading calendars (Calculating time remaining…)">S\'està calculant el temps restant…</string>
     <string name="search_downloading_time_remaining_almost_done" comment="Example: Time remaining: almost done">gairebé hem acabat</string>
     <string name="search_downloading_pause">Posa la descàrrega en pausa</string>
-    <string name="search_settings_dialog_toggle_off_title">Voleu eliminar tots els calendaris descarregats?</string>
+    <string name="search_settings_dialog_toggle_off_title">Voleu esborrar tots els calendaris descarregats?</string>
     <string name="search_settings_dialog_toggle_off_text">Heu de tornar a descarregar els calendaris si voleu cercar-hi.</string>
     <string name="search_settings_dialog_toggle_on_title">Voleu descarregar els calendaris en aquest dispositiu?</string>
     <string name="search_settings_dialog_toggle_on_text">És necessari per a poder cercar.</string>
@@ -264,27 +264,27 @@
     <string name="recurring_event_add_participants_overwrite_dialog_description">S\'enviarà una invitació als participants afegits per a tots els esdeveniments d\'aquesta sèrie.\nEs perdran les modificacions prèvies d\'aquesta sèrie.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancel·la</string>
-    <string name="event_remove_participants_dialog_title">Suprimeix els participants</string>
-    <string name="event_remove_participants_dialog_description">S\'enviarà un correu electrònic de cancel·lació als participants suprimits.</string>
-    <string name="recurring_event_remove_participants_dialog_description">S\'enviarà un correu de cancel·lació als participants suprimits per a tots els esdeveniments d\'aquesta sèrie.</string>
-    <string name="event_add_and_remove_participants_dialog_description">Els participants afegits i els suprimits seran notificats.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Els participants afegits i els suprimits seran notificats de tots els esdeveniments d\'aquesta sèrie.</string>
+    <string name="event_remove_participants_dialog_title">Esborra els participants</string>
+    <string name="event_remove_participants_dialog_description">S\'enviarà un correu electrònic de cancel·lació als participants esborrats.</string>
+    <string name="recurring_event_remove_participants_dialog_description">S\'enviarà un correu de cancel·lació als participants esborrats per a tots els esdeveniments d\'aquesta sèrie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Els participants afegits i els esborrats seran notificats.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Els participants afegits i els esborrats seran notificats de tots els esdeveniments d\'aquesta sèrie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s s\'ha cancel·lat.</string>
     <string name="event_save_changes">Desa els canvis</string>
     <string name="event_update_add_participants_dialog_description">Els participants existents i els afegits seran notificats.</string>
     <string name="recurring_event_update_add_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els afegits seran notificats.</string>
-    <string name="event_update_remove_participants_dialog_description">Els participants existents i els suprimits seran notificats.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Els participants suprimits seran notificats.</string>
-    <string name="recurring_event_update_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els suprimits seran notificats.</string>
-    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants suprimits seran notificats.</string>
-    <string name="event_update_add_and_remove_participants_dialog_description">Els participants existents, els afegits i els suprimits seran notificats.</string>
-    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents, els afegits i els suprimits seran notificats.</string>
+    <string name="event_update_remove_participants_dialog_description">Els participants existents i els esborrats seran notificats.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Els participants esborrats seran notificats.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els esborrats seran notificats.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants esborrats seran notificats.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Els participants existents, els afegits i els esborrats seran notificats.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents, els afegits i els esborrats seran notificats.</string>
     <string name="success_snack_email_update_recurring">S\'ha notificat als participants i s\'han actualitzat tots els esdeveniments.</string>
     <string name="success_snack_email_update">S\'ha notificat als participants i s\'ha actualitzat l\'esdeveniment.</string>
     <string name="success_snack_add_attendees_recurring">S\'ha enviat la invitació i s\'han afegit els participants a tots els esdeveniments.</string>
     <string name="success_snack_add_attendees">S\'ha enviat la invitació i s\'han afegit els participants.</string>
-    <string name="success_snack_remove_attendees_recurring">S\'ha enviat la cancel·lació i s\'han suprimit els participants de tots els esdeveniments.</string>
-    <string name="success_snack_remove_attendees">S\'ha enviat la cancel·lació i s\'han suprimit els participants.</string>
+    <string name="success_snack_remove_attendees_recurring">S\'ha enviat la cancel·lació i s\'han esborrat els participants de tots els esdeveniments.</string>
+    <string name="success_snack_remove_attendees">S\'ha enviat la cancel·lació i s\'han esborrat els participants.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Els meus calendaris</string>
     <string name="nav_view_subscribed_calendars">Calendaris subscrits</string>
@@ -443,7 +443,7 @@
     <string name="settings_week_numbers_title">Mostra els números de les setmanes</string>
     <string name="settings_auto_invites_title">Afegeix les invitacions al calendari i marca-les com a pendents</string>
     <string name="settings_search_title">Cerca calendaris</string>
-    <string name="settings_search_subtitle">Descarrega i emmagatzema el contingut del calendari al teu dispositiu per a poder cercar-hi. Si desactiveu aquesta opció, s\'eliminarà el contingut descarregat.\n\nLa cerca és una funcionalitat beta experimental. Activar-la pot fer que l\'aplicació sigui inestable.</string>
+    <string name="settings_search_subtitle">Descarrega i emmagatzema el contingut del calendari al vostre dispositiu per a poder cercar-hi. Si desactiveu aquesta opció, s\'esborrarà el contingut descarregat.\n\nLa cerca és una funcionalitat beta experimental. Activar-la pot fer que l\'aplicació sigui inestable.</string>
     <string name="settings_alternative_routing_title">Permet l\'encaminament alternatiu</string>
     <string name="settings_alternative_routing_subtitle">En cas que es bloquegin els llocs de Proton, aquest paràmetre permet a l\'aplicació provar l\'encaminament de xarxa alternatiu per arribar a Proton, cosa que pot ser útil per evitar els tallafocs o problemes de xarxa. Recomanem mantenir aquesta configuració per a una major fiabilitat.</string>
     <string name="settings_value_placeholder">Toqueu per seleccionar</string>
@@ -492,27 +492,27 @@
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">Afegeix</string>
     <string name="create_calendar_limit_reached">Heu arribat al nombre màxim de calendaris.</string>
     <string name="create_calendar_limit_reached_title">No es poden afegir més calendaris</string>
-    <string name="create_calendar_limit_reached_paid_description">Heu assolit el màxim de 25 calendaris disponibles del vostre pla.\n\nPer afegir-ne un de nou, cal que n\'elimineu algun.</string>
+    <string name="create_calendar_limit_reached_paid_description">Heu assolit el màxim de 25 calendaris disponibles del vostre pla.\n\nPer afegir-ne un de nou, cal que n\'esborreu algun.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Heu de tenir almenys un calendari personal abans d\'arribar al límit de 25 calendaris del pla.</string>
     <string name="create_calendar_limit_reached_manage">Gestiona els calendaris</string>
-    <string name="create_calendar_limit_reached_free_description">Heu assolit el màxim de 3 calendaris disponibles del vostre pla.\n\nPer afegir-ne un de nou, cal que n\'elimineu algun.</string>
+    <string name="create_calendar_limit_reached_free_description">Heu assolit el màxim de 3 calendaris disponibles del vostre pla.\n\nPer afegir-ne un de nou, cal que n\'esborreu algun.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">Heu de tenir almenys un calendari personal abans d\'arribar al límit de 3 calendaris del pla.</string>
     <string name="create_calendar_limit_reached_error">Error</string>
     <string name="delete_calendar_dialog_title">Elimina el calendari</string>
     <string name="delete_calendar_dialog_message">Segur que voleu eliminar aquest calendari?</string>
-    <string name="remove_calendar_dialog_title">Suprimeix el calendari</string>
-    <string name="remove_calendar_dialog_message">Segur que voleu suprimir aquest calendari?</string>
+    <string name="remove_calendar_dialog_title">Esborra el calendari</string>
+    <string name="remove_calendar_dialog_message">Segur que voleu esborrar aquest calendari?</string>
     <string name="leave_calendar_dialog_title">Deixa el calendari</string>
     <string name="leave_calendar_dialog_message">Si abandoneu aquest calendari, haureu de demanar permís al propietari per tornar a unir-vos-hi.</string>
     <string name="delete_default_calendar_dialog_message">Segur que voleu eliminar aquest calendari? \"%1$s\" passarà a ser el calendari per defecte.</string>
     <string name="delete_calendar_snack_deleted">S\'ha eliminat el calendari</string>
-    <string name="remove_calendar_snack_removed">S\'ha suprimit el calendari</string>
+    <string name="remove_calendar_snack_removed">S\'ha esborrat el calendari.</string>
     <string name="delete_calendar_snack_error">S\'ha produït un error en eliminar el calendari</string>
     <string name="remove_calendar_snack_error">S\'ha produït un error en suprimir el calendari</string>
     <string name="leave_calendar_snack_error">S\'ha produït un error en deixar el calendari</string>
     <string name="delete_calendar_snack_error_password_confirmation">No s\'ha pogut confirmar la contrasenya.</string>
     <string name="recreate_calendar_dialog_title">Neteja el calendari</string>
-    <string name="recreate_calendar_dialog_message">Aquesta acció suprimirà tots els esdeveniments i els usuaris convidats.\n\nSegur que voleu netejar aquest calendari?</string>
+    <string name="recreate_calendar_dialog_message">Aquesta acció esborrarà tots els esdeveniments i els usuaris convidats.\n\nSegur que voleu netejar aquest calendari?</string>
     <string name="recreate_calendar_snack_error">S\'ha produït un error en netejar el calendari</string>
     <string name="recreate_calendar_snack_deleted">S\'ha netejat el calendari</string>
     <string name="recreate_calendar_snack_clearing">S\'està netejant el calendari…</string>
@@ -584,11 +584,11 @@
     <string name="spotlight_dialog_import_description">• Importeu esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
     <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments en calendaris que s\'han compartit amb vós.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 nous idiomes disponibles.</string>
-    <string name="spotlight_dialog_wipe_search_title">S\'ha suprimit la cerca per a millorar-la</string>
+    <string name="spotlight_dialog_wipe_search_title">S\'ha esborrat la cerca per a millorar-la.</string>
     <string name="spotlight_dialog_wipe_search_description">Estem suprimint la capacitat de cerca experimental de Proton Calendar Beta perquè volem fer-la més útil i confiable per a vós. Això pot trigar uns segons.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Els dies festius són aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu suprimir abans un calendari existent.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>
@@ -638,9 +638,9 @@
     <string name="import_assistant_status_paused_storage_full_title">L\'emmagatzematge és ple.</string>
     <string name="import_assistant_status_paused_storage_full_description">El vostre compte de Proton no té prou emmagatzematge per a finalitzar la importació d\'aquest calendari. Allibereu espai o afegiu més emmagatzematge. Després, torneu aquí per a continuar.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reprèn</string>
-    <string name="import_assistant_delete_report_title">Voleu suprimir-ho de la llista?</string>
+    <string name="import_assistant_delete_report_title">Voleu esborrar-ho de la llista?</string>
     <string name="import_assistant_delete_report_message">Ja no veureu aquest registre d\'importació a la llista.</string>
-    <string name="import_assistant_delete_report_positive_button">Suprimeix</string>
+    <string name="import_assistant_delete_report_positive_button">Esborra</string>
     <string name="import_assistant_delete_report_negative_button">Manté</string>
     <string name="import_assistant_cancel_import_title">La importació és incompleta.</string>
     <string name="import_assistant_cancel_import_message">Si cancel·leu aquesta importació, no la podreu reprendre. Proton ha desat tot el progrés del vostre compte. Voleu cancel·lar-ho de totes maneres?</string>

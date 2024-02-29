@@ -17,7 +17,7 @@
     <string name="dialog_button_close">Sulje</string>
     <string name="dialog_button_remove">Poista</string>
     <string name="dialog_button_download">Lataa</string>
-    <string name="dialog_button_update">Päivitä</string>
+    <string name="dialog_button_update">Muuta</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Tapahtuman osallistujille lähetetään perumisilmoitus sähköpostitse. Haluatko poistaa tapahtuman?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Osoitteesi on poistettu käytöstä, eikä osallistujille sen vuoksi voida lähettää peruutusviestiä. Haluatko silti poistaa tapahtuman?</string>
@@ -443,7 +443,7 @@
     <string name="settings_week_numbers_title">Näytä viikkonumerot</string>
     <string name="settings_auto_invites_title">Lisää kutsut kalenteriin ja merkitse ne odottaviksi</string>
     <string name="settings_search_title">Etsi kalentereista</string>
-    <string name="settings_search_subtitle">Lataa ja tallentaa kalenterin sisällön laitteellesi hakua varten. Ominaisuuden käytöstä poisto poistaa myös ladatun sisällön.\n\nHaku on kokeellinen beta-ominaisuus ja sen käyttöönotto voi tehdä sovelluksesta epävakaan.</string>
+    <string name="settings_search_subtitle">Lataa ja tallentaa kalenterin sisällön laitteellesi hakua varten. Ominaisuuden käytöstäpoisto poistaa myös ladatun sisällön.\n\nHaku on kokeellinen beta-ominaisuus ja sen käyttöönotto voi tehdä sovelluksesta epävakaan.</string>
     <string name="settings_alternative_routing_title">Salli vaihtoehtoinen reititys</string>
     <string name="settings_alternative_routing_subtitle">Jos Protonin sivustoja ei tavoiteta, sallii tämä asetus niiden tavoittamiseksi verkkoyhteyden vaihtoehtoisen reitityksen, joka voi auttaa palomuurien tai yhteysongelmien kierrossa. Tämä on suositeltavaa luotettavuuden lisäämiseksi.</string>
     <string name="settings_value_placeholder">Valitse napauttamalla</string>
@@ -485,7 +485,7 @@
     <string name="calendar_form_add_notification">Lisää ilmoitus</string>
     <string name="calendar_form_default_email">Sähköpostiosoite</string>
     <string name="calendar_form_default_email_value_error">Oletussähköpostin lataus epäonnistui</string>
-    <string name="calendar_form_name_hint">Lisää kalenterille nimi</string>
+    <string name="calendar_form_name_hint">Nimeä kalenteri</string>
     <string name="calendar_form_name_required_error">Nimi vaaditaan</string>
     <string name="calendar_form_description_hint">Lisää kalenterille kuvaus</string>
     <string name="add_calendar_text">Lisää kalenteri</string>
@@ -587,7 +587,7 @@
     <string name="spotlight_dialog_wipe_search_title">Haku on poistettu sen parantamiseksi</string>
     <string name="spotlight_dialog_wipe_search_description">Poistamme kokeellisen hakutoiminnon Proton Calendar Betasta, koska haluamme tehdä siitä sinulle hyödyllisemmän ja luotettavamman. Tämä saattaa kestää muutaman sekunnin.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Yleiset vapaapäivät ovat täällä!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai hukattuja pitkiä viikonloppuja.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ei enää vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nKoska olet jo saavuttanut kalenterien enimmäismäärän, on jokin nykyisistä kalentereista poistettava yleisten vapaapäivien lisäämiseksi.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Myönnä käyttöoikeus</string>

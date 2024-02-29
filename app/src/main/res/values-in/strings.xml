@@ -46,7 +46,7 @@
     <string name="action_recreate">Kosongkan</string>
     <string name="action_today">Hari ini</string>
     <string name="action_create_event">Buat acara</string>
-    <string name="action_mark_default">Tandai sebagai default</string>
+    <string name="action_mark_default">Tandai sebagai bawaan</string>
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">Tidak ada acara</string>
     <string name="agenda_loading_events">Memuat acara…</string>
@@ -111,7 +111,7 @@
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s telah menerima undangan Anda ke %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s telah menolak undangan Anda ke %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s telah sementara menerima undangan Anda ke $%2$s</string>
-    <string name="event_organizer_send_prefs_error_title">Panitia tidak bisa dihubungi</string>
+    <string name="event_organizer_send_prefs_error_title">Penyelenggara tidak dapat diberi tahu</string>
     <string name="event_organizer_send_prefs_message_accepted_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menerima undangan</string>
     <string name="event_organizer_send_prefs_message_declined_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menolak undangan</string>
     <string name="event_organizer_send_prefs_message_tentative_title">Penyelenggara tidak dapat diberi tahu bahwa Anda sementara menerima undangan</string>
@@ -138,7 +138,7 @@
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Peserta (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Anda</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d lagi</string>
-    <string name="event_text_switch_all_day">Seharian</string>
+    <string name="event_text_switch_all_day">Sepanjang hari</string>
     <string name="event_text_date_start">Mulai</string>
     <string name="event_text_date_end">Akhir</string>
     <string name="event_text_date_repeat">Perulangan</string>
@@ -170,7 +170,7 @@
     <string name="search_settings_dialog_toggle_on_title">Unduh kalender ke perangkat ini?</string>
     <string name="search_settings_dialog_toggle_on_text">Hal ini dibutuhkan agar kamu dapat melakukan pencarian.</string>
     <string name="search_onboarding_header">Ingin mencari kalender Anda?</string>
-    <string name="search_onboarding_text">Pertama-tama, Anda perlu mengunduh salinan kalender terenkripsi Anda. Hal ini akan memakan waktu sejenak, dan Anda akan tetap dapat menggunakan kalender seperti biasa dalam prosesnya. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="search_onboarding_text">Pertama-tama, Anda perlu untuk mengunduh salinan kalender terenkripsi Anda. Hal ini akan memakan waktu sejenak, dan Anda akan tetap dapat menggunakan aplikasi kalender seperti biasa dalam prosesnya. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="search_onboarding_action_download_calendars">Unduh kalender</string>
     <string name="search_onboarding_action_pause">Jeda</string>
     <string name="search_onboarding_action_resume">Lanjutkan</string>
@@ -178,14 +178,14 @@
     <string name="search_onboarding_progress_header_ongoing">Mengunduh kalender…</string>
     <string name="search_onboarding_progress_header_completed">Unduhan selesai</string>
     <string name="search_onboarding_progress_header_paused">Unduhan kalender dijeda</string>
-    <string name="search_onboarding_progress_header_error">Kesalahan dalam mengunduh kalender</string>
+    <string name="search_onboarding_progress_header_error">Terdapat masalah dalam mengunduh kalender</string>
     <string name="search_spotlight_activation_snack">Pencarian kalender diaktifkan</string>
     <!-- TODO Start Timezone / End Timezone? -->
     <string name="event_text_add_alarm">Tambahkan pemberitahuan</string>
     <string name="event_text_description">Deskripsi</string>
     <string name="event_hint_description">Tambahkan deskripsi</string>
     <string name="event_text_custom">sesuaikan</string>
-    <string name="event_alert_invalid_start_end_date">Tanggal mulai acara tidak bisa setelah tanggal berakhir</string>
+    <string name="event_alert_invalid_start_end_date">Tanggal mulai acara tidak dapat diatur setelah tanggal akhir</string>
     <string name="event_alarms_title">Pemberitahuan</string>
     <string name="event_custom_alarms_field">Beritahu</string>
     <string name="event_custom_alarms_title">Pemberitahuan yang disesuaikan</string>
@@ -249,7 +249,7 @@
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Pembatalan acara yang akan dimulai pada hari $%1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Anda diundang ke %1$s\nYang akan diselenggarakan pada: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s telah diperbarui\nTanggal baru: %2$s</string>
-    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (seharian penuh)</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (sepanjang hari)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s pukul %2$s %3$s - %4$s pukul %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nDi mana: %1$s</string>
@@ -333,13 +333,13 @@
     <string name="snack_event_edit_calendar_with_attendees_error">Tidak dapat menambah peserta dan mengubah kalender secara bersamaan</string>
     <string name="snack_event_init_error">Gagal membuat acara baru</string>
     <string name="snack_event_calendar_error">Kesalahan beralih kalender</string>
-    <string name="snack_event_maximum_alarm_reached_error">Jumlah notifikasi telah mencapai batas maksimal</string>
+    <string name="snack_event_maximum_alarm_reached_error">Batas jumlah notifikasi telah tercapai</string>
     <string name="snack_send_bug_report_success">Laporan terkirim, terima kasih atas masukan Anda</string>
     <string name="snack_send_bug_report_error">Pengiriman laporan gagal, mohon coba kembali</string>
     <string name="snack_send_bug_report_description_empty">Mohon beri keterangan pada laporan Anda</string>
     <string name="snack_create_event_no_active_personal_calendar">Anda perlu kalender pribadi untuk membuat acara</string>
     <string name="snack_create_event_no_active_calendar">Anda perlu memiliki kalender yang aktif untuk dapat membuat acara</string>
-    <string name="snack_add_self_as_participant">Tidak bisa mengundang diri sendiri</string>
+    <string name="snack_add_self_as_participant">Anda tidak dapat mengundang diri sendiri</string>
     <string name="snack_maximum_participants_reached">Jumlah peserta telah mencapai batas maksimal.</string>
     <string name="snack_add_participant_error">Terjadi masalah saat menambah peserta</string>
     <string name="snack_add_participant_invalid_email">Alamat surel tidak valid</string>
@@ -371,7 +371,7 @@
     <string name="snack_ics_unsupported_publish_error">Impor acara untuk saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Kami saat ini hanya mendukung jawaban yang diperuntukkan bagi seluruh acara yang terdapat pada suatu rangkaian</string>
     <string name="snack_ics_party_crasher_error">Alamat surel Anda tidak ada dalam daftar peserta</string>
-    <string name="snack_ics_reply_party_crasher_error">Peserta yang tidak diundang oleh penyelenggara tidak bisa ditambahkan</string>
+    <string name="snack_ics_reply_party_crasher_error">Peserta yang tidak diundang oleh penyelenggara tidak dapat ditambahkan</string>
     <string name="snack_ics_missing_uid_error">UID acara ini hilang</string>
     <string name="snack_ics_no_active_personal_calendar_error">Tidak ada kalender personal aktif yang terhubung dengan akun ini</string>
     <string name="snack_ics_no_active_calendar_error">Tidak ada kalender aktif yang terhubung dengan akun ini</string>
@@ -407,7 +407,7 @@
     <string name="dialog_title_calendar_picker">Kalender</string>
     <string name="import_from_google_title">Impor dari Google</string>
     <string name="notifications_permission_dialog_title">Izinkan Proton Calender untuk memunculkan notifikasi?</string>
-    <string name="notifications_permission_dialog_message">Proton Calendar memerlukan izin untuk menampilkan notifikasi untuk acara yang akan datang kepada Anda.</string>
+    <string name="notifications_permission_dialog_message">Proton Calendar memerlukan izin untuk menampilkan notifikasi bagi acara Anda yang akan datang.</string>
     <string name="notifications_permission_dialog_open_settings">Buka Pengaturan</string>
     <string name="notifications_permission_dialog_cancel">Tolak</string>
     <!-- NOTIFICATIONS -->
@@ -422,7 +422,7 @@
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s pada pukul %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Judul</string>
-    <string name="bug_report_hint_description">Mohon uraikan masalah dan sertakan pesan kesalahan apa pun.</string>
+    <string name="bug_report_hint_description">Mohon uraikan masalah Anda dan sertakan pesan kesalahan yang Anda temui.</string>
     <string name="bug_report_discard_changes_title">Perubahan yang belum disimpan</string>
     <string name="bug_report_discard_changes_description">Ada entri yang belum disimpan dalam formulir. Apakah Anda yakin ingin membuangnya?</string>
     <string name="bug_report_discard_changes_cancel">Teruskan menulis</string>
@@ -433,7 +433,7 @@
     <string name="settings_timezone_title">Zona waktu</string>
     <string name="settings_language_title">Bahasa aplikasi</string>
     <string name="settings_language_default">Deteksi otomatis</string>
-    <string name="settings_default_view_title">Tampilan default</string>
+    <string name="settings_default_view_title">Tampilan bawaan</string>
     <string name="settings_default_view_default">Tampilan terkini</string>
     <string name="settings_update_timezone_title">Minta agar pengaturan zona waktu diperbarui</string>
     <string name="settings_update_timezone_subtitle">Apabila zona waktu sistem tidak sesuai dengan pengaturan zona waktu saat ini, Anda akan diminta untuk memperbaruinya.</string>
@@ -586,7 +586,7 @@
     <string name="spotlight_dialog_calendar_provider_description">• Tambahkan acara dari aplikasi lain ke Proton Calendar secara langsung.\n\n• Buat dan kelola acara pada kalender yang telah dibagikan dengan Anda.\n\n• Tentukan mode tampilan bawaan yang akan muncul pada saat Anda membuka aplikasi.\n\n• Dengan 13 pilihan bahasa baru yang tersedia.</string>
     <string name="spotlight_dialog_wipe_search_title">Pencarian dihapus untuk membuatnya lebih baik</string>
     <string name="spotlight_dialog_wipe_search_description">Kami menghilangkan kemampuan pencarian eksperimental dari Proton Calendar Beta, dalam upaya meningkatkannya supaya lebih berguna dan andal bagi Anda. Ini dapat membutuhkan beberapa detik.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Liburan umum telah hadir!</string>
+    <string name="spotlight_dialog_holiday_calendar_title">Libur telah tiba!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Tidak ada penjadwalan pertemuan ketika semuanya libur atau lupa merencanakan liburan akhir pekan yang panjang.\n\nTambahkan liburan publik negara mana pun ke kalender Anda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Tidak ada lagi pertemuan yang dijadwalkan ketika semuanya sedang libur atau melupakan untuk merencanakan liburan akhir pekan yang panjang.\n\nKarena Anda saat ini berada di batas kalender, untuk menambahkan kalender liburan, Anda harus menghapus kalender yang sudah ada terlebih dahulu.</string>
     <!-- Import -->
