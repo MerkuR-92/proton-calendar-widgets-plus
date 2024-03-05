@@ -35,7 +35,7 @@
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Раніше оновлені організатором повторення будуть збережені</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Організатор не може бути повідомлений, що ви відхилили запрошення:\n\n• %1$s\n\nУсе одно бажаєте видалити подію?</string>
     <string name="dialog_button_set">Встановити</string>
-    <string name="dialog_button_ok">Гаразд</string>
+    <string name="dialog_button_ok">OK</string>
     <string name="action_save">Зберегти</string>
     <string name="action_done">Готово</string>
     <string name="action_edit">Змінити</string>
@@ -116,7 +116,7 @@
     <string name="event_organizer_send_prefs_message_declined_title">Неможливо повідомити організатора про те, що ви відхилили запрошення</string>
     <string name="event_organizer_send_prefs_message_tentative_title">Неможливо повідомити організатора про те, що ви із сумнівом прийняли запрошення</string>
     <string name="event_organizer_send_prefs_message_default_title">Неможливо повідомити організатора про те, що ви відповіли на запрошення</string>
-    <string name="event_organizer_send_prefs_button_title">Гаразд</string>
+    <string name="event_organizer_send_prefs_button_title">OK</string>
     <string name="event_attendees_send_prefs_error_title">Неможливо сповістити учасників</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Неможливо сповістити нікого з учасників про ваші зміни:\n\n• %1$s\n\nВсе одно бажаєте продовжити?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Неможливо сповістити про ваші зміни таких учасників:\n\n• %1$s\n\nВсе одно бажаєте продовжити?</string>
@@ -525,7 +525,7 @@
     <string name="holiday_calendar_already_exists">Цей святковий календар вже додано.</string>
     <string name="holiday_calendar_value_placeholder">Обрати країну</string>
     <!-- Bootstrap errors -->
-    <string name="bootstrap_error_default_confirm">Гаразд</string>
+    <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Немає календарів, пов\'язаних із цим обліковим записом.</string>
     <string name="bootstrap_error_no_calendar_message">Щоб налаштувати його, перейдіть до <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Помилка підготовки календарів</string>
@@ -563,7 +563,7 @@
     <string name="spotlight_dialog_header">Що нового</string>
     <string name="spotlight_dialog_beta_header">Calendar Beta</string>
     <string name="spotlight_dialog_skip">Пропустити</string>
-    <string name="spotlight_dialog_confirmation_button">Гаразд</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Перегляд місяця</string>
     <string name="spotlight_dialog_month_view_description">Оглядайте ваші події у нашому новому поданні на місяць. Перемикайте вигляд за допомогою меню.</string>
     <string name="spotlight_dialog_easy_switch_description">Імпортувати події та інші дані з календаря Google у календар Proton Calendar стало легше, ніж будь-коли. Наш імпортер Easy Switch допоможе вам на всіх етапах.</string>
