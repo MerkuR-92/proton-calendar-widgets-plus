@@ -6,6 +6,7 @@ import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
 import me.proton.core.user.domain.entity.Delinquent
 import me.proton.core.user.domain.entity.Role
+import me.proton.core.user.domain.entity.Type
 
 /**
  * Global mocks
@@ -92,6 +93,7 @@ const val private = true
 const val services = 1
 const val subscribed = 1
 
+val userType = Type.Proton
 val role = Role.NoOrganization
 val delinquent = Delinquent.None
 

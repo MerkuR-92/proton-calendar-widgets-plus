@@ -142,7 +142,7 @@ class MonthView : ViewGroup {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0) { }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         drawMonthGrid(canvas)
@@ -150,7 +150,7 @@ class MonthView : ViewGroup {
         drawEvents(canvas)
     }
 
-    private fun drawMonthGrid(canvas: Canvas?) {
+    private fun drawMonthGrid(canvas: Canvas) {
 
         val dayList = this.dayList
         val month = this.month

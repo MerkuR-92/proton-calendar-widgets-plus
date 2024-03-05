@@ -17,7 +17,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        isCoreLibraryDesugaringEnabled = true
     }
 
     testOptions {
@@ -45,5 +44,4 @@ dependencies {
     implementation(libs.biweekly)
     implementation(libs.kotlinx.serialization.json)
     kapt(libs.dagger.hilt.android.compiler)
-    coreLibraryDesugaring(libs.tools.desugar)
 }
