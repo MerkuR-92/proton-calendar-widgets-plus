@@ -161,6 +161,11 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    sealed class EventDetailsActionType {
+        object Edit : EventDetailsActionType()
+        object Delete : EventDetailsActionType()
+    }
+
     private var viewModelJob = Job() // TODO extract this to superclass
     private var coroutineScope = CoroutineScope(Dispatchers.Default)
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
@@ -230,6 +235,7 @@ class EventViewModel @Inject constructor(
         sealed class Processing: EventState() {
             object Saving: Processing()
             object Deleting: Processing()
+            object EditLoading: Processing()
         }
     }
 
@@ -2389,6 +2395,59 @@ class EventViewModel @Inject constructor(
         }
     }
 
+    suspend fun onEditClick(
+        navigateToEditForm: () -> Unit
+    ) {
+        // Post deleting event value to true to display loading state
+        eventDetailsState.value = EventState.Processing.Deleting
+
+        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Edit)) {
+            eventDetailsState.value = EventState.Idle
+            return
+        }
+
+        navigateToEditForm()
+    }
+
+    private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(actionType: EventDetailsActionType): Boolean {
+        val event = eventLiveData.value!!
+        if (event.isAnInvitation && (event.isRecurring() || event.isSingleEdit())) {
+            var errorResId: Int? = null
+            if (event.isSingleEdit()) {
+                errorResId = when (actionType) {
+                    EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_single_edit_error
+                    EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_single_edit_error
+                }
+            } else if (hasExDates()) {
+                errorResId = when (actionType) {
+                    EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_ex_date_error
+                    EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_ex_date_error
+                }
+            } else {
+                val immutableSingleEditsInfo = singleEditsInfo ?: getSingleEditsInfo()
+                if (immutableSingleEditsInfo == null) {
+                    errorResId = when (actionType) {
+                        EventDetailsActionType.Edit -> R.string.snack_event_opening_edit_error
+                        EventDetailsActionType.Delete -> R.string.snack_event_deleted_error
+                    }
+                } else if (immutableSingleEditsInfo.hasSingleEdit) {
+                    errorResId = when (actionType) {
+                        EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_single_edit_error
+                        EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_single_edit_error
+                    }
+                }
+            }
+
+            if (errorResId != null) {
+                eventDetailsSnackState.value = EventSnackState.DisplaySnack(
+                    resourceProvider.provideString(errorResId)
+                )
+                return true
+            }
+        }
+
+        return false
+    }
 
     /**
      * This method starts the delete flow
@@ -2420,6 +2479,11 @@ class EventViewModel @Inject constructor(
 
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
+
+        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Delete)) {
+            eventDetailsState.value = EventState.Idle
+            return
+        }
 
         val originalOccurrenceNumber =
             if (event.isSingleEdit() && occurrenceNumber == 0) {
