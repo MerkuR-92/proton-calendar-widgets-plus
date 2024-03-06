@@ -157,12 +157,20 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 )
             )
             setOnSingleClickListener {
-                findNavController().navigate(
-                    (Navigation.Deeplink.toEventEdit(
-                        navigationArguments.eventId,
-                        navigationArguments.occurrenceNumber
-                    ))
-                )
+                if (mainViewModel.isConnectedToNetwork.not()) {
+                    view?.displaySnackBar(getString(R.string.snack_network_error))
+                    return@setOnSingleClickListener
+                }
+                lifecycleScope.launch {
+                    eventViewModel.onEditClick(
+                        navigateToEditForm = {
+                            findNavController().navigate((Navigation.Deeplink.toEventEdit(
+                                navigationArguments.eventId,
+                                navigationArguments.occurrenceNumber
+                            )))
+                        }
+                    )
+                }
             }
         }
         buttonDelete = layoutInflater.inflate(R.layout.toolbar_action_button, dialogToolbarContent, false)
@@ -391,7 +399,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             eventViewModel.eventDetailsState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventState ->
                 // Update action bar buttons visibility
                 val deletingEvent = eventState == EventViewModel.EventState.Processing.Deleting
-                loadingAction.visibleOrGone(deletingEvent)
+                val isEditLoading = eventState == EventViewModel.EventState.Processing.EditLoading
+                loadingAction.visibleOrGone(deletingEvent || isEditLoading)
                 // TODO Remove attendees condition once edit attendees is implemented
                 lifecycleScope.launch {
                     val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
@@ -401,6 +410,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                             && event.isUserOrganizer(canonicalUserEmails)
                     buttonEdit.visibleOrGone(
                         event.calendar.isActive &&
+                                !isEditLoading &&
                                 !deletingEvent &&
                                 !event.calendar.isSubscribed &&
                                 event.calendar.allowEditEvents &&
