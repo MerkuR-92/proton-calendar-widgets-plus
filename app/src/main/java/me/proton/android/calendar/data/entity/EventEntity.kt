@@ -61,5 +61,7 @@ data class EventEntity(
     @SerialName("IsPersonalMigrated")
     val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
     @SerialName("Notifications")
-    val notifications: List<JsonElement>? = null
+    val notifications: List<JsonElement>? = null,
+    @SerialName("Color")
+    val color: String? = null
 )
