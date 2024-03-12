@@ -45,7 +45,8 @@ data class Event private constructor(
     val currentUserAttendeeId: String? = null,
     val sharedEventId: String? = null,
     val isProtonProtonInvite: Boolean? = null,
-    var notifications: NotificationMigration = NotificationMigration(false, null)
+    var notifications: NotificationMigration = NotificationMigration(false, null),
+    val color: String? = null
 ) : BaseModel() {
 
     companion object {
@@ -60,7 +61,8 @@ data class Event private constructor(
             currentUserAttendeeId: String? = null,
             sharedEventId: String? = null,
             isProtonProtonInvite: Boolean? = null,
-            notifications: NotificationMigration? = null
+            notifications: NotificationMigration? = null,
+            color: String? = null
         ): Event? {
 
             val vEvent = iCalendar.events.firstOrNull()
@@ -76,7 +78,8 @@ data class Event private constructor(
                     currentUserAttendeeId,
                     sharedEventId,
                     isProtonProtonInvite,
-                    notifications ?: NotificationMigration(false, null)
+                    notifications ?: NotificationMigration(false, null),
+                    color
                 )
             } else null
 
@@ -87,7 +90,14 @@ data class Event private constructor(
          * Copy event with specified id / calendar / iCalendar / notifications values
          * and Timezone Assignments
          */
-        fun from(event: Event, id: String? = null, calendar: Calendar? = null, iCalendar: ICalendar? = null, notifications: NotificationMigration? = null): Event {
+        fun from(
+            event: Event,
+            id: String? = null,
+            calendar: Calendar? = null,
+            iCalendar: ICalendar? = null,
+            notifications: NotificationMigration? = null,
+            color: String? = null
+        ): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
             val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
             val endTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
@@ -119,7 +129,9 @@ data class Event private constructor(
                     setEndTimeZone(endTimezoneId)
                     setDefaultTimeZone(defaultTimezoneId)
                 },
-                notifications = notifications ?: event.notifications)
+                notifications = notifications ?: event.notifications,
+                color = color ?: event.color
+            )
         }
 
         /**
@@ -183,6 +195,8 @@ data class Event private constructor(
     val description: String? get() = iCalEvent.description?.value
 
     val status: Status? get() = iCalEvent.status
+
+    val displayColor: String get() = color ?: calendar.color
 
     /**
      * Use this getter to handle Alarms instead of taking them directly from ICS. This contains custom logic
@@ -621,21 +635,21 @@ data class Event private constructor(
     }
 
     fun toUiEvent(userEmails: List<String>, timeZoneId: String): UiEvent = UiEvent(
-            id,
-            calendar.id,
-            uid,
-            summary,
-            location,
-            description,
-            this.getOccurrenceStart(timeZoneId),
-            this.getOccurrenceEnd(timeZoneId),
-            isAllDay(),
-            occurrence?.occurrenceNumber ?: 0,
-            calendar.color,
-            decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
-            getParticipationStatus(userEmails),
-            this.status ?: Status.confirmed()
-        )
+        id,
+        calendar.id,
+        uid,
+        summary,
+        location,
+        description,
+        this.getOccurrenceStart(timeZoneId),
+        this.getOccurrenceEnd(timeZoneId),
+        isAllDay(),
+        occurrence?.occurrenceNumber ?: 0,
+        displayColor,
+        decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
+        getParticipationStatus(userEmails),
+        this.status ?: Status.confirmed()
+    )
 }
 
 

@@ -3,7 +3,6 @@ package me.proton.android.calendar.domain.model
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Status
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 
 /**
@@ -22,7 +21,7 @@ data class UiEvent(
     val isAllDay: Boolean,
     val occurrenceNumber: Int, // 0 means it's non-recurring
 
-    val calendarColor: String,
+    val displayColor: String,
 
     val decryptionStatus: Event.DecryptionStatus,
 
