@@ -61,7 +61,7 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): WeekViewCa
         location = "",
         startTime = this.dateStart.toLocalDateTime(),
         endTime = this.dateEnd.toLocalDateTime(),
-        color = Color.parseColor(this.calendarColor),
+        color = Color.parseColor(this.displayColor),
         isAllDay = this.isAllDay,
         strikeThroughTitle = this.isCancelled() || participationStatus == ParticipationStatus.DECLINED,
         isPastEvent = this.isInThePast(),

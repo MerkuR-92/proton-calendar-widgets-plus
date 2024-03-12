@@ -1298,7 +1298,7 @@ class CalendarViewModel @Inject constructor(
                         daySpanCount = fullDayCounter.second,
                         daySpanIndex = fullDayCounter.first,
                         calendarColor = if (isSkeletonEvent) resourceProvider.provideColor(R.color.interaction_weak_norm)
-                        else Color.parseColor(event.calendarColor),
+                        else Color.parseColor(event.displayColor),
                         pastEvent = event.isInThePast(),
                         isUnanswered = !event.isCancelled() && event.participationStatus == ParticipationStatus.NEEDS_ACTION,
                         strikeThroughTitle = event.isCancelled() || event.participationStatus == ParticipationStatus.DECLINED,

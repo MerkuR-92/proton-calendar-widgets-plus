@@ -432,7 +432,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             }
 
             // Set default style for calendar bar (overridden by part stat if user is attendee)
-            setCalendarBar(event.calendar.color, null, event.isCancelled())
+            setCalendarBar(event.displayColor, null, event.isCancelled())
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
@@ -464,7 +464,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     val userEmails = userAddresses.map { it.email }
                     val participationStatus = event.getParticipationStatus(userEmails)
 
-                    setCalendarBar(event.calendar.color, participationStatus, event.isCancelled())
+                    setCalendarBar(event.displayColor, participationStatus, event.isCancelled())
 
                     displayAttendeeAnswerState(participationStatus, false)
 
@@ -520,7 +520,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 //Set icon view to Invisible to keep the text view constraints
                 imageIcon.visibleOrInvisible(false)
                 imageDotIcon.visibleOrGone(true)
-                imageDotIcon.drawable.setTint(Color.parseColor(event.calendar.color))
+                imageDotIcon.drawable.setTint(Color.parseColor(event.displayColor))
                 root.visibleOrGone(true)
             }
 
@@ -625,17 +625,17 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
         }
     }
 
-    private fun setCalendarBar(calendarColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
+    private fun setCalendarBar(displayColor: String, participationStatus: ParticipationStatus?, isCancelled: Boolean) {
         if (participationStatus == ParticipationStatus.NEEDS_ACTION && !isCancelled) {
             AndroidUtils.setStripedBackground(
                 binding.sectionEventInfo.viewCalendarBar,
                 requireContext(),
-                Color.parseColor(calendarColor),
+                Color.parseColor(displayColor),
                 true
             )
         } else {
             binding.sectionEventInfo.viewCalendarBar.setBackgroundResource(R.drawable.shape_calendar_bar)
-            binding.sectionEventInfo.viewCalendarBar.background.setTint(Color.parseColor(calendarColor))
+            binding.sectionEventInfo.viewCalendarBar.background.setTint(Color.parseColor(displayColor))
         }
     }
 
