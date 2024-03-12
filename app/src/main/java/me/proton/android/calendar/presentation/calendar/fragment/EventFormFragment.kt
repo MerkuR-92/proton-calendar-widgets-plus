@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -516,10 +515,6 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             binding.eventFormCalendar.text = event.calendar.name
-            ImageViewCompat.setImageTintList(
-                binding.eventFormCalendarIcon,
-                ColorStateList.valueOf(Color.parseColor(event.calendar.color))
-            )
 
             binding.eventFormRecurrence.text =
                 AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
