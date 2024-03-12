@@ -517,10 +517,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 } else {
                     requireContext().getText(R.string.event_calendar_disabled, event.calendar.name)
                 }
-                //Set icon view to Invisible to keep the text view constraints
-                imageIcon.visibleOrInvisible(false)
-                imageDotIcon.visibleOrGone(true)
-                imageDotIcon.drawable.setTint(Color.parseColor(event.displayColor))
+                imageIcon.setImageResource(R.drawable.ic_proton_calendar_grid)
                 root.visibleOrGone(true)
             }
 

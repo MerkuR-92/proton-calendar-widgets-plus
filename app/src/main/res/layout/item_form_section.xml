@@ -17,19 +17,6 @@
         app:tint="@color/icon_norm"
         />
 
-    <ImageView
-        android:id="@+id/image_dot_icon"
-        style="@style/ColoredDot"
-        android:scaleType="centerInside"
-        app:layout_constraintStart_toStartOf="@+id/image_icon"
-        app:layout_constraintEnd_toEndOf="@+id/image_icon"
-        app:layout_constraintTop_toTopOf="@+id/image_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/image_icon"
-        app:srcCompat="@drawable/shape_calendar_circle"
-        app:tint="?attr/brand_norm"
-        android:visibility="gone"
-        />
-
     <TextView
         android:id="@+id/text_header"
         style="@style/Text.Default"
