@@ -43,7 +43,7 @@ class JoinCalendarUseCase @Inject constructor(
     suspend fun joinHolidayCalendar(
         userId: UserId,
         managedHolidayCalendarEntity: ManagedHolidayCalendarEntity,
-        calendarColor: Int,
+        calendarColor: String,
         defaultFullDayNotifications: List<VAlarm>?,
         priority: Int? = null
     ): UseCase.Result {
@@ -69,7 +69,7 @@ class JoinCalendarUseCase @Inject constructor(
         val joinCalendarApiRequest = JoinCalendarApiRequest(
             signature = tokenSignature,
             passphraseKeyPacket = keyPacket!!,
-            color = calendarColor.toHexColor(),
+            color = calendarColor,
             defaultFullDayNotifications = defaultFullDayNotifications?.map {
                 NotificationEntity(
                     type = if (it.action.isEmail) 0 else 1,

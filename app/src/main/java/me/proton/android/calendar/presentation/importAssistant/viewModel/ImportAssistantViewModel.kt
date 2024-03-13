@@ -1,7 +1,6 @@
 package me.proton.android.calendar.presentation.importAssistant.viewModel
 
 import android.app.Application
-import android.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +13,7 @@ import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.common.CalendarImport
 import me.proton.android.calendar.common.utils.AndroidUtils.ellipsize
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.ApiResponse
@@ -132,7 +132,7 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, calendarColors: IntArray, importerId: String? = null): Boolean {
+    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, colorArray: Array<String>, importerId: String? = null): Boolean {
         // Create Access token resource
         val token = importerApi.createAccessToken(userId, code).valueOrNullAndLogErrors(logger)?.token ?: return false
         val tokenId = token.id
@@ -141,11 +141,11 @@ class ImportAssistantViewModel @Inject constructor(
         return if (importerId != null) {
             updateImporter(userId, tokenId, importerId, token.account)
         } else {
-            createImporter(userId, tokenId, token.account, calendarColors)
+            createImporter(userId, tokenId, token.account, colorArray)
         }
     }
 
-    private suspend fun createImporter(userId: UserId, tokenId: String, account: String, calendarColors: IntArray): Boolean {
+    private suspend fun createImporter(userId: UserId, tokenId: String, account: String, colorArray: Array<String>): Boolean {
         // Create the importer for the required products
         importerId = importerApi.createCalendarImporter(userId, tokenId).valueOrNullAndLogErrors(logger)?.importerID ?: return false
 
@@ -172,7 +172,7 @@ class ImportAssistantViewModel @Inject constructor(
                     destinationName = it.source.ellipsize(100),
                     destinationEmail = defaultUserEmail.value!!,
                     destinationDescription = it.description.ellipsize(255),
-                    destinationColor = calendarColors.random()
+                    destinationColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
                 )
             )
         }
@@ -237,7 +237,7 @@ class ImportAssistantViewModel @Inject constructor(
         calendarName: String,
         calendarDescription: String,
         calendarEmail: String,
-        calendarColor: Int
+        calendarColor: String
     ): String? {
         val userId = getPrimaryUserIdOrNull() ?: return null
 
@@ -294,7 +294,7 @@ class ImportAssistantViewModel @Inject constructor(
         return indexOfItem
     }
 
-    suspend fun setCreateNewCalendar(calendarToImport: ImportCalendarMapping, calendarColor: Int) {
+    suspend fun setCreateNewCalendar(calendarToImport: ImportCalendarMapping, calendarColor: String) {
         val defaultUserEmail = defaultUserEmail.value ?: getDefaultUserEmail() ?: return
         val updatedCalendarToImport = ImportCalendarMapping(
             importCalendar = true,
@@ -329,7 +329,7 @@ class ImportAssistantViewModel @Inject constructor(
             destinationName = calendar.name,
             destinationEmail = calendar.email,
             destinationDescription = calendar.description,
-            destinationColor = Color.parseColor(calendar.color)
+            destinationColor = calendar.color
         )
         val currentList = _importCalendarMappingList.value?.let { ArrayList(it) } ?: return
         val indexOfItem = currentList.indexOf(calendarToImport)

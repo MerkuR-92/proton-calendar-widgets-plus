@@ -45,8 +45,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         userId: UserId,
         showConfirmationDialog: Boolean,
         defaultCalendarName: String,
-        defaultCalendarColor: Int,
-        defaultHolidayCalendarColor: Int,
+        defaultCalendarColor: String,
+        defaultHolidayCalendarColor: String,
         defaultLanguageCode: String?,
         defaultCountryCode: String?
     ): UseCase.Result {

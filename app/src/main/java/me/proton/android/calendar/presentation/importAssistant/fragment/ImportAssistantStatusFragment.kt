@@ -324,7 +324,6 @@ class ImportAssistantStatusFragment : BaseDialogFragment<FragmentImportAssistant
         lifecycleScope.launch {
             val userId = accountViewModel.getPrimaryUserId()
             val importerId = this@ImportAssistantStatusFragment.resumeImportId
-            val calendarColors = resources.getIntArray(R.array.accent_colors_base)
             if (userId == null || importerId == null) {
                 view?.displaySnackBar(getString(R.string.import_assistant_update_import_error))
                 return@launch
@@ -334,7 +333,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment<FragmentImportAssistant
             if (!importAssistantViewModel.handleGoogleSignInRedirect(
                     userId,
                     authCode,
-                    calendarColors,
+                    resources.getStringArray(R.array.colors_with_names),
                     importerId
                 )
             ) {

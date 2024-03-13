@@ -20,6 +20,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.common.DEFAULT_HOLIDAY_CALENDAR_COLOR
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -86,8 +87,8 @@ class AccountViewModel @Inject constructor(
 
     // Those values are set in init.
     private var defaultCalendarName: String = "My calendar"
-    private var defaultCalendarColor: Int = DEFAULT_CALENDAR_COLOR
-    private var defaultHolidayCalendarColor: Int = DEFAULT_HOLIDAY_CALENDAR_COLOR
+    private var defaultCalendarColor: String = DEFAULT_CALENDAR_COLOR
+    private var defaultHolidayCalendarColor: String = DEFAULT_HOLIDAY_CALENDAR_COLOR
     private var defaultCountryCode: String? = null
     private var defaultLanguageCode: String? = null
 
@@ -102,14 +103,14 @@ class AccountViewModel @Inject constructor(
 
             valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
+            val colorArray = context.resources.getStringArray(R.array.colors_with_names)
             defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
-            val calendarColors = context.resources.getIntArray(R.array.accent_colors_base)
-            defaultCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
-            defaultHolidayCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
+            defaultCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
+            defaultHolidayCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
             for (i in 0 until 10) {
                 // Try and use a different value for default calendar and holiday calendar colors
                 if (defaultHolidayCalendarColor != defaultCalendarColor) break
-                defaultHolidayCalendarColor = calendarColors[(0..calendarColors.lastIndex).random()]
+                defaultHolidayCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
             }
             val languageTag = context.resources.configuration.currentLocale().toLanguageTag().lowercase()
             defaultCountryCode = languageTag.substringAfter("-", "")

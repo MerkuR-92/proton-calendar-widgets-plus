@@ -34,7 +34,7 @@ class CreateCalendarUseCase @Inject constructor(
         userId: UserId,
         name: String,
         description: String = "",
-        color: Int = DEFAULT_CALENDAR_COLOR,
+        color: String = DEFAULT_CALENDAR_COLOR,
         display: Int = 1,
         email: String? = null
     ) : UseCase.Result {
@@ -48,7 +48,7 @@ class CreateCalendarUseCase @Inject constructor(
                 name = name,
                 description = description,
                 addressId = address.addressId.id,
-                color = color.toHexColor(),
+                color = color,
                 display = display
             )
 

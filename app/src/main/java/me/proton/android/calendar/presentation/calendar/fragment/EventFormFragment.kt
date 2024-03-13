@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -53,6 +54,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
@@ -410,6 +412,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormStartTimePress.isEnabled = !processingEvent
                 binding.eventFormEndTimePress.isEnabled = !processingEvent
                 binding.eventFormCalendarPress.root.isEnabled = !processingEvent
+                binding.eventFormColorPress.root.isEnabled = !processingEvent
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
 
@@ -515,6 +518,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             binding.eventFormCalendar.text = event.calendar.name
+
+            ImageViewCompat.setImageTintList(
+                binding.eventFormColorIcon,
+                ColorStateList.valueOf(Color.parseColor(event.displayColor))
+            )
 
             binding.eventFormRecurrence.text =
                 AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
@@ -802,6 +810,21 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         }
                     }
 
+                }
+            }
+        }
+
+        binding.eventFormColorPress.root.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            lifecycleScope.launch {
+
+                ColorUtils.displayColorPicker(
+                    requireContext(),
+                    resources.getString(R.string.dialog_title_event_color_picker),
+                    resources.getStringArray(R.array.colors_with_names),
+                    eventViewModel.eventLiveData.value!!.displayColor,
+                    eventViewModel.eventLiveData.value!!.calendar.color
+                ) {
                 }
             }
         }

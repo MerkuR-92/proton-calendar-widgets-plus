@@ -13,29 +13,6 @@
     <!-- constant colors, do not change in dark mode -->
     <color name="text_on_calendar_color">#FFFFFF</color>
 
-    <array name="accent_colors_base">
-        <item>@color/purple_base</item>
-        <item>@color/pink_base</item>
-        <item>@color/strawberry_base</item>
-        <item>@color/carrot_base</item>
-        <item>@color/sahara_base</item>
-        <item>@color/enzian_base</item>
-        <item>@color/plum_base</item>
-        <item>@color/cerise_base</item>
-        <item>@color/copper_base</item>
-        <item>@color/soil_base</item>
-        <item>@color/slateblue_base</item>
-        <item>@color/pacific_base</item>
-        <item>@color/reef_base</item>
-        <item>@color/fern_base</item>
-        <item>@color/olive_base</item>
-        <item>@color/cobalt_base</item>
-        <item>@color/ocean_base</item>
-        <item>@color/pine_base</item>
-        <item>@color/forest_base</item>
-        <item>@color/pickle_base</item>
-    </array>
-
     <color name="purple_base">#8080FF</color>
     <color name="strawberry_base">#EC3E7C</color>
     <color name="pink_base">#DB60D6</color>
