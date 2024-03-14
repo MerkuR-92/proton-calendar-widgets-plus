@@ -37,6 +37,7 @@ class FeatureFlagViewModel @Inject constructor(
     val state = mutableState.asStateFlow()
 
     var holidayCalendarFeatureFlag: LiveData<Boolean> = MutableLiveData()
+    var colorPerEventFeatureFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
@@ -64,6 +65,12 @@ class FeatureFlagViewModel @Inject constructor(
             CalendarFeatureFlag.CalendarAndroidHoliday.featureId
         ).map {
             it?.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+        colorPerEventFeatureFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.CalendarAndroidColorPerEvent.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.CalendarAndroidColorPerEvent.fallbackValue
         }.asLiveData(Dispatchers.Default)
     }
 
@@ -100,6 +107,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     fun isHolidayCalendarEnabled(): Boolean {
         return holidayCalendarFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidHoliday.fallbackValue
+    }
+
+    fun isColorPerEventEnabled(): Boolean {
+        return colorPerEventFeatureFlag.value ?: CalendarFeatureFlag.CalendarAndroidColorPerEvent.fallbackValue
     }
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {

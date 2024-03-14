@@ -13,6 +13,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     CalendarAndroidAutoAddHoliday(FeatureId("CalendarAndroidAutoAddHoliday"), false, false),
     RatingAndroidCalendar(FeatureId("RatingAndroidCalendar"), false, false),
     CalendarAndroidServerDownBanner(FeatureId("CalendarAndroidServerDownBanner"), false, false),
+    CalendarAndroidColorPerEvent(FeatureId("CalendarAndroidColorPerEvent"), false, false),
 
     // Local only flag (unknown to remote API)
     // Enabled
@@ -40,6 +41,5 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ClearCalendar(FeatureId("ClearCalendar"), false, true),
     ShowEventSearch(FeatureId("ShowEventSearch"), false, true),
     EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), false, true),
-    Payments(FeatureId("Subscription"), false, true),
-    ColorPerEvent(FeatureId("ColorPerEvent"), false, true)
+    Payments(FeatureId("Subscription"), false, true)
 }

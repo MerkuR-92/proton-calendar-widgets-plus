@@ -87,6 +87,7 @@ import me.proton.android.calendar.common.SERVER_DOWN_BANNER_DURATION_SECONDS
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -524,11 +525,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         // Display spotlight dialog if needed
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
                         val isHolidayCalendarEnabled = featureFlagViewModel.isHolidayCalendarEnabled()
+                        val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
                         val hasHolidayCalendars = calendarViewModel.hasHolidayCalendars()
                         val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
                         val spotlightShown =
                             if (currentViewIsCalendar) {
                                 showLastSpotlightDialog(
+                                    calendarViewModel.isFreeUser() ?: true,
+                                    isColorPerEventEnabled,
                                     isHolidayCalendarEnabled,
                                     hasHolidayCalendars,
                                     isCalendarLimitReached
@@ -1784,6 +1788,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
             holidayCalendarFeatureFlag ?: return@Observer
+        })
+        featureFlagViewModel.colorPerEventFeatureFlag.observe(this@MainActivity, Observer { colorPerEventFeatureFlag ->
+            colorPerEventFeatureFlag ?: return@Observer
         })
 
         lifecycleScope.launch {

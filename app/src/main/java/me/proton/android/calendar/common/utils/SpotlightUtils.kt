@@ -11,6 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CALENDAR_PROVIDER_VERSION_CODE
+import me.proton.android.calendar.common.COLOR_PER_EVENT_VERSION_CODE
 import me.proton.android.calendar.common.EASY_SWITCH_VERSION_CODE
 import me.proton.android.calendar.common.HOLIDAY_CALENDAR_VERSION_CODE
 import me.proton.android.calendar.common.IMPORT_VERSION_CODE
@@ -103,7 +104,16 @@ object SpotlightUtils {
         )
     }
 
+    private fun getColorPerEventDialogContent(): Pair<Int, Int> {
+        return Pair(
+            R.string.spotlight_dialog_color_per_event_title,
+            R.string.spotlight_dialog_color_per_event_description
+        )
+    }
+
     fun Activity.showLastSpotlightDialog(
+        isFreeUser: Boolean,
+        isColorPerEventEnabled: Boolean,
         isHolidayCalendarEnabled: Boolean,
         hasHolidayCalendar: Boolean,
         calendarLimitReached: Boolean,
@@ -223,6 +233,19 @@ object SpotlightUtils {
                 )
                 true
             }
+            COLOR_PER_EVENT_VERSION_CODE -> {
+                if (!isColorPerEventEnabled || isFreeUser) return false // Color per event is a paid feature
+                val content = getColorPerEventDialogContent()
+                this.displaySpotlightDialog(
+                    content.first,
+                    content.second,
+                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button,
+                    customPositiveButtonCallback = {
+                        positiveCallback?.invoke(lastSpotlightVersionCode)
+                    }
+                )
+                true
+            }
             else -> {
                 // Do nothing if we don't have any dialog to show for that version code
                 false
@@ -281,8 +304,8 @@ object SpotlightUtils {
             viewBinding.dialogSpotlightCustomNegativeButton.setOnSingleClickListener {
                 dialog?.dismiss()
             }
-        } else {
-            materialDialogBuilder.setNegativeButton(materialNegativeButtonText ?: R.string.spotlight_dialog_skip) { _, _ ->
+        } else if (materialNegativeButtonText != null) {
+            materialDialogBuilder.setNegativeButton(materialNegativeButtonText) { _, _ ->
                 // Nothing to do here
             }
         }
