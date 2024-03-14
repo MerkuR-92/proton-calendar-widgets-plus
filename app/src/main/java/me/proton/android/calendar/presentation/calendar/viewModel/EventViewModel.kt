@@ -839,6 +839,7 @@ class EventViewModel @Inject constructor(
     }
 
     fun handleColor(colorHex: String) {
+        markEventAsEdited()
         event = Event.from(
             event,
             color = colorHex

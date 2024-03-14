@@ -75,6 +75,7 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.clearText
@@ -93,6 +94,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
     private val eventViewModel: EventViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -520,17 +522,18 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
             binding.eventFormCalendar.text = event.calendar.name
 
-            binding.eventFormCalendarIcon.visibleOrGone(CalendarFeatureFlag.ColorPerEvent.fallbackValue)
-            binding.eventFormCalendarDot.visibleOrGone(!CalendarFeatureFlag.ColorPerEvent.fallbackValue)
-            if (!CalendarFeatureFlag.ColorPerEvent.fallbackValue) {
+            val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
+            binding.eventFormCalendarIcon.visibleOrGone(isColorPerEventEnabled)
+            binding.eventFormCalendarDot.visibleOrGone(!isColorPerEventEnabled)
+            if (!isColorPerEventEnabled) {
                 ImageViewCompat.setImageTintList(
                     binding.eventFormCalendarDot,
                     ColorStateList.valueOf(Color.parseColor(event.calendar.color))
                 )
             }
 
-            binding.eventFormColorLayout.visibleOrGone(CalendarFeatureFlag.ColorPerEvent.fallbackValue)
-            if (CalendarFeatureFlag.ColorPerEvent.fallbackValue) {
+            binding.eventFormColorLayout.visibleOrGone(isColorPerEventEnabled)
+            if (isColorPerEventEnabled) {
                 binding.eventFormColor.text = ColorUtils.getColorNameForHex(
                     resources.getStringArray(R.array.colors_with_names),
                     event.displayColor
@@ -834,18 +837,21 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         }
 
         val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
-        binding.eventFormColorPress.root.visibleOrGone(!isFreeUser)
         binding.eventFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-                ColorUtils.displayColorPicker(
-                    requireContext(),
-                    resources.getString(R.string.dialog_title_event_color_picker),
-                    resources.getStringArray(R.array.colors_with_names),
-                    eventViewModel.eventLiveData.value!!.displayColor,
-                    eventViewModel.eventLiveData.value!!.calendar.color
-                ) {
-                    eventViewModel.handleColor(it)
+                if (isFreeUser) {
+                    view?.displaySnackBar(getString(R.string.snack_color_per_event_paid_feature))
+                } else {
+                    ColorUtils.displayColorPicker(
+                        requireContext(),
+                        resources.getString(R.string.dialog_title_event_color_picker),
+                        resources.getStringArray(R.array.colors_with_names),
+                        eventViewModel.eventLiveData.value!!.displayColor,
+                        eventViewModel.eventLiveData.value!!.calendar.color
+                    ) {
+                        eventViewModel.handleColor(it)
+                    }
                 }
             }
         }
