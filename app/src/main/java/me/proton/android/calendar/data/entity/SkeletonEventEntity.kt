@@ -21,7 +21,9 @@ data class SkeletonEventEntity(
     @SerialName("ModifyTime")
     val modifyTime: Long,
     @SerialName("AddressID")
-    val addressId: String?
+    val addressId: String?,
+    @SerialName("Color")
+    val color: String? = null
 )
 
 /**
@@ -37,7 +39,8 @@ fun SkeletonEventEntity.toSkeletonEvent(json: Json, calendarColor: String? = nul
                 it,
                 modifyTime,
                 null,
-                null
+                null,
+                color = this.color
             )
         } else null
     }
