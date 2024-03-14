@@ -78,6 +78,7 @@ import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.clearText
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import java.time.Instant
@@ -519,16 +520,28 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
             binding.eventFormCalendar.text = event.calendar.name
 
-            binding.eventFormColor.text = ColorUtils.getColorNameForHex(
-                resources.getStringArray(R.array.colors_with_names),
-                event.displayColor
-            ) ?: getString(R.string.undefined_color)
-            binding.eventFormColorDefault.visibleOrGone(event.displayColor == event.calendar.color)
+            binding.eventFormCalendarIcon.visibleOrGone(CalendarFeatureFlag.ColorPerEvent.fallbackValue)
+            binding.eventFormCalendarDot.visibleOrGone(!CalendarFeatureFlag.ColorPerEvent.fallbackValue)
+            if (!CalendarFeatureFlag.ColorPerEvent.fallbackValue) {
+                ImageViewCompat.setImageTintList(
+                    binding.eventFormCalendarDot,
+                    ColorStateList.valueOf(Color.parseColor(event.calendar.color))
+                )
+            }
 
-            ImageViewCompat.setImageTintList(
-                binding.eventFormColorIcon,
-                ColorStateList.valueOf(Color.parseColor(event.displayColor))
-            )
+            binding.eventFormColorLayout.visibleOrGone(CalendarFeatureFlag.ColorPerEvent.fallbackValue)
+            if (CalendarFeatureFlag.ColorPerEvent.fallbackValue) {
+                binding.eventFormColor.text = ColorUtils.getColorNameForHex(
+                    resources.getStringArray(R.array.colors_with_names),
+                    event.displayColor
+                ) ?: getString(R.string.undefined_color)
+                binding.eventFormColorDefault.visibleOrGone(event.displayColor == event.calendar.color)
+
+                ImageViewCompat.setImageTintList(
+                    binding.eventFormColorIcon,
+                    ColorStateList.valueOf(Color.parseColor(event.displayColor))
+                )
+            }
 
             binding.eventFormRecurrence.text =
                 AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
@@ -820,10 +833,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             }
         }
 
+        val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
+        binding.eventFormColorPress.root.visibleOrGone(!isFreeUser)
         binding.eventFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
             lifecycleScope.launch {
-
                 ColorUtils.displayColorPicker(
                     requireContext(),
                     resources.getString(R.string.dialog_title_event_color_picker),
