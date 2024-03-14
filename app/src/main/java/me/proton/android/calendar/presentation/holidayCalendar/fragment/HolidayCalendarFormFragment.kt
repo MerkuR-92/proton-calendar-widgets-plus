@@ -213,6 +213,11 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
             }
 
             binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
+
+            binding.holidayCalendarFormColor.text = ColorUtils.getColorNameForHex(
+                resources.getStringArray(R.array.colors_with_names),
+                calendarColor
+            ) ?: getString(R.string.undefined_color)
         }
 
         holidayCalendarViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->

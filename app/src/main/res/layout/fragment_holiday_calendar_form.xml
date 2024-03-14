@@ -227,7 +227,7 @@
             android:layout_marginStart="@dimen/default_margin_text_start"
             android:layout_marginTop="@dimen/spacing_page"
             android:layout_marginEnd="@dimen/spacing_page"
-            android:text="@string/calendar_form_color"
+            tools:text="@string/calendar_form_color"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>

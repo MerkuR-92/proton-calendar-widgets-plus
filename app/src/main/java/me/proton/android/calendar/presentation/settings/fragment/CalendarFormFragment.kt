@@ -268,6 +268,11 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
             }
 
             binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
+
+            binding.calendarFormColor.text = ColorUtils.getColorNameForHex(
+                resources.getStringArray(R.array.colors_with_names),
+                calendarColor
+            ) ?: getString(R.string.undefined_color)
         }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
             binding.calendarFormDefaultEventNotifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
