@@ -519,6 +519,12 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
             binding.eventFormCalendar.text = event.calendar.name
 
+            binding.eventFormColor.text = ColorUtils.getColorNameForHex(
+                resources.getStringArray(R.array.colors_with_names),
+                event.displayColor
+            ) ?: getString(R.string.undefined_color)
+            binding.eventFormColorDefault.visibleOrGone(event.displayColor == event.calendar.color)
+
             ImageViewCompat.setImageTintList(
                 binding.eventFormColorIcon,
                 ColorStateList.valueOf(Color.parseColor(event.displayColor))
@@ -825,6 +831,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.eventLiveData.value!!.displayColor,
                     eventViewModel.eventLiveData.value!!.calendar.color
                 ) {
+                    eventViewModel.handleColor(it)
                 }
             }
         }

@@ -33,6 +33,14 @@ object ColorUtils {
         return toColorNameWithHex(colorArray.random()).hexString
     }
 
+    fun getColorNameForHex(colorArray: Array<String>, colorHex: String): String? {
+        return colorArray.map {
+            toColorNameWithHex(it)
+        }.firstOrNull {
+            it.hexString == colorHex
+        }?.name
+    }
+
     private fun toColorNameWithHex(colorResource: String): ColorNameWithHex {
         val splitResult = colorResource.split("|")
         return ColorNameWithHex(

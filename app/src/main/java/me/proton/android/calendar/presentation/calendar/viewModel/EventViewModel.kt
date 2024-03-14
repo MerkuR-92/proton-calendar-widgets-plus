@@ -822,7 +822,9 @@ class EventViewModel @Inject constructor(
                     calendar.defaultEventDuration,
                     calendar.defaultPartDayNotifications,
                     calendar.defaultFullDayNotifications
-                )
+                ),
+                color = if (event.color == event.calendar.color) calendar.color
+                else event.color
             )
 
             // when changing calendar, don't apply its default alarms
@@ -834,6 +836,14 @@ class EventViewModel @Inject constructor(
         } else {
             false
         }
+    }
+
+    fun handleColor(colorHex: String) {
+        event = Event.from(
+            event,
+            color = colorHex
+        )
+        _event.postValue(event)
     }
 
     fun handleTimeZone(timeZoneId: String) {

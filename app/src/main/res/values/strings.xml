@@ -666,6 +666,7 @@
     <string name="import_event_disclaimer_dialog_title">Import as simple event?</string>
     <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
     <string name="import_event_disclaimer_dialog_positive">Import</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
