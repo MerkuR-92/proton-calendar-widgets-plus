@@ -47,6 +47,7 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
+import me.proton.android.calendar.common.MAX_CALENDAR_INDICATORS
 import me.proton.android.calendar.common.MAX_CALENDAR_PAID
 import me.proton.android.calendar.common.SIGNATURE_VERIFICATION_API_TIMEOUT
 import me.proton.android.calendar.common.ViewMode
@@ -110,8 +111,6 @@ import javax.inject.Inject
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
-
-private const val MAX_CALENDAR_INDICATORS = 5
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
@@ -338,7 +337,7 @@ class CalendarViewModel @Inject constructor(
 
     private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {
 
-        val indicators = mutableMapOf<LocalDate, MutableSet<String>>().withDefault { mutableSetOf() }
+        val indicators = mutableMapOf<LocalDate, MutableList<String>>().withDefault { mutableListOf() }
 
         events.forEach { event ->
             val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
@@ -348,7 +347,7 @@ class CalendarViewModel @Inject constructor(
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
                 val current = indicators.getValue(start)
-                current.add(event.calendar.color)
+                current.add(event.displayColor)
                 indicators[start] = current
                 start = start.plusDays(1)
 

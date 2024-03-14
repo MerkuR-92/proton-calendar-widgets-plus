@@ -27,6 +27,7 @@ import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.FragmentArguments.DATE_ARG
 import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.FragmentArguments.STARTING_POSITION_ARG
+import me.proton.android.calendar.common.MAX_CALENDAR_INDICATORS
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWeek
@@ -37,6 +38,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.databinding.ItemMiniCalendarBinding
 import me.proton.android.calendar.databinding.ItemMiniCalendarFragmentBinding
 import me.proton.android.calendar.databinding.MiniCalendarDotBinding
+import me.proton.android.calendar.databinding.MiniCalendarPlusBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import java.time.DayOfWeek
@@ -385,17 +387,25 @@ class ItemMiniCalendarFragment : Fragment() {
                 val llCalendarDotsView = itemView.findViewById<LinearLayout>(R.id.ll_calendar_dots)
                 llCalendarDotsView.visibleOrInvisible(true)
                 processedViewIndexList.add(miniCalendarIndex)
-                indicatorColors.forEach { indicatorColor ->
-                    val miniCalendarDotViewBinding = MiniCalendarDotBinding.inflate(
-                        LayoutInflater.from(this.context),
-                        llCalendarDotsView,
-                        false
-                    )
-
-                    miniCalendarDotViewBinding.root.backgroundTintList = ColorStateList.valueOf(
-                        Color.parseColor(indicatorColor)
-                    )
-                    llCalendarDotsView.addView(miniCalendarDotViewBinding.root)
+                indicatorColors.forEachIndexed { index, indicatorColor ->
+                    if (index + 1 == MAX_CALENDAR_INDICATORS) {
+                        val miniCalendarPlusViewBinding = MiniCalendarPlusBinding.inflate(
+                            LayoutInflater.from(this.context),
+                            llCalendarDotsView,
+                            false
+                        )
+                        llCalendarDotsView.addView(miniCalendarPlusViewBinding.root)
+                    } else {
+                        val miniCalendarDotViewBinding = MiniCalendarDotBinding.inflate(
+                            LayoutInflater.from(this.context),
+                            llCalendarDotsView,
+                            false
+                        )
+                        miniCalendarDotViewBinding.root.backgroundTintList = ColorStateList.valueOf(
+                            Color.parseColor(indicatorColor)
+                        )
+                        llCalendarDotsView.addView(miniCalendarDotViewBinding.root)
+                    }
                 }
             }
         }
