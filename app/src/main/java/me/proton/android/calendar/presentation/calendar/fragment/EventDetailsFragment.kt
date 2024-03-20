@@ -168,6 +168,12 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                                 navigationArguments.eventId,
                                 navigationArguments.occurrenceNumber
                             )))
+                        },
+                        navigateToEditFormPersonal = {
+                            findNavController().navigate((Navigation.Deeplink.toEventEditPersonal(
+                                navigationArguments.eventId,
+                                navigationArguments.occurrenceNumber
+                            )))
                         }
                     )
                 }
@@ -413,7 +419,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                                 !isEditLoading &&
                                 !deletingEvent &&
                                 !event.calendar.isSubscribed &&
-                                event.calendar.allowEditEvents &&
+                                (event.calendar.allowEditEvents || event.calendar.isSharedWithMe) &&
                                 (!event.isAnInvitation || allowEditInvitation)
                     )
                 }

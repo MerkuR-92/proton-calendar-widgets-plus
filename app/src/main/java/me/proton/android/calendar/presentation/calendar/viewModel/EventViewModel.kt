@@ -96,6 +96,7 @@ import me.proton.android.calendar.domain.usecase.SendEmailUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -147,6 +148,7 @@ class EventViewModel @Inject constructor(
     private val database: AppDatabase,
     private val upgradeEventUseCase: UpgradeEventUseCase,
     private val workManager: WorkManager,
+    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -2251,6 +2253,70 @@ class EventViewModel @Inject constructor(
         handleSaveResult(saveResult, occurrenceNumber, userErrorMessage)
     }
 
+    suspend fun onSavePersonalClick(
+        displayDialog: BaseDialogFragment.DisplayDialog,
+        eventId: String
+    ) {
+        // Update Event Form state
+        eventFormState.value = EventState.Processing.Saving
+
+        if (event.isRecurring() && !event.isSingleEdit()) {
+            // Display edit all events dialog
+            uiScope.launch {
+                displayDialog.alertDialog(
+                    resourceProvider.provideString(R.string.update_recurring_event),
+                    resourceProvider.provideString(R.string.update_recurring_all_events),
+                    resourceProvider.provideString(R.string.dialog_button_update),
+                    resourceProvider.provideString(R.string.dialog_button_cancel),
+                    object : BaseDialogFragment.DialogListener {
+                        override fun onPositive(selectedItem: Int) {
+                            coroutineScope.launch {
+                                // Save event
+                                handleSavePersonal(eventId)
+                            }
+                        }
+                        override fun onNegative() {
+                            eventFormState.value = EventState.Idle
+                        }
+                        override fun onCancel() {
+                            eventFormState.value = EventState.Idle
+                        }
+                        override fun onDismiss() {}
+                    }
+                )
+            }
+        } else {
+            // Save event
+            handleSavePersonal(eventId)
+        }
+    }
+
+    private suspend fun handleSavePersonal(eventId: String) {
+
+        val eventCopy = Event.from(event)
+        val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(
+            userId,
+            eventCopy.calendar.id,
+            eventId,
+            "",
+            eventCopy.notifications.notifications,
+            eventCopy.color
+        )
+
+        if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
+            updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventEntity>()?.let {
+                calendarsRepository.persistEvents(it)
+            }
+        }
+
+        // Handle save result
+        handleSaveResult(
+            saveResult = if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) SaveResult.SUCCESS
+            else SaveResult.ERROR,
+            occurrenceNumber = 0 // We can ignore this for this case
+        )
+    }
+
     /**
      * Handle save event result
      */
@@ -2407,7 +2473,8 @@ class EventViewModel @Inject constructor(
     }
 
     suspend fun onEditClick(
-        navigateToEditForm: () -> Unit
+        navigateToEditForm: () -> Unit,
+        navigateToEditFormPersonal: () -> Unit
     ) {
         // Post deleting event value to true to display loading state
         eventDetailsState.value = EventState.Processing.Deleting
@@ -2417,7 +2484,8 @@ class EventViewModel @Inject constructor(
             return
         }
 
-        navigateToEditForm()
+        if (event.calendar.isSharedWithMe && !event.calendar.allowEditEvents) navigateToEditFormPersonal()
+        else navigateToEditForm()
     }
 
     private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(actionType: EventDetailsActionType): Boolean {

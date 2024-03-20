@@ -804,7 +804,9 @@ data class UpdateEventPersonalPartApiRequest(
     @SerialName("PersonalEventContent")
     val personalEventContent: PersonalEventContentApiRequest? = null,
     @SerialName("Notifications")
-    val notifications: List<NotificationEntity>?
+    val notifications: List<NotificationEntity>?,
+    @SerialName("Color")
+    val color: String? = null,
 )
 
 @Serializable
