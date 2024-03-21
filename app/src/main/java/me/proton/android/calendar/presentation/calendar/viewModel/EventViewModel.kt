@@ -2293,14 +2293,28 @@ class EventViewModel @Inject constructor(
 
     private suspend fun handleSavePersonal(eventId: String) {
 
-        val eventCopy = Event.from(event)
+        // Make sure to upgrade the event first
+        val upgradedEventEntity = (upgradeEventUseCase.execute(
+            userId,
+            eventId
+        ) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
+        if (upgradedEventEntity == null) {
+            logger.e("handleSavePersonal could not upgrade Event")
+            // Reset event form state
+            eventFormState.value = EventState.Idle
+            // Display error updating event snack
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_event_updated_error)
+            )
+        }
+
         val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(
             userId,
-            eventCopy.calendar.id,
+            event.calendar.id,
             eventId,
             "",
-            eventCopy.notifications.notifications,
-            eventCopy.color
+            event.notifications.notifications,
+            event.color
         )
 
         if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
@@ -2310,11 +2324,22 @@ class EventViewModel @Inject constructor(
         }
 
         // Handle save result
-        handleSaveResult(
-            saveResult = if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) SaveResult.SUCCESS
-            else SaveResult.ERROR,
-            occurrenceNumber = 0 // We can ignore this for this case
-        )
+        if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
+            // Display event updated snack and return to month view with focus on the event's start date
+            eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
+                resourceProvider.provideString(R.string.snack_event_updated),
+                eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate(),
+                if (eventLiveData.value?.isAllDay() == false) eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalTime()
+                else null
+            )
+        } else {
+            // Reset event form state
+            eventFormState.value = EventState.Idle
+            // Display error updating event snack
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_event_updated_error)
+            )
+        }
     }
 
     /**
@@ -2484,7 +2509,14 @@ class EventViewModel @Inject constructor(
             return
         }
 
-        if (event.calendar.isSharedWithMe && !event.calendar.allowEditEvents) navigateToEditFormPersonal()
+        if (event.isAnInvitation) {
+            val canonicalUserEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
+                ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
+            }
+            if (!event.isUserOrganizer(canonicalUserEmails)) {
+                navigateToEditFormPersonal()
+            } else navigateToEditForm()
+        } else if (!event.calendar.allowEditEvents) navigateToEditFormPersonal()
         else navigateToEditForm()
     }
 

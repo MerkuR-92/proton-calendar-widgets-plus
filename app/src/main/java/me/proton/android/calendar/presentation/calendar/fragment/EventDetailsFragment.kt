@@ -410,16 +410,16 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 // TODO Remove attendees condition once edit attendees is implemented
                 lifecycleScope.launch {
                     val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
-                    val allowEditInvitation = CalendarFeatureFlag.EditInvitationAsOrganizer.fallbackValue
+                    val allowEditInvitation = (CalendarFeatureFlag.EditInvitationAsOrganizer.fallbackValue
                             && event.isAnInvitation
                             && event.calendar.isOwner
-                            && event.isUserOrganizer(canonicalUserEmails)
+                            && event.isUserOrganizer(canonicalUserEmails))
+                            || (event.isAnInvitation && !event.isUserOrganizer(canonicalUserEmails))
                     buttonEdit.visibleOrGone(
                         event.calendar.isActive &&
                                 !isEditLoading &&
                                 !deletingEvent &&
                                 !event.calendar.isSubscribed &&
-                                (event.calendar.allowEditEvents || event.calendar.isSharedWithMe) &&
                                 (!event.isAnInvitation || allowEditInvitation)
                     )
                 }
