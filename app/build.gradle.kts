@@ -35,6 +35,11 @@ android {
     buildFeatures {
         dataBinding = true
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions{
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get().toString()
     }
 
     signingConfigs {
@@ -280,9 +285,10 @@ dependencies {
     androidTestImplementation(libs.test.androidx.compose.ui.test.junit)
     androidTestImplementation(libs.test.fusion)
     androidTestImplementation(libs.test.androidx.ext.junit)
+    androidTestImplementation(libs.core.accountRecovery.test)
     androidTestImplementation(libs.core.auth.test)
     androidTestImplementation(libs.core.plan.test)
-    androidTestImplementation(libs.core.accountRecovery.test)
+    androidTestImplementation(libs.core.userSettings.test)
     androidTestImplementation(project(":shared-test-code"))
     androidTestImplementation(libs.dagger.hilt.android.testing)
     androidTestImplementation(libs.test.espresso.core)

@@ -56,6 +56,9 @@
         android:label=""
         tools:layout="@layout/fragment_settings">
         <action
+            android:id="@+id/action_nav_settings_to_nav_account_settings"
+            app:destination="@id/nav_account_settings" />
+        <action
             android:id="@+id/action_nav_settings_to_nav_general_settings"
             app:destination="@id/nav_general_settings" />
         <action
@@ -109,6 +112,16 @@
             android:id="@+id/deepLinkImportAssistantStatus"
             android:autoVerify="true"
             app:uri="proton-calendar://protonmail.com/importStatus" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/nav_account_settings"
+        android:name="me.proton.android.calendar.presentation.settings.fragment.AccountSettingsFragment"
+        android:label=""
+        tools:layout="@layout/fragment_account_settings">
+        <action
+            android:id="@+id/action_nav_general_settings_to_nav_settings"
+            app:destination="@id/nav_settings" />
     </dialog>
 
     <dialog

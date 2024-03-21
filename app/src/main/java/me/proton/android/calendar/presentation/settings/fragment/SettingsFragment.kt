@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
@@ -53,6 +54,8 @@ import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewMod
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
+import me.proton.core.accountmanager.presentation.compose.AccountSettingsItem
+import me.proton.core.compose.theme.ProtonTheme
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
@@ -101,6 +104,17 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.settingsAccountItem.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ProtonTheme {
+                    AccountSettingsItem(
+                        onClick = { findNavController().navigate(R.id.action_nav_settings_to_nav_account_settings) }
+                    )
+                }
+            }
+        }
 
         binding.settingsGeneralPress.root.setOnSingleClickListener {
             findNavController().navigate(R.id.action_nav_settings_to_nav_general_settings)
