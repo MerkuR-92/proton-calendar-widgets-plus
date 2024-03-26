@@ -11,7 +11,6 @@ import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarEventsServerEvents
 import me.proton.android.calendar.data.api.EventApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
@@ -87,6 +86,8 @@ class CalendarEventListener @Inject constructor(
             return
         }
 
+        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
+
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
         val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
@@ -98,6 +99,9 @@ class CalendarEventListener @Inject constructor(
             logger.i("action UPDATE for calendarEvent in deleted calendar")
             return
         }
+
+        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
+
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
         val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
@@ -106,6 +110,7 @@ class CalendarEventListener @Inject constructor(
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         if (keys.isEmpty()) return
+        calendarsRepository.deleteEventsMetadataByEventIds(keys)
         calendarsRepository.deleteEventsById(config.asCalendar().calendarId, keys)
     }
 
@@ -118,6 +123,7 @@ class CalendarEventListener @Inject constructor(
         val calendarId = config.asCalendar().calendarId
 
         // Wipe the calendar events from DB
+        calendarsRepository.deleteEventsMetadataByCalendarId(calendarId)
         calendarsRepository.deleteAllEvents(calendarId)
 
         // Wipe all the calendar search events from DB

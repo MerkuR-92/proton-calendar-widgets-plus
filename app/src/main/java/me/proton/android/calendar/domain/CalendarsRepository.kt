@@ -6,7 +6,6 @@ import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -232,6 +231,12 @@ interface CalendarsRepository {
     suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean?
 
     suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean?
+
+    suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata)
+
+    suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>)
+
+    suspend fun deleteEventsMetadataByCalendarId(calendarId: String)
 
     suspend fun persistEvents(vararg events: EventEntity)
 
