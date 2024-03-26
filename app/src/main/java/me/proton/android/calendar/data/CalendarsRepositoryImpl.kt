@@ -72,6 +72,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -1148,7 +1149,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean {
+    override suspend fun shouldFetchEvent(metadata: EventEntityMetadata): Boolean {
 
         val dbEventEntity = database.eventsDao().selectById(metadata.id)
         val isDbEventUpToDate = dbEventEntity?.modifyTime == metadata.modifyTime

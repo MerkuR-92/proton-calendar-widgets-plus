@@ -14,6 +14,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -210,7 +211,7 @@ interface CalendarsRepository {
 
     suspend fun eventExistsOnServer(userId: UserId, eventId: String, calendarId: String): Boolean?
 
-    suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean
+    suspend fun shouldFetchEvent(metadata: EventEntityMetadata): Boolean
 
     suspend fun hasCalendar(calendarId: String, ): Boolean
 

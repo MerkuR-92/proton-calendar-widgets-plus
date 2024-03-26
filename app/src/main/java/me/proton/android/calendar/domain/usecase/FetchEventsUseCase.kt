@@ -17,6 +17,7 @@ import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -259,9 +260,9 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         toDate: LocalDate,
         timeZoneId: String,
         coroutineScope: CoroutineScope
-    ): ReceiveChannel<List<ServerEvent.EventEntityMetadata>> {
+    ): ReceiveChannel<List<EventEntityMetadata>> {
 
-        val eventMetadatasChannel = Channel<List<ServerEvent.EventEntityMetadata>>(8)
+        val eventMetadatasChannel = Channel<List<EventEntityMetadata>>(8)
 
         coroutineScope.launch {
 
@@ -322,7 +323,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     /**
      * @throws Exception
      */
-    private suspend fun ReceiveChannel<List<ServerEvent.EventEntityMetadata>>.fetchRemoteEventEntities(
+    private suspend fun ReceiveChannel<List<EventEntityMetadata>>.fetchRemoteEventEntities(
         userId: UserId,
         coroutineScope: CoroutineScope
     ): ReceiveChannel<List<EventEntity>> {

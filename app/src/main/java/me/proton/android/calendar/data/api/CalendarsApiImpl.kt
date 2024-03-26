@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
@@ -485,7 +486,7 @@ data class EventsApiResponse(
 @Serializable
 data class EventsMetadataApiResponse(
     @SerialName("Events")
-    val events: List<ServerEvent.EventEntityMetadata>,
+    val events: List<EventEntityMetadata>,
     @SerialName("More")
     val more: Int
 )
