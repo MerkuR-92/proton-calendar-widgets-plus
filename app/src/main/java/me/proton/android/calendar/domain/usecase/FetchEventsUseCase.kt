@@ -2,6 +2,7 @@
 
 package me.proton.android.calendar.domain.usecase
 
+import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -9,11 +10,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
-import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
@@ -289,6 +289,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                                 if (eventsResponse is ApiResponse.Success) {
 
+                                    persistEventsMetadata(*eventsResponse.data.events.toTypedArray())
+
                                     if (!eventMetadatasChannel.isClosedForSend && eventsResponse.data.events.isNotEmpty()) {
                                         eventMetadatasChannel.send(eventsResponse.data.events) // PRODUCE
                                     }
@@ -318,6 +320,41 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         }
 
         return eventMetadatasChannel
+    }
+
+    private suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata) {
+        val eventsMetadataByCalendar = eventsMetadata.groupBy { it.calendarId }
+        database.inTransaction {
+            eventsMetadataByCalendar.forEach {
+                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
+                if (calendarUserId != null /* Calendar exists */) {
+                    try {
+                        it.value.forEach {
+                            // don't overwrite Event it we already have newer one in DB
+                            val hasEventMetadataWithHigherModifyTime = database.eventsMetadataDao().hasEventMetadataWithHigherModifyTime(
+                                it.id,
+                                it.calendarId,
+                                it.modifyTime
+                            )
+                            if (!hasEventMetadataWithHigherModifyTime) {
+                                database.eventsMetadataDao().updateOrInsert(it)
+                            }
+                        }
+                    } catch (e: SQLiteConstraintException) {
+                        // hack for different SQLite implementations formatting message differently
+                        if (e.message?.contains("787") == true
+                            && e.message?.contains("foreign", ignoreCase = true) == true
+                            && e.message?.contains("constraint", ignoreCase = true) == true
+                        ) {
+                            // ignore, it means this Event's Calendar doesn't exist
+                            logger.e("persistEventsMetadata couldn't insert because ${e.message}", e)
+                        } else throw e
+                    }
+                } else {
+                    logger.i("persistEventsMetadata couldn't insert because calendar doesn't exist")
+                }
+            }
+        }
     }
 
     /**
