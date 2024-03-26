@@ -173,6 +173,7 @@ abstract class AppDatabase :
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
+    abstract fun eventsMetadataDao(): EventsMetadataDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
     abstract fun calendarSubscriptionDao(): CalendarSubscriptionDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
@@ -291,6 +292,16 @@ class DatabaseTypeConverters {
     @TypeConverter
     fun fromJsonObject(json: JsonObject?): String? {
         return json?.run { Json { ignoreUnknownKeys = true }.encodeToString(json) }
+    }
+
+    @TypeConverter
+    fun toListOfLong(value: List<String>?): List<Long>? {
+        return value?.map { it.toLong() }
+    }
+
+    @TypeConverter
+    fun fromListOfLong(value: List<Long>?): List<String>? {
+        return value?.map { it.toString() }
     }
 
 }
