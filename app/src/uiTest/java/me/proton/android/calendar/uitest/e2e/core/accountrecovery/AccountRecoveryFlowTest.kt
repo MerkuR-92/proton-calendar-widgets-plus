@@ -9,9 +9,11 @@ import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import me.proton.android.calendar.uitest.BaseTest
+import me.proton.android.calendar.uitest.rule.NotificationPermissionRule
 import me.proton.core.accountmanager.data.AccountStateHandler
 import me.proton.core.accountrecovery.dagger.CoreAccountRecoveryFeaturesModule
 import me.proton.core.accountrecovery.domain.IsAccountRecoveryEnabled
+import me.proton.core.accountrecovery.domain.IsAccountRecoveryResetEnabled
 import me.proton.core.accountrecovery.test.MinimalAccountRecoveryNotificationTest
 import me.proton.core.auth.test.usecase.WaitForPrimaryAccount
 import me.proton.core.domain.entity.UserId
@@ -31,12 +33,9 @@ import javax.inject.Inject
     CoreNotificationFeaturesModule::class,
 )
 class AccountRecoveryFlowTest : BaseTest(), MinimalAccountRecoveryNotificationTest {
+
     @get:Rule(order = Rule.DEFAULT_ORDER - 2)
-    val grantPermissionRule: GrantPermissionRule = if (Build.VERSION.SDK_INT >= 33) {
-        GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
-    } else {
-        GrantPermissionRule.grant()
-    }
+    val grantPermissionRule = NotificationPermissionRule()
 
     @get:Rule(order = Rule.DEFAULT_ORDER - 1)
     val composeTestRule: ComposeTestRule = createEmptyComposeRule()
@@ -44,6 +43,15 @@ class AccountRecoveryFlowTest : BaseTest(), MinimalAccountRecoveryNotificationTe
     @BindValue
     internal val isAccountRecoveryEnabled = object : IsAccountRecoveryEnabled {
         override fun invoke(userId: UserId?): Boolean = true
+        override fun isLocalEnabled(): Boolean = true
+        override fun isRemoteEnabled(userId: UserId?): Boolean = true
+    }
+
+    @BindValue
+    internal val isAccountRecoveryResetEnabled = object : IsAccountRecoveryResetEnabled {
+        override fun invoke(userId: UserId?): Boolean = true
+        override fun isLocalEnabled(): Boolean = true
+        override fun isRemoteEnabled(userId: UserId?): Boolean = true
     }
 
     @BindValue

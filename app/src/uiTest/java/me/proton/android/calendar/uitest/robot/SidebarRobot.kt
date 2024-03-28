@@ -12,7 +12,8 @@ object SidebarRobot : Robot {
         ThreeDays(R.id.nav_view_switcher_three_day_layout),
         Week(R.id.nav_view_switcher_week_layout),
         Month(R.id.nav_view_switcher_month_layout),
-        Subscriptions(R.id.nav_view_more_subscription_layout)
+        Subscriptions(R.id.nav_view_more_subscription_layout),
+        Settings(R.id.nav_view_more_settings_layout)
     }
 
     private fun  clickNavigationItem(navigationItem: NavigationItem) =
@@ -24,4 +25,5 @@ object SidebarRobot : Robot {
     fun clickWeek() = HomeRobot.apply { clickNavigationItem(NavigationItem.Week) }
     fun clickMonth() = HomeRobot.apply { clickNavigationItem(NavigationItem.Month) }
     fun clickSubscriptions() = clickNavigationItem(NavigationItem.Subscriptions)
+    fun clickSettings() = SettingsRobot.apply { clickNavigationItem(NavigationItem.Settings) }
 }
