@@ -1442,6 +1442,11 @@ class CalendarsRepositoryImpl @Inject constructor(
         database.calendarKeysDao().updateOrInsert(calendarKey)
     }
 
+    override suspend fun deleteAllCalendars() {
+        database.calendarsDao().deleteAll()
+        database.calendarUserSettingsDao().deleteAll()
+    }
+
     override suspend fun deleteCalendarKeyById(id: String) {
         database.calendarKeysDao().deleteById(id)
     }
