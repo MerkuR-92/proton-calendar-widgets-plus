@@ -1,7 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
+import configuration.util.getTokenFromCurl
 
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
@@ -12,7 +14,10 @@ plugins {
     id("androidx.navigation.safeargs.kotlin")
     id("dagger.hilt.android.plugin")
     id("jacoco")
+    alias(libs.plugins.gradlePlugin.proton.environmentConfig)
 }
+
+val atlasProxyUrl: String = System.getenv("ATLAS_PROXY_URL")
 
 sonarqube {
     properties {
@@ -69,6 +74,10 @@ android {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
             }
         }
+
+        protonEnvironment {
+            apiPrefix = "calendar-api"
+        }
     }
 
     flavorDimensions.add("env")
@@ -76,21 +85,23 @@ android {
         create("dev") {
             dimension = "env"
             applicationIdSuffix = ".dev"
-            buildConfigField("String", "API_HOST", "\"api.proton.black\"")
-            buildConfigField("String", "HV3_HOST", "\"verify.proton.black\"")
-            buildConfigField("String", "QUARK_HOST", "\"proton.black\"")
-            buildConfigField("String", "PROXY_TOKEN", System.getenv("PROXY_TOKEN").toBuildConfigValue())
-            buildConfigField("Boolean", "USE_DEFAULT_PINS", "false")
             resValue("string", "app_name", "Atlas Proton Calendar")
+            protonEnvironment {
+                proxyToken = getTokenFromCurl(atlasProxyUrl)
+                host = "proton.black"
+            }
+
         }
         create("prod") {
             dimension = "env"
-            buildConfigField("String", "API_HOST", "\"calendar-api.proton.me\"")
-            buildConfigField("String", "HV3_HOST", "\"verify.proton.me\"")
-            buildConfigField("String", "QUARK_HOST", "\"\"")
-            buildConfigField("String", "PROXY_TOKEN", "\"\"")
-            buildConfigField("Boolean", "USE_DEFAULT_PINS", "true")
             resValue("string", "app_name", "Proton Calendar")
+
+            protonEnvironment {
+                // If we are creating a custom build (prod build that points to scientist env)
+                // do not use the default pins
+                useDefaultPins = true
+                apiPrefix = "calendar-api"
+            }
         }
     }
 
@@ -220,6 +231,9 @@ dependencies {
     implementation(libs.core.user)
     implementation(libs.core.userSettings)
     implementation(libs.core.utilAndroidDagger)
+    implementation(libs.core.config.data)
+    releaseImplementation(libs.core.config.dagger.staticDefaults)
+    debugImplementation(libs.core.config.dagger.contentProvider)
     implementation(libs.core.utilAndroidSentry)
     implementation(libs.core.utilKotlin)
     implementation(libs.core.challenge)

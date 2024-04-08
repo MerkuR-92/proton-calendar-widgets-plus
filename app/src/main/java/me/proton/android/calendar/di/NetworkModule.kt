@@ -5,9 +5,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.data.api.CalendarApiClient
-import me.proton.android.calendar.domain.EnvironmentConfiguration
+import me.proton.core.configuration.EnvironmentConfiguration
 import me.proton.core.network.data.client.ExtraHeaderProviderImpl
 import me.proton.core.network.data.di.AlternativeApiPins
 import me.proton.core.network.data.di.BaseProtonApiUrl
@@ -27,7 +26,7 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @BaseProtonApiUrl
-    fun provideProtonApiUrl(envConfiguration: EnvironmentConfiguration): HttpUrl = envConfiguration.apiHost.toHttpUrl()
+    fun provideProtonApiUrl(envConfiguration: EnvironmentConfiguration): HttpUrl = envConfiguration.baseUrl.toHttpUrl()
 
     @DohProviderUrls
     @Provides
@@ -35,7 +34,7 @@ object NetworkModule {
 
     @CertificatePins
     @Provides
-    fun provideCertificatePins() = if (BuildConfig.USE_DEFAULT_PINS) {
+    fun provideCertificatePins(envConfiguration: EnvironmentConfiguration) = if (envConfiguration.useDefaultPins) {
         Constants.DEFAULT_SPKI_PINS
     } else {
         emptyArray()
@@ -43,7 +42,7 @@ object NetworkModule {
 
     @AlternativeApiPins
     @Provides
-    fun provideAlternativeApiPins() = if (BuildConfig.USE_DEFAULT_PINS) {
+    fun provideAlternativeApiPins(envConfiguration: EnvironmentConfiguration) = if (envConfiguration.useDefaultPins) {
         Constants.ALTERNATIVE_API_SPKI_PINS
     } else {
         emptyList()

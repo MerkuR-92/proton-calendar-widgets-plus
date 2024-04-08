@@ -60,6 +60,7 @@ logging-interceptor = "4.8.0"
 sql-cipher = "4.5.2"
 guava = "31.0.1-android"
 proton-detekt-plugin = "1.3.0"
+gradlePlugin-proton-config = "1.3.1"
 review = "2.0.1"
 espresso-core="3.5.1"
 
@@ -133,7 +134,9 @@ core-userSettings-test = { module = "me.proton.core:user-settings-test", version
 core-utilAndroidDagger = { module = "me.proton.core:util-android-dagger", version.ref = "core" }
 core-utilAndroidSentry = { module = "me.proton.core:util-android-sentry", version.ref = "core" }
 core-utilKotlin = { module = "me.proton.core:util-kotlin", version.ref = "core" }
-
+core-config-data = { module = "me.proton.core:configuration-data", version.ref = "core" }
+core-config-dagger-staticDefaults = { module = "me.proton.core:configuration-dagger-staticdefaults", version.ref = "core" }
+core-config-dagger-contentProvider = { module = "me.proton.core:configuration-dagger-content-resolver", version.ref = "core" }
 # Gradle
 gradle-plugin-android = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
 gradle-plugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -224,4 +227,5 @@ google-play-review-ktx = { module = "com.google.android.play:review-ktx", versio
 
 [plugins]
 proton-detekt = { id = "me.proton.core.gradle-plugins.detekt", version.ref = "proton-detekt-plugin" }
+gradlePlugin-proton-environmentConfig = { id = "me.proton.core.gradle-plugins.environment-config", version.ref = "gradlePlugin-proton-config" }
 proton-jacoco = { id = "me.proton.core.gradle-plugins.jacoco", version.ref = "proton-detekt-plugin" }
