@@ -28,6 +28,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events")
     abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events WHERE id IN (:ids) ORDER BY ID")
+    abstract fun selectSkeletonEventsById(ids: List<String>): List<SkeletonEventEntity>
+
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events WHERE calendarId = :calendarId")
     abstract fun getSkeletonEventsInCalendarFlow(calendarId: String): Flow<List<SkeletonEventEntity>>
 

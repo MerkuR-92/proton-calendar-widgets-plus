@@ -72,6 +72,8 @@ interface CalendarsRepository {
 
     suspend fun selectSubscribedCalendars(userId: String): List<Calendar>
 
+    fun flowVisibleCalendarIds(userId: String): Flow<List<String>>
+
     fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>>
@@ -127,15 +129,6 @@ interface CalendarsRepository {
 
     suspend fun updateCalendarDisplay(calendarId: String, display: Boolean)
 
-    // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
-
-    // events
-    fun eventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<List<Event>?>
-
     /**
      * Request Events to be pushed to observers and also fetched from API if possible.
      */
@@ -154,21 +147,21 @@ interface CalendarsRepository {
 
     suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event?
 
-    /**
-     * @return Transformed Events.
-     */
-    fun getEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        allowCached: Boolean
-    ): Flow<GetEventsResult<Event>>
-
     fun getUiEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
     ): Flow<GetEventsResult<UiEvent>>
+
+    suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>,
+        isFreeUser: Boolean
+    ): List<UiEvent>?
 
     suspend fun getEvents(
         userId: String,
@@ -187,15 +180,6 @@ interface CalendarsRepository {
     suspend fun deleteAllSearchEventsInCalendar(userId: String, calendarId: String)
 
     suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>)
-
-    /**
-     * @return SkeletonEvents with correct Calendar Color.
-     */
-    suspend fun getSkeletonEvents(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): List<SkeletonEvent>
 
     /**
      * @return SkeletonEvents with correct Calendar Color.

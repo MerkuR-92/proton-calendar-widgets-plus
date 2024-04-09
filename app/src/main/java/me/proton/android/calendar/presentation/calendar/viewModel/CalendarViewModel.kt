@@ -14,7 +14,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -156,6 +155,7 @@ class CalendarViewModel @Inject constructor(
     val selectedDateTime: LiveData<Pair<LocalDate, LocalTime?>> = _selectedDateTime
 
     // userCalendars contains all non-subscribed calendars regardless of their flags
+    var visibleCalendarIds: LiveData<List<String>> = MutableLiveData()
     var userCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0
     var userPersonalCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0 where user is owner
     var otherCalendars: LiveData<List<Calendar>> = MutableLiveData() // Calendars with type 0 where user is member, type 1 and type 2
@@ -213,6 +213,7 @@ class CalendarViewModel @Inject constructor(
             logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
+        visibleCalendarIds = calendarsRepository.flowVisibleCalendarIds(userId).asLiveData(Dispatchers.Default)
         userCalendars = calendarsRepository.flowUserCalendars(userId).asLiveData(Dispatchers.Default)
         userPersonalCalendars = calendarsRepository.flowUserPersonalCalendars(userId).asLiveData(Dispatchers.Default)
         otherCalendars = combine(
@@ -344,7 +345,7 @@ class CalendarViewModel @Inject constructor(
         val indicators = mutableMapOf<LocalDate, MutableList<String>>().withDefault { mutableListOf() }
 
         events.forEach { event ->
-            val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId) .toLocalTime() == LocalTime.MIDNIGHT)
+            val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT)
             var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
             val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
 
@@ -434,14 +435,6 @@ class CalendarViewModel @Inject constructor(
 
     }
 
-    suspend fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): List<SkeletonEvent> {
-        return calendarsRepository.getSkeletonEvents(fromDate, toDate, timeZoneId)
-    }
-
-    fun getSkeletonEventsFlow(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<CalendarsRepository.GetEventsResult<SkeletonEvent>> {
-        return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).asLiveData()
-    }
-
     fun calendarIndicators(
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -449,7 +442,7 @@ class CalendarViewModel @Inject constructor(
         isFreeUser: Boolean
     ): LiveData<Map<LocalDate, List<String>>> {
 
-        return getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
+        return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
             when (skeletonResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()
@@ -464,7 +457,7 @@ class CalendarViewModel @Inject constructor(
                     emptyMap()
                 }
             }
-        }
+        }.asLiveData()
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState

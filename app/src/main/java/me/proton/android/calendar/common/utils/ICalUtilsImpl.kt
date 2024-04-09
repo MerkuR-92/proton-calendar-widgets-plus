@@ -38,7 +38,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
-import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.domain.model.Event
@@ -51,7 +50,6 @@ import java.time.*
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 object ICalUtilsImpl : ICalUtils {
 
@@ -543,71 +541,6 @@ object ICalUtilsImpl : ICalUtils {
             startEndOverlapsWithFullDayRange(actualStart, actualEnd, fromDate, toDate, timeZoneId)
         }
 
-    }
-
-    /**
-     * Combines expanding, including single edits and filtering by exdates.
-     */
-    override fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-        originalEvent: Event,
-        eventsSharingUid: List<Event>,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        userEmails: List<String>,
-        isFreeUser: Boolean
-    ): List<UiEvent>? {
-        val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
-            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
-        } else {
-            toDate
-        }
-
-        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
-
-        val exZonedDateTimes =
-            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
-                exDates.values.map { exDate ->
-                    exDate.toZonedDateTime(timeZoneId)
-                }
-            }
-
-        return occurrences.mapNotNull { occurrence ->
-
-            val event = // single edit or original event
-                eventsSharingUid.find {
-                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(
-                        occurrence.startDateTime,
-                        originalEvent.isAllDay()
-                    )
-                } ?: originalEvent
-
-            if (!event.isSingleEdit() && (occurrence.startDateTime in exZonedDateTimes || !startEndOverlapsWithFullDayRange(occurrence.startDateTime, occurrence.endDateTime, fromDate, toDate, timeZoneId))) {
-                // occurrence is exdated
-                null
-            } else if (event.isSingleEdit() && !startEndOverlapsWithFullDayRange(event.getStart(timeZoneId), event.getEnd(timeZoneId), fromDate, toDate, timeZoneId)) {
-                null
-            } else {
-                UiEvent(
-                    event.id,
-                    event.calendar.id,
-                    event.uid,
-                    event.summary,
-                    event.location,
-                    event.description,
-                    if (event.isSingleEdit()) event.getStart(timeZoneId) else occurrence.startDateTime,
-                    if (event.isSingleEdit()) event.getEnd(timeZoneId) else occurrence.endDateTime,
-                    event.isAllDay(),
-                    if (event.isSingleEdit()) 0 else occurrence.occurrenceNumber,
-                    event.getDisplayColor(isFreeUser),
-                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
-                    event.getParticipationStatus(userEmails),
-                    event.status ?: Status.confirmed()
-                )
-            }
-
-        }
     }
 
     /**

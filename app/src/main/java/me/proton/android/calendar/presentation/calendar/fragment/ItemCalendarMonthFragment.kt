@@ -323,10 +323,11 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         lifecycleScope.launch {
             calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId, coroutineScope = fetchingEventsScope)
 
+            // TODO Skeleton events have been discarded for now
             // Get and display skeleton events
-            val skeletonEvents = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
+            //  val skeletonEvents = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
             // Display the skeleton events in the month view
-            displayMonthViewSkeletonEvents(skeletonEvents, fromDate, timeZoneId)
+            //  displayMonthViewSkeletonEvents(skeletonEvents, fromDate, timeZoneId)
 
             getEvents(fromDate, toDate, timeZoneId, position)
         }

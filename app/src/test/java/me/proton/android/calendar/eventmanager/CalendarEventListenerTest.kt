@@ -74,6 +74,7 @@ class CalendarEventListenerTest {
     @Test
     fun `onResetAll deletes all events and fetches recent events`() {
         runBlocking {
+            coEvery { calendarsRepository.deleteEventsMetadataByCalendarId(any()) } returns Unit
             coEvery { calendarsRepository.deleteAllEvents(any()) } returns Unit
 
             listener.onResetAll(config)
@@ -128,7 +129,7 @@ fun createEventMetadata(
     sharedKeyPacket = null,
     calendarKeyPacket = null,
     addressKeyPacket = null,
-    isPersonalSingleEdit = 0
+    isPersonalSingleEdit = false
 )
 
 private const val eventsResponse = """
@@ -156,7 +157,12 @@ private const val eventsResponse = """
                 "RRule": null,
                 "CreateTime": 1637683433,
                 "ModifyTime": 1637927851,
-                "IsOrganizer": 1
+                "IsOrganizer": 1,
+                "AddressID": null,
+                "SharedKeyPacket": null,
+                "CalendarKeyPacket": null,
+                "AddressKeyPacket": null,
+                "IsPersonalSingleEdit": false
             }
         }
     ],
