@@ -4,8 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import me.proton.android.calendar.di.EnvironmentConfig
-import me.proton.android.calendar.domain.EnvironmentConfiguration
+import me.proton.core.configuration.EnvironmentConfiguration
+import me.proton.core.configuration.dagger.ContentResolverEnvironmentConfigModule
 import me.proton.core.util.kotlin.EMPTY_STRING
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Singleton
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 @Module
 @TestInstallIn(
     components = [SingletonComponent::class],
-    replaces = [EnvironmentConfig::class]
+    replaces = [ContentResolverEnvironmentConfigModule::class]
 )
 object AtlasEnvironmentConfig {
 
@@ -22,9 +22,12 @@ object AtlasEnvironmentConfig {
 
     @Provides
     @Singleton
-    fun provideEnvironmentConfig(): EnvironmentConfiguration = object : EnvironmentConfiguration {
-        override val apiHost: String = "https://api.${atlasHost.get()}"
-        override val hvHost: String = "https://verify.${atlasHost.get()}"
-        override val proxyToken: String? = atlasProxyToken.get()
+    fun provideEnvironmentConfig(): EnvironmentConfiguration {
+        val map = mapOf(
+            "apiHost" to "https://api.${atlasHost.get()}",
+            "hvHost" to "https://verify.${atlasHost.get()}",
+            "proxyToken" to atlasProxyToken.get(),
+        )
+        return EnvironmentConfiguration.fromMap(map)
     }
 }

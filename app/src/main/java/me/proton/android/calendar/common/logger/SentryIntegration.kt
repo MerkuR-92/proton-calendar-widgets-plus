@@ -13,8 +13,8 @@ import io.sentry.SentryLevel
 import io.sentry.android.core.SentryAndroid
 import io.sentry.protocol.User
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.common.API_HOST
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.util.android.sentry.TimberLoggerIntegration
 import me.proton.core.util.android.sentry.project.AccountSentryHubBuilder
 import java.util.UUID
@@ -44,7 +44,8 @@ object SentryIntegration {
             options.isAttachStacktrace = true
             options.isEnableAutoSessionTracking = false
             options.isEnableActivityLifecycleBreadcrumbs = false
-            options.environment = "${if (BuildConfig.DEBUG) "debug" else "release"}\\$API_HOST"
+            options.environment =
+                "${if (BuildConfig.DEBUG) "debug" else "release"}\\${EnvironmentConfigurationDefaults.apiHost}"
             options.addIntegration(
                 TimberLoggerIntegration(
                     minEventLevel = SentryLevel.ERROR,
@@ -52,7 +53,7 @@ object SentryIntegration {
                 )
             )
         }
-        Sentry.setUser(User().apply { id = installationId } )
+        Sentry.setUser(User().apply { id = installationId })
     }
 
     private fun initAccountSentry(context: Context, installationId: String) {
