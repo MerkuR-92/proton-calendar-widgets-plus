@@ -17,8 +17,6 @@ plugins {
     alias(libs.plugins.gradlePlugin.proton.environmentConfig)
 }
 
-val atlasProxyUrl: String = System.getenv("ATLAS_PROXY_URL")
-
 sonarqube {
     properties {
         property("sonar.projectKey", "android_calendar_proton-calendar-android_AYGvp8U7f_vcScryKn5V")
@@ -87,7 +85,7 @@ android {
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "Atlas Proton Calendar")
             protonEnvironment {
-                proxyToken = getTokenFromCurl(atlasProxyUrl)
+                proxyToken = getProxyToken()
                 host = "proton.black"
             }
 
@@ -382,4 +380,9 @@ object Config {
             "ka", // Georgian
             "zh-rTW", // Chinese Traditional (Taiwan)
         )
+}
+
+fun getProxyToken(): String {
+    val proxyTokenUrl = System.getenv("ATLAS_PROXY_URL") ?: return ""
+    return getTokenFromCurl(proxyTokenUrl)
 }
