@@ -36,13 +36,14 @@ class FeatureFlagViewModel @Inject constructor(
     val state = mutableState.asStateFlow()
 
     var colorPerEventFeatureFlag: LiveData<Boolean> = MutableLiveData()
+    var eventSearchFeatureFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
     fun prefetchForCurrentUser() {
         if (System.currentTimeMillis().minus(lastFetchMs) <= TimeUnit.SECONDS.toMillis(FETCH_FEATURE_FLAG_INTERVAL_SECONDS)) return
         accountManager.getPrimaryUserId().filterNotNull().mapLatest { userId ->
-            val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
+            val featureIds = CalendarFeatureFlag.entries.filter { !it.isLocalFlag }.map { it.featureId }.toSet()
             featureFlagManager.prefetch(userId, featureIds)
             lastFetchMs = System.currentTimeMillis()
         }.launchIn(viewModelScope)
@@ -52,11 +53,19 @@ class FeatureFlagViewModel @Inject constructor(
      * Use this init method to initialize the remote feature flags we want to observe.
      */
     fun initRemoteFeatureFlagsToObserve(userId: UserId) {
+        // Color per event feature flag
         colorPerEventFeatureFlag = featureFlagManager.observe(
             userId,
             CalendarFeatureFlag.ColorPerEventAndroid.featureId
         ).map {
             it?.value ?: CalendarFeatureFlag.ColorPerEventAndroid.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+        // Event search feature flag
+        eventSearchFeatureFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.EventSearchAndroid.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.EventSearchAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
     }
 
@@ -93,6 +102,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     fun isColorPerEventEnabled(): Boolean {
         return colorPerEventFeatureFlag.value ?: CalendarFeatureFlag.ColorPerEventAndroid.fallbackValue
+    }
+
+    fun isEventSearchEnabled(): Boolean {
+        return eventSearchFeatureFlag.value ?: CalendarFeatureFlag.EventSearchAndroid.fallbackValue
     }
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {

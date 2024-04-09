@@ -114,6 +114,7 @@ object SpotlightUtils {
     fun Activity.showLastSpotlightDialog(
         isFreeUser: Boolean,
         isColorPerEventEnabled: Boolean,
+        isEventSearchEnabled: Boolean,
         hasHolidayCalendar: Boolean,
         calendarLimitReached: Boolean,
         positiveCallback: ((lastSpotlightVersionCode: Int) -> Unit)? = null
@@ -198,19 +199,6 @@ object SpotlightUtils {
                 )
                 true
             }
-            SEARCH_VERSION_CODE -> {
-                if (!CalendarFeatureFlag.ShowEventSearch.fallbackValue) return false
-                val content = getSearchDialogContent()
-                this.displaySpotlightDialog(
-                    content.first,
-                    content.second,
-                    materialPositiveButtonText = R.string.spotlight_v5_dialog_got_it_button,
-                    customPositiveButtonCallback = {
-                        positiveCallback?.invoke(lastSpotlightVersionCode)
-                    }
-                )
-                true
-            }
             HOLIDAY_CALENDAR_VERSION_CODE -> {
                 if (hasHolidayCalendar) {
                     setLastSpotlightShown(BuildConfig.VERSION_CODE)
@@ -241,6 +229,20 @@ object SpotlightUtils {
                     customPositiveButtonCallback = {
                         positiveCallback?.invoke(lastSpotlightVersionCode)
                     }
+                )
+                true
+            }
+            SEARCH_VERSION_CODE -> {
+                if (!isEventSearchEnabled) return false
+                val content = getSearchDialogContent()
+                this.displaySpotlightDialog(
+                    content.first,
+                    content.second,
+                    materialPositiveButtonText = R.string.spotlight_dialog_search_positive,
+                    customPositiveButtonCallback = {
+                        positiveCallback?.invoke(lastSpotlightVersionCode)
+                    },
+                    materialNegativeButtonText = R.string.spotlight_dialog_search_negative
                 )
                 true
             }

@@ -11,6 +11,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
 
     // Unleash
     ColorPerEventAndroid(FeatureId("ColorPerEventAndroid"), false, false),
+    EventSearchAndroid(FeatureId("EventSearchAndroid"), false, false),
 
     /** Local only flag (unknown to remote API) **/
     // Enabled
@@ -37,6 +38,5 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ShowSignatureVerificationBadges(FeatureId("ShowSignatureVerificationBadges"), false, true),
     DragAndDrop(FeatureId("DragAndDrop"), false, true),
     ClearCalendar(FeatureId("ClearCalendar"), false, true),
-    ShowEventSearch(FeatureId("ShowEventSearch"), false, true),
     Payments(FeatureId("Subscription"), false, true)
 }

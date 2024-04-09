@@ -91,6 +91,7 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerA
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -113,6 +114,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
 
     @Inject
     lateinit var handleAlarmsUseCase: HandleAlarmsUseCase
@@ -171,12 +173,12 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
         // TODO extract somewhere to remove boilerplate
         with(toolbar.findViewById<ViewGroup>(R.id.fragment_toolbar_content)) {
-            if (CalendarFeatureFlag.ShowEventSearch.fallbackValue) {
-                addView(buttonSearch, resources.getDimensionPixelSize(
-                    R.dimen.action_clickable_size
-                ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))
-                buttonSearch.visibleOrGone(false)
-            }
+            addView(buttonSearch, resources.getDimensionPixelSize(
+                R.dimen.action_clickable_size
+            ), resources.getDimensionPixelSize(R.dimen.action_clickable_size))
+            buttonSearch.visibleOrGone(
+                featureFlagViewModel.isEventSearchEnabled()
+            )
 
             addView(
                 buttonToday, resources.getDimensionPixelSize(
@@ -200,9 +202,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private fun setToolbarListeners(timeZoneId: ZoneId) {
         buttonSearch.setOnSingleClickListener {
             requireActivity().findNavController(R.id.nav_host_fragment_container_view).navigate(R.id.nav_search)
-        }
-        searchViewModel.calendarDownloadEnabledState.flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).asLiveData().observe(viewLifecycleOwner) {
-            buttonSearch.visibleOrGone(it)
         }
 
         buttonCreate.setOnSingleClickListener {
@@ -659,6 +658,11 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 createImageButton.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_disabled))
                 createImageButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.ripple_action_button_disabled_oval)
             }
+        }
+
+        featureFlagViewModel.eventSearchFeatureFlag.observe(viewLifecycleOwner) { eventSearchFeatureFlag ->
+            eventSearchFeatureFlag ?: return@observe
+            buttonSearch.visibleOrGone(eventSearchFeatureFlag)
         }
 
         weekViewAdapter = WeekViewAdapter(
