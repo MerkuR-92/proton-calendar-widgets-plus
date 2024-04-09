@@ -15,12 +15,11 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.CalendarWidgetRefresher
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
@@ -39,11 +38,10 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.*
+import java.util.TimeZone
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -62,7 +60,6 @@ internal class CalendarRepositoryTest {
     private val eventDecryptorMock: EventDecryptor = mockk()
     private val searchDatabaseMock: SearchDatabase = mockk()
     private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()
-    private val userManagerMock: UserManager = mockk()
     private val userAddressManagerMock: UserAddressManager = mockk()
     private val accountManagerMock: AccountManager = mockk()
     private val networkManagerMock: NetworkManager = mockk()
@@ -376,7 +373,6 @@ internal class CalendarRepositoryTest {
             eventDecryptorMock,
             searchDatabaseMock,
             indexEventForSearchUseCaseMock,
-            userManagerMock,
             userAddressManagerMock,
             accountManagerMock,
             networkManagerMock
