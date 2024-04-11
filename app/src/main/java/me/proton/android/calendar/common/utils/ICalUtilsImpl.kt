@@ -554,7 +554,8 @@ object ICalUtilsImpl : ICalUtils {
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        userEmails: List<String>
+        userEmails: List<String>,
+        isFreeUser: Boolean
     ): List<UiEvent>? {
         val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
         val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
@@ -599,7 +600,7 @@ object ICalUtilsImpl : ICalUtils {
                     if (event.isSingleEdit()) event.getEnd(timeZoneId) else occurrence.endDateTime,
                     event.isAllDay(),
                     if (event.isSingleEdit()) 0 else occurrence.occurrenceNumber,
-                    event.displayColor,
+                    if (isFreeUser) event.calendar.color else event.displayColor,
                     originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
                     event.getParticipationStatus(userEmails),
                     event.status ?: Status.confirmed()

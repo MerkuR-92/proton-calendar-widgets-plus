@@ -142,7 +142,8 @@ interface ICalUtils {
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        userEmails: List<String>
+        userEmails: List<String>,
+        isFreeUser: Boolean
     ): List<UiEvent>?
 
     /**

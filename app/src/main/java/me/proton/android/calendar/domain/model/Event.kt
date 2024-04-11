@@ -634,7 +634,7 @@ data class Event private constructor(
         )
     }
 
-    fun toUiEvent(userEmails: List<String>, timeZoneId: String): UiEvent = UiEvent(
+    fun toUiEvent(userEmails: List<String>, timeZoneId: String, isFreeUser: Boolean): UiEvent = UiEvent(
         id,
         calendar.id,
         uid,
@@ -645,7 +645,7 @@ data class Event private constructor(
         this.getOccurrenceEnd(timeZoneId),
         isAllDay(),
         occurrence?.occurrenceNumber ?: 0,
-        displayColor,
+        if (isFreeUser) calendar.color else displayColor,
         decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
         getParticipationStatus(userEmails),
         this.status ?: Status.confirmed()
