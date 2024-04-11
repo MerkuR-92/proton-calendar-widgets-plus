@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
@@ -34,6 +35,7 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
+import me.proton.android.calendar.test.shared.mocks.eventUid
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
@@ -42,6 +44,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -383,7 +386,7 @@ internal class CalendarRepositoryTest {
         // Orphan single edit
         return EventsByUidApiResponse(
             events = listOf(
-                EventEntity( // Parent
+                EventResponse( // Parent
                     id = "eventIdSingleEdit",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -403,7 +406,19 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632441600L,
+                    startTimeZone = "GMT",
+                    endTime = 1632528000L,
+                    endTimeZone = "GMT",
+                    fullDay = 0,
+                    uid = "4trl5eflr8jo9vtotb0gmtsf4c@google.com",
+                    recurrenceID = 1632441600L,
+                    exDates = emptyList(),
+                    rRule = null,
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 )
             )
         )
@@ -413,7 +428,7 @@ internal class CalendarRepositoryTest {
         // Recurring with two occurrences and one single edit
         return EventsByUidApiResponse(
             events = listOf(
-                EventEntity( // Parent
+                EventResponse( // Parent
                     id = "eventIdParent",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -433,9 +448,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit
+                EventResponse( // Single edit
                     id = "eventIdSingleEdit",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -455,7 +482,19 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632441600L,
+                    startTimeZone = "GMT",
+                    endTime = 1632528000L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = 1632441600L,
+                    exDates = emptyList(),
+                    rRule = null,
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 )
             )
         )
@@ -465,7 +504,7 @@ internal class CalendarRepositoryTest {
         // Recurring with only single edit (3)
         return EventsByUidApiResponse(
             events = listOf(
-                EventEntity( // Parent
+                EventResponse( // Parent
                     id = "eventIdParent",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -485,9 +524,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 1
+                EventResponse( // Single edit 1
                     id = "eventIdSingleEdit1",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -507,9 +558,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 2
+                EventResponse( // Single edit 2
                     id = "eventIdSingleEdit2",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -529,9 +592,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 3
+                EventResponse( // Single edit 3
                     id = "eventIdSingleEdit3",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -551,7 +626,19 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 )
             )
         )
@@ -561,7 +648,7 @@ internal class CalendarRepositoryTest {
         // Recurring with two single edits and one ex date (no normal occurrences)
         return EventsByUidApiResponse(
             events = listOf(
-                EventEntity( // Parent
+                EventResponse( // Parent
                     id = "eventIdParent",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -581,9 +668,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 1
+                EventResponse( // Single edit 1
                     id = "eventIdSingleEdit1",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -603,9 +702,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 2
+                EventResponse( // Single edit 2
                     id = "eventIdSingleEdit2",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -625,7 +736,19 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 )
             )
         )
@@ -634,7 +757,7 @@ internal class CalendarRepositoryTest {
     private fun mockEventsByUidStandaloneSingleEdit(): EventsByUidApiResponse {
         return EventsByUidApiResponse(
             events = listOf(
-                EventEntity( // Parent
+                EventResponse( // Parent
                     id = "eventIdParent",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -654,9 +777,21 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
                 ),
-                EventEntity( // Single edit 1
+                EventResponse( // Single edit 1
                     id = "eventIdSingleEdit1",
                     calendarId = "calendarId",
                     sharedEventId = "sharedEventId",
@@ -676,7 +811,20 @@ internal class CalendarRepositoryTest {
                     personalEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
-                    isProtonProtonInvite = 0)
+                    isProtonProtonInvite = 0,
+                    isPersonalMigrated = null,
+                    startTime = 1632355200L,
+                    startTimeZone = "GMT",
+                    endTime = 1632441600L,
+                    endTimeZone = "GMT",
+                    fullDay = 1,
+                    uid = "4rus20gb7bkamq3l8q1gmm8n8g@google.com",
+                    recurrenceID = null,
+                    exDates = emptyList(),
+                    rRule = "FREQ=DAILY;COUNT=3",
+                    isOrganizer = 0,
+                    isPersonalSingleEdit = false
+                )
             )
         )
     }

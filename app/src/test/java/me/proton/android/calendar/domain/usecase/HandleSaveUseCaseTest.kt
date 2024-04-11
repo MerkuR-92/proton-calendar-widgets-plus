@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventResponse
 import me.proton.android.calendar.test.shared.mocks.UserMocks.provideUserSettingsEntity
 import org.junit.jupiter.api.BeforeEach
@@ -53,7 +54,7 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create single event test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventResponse()
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
@@ -89,7 +90,7 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create recurring event test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventResponse()
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
@@ -125,7 +126,7 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create single event with attendees test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventResponse()
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = false, isOrganizer = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
@@ -165,7 +166,7 @@ internal class HandleSaveUseCaseTest {
     fun `handleSave create recurring event with attendees test`() {
         runBlocking {
 
-            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventResponse()
+            coEvery { calendarsRepositoryMock.selectEventEntity(any()) } returns provideEventEntity()
             val event = provideEvent(isRecurring = true, isOrganizer = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptorMock.decrypt(any())
