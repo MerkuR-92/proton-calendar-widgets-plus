@@ -20,9 +20,12 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueSet
@@ -158,21 +161,21 @@ class FetchCalendarsWorker @AssistedInject constructor(
             reportProgress(calendarMetadata.calendarId, allEventCount.toInt())
 
 
-            val eventEntityBatches =
+            val eventResponseBatches =
                 fetchEventsUseCase.fetchForExport(userId, calendarMetadata.calendarId, lastEventId, coroutineScope)
 
             coroutineScope.launch {
-                for (eventEntityBatch in eventEntityBatches) {
+                for (eventResponseBatch in eventResponseBatches) {
 
-                    allEventCount += eventEntityBatch.size
+                    allEventCount += eventResponseBatch.size
 
                     saveProgressSoFar(
                         userId.id,
                         userValueStore,
                         calendarMetadata.calendarId,
-                        eventEntityBatch.lastOrNull()?.id,
+                        eventResponseBatch.lastOrNull()?.id,
                         allEventCount,
-                        eventEntityBatch
+                        eventResponseBatch
                     )
 
                     reportProgress(calendarMetadata.calendarId, allEventCount.toInt())
@@ -267,12 +270,14 @@ class FetchCalendarsWorker @AssistedInject constructor(
         calendarId: String,
         lastEventId: String?,
         totalDownloadedCount: Long,
-        events: List<EventEntity>
+        events: List<EventResponse>
     ): Boolean {
 
-        calendarsRepository.persistEvents(*events.toTypedArray())
+        val eventEntities = events.map { it.toEventEntity() }
+        calendarsRepository.persistEvents(*eventEntities.toTypedArray())
+        calendarsRepository.persistEventsMetadata(*events.map { it.toEventEntityMetadata() }.toTypedArray())
 
-        indexEventForSearchUseCase.execute(userId, events)
+        indexEventForSearchUseCase.execute(userId, eventEntities)
 
         // save helper data for this Calendar in case we need to resume work later
         lastEventId?.let {

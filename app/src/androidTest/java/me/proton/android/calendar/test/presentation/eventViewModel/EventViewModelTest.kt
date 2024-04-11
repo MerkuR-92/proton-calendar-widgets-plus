@@ -93,9 +93,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
@@ -117,9 +117,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent()
 
             val eventViewModel = getInitialisedEventViewModel(
@@ -142,9 +142,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent()
 
             // No default calendar
@@ -181,9 +181,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent()
 
             // No default calendar
@@ -219,7 +219,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
         runBlocking {
 
             // Mock single edit event
-            val singleEditEventEntity = EventMocks.provideEventEntity(isSingleEdit = true)
+            val singleEditEventEntity = EventMocks.provideEventResponse(isSingleEdit = true)
             val singleEditEvent = EventMocks.provideEvent(isSingleEdit = true)
             coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns singleEditEventEntity
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
@@ -229,7 +229,7 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
             } } returns singleEditEvent
 
             // Mock root event
-            val rootEventEntity = EventMocks.provideEventEntity()
+            val rootEventEntity = EventMocks.provideEventResponse()
             val rootEvent = EventMocks.provideEvent(isRecurring = true)
             coEvery { calendarsRepositoryMock.selectRootEventEntity(eventUid) } returns rootEventEntity
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
@@ -268,9 +268,9 @@ open class EventViewModelTest: KoinComponent, EventViewModelTestCommon() {
 
             // Mock event with attendee (user as organizer)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true, isOrganizer = true)
 
             // Mock single edit with attendee (user as organizer)

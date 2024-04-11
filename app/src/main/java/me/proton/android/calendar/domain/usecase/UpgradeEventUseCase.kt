@@ -7,6 +7,8 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.UpgradeEventApiRequest
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
@@ -79,7 +81,8 @@ class UpgradeEventUseCase @Inject constructor(
                 if (upgradeResponse.data.event.sharedKeyPacket == null) {
                     UseCase.Result.Error("UpgradeEventUseCase: Event returned after upgrading has empty sharedKeyPacket")
                 } else {
-                    calendarsRepository.persistEvents(upgradeResponse.data.event)
+                    calendarsRepository.persistEvents(upgradeResponse.data.event.toEventEntity())
+                    calendarsRepository.persistEventsMetadata(upgradeResponse.data.event.toEventEntityMetadata())
                     UseCase.Result.Success(upgradeResponse.data.event)
                 }
             }
@@ -93,7 +96,8 @@ class UpgradeEventUseCase @Inject constructor(
                     } else if (event.sharedKeyPacket == null) {
                         UseCase.Result.Error("UpgradeEventUseCase: Event fetched after NOT_ALLOWED has empty sharedKeyPacket")
                     } else {
-                        calendarsRepository.persistEvents(event)
+                        calendarsRepository.persistEvents(event.toEventEntity())
+                        calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
                         UseCase.Result.Success(event)
                     }
                 } else {

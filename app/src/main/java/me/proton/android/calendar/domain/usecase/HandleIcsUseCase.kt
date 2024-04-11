@@ -28,6 +28,8 @@ import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.getDefaultAlarms
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -128,7 +130,8 @@ class HandleIcsUseCase @Inject constructor(
         // Find an existing event from the ones sharing the same UID
         var existingEvent: Event? = null
         eventsSharingUidResponse.let {
-            for (eventEntity in eventsSharingUidResponse) {
+            for (eventResponse in eventsSharingUidResponse) {
+                val eventEntity = eventResponse.toEventEntity()
                 val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
@@ -137,6 +140,7 @@ class HandleIcsUseCase @Inject constructor(
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
+                    calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
                     break
                 }
             }
@@ -160,6 +164,7 @@ class HandleIcsUseCase @Inject constructor(
                     if (immutableExistingEvent != null) {
                         // If event with same UID existed and sync call succeeded, delete existing event locally since we overwrite on import
                         calendarsRepository.deleteEventsById(immutableExistingEvent.calendar.id, listOf(immutableExistingEvent.id))
+                        calendarsRepository.deleteEventsMetadataByEventIds(listOf(immutableExistingEvent.id))
                     }
 
                     return IcsSurgeryUtils.HandleIcsResult.Success(eventId = eventId ?: return IcsSurgeryUtils.HandleIcsResult.Error.EditCreateEventError(), IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT, isRecurring = newEvent.isRecurring())
@@ -281,8 +286,8 @@ class HandleIcsUseCase @Inject constructor(
                 ).events
 
         // IMPORTANT: We need parent event to clean recurrence id
-        val parentEventEntity = eventsSharingUidResponse.firstOrNull { eventEntity ->
-            eventEntity.sharedEvents.any {
+        val parentEventEntity = eventsSharingUidResponse.firstOrNull { eventResponse ->
+            eventResponse.sharedEvents.any {
                 try {
                     // only root event contains RRULE
                     it.jsonObject.get("Data")?.jsonPrimitive?.content?.contains("RRULE:") == true
@@ -290,7 +295,7 @@ class HandleIcsUseCase @Inject constructor(
                     false
                 }
             }
-        }
+        }?.toEventEntity()
         val parentEvent = if (parentEventEntity != null) {
             if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                 eventDecryptor.decrypt(parentEventEntity)
@@ -309,7 +314,8 @@ class HandleIcsUseCase @Inject constructor(
         var existingEvent: Event? = null
         var existingEventEntity: EventEntity? = null
         eventsSharingUidResponse.let {
-            for (eventEntity in eventsSharingUidResponse) {
+            for (eventResponse in eventsSharingUidResponse) {
+                val eventEntity = eventResponse.toEventEntity()
                 val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
                 } else {
@@ -319,6 +325,7 @@ class HandleIcsUseCase @Inject constructor(
                     existingEvent = event
                     existingEventEntity = eventEntity
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
+                    calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
                     break
                 }
             }

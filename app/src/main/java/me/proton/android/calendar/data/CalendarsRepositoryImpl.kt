@@ -77,6 +77,7 @@ import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.data.entity.SearchEventEntity
 import me.proton.android.calendar.data.entity.SkeletonEventEntity
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.data.entity.toSkeletonEvent
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -248,7 +249,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 fetchEventsResult.second?.let {
                     logger.v("fetchEventsResult success: ${it.size}")
-                    persistEvents(*it.toTypedArray())
+                    persistEvents(*it.toTypedArray()) // We already persisted metadata on fetch result
                     updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
                     fetchedWindows.add(fetchWindow)
                 }
@@ -1204,7 +1205,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         if (hasSingleEditsInDb) return true
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
-            eventsSharingUidResponse.data.events.forEach {
+            eventsSharingUidResponse.data.events.map { it.toEventEntity() }.forEach {
                 val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(it)
                 } else {
@@ -1221,7 +1222,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             val events = arrayListOf<Event>()
-            eventsSharingUidResponse.data.events.forEach {
+            eventsSharingUidResponse.data.events.map { it.toEventEntity() }.forEach {
                 val event = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(it)
                 } else {

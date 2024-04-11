@@ -7,6 +7,8 @@ import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -129,7 +131,8 @@ class SyncAlarmsUseCase @Inject constructor(
                             when (val event = calendarsApi.getEvent(userId, alarmEntity.calendarId, alarmEntity.eventId)) {
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
-                                    calendarsRepository.persistEvents(event.data.event)
+                                    calendarsRepository.persistEvents(event.data.event.toEventEntity())
+                                    calendarsRepository.persistEventsMetadata(event.data.event.toEventEntityMetadata())
                                     safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get

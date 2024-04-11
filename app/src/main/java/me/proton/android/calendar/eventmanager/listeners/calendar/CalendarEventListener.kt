@@ -14,6 +14,7 @@ import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
@@ -70,7 +71,7 @@ class CalendarEventListener @Inject constructor(
 
     private suspend fun fetchEventEntity(userId: UserId, response: EventEntityMetadata): EventEntity? {
         return when (val result = calendarsRepository.fetchEventById(userId, response.calendarId, response.id)) {
-            is ApiResponse.Success<EventApiResponse> -> result.data.event
+            is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
                 // If event was not found just omit it, otherwise we'll retry this indefinitely
                 if (result.isNotFound()) return null

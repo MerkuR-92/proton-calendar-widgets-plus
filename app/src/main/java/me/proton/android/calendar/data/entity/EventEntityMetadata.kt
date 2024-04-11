@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.db.AppDatabase
 
 
@@ -63,3 +64,28 @@ data class EventEntityMetadata(
     @SerialName("IsPersonalSingleEdit")
     val isPersonalSingleEdit: Boolean
 )
+
+fun EventResponse.toEventEntityMetadata(): EventEntityMetadata {
+    return EventEntityMetadata(
+        id = this.id,
+        calendarId = this.calendarId,
+        sharedEventId = this.sharedEventId!!,
+        addressId = this.addressId,
+        startTime = this.startTime,
+        startTimeZone = this.startTimeZone,
+        endTime = this.endTime,
+        endTimeZone = this.endTimeZone,
+        fullDay = this.fullDay,
+        uid = this.uid,
+        recurrenceID = this.recurrenceID,
+        exDates = this.exDates,
+        rRule = this.rRule,
+        createTime = this.createTime,
+        modifyTime = this.modifyTime,
+        isOrganizer = this.isOrganizer,
+        sharedKeyPacket = this.sharedKeyPacket,
+        calendarKeyPacket = this.calendarKeyPacket,
+        addressKeyPacket = this.addressKeyPacket,
+        isPersonalSingleEdit = this.isPersonalSingleEdit
+    )
+}

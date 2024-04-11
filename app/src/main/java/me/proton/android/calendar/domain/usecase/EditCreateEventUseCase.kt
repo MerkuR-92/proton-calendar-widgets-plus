@@ -24,6 +24,8 @@ import me.proton.android.calendar.data.api.SyncEventsUpdateApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Ciphertext
 import me.proton.android.calendar.domain.Crypto
@@ -417,7 +419,8 @@ class EditCreateEventUseCase @Inject constructor(
                     }
                 }
 
-                calendarsRepository.persistEvents(*eventsToInsertOrUpdate.toTypedArray())
+                calendarsRepository.persistEvents(*eventsToInsertOrUpdate.map { it.toEventEntity() }.toTypedArray())
+                calendarsRepository.persistEventsMetadata(*eventsToInsertOrUpdate.map { it.toEventEntityMetadata() }.toTypedArray())
                 updateAlarmsUseCase.execute(userId.id, eventsToInsertOrUpdate.map { it.id })
 
                 // TODO we don't need it anymore, since all alarms are calculated locally

@@ -1,6 +1,5 @@
 package me.proton.android.calendar.data.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -8,6 +7,7 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.db.AppDatabase
 
 @Entity(
@@ -65,3 +65,26 @@ data class EventEntity(
     @SerialName("Color")
     val color: String? = null
 )
+
+fun EventResponse.toEventEntity(): EventEntity {
+    return EventEntity(
+        id = this.id,
+        calendarId = this.calendarId,
+        sharedEventId = this.sharedEventId,
+        calendarKeyPacket = this.calendarKeyPacket,
+        createTime = this.createTime,
+        modifyTime = this.modifyTime,
+        permissions = this.permissions,
+        addressKeyPacket = this.addressKeyPacket,
+        addressId = this.addressId,
+        sharedKeyPacket = this.sharedKeyPacket,
+        sharedEvents = this.sharedEvents,
+        calendarEvents = this.calendarEvents,
+        personalEvents = this.personalEvents,
+        attendeesEvents = this.attendeesEvents,
+        attendees = this.attendees,
+        isProtonProtonInvite = this.isProtonProtonInvite,
+        isPersonalMigrated = this.isPersonalMigrated,
+        notifications = this.notifications
+    )
+}

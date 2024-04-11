@@ -18,6 +18,7 @@ import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendarUserSettingsEntity
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventResponse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -59,7 +60,7 @@ internal class HandleDeleteUseCaseTest {
         coEvery { calendarsApiMock.getEventsByUid(userId, any(), any(), any()) } returns ApiResponse.Success(
             EventsByUidApiResponse(
                 listOf(
-                    provideEventEntity()
+                    provideEventResponse()
                 )
             )
         )
@@ -86,7 +87,7 @@ internal class HandleDeleteUseCaseTest {
         coEvery { calendarsRepositoryMock.deleteEventsById(any(), any()) } just Runs
         coEvery { calendarsRepositoryMock.fetchEventById(userId, any(), any()) } returns ApiResponse.Success(
             EventApiResponse(
-                event = provideEventEntity()
+                event = provideEventResponse()
             )
         )
 
@@ -127,7 +128,7 @@ internal class HandleDeleteUseCaseTest {
                     index = 0,
                     response = SyncResponse(
                         code = ApiResponseCode.DOES_NOT_EXIST,
-                        event = provideEventEntity()
+                        event = provideEventResponse()
                     )
                 )
             )
@@ -136,7 +137,7 @@ internal class HandleDeleteUseCaseTest {
                     index = 0,
                     response = SyncResponse(
                         code = 0,
-                        event = provideEventEntity()
+                        event = provideEventResponse()
                     )
                 )
             )
