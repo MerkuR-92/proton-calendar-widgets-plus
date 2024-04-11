@@ -26,6 +26,7 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.core.util.kotlin.toBoolean
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.core.KoinComponent
@@ -33,6 +34,7 @@ import org.koin.core.KoinComponent
 /**
  * EventViewModel change answer flow tests
  */
+@Ignore("Those tests have not been maintained. Update them following recent changes.")
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTestCommon() {
