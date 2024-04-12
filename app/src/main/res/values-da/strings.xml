@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Begivenhed oprettet, men invitation blev ikke sendt</string>
     <string name="snack_event_created_error">Fejl ved opretning af begivenhed</string>
     <string name="snack_event_opening_edit_error">Fejl under åbning af begivenhed for redigering</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kan ikke redigere en tilbagevendende invitation, der indeholder ændringer for enkelte forekomster.</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kan ikke slette en tilbagevendende invitation, der indeholder ændringer af enkelte forekomster.</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Du kan ikke redigere en tilbagevendende invitation, der indeholder slettede forekomster.</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Du kan ikke slette en tilbagevendende invitation, der indeholder slettede forekomster.</string>
     <string name="snack_event_edit_with_attendees_error">Redigering af begivenheder med deltagere understøttes endnu ikke</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Kan ikke tilføje deltagere og ændre kalender på samme tid</string>
     <string name="snack_event_init_error">Fejl under initialisering af ny begivenhed</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Fortsæt skrivning</string>
     <string name="bug_report_discard_changes_confirm">Kassér</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Denne indstilling påvirker kun udseendet af Proton Calendar-appen på denne enhed. Appen genstartes efter ændring af temaet.</string>
     <string name="settings_timezone_title">Tidszone</string>

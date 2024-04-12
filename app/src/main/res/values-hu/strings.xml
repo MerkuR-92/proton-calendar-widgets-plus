@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Esemény létrehozva, de a meghívó kiküldése során hiba lépett fel</string>
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">You cannot edit a recurring invitation containing changes to single occurrences</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">You cannot delete a recurring invitation containing changes to single occurrences</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">You cannot edit a recurring invitation containing deleted occurrences</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">You cannot delete a recurring invitation containing deleted occurrences</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nem lehet egyszerre résztvevőket hozzáadni és az eseményt megváltoztatni</string>
     <string name="snack_event_init_error">Hiba az új esemény inicializálása közben</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Szerkesztés folytatása</string>
     <string name="bug_report_discard_changes_confirm">Elvetés</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">Téma</string>
     <string name="settings_theme_info">Ez a beállítás csak ezen az eszközön változtatja meg a Proton Calendar megjelenését. A változtatás után az alkalmazás újraindul.</string>
     <string name="settings_timezone_title">Időzóna</string>
@@ -788,7 +793,7 @@
     <string-array name="time_formats">
         <item>Rendszer alapértelmezett</item>
         <item>13:00</item>
-        <item>1:00 du.</item>
+        <item>1:00 d.u.</item>
     </string-array>
     <string-array name="week_start">
         <item>Rendszer alapértelmezett</item>

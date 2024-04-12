@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Падзея створана, але не ўдалося адправіць запрашэнне</string>
     <string name="snack_event_created_error">Памылка стварэння падзеі</string>
     <string name="snack_event_opening_edit_error">Памылка адкрыцця падзеі для змянення</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">У вас няма магчымасці рэдагаваць перыядычнае запрашэнне, якое змяшчае змены ў асобных паўтарэннях</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">У вас няма магчымасці выдаляць перыядычнае запрашэнне, якое змяшчае змены ў асобных паўтарэннях</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">У вас няма магчымасці рэдагаваць перыядычнае запрашэнне, якое змяшчае выдаленыя паўтарэнні</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">У вас няма магчымасці выдаляць перыядычнае запрашэнне, якое змяшчае выдаленыя паўтарэнні</string>
     <string name="snack_event_edit_with_attendees_error">Змяненне падзей з удзельнікамі пакуль не падтрымліваецца</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Немагчыма дадаваць удзельнікаў і змяняць каляндар адначасова</string>
     <string name="snack_event_init_error">Памылка ініцыялізацыі новай падзеі</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Працягнуць пісаць</string>
     <string name="bug_report_discard_changes_confirm">Адхіліць</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">Налады праграмы</string>
     <string name="settings_theme_title">Тэма</string>
     <string name="settings_theme_info">Гэты параметр уплывае толькі на вонкавы выгляд праграмы Proton Calendar на гэтай прыладзе. Праграма перазапусціцца пасля змянення тэмы.</string>
     <string name="settings_timezone_title">Часавы пояс</string>

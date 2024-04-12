@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">活動已創建，但邀請傳送失敗</string>
     <string name="snack_event_created_error">創建活動時發生錯誤</string>
     <string name="snack_event_opening_edit_error">開啟活動以作編輯時發生錯誤</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">無法編輯含有單事件變動的週期性邀請函</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">無法刪除含有單事件變動的週期性邀請函</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">無法編輯含有已刪除事件的週期性邀請函</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">無法刪除含有已刪除事件的週期性邀請函</string>
     <string name="snack_event_edit_with_attendees_error">暫未支援編輯帶有參與者的活動</string>
     <string name="snack_event_edit_calendar_with_attendees_error">無法同時加入參與者及變更行事曆</string>
     <string name="snack_event_init_error">初始化新活動時發生錯誤</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">繼續撰寫</string>
     <string name="bug_report_discard_changes_confirm">捨棄</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">佈景主題</string>
     <string name="settings_theme_info">此設定僅影響在此裝置上的 Proton Calendar 應用程式。變更布景主題後，應用程式將會重新啟動。</string>
     <string name="settings_timezone_title">時區</string>

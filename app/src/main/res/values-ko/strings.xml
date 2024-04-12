@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">이벤트가 생성되었으나 초대 전송을 실패함</string>
     <string name="snack_event_created_error">이벤트 생성 실패</string>
     <string name="snack_event_opening_edit_error">이벤트 편집 실패</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">한 번의 개최에 대한 변경사항을 포함한 반복되는 초대를 편집할 수 없습니다.</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">한 번의 개최에 대한 변경사항을 포함한 반복되는 초대를 삭제할 수 없습니다.</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">삭제한 개최를 포함하고 있는 반복되는 초대를 편집할 수 없습니다.</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">삭제한 개최를 포함하고 있는 반복되는 초대를 삭제할 수 없습니다.</string>
     <string name="snack_event_edit_with_attendees_error">참여자와 이벤트를 편집하는 것은 아직 지원되지 않습니다</string>
     <string name="snack_event_edit_calendar_with_attendees_error">참가자를 추가하면서 캘린더를 동시에 변경할 수 없습니다.</string>
     <string name="snack_event_init_error">새로운 이벤트 구성 오류</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">계속 작성하기</string>
     <string name="bug_report_discard_changes_confirm">취소</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">앱 설정</string>
     <string name="settings_theme_title">테마</string>
     <string name="settings_theme_info">이 설정은 이 기기의 Proton Calendar 앱 외관에만 영향을 미칩니다. 테마를 변경한 후 앱이 다시 시작됩니다.</string>
     <string name="settings_timezone_title">시간대</string>

@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Evento criado, mas o convite não foi enviado</string>
     <string name="snack_event_created_error">Erro ao criar o evento</string>
     <string name="snack_event_opening_edit_error">Erro ao abrir evento para edição</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Você não pode editar um convite recorrente que contenha alterações em ocorrências únicas</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Não pode eliminar um convite recorrente, que contenha alterações de ocorrências únicas</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Não pode editar um convite recorrente, que contenha ocorrências eliminadas</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Não pode eliminar um convite recorrente, que contenha ocorrências eliminadas</string>
     <string name="snack_event_edit_with_attendees_error">Ainda não é possível editar eventos com participantes</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Não é possível adicionar participantes e alterar em simultâneo o calendário</string>
     <string name="snack_event_init_error">Erro ao inicializar novo evento</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Continuar a escrever</string>
     <string name="bug_report_discard_changes_confirm">Descartar</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Esta definição só afeta a aparência do Proton Calendar neste dispositivo. A aplicação será reiniciada após alterar o tema.</string>
     <string name="settings_timezone_title">Fuso horário</string>

@@ -224,7 +224,7 @@
     <string name="event_recurring_edit_all_events">Všetky udalosti</string>
     <string name="event_discard_changes_title">Zahodiť zmeny?</string>
     <string name="event_discard_changes_description">Stratíte všetky neuložené zmeny.</string>
-    <string name="event_discard_changes_cancel">Pokračovať v editácii</string>
+    <string name="event_discard_changes_cancel">Pokračovať v úpravách</string>
     <string name="event_discard_changes_confirm">Zahodiť</string>
     <string name="event_recurring_update_this_title">Aktualizovať opakujúcu sa udalosť</string>
     <string name="event_recurring_update_this_description">Zmeny frekvencie budú stratené</string>
@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Udalosť bola vytvorená, ale pozvánku sa nepodarilo odoslať</string>
     <string name="snack_event_created_error">Chyba pri vytváraní udalosti</string>
     <string name="snack_event_opening_edit_error">Chyba pri otváraní udalosti na úpravu</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Nemôžete upravovať opakujúcu sa udalosť, ktorá obsahuje zmeny v jednotlivých výskytoch</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nemôžete vymazať opakujúcu sa pozvánku, ktorá obsahuje zmeny v jednotlivých výskytoch</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nemôžete upravovať opakujúcu sa pozvánku obsahujúcu vymazané výskyty</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Nemôžete vymazať opakujúcu sa pozvánku obsahujúcu vymazané výskyty</string>
     <string name="snack_event_edit_with_attendees_error">Úprava udalostí s účastníkmi zatiaľ nie je podporovaná</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nie je možné zároveň pridávať účastníkov a meniť kalendár</string>
     <string name="snack_event_init_error">Chyba pri inicializácii novej udalosti</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Pokračovať v písaní</string>
     <string name="bug_report_discard_changes_confirm">Zahodiť</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">Motív</string>
     <string name="settings_theme_info">Toto nastavenie vplýva iba na vzhľad aplikácie Proton Calendar na tomto zariadení. Po zmene vzhľadu sa aplikácia reštartuje.</string>
     <string name="settings_timezone_title">Časové pásmo</string>
@@ -450,7 +455,7 @@
     <string name="settings_general_title">Všeobecné</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s atď.</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
-    <string name="settings_general_info_theme">vzhľad</string>
+    <string name="settings_general_info_theme">motív</string>
     <string name="settings_general_info_language">jazyk</string>
     <string name="settings_general_info_time_zone">časové pásmo</string>
     <string name="settings_general_info_calendar_layout">rozloženie kalendára</string>
