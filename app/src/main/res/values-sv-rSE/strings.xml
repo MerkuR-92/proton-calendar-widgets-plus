@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Händelse skapad men inbjudan misslyckades att skickas</string>
     <string name="snack_event_created_error">Det gick inte att skapa händelse</string>
     <string name="snack_event_opening_edit_error">Det gick inte att öppna händelse för redigering</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kan inte redigera en återkommande inbjudan som innehåller ändringar av enstaka förekomster</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kan inte ta bort en återkommande inbjudan som innehåller ändringar av enstaka förekomster</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Du kan inte redigera en återkommande inbjudan som innehåller borttagna förekomster</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Du kan inte ta bort en återkommande inbjudan som innehåller borttagna förekomster</string>
     <string name="snack_event_edit_with_attendees_error">Redigering av händelser med deltagare stöds inte ännu</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Kan inte lägga till deltagare och byta kalender samtidigt</string>
     <string name="snack_event_init_error">Fel vid initialisering av ny händelse</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Fortsätt skriva</string>
     <string name="bug_report_discard_changes_confirm">Förkasta</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App-inställningar</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Denna inställning påverkar endast utseendet på Proton Calendar-appen på denna enhet. Appen kommer starta om efter att ha ändrat temat.</string>
     <string name="settings_timezone_title">Tidszon</string>

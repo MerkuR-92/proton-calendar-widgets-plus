@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>
     <string name="snack_event_created_error">Помилка створення події</string>
     <string name="snack_event_opening_edit_error">Помилка відкриття події для редагування</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Ви не можете редагувати повторювані запрошення, що містять зміни до одиничних подій</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Ви не можете видалити повторюване запрошення, що містить зміни до одиничних подій</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Ви не можете редагувати повторювані запрошення, що містять видалені події</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Ви не можете видалити повторюване запрошення, що містить видалені події</string>
     <string name="snack_event_edit_with_attendees_error">Редагування подій з учасниками ще не підтримується</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Не можна додавати учасників та змінювати календар одночасно</string>
     <string name="snack_event_init_error">Помилка ініціалізації нової події</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Продовжити писати</string>
     <string name="bug_report_discard_changes_confirm">Відхилити</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App settings</string>
     <string name="settings_theme_title">Тема</string>
     <string name="settings_theme_info">Цей параметр впливає лише на зовнішній вигляд програми Proton Calendar на цьому пристрої. Після зміни теми програма перезапуститься.</string>
     <string name="settings_timezone_title">Часовий пояс</string>

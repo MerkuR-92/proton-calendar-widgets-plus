@@ -152,7 +152,7 @@
     <string name="invite_change_attendees_disclaimer">Kutsuihin liittyviä osallistujia ei ole vielä mahdollista muokata.</string>
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
-    <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään kutsupäivitys.</string>
+    <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään päivitetty kutsu.</string>
     <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
     <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
     <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään päivitetty kutsu.</string>
@@ -241,14 +241,14 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Kutsu %1$s klo %2$s %3$s alkavaan tapahtumaan</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Kutsu %1$s alkavaan tapahtumaan</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Kutsu %1$s alkavaan tapahtumaan</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Muutos %1$s klo %2$s %3$s alkavaan tapahtumaan</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Päivitys %1$s klo %2$s %3$s alkavaan tapahtumaan</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Muutos %1$s ajoitettuun tapahtumaan</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Muutos %1$s alkavaan tapahtumaan</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%1$s klo %2$s %3$s alkavan tapahtuman peruutus</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s alkavan tapahtuman peruutus</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s alkavan tapahtuman peruutus</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Sinut on kutsuttu tapahtumaan %1$s\nAika: %2$s</string>
-    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s on muuttunut.\nMilloin: %2$s</string>
+    <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s päivitettiin.\nMilloin: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (koko päivä)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s – %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s klo %2$s %3$s – %4$s klo %5$s %6$s</string>
@@ -274,7 +274,7 @@
     <string name="event_update_add_participants_dialog_description">Nykyisille ja lisätyille osallistujille ilmoitetaan.</string>
     <string name="recurring_event_update_add_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Nykyisille ja lisätyille osallistujille ilmoitetaan.</string>
     <string name="event_update_remove_participants_dialog_description">Nykyisille ja poistetuille osallistujille ilmoitetaan.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Poistetuille osallistujille ilmoitetaan.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Poistetuille osallistujille lähetetään ilmoitus.</string>
     <string name="recurring_event_update_remove_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Nykyisille ja poistetuille osallistujille ilmoitetaan.</string>
     <string name="recurring_event_update_remove_all_participants_dialog_description">Päivität ketjun kaikki tapahtumat. Poistetuille osallistujille ilmoitetaan.</string>
     <string name="event_update_add_and_remove_participants_dialog_description">Nykyisille, lisätyille ja poistetuille osallistujille ilmoitetaan.</string>
@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
     <string name="snack_event_created_error">Virhe luotaessa tapahtumaa</string>
     <string name="snack_event_opening_edit_error">Virhe avattaessa tapahtuman muokkausta</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Et voi muokata toistuvaa kutsua, jossa on muutoksia yksittäisiin tapahtumiin</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Et voi poistaa toistuvaa kutsua, jossa on muutoksia yksittäisiin tapahtumiin</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Et voi muokata toistuvaa kutsua, joka sisältää poistettuja tapahtumia</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Et voi poistaa toistuvaa kutsua, joka sisältää poistettuja tapahtumia</string>
     <string name="snack_event_edit_with_attendees_error">Osallistujia sisältävien tapahtumien muokkausta ei vielä tueta</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Osallistujia ei ole mahdollista lisätä ja kalenteria vaihtaa samaan aikaan</string>
     <string name="snack_event_init_error">Virhe alustettaessa uutta tapahtumaa</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Jatka kirjoittamista</string>
     <string name="bug_report_discard_changes_confirm">Hylkää</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">Sovelluksen asetukset</string>
     <string name="settings_theme_title">Teema</string>
     <string name="settings_theme_info">Asetus vaikuttaa ainoastaan Proton Calendar -sovelluksen ulkoasuun tässä laitteessa. Teeman vaihto vaatii sovelluksen uudelleenkäynnistyksen.</string>
     <string name="settings_timezone_title">Aikavyöhyke</string>
@@ -517,12 +522,12 @@
     <string name="recreate_calendar_snack_deleted">Kalenteri tyhjennettiin</string>
     <string name="recreate_calendar_snack_clearing">Kalenteria tyhjennetään…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">Lisää yleiset vapaapäivät</string>
-    <string name="holiday_calendar_title">Yleiset vapaapäivät</string>
+    <string name="add_holiday_calendar_title">Lisää juhlapäiväkalenteri</string>
+    <string name="holiday_calendar_title">Juhlapäiväkalenteri</string>
     <string name="add_holiday_calendar_country_search_hint">Etsi maata</string>
     <string name="holiday_calendar_form_picker_title">Maa</string>
     <string name="holiday_calendar_time_zone_based">Perustuu aikavyöhykkeeseesi</string>
-    <string name="holiday_calendar_already_exists">Tämä vapaapäiväkalenteri on jo lisätty.</string>
+    <string name="holiday_calendar_already_exists">Yleiset vapaapäivät on jo lisätty.</string>
     <string name="holiday_calendar_value_placeholder">Valitse maa</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>

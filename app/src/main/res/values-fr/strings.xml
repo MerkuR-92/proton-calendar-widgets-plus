@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">L\'événement est créé, mais l\'invitation n\'a pas été envoyée.</string>
     <string name="snack_event_created_error">Une erreur s\'est produite pendant la création de l\'événement.</string>
     <string name="snack_event_opening_edit_error">Une erreur s\'est produite pendant l\'ouverture de l\'événement pour le modifier.</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Vous ne pouvez pas modifier une invitation récurrente contenant des changements à des occurrences individuelles.</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Vous ne pouvez pas supprimer une invitation récurrente contenant des changements à des occurrences individuelles.</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Vous ne pouvez pas modifier une invitation récurrente contenant des occurrences supprimées.</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Vous ne pouvez pas supprimer une invitation récurrente contenant des occurrences supprimées.</string>
     <string name="snack_event_edit_with_attendees_error">La modification des événements avec des participants n\'est pas encore possible.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Il n\'est pas possible d\'ajouter des participants et de modifier le calendrier en même temps.</string>
     <string name="snack_event_init_error">Une erreur s\'est produite pendant l\'initialisation du nouvel événement.</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Continuer à écrire</string>
     <string name="bug_report_discard_changes_confirm">Abandonner</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">Paramètres de l\'application</string>
     <string name="settings_theme_title">Thème</string>
     <string name="settings_theme_info">Ce paramètre n\'affecte que l\'apparence de l\'application Proton Calendar sur cet appareil. L\'application redémarrera après avoir changé de thème.</string>
     <string name="settings_timezone_title">Fuseau horaire</string>

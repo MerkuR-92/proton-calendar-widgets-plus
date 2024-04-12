@@ -240,7 +240,7 @@
     <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">AW: Einladung zu einem Termin, der am %1$s beginnt</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Einladung zu einem Termin, der am %1$s um %2$s %3$s beginnt</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Einladung zu einem Termin am %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Einladung zu einem Termin, der am $%1$s beginnt</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Einladung zu einem Termin, der am %1$s beginnt</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Aktualisierung eines Termins, der am %1$s um %2$s %3$s beginnt</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aktualisierung eines Termins am %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aktualisierung eines Termins, der am %1$s beginnt</string>
@@ -329,6 +329,10 @@
     <string name="snack_event_created_failed_mail">Termin erstellt, aber Einladung konnte nicht gesendet werden</string>
     <string name="snack_event_created_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_event_opening_edit_error">Fehler beim Öffnen des Termins zur Bearbeitung</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kannst keine wiederkehrende Einladung bearbeiten, die Änderungen an einzelnen Ereignissen enthält</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kannst eine wiederkehrende Einladung, die Änderungen an einzelnen Terminen enthält, nicht löschen</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Du kannst eine wiederkehrende Einladung mit gelöschten Terminen nicht bearbeiten</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Du kannst keine wiederkehrenden Einladungen mit gelöschten Terminen löschen</string>
     <string name="snack_event_edit_with_attendees_error">Das Bearbeiten von Terminen mit Teilnehmern wird derzeit noch nicht unterstützt</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Teilnehmer hinzufügen und gleichzeitig den Kalender wechseln ist nicht möglich</string>
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termins</string>
@@ -428,6 +432,7 @@
     <string name="bug_report_discard_changes_cancel">Bearbeitung fortsetzen</string>
     <string name="bug_report_discard_changes_confirm">Verwerfen</string>
     <!-- Settings -->
+    <string name="settings_app_settings_title">App-Einstellungen</string>
     <string name="settings_theme_title">Farbschema</string>
     <string name="settings_theme_info">Diese Einstellung wirkt sich ausschließlich auf das Aussehen der Proton Calendar App auf diesem Gerät aus. Die App wird nach dem Ändern des Farbschemas neu gestartet.</string>
     <string name="settings_timezone_title">Zeitzone</string>
