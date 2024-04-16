@@ -110,42 +110,32 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                 // Fetch the holiday calendar feature flag value
                 val featureIds = CalendarFeatureFlag.values().filter { !it.isLocalFlag }.map { it.featureId }.toSet()
                 featureFlagManager.prefetch(userId, featureIds)
-                val isAutoAddHolidayEnabled = featureFlagManager.getOrDefault(
-                    userId,
-                    CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.featureId,
-                    FeatureFlag.default(
-                        CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.featureId.id,
-                        CalendarFeatureFlag.CalendarAndroidAutoAddHoliday.fallbackValue
-                    )
-                ).value
 
-                if (isAutoAddHolidayEnabled) {
-                    val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
-                    calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let { holidayCalendars ->
-                        // Get calendars matching the default time zone
-                        val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
-                            holidayCalendars,
-                            primaryTimeZone,
-                            defaultLanguageCode,
-                            defaultCountryCode
+                val primaryTimeZone = fallbackTimeZone(TimeZone.getDefault().id, fallbackToDefault = true)!!
+                calendarsRepository.refreshVisibleManagedHolidayCalendars(userId)?.let { holidayCalendars ->
+                    // Get calendars matching the default time zone
+                    val matchingDefaultHolidayCalendar = ProtonUtilsImpl.getMatchingDefaultHolidayCalendar(
+                        holidayCalendars,
+                        primaryTimeZone,
+                        defaultLanguageCode,
+                        defaultCountryCode
+                    )
+
+                    // If holiday calendar already exists, leave the fields empty
+                    matchingDefaultHolidayCalendar?.let { holidayCalendar ->
+                        val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
+                            userId,
+                            holidayCalendar,
+                            defaultHolidayCalendarColor,
+                            arrayListOf()
                         )
 
-                        // If holiday calendar already exists, leave the fields empty
-                        matchingDefaultHolidayCalendar?.let { holidayCalendar ->
-                            val joinCalendarResult = joinCalendarUseCase.joinHolidayCalendar(
-                                userId,
-                                holidayCalendar,
-                                defaultHolidayCalendarColor,
-                                arrayListOf()
-                            )
-
-                            if (joinCalendarResult !is UseCase.Result.Success<*>) {
-                                logger.e("BootstrapAllCalendarsUseCase: error unable to join holiday calendar for user")
-                            }
+                        if (joinCalendarResult !is UseCase.Result.Success<*>) {
+                            logger.e("BootstrapAllCalendarsUseCase: error unable to join holiday calendar for user")
                         }
-                    } ?: run {
-                        logger.e("BootstrapAllCalendarsUseCase: error failed to fetch holiday calendars for user")
                     }
+                } ?: run {
+                    logger.e("BootstrapAllCalendarsUseCase: error failed to fetch holiday calendars for user")
                 }
             }
 

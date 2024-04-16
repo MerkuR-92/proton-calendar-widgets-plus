@@ -524,7 +524,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                     } else {
                         // Display spotlight dialog if needed
                         val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
-                        val isHolidayCalendarEnabled = featureFlagViewModel.isHolidayCalendarEnabled()
                         val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
                         val hasHolidayCalendars = calendarViewModel.hasHolidayCalendars()
                         val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
@@ -533,7 +532,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                 showLastSpotlightDialog(
                                     calendarViewModel.isFreeUser() ?: true,
                                     isColorPerEventEnabled,
-                                    isHolidayCalendarEnabled,
                                     hasHolidayCalendars,
                                     isCalendarLimitReached
                                 ) {
@@ -1400,10 +1398,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             bottomSheetDialog.dismiss()
         }
 
-        val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
-        addHolidayCalendar?.visibleOrGone(
-            featureFlagViewModel.isHolidayCalendarEnabled()
-        )
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
@@ -1786,9 +1780,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             }
         })
 
-        featureFlagViewModel.holidayCalendarFeatureFlag.observe(this@MainActivity, Observer { holidayCalendarFeatureFlag ->
-            holidayCalendarFeatureFlag ?: return@Observer
-        })
         featureFlagViewModel.colorPerEventFeatureFlag.observe(this@MainActivity, Observer { colorPerEventFeatureFlag ->
             colorPerEventFeatureFlag ?: return@Observer
         })

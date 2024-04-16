@@ -457,7 +457,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                 (calendar.isSubscribed.not() && calendar.isOwner) || // my own personal calendar
                         calendar.isSubscribed || // subscribed calendar
                         (calendar.isSharedWithMe && CalendarFeatureFlag.EditingSharedCalendars.fallbackValue) || // shared calendar
-                        (calendar.isHolidayCalendar && featureFlagViewModel.isHolidayCalendarEnabled()) // holiday calendar
+                        calendar.isHolidayCalendar // holiday calendar
             )
 
             val deleteLayout = bottomSheetDialog.findViewById<ConstraintLayout>(R.id.dialog_calendar_settings_delete)
@@ -512,10 +512,6 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
             bottomSheetDialog.dismiss()
         }
 
-        val addHolidayCalendar = bottomSheetDialog.findViewById<View>(R.id.dialog_calendars_holiday_calendar)
-        addHolidayCalendar?.visibleOrGone(
-            featureFlagViewModel.isHolidayCalendarEnabled()
-        )
         addHolidayCalendarPress?.setOnSingleClickListener {
             onClickCreateCalendar(Calendar.CalendarType.HOLIDAY)
             bottomSheetDialog.dismiss()
