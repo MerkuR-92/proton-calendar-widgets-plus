@@ -333,15 +333,38 @@
                 app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
                 app:layout_constraintStart_toStartOf="parent" />
 
+            <ImageView
+                android:id="@+id/event_form_calendar_color_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                app:srcCompat="@drawable/ic_dot"
+                android:layout_marginStart="@dimen/default_margin_text_start"
+                app:layout_constraintTop_toTopOf="@+id/event_form_calendar"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_calendar"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/event_form_calendar_without_dot"
+                style="@style/Text.Default.Form"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="Work"
+                android:visibility="gone"
+                android:layout_marginEnd="@dimen/default_inner_padding_end"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
             <TextView
                 android:id="@+id/event_form_calendar"
                 style="@style/Text.Default.Form"
+                android:layout_marginStart="6dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 tools:text="Work"
                 android:layout_marginEnd="@dimen/default_inner_padding_end"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/event_form_calendar_color_icon"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <TextView
@@ -353,9 +376,10 @@
                 tools:text="Sending invitations is available only within personal calendars."
                 style="@style/Text.Caption.Weak"
                 android:layout_marginEnd="@dimen/default_inner_padding_end"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="@dimen/default_margin_text_start"
                 app:layout_constraintTop_toBottomOf="@+id/event_form_calendar"
-                app:layout_constraintStart_toStartOf="@+id/event_form_calendar"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <View
