@@ -54,6 +54,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
@@ -521,16 +522,19 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             binding.eventFormCalendar.text = event.calendar.name
+            binding.eventFormCalendarWithoutDot.text = event.calendar.name // TODO Delete once color per event is released
 
             val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
             binding.eventFormCalendarIcon.visibleOrGone(isColorPerEventEnabled)
+            binding.eventFormCalendarColorIcon.visibleOrGone(isColorPerEventEnabled)
             binding.eventFormCalendarDot.visibleOrGone(!isColorPerEventEnabled)
-            if (!isColorPerEventEnabled) {
-                ImageViewCompat.setImageTintList(
-                    binding.eventFormCalendarDot,
-                    ColorStateList.valueOf(Color.parseColor(event.calendar.color))
-                )
-            }
+            binding.eventFormCalendar.visibleOrInvisible(isColorPerEventEnabled)
+            binding.eventFormCalendarWithoutDot.visibleOrGone(!isColorPerEventEnabled) // TODO Delete once color per event is released
+            ImageViewCompat.setImageTintList(
+                if (!isColorPerEventEnabled) binding.eventFormCalendarDot
+                else binding.eventFormCalendarColorIcon,
+                ColorStateList.valueOf(Color.parseColor(event.calendar.color))
+            )
 
             binding.eventFormColorLayout.visibleOrGone(isColorPerEventEnabled)
             if (isColorPerEventEnabled) {
