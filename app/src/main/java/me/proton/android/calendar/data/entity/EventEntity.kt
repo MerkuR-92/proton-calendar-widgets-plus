@@ -85,6 +85,7 @@ fun EventResponse.toEventEntity(): EventEntity {
         attendees = this.attendees,
         isProtonProtonInvite = this.isProtonProtonInvite,
         isPersonalMigrated = this.isPersonalMigrated,
-        notifications = this.notifications
+        notifications = this.notifications,
+        color = this.color
     )
 }

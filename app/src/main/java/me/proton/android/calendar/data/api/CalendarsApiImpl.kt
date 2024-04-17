@@ -931,6 +931,8 @@ data class EventResponse(
     val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
     @SerialName("Notifications")
     val notifications: List<JsonElement>? = null,
+    @SerialName("Color")
+    val color: String? = null,
     @SerialName("StartTime")
     val startTime: Long, // Epoch seconds
     @SerialName("StartTimezone")
