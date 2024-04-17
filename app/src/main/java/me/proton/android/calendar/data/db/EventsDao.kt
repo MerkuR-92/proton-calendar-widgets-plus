@@ -25,22 +25,22 @@ abstract class EventsDao : BaseDao<EventEntity> {
     @Query("SELECT * FROM events")
     abstract fun selectEventsFlow(): Flow<List<EventEntity>>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events")
     abstract fun selectSkeletonEventsFlow(): Flow<List<SkeletonEventEntity>>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events WHERE id IN (:ids) ORDER BY ID")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE id IN (:ids) ORDER BY ID")
     abstract fun selectSkeletonEventsById(ids: List<String>): List<SkeletonEventEntity>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events WHERE calendarId = :calendarId")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE calendarId = :calendarId")
     abstract fun getSkeletonEventsInCalendarFlow(calendarId: String): Flow<List<SkeletonEventEntity>>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events ORDER BY ID ASC LIMIT :limit OFFSET :offset")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events ORDER BY ID ASC LIMIT :limit OFFSET :offset")
     abstract fun selectSkeletonEventsPaginated(limit: Int, offset: Int): List<SkeletonEventEntity>
 
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE calendarId = :calendarId ORDER BY ID ASC LIMIT :limit OFFSET :offset")
     abstract fun selectSkeletonEventsInCalendarPaginated(calendarId: String, limit: Int, offset: Int): List<SkeletonEventEntity>
 
-    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID FROM events WHERE calendarId = :calendarId")
+    @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE calendarId = :calendarId")
     abstract fun selectSkeletonEvents(calendarId: String): List<SkeletonEventEntity>
 
     @Query("SELECT COUNT(ID) FROM events")
