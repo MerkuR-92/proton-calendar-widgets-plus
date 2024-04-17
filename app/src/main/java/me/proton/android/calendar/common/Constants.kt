@@ -42,8 +42,8 @@ const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
-const val DEFAULT_CALENDAR_COLOR: Int = 0x8080FF
-const val DEFAULT_HOLIDAY_CALENDAR_COLOR: Int = 0xF78400
+const val DEFAULT_CALENDAR_COLOR: String = "#8080FF"
+const val DEFAULT_HOLIDAY_CALENDAR_COLOR: String = "#F78400"
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
@@ -76,6 +76,8 @@ const val DAY_VIEW_ALL_DAY_MAX = 3
 const val MAX_CALENDAR_PAID = 25
 const val MAX_CALENDAR_FREE = 3
 
+const val MAX_CALENDAR_INDICATORS = 5
+
 const val SEARCH_MIN_QUERY_LENGTH = 2
 const val SEARCH_QUERY_DEBOUNCE_MS = 500L
 const val SEARCH_RESULTS_RANGE = 500
@@ -102,6 +104,7 @@ const val IMPORT_VERSION_CODE = 186
 const val CALENDAR_PROVIDER_VERSION_CODE = 191
 const val SEARCH_VERSION_CODE = 1 // TODO disable search spotlight
 const val HOLIDAY_CALENDAR_VERSION_CODE = 223
+const val COLOR_PER_EVENT_VERSION_CODE = 257
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -119,7 +122,8 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     IMPORT_VERSION_CODE, // Import (2.6.6)
     CALENDAR_PROVIDER_VERSION_CODE, // Calendar provider (2.9.1)
     SEARCH_VERSION_CODE, // Search view // TODO Disabled
-    HOLIDAY_CALENDAR_VERSION_CODE // Holiday calendar (2.12.4)
+    HOLIDAY_CALENDAR_VERSION_CODE, // Holiday calendar (2.12.4)
+    COLOR_PER_EVENT_VERSION_CODE // Color per event (2.17.0)
 )
 
 object HttpResponseCode {

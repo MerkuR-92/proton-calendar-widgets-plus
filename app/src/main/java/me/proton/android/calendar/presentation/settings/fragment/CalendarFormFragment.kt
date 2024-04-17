@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -32,16 +32,15 @@ import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.databinding.DialogCalendarColorPickerBinding
 import me.proton.android.calendar.databinding.FragmentCalendarFormBinding
 import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
 import me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.presentation.utils.onTextChange
 import org.koin.core.KoinComponent
@@ -198,9 +197,10 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
                 requireContext().showKeyboard()
 
                 // Use random color from array as calendar color
-                val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
-                calendarFormViewModel.initCreateCalendarForm(calendarColors[(0..calendarColors.lastIndex).random()])
+                calendarFormViewModel.initCreateCalendarForm(
+                    ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names))
+                )
             }
         }
 
@@ -261,13 +261,18 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
             )
         }
         calendarFormViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
-            if (calendarColor == 0) {
+            if (calendarColor.isEmpty()) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
                 binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor)
+            binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
+
+            binding.calendarFormColor.text = ColorUtils.getColorNameForHex(
+                resources.getStringArray(R.array.colors_with_names),
+                calendarColor
+            ) ?: getString(R.string.undefined_color)
         }
         calendarFormViewModel.defaultPartDayAlarms.observe(viewLifecycleOwner) { defaultPartDayAlarms ->
             binding.calendarFormDefaultEventNotifications.visibleOrGone(defaultPartDayAlarms.size < DEFAULT_NOTIFICATIONS_COUNT_MAX)
@@ -380,30 +385,14 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
         binding.calendarFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-
-            // Get calendar color list
-            val calendarColors = resources.getIntArray(R.array.accent_colors_base)
-
-            // Get dialog custom view
-            val colorPickerViewBinding = DialogCalendarColorPickerBinding.inflate(
-                LayoutInflater.from(context),
-                null,
-                false
-            )
-
-            // Set grid view with color list
-            val calendarColorPickerGridView = colorPickerViewBinding.dialogCalendarColorPickerLayout
-            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), calendarFormViewModel.calendarColor.value) { calendarColor ->
-                calendarFormViewModel.handleCalendarColor(calendarColor)
-                dialog?.dismiss()
+            ColorUtils.displayColorPicker(
+                requireContext(),
+                resources.getString(R.string.dialog_title_calendar_color_picker),
+                resources.getStringArray(R.array.colors_with_names),
+                calendarFormViewModel.calendarColor.value!!
+            ) {
+                calendarFormViewModel.handleCalendarColor(it)
             }
-
-            // Display dialog
-            dialog = MaterialAlertDialogBuilder(requireContext())
-                .setView(colorPickerViewBinding.root)
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
 
         // Calendar email (can only be changed for create calendar)

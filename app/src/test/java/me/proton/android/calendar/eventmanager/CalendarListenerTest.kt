@@ -176,7 +176,7 @@ class CalendarListenerTest {
             val ids = listOf("calendar_id")
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
-                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR,0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()
             )
 
             listener.onDelete(config, ids)
@@ -191,7 +191,7 @@ class CalendarListenerTest {
             val ids = listOf("calendar_id")
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
-                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 2, 127, 30, emptyList(), emptyList()
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR,0, "addressId", "memberId", 1, true, 2, 127, 30, emptyList(), emptyList()
             )
 
             listener.onDelete(config, ids)
@@ -206,7 +206,7 @@ class CalendarListenerTest {
             val ids = listOf("calendar_id")
 
             coEvery { calendarsRepository.selectCalendar(any()) } returns Calendar(
-                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR.toHexColor(),0, "addressId", "memberId", 1, true, 0, 32, 30, emptyList(), emptyList()
+                "id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR,0, "addressId", "memberId", 1, true, 0, 32, 30, emptyList(), emptyList()
             )
 
             listener.onDelete(config, ids)

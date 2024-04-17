@@ -88,8 +88,8 @@ class HolidayCalendarViewModel @Inject constructor(
     private val _country = MutableLiveData("")
     val country: LiveData<String> = _country
 
-    private val _calendarColor = MutableLiveData<Int>()
-    val calendarColor: LiveData<Int> = _calendarColor
+    private val _calendarColor = MutableLiveData<String>()
+    val calendarColor: LiveData<String> = _calendarColor
 
     private val _language = MutableLiveData<String>()
     val language: LiveData<String> = _language
@@ -117,7 +117,7 @@ class HolidayCalendarViewModel @Inject constructor(
     fun resetValues() {
         _country.value = ""
         _language.value = ""
-        _calendarColor.value = 0
+        _calendarColor.value = ""
         _defaultAllDayAlarms.value = arrayListOf()
         _calendar = null
         calendarEdited = false
@@ -169,7 +169,7 @@ class HolidayCalendarViewModel @Inject constructor(
             _language.value = managedHolidayCalendar.language
 
             // Calendar color
-            _calendarColor.value = Color.parseColor(calendar.color)
+            _calendarColor.value = calendar.color
 
             // Default all day event notifications
             setDefaultAlarms(calendar.defaultFullDayNotifications)
@@ -188,7 +188,7 @@ class HolidayCalendarViewModel @Inject constructor(
     }
 
     suspend fun initCreateHolidayCalendar(
-        calendarColor: Int,
+        calendarColor: String,
         defaultLanguageCode: String,
         defaultCountryCode: String,
         returnToSettings: Boolean
@@ -353,7 +353,7 @@ class HolidayCalendarViewModel @Inject constructor(
         checkExistingHolidayCalendar()
     }
 
-    fun handleCalendarColor(calendarColor: Int) {
+    fun handleCalendarColor(calendarColor: String) {
         if (_calendarColor.value == calendarColor) return
         calendarEdited = true
         _calendarColor.value = calendarColor
@@ -420,7 +420,7 @@ class HolidayCalendarViewModel @Inject constructor(
     private suspend fun handleUpdateHolidayCalendar(
         userId: UserId,
         holidayCalendar: ManagedHolidayCalendarEntity,
-        calendarColor: Int,
+        calendarColor: String,
         selectedDate: LocalDate?
     ) {
         val calendar = _calendar
@@ -436,7 +436,7 @@ class HolidayCalendarViewModel @Inject constructor(
         val calendarPriority = calendar.priority
         val currentDefaultAllDayNotifications = calendar.defaultFullDayNotifications.map { it.toVAlarm() }
         val notificationsChanged = currentDefaultAllDayNotifications != _defaultAllDayAlarms.value
-        val colorChanged = calendar.color != calendarColor.toHexColor()
+        val colorChanged = calendar.color != calendarColor
         val calendarChanged = calendar.id != holidayCalendar.calendarId
         if (calendarChanged) {
             // Check that holiday calendar doesn't already exist
@@ -508,7 +508,7 @@ class HolidayCalendarViewModel @Inject constructor(
                 updateCalendarUseCase.executeUpdate(
                     userId,
                     calendar.id,
-                    color = calendarColor.toHexColor()
+                    color = calendarColor
                 )
             } else UseCase.Result.Success<Unit>()
 
@@ -562,7 +562,7 @@ class HolidayCalendarViewModel @Inject constructor(
         returnToSettings: Boolean,
         userId: UserId,
         holidayCalendar: ManagedHolidayCalendarEntity,
-        calendarColor: Int,
+        calendarColor: String,
         selectedDate: LocalDate?
     ) {
         // Check that holiday calendar doesn't already exist

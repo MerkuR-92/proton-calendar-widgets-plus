@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -29,7 +30,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.dpToPixel
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.databinding.FragmentHolidayCalendarSearchBinding
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.databinding.FragmentImportAssistantBinding
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.ImportCalendarMapping
@@ -151,7 +152,7 @@ class ImportAssistantFragment : BaseDialogFragment<FragmentImportAssistantBindin
                 if (!importAssistantViewModel.handleGoogleSignInRedirect(
                         userId,
                         navigationArguments.code,
-                        resources.getIntArray(R.array.accent_colors_base)
+                        resources.getStringArray(R.array.colors_with_names)
                     )) {
                     // Display error snack and navigate back
                     if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
@@ -512,8 +513,8 @@ class ImportAssistantFragment : BaseDialogFragment<FragmentImportAssistantBindin
         val newCalendarIcon = bottomSheetDialog.findViewById<ImageView>(R.id.dialog_calendar_import_mapping_new_calendar_icon)
         val newCalendarColor =
             if (calendarToImport.createDestinationCalendar) calendarToImport.destinationColor
-            else resources.getIntArray(R.array.accent_colors_base).random()
-        newCalendarIcon?.imageTintList = ColorStateList.valueOf(newCalendarColor)
+            else ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names))
+        newCalendarIcon?.imageTintList = ColorStateList.valueOf(newCalendarColor.toColorInt())
         val newCalendarName = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_import_mapping_new_calendar_title)
         newCalendarName?.text = calendarToImport.sourceName
 

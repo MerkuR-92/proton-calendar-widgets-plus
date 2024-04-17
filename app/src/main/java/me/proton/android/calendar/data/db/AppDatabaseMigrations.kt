@@ -518,4 +518,10 @@ object AppDatabaseMigrations {
             PaymentDatabase.MIGRATION_1.migrate(database)
         }
     }
+
+    val MIGRATION_65_66 = object : Migration(65, 66) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.addTableColumn(TABLE_EVENTS, "color", "TEXT")
+        }
+    }
 }

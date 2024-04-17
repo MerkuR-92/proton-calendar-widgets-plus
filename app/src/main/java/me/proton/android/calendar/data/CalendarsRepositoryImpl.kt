@@ -42,6 +42,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.PING_INTERVAL_SECONDS
+import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getFullyOverlappingWindow
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
@@ -99,6 +100,7 @@ import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toInt
 import java.time.Duration
@@ -738,8 +740,12 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         return visibleSkeletonEventsFlow.map<List<SkeletonEvent>, CalendarsRepository.GetEventsResult<UiEvent>> { visibleSkeletonEvents ->
 
-            val userAddresses = accountManager.getPrimaryUserId().firstOrNull()?.let { userAddressManager.getAddressesOrNull(it) }
-                ?: return@map CalendarsRepository.GetEventsResult.Exception(Exception("could not get user addresses in getUiEventsFlow"))
+            val userId = accountManager.getPrimaryUserId().firstOrNull()
+            val userAddresses = userId?.let {
+                userAddressManager.getAddressesOrNull(it)
+            } ?: return@map CalendarsRepository.GetEventsResult.Exception(Exception("could not get user addresses in getUiEventsFlow"))
+
+            val isFreeUser = userManager.getUserOrNull(userId, logger)?.hasSubscriptionForMail() == false
 
             val userEmails = userAddresses.map { it.email }
 
@@ -782,7 +788,8 @@ class CalendarsRepositoryImpl @Inject constructor(
                         event,
                         transformedEvents,
                         eventsWindow,
-                        userEmails
+                        userEmails,
+                        isFreeUser
                     )
                 }.flatten()
 
@@ -1234,7 +1241,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun expandSkeletonEventsAndFilterInWindowToUiEvents(event: Event, allEvents: List<Event>, eventsWindow: CalendarsRepository.EventsWindow, userEmails: List<String>): List<UiEvent> {
+    private fun expandSkeletonEventsAndFilterInWindowToUiEvents(event: Event, allEvents: List<Event>, eventsWindow: CalendarsRepository.EventsWindow, userEmails: List<String>, isFreeUser: Boolean): List<UiEvent> {
 
         return if (event.isRecurring()) {
             // occurrences are already filtered for time window
@@ -1244,7 +1251,8 @@ class CalendarsRepositoryImpl @Inject constructor(
                 eventsWindow.fromDate,
                 eventsWindow.toDate,
                 eventsWindow.timeZoneId,
-                userEmails
+                userEmails,
+                isFreeUser
             )!!
         } else if (event.isSingleEdit()) {
             // single edits are already generated when expanding above ^
@@ -1253,10 +1261,10 @@ class CalendarsRepositoryImpl @Inject constructor(
             if (allEvents.find { it.uid == event.uid && it.isRecurring() } != null) {
                 emptyList()
             } else {
-                if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId)) else emptyList()
+                if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId, isFreeUser)) else emptyList()
             }
         } else {
-            if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId)) else emptyList()
+            if (event.overlapsWithFullDayRange(eventsWindow.fromDate, eventsWindow.toDate, eventsWindow.timeZoneId)) listOf(event.toUiEvent(userEmails, eventsWindow.timeZoneId, isFreeUser)) else emptyList()
         }
     }
 

@@ -324,7 +324,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedEventId = sanitizedNewEvent.sharedEventId,
                                 uid = sanitizedNewEvent.uid,
                                 sourceCalendarId = oldCalendarId,
-                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
+                                color = sanitizedNewEvent.color
                             )
                         )
                     )
@@ -349,7 +350,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 // In both cases adding attendees happens in the "second call to /sync after the first one that created event", which is right here.
                                 // If we sent the SharedSessionKey already before, the attendee has the event auto-created in their calendar already, so we are done.
                                 addedProtonAttendees = addedProtonAttendees,
-                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
+                                color = sanitizedNewEvent.color
                             )
                         )
                     )
@@ -369,7 +371,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 attendees = attendees,
                                 sharedEventId = sharedEventId,
                                 uid = sanitizedNewEvent.uid,
-                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
+                                color = sanitizedNewEvent.color
                             )
                         )
                     )
@@ -392,7 +395,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 attendees =
                                 if (sanitizedNewEvent.iCalendar.method?.isRequest == true) attendees.takeIfNotEmpty()  // If we create an event from an invitation we provide attendees
                                 else null, // We first create without attendees,
-                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) }
+                                notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
+                                color = sanitizedNewEvent.color
                             ),
                             overwrite = isImport.toInt() // We always overwrite for imports
                         )

@@ -54,6 +54,7 @@ import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickList
 import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
@@ -74,9 +75,11 @@ import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.clearText
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import java.time.Instant
@@ -91,6 +94,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
     private val eventViewModel: EventViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
 
     override val TAG = "EventFormFragment" // TODO
     override val layoutResourceId = R.layout.fragment_event_form
@@ -411,6 +415,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormStartTimePress.isEnabled = !processingEvent
                 binding.eventFormEndTimePress.isEnabled = !processingEvent
                 binding.eventFormCalendarPress.root.isEnabled = !processingEvent
+                binding.eventFormColorPress.root.isEnabled = !processingEvent
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
 
@@ -516,10 +521,30 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             ) // TimeZone picked by user is saved in iCalendar's Default Timezone
 
             binding.eventFormCalendar.text = event.calendar.name
-            ImageViewCompat.setImageTintList(
-                binding.eventFormCalendarIcon,
-                ColorStateList.valueOf(Color.parseColor(event.calendar.color))
-            )
+
+            val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
+            binding.eventFormCalendarIcon.visibleOrGone(isColorPerEventEnabled)
+            binding.eventFormCalendarDot.visibleOrGone(!isColorPerEventEnabled)
+            if (!isColorPerEventEnabled) {
+                ImageViewCompat.setImageTintList(
+                    binding.eventFormCalendarDot,
+                    ColorStateList.valueOf(Color.parseColor(event.calendar.color))
+                )
+            }
+
+            binding.eventFormColorLayout.visibleOrGone(isColorPerEventEnabled)
+            if (isColorPerEventEnabled) {
+                binding.eventFormColor.text = ColorUtils.getColorNameForHex(
+                    resources.getStringArray(R.array.colors_with_names),
+                    event.displayColor
+                ) ?: getString(R.string.undefined_color)
+                binding.eventFormColorDefault.visibleOrGone(event.displayColor == event.calendar.color)
+
+                ImageViewCompat.setImageTintList(
+                    binding.eventFormColorIcon,
+                    ColorStateList.valueOf(Color.parseColor(event.displayColor))
+                )
+            }
 
             binding.eventFormRecurrence.text =
                 AndroidUtils.formatRecurrence(requireContext().resources, event, eventViewModel.eventTimeZoneId)
@@ -807,6 +832,26 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         }
                     }
 
+                }
+            }
+        }
+
+        val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
+        binding.eventFormColorPress.root.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            lifecycleScope.launch {
+                if (isFreeUser) {
+                    view?.displaySnackBar(getString(R.string.snack_color_per_event_paid_feature))
+                } else {
+                    ColorUtils.displayColorPicker(
+                        requireContext(),
+                        resources.getString(R.string.dialog_title_event_color_picker),
+                        resources.getStringArray(R.array.colors_with_names),
+                        eventViewModel.eventLiveData.value!!.displayColor,
+                        eventViewModel.eventLiveData.value!!.calendar.color
+                    ) {
+                        eventViewModel.handleColor(it)
+                    }
                 }
             }
         }

@@ -693,7 +693,10 @@ data class SyncEvent(
     @SerialName("SourceCalendarID") // original Calendar ID when creating new Event for "change calendar"
     val sourceCalendarId: String? = null,
     @SerialName("Notifications") // notifications that used to be in the PersonalEventContent
-    val notifications: List<NotificationEntity>? = null
+    val notifications: List<NotificationEntity>? = null,
+    @SerialName("Color")
+    val color: String? = null,
+
 )
 
 @Serializable

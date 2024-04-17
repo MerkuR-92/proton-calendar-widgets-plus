@@ -98,7 +98,7 @@ class EventAdapter(
                 } else {
                     imageViewIcon.setBackgroundResource(R.drawable.shape_calendar_bar)
                 }
-                imageViewIcon.background.setTint(Color.parseColor(event.calendarColor))
+                imageViewIcon.background.setTint(Color.parseColor(event.displayColor))
 
                 textViewHeader.text =
                     "${(event.dateStart.withZoneSameInstant(
@@ -204,7 +204,7 @@ class EventAdapter(
                     textViewSubheader.visibleOrGone(true)
                 }
 
-                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.calendarColor)))
+                viewSideStrip.setTint(Color.parseColor(AndroidUtils.darkenCalendarColor(event.displayColor)))
 
                 if (event.isInThePast()) {
                     textViewHeader.setTextAppearance(R.style.Text_DefaultSmall_Weak)
@@ -241,10 +241,10 @@ class EventAdapter(
                         setStripedBackground(
                             viewBackgroundStriped,
                             context,
-                            Color.parseColor(event.calendarColor)
+                            Color.parseColor(event.displayColor)
                         ) // striped background with 20% opacity for unanswered all day events
                     } else {
-                        viewMainSurface.setTint(Color.parseColor(event.calendarColor))
+                        viewMainSurface.setTint(Color.parseColor(event.displayColor))
                         textViewHeader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
                         textViewSubheader.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))
                         textViewSubheaderSide.setTextColor(ContextCompat.getColor(context, R.color.text_on_calendar_color))

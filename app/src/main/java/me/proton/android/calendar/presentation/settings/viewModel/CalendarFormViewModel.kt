@@ -105,8 +105,8 @@ class CalendarFormViewModel @Inject constructor(
     private val _calendarEmail = MutableLiveData<String>()
     val calendarEmail: LiveData<String> = _calendarEmail
 
-    private val _calendarColor = MutableLiveData<Int>()
-    val calendarColor: LiveData<Int> = _calendarColor
+    private val _calendarColor = MutableLiveData<String>()
+    val calendarColor: LiveData<String> = _calendarColor
 
     private val _defaultEventDuration = MutableLiveData<Int>()
     val defaultEventDuration: LiveData<Int> = _defaultEventDuration
@@ -135,7 +135,7 @@ class CalendarFormViewModel @Inject constructor(
     fun resetFormValues() {
         _calendarName.value = ""
         _calendarDescription.value = ""
-        _calendarColor.value = 0
+        _calendarColor.value = ""
         _calendarEmail.value = ""
         _defaultEventDuration.value = EVENT_DEFAULT_DURATION_MINUTES.first()
         _defaultPartDayAlarms.value = arrayListOf()
@@ -194,7 +194,7 @@ class CalendarFormViewModel @Inject constructor(
         _calendarEmail.value = calendar.email
 
         // Calendar color
-        _calendarColor.value = Color.parseColor(calendar.color)
+        _calendarColor.value = calendar.color
 
         // Default event duration
         _defaultEventDuration.value = calendarSettings.defaultEventDuration
@@ -206,7 +206,7 @@ class CalendarFormViewModel @Inject constructor(
         setDefaultAlarms(calendar.defaultFullDayNotifications, isAllDay = true)
     }
 
-    suspend fun initCreateCalendarForm(calendarColor: Int) {
+    suspend fun initCreateCalendarForm(calendarColor: String) {
         // Set default calendar color (picked randomly from the colors array)
         _calendarColor.value = calendarColor
 
@@ -323,7 +323,7 @@ class CalendarFormViewModel @Inject constructor(
         _calendarDescription.value = calendarDescription
     }
 
-    fun handleCalendarColor(calendarColor: Int) {
+    fun handleCalendarColor(calendarColor: String) {
         if (_calendarColor.value == calendarColor) return
         calendarEdited = true
         _calendarColor.value = calendarColor
@@ -360,7 +360,7 @@ class CalendarFormViewModel @Inject constructor(
                     calendarId,
                     description = _calendarDescription.value,
                     name = _calendarName.value,
-                    color = _calendarColor.value?.toHexColor()
+                    color = _calendarColor.value
                 )
                 if (updateCalendarUseCaseResult !is UseCase.Result.Success<*>) {
                     updateCalendarUseCaseResult.ifSuccessAndLogErrors(logger) {}

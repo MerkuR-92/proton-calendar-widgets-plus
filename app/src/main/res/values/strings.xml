@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Canceled</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Disabled)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d yes</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d maybe</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
     <string name="snack_down_banner_action">Open status page</string>
+    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
     <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Open Settings</string>
     <string name="contacts_permission_dialog_cancel">Deny</string>
     <string name="dialog_title_calendar_picker">Calendar</string>
+    <string name="dialog_title_calendar_color_picker">Calendar color</string>
+    <string name="dialog_title_event_color_picker">Event color</string>
     <string name="import_from_google_title">Import from Google</string>
     <string name="notifications_permission_dialog_title">Allow Proton Calendar to display notifications?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar needs permission to show you upcoming event notifications.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
+    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Import as simple event?</string>
     <string name="import_event_disclaimer_dialog_description">\nImported invitations appear in Proton Calendar as simple events <b>without organizer</b> and <b>participant</b> details.\n\nTo get event updates and see participants, ask organizers to invite you using your Proton email address.</string>
     <string name="import_event_disclaimer_dialog_positive">Import</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendar</item>
@@ -800,5 +807,27 @@
         <item>Monday</item>
         <item>Saturday</item>
         <item>Sunday</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Purple|#8080FF</item>
+        <item>Strawberry|#EC3E7C</item>
+        <item>Pink|#DB60D6</item>
+        <item>Carrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>Soil|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

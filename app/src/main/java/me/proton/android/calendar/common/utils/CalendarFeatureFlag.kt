@@ -4,17 +4,15 @@ import me.proton.core.featureflag.domain.entity.FeatureId
 
 enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Boolean, val isLocalFlag: Boolean) {
 
-    // Naming convention for remote feature flags:
-    //  - Features shared among different products: {FeatureName}{Platform}{Product} (ex: RatingAndroidCalendar)
-    //  - Others: {Product}{Platform}{FeatureName} (ex: CalendarAndroidHoliday)
-
-    // Remote flags
-    CalendarAndroidHoliday(FeatureId("CalendarAndroidHoliday"), false, false),
-    CalendarAndroidAutoAddHoliday(FeatureId("CalendarAndroidAutoAddHoliday"), false, false),
+    /** Remote flags **/
+    // Proton Admin panel
     RatingAndroidCalendar(FeatureId("RatingAndroidCalendar"), false, false),
     CalendarAndroidServerDownBanner(FeatureId("CalendarAndroidServerDownBanner"), false, false),
 
-    // Local only flag (unknown to remote API)
+    // Unleash
+    ColorPerEventAndroid(FeatureId("ColorPerEventAndroid"), false, false),
+
+    /** Local only flag (unknown to remote API) **/
     // Enabled
     AddAttendees(FeatureId("AddAttendees"), true, true),
     ChangeAnswer(FeatureId("ChangeAnswer"), true, true),
@@ -32,13 +30,13 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     WeekView(FeatureId("WeekView"), true, true),
     ImportIcs(FeatureId("ImportIcs"), true, true),
     EditingSharedCalendars(FeatureId("EditingSharedCalendars"), true, true),
-    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), false, true),
-    Payments(FeatureId("Subscription"), false, true),
     EditAttendeesAsOrganizer(FeatureId("EditAttendeesAsOrganizer"), true, true),
 
     // Disabled
     ShowSignatureVerificationBadges(FeatureId("ShowSignatureVerificationBadges"), false, true),
     DragAndDrop(FeatureId("DragAndDrop"), false, true),
     ClearCalendar(FeatureId("ClearCalendar"), false, true),
-    ShowEventSearch(FeatureId("ShowEventSearch"), false, true)
+    ShowEventSearch(FeatureId("ShowEventSearch"), false, true),
+    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), false, true),
+    Payments(FeatureId("Subscription"), false, true)
 }

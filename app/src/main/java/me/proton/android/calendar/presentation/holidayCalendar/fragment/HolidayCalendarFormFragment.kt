@@ -7,9 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
@@ -30,9 +30,9 @@ import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
-import me.proton.android.calendar.databinding.DialogCalendarColorPickerBinding
 import me.proton.android.calendar.databinding.FragmentHolidayCalendarFormBinding
 import me.proton.android.calendar.databinding.ItemAlarmTextButtonBinding
 import me.proton.android.calendar.presentation.calendar.fragment.EventFormAlarmFragment
@@ -40,7 +40,6 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.holidayCalendar.viewModel.HolidayCalendarViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.android.calendar.presentation.settings.adapter.CalendarColorListAdapter
 import me.proton.core.presentation.utils.currentLocale
 import org.koin.core.KoinComponent
 import java.time.LocalDate
@@ -159,13 +158,12 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
                 holidayCalendarViewModel.initUpdateHolidayCalendar(it)
             } ?: run {
                 // Use random color from array as calendar color
-                val calendarColors = resources.getIntArray(R.array.accent_colors_base)
                 // Init form for new calendar
                 val returnToSettings = findNavController().previousBackStackEntry?.destination?.id == R.id.nav_settings
                 val languageTag = requireContext().resources.configuration.currentLocale().toLanguageTag().lowercase()
                 val countryCode = languageTag.substringAfter("-", "")
                 holidayCalendarViewModel.initCreateHolidayCalendar(
-                    calendarColors[(0..calendarColors.lastIndex).random()],
+                    ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names)),
                     requireContext().resources.configuration.currentLocale().language.lowercase(),
                     countryCode,
                     returnToSettings
@@ -208,13 +206,18 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
         }
 
         holidayCalendarViewModel.calendarColor.observe(viewLifecycleOwner) { calendarColor ->
-            if (calendarColor == 0) {
+            if (calendarColor.isEmpty()) {
                 // Value was reset. Set to background_norm to avoid seeing the color being refreshed
                 binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.background_norm))
                 return@observe
             }
 
-            binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor)
+            binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
+
+            binding.holidayCalendarFormColor.text = ColorUtils.getColorNameForHex(
+                resources.getStringArray(R.array.colors_with_names),
+                calendarColor
+            ) ?: getString(R.string.undefined_color)
         }
 
         holidayCalendarViewModel.defaultAllDayAlarms.observe(viewLifecycleOwner) { defaultAllDayAlarms ->
@@ -355,30 +358,14 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
         binding.holidayCalendarFormColorPress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
 
-            var dialog: AlertDialog? = null
-
-            // Get calendar color list
-            val calendarColors = resources.getIntArray(R.array.accent_colors_base)
-
-            // Get dialog custom view
-            val colorPickerViewBinding = DialogCalendarColorPickerBinding.inflate(
-                LayoutInflater.from(context),
-            null,
-                false
-            )
-
-            // Set grid view with color list
-            val calendarColorPickerGridView = colorPickerViewBinding.dialogCalendarColorPickerLayout
-            calendarColorPickerGridView.adapter = CalendarColorListAdapter(calendarColors.toList(), holidayCalendarViewModel.calendarColor.value) { calendarColor ->
-                holidayCalendarViewModel.handleCalendarColor(calendarColor)
-                dialog?.dismiss()
+            ColorUtils.displayColorPicker(
+                requireContext(),
+                resources.getString(R.string.dialog_title_calendar_color_picker),
+                resources.getStringArray(R.array.colors_with_names),
+                holidayCalendarViewModel.calendarColor.value!!
+            ) {
+                holidayCalendarViewModel.handleCalendarColor(it)
             }
-
-            // Display dialog
-            dialog = MaterialAlertDialogBuilder(requireContext())
-                .setView(colorPickerViewBinding.root)
-                .setPositiveButton(getString(R.string.dialog_button_close)) { _, _ -> }
-                .show()
         }
     }
 
