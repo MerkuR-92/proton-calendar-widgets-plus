@@ -40,6 +40,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
+import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -63,6 +64,7 @@ internal class CalendarRepositoryTest {
     private val eventDecryptorMock: EventDecryptor = mockk()
     private val searchDatabaseMock: SearchDatabase = mockk()
     private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()
+    private val userManagerMock: UserManager = mockk()
     private val userAddressManagerMock: UserAddressManager = mockk()
     private val accountManagerMock: AccountManager = mockk()
     private val networkManagerMock: NetworkManager = mockk()
@@ -376,6 +378,7 @@ internal class CalendarRepositoryTest {
             eventDecryptorMock,
             searchDatabaseMock,
             indexEventForSearchUseCaseMock,
+            userManagerMock,
             userAddressManagerMock,
             accountManagerMock,
             networkManagerMock
