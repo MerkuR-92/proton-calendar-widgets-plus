@@ -2505,7 +2505,7 @@ class EventViewModel @Inject constructor(
         eventDetailsState.value = EventState.Processing.Deleting
 
         if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Edit)) {
-            eventDetailsState.value = EventState.Idle
+            navigateToEditFormPersonal()
             return
         }
 
