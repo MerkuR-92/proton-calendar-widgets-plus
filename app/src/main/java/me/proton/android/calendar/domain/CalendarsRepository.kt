@@ -251,6 +251,8 @@ interface CalendarsRepository {
 
     suspend fun persistCalendarKey(calendarKey: CalendarKeyEntity) // calendarId is already there
 
+    suspend fun deleteAllCalendars()
+
     suspend fun deleteCalendarKeyById(id: String)
 
     suspend fun deleteCalendarKeyByCalendarId(calendarId: String)
