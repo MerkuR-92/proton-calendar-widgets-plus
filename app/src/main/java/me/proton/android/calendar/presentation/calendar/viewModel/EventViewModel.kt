@@ -1313,10 +1313,6 @@ class EventViewModel @Inject constructor(
             }
         } else {
             event.iCalEvent.attendees.removeFirst { it.extractEmail()?.equalsNoCase(attendee.extractEmail()) == true }
-            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
-                // TODO Update this once we allow editing events that have attendees
-                event.iCalEvent.organizer = null
-            }
         }
         _event.postValue(event)
     }
