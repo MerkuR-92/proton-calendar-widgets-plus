@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Dibatalkan</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Nonaktif)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Bawaan)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ya</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d mungkin</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Pembuatan alamat pada kalender bersama tidak diperkenankan</string>
     <string name="snack_down_banner">Server Proton sedang down. Kunjungi halaman status kami untuk rincian selengkapnya.</string>
     <string name="snack_down_banner_action">Buka halaman status</string>
+    <string name="snack_color_per_event_paid_feature">Warna acara merupakan fitur berbayar</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
     <string name="error_occurrence_does_not_exist">Peristiwa ini tidak ada</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Buka Pengaturan</string>
     <string name="contacts_permission_dialog_cancel">Tolak</string>
     <string name="dialog_title_calendar_picker">Kalender</string>
+    <string name="dialog_title_calendar_color_picker">Warna kalender</string>
+    <string name="dialog_title_event_color_picker">Warna acara</string>
     <string name="import_from_google_title">Impor dari Google</string>
     <string name="notifications_permission_dialog_title">Izinkan Proton Calender untuk memunculkan notifikasi?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar memerlukan izin untuk menampilkan notifikasi bagi acara Anda yang akan datang.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Libur telah tiba!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Tidak ada penjadwalan pertemuan ketika semuanya libur atau lupa merencanakan liburan akhir pekan yang panjang.\n\nTambahkan liburan publik negara mana pun ke kalender Anda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Tidak ada lagi pertemuan yang dijadwalkan ketika semuanya sedang libur atau melupakan untuk merencanakan liburan akhir pekan yang panjang.\n\nKarena Anda saat ini berada di batas kalender, untuk menambahkan kalender liburan, Anda harus menghapus kalender yang sudah ada terlebih dahulu.</string>
+    <string name="spotlight_dialog_color_per_event_title">Tandai acara Anda dengan warna</string>
+    <string name="spotlight_dialog_color_per_event_description">• Sesuaikan warna untuk acara pribadi untuk mengatur harimu.\n\n• Catat dan efisienkan waktumu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Impor sebagai acara sederhana?</string>
     <string name="import_event_disclaimer_dialog_description">\nUndangan yang diimpor akan muncul pada Proton Calendar dalam bentuk acara sederhana <b>tanpa rincian penyelenggara</b> dan <b>peserta</b>.\n\nUntuk mendapatkan pembaruan seputar acara dan melihat daftar peserta, mintalah penyelenggara acara untuk mengundang Anda menggunakan alamat email Proton Anda.</string>
     <string name="import_event_disclaimer_dialog_positive">Impor</string>
+    <string name="undefined_color">Belum ditentukan</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="other">kalender</item>
@@ -774,5 +781,27 @@
         <item>Senin</item>
         <item>Sabtu</item>
         <item>Minggu</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Ungu|#8080FF</item>
+        <item>Arbei|#EC3E7C</item>
+        <item>Merah Jambu|#DB60D6</item>
+        <item>Wortel|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Ceri|#BA1E55</item>
+        <item>Tembaga|#C44800</item>
+        <item>Tanah|#54473F</item>
+        <item>Biru Keabuan|#415DF0</item>
+        <item>Pasifik|#179FD9</item>
+        <item>Karang|#1DA583</item>
+        <item>Perdu|#3CBB3A</item>
+        <item>Zaitun|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Samudera|#0A77A6</item>
+        <item>Pinus|#0F735A</item>
+        <item>Hutan|#258723</item>
+        <item>Acar|#807304</item>
     </string-array>
 </resources>

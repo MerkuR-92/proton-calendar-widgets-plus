@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">İptal edildi</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(kullanım dışı)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Varsayılan)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d evet</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d belki</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Paylaşılmış bir takvim için davet oluşturulmasına izin verilmiyor</string>
     <string name="snack_down_banner">Proton sunucuları çalışmıyor. Ayrıntılı bilgi almak için durum sayfamıza bakın.</string>
     <string name="snack_down_banner_action">Durum sayfasını aç</string>
+    <string name="snack_color_per_event_paid_feature">Etkinlik rengi, ücretli bir özelliktir</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Ayarları aç</string>
     <string name="contacts_permission_dialog_cancel">Reddet</string>
     <string name="dialog_title_calendar_picker">Takvim</string>
+    <string name="dialog_title_calendar_color_picker">Takvim rengi</string>
+    <string name="dialog_title_event_color_picker">Etkinlik rengi</string>
     <string name="import_from_google_title">Google üzerinden içe aktar</string>
     <string name="notifications_permission_dialog_title">Proton Calendar bildirimleri görüntülensin mi?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar yaklaşan etkinlik bildirimlerini görüntüleyebilmek için izninizi istiyor.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Resmi tatiller burada!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nİstediğiniz ülkenin resmi tatillerini takviminize ekleyin.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nTakvim sayısı sınırına ulaşmış olduğunuzdan yeni bir tatil takvimi eklemek için önce var olan bir takvimi kaldırmanız gerekir.</string>
+    <string name="spotlight_dialog_color_per_event_title">Etkinliklerinizi renklerle kodlayın</string>
+    <string name="spotlight_dialog_color_per_event_description">• Gününüzü daha iyi düzenlemek için istediğiniz etkinliklerin rengini özelleştirin.\n\n• Zamanınızı planlayın ve verimliliği artırın.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">İçe basit etkinlik olarak aktarılsın mı?</string>
     <string name="import_event_disclaimer_dialog_description">\nİçe aktarılan davetler Proton Takvim içinde <b>düzenleyici</b> ve <b>katılımcı</b> bilgileri olmadan basit etkinlikler olarak görüntülenir.\n\nEtkinlik güncellemelerini almak ve katılımcıları görmek için, etkinlik düzenleyicilerinden sizi Proton e-posta adresinizi kullanarak davet etmelerini isteyin.</string>
     <string name="import_event_disclaimer_dialog_positive">İçe aktar</string>
+    <string name="undefined_color">Tanımlanmamış</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">takvim</item>
@@ -800,5 +807,27 @@
         <item>Pazartesi</item>
         <item>Cumartesi</item>
         <item>Pazar</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Mor|#8080FF</item>
+        <item>Çilek|#EC3E7C</item>
+        <item>Pembe|#DB60D6</item>
+        <item>Havuç|#F78400</item>
+        <item>Çöl|#936D58</item>
+        <item>Kantaron|#5252CC</item>
+        <item>Erik|#A839A4</item>
+        <item>Kiraz|#BA1E55</item>
+        <item>Bakır|#C44800</item>
+        <item>Toprak|#54473F</item>
+        <item>Arduvaz Mavisi|#415DF0</item>
+        <item>Pasifik|#179FD9</item>
+        <item>Resif|#1DA583</item>
+        <item>Eğrelti Otu|#3CBB3A</item>
+        <item>Zeytin|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Okyanus|#0A77A6</item>
+        <item>Çam|#0F735A</item>
+        <item>Orman|#258723</item>
+        <item>Salatalık|#807304</item>
     </string-array>
 </resources>

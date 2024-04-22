@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">გაუქმებულია</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(გათიშულია)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(ნაგულისხმევი)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d დიახ</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">შეიძლება %1$d</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">გაზიარებულ კალენდარში მოსაწვევების შექმნა აკრძალულია</string>
     <string name="snack_down_banner">Proton-ის სერვერები გამორთულია. დეტალებისთვის იხილეთ სტატუსის გვერდი.</string>
     <string name="snack_down_banner_action">სტატუსის გვერდის გახსნა</string>
+    <string name="snack_color_per_event_paid_feature">მოვლენის ფერი ფასიანი ფუნქციაა</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">მორგების ფანჯრის გახსნა</string>
     <string name="contacts_permission_dialog_cancel">უარყოფა</string>
     <string name="dialog_title_calendar_picker">კალენდარი</string>
+    <string name="dialog_title_calendar_color_picker">კალენდრის ფერი</string>
+    <string name="dialog_title_event_color_picker">მოვლენის ფერი</string>
     <string name="import_from_google_title">Google-დან შემოტანა</string>
     <string name="notifications_permission_dialog_title">მისცემთ Proton Calendar-ს გაფრთხილებების ჩვენების უფლებას?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar-ს მომავალი მოვლენის გაფრთხილების საჩვენებლად უფლება სჭირდება.</string>
@@ -432,7 +436,7 @@
     <string name="bug_report_discard_changes_cancel">წერის გაგრძელება</string>
     <string name="bug_report_discard_changes_confirm">მოცილება</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">აპის მორგება</string>
     <string name="settings_theme_title">თემა</string>
     <string name="settings_theme_info">ეს პარამეტრი გავლენას ახდენს, მხოლოდ, Proton Calendar-ის აპის გამოჩენაზე ამ მოწყობილობაზე. აპლიკაცია განახლდება თემის შეცვლის შემდეგ.</string>
     <string name="settings_timezone_title">დროის სარტყელი</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">დასვენებაა!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და გეგმების დავიწყება გრძელი დასვენების დღეებისთვის.\n\nდაამატეთ ნებისმიერი ქვეყნის დასვენების დღე თქვენს კალენდარში.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და ნუ დაივიწყებთ გრძელი დასვენებების შესახებ.\n\nრადგან თქვენი კალენდარი თითქმის სავსეა, იმისათვის, რომ დასვენების დღე დაამატოთ, ჯერ არსებული უნდა წაშალოთ.</string>
+    <string name="spotlight_dialog_color_per_event_title">ფერის კოდი თქვენი მოვლენებისთვის</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">შემოვიტანო მარტივი მოვლენის სახით?</string>
     <string name="import_event_disclaimer_dialog_description">\nშემოტანილი მოსაწვევები გამოჩნდება Proton Calendar-ში, როგორც მარტივი ღონისძიებები <b>ორგანიზატორის</b> და <b>მონაწილის</b> დეტალების გარეშე.\n\nმოვლენის განახლებების მისაღებად და მონაწილეების სანახავად სთხოვეთ ორგანიზატორებს, მიგიწვიონ თქვენი Proton ელფოსტის მისამართის გამოყენებით.</string>
     <string name="import_event_disclaimer_dialog_positive">შემოტანა</string>
+    <string name="undefined_color">განუსაზღვრელი</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">კალენდარი</item>
@@ -800,5 +807,27 @@
         <item>ორშაბათი</item>
         <item>შაბათი</item>
         <item>კვირა</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>მეწამული|#8080FF</item>
+        <item>მარწყვისფერი|#EC3E7C</item>
+        <item>ვარდისფერი|#DB60D6</item>
+        <item>სტაფილოსფერი|#F78400</item>
+        <item>უდაბნოსფერი|#936D58</item>
+        <item>ნაღველასფერი|#5252CC</item>
+        <item>ქლიავი|#A839A4</item>
+        <item>ღია ალუბლისფერი|#BA1E55</item>
+        <item>სპილენძისფერი|#C44800</item>
+        <item>მიწისფერი|#54473F</item>
+        <item>მოლურჯო-მოშიფრისფრო|#415DF0</item>
+        <item>წყნარი ოკეანე|#179FD9</item>
+        <item>მარჯნისფერი|#1DA583</item>
+        <item>გვიმრისფერი|#3CBB3A</item>
+        <item>ზეთისხილისფერი|#B4A40E</item>
+        <item>კობალტისფერი|#273EB2</item>
+        <item>ზღვისფერი|#0A77A6</item>
+        <item>ფიჭვისფერი|#0F735A</item>
+        <item>ტყისფერი|#258723</item>
+        <item>მწნილისფერი|#807304</item>
     </string-array>
 </resources>

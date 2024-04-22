@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%2$s %1$d명</string>
     <string name="event_status_canceled">취소됨</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(비활성화됨)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(기본값)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d명 네</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d 아마도</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">공유 캘린더에서는 초대를 생성할 수 없습니다</string>
     <string name="snack_down_banner">Proton 서버가 다운되었습니다. 더 자세한 정보는 서버 상태를 참고하세요.</string>
     <string name="snack_down_banner_action">서버 상태</string>
+    <string name="snack_color_per_event_paid_feature">이벤트 색상은 유료 기능입니다.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">이벤트가 존재하지 않습니다</string>
     <string name="error_occurrence_does_not_exist">일정이 존재하지 않습니다</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">설정 열기</string>
     <string name="contacts_permission_dialog_cancel">거절</string>
     <string name="dialog_title_calendar_picker">캘린더</string>
+    <string name="dialog_title_calendar_color_picker">캘린더 색상</string>
+    <string name="dialog_title_event_color_picker">이벤트 색상</string>
     <string name="import_from_google_title">Google에서 가져오기</string>
     <string name="notifications_permission_dialog_title">Proton Calendar의 알림 표시를 허용하시겠어요?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar가 다가오는 이벤트를 보여주려면 권환이 필요합니다.</string>
@@ -595,6 +599,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">즐거운 공휴일입니다!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">더 이상 모두가 쉬는 날에 회의 일정을 잡거나 주말 여행 계획을 잊어버릴 필요가 없습니다.\n\n캘린더에 여러분의 국가의 공휴일을 추가하세요.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">더 이상 모두가 쉬는 날에 회의 일정을 잡거나 주말 휴가 계획을 잊어버릴 필요가 없습니다.\n\n현재 캘린더 한도에 도달했으므로 휴일 캘린더를 추가하려면 먼저 기존 캘린더를 제거해야 합니다.</string>
+    <string name="spotlight_dialog_color_per_event_title">내 이벤트의 컬러 코드</string>
+    <string name="spotlight_dialog_color_per_event_description">• 개별 이벤트의 색상을 커스마이징하여 하루를 더 잘 구성할 수 있습니다.\n\n• 시간을 추적하고 효율성을 높이세요.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">접근 허용</string>
     <string name="dialog_google_auth_description">불러오기를 시작하려면, Google Calendar에 로그인하고 Proton이 사용자의 데이터에 접근할 수 있도록 허용하세요.</string>
@@ -664,6 +670,7 @@
     <string name="import_event_disclaimer_dialog_title">간단 이벤트로 불러오시겠어요?</string>
     <string name="import_event_disclaimer_dialog_description">\n불러온 초대는 Proton Calendar에 <b>주최자</b> 및 <b>참가자</b> 세부 정보가 없는 간단한 이벤트로 표시됩니다.\n\n이벤트 업데이트를 받고 참가자를 보려면, 주최자에게 Proton 이메일 주소를 사용하여 초대를 요청하세요.</string>
     <string name="import_event_disclaimer_dialog_positive">불러오기</string>
+    <string name="undefined_color">정의되지 않음</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="other">캘린더</item>
@@ -775,5 +782,27 @@
         <item>월요일</item>
         <item>토요일</item>
         <item>일요일</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>퍼플|#8080FF</item>
+        <item>스트로베리|#EC3E7C</item>
+        <item>핑크|#DB60D6</item>
+        <item>캐롯|#F78400</item>
+        <item>사하라|#936D58</item>
+        <item>엔지안|#5252CC</item>
+        <item>플럼|#A839A4</item>
+        <item>세리즈|#BA1E55</item>
+        <item>코퍼|#C44800</item>
+        <item>소일|#54473F</item>
+        <item>슬레이트 블루|#415DF0</item>
+        <item>퍼시픽|#179FD9</item>
+        <item>리프|#1DA583</item>
+        <item>펀|#3CBB3A</item>
+        <item>올리브|#B4A40E</item>
+        <item>코발트|#273EB2</item>
+        <item>오션|#0A77A6</item>
+        <item>파인|#0F735A</item>
+        <item>포레스트|#258723</item>
+        <item>피클|#807304</item>
     </string-array>
 </resources>

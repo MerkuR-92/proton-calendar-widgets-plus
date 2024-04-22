@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Скасавана</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(адключана)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Прадвызначаны)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d так</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d магчыма</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Стварэнне запрашэнняў у абагуленым календары забаронена</string>
     <string name="snack_down_banner">Серверы Proton недаступны. Наведайце нашу старонку статусу для падрабязнасцяў.</string>
     <string name="snack_down_banner_action">Адкрыць старонку статусу</string>
+    <string name="snack_color_per_event_paid_feature">Колер падзеі з\'яўляецца платнай функцыяй</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Падзея не існуе</string>
     <string name="error_occurrence_does_not_exist">Паўтарэння не існуе</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Адкрыць налады</string>
     <string name="contacts_permission_dialog_cancel">Забараніць</string>
     <string name="dialog_title_calendar_picker">Каляндар</string>
+    <string name="dialog_title_calendar_color_picker">Колер календара</string>
+    <string name="dialog_title_event_color_picker">Колер падзеі</string>
     <string name="import_from_google_title">Імпартаваць з Google</string>
     <string name="notifications_permission_dialog_title">Дазволіць Proton Calendar паказваць апавяшчэнні?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar патрабуецца дазвол, каб паказваць вам апавяшчэнні пра надыходзячыя падзеі.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Дзяржаўныя святы знаходзяцца тут!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nДадайце дзяржаўныя святы любой краіны ў свой каляндар.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nПаколькі вы амаль дасягнулі абмежавання па календары, каб дадаць святы, вам неабходна спачатку выдаліць наяўны каляндар.</string>
+    <string name="spotlight_dialog_color_per_event_title">Пазначэнне колерам вашых падзей</string>
+    <string name="spotlight_dialog_color_per_event_description">• Наладзьце з дапамогай колеру індывідуальныя падзеі, каб лепш арганізаваць ваш дзень.\n\n• Адсочвайце свой час і павышайце эфектыўнасць.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
     <string name="dialog_google_auth_description">Для пачатку імпартавання, увайдзіце ў Google Calendar і дазвольце Proton атрымаць доступ да вашых даных.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Імпартаваць як простую падзею?</string>
     <string name="import_event_disclaimer_dialog_description">\nІмпартаваныя запрашэнні з\'явяцца ў Proton Calendar як простыя падзеі без падрабязнасцяў пра <b>арганізатара</b> і <b>ўдзельніка</b>.\n\nДля таго, каб атрымліваць абнаўленні падзей і бачыць удзельнікаў, папрасіце арганізатараў запрасіць вас пры дапамозе вашага адраса электроннай пошты Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Імпартаванне</string>
+    <string name="undefined_color">Не вызначана</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">каляндар</item>
@@ -852,5 +859,27 @@
         <item>Панядзелак</item>
         <item>Субота</item>
         <item>Нядзеля</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Фіялетавы|#8080FF</item>
+        <item>Клубнічны|#EC3E7C</item>
+        <item>Ружовы|#DB60D6</item>
+        <item>Маркоўны|#F78400</item>
+        <item>Сахара|#936D58</item>
+        <item>Чарнільны|#5252CC</item>
+        <item>Слівавы|#A839A4</item>
+        <item>Вішнёвы|#BA1E55</item>
+        <item>Медны|#C44800</item>
+        <item>Зямлісты|#54473F</item>
+        <item>Сланцава-блакітны|#415DF0</item>
+        <item>Ціхаакіянскі|#179FD9</item>
+        <item>Рыфавы|#1DA583</item>
+        <item>Папаратнікавы|#3CBB3A</item>
+        <item>Аліўкавы|#B4A40E</item>
+        <item>Кобальтавы|#273EB2</item>
+        <item>Акіянічны|#0A77A6</item>
+        <item>Сасновы|#0F735A</item>
+        <item>Лясны|#258723</item>
+        <item>Агурочны|#807304</item>
     </string-array>
 </resources>

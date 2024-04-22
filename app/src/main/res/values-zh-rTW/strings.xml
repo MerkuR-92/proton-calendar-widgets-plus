@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d 個%2$s</string>
     <string name="event_status_canceled">已取消</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(已停用)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">（預設）</string>
     <string name="event_attendee_status_separator">%1$s，%2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d 人會出席</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d 人或會出席</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">無法在共享行事曆中創建邀請函</string>
     <string name="snack_down_banner">Proton伺服器目前關閉。請參考狀態頁面獲得詳細資料。</string>
     <string name="snack_down_banner_action">開啟狀態頁面。</string>
+    <string name="snack_color_per_event_paid_feature">行程顏色設定為付費功能</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">此活動不存在</string>
     <string name="error_occurrence_does_not_exist">行程不存在</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">開啟設定</string>
     <string name="contacts_permission_dialog_cancel">婉拒</string>
     <string name="dialog_title_calendar_picker">行事曆</string>
+    <string name="dialog_title_calendar_color_picker">行事曆顏色</string>
+    <string name="dialog_title_event_color_picker">行程顏色</string>
     <string name="import_from_google_title">從 Google 匯入</string>
     <string name="notifications_permission_dialog_title">要允許 Proton 行事曆顯示通知？</string>
     <string name="notifications_permission_dialog_message">Proton 行事曆需有授權才可讓您看見下個行程的通知。</string>
@@ -432,7 +436,7 @@
     <string name="bug_report_discard_changes_cancel">繼續撰寫</string>
     <string name="bug_report_discard_changes_confirm">捨棄</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">應用程式設定</string>
     <string name="settings_theme_title">佈景主題</string>
     <string name="settings_theme_info">此設定僅影響在此裝置上的 Proton Calendar 應用程式。變更布景主題後，應用程式將會重新啟動。</string>
     <string name="settings_timezone_title">時區</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">公定假日在這兒</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
+    <string name="spotlight_dialog_color_per_event_title">顏色代碼於行程</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">要匯入為簡單事件嗎？</string>
     <string name="import_event_disclaimer_dialog_description">\n已匯入的邀請會在 Proton Calendar 中顯示為<b>沒有舉辦人</b>與<b>參與者</b>詳細資訊的簡單事件。\n\n要取得事件更新並檢視參與者，請要求舉辦人以您的 Proton 電子郵件位址向您傳送邀請。</string>
     <string name="import_event_disclaimer_dialog_positive">匯入</string>
+    <string name="undefined_color">未定義</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="other">行事曆</item>
@@ -774,5 +781,27 @@
         <item>週一</item>
         <item>週六</item>
         <item>週日</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>紫色|#8080FF</item>
+        <item>草莓|#EC3E7C</item>
+        <item>粉紅色|#DB60D6</item>
+        <item>蘿蔔|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>土壤|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>森林|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Preklicano</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s<i>(Onemogočen)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d da</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d morda</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Ustvarjanje povabil v deljenem koledarju ni dovoljeno</string>
     <string name="snack_down_banner">Strežniki Proton ne delujejo. Za podrobnosti obiščite našo stran s stanjem.</string>
     <string name="snack_down_banner_action">Odpri stran s stanjem</string>
+    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Dogodek ne obstaja</string>
     <string name="error_occurrence_does_not_exist">Ponovitev ne obstaja</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Odpri nastavitve</string>
     <string name="contacts_permission_dialog_cancel">Zavrni</string>
     <string name="dialog_title_calendar_picker">Koledar</string>
+    <string name="dialog_title_calendar_color_picker">Barva koledarja</string>
+    <string name="dialog_title_event_color_picker">Barva dogodka</string>
     <string name="import_from_google_title">Uvoz iz Googlovega računa</string>
     <string name="notifications_permission_dialog_title">Ali dovolite Proton Calendar, da prikaže obvestila?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar potrebuje dovoljenje za prikaz obvestil o prihajajočih dogodkih.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Prazniki so tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nV svoj koledar dodajte državne praznike katere koli države.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nKer ste trenutno na koledarski omejitvi, morate za dodajanje koledarja praznikov najprej odstraniti obstoječi koledar.</string>
+    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Dovoli dostop</string>
     <string name="dialog_google_auth_description">Za uvoz podatkov se najprej prijavite v Googlov koledar in Protonu omogočite dostop do svojih podatkov.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Uvoz kot preprost dogodek?</string>
     <string name="import_event_disclaimer_dialog_description">\nUvožena vabila so v Proton Calendar prikazana kot običajni dogodki brez podrobnosti o <b>organizatorju</b> ali <b>udeležencu</b>. \n\nČe želite prejemati posodobitve dogodka in si ogledati seznam udeležencev, od organizatorjev zahtevajte povabilo na vaš Proton e-poštni naslov.</string>
     <string name="import_event_disclaimer_dialog_positive">Uvoz</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">koledar</item>
@@ -852,5 +859,27 @@
         <item>Ponedeljek</item>
         <item>Sobota</item>
         <item>Nedelja</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Vijolična|#8080FF</item>
+        <item>Jagoda|#EC3E7C</item>
+        <item>Roza|#DB60D6</item>
+        <item>Korenček|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Encijan|#5252CC</item>
+        <item>Sliva|#A839A4</item>
+        <item>Češnja|#BA1E55</item>
+        <item>Bakrena|#C44800</item>
+        <item>Zemlja|#54473F</item>
+        <item>Skrilasto modra|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Korala|#1DA583</item>
+        <item>Praprot|#3CBB3A</item>
+        <item>Olivna|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Bor|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

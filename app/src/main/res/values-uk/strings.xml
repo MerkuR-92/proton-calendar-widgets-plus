@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Скасовано</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(вимкнено)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d так</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d можливо</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Створення запрошень у спільному календарі не дозволено</string>
     <string name="snack_down_banner">Сервери Proton не працюють. Відвідайте нашу сторінку стану, щоб переглянути подробиці.</string>
     <string name="snack_down_banner_action">Відкрити сторінку стану</string>
+    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
     <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Відкрити налаштування</string>
     <string name="contacts_permission_dialog_cancel">Заборонити</string>
     <string name="dialog_title_calendar_picker">Календар</string>
+    <string name="dialog_title_calendar_color_picker">Calendar color</string>
+    <string name="dialog_title_event_color_picker">Event color</string>
     <string name="import_from_google_title">Імпортувати з Google</string>
     <string name="notifications_permission_dialog_title">Дозволити Proton Calendar показувати сповіщення?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar потребує дозволу, щоб показувати вам сповіщення про майбутні події.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Державні свята вже тут!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Більше не потрібно призначати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nДодайте державні свята будь-якої країни до свого календаря.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Більше не потрібно планувати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nОскільки ви досягли обмеження доступних календарів, щоб додати календар свят, потрібно спершу вилучити будь-який інший календар.</string>
+    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Імпортувати як просту подію?</string>
     <string name="import_event_disclaimer_dialog_description">\nІмпортовані запрошення з\'являються у календарі Proton як прості події <b>без інформації про організатора</b> та <b>учасників</b>.\n\nЩоб отримувати оновлення події та бачити учасників, попросіть організатора запросити вас із використанням вашої адреси електронної пошти Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Імпортувати</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">календар</item>
@@ -852,5 +859,27 @@
         <item>Понеділок</item>
         <item>Субота</item>
         <item>Неділя</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Purple|#8080FF</item>
+        <item>Strawberry|#EC3E7C</item>
+        <item>Pink|#DB60D6</item>
+        <item>Carrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>Soil|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

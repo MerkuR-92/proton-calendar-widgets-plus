@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancelado</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s &lt;i&gt;(Desactivado)&lt;/i&gt;]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Por defecto)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d quizás</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">No se pueden crear invitaciones en un calendario compartido</string>
     <string name="snack_down_banner">Los servidores de Proton no funcionan. Visita nuestra página de estado para más detalles.</string>
     <string name="snack_down_banner_action">Abrir la página de estado</string>
+    <string name="snack_color_per_event_paid_feature">Los colores de eventos son una función de pago.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">El evento no existe.</string>
     <string name="error_occurrence_does_not_exist">La ocurrencia no existe.</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Abrir configuración</string>
     <string name="contacts_permission_dialog_cancel">Denegar</string>
     <string name="dialog_title_calendar_picker">Calendario</string>
+    <string name="dialog_title_calendar_color_picker">Color del calendario</string>
+    <string name="dialog_title_event_color_picker">Color del evento</string>
     <string name="import_from_google_title">Importar desde Google</string>
     <string name="notifications_permission_dialog_title">¿Permitir a Proton Calendar mostrar notificaciones?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar necesita permisos para mostrarte notificaciones de eventos próximos.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Calendario de festivos</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nAñade los días festivos de cualquier país a tu calendario.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo actualmente estás al límite del calendario, para añadir un calendario de días festivos, necesitarás borrar un calendario existente primero.</string>
+    <string name="spotlight_dialog_color_per_event_title">Codifica por colores tus eventos</string>
+    <string name="spotlight_dialog_color_per_event_description">• Personaliza el color de cada evento para organizar mejor tu día.\n\n Gestiona tu tiempo y aumenta tu eficiencia.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">¿Importar el evento sin detalles?</string>
     <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones del evento y ver los participantes, pide a los organizadores que te inviten utilizando tu dirección de correo electrónico Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
+    <string name="undefined_color">Sin definir</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendario</item>
@@ -800,5 +807,27 @@
         <item>Lunes</item>
         <item>Sábado</item>
         <item>Domingo</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Púrpura|#8080FF</item>
+        <item>Fresa|#EC3E7C</item>
+        <item>Rosa|#DB60D6</item>
+        <item>Zanahoria|#F78400</item>
+        <item>Sáhara|#936D58</item>
+        <item>Genciana|#5252CC</item>
+        <item>Ciruela|#A839A4</item>
+        <item>Cereza|#BA1E55</item>
+        <item>Cobre|#C44800</item>
+        <item>Tierra|#54473F</item>
+        <item>Azul pizarra|#415DF0</item>
+        <item>Pacífico|#179FD9</item>
+        <item>Arrecife|#1DA583</item>
+        <item>Helecho|#3CBB3A</item>
+        <item>Aceituna|#B4A40E</item>
+        <item>Cobalto|#273EB2</item>
+        <item>Océano|#0A77A6</item>
+        <item>Pino|#0F735A</item>
+        <item>Bosque|#258723</item>
+        <item>Pepinillo|#807304</item>
     </string-array>
 </resources>
