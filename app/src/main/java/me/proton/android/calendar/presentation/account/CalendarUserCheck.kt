@@ -33,7 +33,7 @@ class CalendarUserCheck(
     )
 
     override suspend fun invoke(user: User): PostLoginAccountSetup.UserCheckResult = when {
-        user.usedSpace >= user.maxSpace -> errorStoreQuota()
+        // user.usedSpace >= user.maxSpace -> errorStoreQuota()
         else -> super.invoke(user)
     }
 }
