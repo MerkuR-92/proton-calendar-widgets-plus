@@ -432,7 +432,12 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             }
 
             // Set default style for calendar bar (overridden by part stat if user is attendee)
-            setCalendarBar(event.displayColor, null, event.isCancelled())
+            val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
+            setCalendarBar(
+                event.getDisplayColor(isFreeUser),
+                null,
+                event.isCancelled()
+            )
 
             // TODO when we perform "edit this", new event is created and it won't automatically refresh here
             //  because we're still listening for the old event.id !!!
@@ -464,7 +469,11 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     val userEmails = userAddresses.map { it.email }
                     val participationStatus = event.getParticipationStatus(userEmails)
 
-                    setCalendarBar(event.displayColor, participationStatus, event.isCancelled())
+                    setCalendarBar(
+                        event.getDisplayColor(isFreeUser),
+                        participationStatus,
+                        event.isCancelled()
+                    )
 
                     displayAttendeeAnswerState(participationStatus, false)
 

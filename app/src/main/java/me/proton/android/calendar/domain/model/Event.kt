@@ -196,8 +196,6 @@ data class Event private constructor(
 
     val status: Status? get() = iCalEvent.status
 
-    val displayColor: String get() = color ?: calendar.color
-
     /**
      * Use this getter to handle Alarms instead of taking them directly from ICS. This contains custom logic
      * for supporting default Calendar Alarms that can't be represented easily in ICS.
@@ -217,6 +215,8 @@ data class Event private constructor(
             iCalEvent.alarms
         }
     }
+
+    fun getDisplayColor(isFreeUser: Boolean) = if (isFreeUser) calendar.color else color ?: calendar.color
 
     fun clearAlarms() {
         iCalEvent.alarms?.clear()
@@ -645,7 +645,7 @@ data class Event private constructor(
         this.getOccurrenceEnd(timeZoneId),
         isAllDay(),
         occurrence?.occurrenceNumber ?: 0,
-        if (isFreeUser) calendar.color else displayColor,
+        this.getDisplayColor(isFreeUser),
         decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
         getParticipationStatus(userEmails),
         this.status ?: Status.confirmed()
