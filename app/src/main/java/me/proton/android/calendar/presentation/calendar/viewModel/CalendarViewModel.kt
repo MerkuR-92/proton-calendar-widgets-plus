@@ -335,7 +335,11 @@ class CalendarViewModel @Inject constructor(
         _selectedDateTime.value = Pair(date, time)
     }
 
-    private fun calculateCalendarIndicators(events: List<Event>, timeZoneId: String): Map<LocalDate, List<String>> {
+    private fun calculateCalendarIndicators(
+        events: List<Event>,
+        timeZoneId: String,
+        isFreeUser: Boolean
+    ): Map<LocalDate, List<String>> {
 
         val indicators = mutableMapOf<LocalDate, MutableList<String>>().withDefault { mutableListOf() }
 
@@ -347,7 +351,7 @@ class CalendarViewModel @Inject constructor(
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
                 val current = indicators.getValue(start)
-                current.add(event.displayColor)
+                current.add(event.getDisplayColor(isFreeUser))
                 indicators[start] = current
                 start = start.plusDays(1)
 
@@ -438,7 +442,12 @@ class CalendarViewModel @Inject constructor(
         return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).asLiveData()
     }
 
-    fun calendarIndicators(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): LiveData<Map<LocalDate, List<String>>> {
+    fun calendarIndicators(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        isFreeUser: Boolean
+    ): LiveData<Map<LocalDate, List<String>>> {
 
         return getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
             when (skeletonResult) {
@@ -447,7 +456,8 @@ class CalendarViewModel @Inject constructor(
                 }
                 is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
                     skeletonResult.events,
-                    timeZoneId
+                    timeZoneId,
+                    isFreeUser
                 )
                 is CalendarsRepository.GetEventsResult.Exception -> {
                     logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
@@ -914,7 +924,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun isDelinquentUser(): Boolean? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            logger.e("User ID was null in CalendarViewModel isDelinquentUser")
             return null
         }
         val user = userManager.getUserOrNull(userId, logger)

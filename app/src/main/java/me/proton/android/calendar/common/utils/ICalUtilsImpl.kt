@@ -600,7 +600,7 @@ object ICalUtilsImpl : ICalUtils {
                     if (event.isSingleEdit()) event.getEnd(timeZoneId) else occurrence.endDateTime,
                     event.isAllDay(),
                     if (event.isSingleEdit()) 0 else occurrence.occurrenceNumber,
-                    if (isFreeUser) event.calendar.color else event.displayColor,
+                    event.getDisplayColor(isFreeUser),
                     originalEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
                     event.getParticipationStatus(userEmails),
                     event.status ?: Status.confirmed()
