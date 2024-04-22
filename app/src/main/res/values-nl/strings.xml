@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Geannuleerd</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Uitgeschakeld)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standaard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d misschien</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Uitnodigingen maken in een gedeelde agenda is niet toegestaan</string>
     <string name="snack_down_banner">Proton servers zijn down. Bezoek onze status pagina voor informatie.</string>
     <string name="snack_down_banner_action">Open status pagina</string>
+    <string name="snack_color_per_event_paid_feature">Kleur voor afspraak is een betalende functionaliteit</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Instellingen openen</string>
     <string name="contacts_permission_dialog_cancel">Weigeren</string>
     <string name="dialog_title_calendar_picker">Agenda</string>
+    <string name="dialog_title_calendar_color_picker">Agenda kleur</string>
+    <string name="dialog_title_event_color_picker">Kleur gebeurtenis</string>
     <string name="import_from_google_title">Importeren uit Google</string>
     <string name="notifications_permission_dialog_title">Proton Calender toestaan om meldingen weer te geven?</string>
     <string name="notifications_permission_dialog_message">Proton Calender heeft toestemming nodig om u meldingen over toekomstige afspraken te tonen.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
+    <string name="spotlight_dialog_color_per_event_title">Geef je gebeurtenissen een kleur code</string>
+    <string name="spotlight_dialog_color_per_event_description">• Pas de kleur van individuele gebeurtenissen aan om je dag beter te organiseren.\n\n• Registreer je tijd en boost je efficiëntie.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importeren als eenvoudige afspraak?</string>
     <string name="import_event_disclaimer_dialog_description">\nGeïmporteerde uitnodigingen verschijnen in Proton Calendar als eenvoudige afspraken zonder details over de <b>organisator</b> en <b>deelnemers</b>.\n\nOm updates van afspraken te krijgen en deelnemers te zien, vraag de organisatoren om u uit te nodigen met uw Proton e-mailadres.</string>
     <string name="import_event_disclaimer_dialog_positive">Importeren</string>
+    <string name="undefined_color">Ongedefiniëerd</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">agenda</item>
@@ -802,5 +809,27 @@ Deselecteer minstens %1$d agenda\'s</item>
         <item>Maandag</item>
         <item>Zaterdag</item>
         <item>Zondag</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Paars|#8080FF</item>
+        <item>Aardbei|#EC3E7C</item>
+        <item>Roze|#DB60D6</item>
+        <item>Wortel|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Pruim|#A839A4</item>
+        <item>Kers|#BA1E55</item>
+        <item>Koper|#C44800</item>
+        <item>Aarde|#54473F</item>
+        <item>Blauwe Leisteen|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Rif|#1DA583</item>
+        <item>Varen|#3CBB3A</item>
+        <item>Olijf|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Oceaan|#0A77A6</item>
+        <item>Denneboom|#0F735A</item>
+        <item>Bos|#258723</item>
+        <item>Augurk|#807304</item>
     </string-array>
 </resources>

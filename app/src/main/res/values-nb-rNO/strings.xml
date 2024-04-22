@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Avbrutt</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(deaktivert)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d kanskje</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tillat å opprette invitasjoner i en delt kalender.</string>
     <string name="snack_down_banner">Proton-tjenerne er nede. Se vår statusside for detaljer.</string>
     <string name="snack_down_banner_action">Åpne statusside</string>
+    <string name="snack_color_per_event_paid_feature">Hendelsesfarge er en betalt funksjon</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Hendelsen eksisterer ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten eksisterer ikke</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Åpne innstillinger</string>
     <string name="contacts_permission_dialog_cancel">Avslå</string>
     <string name="dialog_title_calendar_picker">Kalender</string>
+    <string name="dialog_title_calendar_color_picker">Kalenderfarge</string>
+    <string name="dialog_title_event_color_picker">Hendelsesfarge</string>
     <string name="import_from_google_title">Importer fra Google</string>
     <string name="notifications_permission_dialog_title">Tillat Proton Calendar å vise varsler?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar trenger tillatelse til å vise deg kommende hendelsesvarsler.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Helligdager er her</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ikke mer planlegging av møter når alle har fri eller glemmer å planlegge en langhelgetur.\n\nLegg til et lands helligdager i kalenderen din.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ikke mer planlegging av møter når alle har fri eller glemmer å planlegge en langhelgetur.\n\nSiden du for øyeblikket er på kalendergrensen, må du først fjerne en eksisterende kalender for å legge til en feriekalender.</string>
+    <string name="spotlight_dialog_color_per_event_title">Fargekode hendelsene dine</string>
+    <string name="spotlight_dialog_color_per_event_description">• Tilpass fargen på individuelle hendelser for å organisere dagen din bedre.\n\n• Spor tiden din, og øk effektiviteten.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillat tilgang</string>
     <string name="dialog_google_auth_description">For å starte importen må du logge på hos Google Calendar og gi Proton tilgang til dataene dine.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importer som enkel hendelse?</string>
     <string name="import_event_disclaimer_dialog_description">\nImporterte invitasjoner vises i Proton Calendar som enkle hendelser <b>uten arrangør-</b> og <b>deltaker</b>informasjon.\n\nFor å få arrangementsoppdateringer og se deltakere, be arrangørene om å invitere deg ved å bruke Proton-e-postadressen din.</string>
     <string name="import_event_disclaimer_dialog_positive">Importer</string>
+    <string name="undefined_color">Udefinert</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalender</item>
@@ -800,5 +807,27 @@
         <item>Mandag</item>
         <item>Lørdag</item>
         <item>Søndag</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Lilla|#8080FF</item>
+        <item>Jordbær|#EC3E7C</item>
+        <item>Rosa|#DB60D6</item>
+        <item>Gulrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plomme|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Kobber|#C44800</item>
+        <item>Jord|#54473F</item>
+        <item>Skiferblå|#415DF0</item>
+        <item>Stillehavet|#179FD9</item>
+        <item>Skjæret|#1DA583</item>
+        <item>Bregne|#3CBB3A</item>
+        <item>Oliven|#B4A40E</item>
+        <item>Kobolt|#273EB2</item>
+        <item>Hav|#0A77A6</item>
+        <item>Furu|#0F735A</item>
+        <item>Skog|#258723</item>
+        <item>Sylteagurk|#807304</item>
     </string-array>
 </resources>

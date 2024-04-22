@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Zrušeno</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deaktivován)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Výchozí)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ano</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d možná</string>
@@ -329,10 +330,10 @@
     <string name="snack_event_created_failed_mail">Událost byla vytvořena ale pozvánku se nepodařilo odeslat</string>
     <string name="snack_event_created_error">Chyba při vytváření události</string>
     <string name="snack_event_opening_edit_error">Chyba při otevírání události kvůli změnám</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Nemůžete upravit opakující pozvánku obsahující změny na jednotlivé výskyty</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nelze odstranit opakující se pozvánku obsahující změny jednotlivých výskytů</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nelze upravit opakující se pozvánku obsahující smazané výskyty</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">Nelze smazat opakující se pozvánku obsahující smazané výskyty</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Opakující se pozvánku obsahující změny jednotlivých výskytů nelze upravovat</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Opakující se pozvánku obsahující změny jednotlivých výskytů nelze smazat</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Opakující se pozvánku obsahující smazané výskyty nelze upravit</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Opakující se pozvánku obsahující smazané výskyty nelze smazat</string>
     <string name="snack_event_edit_with_attendees_error">Úprava událostí s účastníky ještě není podporována</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nemůžete přidávat účastníky a měnit kalendář zároveň</string>
     <string name="snack_event_init_error">Chyba při založení nové události</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváření pozvánek ve sdíleném kalendáři není povoleno</string>
     <string name="snack_down_banner">Servery Protonu jsou mimo provoz. Podrobnosti naleznete na naší stavové stránce.</string>
     <string name="snack_down_banner_action">Otevřít stavovou stránku</string>
+    <string name="snack_color_per_event_paid_feature">Barva události je placená funkce</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Událost neexistuje</string>
     <string name="error_occurrence_does_not_exist">Výskyt události neexistuje</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Otevřít nastavení</string>
     <string name="contacts_permission_dialog_cancel">Zamítnout</string>
     <string name="dialog_title_calendar_picker">Kalendář</string>
+    <string name="dialog_title_calendar_color_picker">Barva kalendáře</string>
+    <string name="dialog_title_event_color_picker">Barva události</string>
     <string name="import_from_google_title">Importovat z Google</string>
     <string name="notifications_permission_dialog_title">Povolit aplikaci Proton Calendar zobrazovat oznámení?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar potřebuje oprávnění k zobrazování oznámení o nadcházejících událostech.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Státní svátky jsou tady!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už nemusíte plánovat schůzky v době, kdy mají všichni volno, ani zapomínat naplánovat prodloužený víkend.\n\nPřidejte si do kalendáře státní svátky v jakékoli zemi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žádné plánování schůzek v době, kdy mají všichni volno, nebo zapomínání na plánování prodlouženého víkendu.\n\nPro přidání prázdninového kalendáře budete muset nejprve odstranit stávající kalendář, protože v současné době máte omezený počet kalendářů.</string>
+    <string name="spotlight_dialog_color_per_event_title">Označte svoje události barvou</string>
+    <string name="spotlight_dialog_color_per_event_description">• Přizpůsobte barvu jednotlivých událostí abyste si organizovali váš den.\n\n• Sledujte váš čas a zvyšte efektivitu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importovat jako jednoduchou událost?</string>
     <string name="import_event_disclaimer_dialog_description">\nImportované pozvánky naleznete v Proton Calendar jako prosté události bez podrobností o <b>organizátorech</b> a <b>účastnících</b>.\n\nPro aktualizace událostí a zobrazení účastníků požádejte organizátory o pozvánku pomocí své e-mailové adresy Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importovat</string>
+    <string name="undefined_color">Nedefinováno</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalendář</item>
@@ -852,5 +859,27 @@
         <item>Pondělí</item>
         <item>Sobota</item>
         <item>Neděle</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Fialová|#8080FF</item>
+        <item>Jahodová|#EC3E7C</item>
+        <item>Růžová|#DB60D6</item>
+        <item>Mrkvová|#F74800</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Švestková|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Měděná|#C44800</item>
+        <item>Hliněná|#54473F</item>
+        <item>Břidlicově Modrá|#415DF0</item>
+        <item>Pacifická|#179FD9</item>
+        <item>Útesová|#1DA583</item>
+        <item>Kapraďová|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

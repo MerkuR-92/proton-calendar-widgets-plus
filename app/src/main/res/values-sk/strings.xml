@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Zrušené</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(vypnuté)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Predvolené)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d áno</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d možno</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváranie pozvánok v zdieľanom kalendári nie je povolené</string>
     <string name="snack_down_banner">Proton servery sú mimo prevádzky. Podrobnosti nájdete na našej stránke o stave.</string>
     <string name="snack_down_banner_action">Otvoriť stránku statusu</string>
+    <string name="snack_color_per_event_paid_feature">Farba udalosti je platená funkcia</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Udalosť neexistuje</string>
     <string name="error_occurrence_does_not_exist">Opakovanie neexistuje</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Otvoriť nastavenia</string>
     <string name="contacts_permission_dialog_cancel">Zamietnuť</string>
     <string name="dialog_title_calendar_picker">Kalendár</string>
+    <string name="dialog_title_calendar_color_picker">Farba kalendára</string>
+    <string name="dialog_title_event_color_picker">Farba udalosti</string>
     <string name="import_from_google_title">Importovať z Google</string>
     <string name="notifications_permission_dialog_title">Povoliť aplikácii Proton Calendar zobrazovať notifikácie?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar potrebuje povolenie na zobrazovanie notifikácií o nadchádzajúcich udalostiach.</string>
@@ -432,7 +436,7 @@
     <string name="bug_report_discard_changes_cancel">Pokračovať v písaní</string>
     <string name="bug_report_discard_changes_confirm">Zahodiť</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">Nastavenia aplikácie</string>
     <string name="settings_theme_title">Motív</string>
     <string name="settings_theme_info">Toto nastavenie vplýva iba na vzhľad aplikácie Proton Calendar na tomto zariadení. Po zmene vzhľadu sa aplikácia reštartuje.</string>
     <string name="settings_timezone_title">Časové pásmo</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Štátne sviatky sú tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nPridajte si do kalendára štátne sviatky akejkoľvek krajiny.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nKeďže ste momentálne na limite kalendárov, na pridanie kalendára sviatkov budete musieť najprv odstrániť existujúci kalendár.</string>
+    <string name="spotlight_dialog_color_per_event_title">Farebné označovanie udalostí</string>
+    <string name="spotlight_dialog_color_per_event_description">- Prispôsobte si farbu jednotlivých udalostí, aby ste si lepšie zorganizovali deň.\n\n- Sledujte svoj čas a zvýšte efektivitu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povoliť prístup</string>
     <string name="dialog_google_auth_description">Na spustenie importu sa prihláste do Kalendára Google a povoľte Protonu prístup k vašim dátam.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importovať ako jednoduchú udalosť?</string>
     <string name="import_event_disclaimer_dialog_description">\nImportované pozvánky sa v Proton Calendar zobrazujú ako jednoduché udalosti <b>bez podrobností o organizátorovi</b> a <b>účastníkoch</b>.\n\nAk chcete dostávať aktuálne informácie o udalosti a vidieť účastníkov, požiadajte organizátorov, aby vás pozvali cez vašu Proton emailovú adresu.</string>
     <string name="import_event_disclaimer_dialog_positive">Importovať</string>
+    <string name="undefined_color">Nedefinovaná</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalendár</item>
@@ -852,5 +859,27 @@
         <item>Pondelok</item>
         <item>Sobota</item>
         <item>Nedeľa</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Fialová|#8080FF</item>
+        <item>Jahoda|#EC3E7C</item>
+        <item>Ružová|#DB60D6</item>
+        <item>Mrkva|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Encián|#5252CC</item>
+        <item>Slivka|#A839A4</item>
+        <item>Ruža|#BA1E55</item>
+        <item>Meď|#C44800</item>
+        <item>Hlina|#54473F</item>
+        <item>Bridlicová modrá|#415DF0</item>
+        <item>Pacifik|#179FD9</item>
+        <item>Útes|#1DA583</item>
+        <item>Papraď|#3CBB3A</item>
+        <item>Oliva|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Oceán|#0A77A6</item>
+        <item>Borovica|#0F735A</item>
+        <item>Les|#258723</item>
+        <item>Uhorka|#807304</item>
     </string-array>
 </resources>

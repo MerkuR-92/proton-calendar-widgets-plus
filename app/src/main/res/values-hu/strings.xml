@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Törölve</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Letiltva)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d igen</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d talán</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
     <string name="snack_down_banner">A Proton szerverek leálltak. A részletekért látogasson el a státusz oldalunkra.</string>
     <string name="snack_down_banner_action">Státusz oldal megtekintése</string>
+    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Beállítások megnyitása</string>
     <string name="contacts_permission_dialog_cancel">Megtagadás</string>
     <string name="dialog_title_calendar_picker">Naptár</string>
+    <string name="dialog_title_calendar_color_picker">Calendar color</string>
+    <string name="dialog_title_event_color_picker">Event color</string>
     <string name="import_from_google_title">Importálás Google fájlból</string>
     <string name="notifications_permission_dialog_title">Engedélyezi, hogy a Proton Calendar értesítéseket jelenítsen meg?</string>
     <string name="notifications_permission_dialog_message">A Proton Calendarnak engedélyre van szüksége, hogy az eseményekkel kapcsolatos emlékeztetőket megjelenítse.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nBármely ország munkaszüneti napjait hozzáadhatja a naptárhoz.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nMivel jelenleg az elérhető összes naptára használatban van, a munkaszüneti naptár hozzáadásához először el kell távolítania egy meglévő naptárat.</string>
+    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importálás egyszerű eseményként?</string>
     <string name="import_event_disclaimer_dialog_description">\nAz importált meghívások a Proton Calendarban egyszerű eseményekként jelennek meg, <b>a szervező</b> és <b>a résztvevők nélkül</b>.\n\nHogy továbbra is kapjon értesítéseket a frissítésekről és a résztvevőkről, kérje meg a szervezőt, hogy a Proton e-mail címével hívja meg önt.</string>
     <string name="import_event_disclaimer_dialog_positive">Importálás</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">naptár</item>
@@ -800,5 +807,27 @@
         <item>Hétfő</item>
         <item>Szombat</item>
         <item>Vasárnap</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Purple|#8080FF</item>
+        <item>Strawberry|#EC3E7C</item>
+        <item>Pink|#DB60D6</item>
+        <item>Carrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>Soil|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

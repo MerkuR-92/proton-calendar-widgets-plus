@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annullato</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Disabilitato)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Predefinito)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sì</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d forse</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Non è consentito invitare partecipanti in un calendario condiviso</string>
     <string name="snack_down_banner">I server Proton non funzionano. Visita la nostra pagina di stato per i dettagli.</string>
     <string name="snack_down_banner_action">Apri la pagina di stato</string>
+    <string name="snack_color_per_event_paid_feature">Il colore dell\'evento è una funzionalità a pagamento</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'evento non esiste</string>
     <string name="error_occurrence_does_not_exist">L\'occorrenza non esiste</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Apri Impostazioni</string>
     <string name="contacts_permission_dialog_cancel">Nega</string>
     <string name="dialog_title_calendar_picker">Calendario</string>
+    <string name="dialog_title_calendar_color_picker">Colore del calendario</string>
+    <string name="dialog_title_event_color_picker">Colore dell\'evento</string>
     <string name="import_from_google_title">Importa da Google</string>
     <string name="notifications_permission_dialog_title">Consentire a Proton Calendar di mostrare notifiche?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar ha bisogno dell\'autorizzazione per mostrarti le notifiche degli eventi in arrivo.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Sono arrivati i giorni festivi!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Non ti succederà più di pianificare riunioni quando gli altri sono in giro o di dimenticare di organizzare un lungo fine settimana di vacanza.\n\nAggiungi le festività pubbliche di qualsiasi paese al tuo calendario.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Non ti succederà più di pianificare riunioni quando gli altri sono in giro o di dimenticare di organizzare un lungo fine settimana di vacanza.\n\nPoiché hai raggiunto il limite di calendari devi eliminare un calendario esistente prima di poter aggiungere un calendario con le festività.</string>
+    <string name="spotlight_dialog_color_per_event_title">Colora i tuoi eventi</string>
+    <string name="spotlight_dialog_color_per_event_description">• Personalizza il colore dei singoli eventi per organizzare al meglio la tua giornata.\n\n• Tieni traccia del tuo tempo e aumenta l\'efficienza.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importare come evento senza i dettagli?</string>
     <string name="import_event_disclaimer_dialog_description">\nGli inviti importati appariranno in Proton Calendar come eventi semplici, senza i dettagli sull\'<b>organizzatore</b> e i <b>partecipanti</b>.\n\n Per ricevere gli aggiornamenti sugli eventi e visualizzare i partecipanti, chiedi agli organizzatori di invitarti utilizzando il tuo indirizzo email Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importa</string>
+    <string name="undefined_color">Non definito</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendario</item>
@@ -800,5 +807,27 @@
         <item>Lunedì</item>
         <item>Sabato</item>
         <item>Domenica</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Viola|#8080FF</item>
+        <item>Fragola|#EC3E7C</item>
+        <item>Rosa|#DB60D6</item>
+        <item>Carota|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Genziana|#5252CC</item>
+        <item>Prugna|#A839A4</item>
+        <item>Ciliegia|#BA1E55</item>
+        <item>Rame|#C44800</item>
+        <item>Terreno|#54473F</item>
+        <item>Ardesia|#415DF0</item>
+        <item>Pacifico|#179FD9</item>
+        <item>Barriera corallina|#1DA583</item>
+        <item>Felce|#3CBB3A</item>
+        <item>Oliva|#B4A40E</item>
+        <item>Cobalto|#273EB2</item>
+        <item>Oceano|#0A77A6</item>
+        <item>Pino|#0F735A</item>
+        <item>Foresta|#258723</item>
+        <item>Sottaceto|#807304</item>
     </string-array>
 </resources>

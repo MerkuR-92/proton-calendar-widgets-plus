@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annulleret</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(deaktiveret)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d måske</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tilladt at oprette invitationer i en delt kalender</string>
     <string name="snack_down_banner">Proton-serverne er nede. Besøg vores statusside for detaljer.</string>
     <string name="snack_down_banner_action">Åbn statusside</string>
+    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Åbn Indstillinger</string>
     <string name="contacts_permission_dialog_cancel">Afvis</string>
     <string name="dialog_title_calendar_picker">Kalender</string>
+    <string name="dialog_title_calendar_color_picker">Kalenderfarve</string>
+    <string name="dialog_title_event_color_picker">Begivenhedsfarve</string>
     <string name="import_from_google_title">Importér fra Google</string>
     <string name="notifications_permission_dialog_title">Tillad Proton Calendar at vise notifikationer?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar har brug for tilladelse til at vise dig meddelelser om kommende begivenheder.</string>
@@ -432,7 +436,7 @@
     <string name="bug_report_discard_changes_cancel">Fortsæt skrivning</string>
     <string name="bug_report_discard_changes_confirm">Kassér</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">App-indstillinger</string>
     <string name="settings_theme_title">Tema</string>
     <string name="settings_theme_info">Denne indstilling påvirker kun udseendet af Proton Calendar-appen på denne enhed. Appen genstartes efter ændring af temaet.</string>
     <string name="settings_timezone_title">Tidszone</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Så er helligdagene her!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nTilføj et hvilket som helst lands helligdage til din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nEftersom du i øjeblikket er på grænsen for antal kalendere, skal du først fjerne en eksisterende kalender for at tilføje en feriekalender.</string>
+    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
+    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>
     <string name="dialog_google_auth_description">For at starte importen skal du logge ind på Google Kalender og give Proton adgang til dine data.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importér som simpel begivenhed?</string>
     <string name="import_event_disclaimer_dialog_description">\nImporterede invitationer vises i Proton Calendar som simple begivenheder uden oplysninger om <b>arrangør</b> og <b>deltagere</b>.\n\nHvis du vil have opdateringer om begivenhederne og se deltagerne, skal du bede arrangørerne om at invitere dig med din Proton-e-mailadresse.</string>
     <string name="import_event_disclaimer_dialog_positive">Importér</string>
+    <string name="undefined_color">Undefined</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalender</item>
@@ -800,5 +807,27 @@
         <item>Mandag</item>
         <item>Lørdag</item>
         <item>Søndag</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Purple|#8080FF</item>
+        <item>Strawberry|#EC3E7C</item>
+        <item>Pink|#DB60D6</item>
+        <item>Carrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>Soil|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
     </string-array>
 </resources>

@@ -81,6 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Peruttu</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(ei käytössä)</i>]]></string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Oletus)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d kyllä</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d mahdollisesti</string>
@@ -396,6 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Kutsujen luontia ei sallita jaetussa kalenterissa</string>
     <string name="snack_down_banner">Protonin palvelimet ovat poissa käytöstä. Käy tilasivullamme saadaksesi lisätietoja.</string>
     <string name="snack_down_banner_action">Avaa tilasivu</string>
+    <string name="snack_color_per_event_paid_feature">Tapahtuman väri on maksullinen ominaisuus</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Tapahtumaa ei ole olemassa</string>
     <string name="error_occurrence_does_not_exist">Tapahtumakertaa ei ole olemassa</string>
@@ -409,6 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Avaa Asetukset</string>
     <string name="contacts_permission_dialog_cancel">Ei</string>
     <string name="dialog_title_calendar_picker">Kalenteri</string>
+    <string name="dialog_title_calendar_color_picker">Kalenterin väri</string>
+    <string name="dialog_title_event_color_picker">Tapahtuman väri</string>
     <string name="import_from_google_title">Tuo Googlesta</string>
     <string name="notifications_permission_dialog_title">Sallitaanko Proton Calendarin näyttää ilmoituksia?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar tarvitsee käyttöoikeuden näyttääkseen ilmoituksia tulevista tapahtumista.</string>
@@ -594,6 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Yleiset vapaapäivät ovat täällä!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai hukattuja pitkiä viikonloppuja.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ei enää vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nKoska olet jo saavuttanut kalenterien enimmäismäärän, on jokin nykyisistä kalentereista poistettava yleisten vapaapäivien lisäämiseksi.</string>
+    <string name="spotlight_dialog_color_per_event_title">Värikoodaa tapahtumasi</string>
+    <string name="spotlight_dialog_color_per_event_description">• Organisoi päiväsi paremmin mukauttamalla yksittäisten tapahtumien värejä.\n\n• Pysy ajan tasalla ja tehosta toimintaasi.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Myönnä käyttöoikeus</string>
     <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Google Kalenteriin ja myönnä Protonille tietojesi käyttöoikeus.</string>
@@ -663,6 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Tuodaanko yksinkertaisena tapahtumana?</string>
     <string name="import_event_disclaimer_dialog_description">\nTuodut kutsut näkyvät Proton Calendarissa yksinkertaisina tapahtumina, ilman tietoja <b>järjestäjistä</b> ja <b>osallistujista</b>.\n\nVastaanottaaksesi tapahtumapäivityksiä ja nähdäksesi osallistujat, pyydä järjestäjiä kutsumaan sinut Proton-sähköpostillasi.</string>
     <string name="import_event_disclaimer_dialog_positive">Tuo</string>
+    <string name="undefined_color">Määrittämätön</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalenteri</item>
@@ -800,5 +807,27 @@
         <item>Maanantai</item>
         <item>Lauantai</item>
         <item>Sunnuntai</item>
+    </string-array>
+    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+        <item>Purppura|#8080FF</item>
+        <item>Mansikka|#EC3E7C</item>
+        <item>Pinkki|#DB60D6</item>
+        <item>Porkkana|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Katkero|#5252CC</item>
+        <item>Luumu|#A839A4</item>
+        <item>Kirsikka|#BA1E55</item>
+        <item>Kupari|#C44800</item>
+        <item>Maa|#54473F</item>
+        <item>Liuskekiven sininen|#415DF0</item>
+        <item>Tyynimeri|#179FD9</item>
+        <item>Riutta|#1DA583</item>
+        <item>Saniainen|#3CBB3A</item>
+        <item>Oliivi|#B4A40E</item>
+        <item>Koboltti|#273EB2</item>
+        <item>Valtameri|#0A77A6</item>
+        <item>Mänty|#0F735A</item>
+        <item>Metsä|#258723</item>
+        <item>Suolakurkku|#807304</item>
     </string-array>
 </resources>
