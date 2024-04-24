@@ -40,6 +40,7 @@ val REFRESH_CURRENT_TIME_INDICATOR = Duration.ofMinutes(1).toMillis()
 // TODO change this also in Navigation.kt
 const val DEEPLINK_PATH_EVENT_DETAILS = "proton-calendar://protonmail.com/event_details/"
 const val DEEPLINK_PATH_EVENT_EDIT = "proton-calendar://protonmail.com/event/edit?eventId="
+const val DEEPLINK_PATH_EVENT_EDIT_PERSONAL = "proton-calendar://protonmail.com/event/editPersonal?eventId="
 const val DEEPLINK_PATH_EVENT_CREATE = "proton-calendar://protonmail.com/event/create"
 
 const val DEFAULT_CALENDAR_COLOR: String = "#8080FF"

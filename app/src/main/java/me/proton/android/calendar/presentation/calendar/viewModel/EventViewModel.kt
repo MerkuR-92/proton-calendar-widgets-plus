@@ -96,6 +96,7 @@ import me.proton.android.calendar.domain.usecase.SendEmailUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
@@ -147,6 +148,7 @@ class EventViewModel @Inject constructor(
     private val database: AppDatabase,
     private val upgradeEventUseCase: UpgradeEventUseCase,
     private val workManager: WorkManager,
+    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -1311,10 +1313,6 @@ class EventViewModel @Inject constructor(
             }
         } else {
             event.iCalEvent.attendees.removeFirst { it.extractEmail()?.equalsNoCase(attendee.extractEmail()) == true }
-            if (event.iCalEvent.organizer != null && event.iCalEvent.attendees.isNullOrEmpty()) {
-                // TODO Update this once we allow editing events that have attendees
-                event.iCalEvent.organizer = null
-            }
         }
         _event.postValue(event)
     }
@@ -2251,6 +2249,95 @@ class EventViewModel @Inject constructor(
         handleSaveResult(saveResult, occurrenceNumber, userErrorMessage)
     }
 
+    suspend fun onSavePersonalClick(
+        displayDialog: BaseDialogFragment.DisplayDialog,
+        eventId: String
+    ) {
+        // Update Event Form state
+        eventFormState.value = EventState.Processing.Saving
+
+        if (event.isRecurring() && !event.isSingleEdit()) {
+            // Display edit all events dialog
+            uiScope.launch {
+                displayDialog.alertDialog(
+                    resourceProvider.provideString(R.string.update_recurring_event),
+                    resourceProvider.provideString(R.string.update_recurring_all_events),
+                    resourceProvider.provideString(R.string.dialog_button_update),
+                    resourceProvider.provideString(R.string.dialog_button_cancel),
+                    object : BaseDialogFragment.DialogListener {
+                        override fun onPositive(selectedItem: Int) {
+                            coroutineScope.launch {
+                                // Save event
+                                handleSavePersonal(eventId)
+                            }
+                        }
+                        override fun onNegative() {
+                            eventFormState.value = EventState.Idle
+                        }
+                        override fun onCancel() {
+                            eventFormState.value = EventState.Idle
+                        }
+                        override fun onDismiss() {}
+                    }
+                )
+            }
+        } else {
+            // Save event
+            handleSavePersonal(eventId)
+        }
+    }
+
+    private suspend fun handleSavePersonal(eventId: String) {
+
+        // Make sure to upgrade the event first
+        val upgradedEventEntity = (upgradeEventUseCase.execute(
+            userId,
+            eventId
+        ) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
+        if (upgradedEventEntity == null) {
+            logger.e("handleSavePersonal could not upgrade Event")
+            // Reset event form state
+            eventFormState.value = EventState.Idle
+            // Display error updating event snack
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_event_updated_error)
+            )
+        }
+
+        val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(
+            userId,
+            event.calendar.id,
+            eventId,
+            "",
+            event.notifications.notifications,
+            event.color
+        )
+
+        if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
+            updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventEntity>()?.let {
+                calendarsRepository.persistEvents(it)
+            }
+        }
+
+        // Handle save result
+        if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
+            // Display event updated snack and return to month view with focus on the event's start date
+            eventFormSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
+                resourceProvider.provideString(R.string.snack_event_updated),
+                eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalDate(),
+                if (eventLiveData.value?.isAllDay() == false) eventLiveData.value?.getStart(displayTimeZoneId)?.toLocalTime()
+                else null
+            )
+        } else {
+            // Reset event form state
+            eventFormState.value = EventState.Idle
+            // Display error updating event snack
+            eventFormSnackState.value = EventSnackState.DisplaySnack(
+                resourceProvider.provideString(R.string.snack_event_updated_error)
+            )
+        }
+    }
+
     /**
      * Handle save event result
      */
@@ -2407,17 +2494,26 @@ class EventViewModel @Inject constructor(
     }
 
     suspend fun onEditClick(
-        navigateToEditForm: () -> Unit
+        navigateToEditForm: () -> Unit,
+        navigateToEditFormPersonal: () -> Unit
     ) {
         // Post deleting event value to true to display loading state
         eventDetailsState.value = EventState.Processing.Deleting
 
         if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Edit)) {
-            eventDetailsState.value = EventState.Idle
+            navigateToEditFormPersonal()
             return
         }
 
-        navigateToEditForm()
+        if (event.isAnInvitation) {
+            val canonicalUserEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
+                ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
+            }
+            if (!event.isUserOrganizer(canonicalUserEmails)) {
+                navigateToEditFormPersonal()
+            } else navigateToEditForm()
+        } else if (!event.calendar.allowEditEvents) navigateToEditFormPersonal()
+        else navigateToEditForm()
     }
 
     private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(actionType: EventDetailsActionType): Boolean {

@@ -31,12 +31,12 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ImportIcs(FeatureId("ImportIcs"), true, true),
     EditingSharedCalendars(FeatureId("EditingSharedCalendars"), true, true),
     EditAttendeesAsOrganizer(FeatureId("EditAttendeesAsOrganizer"), true, true),
+    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), true, true),
 
     // Disabled
     ShowSignatureVerificationBadges(FeatureId("ShowSignatureVerificationBadges"), false, true),
     DragAndDrop(FeatureId("DragAndDrop"), false, true),
     ClearCalendar(FeatureId("ClearCalendar"), false, true),
     ShowEventSearch(FeatureId("ShowEventSearch"), false, true),
-    EditInvitationAsOrganizer(FeatureId("EditInvitationAsOrganizer"), false, true),
     Payments(FeatureId("Subscription"), false, true)
 }

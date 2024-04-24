@@ -25,7 +25,14 @@ class UpdatePersonalPartUseCase @Inject constructor(
         const val WORKER_ID = "WORKER_ID_UPDATE_PERSONAL_PART"
     }
 
-    suspend fun execute(userId: UserId, calendarId: String, eventId: String, personalPartICalString: String, notifications: List<Notification>?): UseCase.Result {
+    suspend fun execute(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        personalPartICalString: String,
+        notifications: List<Notification>?,
+        color: String? = null
+    ): UseCase.Result {
 
         var personalEventContentApiRequest: PersonalEventContentApiRequest? = null
 
@@ -51,7 +58,8 @@ class UpdatePersonalPartUseCase @Inject constructor(
             eventId,
             UpdateEventPersonalPartApiRequest(
                 personalEventContentApiRequest,
-                notifications = notifications?.map { NotificationEntity.fromNotification(it) }
+                notifications = notifications?.map { NotificationEntity.fromNotification(it) },
+                color = color
             )
         )) {
             is ApiResponse.Success -> {

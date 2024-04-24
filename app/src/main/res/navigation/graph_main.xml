@@ -192,6 +192,9 @@
         <action
             android:id="@+id/action_nav_event_details_to_nav_event_form"
             app:destination="@id/nav_event_form" />
+        <action
+            android:id="@+id/action_nav_event_details_to_nav_event_form_personal"
+            app:destination="@id/nav_event_form_personal" />
         <deepLink
             android:id="@+id/deepLink"
             android:autoVerify="true"
@@ -282,6 +285,27 @@
         <action
             android:id="@+id/action_nav_event_form_to_nav_event_form_recurrence"
             app:destination="@id/nav_event_form_recurrence" />
+        <action
+            android:id="@+id/action_nav_event_form_to_nav_event_form_alarm"
+            app:destination="@id/nav_event_form_alarm" />
+    </dialog>
+    <dialog
+        android:id="@+id/nav_event_form_personal"
+        android:name="me.proton.android.calendar.presentation.calendar.fragment.EventFormPersonalFragment"
+        android:label="EventFormPersonalFragment">
+        <deepLink
+            android:id="@+id/deepLinkEditPersonal"
+            android:autoVerify="true"
+            app:uri="proton-calendar://protonmail.com/event/editPersonal?eventId={eventId}&amp;occurrenceNumber={occurrenceNumber}" />
+        <argument
+            android:name="eventId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <argument
+            android:name="occurrenceNumber"
+            app:argType="integer"
+            android:defaultValue="0" />
         <action
             android:id="@+id/action_nav_event_form_to_nav_event_form_alarm"
             app:destination="@id/nav_event_form_alarm" />
