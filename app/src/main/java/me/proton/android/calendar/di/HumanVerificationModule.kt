@@ -17,5 +17,5 @@ object HumanVerificationModule {
 
     @Provides
     @HumanVerificationApiHost
-    fun provideHumanVerificationApiHost(envConfiguration: EnvironmentConfiguration): String = envConfiguration.hv3Host
+    fun provideHumanVerificationApiHost(envConfiguration: EnvironmentConfiguration): String = envConfiguration.hv3Url
 }
