@@ -818,16 +818,16 @@
         <item>Prugna|#A839A4</item>
         <item>Ciliegia|#BA1E55</item>
         <item>Rame|#C44800</item>
-        <item>Terreno|#54473F</item>
+        <item>Terra|#54473F</item>
         <item>Ardesia|#415DF0</item>
         <item>Pacifico|#179FD9</item>
-        <item>Barriera corallina|#1DA583</item>
+        <item>Corallo|#1DA583</item>
         <item>Felce|#3CBB3A</item>
         <item>Oliva|#B4A40E</item>
         <item>Cobalto|#273EB2</item>
         <item>Oceano|#0A77A6</item>
         <item>Pino|#0F735A</item>
         <item>Foresta|#258723</item>
-        <item>Sottaceto|#807304</item>
+        <item>Cetriolo|#807304</item>
     </string-array>
 </resources>

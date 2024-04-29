@@ -599,7 +599,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
     <string name="spotlight_dialog_color_per_event_title">顏色代碼於行程</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_description">• 為不同的行程自定化顏色，更有序地安排你的日程。\n\n• 更好運用你的時間，提升效率。</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>
@@ -787,20 +787,20 @@
         <item>草莓|#EC3E7C</item>
         <item>粉紅色|#DB60D6</item>
         <item>蘿蔔|#F78400</item>
-        <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
+        <item>薩哈拉|#936D58</item>
+        <item>暗岩藍|#5252CC</item>
+        <item>梅|#A839A4</item>
         <item>Cerise|#BA1E55</item>
-        <item>Copper|#C44800</item>
+        <item>銅|#C44800</item>
         <item>土壤|#54473F</item>
         <item>Slate Blue|#415DF0</item>
         <item>Pacific|#179FD9</item>
         <item>Reef|#1DA583</item>
         <item>Fern|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
+        <item>橄欖|#B4A40E</item>
         <item>Cobalt|#273EB2</item>
-        <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
+        <item>海洋|#0A77A6</item>
+        <item>松木|#0F735A</item>
         <item>森林|#258723</item>
         <item>Pickle|#807304</item>
     </string-array>

@@ -344,7 +344,7 @@
     <string name="snack_send_bug_report_description_empty">Апішыце праблему з якой вы сутыкнуліся</string>
     <string name="snack_create_event_no_active_personal_calendar">Вам неабходны асабісты актыўны каляндар для стварэння падзей</string>
     <string name="snack_create_event_no_active_calendar">Каб ствараць падзеі, вам неабходна мець актыўны каляндар</string>
-    <string name="snack_add_self_as_participant">Нельга запрасіць самога сябе</string>
+    <string name="snack_add_self_as_participant">Забаронена запрашаць самога сябе</string>
     <string name="snack_maximum_participants_reached">Дасягнута максімальная колькасць удзельнікаў.</string>
     <string name="snack_add_participant_error">Падчас дадавання ўдзельніка адбылася памылка</string>
     <string name="snack_add_participant_invalid_email">Памылковая электронная пошта</string>
@@ -599,7 +599,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nДадайце дзяржаўныя святы любой краіны ў свой каляндар.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больш не трэба прызначаць сустрэчы, калі ўсе адпачываюць або забываць планаваць адпачынак на доўгія выхадныя.\n\nПаколькі вы амаль дасягнулі абмежавання па календары, каб дадаць святы, вам неабходна спачатку выдаліць наяўны каляндар.</string>
     <string name="spotlight_dialog_color_per_event_title">Пазначэнне колерам вашых падзей</string>
-    <string name="spotlight_dialog_color_per_event_description">• Наладзьце з дапамогай колеру індывідуальныя падзеі, каб лепш арганізаваць ваш дзень.\n\n• Адсочвайце свой час і павышайце эфектыўнасць.</string>
+    <string name="spotlight_dialog_color_per_event_description">• Наладжвайце індывідуальныя падзеі з дапамогай колеру, каб лепш арганізаваць свой дзень.\n\n• Адсочвайце час і павышайце эфектыўнасць.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дазволіць доступ</string>
     <string name="dialog_google_auth_description">Для пачатку імпартавання, увайдзіце ў Google Calendar і дазвольце Proton атрымаць доступ да вашых даных.</string>
