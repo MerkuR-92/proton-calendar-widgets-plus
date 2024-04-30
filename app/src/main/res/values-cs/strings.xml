@@ -598,8 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Státní svátky jsou tady!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už nemusíte plánovat schůzky v době, kdy mají všichni volno, ani zapomínat naplánovat prodloužený víkend.\n\nPřidejte si do kalendáře státní svátky v jakékoli zemi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žádné plánování schůzek v době, kdy mají všichni volno, nebo zapomínání na plánování prodlouženého víkendu.\n\nPro přidání prázdninového kalendáře budete muset nejprve odstranit stávající kalendář, protože v současné době máte omezený počet kalendářů.</string>
-    <string name="spotlight_dialog_color_per_event_title">Označte svoje události barvou</string>
-    <string name="spotlight_dialog_color_per_event_description">• Přizpůsobte barvu jednotlivých událostí abyste si organizovali váš den.\n\n• Sledujte váš čas a zvyšte efektivitu.</string>
+    <string name="spotlight_dialog_color_per_event_title">Označte své události barvou</string>
+    <string name="spotlight_dialog_color_per_event_description">• Přizpůsobte barvu jednotlivých událostí pro lepší organizaci vašeho dne.\n\n• Sledujte váš čas a zvyšte efektivitu.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>

@@ -81,7 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annulé</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(désactivé)</i>]]></string>
-    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Par défaut)</string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(par défaut)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d oui</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d peut-être</string>
@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vous ne pouvez pas créer des invitations dans un calendrier partagé.</string>
     <string name="snack_down_banner">Les serveurs de Proton sont en panne. Consultez notre page d\'état pour plus de détails.</string>
     <string name="snack_down_banner_action">Ouvrir la page d\'état</string>
-    <string name="snack_color_per_event_paid_feature">L\'ajout de couleurs aux événements est une fonctionnalité payante</string>
+    <string name="snack_color_per_event_paid_feature">L\'ajout de couleurs aux événements est une fonctionnalité payante.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas.</string>
     <string name="error_occurrence_does_not_exist">L\'occurrence n\'existe pas.</string>
@@ -599,7 +599,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nAjoutez les jours fériés de n\'importe quel pays à votre calendrier.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord retirer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
     <string name="spotlight_dialog_color_per_event_title">Ajoutez un code couleur à vos événements.</string>
-    <string name="spotlight_dialog_color_per_event_description">• Personnalisez la couleur de chaque événement pour mieux organiser votre journée.\n\n• Organisez votre emploi du temps et gagnez en efficacité.</string>
+    <string name="spotlight_dialog_color_per_event_description">• Personnalisez la couleur de chaque événement pour mieux organiser vos journées.\n\n• Disposez d\'une meilleure visibilité pour gagner en efficacité.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>

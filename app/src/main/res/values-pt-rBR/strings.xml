@@ -814,12 +814,12 @@
         <item>Rosa|#DB60D6</item>
         <item>Cenoura|#F78400</item>
         <item>Saara|#936D58</item>
-        <item>Gentiana|#5252CC</item>
+        <item>Enzian|#5252CC</item>
         <item>Ameixa|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
+        <item>Cereja|#BA1E55</item>
         <item>Cobre|#C44800</item>
         <item>Terra|#54473F</item>
-        <item>Azul ardósia escuro|#415DF0</item>
+        <item>Azul ardósia|#415DF0</item>
         <item>Pacífico|#179FD9</item>
         <item>Recife|#1DA583</item>
         <item>Samambaia|#3CBB3A</item>
@@ -828,6 +828,6 @@
         <item>Oceano|#0A77A6</item>
         <item>Pinheiro|#0F735A</item>
         <item>Floresta|#258723</item>
-        <item>Pepino|#807304</item>
+        <item>Salmoura|#807304</item>
     </string-array>
 </resources>

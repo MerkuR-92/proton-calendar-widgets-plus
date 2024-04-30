@@ -391,7 +391,7 @@
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s kieltäytyi kutsustasi</string>
     <string name="snack_app_link_invalid">Virheellinen tapahtumalinkki</string>
     <string name="snack_app_link_error">Virhe avattaessa tapahtumaa</string>
-    <string name="snack_app_link_import_error">Todennus peruttiin</string>
+    <string name="snack_app_link_import_error">Tunnistautuminen peruttiin</string>
     <string name="snack_notification_already_added">Ilmoitus on jo lisätty</string>
     <string name="snack_opening_ics">Tapahtumaa avataan…</string>
     <string name="snack_invite_in_shared_calendar_error">Kutsujen luontia ei sallita jaetussa kalenterissa</string>
@@ -644,7 +644,7 @@
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">Keskeytetty</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Epäonnistui</string>
     <string name="import_assistant_status_paused_lost_connection_title">Yhteys Googleen katosi</string>
-    <string name="import_assistant_status_paused_lost_connection_description">Jatka tuontia napauttamalla \"Yhdistä uudelleen\", kirjaudu Googleen ja myönnä Protonille tietojesi käyttöoikeus uudelleen.</string>
+    <string name="import_assistant_status_paused_lost_connection_description">Jatka tuontia napauttamalla \"Yhdistä uudelleen\", kirjaudu Googleen ja myönnä Protonille uudelleen oikeus käsitellä tietojasi.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Yhdistä uudelleen</string>
     <string name="import_assistant_status_paused_storage_full_title">Tallennustilasi on täynnä</string>
     <string name="import_assistant_status_paused_storage_full_description">Proton-tililläsi ei ole riittävästi tallennustilaa tämän kalenterin tuonnin viimeistelyyn. Vapauta tilaa tai hanki lisää ja palaa sen jälkeentänne jatkamaan tuontia.</string>
@@ -662,7 +662,7 @@
     <string name="import_assistant_discard_import_message">Tuonti ei ole valmis, etkä voi jatkaa sitä, jos perut sen.</string>
     <string name="import_assistant_discard_import_positive">Peru tuonti</string>
     <string name="import_assistant_discard_import_negative">Jatka tuontia</string>
-    <string name="import_assistant_authentication_canceled">Todennus peruttiin</string>
+    <string name="import_assistant_authentication_canceled">Tunnistautuminen peruttiin</string>
     <string name="import_assistant_sign_in_in_progress">Kirjautumistapahtuma on jo käynnissä</string>
     <string name="import_assistant_in_progress_error_snack">Jokin tuonti on vielä kesken</string>
     <!-- Import events -->

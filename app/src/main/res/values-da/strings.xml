@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tilladt at oprette invitationer i en delt kalender</string>
     <string name="snack_down_banner">Proton-serverne er nede. Besøg vores statusside for detaljer.</string>
     <string name="snack_down_banner_action">Åbn statusside</string>
-    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
+    <string name="snack_color_per_event_paid_feature">Begivenhedsfarve er en betalt funktion</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
@@ -598,8 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Så er helligdagene her!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nTilføj et hvilket som helst lands helligdage til din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nEftersom du i øjeblikket er på grænsen for antal kalendere, skal du først fjerne en eksisterende kalender for at tilføje en feriekalender.</string>
-    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Farvekod dine begivenheder</string>
+    <string name="spotlight_dialog_color_per_event_description">• Tilpas farven på individuelle begivenheder for bedre at organisere din dag.\n\n• Hold styr på din tid, og øg effektiviteten.</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>
     <string name="dialog_google_auth_description">For at starte importen skal du logge ind på Google Kalender og give Proton adgang til dine data.</string>
@@ -669,7 +669,7 @@
     <string name="import_event_disclaimer_dialog_title">Importér som simpel begivenhed?</string>
     <string name="import_event_disclaimer_dialog_description">\nImporterede invitationer vises i Proton Calendar som simple begivenheder uden oplysninger om <b>arrangør</b> og <b>deltagere</b>.\n\nHvis du vil have opdateringer om begivenhederne og se deltagerne, skal du bede arrangørerne om at invitere dig med din Proton-e-mailadresse.</string>
     <string name="import_event_disclaimer_dialog_positive">Importér</string>
-    <string name="undefined_color">Undefined</string>
+    <string name="undefined_color">Udefineret</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">kalender</item>
@@ -809,25 +809,25 @@
         <item>Søndag</item>
     </string-array>
     <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
-        <item>Purple|#8080FF</item>
-        <item>Strawberry|#EC3E7C</item>
+        <item>Lilla|#8080FF</item>
+        <item>Jordbær|#EC3E7C</item>
         <item>Pink|#DB60D6</item>
-        <item>Carrot|#F78400</item>
+        <item>Gulerod|#F78400</item>
         <item>Sahara|#936D58</item>
         <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
+        <item>Blomme|#A839A4</item>
         <item>Cerise|#BA1E55</item>
-        <item>Copper|#C44800</item>
-        <item>Soil|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
+        <item>Kobber|#C44800</item>
+        <item>Jord|#54473F</item>
+        <item>Blågrå|#415DF0</item>
+        <item>Stillehavet|#179FD9</item>
+        <item>Rev|#1DA583</item>
+        <item>Bregne|#3CBB3A</item>
         <item>Olive|#B4A40E</item>
         <item>Cobalt|#273EB2</item>
         <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+        <item>Fyrretræ|#0F735A</item>
+        <item>Skov|#258723</item>
+        <item>Syltet agurk|#807304</item>
     </string-array>
 </resources>
