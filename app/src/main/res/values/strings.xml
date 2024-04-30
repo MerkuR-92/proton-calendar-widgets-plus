@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Creating invites in a shared calendar is not allowed</string>
     <string name="snack_down_banner">Proton servers are down. Visit our status page for details.</string>
     <string name="snack_down_banner_action">Open status page</string>
-    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">The event does not exist</string>
     <string name="error_occurrence_does_not_exist">The occurrence does not exist</string>
@@ -598,8 +598,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Public holidays are here!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nAdd any country\'s public holidays to your calendar.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No more scheduling meetings when everyone\'s off or forgetting to plan a long weekend getaway.\n\nSince you are currently at the calendar limit, to add a holiday calendar, you\'ll need to remove an existing calendar first.</string>
-    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Allow access</string>
     <string name="dialog_google_auth_description">To start the import, sign in to Google Calendar and allow Proton to access your data.</string>
