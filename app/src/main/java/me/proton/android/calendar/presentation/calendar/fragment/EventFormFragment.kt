@@ -539,6 +539,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormColorLayout.visibleOrGone(isColorPerEventEnabled)
             if (isColorPerEventEnabled) {
                 val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
+                binding.eventFormColorUpgrade.visibleOrGone(isFreeUser)
                 binding.eventFormColor.text = ColorUtils.getColorNameForHex(
                     resources.getStringArray(R.array.colors_with_names),
                     event.getDisplayColor(isFreeUser)
@@ -555,6 +556,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         )
                     )
                 )
+            } else {
+                binding.eventFormColorUpgrade.visibleOrGone(false)
             }
 
             binding.eventFormRecurrence.text =
