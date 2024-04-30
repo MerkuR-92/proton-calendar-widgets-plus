@@ -1205,7 +1205,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             binding.navViewMainContent.navViewMoreLoginLayout.isGone = hasPrimary
         })
         binding.navViewMainContent.navViewMoreLogoutPress.setOnSingleClickListener {
-            SignOutDialogActivity.start(this)
+            accountViewModel.logoutPrimary()
+            displaySplashScreen(true, spinnerText = "")
+            safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.rootFragment, false)
             binding.drawerLayout.close()
         }
         binding.navViewMainContent.navViewMoreLoginPress.setOnSingleClickListener {

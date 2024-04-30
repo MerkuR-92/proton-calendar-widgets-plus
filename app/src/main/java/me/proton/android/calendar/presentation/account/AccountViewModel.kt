@@ -118,8 +118,8 @@ class AccountViewModel @Inject constructor(
 
             setupUser(account.userId)
         }.onFailure {
-            logger.e("checkAccount failed, disabling user.", it)
-            disableUser(account.userId)
+            logger.e("checkAccount failed, removing user.", it)
+            removeUser(account.userId)
 
             if (it is CancellationException) throw it
         }
@@ -145,7 +145,7 @@ class AccountViewModel @Inject constructor(
                     bootstrapResult.error == UseCase.Error.Bootstrap.UpdatePassphrase
                 ) return
             } else {
-                disableUser(userId)
+                removeUser(userId)
             }
             return
         }
@@ -153,8 +153,8 @@ class AccountViewModel @Inject constructor(
         _state.tryEmit(State.Ready)
     }
 
-    private suspend fun disableUser(userId: UserId) {
-        accountManager.disableAccount(userId)
+    private suspend fun removeUser(userId: UserId) {
+        accountManager.removeAccount(userId)
         valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
@@ -186,9 +186,9 @@ class AccountViewModel @Inject constructor(
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
-                .onAccountTwoPassModeFailed { disableUser(it.userId) }
-                .onAccountCreateAddressFailed { disableUser(it.userId) }
-                .onAccountDisabled { cleanUser() }
+                .onAccountTwoPassModeFailed { removeUser(it.userId) }
+                .onAccountCreateAddressFailed { removeUser(it.userId) }
+                .onAccountDisabled { removeUser(it.userId) }
                 .onAccountRemoved { cleanUser() }
         }
 
@@ -224,7 +224,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun logoutPrimary() = viewModelScope.launch {
-        getPrimaryUserId()?.let { userId -> disableUser(userId) }
+        getPrimaryUserId()?.let { userId -> removeUser(userId) }
     }
 
     fun clearError() {
@@ -240,7 +240,7 @@ class AccountViewModel @Inject constructor(
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
             resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
             if (resetCalendarsKeyResult !is UseCase.Result.Success<*>) {
-                disableUser(userId)
+                removeUser(userId)
                 return@launch
             }
 
