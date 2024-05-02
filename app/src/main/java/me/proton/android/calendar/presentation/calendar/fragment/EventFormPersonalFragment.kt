@@ -322,7 +322,8 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
             if (isColorPerEventEnabled) {
                 val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
                 binding.eventFormPersonalColor.text = ColorUtils.getColorNameForHex(
-                    resources.getStringArray(R.array.colors_with_names),
+                    resources.getStringArray(R.array.colors_names),
+                    resources.getStringArray(R.array.colors_values),
                     event.getDisplayColor(isFreeUser)
                 ) ?: getString(R.string.undefined_color)
                 binding.eventFormPersonalColorDefault.visibleOrGone(event.getDisplayColor(isFreeUser) == event.calendar.color)
@@ -384,7 +385,8 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                     ColorUtils.displayColorPicker(
                         requireContext(),
                         resources.getString(R.string.dialog_title_event_color_picker),
-                        resources.getStringArray(R.array.colors_with_names),
+                        resources.getStringArray(R.array.colors_names),
+                        resources.getStringArray(R.array.colors_values),
                         eventViewModel.eventLiveData.value!!.getDisplayColor(isFreeUser),
                         eventViewModel.eventLiveData.value!!.calendar.color
                     ) {
