@@ -333,7 +333,7 @@ class ImportAssistantStatusFragment : BaseDialogFragment<FragmentImportAssistant
             if (!importAssistantViewModel.handleGoogleSignInRedirect(
                     userId,
                     authCode,
-                    resources.getStringArray(R.array.colors_with_names),
+                    resources.getStringArray(R.array.colors_values),
                     importerId
                 )
             ) {

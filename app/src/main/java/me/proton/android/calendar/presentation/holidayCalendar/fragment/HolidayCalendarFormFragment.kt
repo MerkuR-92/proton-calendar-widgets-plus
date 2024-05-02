@@ -163,7 +163,7 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
                 val languageTag = requireContext().resources.configuration.currentLocale().toLanguageTag().lowercase()
                 val countryCode = languageTag.substringAfter("-", "")
                 holidayCalendarViewModel.initCreateHolidayCalendar(
-                    ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names)),
+                    resources.getStringArray(R.array.colors_values).random(),
                     requireContext().resources.configuration.currentLocale().language.lowercase(),
                     countryCode,
                     returnToSettings
@@ -215,7 +215,8 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
             binding.holidayCalendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
 
             binding.holidayCalendarFormColor.text = ColorUtils.getColorNameForHex(
-                resources.getStringArray(R.array.colors_with_names),
+                resources.getStringArray(R.array.colors_names),
+                resources.getStringArray(R.array.colors_values),
                 calendarColor
             ) ?: getString(R.string.undefined_color)
         }
@@ -361,7 +362,8 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
             ColorUtils.displayColorPicker(
                 requireContext(),
                 resources.getString(R.string.dialog_title_calendar_color_picker),
-                resources.getStringArray(R.array.colors_with_names),
+                resources.getStringArray(R.array.colors_names),
+                resources.getStringArray(R.array.colors_values),
                 holidayCalendarViewModel.calendarColor.value!!
             ) {
                 holidayCalendarViewModel.handleCalendarColor(it)

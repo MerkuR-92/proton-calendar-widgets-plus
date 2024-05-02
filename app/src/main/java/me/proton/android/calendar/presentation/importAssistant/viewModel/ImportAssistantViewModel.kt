@@ -132,7 +132,7 @@ class ImportAssistantViewModel @Inject constructor(
         }
     }
 
-    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, colorArray: Array<String>, importerId: String? = null): Boolean {
+    suspend fun handleGoogleSignInRedirect(userId: UserId, code: String, colorValuesArray: Array<String>, importerId: String? = null): Boolean {
         // Create Access token resource
         val token = importerApi.createAccessToken(userId, code).valueOrNullAndLogErrors(logger)?.token ?: return false
         val tokenId = token.id
@@ -141,11 +141,11 @@ class ImportAssistantViewModel @Inject constructor(
         return if (importerId != null) {
             updateImporter(userId, tokenId, importerId, token.account)
         } else {
-            createImporter(userId, tokenId, token.account, colorArray)
+            createImporter(userId, tokenId, token.account, colorValuesArray)
         }
     }
 
-    private suspend fun createImporter(userId: UserId, tokenId: String, account: String, colorArray: Array<String>): Boolean {
+    private suspend fun createImporter(userId: UserId, tokenId: String, account: String, colorValuesArray: Array<String>): Boolean {
         // Create the importer for the required products
         importerId = importerApi.createCalendarImporter(userId, tokenId).valueOrNullAndLogErrors(logger)?.importerID ?: return false
 
@@ -172,7 +172,7 @@ class ImportAssistantViewModel @Inject constructor(
                     destinationName = it.source.ellipsize(100),
                     destinationEmail = defaultUserEmail.value!!,
                     destinationDescription = it.description.ellipsize(255),
-                    destinationColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
+                    destinationColor = colorValuesArray.random()
                 )
             )
         }

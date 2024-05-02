@@ -103,14 +103,14 @@ class AccountViewModel @Inject constructor(
 
             valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
 
-            val colorArray = context.resources.getStringArray(R.array.colors_with_names)
+            val colorValuesArray = context.resources.getStringArray(R.array.colors_values)
             defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
-            defaultCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
-            defaultHolidayCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
+            defaultCalendarColor = colorValuesArray.random()
+            defaultHolidayCalendarColor = colorValuesArray.random()
             for (i in 0 until 10) {
                 // Try and use a different value for default calendar and holiday calendar colors
                 if (defaultHolidayCalendarColor != defaultCalendarColor) break
-                defaultHolidayCalendarColor = ColorUtils.getRandomCalendarColorHexString(colorArray)
+                defaultHolidayCalendarColor = colorValuesArray.random()
             }
             val languageTag = context.resources.configuration.currentLocale().toLanguageTag().lowercase()
             defaultCountryCode = languageTag.substringAfter("-", "")
