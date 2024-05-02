@@ -152,7 +152,7 @@ class ImportAssistantFragment : BaseDialogFragment<FragmentImportAssistantBindin
                 if (!importAssistantViewModel.handleGoogleSignInRedirect(
                         userId,
                         navigationArguments.code,
-                        resources.getStringArray(R.array.colors_with_names)
+                        resources.getStringArray(R.array.colors_values)
                     )) {
                     // Display error snack and navigate back
                     if (findNavController().previousBackStackEntry?.destination?.id == R.id.nav_import_assistant_guide) {
@@ -513,7 +513,7 @@ class ImportAssistantFragment : BaseDialogFragment<FragmentImportAssistantBindin
         val newCalendarIcon = bottomSheetDialog.findViewById<ImageView>(R.id.dialog_calendar_import_mapping_new_calendar_icon)
         val newCalendarColor =
             if (calendarToImport.createDestinationCalendar) calendarToImport.destinationColor
-            else ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names))
+            else resources.getStringArray(R.array.colors_values).random()
         newCalendarIcon?.imageTintList = ColorStateList.valueOf(newCalendarColor.toColorInt())
         val newCalendarName = bottomSheetDialog.findViewById<TextView>(R.id.dialog_calendar_import_mapping_new_calendar_title)
         newCalendarName?.text = calendarToImport.sourceName

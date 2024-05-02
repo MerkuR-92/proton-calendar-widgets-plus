@@ -808,26 +808,48 @@
         <item>Saturday</item>
         <item>Sunday</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
-        <item>Purple|#8080FF</item>
-        <item>Strawberry|#EC3E7C</item>
-        <item>Pink|#DB60D6</item>
-        <item>Carrot|#F78400</item>
-        <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
-        <item>Copper|#C44800</item>
-        <item>Soil|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
-        <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

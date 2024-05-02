@@ -541,7 +541,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 val isFreeUser = eventViewModel.user.hasSubscriptionForMail().not()
                 binding.eventFormColorUpgrade.visibleOrGone(isFreeUser)
                 binding.eventFormColor.text = ColorUtils.getColorNameForHex(
-                    resources.getStringArray(R.array.colors_with_names),
+                    resources.getStringArray(R.array.colors_names),
+                    resources.getStringArray(R.array.colors_values),
                     event.getDisplayColor(isFreeUser)
                 ) ?: getString(R.string.undefined_color)
                 binding.eventFormColorDefault.visibleOrGone(
@@ -860,7 +861,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     ColorUtils.displayColorPicker(
                         requireContext(),
                         resources.getString(R.string.dialog_title_event_color_picker),
-                        resources.getStringArray(R.array.colors_with_names),
+                        resources.getStringArray(R.array.colors_names),
+                        resources.getStringArray(R.array.colors_values),
                         eventViewModel.eventLiveData.value!!.getDisplayColor(isFreeUser),
                         eventViewModel.eventLiveData.value!!.calendar.color
                     ) {

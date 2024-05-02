@@ -199,7 +199,7 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
                 // Use random color from array as calendar color
                 // Init form for new calendar
                 calendarFormViewModel.initCreateCalendarForm(
-                    ColorUtils.getRandomCalendarColorHexString(resources.getStringArray(R.array.colors_with_names))
+                    resources.getStringArray(R.array.colors_values).random()
                 )
             }
         }
@@ -270,7 +270,8 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
             binding.calendarFormColorIcon.imageTintList = ColorStateList.valueOf(calendarColor.toColorInt())
 
             binding.calendarFormColor.text = ColorUtils.getColorNameForHex(
-                resources.getStringArray(R.array.colors_with_names),
+                resources.getStringArray(R.array.colors_names),
+                resources.getStringArray(R.array.colors_values),
                 calendarColor
             ) ?: getString(R.string.undefined_color)
         }
@@ -388,7 +389,8 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
             ColorUtils.displayColorPicker(
                 requireContext(),
                 resources.getString(R.string.dialog_title_calendar_color_picker),
-                resources.getStringArray(R.array.colors_with_names),
+                resources.getStringArray(R.array.colors_names),
+                resources.getStringArray(R.array.colors_values),
                 calendarFormViewModel.calendarColor.value!!
             ) {
                 calendarFormViewModel.handleCalendarColor(it)

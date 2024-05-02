@@ -23,36 +23,32 @@ object ColorUtils {
         val hexString: String
     )
 
-    fun getColorNameWithHexList(colorArray: Array<String>): List<ColorNameWithHex> {
-        return colorArray.map { colorResource ->
-            toColorNameWithHex(colorResource)
+    fun getColorNameWithHexList(
+        colorNamesArray: Array<String>,
+        colorValuesArray: Array<String>
+    ): List<ColorNameWithHex> {
+        return colorNamesArray.mapIndexed { index, colorName ->
+            toColorNameWithHex(colorName, colorValuesArray[index])
         }
     }
 
-    fun getRandomCalendarColorHexString(colorArray: Array<String>): String {
-        return toColorNameWithHex(colorArray.random()).hexString
+    fun getColorNameForHex(colorNamesArray: Array<String>, colorValuesArray: Array<String>, colorHex: String): String? {
+        val colorValueIndex = colorValuesArray.indexOf(colorHex)
+        return colorNamesArray.getOrNull(colorValueIndex)
     }
 
-    fun getColorNameForHex(colorArray: Array<String>, colorHex: String): String? {
-        return colorArray.map {
-            toColorNameWithHex(it)
-        }.firstOrNull {
-            it.hexString == colorHex
-        }?.name
-    }
-
-    private fun toColorNameWithHex(colorResource: String): ColorNameWithHex {
-        val splitResult = colorResource.split("|")
+    private fun toColorNameWithHex(colorName: String, colorHex: String): ColorNameWithHex {
         return ColorNameWithHex(
-            name = splitResult[0],
-            hexString = splitResult[1]
+            name = colorName,
+            hexString = colorHex
         )
     }
 
     fun displayColorPicker(
         context: Context,
         title: String?,
-        colorArray: Array<String>,
+        colorNamesArray: Array<String>,
+        colorValuesArray: Array<String>,
         selectedColorHexString: String,
         defaultCalendarColorHexString: String? = null,
         callback: (selectedColorHexString: String) -> Unit
@@ -62,9 +58,9 @@ object ColorUtils {
 
             lateinit var dialog: DialogInterface
 
-            val colorNameWithHexList = getColorNameWithHexList(colorArray)
+            val colorNameWithHexList = getColorNameWithHexList(colorNamesArray, colorValuesArray)
 
-            override fun getCount(): Int = colorArray.size
+            override fun getCount(): Int = colorNameWithHexList.size
 
             override fun getItem(position: Int): ColorNameWithHex = colorNameWithHexList[position]
 
