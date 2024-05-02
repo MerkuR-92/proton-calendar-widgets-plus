@@ -808,6 +808,28 @@
         <item>Saturday</item>
         <item>Sunday</item>
     </string-array>
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
+        <item>Purple|#8080FF</item>
+        <item>Strawberry|#EC3E7C</item>
+        <item>Pink|#DB60D6</item>
+        <item>Carrot|#F78400</item>
+        <item>Sahara|#936D58</item>
+        <item>Enzian|#5252CC</item>
+        <item>Plum|#A839A4</item>
+        <item>Cerise|#BA1E55</item>
+        <item>Copper|#C44800</item>
+        <item>Soil|#54473F</item>
+        <item>Slate Blue|#415DF0</item>
+        <item>Pacific|#179FD9</item>
+        <item>Reef|#1DA583</item>
+        <item>Fern|#3CBB3A</item>
+        <item>Olive|#B4A40E</item>
+        <item>Cobalt|#273EB2</item>
+        <item>Ocean|#0A77A6</item>
+        <item>Pine|#0F735A</item>
+        <item>Forest|#258723</item>
+        <item>Pickle|#807304</item>
+    </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
         <item>Purple</item>
         <item>Strawberry</item>
