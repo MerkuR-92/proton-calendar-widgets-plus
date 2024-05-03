@@ -29,13 +29,13 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
-import me.proton.android.calendar.databinding.FragmentCalendarFormBinding
 import me.proton.android.calendar.databinding.FragmentGeneralSettingsBinding
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.util.kotlin.equalsNoCase
 import org.koin.core.KoinComponent
@@ -56,6 +56,7 @@ class GeneralSettingsFragment : BaseDialogFragment<FragmentGeneralSettingsBindin
     private val mainViewModel: MainViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
     private val application: ProtonCalendarApplication by lazy {
         requireContext().applicationContext as ProtonCalendarApplication
     }
@@ -285,7 +286,7 @@ class GeneralSettingsFragment : BaseDialogFragment<FragmentGeneralSettingsBindin
         }
 
         binding.settingsSearch.visibleOrGone(
-            CalendarFeatureFlag.ShowEventSearch.fallbackValue
+            featureFlagViewModel.isEventSearchEnabled()
         )
 
         lifecycleScope.launch {

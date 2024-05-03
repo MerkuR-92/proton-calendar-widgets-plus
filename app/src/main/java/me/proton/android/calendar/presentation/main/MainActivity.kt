@@ -110,7 +110,6 @@ import me.proton.android.calendar.common.utils.SpotlightUtils.showLastSpotlightD
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.databinding.ActivityMainBinding
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
-import me.proton.android.calendar.databinding.DialogSpotlightBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -129,7 +128,6 @@ import me.proton.android.calendar.presentation.subscription.PlansViewModel
 import me.proton.core.accountmanager.presentation.compose.SignOutDialogActivity
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.notification.presentation.deeplink.DeeplinkManager
-import me.proton.core.notification.presentation.deeplink.HandleDeeplinkIntent
 import me.proton.core.notification.presentation.deeplink.onActivityCreate
 import me.proton.core.presentation.ui.view.ProtonInput
 import me.proton.core.presentation.ui.view.ProtonProgressButton
@@ -502,65 +500,45 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 featureFlagViewModel.prefetchForCurrentUser()
 
                 lifecycleScope.launch {
-                    val searchEnabled = searchViewModel.isCalendarDownloadEnabled()
-                    if (searchEnabled && mainViewModel.isConnectedToNetwork) {
-                        // Clear events DB
-                        mainViewModel.clearLocalEventsDatabase()
-
-                        // Disable search and clear search DB
-                        searchViewModel.disableCalendarDownload()
-                        searchViewModel.clearDownloadingState()
-
-                        val materialDialogBuilder = MaterialAlertDialogBuilder(this@MainActivity).setCancelable(true)
-                        val viewBinding = DialogSpotlightBinding.inflate(LayoutInflater.from(this@MainActivity), null, false)
-                        viewBinding.dialogSpotlightHeader.text = getText(R.string.spotlight_dialog_beta_header)
-                        viewBinding.dialogSpotlightTitle.text = getText(R.string.spotlight_dialog_wipe_search_title)
-                        viewBinding.dialogSpotlightDescription.text = getText(R.string.spotlight_dialog_wipe_search_description)
-                        materialDialogBuilder.setPositiveButton(R.string.spotlight_v5_dialog_got_it_button) { _, _ ->
-                            // Nothing to do here
-                        }
-                        materialDialogBuilder.setView(viewBinding.root)
-                        materialDialogBuilder.setCancelable(false)
-                        materialDialogBuilder.show()
-                    } else {
-                        // Display spotlight dialog if needed
-                        val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
-                        val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
-                        val hasHolidayCalendars = calendarViewModel.hasHolidayCalendars()
-                        val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
-                        val spotlightShown =
-                            if (currentViewIsCalendar) {
-                                showLastSpotlightDialog(
-                                    calendarViewModel.isFreeUser() ?: true,
-                                    isColorPerEventEnabled,
-                                    hasHolidayCalendars,
-                                    isCalendarLimitReached
-                                ) {
-                                    when (it) {
-                                        SEARCH_VERSION_CODE -> {
-                                            searchViewModel.enableCalendarDownload()
-                                            displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
-                                        }
-                                        HOLIDAY_CALENDAR_VERSION_CODE -> {
-                                            if (isCalendarLimitReached) {
-                                                // Open calendar settings view
-                                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_settings)
-                                            } else {
-                                                // Open holiday calendar form
-                                                safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
-                                            }
+                    // Display spotlight dialog if needed
+                    val isCalendarLimitReached = calendarViewModel.isCalendarLimitReached(Calendar.CalendarType.HOLIDAY) != CalendarViewModel.CalendarLimit.NOT_REACHED
+                    val isColorPerEventEnabled = featureFlagViewModel.isColorPerEventEnabled()
+                    val isEventSearchEnabled = featureFlagViewModel.isEventSearchEnabled()
+                    val hasHolidayCalendars = calendarViewModel.hasHolidayCalendars()
+                    val currentViewIsCalendar = safeFindNavController(R.id.nav_host_fragment_container_view).currentBackStackEntry?.destination?.id == R.id.nav_calendar
+                    val spotlightShown =
+                        if (currentViewIsCalendar) {
+                            showLastSpotlightDialog(
+                                calendarViewModel.isFreeUser() ?: true,
+                                isColorPerEventEnabled,
+                                isEventSearchEnabled,
+                                hasHolidayCalendars,
+                                isCalendarLimitReached
+                            ) {
+                                when (it) {
+                                    SEARCH_VERSION_CODE -> {
+                                        searchViewModel.enableCalendarDownload()
+                                        displaySnackBar(resources.getString(R.string.search_spotlight_activation_snack))
+                                    }
+                                    HOLIDAY_CALENDAR_VERSION_CODE -> {
+                                        if (isCalendarLimitReached) {
+                                            // Open calendar settings view
+                                            safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_settings)
+                                        } else {
+                                            // Open holiday calendar form
+                                            safeFindNavController(R.id.nav_host_fragment_container_view).navigate(R.id.action_nav_calendar_to_nav_holiday_calendar_form)
                                         }
                                     }
                                 }
-                            } else false
+                            }
+                        } else false
 
-                        // Make sure we don't overlap spotlight and play store rating dialogs
-                        if (!spotlightShown) {
-                            // We need to wait a few seconds before displaying the dialog
-                            delay(PLAY_STORE_RATING_DELAY.toMillis())
-                            // Check if we need to display play store rating dialog
-                            handlePlayStoreRatingFlow()
-                        }
+                    // Make sure we don't overlap spotlight and play store rating dialogs
+                    if (!spotlightShown) {
+                        // We need to wait a few seconds before displaying the dialog
+                        delay(PLAY_STORE_RATING_DELAY.toMillis())
+                        // Check if we need to display play store rating dialog
+                        handlePlayStoreRatingFlow()
                     }
                 }
 
@@ -1783,6 +1761,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         featureFlagViewModel.colorPerEventFeatureFlag.observe(this@MainActivity, Observer { colorPerEventFeatureFlag ->
             colorPerEventFeatureFlag ?: return@Observer
+        })
+
+        featureFlagViewModel.eventSearchFeatureFlag.observe(this@MainActivity, Observer { eventSearchFeatureFlag ->
+            eventSearchFeatureFlag ?: return@Observer
         })
 
         lifecycleScope.launch {
