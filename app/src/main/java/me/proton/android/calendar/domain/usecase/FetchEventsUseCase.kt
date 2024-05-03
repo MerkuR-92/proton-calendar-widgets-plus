@@ -2,6 +2,7 @@
 
 package me.proton.android.calendar.domain.usecase
 
+import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -9,14 +10,16 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
-import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.FETCH_EVENTS_MAX_DAYS_WINDOW
 import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -103,7 +106,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         calendarId: String,
         lastKnownEventId: String?,
         coroutineScope: CoroutineScope
-    ): ReceiveChannel<List<EventEntity>> {
+    ): ReceiveChannel<List<EventResponse>> {
 
         // eventIdsRequestPageSize has to be evenly divisible by (workerCount * workerBatchSize)!
         val workerCount = 5
@@ -111,7 +114,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         val eventIdsRequestPageSize = 200
 
         val eventIdsChannel = Channel<List<String>>(1)
-        val eventEntitiesChannel = Channel<List<EventEntity>>(5)
+        val eventResponsesChannel = Channel<List<EventResponse>>(5)
 
         coroutineScope.launch {
 
@@ -168,12 +171,12 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                         null // legitimate situation if Event was deleted in the meantime
                                     } else {
                                         eventResponse.logErrorIfNeeded("[FetchEventsUseCase] error in fetching chunked entities", logger)
-                                        eventEntitiesChannel.close(Exception("Error in fetching chunked entities"))
+                                        eventResponsesChannel.close(Exception("Error in fetching chunked entities"))
                                         null
                                     }
                                     is ApiResponse.Exception -> {
                                         eventResponse.logErrorIfNeeded("[FetchEventsUseCase] exception in fetching chunked entities", logger)
-                                        eventEntitiesChannel.close(Exception("Exception in fetching chunked entities"))
+                                        eventResponsesChannel.close(Exception("Exception in fetching chunked entities"))
                                         null
                                     }
                                     is ApiResponse.Success -> {
@@ -184,18 +187,18 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                         }
                     }.awaitAll().flatten()
 
-                    if (!eventEntitiesChannel.isClosedForSend) {
-                        eventEntitiesChannel.send(fetchedEntities) // PRODUCE Event Entities
+                    if (!eventResponsesChannel.isClosedForSend) {
+                        eventResponsesChannel.send(fetchedEntities) // PRODUCE Event Entities
                     }
 
                 }
 
             }
 
-            eventEntitiesChannel.close()
+            eventResponsesChannel.close()
         }
 
-        return eventEntitiesChannel
+        return eventResponsesChannel
 
     }
 
@@ -259,9 +262,9 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         toDate: LocalDate,
         timeZoneId: String,
         coroutineScope: CoroutineScope
-    ): ReceiveChannel<List<ServerEvent.EventEntityMetadata>> {
+    ): ReceiveChannel<List<EventEntityMetadata>> {
 
-        val eventMetadatasChannel = Channel<List<ServerEvent.EventEntityMetadata>>(8)
+        val eventMetadatasChannel = Channel<List<EventEntityMetadata>>(8)
 
         coroutineScope.launch {
 
@@ -287,6 +290,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                 )
 
                                 if (eventsResponse is ApiResponse.Success) {
+
+                                    persistEventsMetadata(*eventsResponse.data.events.toTypedArray())
 
                                     if (!eventMetadatasChannel.isClosedForSend && eventsResponse.data.events.isNotEmpty()) {
                                         eventMetadatasChannel.send(eventsResponse.data.events) // PRODUCE
@@ -319,10 +324,45 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         return eventMetadatasChannel
     }
 
+    private suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata) {
+        val eventsMetadataByCalendar = eventsMetadata.groupBy { it.calendarId }
+        database.inTransaction {
+            eventsMetadataByCalendar.forEach {
+                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
+                if (calendarUserId != null /* Calendar exists */) {
+                    try {
+                        it.value.forEach {
+                            // don't overwrite Event it we already have newer one in DB
+                            val hasEventMetadataWithHigherModifyTime = database.eventsMetadataDao().hasEventMetadataWithHigherModifyTime(
+                                it.id,
+                                it.calendarId,
+                                it.modifyTime
+                            )
+                            if (!hasEventMetadataWithHigherModifyTime) {
+                                database.eventsMetadataDao().updateOrInsert(it)
+                            }
+                        }
+                    } catch (e: SQLiteConstraintException) {
+                        // hack for different SQLite implementations formatting message differently
+                        if (e.message?.contains("787") == true
+                            && e.message?.contains("foreign", ignoreCase = true) == true
+                            && e.message?.contains("constraint", ignoreCase = true) == true
+                        ) {
+                            // ignore, it means this Event's Calendar doesn't exist
+                            logger.e("persistEventsMetadata couldn't insert because ${e.message}", e)
+                        } else throw e
+                    }
+                } else {
+                    logger.i("persistEventsMetadata couldn't insert because calendar doesn't exist")
+                }
+            }
+        }
+    }
+
     /**
      * @throws Exception
      */
-    private suspend fun ReceiveChannel<List<ServerEvent.EventEntityMetadata>>.fetchRemoteEventEntities(
+    private suspend fun ReceiveChannel<List<EventEntityMetadata>>.fetchRemoteEventEntities(
         userId: UserId,
         coroutineScope: CoroutineScope
     ): ReceiveChannel<List<EventEntity>> {
@@ -358,7 +398,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                     null
                                 }
                                 is ApiResponse.Success -> {
-                                    apiEventEntity.data.event
+                                    // We only care about EventEntity as we already persisted the metadata in DB
+                                    apiEventEntity.data.event.toEventEntity()
                                 }
                             }
                         }

@@ -11,9 +11,10 @@ import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.CalendarEventsServerEvents
 import me.proton.android.calendar.data.api.EventApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
@@ -37,7 +38,7 @@ class CalendarEventListener @Inject constructor(
     private val workManager: WorkManager,
     private val widgetRefresher: WidgetRefresher,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase
-): CalendarBaseEventListener<String, ServerEvent.EventEntityMetadata>(db) {
+): CalendarBaseEventListener<String, EventEntityMetadata>(db) {
     override val order: Int = 3
     override val type: Type = Type.Calendar
 
@@ -46,13 +47,13 @@ class CalendarEventListener @Inject constructor(
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
         response: EventsResponse
-    ): List<Event<String, ServerEvent.EventEntityMetadata>>? {
+    ): List<Event<String, EventEntityMetadata>>? {
         return response.body.deserialize<CalendarEventsServerEvents>().calendarEvents?.map {
             Event(requireNotNull(Action.map[it.action]), it.id, it.event)
         }
     }
 
-    override suspend fun onPrepare(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
+    override suspend fun onPrepare(config: EventManagerConfig, entities: List<EventEntityMetadata>) {
         // Fetch any event not cached as the provided metadata is not enough to create entities
         eventEntities.putAll(
             entities.filter {
@@ -68,9 +69,9 @@ class CalendarEventListener @Inject constructor(
         )
     }
 
-    private suspend fun fetchEventEntity(userId: UserId, response: ServerEvent.EventEntityMetadata): EventEntity? {
+    private suspend fun fetchEventEntity(userId: UserId, response: EventEntityMetadata): EventEntity? {
         return when (val result = calendarsRepository.fetchEventById(userId, response.calendarId, response.id)) {
-            is ApiResponse.Success<EventApiResponse> -> result.data.event
+            is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
                 // If event was not found just omit it, otherwise we'll retry this indefinitely
                 if (result.isNotFound()) return null
@@ -80,11 +81,13 @@ class CalendarEventListener @Inject constructor(
         }
     }
 
-    override suspend fun onCreate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
+    override suspend fun onCreate(config: EventManagerConfig, entities: List<EventEntityMetadata>) {
         if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
             logger.i("action CREATE for calendarEvent in deleted calendar")
             return
         }
+
+        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
 
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
@@ -92,11 +95,14 @@ class CalendarEventListener @Inject constructor(
         calendarsRepository.persistEvents(*entitiesToCreate.toTypedArray())
     }
 
-    override suspend fun onUpdate(config: EventManagerConfig, entities: List<ServerEvent.EventEntityMetadata>) {
+    override suspend fun onUpdate(config: EventManagerConfig, entities: List<EventEntityMetadata>) {
         if (!calendarsRepository.hasCalendar(config.asCalendar().calendarId)) {
             logger.i("action UPDATE for calendarEvent in deleted calendar")
             return
         }
+
+        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
+
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
         val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
@@ -105,6 +111,7 @@ class CalendarEventListener @Inject constructor(
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         if (keys.isEmpty()) return
+        calendarsRepository.deleteEventsMetadataByEventIds(keys)
         calendarsRepository.deleteEventsById(config.asCalendar().calendarId, keys)
     }
 
@@ -117,6 +124,7 @@ class CalendarEventListener @Inject constructor(
         val calendarId = config.asCalendar().calendarId
 
         // Wipe the calendar events from DB
+        calendarsRepository.deleteEventsMetadataByCalendarId(calendarId)
         calendarsRepository.deleteAllEvents(calendarId)
 
         // Wipe all the calendar search events from DB

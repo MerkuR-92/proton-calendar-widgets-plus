@@ -9,20 +9,22 @@ import biweekly.property.Organizer
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import biweekly.util.ICalDate
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendar
+import me.proton.core.util.kotlin.toInt
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Date
+import java.util.concurrent.TimeUnit
 
 object EventMocks {
 
@@ -123,23 +125,61 @@ object EventMocks {
         hasAttendees: Boolean = false
     ): EventEntity {
         return EventEntity(
-            if (isSingleEdit) singleEditEventId else eventId,
-            calendarId,
-            sharedEventId,
-            calendarKeyPacket,
-            0L,
-            0L,
-            1,
-            null,
-            null,
-            sharedKeyPacket,
-            emptyList(),
-            emptyList(),
-            emptyList(),
-            emptyList(), // TODO Mock attendeesEvents too ?
-            if (hasAttendees) listOf(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nATTENDEE;CN=calendarsingle9@proton.dev;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-\\r\\n TOKEN=905eb4e54055cdb47d9edf7e8f6a778bca369a97:mailto:calendarsingle9@proto\\r\\n n.dev\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za8a+AQDA/zlaCVvaSnlRv6HBLyScDTgUhbUE1ArnLaY0G2ot9wD/XGPE\\r\\nB9Ou63paO4mHQJOzBw9LQe6k2HA24doWDD8cfQA=\\r\\n=/tFw\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+            id = if (isSingleEdit) singleEditEventId else eventId,
+            calendarId = calendarId,
+            sharedEventId = sharedEventId,
+            calendarKeyPacket = calendarKeyPacket,
+            createTime = 0L,
+            modifyTime = 0L,
+            permissions = 1,
+            addressKeyPacket = null,
+            addressId = null,
+            sharedKeyPacket = sharedKeyPacket,
+            sharedEvents = emptyList(),
+            calendarEvents = emptyList(),
+            personalEvents = emptyList(),
+            attendeesEvents = emptyList(), // TODO Mock attendeesEvents too ?
+            attendees = if (hasAttendees) listOf(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nATTENDEE;CN=calendarsingle9@proton.dev;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-\\r\\n TOKEN=905eb4e54055cdb47d9edf7e8f6a778bca369a97:mailto:calendarsingle9@proto\\r\\n n.dev\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za8a+AQDA/zlaCVvaSnlRv6HBLyScDTgUhbUE1ArnLaY0G2ot9wD/XGPE\\r\\nB9Ou63paO4mHQJOzBw9LQe6k2HA24doWDD8cfQA=\\r\\n=/tFw\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
             else emptyList(),
-            null
+            isProtonProtonInvite = isProtonProtonInvite.toInt()
+        )
+    }
+
+    fun provideEventResponse(
+        isSingleEdit: Boolean = false,
+        isProtonProtonInvite: Boolean = false,
+        hasAttendees: Boolean = false
+    ): EventResponse {
+        return EventResponse(
+            id = if (isSingleEdit) singleEditEventId else eventId,
+            calendarId = calendarId,
+            sharedEventId = sharedEventId,
+            calendarKeyPacket = calendarKeyPacket,
+            createTime = 0L,
+            modifyTime = 0L,
+            permissions = 1,
+            addressKeyPacket = null,
+            addressId = null,
+            sharedKeyPacket = sharedKeyPacket,
+            sharedEvents = emptyList(),
+            calendarEvents = emptyList(),
+            personalEvents = emptyList(),
+            attendeesEvents = emptyList(), // TODO Mock attendeesEvents too ?
+            attendees = if (hasAttendees) listOf(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nATTENDEE;CN=calendarsingle9@proton.dev;ROLE=REQ-PARTICIPANT;RSVP=TRUE;X-PM-\\r\\n TOKEN=905eb4e54055cdb47d9edf7e8f6a778bca369a97:mailto:calendarsingle9@proto\\r\\n n.dev\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za8a+AQDA/zlaCVvaSnlRv6HBLyScDTgUhbUE1ArnLaY0G2ot9wD/XGPE\\r\\nB9Ou63paO4mHQJOzBw9LQe6k2HA24doWDD8cfQA=\\r\\n=/tFw\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
+            else emptyList(),
+            isProtonProtonInvite = isProtonProtonInvite.toInt(),
+            isPersonalMigrated = null,
+            startTime = TimeUnit.SECONDS.toSeconds(System.currentTimeMillis()),
+            startTimeZone = "GMT",
+            endTime = TimeUnit.SECONDS.toSeconds(System.currentTimeMillis().plus(7200000L)),
+            endTimeZone = "GMT",
+            fullDay = 0,
+            uid = eventUid,
+            recurrenceID = null,
+            exDates = emptyList(),
+            rRule = null,
+            isOrganizer = 0,
+            isPersonalSingleEdit = false
         )
     }
 

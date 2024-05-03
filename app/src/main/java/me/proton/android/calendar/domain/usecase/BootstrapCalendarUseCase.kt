@@ -92,7 +92,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                                 } else {
                                     fetchEventsResult.second?.let {
                                         logger.v("persisting events in bootstrap: ${it.size}")
-                                        calendarsRepository.persistEvents(*it.toTypedArray())
+                                        calendarsRepository.persistEvents(*it.toTypedArray()) // We already persisted events metadata in split fetch
                                         updateAlarmsUseCase.execute(userId.id, it.map { it.id })
                                         widgetRefresher.refreshEventList()
                                     }

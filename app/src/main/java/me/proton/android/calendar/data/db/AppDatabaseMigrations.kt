@@ -21,12 +21,12 @@ package me.proton.android.calendar.data.db
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import androidx.room.RenameColumn
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS_METADATA
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENT_ALARMS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MANAGED_HOLIDAY_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
@@ -37,7 +37,9 @@ import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
 import me.proton.core.challenge.data.db.ChallengeDatabase
 import me.proton.core.contact.data.local.db.ContactDatabase
-import me.proton.core.data.room.db.extension.*
+import me.proton.core.data.room.db.extension.addTableColumn
+import me.proton.core.data.room.db.extension.dropTable
+import me.proton.core.data.room.db.extension.recreateTable
 import me.proton.core.eventmanager.data.db.EventMetadataDatabase
 import me.proton.core.featureflag.data.db.FeatureFlagDatabase
 import me.proton.core.humanverification.data.db.HumanVerificationDatabase
@@ -522,6 +524,13 @@ object AppDatabaseMigrations {
     val MIGRATION_65_66 = object : Migration(65, 66) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.addTableColumn(TABLE_EVENTS, "color", "TEXT")
+        }
+    }
+
+    val MIGRATION_66_67 = object : Migration(66, 67) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_EVENTS_METADATA}` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `sharedEventId` TEXT NOT NULL, `addressId` TEXT, `startTime` INTEGER NOT NULL, `startTimeZone` TEXT NOT NULL, `endTime` INTEGER NOT NULL, `endTimeZone` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `uid` TEXT NOT NULL, `recurrenceID` INTEGER, `exDates` TEXT NOT NULL, `rRule` TEXT, `createTime` INTEGER NOT NULL, `modifyTime` INTEGER NOT NULL, `isOrganizer` INTEGER NOT NULL, `sharedKeyPacket` TEXT, `calendarKeyPacket` TEXT, `addressKeyPacket` TEXT, `isPersonalSingleEdit` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_events_metadata_calendarId` ON `${TABLE_EVENTS_METADATA}` (`calendarId`)")
         }
     }
 }

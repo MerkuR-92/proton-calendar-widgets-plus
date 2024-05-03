@@ -306,39 +306,6 @@ class ServerEvent {
         val event: EventEntityMetadata? = null
     ) : BaseServerEventApiResponse()
 
-    // this class is not persisted in the database
-    @Serializable
-    data class EventEntityMetadata(
-        @SerialName("ID")
-        val id: String,
-        @SerialName("CalendarID")
-        val calendarId: String,
-        @SerialName("StartTime")
-        val startTime: Long,
-        @SerialName("StartTimezone")
-        val startTimeZone: String,
-        @SerialName("EndTime")
-        val endTime: Long,
-        @SerialName("EndTimezone")
-        val endTimeZone: String,
-        @SerialName("FullDay")
-        val fullDay: Int,
-        @SerialName("UID")
-        val uid: String,
-        @SerialName("RecurrenceID")
-        val recurrenceID: Long?,
-        @SerialName("Exdates")
-        val exDates: List<Long>,
-        @SerialName("RRule")
-        val rRule: String?,
-        @SerialName("CreateTime")
-        val createTime: Long, // unix timestamps
-        @SerialName("ModifyTime")
-        val modifyTime: Long,
-        @SerialName("IsOrganizer")
-        val isOrganizer: Int
-    )
-
     @Serializable
     class CalendarSettingsApiResponse(
         @SerialName("ID")

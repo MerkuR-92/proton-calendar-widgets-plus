@@ -124,15 +124,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
         runBlocking {
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isOrganizer = true)
 
             // Mock fetchEventById with event so that isApiEventAnInvitation returns true
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity(hasAttendees = true)
+                    EventMocks.provideEventResponse(hasAttendees = true)
                 )
             )
 
@@ -178,15 +178,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event with hidden calendar
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true, hasHiddenCalendar = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 
@@ -295,15 +295,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 
@@ -417,15 +417,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true, hasExDate = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 
@@ -539,15 +539,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 
@@ -774,15 +774,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 
@@ -895,15 +895,15 @@ internal class EventViewModelSaveTest: KoinComponent, EventViewModelTestCommon()
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventEntity())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventEntity())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
             } } returns EventMocks.provideEvent(isRecurring = true, hasExDate = true)
 
             // Mock fetchEventById so that isApiEventAnInvitation returns false
             coEvery { calendarsRepositoryMock.fetchEventById(userId, calendarId, eventId) } returns ApiResponse.Success(
                 EventApiResponse(
-                    EventMocks.provideEventEntity()
+                    EventMocks.provideEventResponse()
                 )
             )
 

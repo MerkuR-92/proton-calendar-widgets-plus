@@ -14,6 +14,7 @@ import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
@@ -73,6 +74,7 @@ class CalendarEventListenerTest {
     @Test
     fun `onResetAll deletes all events and fetches recent events`() {
         runBlocking {
+            coEvery { calendarsRepository.deleteEventsMetadataByCalendarId(any()) } returns Unit
             coEvery { calendarsRepository.deleteAllEvents(any()) } returns Unit
 
             listener.onResetAll(config)
@@ -107,21 +109,27 @@ fun createEventMetadata(
     endTime: Long? = null,
     modifyTime: Long? = null,
     rRule: String? = null
-) = ServerEvent.EventEntityMetadata(
-    id,
-    calendarId,
-    startTime ?: Instant.now().plusSeconds(3600).epochSecond,
-    "GMT",
-    endTime ?: Instant.now().plusSeconds(7200).epochSecond,
-    "GMT",
-    0,
-    eventUid,
-    null,
-    emptyList(),
-    rRule,
-    0L,
-    modifyTime ?: 0L,
-    0
+) = EventEntityMetadata(
+    id = id,
+    calendarId = calendarId,
+    sharedEventId = sharedEventId,
+    addressId = null,
+    startTime = startTime ?: Instant.now().plusSeconds(3600).epochSecond,
+    startTimeZone = "GMT",
+    endTime = endTime ?: Instant.now().plusSeconds(7200).epochSecond,
+    endTimeZone = "GMT",
+    fullDay = 0,
+    uid = eventUid,
+    recurrenceID = null,
+    exDates = emptyList(),
+    rRule = rRule,
+    createTime = 0L,
+    modifyTime = modifyTime ?: 0L,
+    isOrganizer = 0,
+    sharedKeyPacket = null,
+    calendarKeyPacket = null,
+    addressKeyPacket = null,
+    isPersonalSingleEdit = false
 )
 
 private const val eventsResponse = """
@@ -149,7 +157,12 @@ private const val eventsResponse = """
                 "RRule": null,
                 "CreateTime": 1637683433,
                 "ModifyTime": 1637927851,
-                "IsOrganizer": 1
+                "IsOrganizer": 1,
+                "AddressID": null,
+                "SharedKeyPacket": null,
+                "CalendarKeyPacket": null,
+                "AddressKeyPacket": null,
+                "IsPersonalSingleEdit": false
             }
         }
     ],

@@ -79,6 +79,7 @@ import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.UserSettingsEntity
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -3483,7 +3484,7 @@ class EventViewModel @Inject constructor(
             }
 
         val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
-            val event = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
+            val event = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
             if (event == null) {
                 handleChangeAnswerError()
                 return
@@ -3776,7 +3777,7 @@ class EventViewModel @Inject constructor(
         this.userId = userId
         var eventEntity = calendarsRepository.selectEventEntity(eventId)
         if (eventEntity == null) {
-            eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event
+            eventEntity = calendarsRepository.fetchEventById(userId, eventId, calendarId).valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
                 ?: return EventLinkResult.EventDoesNotExist
         }
         val event = (if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {

@@ -10,6 +10,7 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventEntity
+import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEventResponse
 import me.proton.android.calendar.test.shared.mocks.UserMocks.provideUserSettingsEntity
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

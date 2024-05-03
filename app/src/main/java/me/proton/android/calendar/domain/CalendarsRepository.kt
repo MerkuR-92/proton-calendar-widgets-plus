@@ -6,7 +6,6 @@ import me.proton.android.calendar.data.api.AlarmsApiResponse
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
-import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -14,6 +13,7 @@ import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -72,6 +72,8 @@ interface CalendarsRepository {
 
     suspend fun selectSubscribedCalendars(userId: String): List<Calendar>
 
+    fun flowVisibleCalendarIds(userId: String): Flow<List<String>>
+
     fun flowActiveUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowDisabledUserCalendars(userId: String): Flow<List<Calendar>>
@@ -127,15 +129,6 @@ interface CalendarsRepository {
 
     suspend fun updateCalendarDisplay(calendarId: String, display: Boolean)
 
-    // TODO create FLOW methods taking "event" selections according to "views" like monthly, weekly...
-
-    // events
-    fun eventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<List<Event>?>
-
     /**
      * Request Events to be pushed to observers and also fetched from API if possible.
      */
@@ -154,21 +147,21 @@ interface CalendarsRepository {
 
     suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event?
 
-    /**
-     * @return Transformed Events.
-     */
-    fun getEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        allowCached: Boolean
-    ): Flow<GetEventsResult<Event>>
-
     fun getUiEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
     ): Flow<GetEventsResult<UiEvent>>
+
+    suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        userEmails: List<String>,
+        isFreeUser: Boolean
+    ): List<UiEvent>?
 
     suspend fun getEvents(
         userId: String,
@@ -191,15 +184,6 @@ interface CalendarsRepository {
     /**
      * @return SkeletonEvents with correct Calendar Color.
      */
-    suspend fun getSkeletonEvents(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): List<SkeletonEvent>
-
-    /**
-     * @return SkeletonEvents with correct Calendar Color.
-     */
     fun getSkeletonEventsFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
@@ -210,7 +194,7 @@ interface CalendarsRepository {
 
     suspend fun eventExistsOnServer(userId: UserId, eventId: String, calendarId: String): Boolean?
 
-    suspend fun shouldFetchEvent(metadata: ServerEvent.EventEntityMetadata): Boolean
+    suspend fun shouldFetchEvent(metadata: EventEntityMetadata): Boolean
 
     suspend fun hasCalendar(calendarId: String, ): Boolean
 
@@ -231,6 +215,12 @@ interface CalendarsRepository {
     suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean?
 
     suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean?
+
+    suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata)
+
+    suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>)
+
+    suspend fun deleteEventsMetadataByCalendarId(calendarId: String)
 
     suspend fun persistEvents(vararg events: EventEntity)
 

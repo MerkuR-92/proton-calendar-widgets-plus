@@ -45,7 +45,7 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
 
         val events = fetchEventsResult.second
         return if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
-            calendarsRepository.persistEvents(*events.toTypedArray())
+            calendarsRepository.persistEvents(*events.toTypedArray()) // We already persisted events metadata in split fetch
             updateAlarmsUseCase.execute(userId.id, events.map { it.id })
             widgetRefresher.refreshEventList()
             UseCase.Result.Success<Unit>()

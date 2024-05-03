@@ -102,7 +102,7 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
         coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
-        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventEntity()
+        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventResponse()
 
         coEvery { calendarWidgetRefresherMock.refreshEventList() } just Runs
     }

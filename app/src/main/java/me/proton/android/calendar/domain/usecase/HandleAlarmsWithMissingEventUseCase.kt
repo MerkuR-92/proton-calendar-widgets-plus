@@ -4,6 +4,8 @@ import me.proton.android.calendar.common.utils.isNotFound
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
+import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
@@ -48,7 +50,8 @@ class HandleAlarmsWithMissingEventUseCase @Inject constructor(
         }
 
         // Persist the newly fetched events
-        calendarsRepository.persistEvents(event)
+        calendarsRepository.persistEvents(event.toEventEntity())
+        calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
 
         // Fetch alarms for event
         val alarmEntities = calendarsRepository.fetchEventAlarms(userId, calendarId, eventId).valueOrNullAndLogErrors(logger)?.alarms

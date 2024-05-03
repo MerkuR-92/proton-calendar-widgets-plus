@@ -4,12 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
-import me.proton.android.calendar.data.entity.*
+import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.data.entity.CalendarKeyEntity
+import me.proton.android.calendar.data.entity.CalendarSettingsEntity
+import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
+import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
+import me.proton.android.calendar.data.entity.MemberEntity
+import me.proton.android.calendar.data.entity.PassphraseEntity
+import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.core.account.data.db.AccountConverters
 import me.proton.core.account.data.db.AccountDatabase
 import me.proton.core.account.data.entity.AccountEntity
@@ -109,6 +119,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
+        EventEntityMetadata::class,
         CalendarSettingsEntity::class,
         CalendarUserSettingsEntity::class,
         CalendarKeyEntity::class,
@@ -162,6 +173,7 @@ abstract class AppDatabase :
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
+    abstract fun eventsMetadataDao(): EventsMetadataDao
     abstract fun calendarSettingsDao(): CalendarSettingsDao
     abstract fun calendarSubscriptionDao(): CalendarSubscriptionDao
     abstract fun calendarUserSettingsDao(): CalendarUserSettingsDao
@@ -177,6 +189,7 @@ abstract class AppDatabase :
 
         const val TABLE_CALENDARS = "calendars"
         const val TABLE_EVENTS = "events"
+        const val TABLE_EVENTS_METADATA = "events_metadata"
         const val TABLE_USERS = "users"
         const val TABLE_ADDRESSES = "addresses"
         const val TABLE_CALENDAR_SETTINGS = "calendar_settings"
@@ -191,7 +204,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 66
+        const val version = 67
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -239,7 +252,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_62_63,
             AppDatabaseMigrations.MIGRATION_63_64,
             AppDatabaseMigrations.MIGRATION_64_65,
-            AppDatabaseMigrations.MIGRATION_65_66
+            AppDatabaseMigrations.MIGRATION_65_66,
+            AppDatabaseMigrations.MIGRATION_66_67
         )
 
         fun buildDatabase(context: Context): AppDatabase =
@@ -278,6 +292,16 @@ class DatabaseTypeConverters {
     @TypeConverter
     fun fromJsonObject(json: JsonObject?): String? {
         return json?.run { Json { ignoreUnknownKeys = true }.encodeToString(json) }
+    }
+
+    @TypeConverter
+    fun toListOfLong(value: List<String>?): List<Long>? {
+        return value?.map { it.toLong() }
+    }
+
+    @TypeConverter
+    fun fromListOfLong(value: List<Long>?): List<String>? {
+        return value?.map { it.toString() }
     }
 
 }

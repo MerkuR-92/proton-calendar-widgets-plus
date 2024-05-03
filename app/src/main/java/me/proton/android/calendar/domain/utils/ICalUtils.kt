@@ -136,16 +136,6 @@ interface ICalUtils {
         timeZoneId: String
     ): List<Event>?
 
-    fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-        originalEvent: Event,
-        eventsSharingUid: List<Event>,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        userEmails: List<String>,
-        isFreeUser: Boolean
-    ): List<UiEvent>?
-
     /**
      * Creates ICalendar using only plaintext shared event part.
      */

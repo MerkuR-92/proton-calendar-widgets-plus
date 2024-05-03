@@ -1,14 +1,16 @@
 package me.proton.android.calendar.data.api
 
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.API_VERSION_CALENDAR
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
-import me.proton.android.calendar.data.entity.EventEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
@@ -477,7 +479,7 @@ data class CalendarsApiResponse(
 @Serializable
 data class EventsApiResponse(
     @SerialName("Events")
-    val events: List<EventEntity>,
+    val events: List<EventResponse>,
     @SerialName("More")
     val more: Int
 )
@@ -485,7 +487,7 @@ data class EventsApiResponse(
 @Serializable
 data class EventsMetadataApiResponse(
     @SerialName("Events")
-    val events: List<ServerEvent.EventEntityMetadata>,
+    val events: List<EventEntityMetadata>,
     @SerialName("More")
     val more: Int
 )
@@ -499,7 +501,7 @@ data class EventsExportIdsApiResponse(
 @Serializable
 data class EventsExportApiResponse(
     @SerialName("Events")
-    val events: List<EventEntity>,
+    val events: List<EventResponse>,
     @SerialName("Total")
     val total: Int
 )
@@ -513,7 +515,7 @@ data class EventsCountApiResponse(
 @Serializable
 data class EventApiResponse(
     @SerialName("Event")
-    val event: EventEntity
+    val event: EventResponse
 )
 
 @Serializable
@@ -535,7 +537,7 @@ data class UpgradeEventApiResponse(
     @SerialName("Code")
     override val code: Int,
     @SerialName("Event")
-    val event: EventEntity
+    val event: EventResponse
 ): BaseApiResponse()
 
 @Serializable
@@ -733,7 +735,7 @@ data class SyncResponse(
     @SerialName("Code")
     override val code: Int,
     @SerialName("Event")
-    val event: EventEntity? = null
+    val event: EventResponse? = null
     // TODO errors and other types of payload
 ) : BaseApiResponse()
 
@@ -746,7 +748,7 @@ data class AlarmsApiResponse(
 @Serializable
 data class EventsByUidApiResponse(
     @SerialName("Events")
-    val events: List<EventEntity>
+    val events: List<EventResponse>
 )
 
 @Serializable
@@ -788,7 +790,7 @@ data class ReenableKeyApiRequest(
 @Serializable
 data class AttendeeApiResponse(
     @SerialName("Event")
-    val event: EventEntity
+    val event: EventResponse
 )
 
 @Serializable
@@ -885,4 +887,72 @@ data class JoinCalendarApiResponse(
     val members: List<MemberEntity>,
     @SerialName("CalendarSettings")
     val calendarSettings: CalendarSettingsEntity, // settings specific to calendar, not user
+)
+
+@Serializable
+data class EventResponse(
+    @SerialName("ID")
+    @PrimaryKey
+    val id: String,
+    @SerialName("CalendarID")
+    val calendarId: String,
+    @SerialName("SharedEventID")
+    val sharedEventId: String?,
+    @SerialName("CalendarKeyPacket")
+    val calendarKeyPacket: String?, // keypackets used to decrypt Type 3 CalendarEventData, to be armored with Data packets, base64
+    @SerialName("CreateTime")
+    val createTime: Long, // unix timestamps
+    @SerialName("ModifyTime")
+    val modifyTime: Long,
+    @SerialName("Permissions")
+    val permissions: Int, // Permissions of the attendees (bitmap)
+    // 1 (number) - Can invite
+    //2 (number) - Can modify event
+    //4 (number) - Can see attendees list
+    @SerialName("AddressKeyPacket")
+    val addressKeyPacket: String?, // shared session key encrypted with the Address Key
+    @SerialName("AddressID")
+    val addressId: String?, // which Address contains the Address Key ^
+    @SerialName("SharedKeyPacket")
+    val sharedKeyPacket: String?, // base64, shared session key encrypted with Calendar Key
+    @SerialName("SharedEvents")
+    val sharedEvents: List<JsonElement>, // shared between all calendars
+    @SerialName("CalendarEvents")
+    val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar
+    @SerialName("PersonalEvents")
+    val personalEvents: List<JsonElement>, // specific to a member
+    @SerialName("AttendeesEvents")
+    val attendeesEvents: List<JsonElement>, // shared between all calendars
+    @SerialName("Attendees")
+    val attendees: List<JsonElement>,
+    @SerialName("IsProtonProtonInvite")
+    val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
+    @SerialName("IsPersonalMigrated")
+    val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
+    @SerialName("Notifications")
+    val notifications: List<JsonElement>? = null,
+    @SerialName("Color")
+    val color: String? = null,
+    @SerialName("StartTime")
+    val startTime: Long, // Epoch seconds
+    @SerialName("StartTimezone")
+    val startTimeZone: String,
+    @SerialName("EndTime")
+    val endTime: Long, // Epoch seconds
+    @SerialName("EndTimezone")
+    val endTimeZone: String,
+    @SerialName("FullDay")
+    val fullDay: Int,
+    @SerialName("UID")
+    val uid: String,
+    @SerialName("RecurrenceID")
+    val recurrenceID: Long?,
+    @SerialName("Exdates")
+    val exDates: List<Long>,
+    @SerialName("RRule")
+    val rRule: String?,
+    @SerialName("IsOrganizer")
+    val isOrganizer: Int,
+    @SerialName("IsPersonalSingleEdit")
+    val isPersonalSingleEdit: Boolean
 )

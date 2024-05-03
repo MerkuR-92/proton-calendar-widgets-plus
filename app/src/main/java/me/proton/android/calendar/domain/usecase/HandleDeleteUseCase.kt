@@ -19,6 +19,7 @@ import me.proton.android.calendar.data.api.SyncEventDeleteContainer
 import me.proton.android.calendar.data.api.SyncEventsUpdateApiRequest
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -258,6 +259,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 val successEventIds = eventIds.filterNot { it in errorEventIds }
                 if (successEventIds.isNotEmpty()) {
                     calendarsRepository.deleteEventsById(calendarId, successEventIds)
+                    calendarsRepository.deleteEventsMetadataByEventIds(successEventIds)
                     handleAlarmsUseCase.execute(userId)
                 }
 
@@ -294,9 +296,9 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
         val eventsSharingUid = if (eventsSharingUidResponse is ApiResponse.Success) {
             eventsSharingUidResponse.data.events.mapNotNull {
                 if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                    eventDecryptor.decrypt(it)
+                    eventDecryptor.decrypt(it.toEventEntity())
                 } else {
-                    transformEventUseCase.execute(it)
+                    transformEventUseCase.execute(it.toEventEntity())
                 }
             }
         } else {
@@ -392,12 +394,12 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
 
         if (!event.calendar.isDisabled && sendPreferences.isNotEmpty() && sendReply) {
 
-            val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
+            val eventResponse = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
                 calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event
                     ?: return UseCase.Result.Error("HandleDeleteUseCase: handleDeleteAsAttendee fetchEventById event was null")
             } else null
 
-            val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
+            val isProtonProtonInvite = event.isProtonProtonInvite ?: eventResponse?.isProtonProtonInvite?.toBoolean()
             val updateTime = Instant.now()
 
             val userAttendee = event.iCalEvent.attendees.find { attendee ->
@@ -417,7 +419,7 @@ class HandleDeleteUseCase @Inject constructor( // TODO TESTS
                 ParticipationStatus.DECLINED,
                 sendPreferences,
                 Date.from(updateTime),
-                eventEntity,
+                eventResponse?.toEventEntity(),
                 isProtonProtonInvite ?: false,
                 defaultTimeZone,
                 timeFormatIs24Hours
