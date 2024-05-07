@@ -15,11 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
@@ -61,7 +58,6 @@ import me.proton.android.calendar.common.utils.AndroidUtils.getWeekStartDayOfWee
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.format
@@ -828,7 +824,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         lifecycleScope.launch {
-                            val weekViewCalendarEntities = it.events.map { event ->
+                            val weekViewCalendarEntities = it.events.flatMap { event ->
                                 event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
                             }
                             weekViewAdapter.submitList(
