@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tillat å opprette invitasjoner i en delt kalender.</string>
     <string name="snack_down_banner">Proton-tjenerne er nede. Se vår statusside for detaljer.</string>
     <string name="snack_down_banner_action">Åpne statusside</string>
-    <string name="snack_color_per_event_paid_feature">Hendelsesfarge er en betalt funksjon</string>
+    <string name="snack_color_per_event_paid_feature">Oppgrader for å tilpasse hendelsesfarger</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Hendelsen eksisterer ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten eksisterer ikke</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Nå kan du velge kalendervisningene <b>3 dager</b> og <b>Uke</b>. Velg din foretrukne visning i <b>menyen</b>.\n\n• Juster høyden på radene i dagskolonnene ved å knipe med to fingre for å zoome inn og ut.</string>
     <string name="spotlight_dialog_search_title">Søk etter hendelser</string>
     <string name="spotlight_dialog_search_description">Finn enkelt hendelsen du leter etter med vår nye søkefunksjon. <a href="https://proton.me/support/calendar-search">Lær mer</a>.</string>
+    <string name="spotlight_dialog_search_positive">Aktiver</string>
+    <string name="spotlight_dialog_search_negative">Hopp over</string>
     <string name="spotlight_dialog_import_title">Flere måter å legge til hendelser på</string>
     <string name="spotlight_dialog_import_description">• Importer hendelser til kalenderen din fra filer på mobilen din.\n\n• Legg til turbestillinger direkte fra Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunksjoner</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Helligdager er her</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ikke mer planlegging av møter når alle har fri eller glemmer å planlegge en langhelgetur.\n\nLegg til et lands helligdager i kalenderen din.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ikke mer planlegging av møter når alle har fri eller glemmer å planlegge en langhelgetur.\n\nSiden du for øyeblikket er på kalendergrensen, må du først fjerne en eksisterende kalender for å legge til en feriekalender.</string>
-    <string name="spotlight_dialog_color_per_event_title">Fargekode hendelsene dine</string>
-    <string name="spotlight_dialog_color_per_event_description">• Tilpass fargen på individuelle hendelser for å organisere dagen din bedre.\n\n• Spor tiden din, og øk effektiviteten.</string>
+    <string name="spotlight_dialog_color_per_event_title">Tilpassede hendelsesfarger</string>
+    <string name="spotlight_dialog_color_per_event_description">Tilpass fargen på individuelle hendelser for å:\n\n• Fargekode kalenderen\n\n• Organisere dagen din bedre og spore tiden din\n\n• Angi prioriteringer og øke effektiviteten</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillat tilgang</string>
     <string name="dialog_google_auth_description">For å starte importen må du logge på hos Google Calendar og gi Proton tilgang til dataene dine.</string>
@@ -808,7 +810,7 @@
         <item>Lørdag</item>
         <item>Søndag</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Lilla|#8080FF</item>
         <item>Jordbær|#EC3E7C</item>
         <item>Rosa|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Furu|#0F735A</item>
         <item>Skog|#258723</item>
         <item>Sylteagurk|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Lilla</item>
+        <item>Jordbær</item>
+        <item>Rosa</item>
+        <item>Gulrot</item>
+        <item>Sahara</item>
+        <item>Enzian blå</item>
+        <item>Plomme</item>
+        <item>Kirsebærrød</item>
+        <item>Kobberfarget</item>
+        <item>Jord</item>
+        <item>Skiferblå</item>
+        <item>Stillehavet</item>
+        <item>Rev</item>
+        <item>Bregne</item>
+        <item>Oliven</item>
+        <item>Kobolt</item>
+        <item>Hav</item>
+        <item>Furu</item>
+        <item>Skog</item>
+        <item>Sylteagurk</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

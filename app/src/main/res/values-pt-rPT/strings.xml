@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Não é permitido criar convites num calendário partilhado</string>
     <string name="snack_down_banner">Os servidores Proton estão indisponíveis. Visite a nossa página de status para obter detalhes.</string>
     <string name="snack_down_banner_action">Abrir a página de status</string>
-    <string name="snack_color_per_event_paid_feature">A cor do evento é um recurso pago</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">- Apresentando as vistas <b>3 dias</b> e <b>Semana</b> do calendário. Selecione a sua vista preferida no <b>menu</b>.\n\n- Ajuste a altura das linhas na grelha do dia tocando com dois dedos para aumentar ou diminuir o zoom.</string>
     <string name="spotlight_dialog_search_title">Pesquisar por eventos.</string>
     <string name="spotlight_dialog_search_description">Encontre facilmente o evento que pesquisa com a nossa nova funcionalidade de pesquisa. <a href="https://proton.me/support/calendar-search">Saiba mais</a>.</string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Mais maneiras de adicionar eventos.</string>
     <string name="spotlight_dialog_import_description">• Importe eventos para o seu calendário a partir de ficheiros no seu telefone.\n\n• Adicione reservas de viagem diretamente do Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funcionalidades do calendário</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Os feriados públicos estão aqui!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nAdicione os feriados de qualquer país ao seu calendário.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nDado que está atualmente no limite do calendário, para adicionar um calendário de feriados, terá de remover primeiro um calendário existente.</string>
-    <string name="spotlight_dialog_color_per_event_title">Código de cores para os seus eventos</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Calendar e permita que o Proton aceda aos seus dados.</string>
@@ -669,7 +671,7 @@
     <string name="import_event_disclaimer_dialog_title">Importar como um simples evento?</string>
     <string name="import_event_disclaimer_dialog_description">\nOs convites importados aparecem no Proton Calendar como eventos simples <b>sem detalhes do organizador</b> e de <b>participantes</b>.\n\nPara receber actualizações de eventos e ver os participantes, solicite aos organizadores que o convidem usando o seu endereço de e-mail Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
-    <string name="undefined_color">Undefined</string>
+    <string name="undefined_color">Não definido</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">calendário</item>
@@ -808,26 +810,70 @@
         <item>Sábado</item>
         <item>Domingo</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Púrpura|#8080FF</item>
-        <item>Strawberry|#EC3E7C</item>
+        <item>Morango|#EC3E7C</item>
         <item>Rosa|#DB60D6</item>
         <item>Cenoura|#F78400</item>
         <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
+        <item>Enziano|#5252CC</item>
+        <item>Ameixa|#A839A4</item>
         <item>Cereja|#BA1E55</item>
-        <item>Copper|#C44800</item>
-        <item>Soil|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
+        <item>Cobre|#C44800</item>
+        <item>Castanho Solo├#54473F</item>
+        <item>Azul Ardósia|#415DF0</item>
+        <item>Pacífico|#179FD9</item>
+        <item>Recife|#1DA583</item>
+        <item>Samambaia|#3CBB3A</item>
+        <item>Azeitona|#B4A40E</item>
+        <item>Cobalto|#273EB2</item>
         <item>Oceano|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+        <item>Pinho|#0F735A</item>
+        <item>Floresta|#258723</item>
+        <item>Pepino|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváranie pozvánok v zdieľanom kalendári nie je povolené</string>
     <string name="snack_down_banner">Proton servery sú mimo prevádzky. Podrobnosti nájdete na našej stránke o stave.</string>
     <string name="snack_down_banner_action">Otvoriť stránku statusu</string>
-    <string name="snack_color_per_event_paid_feature">Farba udalosti je platená funkcia</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Udalosť neexistuje</string>
     <string name="error_occurrence_does_not_exist">Opakovanie neexistuje</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Predstavujeme <b>3-dňové</b> a <b>týždenné</b> zobrazenie kalendára. Preferované zobrazenie si vyberte v <b>menu</b>.\n\n• Výšku riadku v dennej mriežke upravíte stiahnutím alebo roztiahnutím dvoch prstov na obrazovke.</string>
     <string name="spotlight_dialog_search_title">Vyhľadať udalosti</string>
     <string name="spotlight_dialog_search_description">Jednoducho vyhľadajte hľadanú udalosť pomocou novej vyhľadávacej funkcie. <a href="https://proton.me/support/calendar-search">Zistiť viac</a></string>
+    <string name="spotlight_dialog_search_positive">Zapnúť</string>
+    <string name="spotlight_dialog_search_negative">Preskočiť</string>
     <string name="spotlight_dialog_import_title">Viac spôsobov pridávania udalostí</string>
     <string name="spotlight_dialog_import_description">• Importujte udalosti do svojho kalendára zo súborov v telefóne.\n\n• Pridávajte rezervácie výletov priamo z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcie kalendára</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Štátne sviatky sú tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nPridajte si do kalendára štátne sviatky akejkoľvek krajiny.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nKeďže ste momentálne na limite kalendárov, na pridanie kalendára sviatkov budete musieť najprv odstrániť existujúci kalendár.</string>
-    <string name="spotlight_dialog_color_per_event_title">Farebné označovanie udalostí</string>
-    <string name="spotlight_dialog_color_per_event_description">- Prispôsobte si farbu jednotlivých udalostí, aby ste si lepšie zorganizovali deň.\n\n- Sledujte svoj čas a zvýšte efektivitu.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povoliť prístup</string>
     <string name="dialog_google_auth_description">Na spustenie importu sa prihláste do Kalendára Google a povoľte Protonu prístup k vašim dátam.</string>
@@ -860,7 +862,7 @@
         <item>Sobota</item>
         <item>Nedeľa</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Fialová|#8080FF</item>
         <item>Jahoda|#EC3E7C</item>
         <item>Ružová|#DB60D6</item>
@@ -881,5 +883,49 @@
         <item>Borovica|#0F735A</item>
         <item>Les|#258723</item>
         <item>Uhorka|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Fialová</item>
+        <item>Jahoda</item>
+        <item>Ružová</item>
+        <item>Mrkva</item>
+        <item>Sahara</item>
+        <item>Horec</item>
+        <item>Slivka</item>
+        <item>Čerešňa</item>
+        <item>Meď</item>
+        <item>Pôda</item>
+        <item>Bridlicovo modrá</item>
+        <item>Pacifik</item>
+        <item>Útes</item>
+        <item>Papraď</item>
+        <item>Oliva</item>
+        <item>Kobalt</item>
+        <item>Oceán</item>
+        <item>Borovica</item>
+        <item>Les</item>
+        <item>Uhorka</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

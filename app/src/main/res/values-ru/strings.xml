@@ -81,7 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Отменено</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Отключен)</i>]]></string>
-    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(По умолчанию)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d да</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d возможно</string>
@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Создание приглашений в общем календаре не разрешается</string>
     <string name="snack_down_banner">Серверы Proton не работают. Посетите нашу статус-страницу, чтобы узнать детали.</string>
     <string name="snack_down_banner_action">Открыть страницу состояния</string>
-    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">События не существует</string>
     <string name="error_occurrence_does_not_exist">Повтор не существует</string>
@@ -411,8 +411,8 @@
     <string name="contacts_permission_dialog_open_settings">Открыть настройки</string>
     <string name="contacts_permission_dialog_cancel">Отказать</string>
     <string name="dialog_title_calendar_picker">Календарь</string>
-    <string name="dialog_title_calendar_color_picker">Calendar color</string>
-    <string name="dialog_title_event_color_picker">Event color</string>
+    <string name="dialog_title_calendar_color_picker">Цвет календаря</string>
+    <string name="dialog_title_event_color_picker">Цвет события</string>
     <string name="import_from_google_title">Импортировать из Google</string>
     <string name="notifications_permission_dialog_title">Разрешить Proton Calendar отображать уведомления?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar требуется разрешение, чтобы показывать вам уведомления о предстоящих событиях.</string>
@@ -436,7 +436,7 @@
     <string name="bug_report_discard_changes_cancel">Продолжить писать</string>
     <string name="bug_report_discard_changes_confirm">Сбросить</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">Настройки приложения</string>
     <string name="settings_theme_title">Тема</string>
     <string name="settings_theme_info">Эта настройка влияет только на внешний вид приложения Proton Calendar на этом устройстве. После смены темы приложение перезапустится.</string>
     <string name="settings_timezone_title">Часовой пояс</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Представляем <b>3-дневный</b> и <b>недельный</b> режимы просмотра календаря. Выберите предпочитаемый режим просмотра в <b>меню</b>.\n\n• Отрегулируйте высоту строк в сетке дня разводя или сводя два пальца по экрану, чтобы увеличить или уменьшить масштаб.</string>
     <string name="spotlight_dialog_search_title">Поиск событий</string>
     <string name="spotlight_dialog_search_description">Легко найти событие, которое вы ищете, при помощи нашей новой функцией поиска. <a href="https://proton.me/support/calendar-search">Узнать больше</a></string>
+    <string name="spotlight_dialog_search_positive">Включить</string>
+    <string name="spotlight_dialog_search_negative">Пропустить</string>
     <string name="spotlight_dialog_import_title">Больше способов добавления событий</string>
     <string name="spotlight_dialog_import_description">• Импортируйте события в календарь из файлов на вашем телефоне.\n\n• Добавляйте бронирования поездок прямо из Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функции календаря</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Государственные праздники здесь!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Бывает, что случайно планируйте встречи, когда все отдыхают, или забывайте запланировать поездку на долгие выходные?\n\nДобавьте государственные праздники любой страны в свой календарь.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больше не назначайте встречи, когда все отсутствуют, или не забывайте планировать долгие выходные.\n\nПоскольку у вас уже максимальное количество календарей, чтобы добавить календарь праздников, вам необходимо сначала удалить существующий календарь.</string>
-    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>
@@ -669,7 +671,7 @@
     <string name="import_event_disclaimer_dialog_title">Импортировать как простое событие?</string>
     <string name="import_event_disclaimer_dialog_description">\nИмпортированные приглашения отображаются в Proton Calendar как простые события без информации об <b>организаторе</b> и <b>участниках</b>.\n\nЧтобы получать обновления и видеть участников, попросите организаторов пригласить вас, используя ваш адрес электронной почты Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Импорт</string>
-    <string name="undefined_color">Undefined</string>
+    <string name="undefined_color">Не задан</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">календарь</item>
@@ -860,26 +862,70 @@
         <item>Суббота</item>
         <item>Воскресенье</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
-        <item>Purple|#8080FF</item>
-        <item>Strawberry|#EC3E7C</item>
-        <item>Pink|#DB60D6</item>
-        <item>Carrot|#F78400</item>
-        <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
-        <item>Copper|#C44800</item>
-        <item>Soil|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
-        <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
+        <item>Фиолетовый|#8080FF</item>
+        <item>Клубничный|#EC3E7C</item>
+        <item>Розовый|#DB60D6</item>
+        <item>Морковный|#F78400</item>
+        <item>Сахара|#936D58</item>
+        <item>Горечавка|#5252CC</item>
+        <item>Сливовый|#A839A4</item>
+        <item>Вишневый|#BA1E55</item>
+        <item>Медный|#C44800</item>
+        <item>Землистый|#54473F</item>
+        <item>Аспидно-синий|#415DF0</item>
+        <item>Морской волны|#179FD9</item>
+        <item>Нефритовый|#1DA583</item>
+        <item>Папоротниковый|#3CBB3A</item>
+        <item>Оливковый|#B4A40E</item>
+        <item>Кобальтовый|#273EB2</item>
+        <item>Океан|#0A77A6</item>
+        <item>Сосна|#0F735A</item>
+        <item>Лес|#258723</item>
+        <item>Огуречный|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Фиолетовый</item>
+        <item>Клубничный</item>
+        <item>Розовый</item>
+        <item>Морковный</item>
+        <item>Сахара</item>
+        <item>Энзианский</item>
+        <item>Сливовый</item>
+        <item>Вишнёвый</item>
+        <item>Медный</item>
+        <item>Землистый</item>
+        <item>Аспидно-синий</item>
+        <item>Тихоокеанский</item>
+        <item>Коралловый</item>
+        <item>Папоротниковый</item>
+        <item>Оливковый</item>
+        <item>Кобальтовый</item>
+        <item>Океанический</item>
+        <item>Сосновый</item>
+        <item>Лесной</item>
+        <item>Огуречный</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

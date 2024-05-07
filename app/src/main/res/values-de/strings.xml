@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Das Erstellen von Einladungen in einem geteilten Kalender ist nicht erlaubt.</string>
     <string name="snack_down_banner">Die Proton-Server sind ausgefallen. Besuche unsere Statusseite für Details.</string>
     <string name="snack_down_banner_action">Statusseite öffnen</string>
-    <string name="snack_color_per_event_paid_feature">Die Termin-Farbgebung ist eine kostenpflichtige Funktion</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Termin existiert nicht</string>
     <string name="error_occurrence_does_not_exist">Wiederholung existiert nicht</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Einführung der <b>3-Tage</b>- und <b>Wochen</b>-Kalenderansichten. Wähle deine bevorzugte Ansicht im <b>Menü</b>.\n\n• Passe die Höhe der Zeilen im Tagesraster an, indem du mit zwei Fingern hinein- oder herauszoomst.</string>
     <string name="spotlight_dialog_search_title">Termine suchen</string>
     <string name="spotlight_dialog_search_description">Dank unserer neuen Suchfunktion kannst du den gewünschten Termin jetzt ganz einfach finden. <a href="https://proton.me/support/calendar-search">Mehr erfahren</a></string>
+    <string name="spotlight_dialog_search_positive">Aktivieren</string>
+    <string name="spotlight_dialog_search_negative">Überspringen</string>
     <string name="spotlight_dialog_import_title">Weitere Möglichkeiten um Termine hinzuzufügen</string>
     <string name="spotlight_dialog_import_description">• Importiere Termine aus Dateien auf deinem Handy in deinen Kalender.\n\n• Füge Reisebuchungen direkt aus Proton Mail hinzu.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktionen</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Die Feiertage sind da!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben, oder vergessen, einen langen Wochenendausflug zu planen.\n\nFüge die Feiertage eines beliebigen Landes deinem Kalender hinzu.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben oder vergessen, einen langen Wochenendausflug zu planen.\n\nDa du derzeit das Kalenderlimit erreicht hast, musst du zunächst einen bestehenden Kalender entfernen, um einen neuen Ferienkalender hinzuzufügen.</string>
-    <string name="spotlight_dialog_color_per_event_title">Fügen deinem Termin einen Farbcode hinzu</string>
-    <string name="spotlight_dialog_color_per_event_description">• Passen die Farbe einzelner Termine an, um deinen Tag besser zu organisieren.\n\n• Verfolgen deine Zeit und steigern deine Effizienz</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>
@@ -808,7 +810,7 @@
         <item>Samstag</item>
         <item>Sonntag</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Hellblau|#8080FF</item>
         <item>Rosa|#EC3E7C</item>
         <item>Magenta|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Moosgrün#0F735A</item>
         <item>Waldgrün|#258723</item>
         <item>Jägergrün|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Violett</item>
+        <item>Erdbeere</item>
+        <item>Rosa</item>
+        <item>Karotte</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Pflaume</item>
+        <item>Kirschrot</item>
+        <item>Kupfer</item>
+        <item>Erde</item>
+        <item>Schieferblau</item>
+        <item>Pazifikblau</item>
+        <item>Riff</item>
+        <item>Farn</item>
+        <item>Olivgrün</item>
+        <item>Kobaltblau</item>
+        <item>Ozeanblau</item>
+        <item>Kiefer</item>
+        <item>Waldgrün</item>
+        <item>Moosgrün</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

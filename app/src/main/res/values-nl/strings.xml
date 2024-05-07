@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Uitnodigingen maken in een gedeelde agenda is niet toegestaan</string>
     <string name="snack_down_banner">Proton servers zijn down. Bezoek onze status pagina voor informatie.</string>
     <string name="snack_down_banner_action">Open status pagina</string>
-    <string name="snack_color_per_event_paid_feature">Kleur voor afspraak is een betalende functionaliteit</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Introductie van de <b>3-dagen</b>- en <b>Week</b>-weergave van een agenda. Selecteer de weergave van uw voorkeur in het <b>menu</b>.\n\n• Pas de hoogte van de rijen in het dagrooster aan door met twee vingers te knijpen om in en uit te zoomen.</string>
     <string name="spotlight_dialog_search_title">Zoek naar afspraken</string>
     <string name="spotlight_dialog_search_description">Vind eenvoudig de afspraak waar u naar op zoek bent met onze nieuwe zoekfunctie. <a href="https://proton.me/support/calendar-search">Meer informatie</a></string>
+    <string name="spotlight_dialog_search_positive">Inschakelen</string>
+    <string name="spotlight_dialog_search_negative">Overslaan</string>
     <string name="spotlight_dialog_import_title">Meer manieren om afspraken toe te voegen</string>
     <string name="spotlight_dialog_import_description">• Afspraken importen naar uw agenda vanuit bestanden op uw telefoon.\n\n• Reisboekingen direct vanuit Proton Mail toevoegen.</string>
     <string name="spotlight_dialog_calendar_provider_title">Agendafuncties</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
-    <string name="spotlight_dialog_color_per_event_title">Geef je gebeurtenissen een kleur code</string>
-    <string name="spotlight_dialog_color_per_event_description">• Pas de kleur van individuele gebeurtenissen aan om je dag beter te organiseren.\n\n• Registreer je tijd en boost je efficiëntie.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
@@ -810,7 +812,7 @@ Deselecteer minstens %1$d agenda\'s</item>
         <item>Zaterdag</item>
         <item>Zondag</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Paars|#8080FF</item>
         <item>Aardbei|#EC3E7C</item>
         <item>Roze|#DB60D6</item>
@@ -831,5 +833,49 @@ Deselecteer minstens %1$d agenda\'s</item>
         <item>Denneboom|#0F735A</item>
         <item>Bos|#258723</item>
         <item>Augurk|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Paars</item>
+        <item>Aardbei</item>
+        <item>Roze</item>
+        <item>Wortel</item>
+        <item>Sahara</item>
+        <item>Gentiaan</item>
+        <item>Pruim</item>
+        <item>Kers</item>
+        <item>Koper</item>
+        <item>Aarde</item>
+        <item>Leiblauw</item>
+        <item>Stille oceaan</item>
+        <item>Rif</item>
+        <item>Varen</item>
+        <item>Olijf</item>
+        <item>Kobalt</item>
+        <item>Oceaan</item>
+        <item>Den</item>
+        <item>Bos</item>
+        <item>Augurk</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

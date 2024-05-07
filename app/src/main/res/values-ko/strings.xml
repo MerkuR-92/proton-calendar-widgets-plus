@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">공유 캘린더에서는 초대를 생성할 수 없습니다</string>
     <string name="snack_down_banner">Proton 서버가 다운되었습니다. 더 자세한 정보는 서버 상태를 참고하세요.</string>
     <string name="snack_down_banner_action">서버 상태</string>
-    <string name="snack_color_per_event_paid_feature">이벤트 색상은 유료 기능입니다.</string>
+    <string name="snack_color_per_event_paid_feature">이벤트 색상을 커스텀하려면 업그레이드하세요</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">이벤트가 존재하지 않습니다</string>
     <string name="error_occurrence_does_not_exist">일정이 존재하지 않습니다</string>
@@ -590,6 +590,8 @@
     <string name="spotlight_dialog_week_view_description"><b>3일</b> 및 <b>주</b> 캘린더 보기를 소개합니다. <b>메뉴</b> 에서 원하는 보기를 선택하세요.\n\n• 두 손가락으로 꼬집어 확대하거나 축소하여 하루 격자의 행 높이를 조정하세요.</string>
     <string name="spotlight_dialog_search_title">이벤트 검색</string>
     <string name="spotlight_dialog_search_description">새로운 검색 기능으로 원하는 이벤트를 쉽게 찾을 수 있습니다. <a href="https://proton.me/support/calendar-search">자세히 알아보기</a></string>
+    <string name="spotlight_dialog_search_positive">활성화</string>
+    <string name="spotlight_dialog_search_negative">건너뛰기</string>
     <string name="spotlight_dialog_import_title">이벤트를 추가할 수 있는 다른 방법</string>
     <string name="spotlight_dialog_import_description">• 휴대폰에 있는 파일에서 캘린더로 이벤트를 가져와보세요.\n\n• Proton Mail에서 바로 여행 예약을 추가하세요.</string>
     <string name="spotlight_dialog_calendar_provider_title">캘린더 기능</string>
@@ -599,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">즐거운 공휴일입니다!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">더 이상 모두가 쉬는 날에 회의 일정을 잡거나 주말 여행 계획을 잊어버릴 필요가 없습니다.\n\n캘린더에 여러분의 국가의 공휴일을 추가하세요.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">더 이상 모두가 쉬는 날에 회의 일정을 잡거나 주말 휴가 계획을 잊어버릴 필요가 없습니다.\n\n현재 캘린더 한도에 도달했으므로 휴일 캘린더를 추가하려면 먼저 기존 캘린더를 제거해야 합니다.</string>
-    <string name="spotlight_dialog_color_per_event_title">내 이벤트의 컬러 코드</string>
-    <string name="spotlight_dialog_color_per_event_description">• 개별 이벤트의 색상을 커스마이징하여 하루를 더 잘 구성할 수 있습니다.\n\n• 시간을 추적하고 효율성을 높이세요.</string>
+    <string name="spotlight_dialog_color_per_event_title">커스텀 이벤트 색상</string>
+    <string name="spotlight_dialog_color_per_event_description">개별 이벤트의 색상을 커스터마이즈하여:\n\n• 캘린더의 색 부호화를\n\n• 더 나은 하루의 정리와 시간의 추적을 \n\n• 우선순위의 지정과 능률의 증진을 이루세요</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">접근 허용</string>
     <string name="dialog_google_auth_description">불러오기를 시작하려면, Google Calendar에 로그인하고 Proton이 사용자의 데이터에 접근할 수 있도록 허용하세요.</string>
@@ -783,7 +785,7 @@
         <item>토요일</item>
         <item>일요일</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>퍼플|#8080FF</item>
         <item>스트로베리|#EC3E7C</item>
         <item>핑크|#DB60D6</item>
@@ -804,5 +806,49 @@
         <item>파인|#0F735A</item>
         <item>포레스트|#258723</item>
         <item>피클|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>퍼플</item>
+        <item>스트로베리</item>
+        <item>핑크</item>
+        <item>캐럿</item>
+        <item>사하라</item>
+        <item>엔지안</item>
+        <item>플럼</item>
+        <item>세리즈</item>
+        <item>코퍼</item>
+        <item>소일</item>
+        <item>슬레이트 블루</item>
+        <item>퍼시픽</item>
+        <item>리프</item>
+        <item>펀</item>
+        <item>올리브</item>
+        <item>코발트</item>
+        <item>오션</item>
+        <item>파인</item>
+        <item>포레스트</item>
+        <item>피클</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

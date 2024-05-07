@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det är inte tillåtet att skapa inbjudningar i en delad kalender</string>
     <string name="snack_down_banner">Proton-servrar är nere. Besök vår statussida för mer information.</string>
     <string name="snack_down_banner_action">Öppna statussida</string>
-    <string name="snack_color_per_event_paid_feature">Händelsefärg är en betald funktion</string>
+    <string name="snack_color_per_event_paid_feature">Uppgradera för att anpassa händelsefärger</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Händelsen finns inte</string>
     <string name="error_occurrence_does_not_exist">Förekomsten finns inte</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Nu finns <b>3-dagars</b>- och <b>vecko</b>vyer i kalendern. Välj din favoritvy i <b>menyn</b>.\n\n• Justera radhöjden i daglayouten genom att använda två fingrar för att zooma in eller ut.</string>
     <string name="spotlight_dialog_search_title">Sök efter händelser</string>
     <string name="spotlight_dialog_search_description">Hitta enkelt händelsen du letar efter med vår nya sökfunktion. <a href="https://proton.me/support/calendar-search">Lär dig mer</a></string>
+    <string name="spotlight_dialog_search_positive">Aktivera</string>
+    <string name="spotlight_dialog_search_negative">Hoppa över</string>
     <string name="spotlight_dialog_import_title">Fler sätt att lägga till händelser</string>
     <string name="spotlight_dialog_import_description">• Importera händelser till din kalender från filer på din telefon.\n\n• Lägg till resebokningar direkt från Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Allmänna helgdagar är här!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nLägg till ett lands allmänna helgdagar i din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nEftersom du för närvarande har nått kalendergränsen måste du först ta bort en befintlig kalender för att lägga till en semesterkalender.</string>
-    <string name="spotlight_dialog_color_per_event_title">Färgkoda dina händelser</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Anpassa händelsefärger</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillåt åtkomst</string>
     <string name="dialog_google_auth_description">För att starta importen, logga in på Google Kalender och tillåt Proton att komma åt dina data.</string>
@@ -808,7 +810,7 @@
         <item>Lördag</item>
         <item>Söndag</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Lila|#8080FF</item>
         <item>Jordgubb|#EC3E7C</item>
         <item>Rosa|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Tall|#0F735A</item>
         <item>Skog|#258723</item>
         <item>Gurka|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Lila</item>
+        <item>Jordgubb</item>
+        <item>Rosa</item>
+        <item>Morot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plommon</item>
+        <item>Körsbär</item>
+        <item>Koppar</item>
+        <item>Jord</item>
+        <item>Skifferblå</item>
+        <item>Stilla havet</item>
+        <item>Rev</item>
+        <item>Ormbunke</item>
+        <item>Oliv</item>
+        <item>Kobolt</item>
+        <item>Hav</item>
+        <item>Tall</item>
+        <item>Skog</item>
+        <item>Gurka</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

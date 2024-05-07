@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Tworzenie zaproszeń w udostępnionym kalendarzu nie jest dozwolone</string>
     <string name="snack_down_banner">Serwery Proton są niedostępne. Odwiedź naszą stronę statusu, aby poznać szczegóły.</string>
     <string name="snack_down_banner_action">Otwórz stronę statusu</string>
-    <string name="snack_color_per_event_paid_feature">Kolor wydarzenia jest płatną funkcją</string>
+    <string name="snack_color_per_event_paid_feature">Ulepsz konto, aby dostosować kolory wydarzenia</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Wydarzenie nie istnieje</string>
     <string name="error_occurrence_does_not_exist">Powtórzenie nie istnieje</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Przedstawiamy widok kalendarza <b>3-dniowy</b> i <b>tygodniowy</b>. Wybierz preferowany widok w <b>menu</b>.\n\n• Dostosuj wysokość rzędów za pomocą dwóch palców, powiększając i pomniejszając siatkę dni.</string>
     <string name="spotlight_dialog_search_title">Szukaj wydarzeń</string>
     <string name="spotlight_dialog_search_description">Znajdź łatwo wydarzenie za pomocą naszej nowej wyszukiwarki. <a href="https://proton.me/support/calendar-search">Dowiedz się więcej</a></string>
+    <string name="spotlight_dialog_search_positive">Włącz</string>
+    <string name="spotlight_dialog_search_negative">Pomiń</string>
     <string name="spotlight_dialog_import_title">Więcej sposobów na dodanie wydarzenia</string>
     <string name="spotlight_dialog_import_description">• Importuj wydarzenia do kalendarza z plików na telefonie.\n\n• Dodaj rezerwacje wycieczek bezpośrednio z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcje kalendarza</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Święta są tutaj!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Koniec z planowaniem spotkań, kiedy inni mają wolne lub zapominaniem o zaplanowaniu długiego weekend.\n\nDodaj święta krajowe do swojego kalendarza.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Koniec z planowaniem spotkań, kiedy inni mają wolne lub zapominaniem o zaplanowaniu długiego weekend.\n\nZ powodu przekroczonego limitu maksymalnej liczby kalendarzy, usuń obecny kalendarz, aby dodać kalendarz świąt.</string>
-    <string name="spotlight_dialog_color_per_event_title">Pokoloruj wydarzenia</string>
-    <string name="spotlight_dialog_color_per_event_description">• Dostosuj kolor każdego wydarzenia, aby lepiej zorganizować dzień.\n\n• Śledź swój czas i zwiększ wydajność.</string>
+    <string name="spotlight_dialog_color_per_event_title">Niestandardowe kolory wydarzenia</string>
+    <string name="spotlight_dialog_color_per_event_description">Dostosuj kolor każdego wydarzenia, aby:\n\n• Pokolorować kalendarz\n\n• Lepiej zorganizować dzień i śledzić swój czas\n\n• Ustawić priorytety i zwiększyć wydajność</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Przyznaj dostęp</string>
     <string name="dialog_google_auth_description">Aby rozpocząć proces importowania, zaloguj się do Kalendarza Google i zezwól usłudze Proton na dostęp do danych.</string>
@@ -860,7 +862,7 @@
         <item>Sobota</item>
         <item>Niedziela</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Fioletowy|#8080FF</item>
         <item>Truskawkowy|#EC3E7C</item>
         <item>Różowy|#DB60D6</item>
@@ -881,5 +883,49 @@
         <item>Sosnowy|#0F735A</item>
         <item>Leśny|#258723</item>
         <item>Khaki|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Fioletowy</item>
+        <item>Truskawkowy</item>
+        <item>Różowy</item>
+        <item>Marchewkowy</item>
+        <item>Sahara</item>
+        <item>Atramentowy</item>
+        <item>Śliwkowy</item>
+        <item>Wiśniowy</item>
+        <item>Miedziany</item>
+        <item>Ziemisty</item>
+        <item>Slate blue</item>
+        <item>Pacyficzny</item>
+        <item>Rafa koralowa</item>
+        <item>Paprotkowy</item>
+        <item>Oliwkowy</item>
+        <item>Kobaltowy</item>
+        <item>Morski</item>
+        <item>Sosnowy</item>
+        <item>Leśny</item>
+        <item>Khaki</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>
