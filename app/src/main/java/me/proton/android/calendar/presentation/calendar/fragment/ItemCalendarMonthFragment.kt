@@ -167,14 +167,15 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             CalendarSettings.DAYS_IN_A_WEEK - (weekStart.value - 1)
         )
         weekDays.forEachIndexed { index, dayOfWeek ->
-            val textView = binding.monthFragmentWeekDaysLayout.getChildAt(index) as TextView
-            val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
-            textView.text = firstLetterDayOfWeek
-            val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
-            if (dayOfWeek == currentDate.dayOfWeek && currentDate.month == firstDayMonthView.month && currentDate.year == firstDayMonthView.year) {
-                textView.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
-            } else {
-                textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
+            (binding.monthFragmentWeekDaysLayout.getChildAt(index) as? TextView)?.let { textView ->
+                val firstLetterDayOfWeek = dayOfWeek.format(firstLetter = true)
+                textView.text = firstLetterDayOfWeek
+                val currentDate = LocalDate.now(ZoneId.of(timeZoneId))
+                if (dayOfWeek == currentDate.dayOfWeek && currentDate.month == firstDayMonthView.month && currentDate.year == firstDayMonthView.year) {
+                    textView.setTextColor(requireContext().getColorFromAttr(R.attr.proton_text_accent))
+                } else {
+                    textView.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_weak))
+                }
             }
         }
     }
@@ -406,9 +407,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         // Setup week numbers
         binding.monthFragmentWeekNumberLayout.run {
             for (i in 0 until 6) {
-                val weekNumberLinearLayout = this.getChildAt(i) as LinearLayout
-                val weekNumberTextView = weekNumberLinearLayout.getChildAt(0) as TextView
-                weekNumberTextView.text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
+                val weekNumberTextView = (this.getChildAt(i) as? LinearLayout)?.getChildAt(0) as? TextView
+                weekNumberTextView?.text = "${firstDay.plusWeeks(i.toLong()).weekNumber(startWeekOn)}"
             }
         }
     }

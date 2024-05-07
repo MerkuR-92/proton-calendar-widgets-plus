@@ -422,14 +422,15 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
                 for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
-                    binding.eventFormAlarmList.getChildAt(i)
-                        .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
+                    binding.eventFormAlarmList.getChildAt(i)?.findViewById<View>(
+                        R.id.item_simple_text_button_delete
+                    )?.isEnabled = !processingEvent
                 }
 
                 binding.eventFormParticipantPress.root.isEnabled = !processingEvent
                 for (i in 0 until binding.eventFormParticipantChipGroup.childCount) {
                     // Disable the chips from inside attendees items views
-                    binding.eventFormParticipantChipGroup.getChildAt(i).isEnabled = !processingEvent
+                    binding.eventFormParticipantChipGroup.getChildAt(i)?.isEnabled = !processingEvent
                 }
 
                 if (eventState is EventViewModel.EventState.UserAddressInvalidForEncryption) {
