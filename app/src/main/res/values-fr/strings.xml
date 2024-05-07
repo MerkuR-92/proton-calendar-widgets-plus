@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vous ne pouvez pas créer des invitations dans un calendrier partagé.</string>
     <string name="snack_down_banner">Les serveurs de Proton sont en panne. Consultez notre page d\'état pour plus de détails.</string>
     <string name="snack_down_banner_action">Ouvrir la page d\'état</string>
-    <string name="snack_color_per_event_paid_feature">L\'ajout de couleurs aux événements est une fonctionnalité payante.</string>
+    <string name="snack_color_per_event_paid_feature">Changez d\'abonnement et personnalisez la couleur de vos événements.</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'événement n\'existe pas.</string>
     <string name="error_occurrence_does_not_exist">L\'occurrence n\'existe pas.</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Voici les vues de calendrier <b>3 jours</b> et <b>Semaine</b>. Sélectionnez votre vue préférée dans le <b>menu</b>.\n\n• Ajustez la hauteur des lignes de la grille des jours en pinçant avec deux doigts pour faire un zoom avant ou arrière.</string>
     <string name="spotlight_dialog_search_title">Rechercher des événements</string>
     <string name="spotlight_dialog_search_description">Trouvez facilement l\'événement que vous recherchez avec notre nouvelle fonction de recherche. <a href="https://proton.me/support/calendar-search">En savoir plus</a></string>
+    <string name="spotlight_dialog_search_positive">Activer</string>
+    <string name="spotlight_dialog_search_negative">Ignorer</string>
     <string name="spotlight_dialog_import_title">Plus de façons d\'ajouter des événements</string>
     <string name="spotlight_dialog_import_description">• Importez des événements dans votre calendrier depuis des fichiers sur votre téléphone.\n\n• Ajoutez des réservations de voyage directement depuis Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fonctionnalités du calendrier</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Les jours fériés sont arrivés !</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nAjoutez les jours fériés de n\'importe quel pays à votre calendrier.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Les réunions prévues quand tout le monde est en congé ou l\'oubli d\'un long week-end pour se changer les idées, c\'est du passé.\n\nComme vous avez atteint la limite du nombre de calendriers, vous devez d\'abord retirer un calendrier existant pour pouvoir ajouter un calendrier de jours fériés.</string>
-    <string name="spotlight_dialog_color_per_event_title">Ajoutez un code couleur à vos événements.</string>
-    <string name="spotlight_dialog_color_per_event_description">• Personnalisez la couleur de chaque événement pour mieux organiser vos journées.\n\n• Disposez d\'une meilleure visibilité pour gagner en efficacité.</string>
+    <string name="spotlight_dialog_color_per_event_title">Couleurs personnalisées des événements</string>
+    <string name="spotlight_dialog_color_per_event_description">Personnalisez la couleur de chacun de vos événements pour :\n\n• Appliquer un code couleur à votre calendrier\n\n• Mieux organiser votre journée et gérer votre temps\n\n• Définir vos priorités et booster votre efficacité</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Autoriser l\'accès</string>
     <string name="dialog_google_auth_description">Pour démarrer l\'importation, connectez-vous à Google Calendar et autorisez Proton à accéder à vos données.</string>
@@ -808,7 +810,7 @@
         <item>Samedi</item>
         <item>Dimanche</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Violet|#8080FF</item>
         <item>Fraise|#EC3E7C</item>
         <item>Rose|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Pin|#0F735A</item>
         <item>Forêt|#258723</item>
         <item>Cornichon|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Violet</item>
+        <item>Fraise</item>
+        <item>Rose</item>
+        <item>Carotte</item>
+        <item>Sahara</item>
+        <item>Gentiane</item>
+        <item>Prune</item>
+        <item>Cerise</item>
+        <item>Cuivre</item>
+        <item>Terre</item>
+        <item>Bleu ardoise</item>
+        <item>Pacifique</item>
+        <item>Récif</item>
+        <item>Fougère</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Océan</item>
+        <item>Pin</item>
+        <item>Forêt</item>
+        <item>Cornichon</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

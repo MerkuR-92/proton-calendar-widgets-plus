@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváření pozvánek ve sdíleném kalendáři není povoleno</string>
     <string name="snack_down_banner">Servery Protonu jsou mimo provoz. Podrobnosti naleznete na naší stavové stránce.</string>
     <string name="snack_down_banner_action">Otevřít stavovou stránku</string>
-    <string name="snack_color_per_event_paid_feature">Barva události je placená funkce</string>
+    <string name="snack_color_per_event_paid_feature">Navyšte si tarif pro přizpůsobení barev událostí</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Událost neexistuje</string>
     <string name="error_occurrence_does_not_exist">Výskyt události neexistuje</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Představujeme zobrazení kalendáře na <b>3 dny</b> a <b>týden</b>. V <b>menu</b> vyberte požadované zobrazení.\n\n• Výšku řádků v mřížce dnů upravíte přiblížením nebo oddálením dvou prstů.</string>
     <string name="spotlight_dialog_search_title">Vyhledat události</string>
     <string name="spotlight_dialog_search_description">Pomocí naší nové funkce vyhledávání snadno najdete událost, kterou hledáte. <a href="https://proton.me/support/calendar-search">Více informací</a></string>
+    <string name="spotlight_dialog_search_positive">Povolit</string>
+    <string name="spotlight_dialog_search_negative">Přeskočit</string>
     <string name="spotlight_dialog_import_title">Více způsobů přidávání událostí</string>
     <string name="spotlight_dialog_import_description">Importovat události do vašeho kalendáře ze souborů na vašem teleofnu.\n\n• Přidat rezervace výletů přímo z Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkce kalendáře</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Státní svátky jsou tady!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už nemusíte plánovat schůzky v době, kdy mají všichni volno, ani zapomínat naplánovat prodloužený víkend.\n\nPřidejte si do kalendáře státní svátky v jakékoli zemi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žádné plánování schůzek v době, kdy mají všichni volno, nebo zapomínání na plánování prodlouženého víkendu.\n\nPro přidání prázdninového kalendáře budete muset nejprve odstranit stávající kalendář, protože v současné době máte omezený počet kalendářů.</string>
-    <string name="spotlight_dialog_color_per_event_title">Označte své události barvou</string>
-    <string name="spotlight_dialog_color_per_event_description">• Přizpůsobte barvu jednotlivých událostí pro lepší organizaci vašeho dne.\n\n• Sledujte váš čas a zvyšte efektivitu.</string>
+    <string name="spotlight_dialog_color_per_event_title">Vlastní barvy událostí</string>
+    <string name="spotlight_dialog_color_per_event_description">Přizpůsobte barvu jednotlivých událostí pro:\n\n• Nastavte barvy vašeho kalendáře\n\n• Organizujte váš den lépe a sledujte váš čas\n\n• Nastavte si priority a podpořte vaši efektivitu</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povolit přístup</string>
     <string name="dialog_google_auth_description">Pro zahájení importu se přihlaste do Google Calendar a povolte Protonu přístup k vašim datům.</string>
@@ -860,26 +862,70 @@
         <item>Sobota</item>
         <item>Neděle</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Fialová|#8080FF</item>
         <item>Jahodová|#EC3E7C</item>
         <item>Růžová|#DB60D6</item>
         <item>Mrkvová|#F74800</item>
         <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
+        <item>Hořec|#5252CC</item>
         <item>Švestková|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
+        <item>Třešeň|#BA1E55</item>
         <item>Měděná|#C44800</item>
         <item>Hliněná|#54473F</item>
         <item>Břidlicově Modrá|#415DF0</item>
         <item>Pacifická|#179FD9</item>
         <item>Útesová|#1DA583</item>
         <item>Kapraďová|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
-        <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+        <item>Oliva|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Oceán|#0A77A6</item>
+        <item>Borovice|#0F735A</item>
+        <item>Les|#258723</item>
+        <item>Okurka|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Fialová</item>
+        <item>Jahoda</item>
+        <item>Růžová</item>
+        <item>Mrkev</item>
+        <item>Sahara</item>
+        <item>Hořec</item>
+        <item>Švestka</item>
+        <item>Třešeň</item>
+        <item>Měď</item>
+        <item>Půda</item>
+        <item>Břidlice modrá</item>
+        <item>Pacifik</item>
+        <item>Útes</item>
+        <item>Kapradí</item>
+        <item>Oliva</item>
+        <item>Kobalt</item>
+        <item>Oceán</item>
+        <item>Borovice</item>
+        <item>Les</item>
+        <item>Okurka</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Det er ikke tilladt at oprette invitationer i en delt kalender</string>
     <string name="snack_down_banner">Proton-serverne er nede. Besøg vores statusside for detaljer.</string>
     <string name="snack_down_banner_action">Åbn statusside</string>
-    <string name="snack_color_per_event_paid_feature">Begivenhedsfarve er en betalt funktion</string>
+    <string name="snack_color_per_event_paid_feature">Opgrader for at tilpasse eventfarver</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
@@ -538,7 +538,7 @@
     <string name="bootstrap_error_no_calendar_title">Der er ingen aktive kalendere tilknyttet denne konto.</string>
     <string name="bootstrap_error_no_calendar_message">Indstil en nu ved at besøge <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Fejl ved forberedelse af kalendere</string>
-    <string name="bootstrap_error_some_calendars_failed_message">Følgende kalendere kunne ikke opsættes</string>
+    <string name="bootstrap_error_some_calendars_failed_message">Følgende kalendere kunne ikke konfigureres</string>
     <string name="bootstrap_error_no_active_calendar_title">Der er ingen aktiv personlig kalender tilknyttet denne konto.</string>
     <string name="bootstrap_error_no_active_calendar_message">Lær hvordan en kalender aktiveres ved at besøge vores <a href="https://proton.me/support">vidensbase</a></string>
     <string name="bootstrap_error_store_quota_reached_message">Der er ikke mere lagerplads.</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Nu kan du vælge kalendervisninger med <b>3 dage</b> og en <b>uge</b>. Vælg din foretrukne visning i <b>menuen</b>.\n\n• Juster højden af rækkerne i dagsgitteret ved at knibe med to fingre for at zoome ind eller ud.</string>
     <string name="spotlight_dialog_search_title">Søg efter begivenheder</string>
     <string name="spotlight_dialog_search_description">Find nemt de begivenheder du leder efter, med vores nye søgefunktion. <a href="https://proton.me/support/calendar-search">Læs mere</a></string>
+    <string name="spotlight_dialog_search_positive">Aktiver</string>
+    <string name="spotlight_dialog_search_negative">Glem det</string>
     <string name="spotlight_dialog_import_title">Flere måder at tilføje begivenheder</string>
     <string name="spotlight_dialog_import_description">• Importer begivenheder til din kalender fra filer på din telefon.\n\n• Tilføj rejsebookinger direkte fra Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Så er helligdagene her!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nTilføj et hvilket som helst lands helligdage til din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Det er slut med at planlægge møder, når alle har fri, eller glemme at planlægge en forlænget weekendtur.\n\nEftersom du i øjeblikket er på grænsen for antal kalendere, skal du først fjerne en eksisterende kalender for at tilføje en feriekalender.</string>
-    <string name="spotlight_dialog_color_per_event_title">Farvekod dine begivenheder</string>
-    <string name="spotlight_dialog_color_per_event_description">• Tilpas farven på individuelle begivenheder for bedre at organisere din dag.\n\n• Hold styr på din tid, og øg effektiviteten.</string>
+    <string name="spotlight_dialog_color_per_event_title">Tilpas event-farver</string>
+    <string name="spotlight_dialog_color_per_event_description">Juster farven på de enkelte events for at:\n\n• Farvekode din kalender\n\n• Bedre organisere din dag og holde styr på din tid\n\n• Sætte prioriteter og øge effektiviteten</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillad adgang</string>
     <string name="dialog_google_auth_description">For at starte importen skal du logge ind på Google Kalender og give Proton adgang til dine data.</string>
@@ -808,7 +810,7 @@
         <item>Lørdag</item>
         <item>Søndag</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Lilla|#8080FF</item>
         <item>Jordbær|#EC3E7C</item>
         <item>Pink|#DB60D6</item>
@@ -823,11 +825,55 @@
         <item>Stillehavet|#179FD9</item>
         <item>Rev|#1DA583</item>
         <item>Bregne|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
+        <item>Oliven|#B4A40E</item>
+        <item>Kobolt|#273EB2</item>
         <item>Ocean|#0A77A6</item>
         <item>Fyrretræ|#0F735A</item>
         <item>Skov|#258723</item>
         <item>Syltet agurk|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Lilla</item>
+        <item>Jordbær</item>
+        <item>Pink</item>
+        <item>Gulerod</item>
+        <item>Sahara</item>
+        <item>Klokkeblomst</item>
+        <item>Blomme</item>
+        <item>Kirsebær</item>
+        <item>Kobber</item>
+        <item>Jordbund</item>
+        <item>Skiferblå</item>
+        <item>Stillehavet</item>
+        <item>Rev</item>
+        <item>Bregne</item>
+        <item>Oliven</item>
+        <item>Kobolt</item>
+        <item>Havet</item>
+        <item>Fyrretræ</item>
+        <item>Skov</item>
+        <item>Agurk</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

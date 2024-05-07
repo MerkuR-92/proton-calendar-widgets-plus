@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">無法在共享行事曆中創建邀請函</string>
     <string name="snack_down_banner">Proton伺服器目前關閉。請參考狀態頁面獲得詳細資料。</string>
     <string name="snack_down_banner_action">開啟狀態頁面。</string>
-    <string name="snack_color_per_event_paid_feature">行程顏色設定為付費功能</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">此活動不存在</string>
     <string name="error_occurrence_does_not_exist">行程不存在</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• 引入<b>三天</b>與<b>週</b>行事曆檢視。在<b>選單</b>中選取您的偏好檢視方式。\n\n• 使用兩根手指合攏來放大或縮小以調整日期網格中的列高度。</string>
     <string name="spotlight_dialog_search_title">搜尋行程</string>
     <string name="spotlight_dialog_search_description">使用我們的新搜尋功能輕鬆找到您正在尋找的行程。<a href="https://proton.me/support/calendar-search">取得更多資訊</a></string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">更多其它加入行程的方法</string>
     <string name="spotlight_dialog_import_description">• 從您手機上的檔案匯入事件至您的行事曆。\n\n• 直接從 Proton Mail 新增旅程預訂。</string>
     <string name="spotlight_dialog_calendar_provider_title">行事曆功能</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">公定假日在這兒</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
-    <string name="spotlight_dialog_color_per_event_title">顏色代碼於行程</string>
-    <string name="spotlight_dialog_color_per_event_description">• 為不同的行程自定化顏色，更有序地安排你的日程。\n\n• 更好運用你的時間，提升效率。</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>
@@ -782,7 +784,7 @@
         <item>週六</item>
         <item>週日</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>紫色|#8080FF</item>
         <item>草莓|#EC3E7C</item>
         <item>粉紅色|#DB60D6</item>
@@ -803,5 +805,49 @@
         <item>松木|#0F735A</item>
         <item>森林|#258723</item>
         <item>Pickle|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

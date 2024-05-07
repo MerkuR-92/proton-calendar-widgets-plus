@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
     <string name="snack_down_banner">A Proton szerverek leálltak. A részletekért látogasson el a státusz oldalunkra.</string>
     <string name="snack_down_banner_action">Státusz oldal megtekintése</string>
-    <string name="snack_color_per_event_paid_feature">Event color is a paid feature</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">Bemutatjuk a <b>3 napos</b> és <b>Heti</b> naptár nézetet. Válassza ki az önnek tetsző nézetet a <b>menüben</b>.\n\n• Állítsa be az oszlopok magasságát a napi rácson úgy, hogy két ujjával rácsíp a be- vagy kinagyításhoz.</string>
     <string name="spotlight_dialog_search_title">Események keresése</string>
     <string name="spotlight_dialog_search_description">Találja meg könnyen a keresett eseményt az új keresési lehetőséggel. <a href="https://proton.me/support/calendar-search">További információk</a></string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nBármely ország munkaszüneti napjait hozzáadhatja a naptárhoz.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nMivel jelenleg az elérhető összes naptára használatban van, a munkaszüneti naptár hozzáadásához először el kell távolítania egy meglévő naptárat.</string>
-    <string name="spotlight_dialog_color_per_event_title">Color-code your events</string>
-    <string name="spotlight_dialog_color_per_event_description">• Customize the color of individual events to better organize your day.\n\n• Track your time, and boost efficiency.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -808,7 +810,7 @@
         <item>Szombat</item>
         <item>Vasárnap</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Purple|#8080FF</item>
         <item>Strawberry|#EC3E7C</item>
         <item>Pink|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Pine|#0F735A</item>
         <item>Forest|#258723</item>
         <item>Pickle|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

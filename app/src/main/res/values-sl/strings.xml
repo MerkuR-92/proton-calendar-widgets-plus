@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Ustvarjanje povabil v deljenem koledarju ni dovoljeno</string>
     <string name="snack_down_banner">Strežniki Proton ne delujejo. Za podrobnosti obiščite našo stran s stanjem.</string>
     <string name="snack_down_banner_action">Odpri stran s stanjem</string>
-    <string name="snack_color_per_event_paid_feature">Barva za dogodke je plačljiva funkcija</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Dogodek ne obstaja</string>
     <string name="error_occurrence_does_not_exist">Ponovitev ne obstaja</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Predstavljamo <b>tridnevni</b> in<b>tedenski</b> pogled koledarja. V <b>meniju</b> izberite želeni pogled.\n\n• Prilagodite višino vrstic v dnevni mreži tako, da jih z dvema prstoma približate ali oddaljite.</string>
     <string name="spotlight_dialog_search_title">Iskanje dogodkov</string>
     <string name="spotlight_dialog_search_description">Z našo novo funkcijo iskanja enostavno najdite dogodek, ki ga iščete. <a href="https://proton.me/support/calendar-search">Več informacij</a></string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Več načinov dodajanja dogodkov</string>
     <string name="spotlight_dialog_import_description">• Uvozite dogodke v koledar iz datotek v telefonu.\n\n• Dodajanje rezervacij potovanj neposredno iz programa Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcije koledarja</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Prazniki so tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nV svoj koledar dodajte državne praznike katere koli države.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nKer ste trenutno na koledarski omejitvi, morate za dodajanje koledarja praznikov najprej odstraniti obstoječi koledar.</string>
-    <string name="spotlight_dialog_color_per_event_title">Barvno označite svoje dogodke</string>
-    <string name="spotlight_dialog_color_per_event_description">• Prilagodite barvo posameznih dogodkov, da bolje organizirate svoj dan.\n\n• Spremljajte svoj čas in povečajte učinkovitost.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Dovoli dostop</string>
     <string name="dialog_google_auth_description">Za uvoz podatkov se najprej prijavite v Googlov koledar in Protonu omogočite dostop do svojih podatkov.</string>
@@ -860,7 +862,7 @@
         <item>Sobota</item>
         <item>Nedelja</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Vijolična|#8080FF</item>
         <item>Jagoda|#EC3E7C</item>
         <item>Roza|#DB60D6</item>
@@ -881,5 +883,49 @@
         <item>Bor|#0F735A</item>
         <item>Gozd|#258723</item>
         <item>Kumarica|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

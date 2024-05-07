@@ -31,8 +31,8 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Acara ini telah diperbarui. Penyelenggara akan diberi tahu bahwa Anda menolak undangan. Apakah Anda ingin menghapus acara ini?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Acara ini telah diperbarui. Penyelenggara tidak akan diberi tahu bahwa Anda menolak undangan karena Anda tidak dapat mengirimkan email dari alamat yang diundang. Apakah Anda ingin menghapus acara ini?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
-    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Kejadian yang sebelumnya diperbarui oleh penyelenggara akan disimpan, tetapi jawaban Anda akan hilang</string>
-    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Kejadian yang sebelumnya diperbaru oleh penyelenggara akan disimpan</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Keberlangsungan acara yang sebelumnya diperbarui oleh penyelenggara akan disimpan, namun jawaban Anda akan hilang</string>
+    <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Keberlangsungan acara yang sebelumnya diperbarui oleh penyelenggara akan disimpan</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Penyelenggara tidak dapat diberi tahu bahwa Anda menolak undangan:\n\n• %1$s\n\n Apakah Anda tetap ingin menghapus acara ini?</string>
     <string name="dialog_button_set">Atur</string>
     <string name="dialog_button_ok">OK</string>
@@ -105,8 +105,8 @@
     <string name="event_signature_verification_network_error">Verifikasi tanda tangan acara terhenti akibat kesalahan yang tidak diduga. <a href="">Coba lagi</a></string>
     <string name="event_change_answer_recurring_title">Perbarui acara berulang</string>
     <string name="event_change_answer_recurring_description">Ingin mengubah jawaban Anda untuk semua rangkaian acara ini?</string>
-    <string name="event_change_answer_recurring_overwrite_description">Apkaah Anda ingin mengubah jawaban Anda untuk semua acara pada rangkaian ini?\nBeberapa jawaban Anda untuk kejadian yang sebelumnya sudah diperbarui oleh penyelenggara akan hilang.</string>
-    <string name="event_change_answer_recurring_single_edit_description">Acara ini telah diperbarui penyelenggara. Anda ingin mengubah jawaban untuk rangkaian kegiatan ini saja?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Apkaah Anda ingin mengubah jawaban Anda untuk seluruh acara pada rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan cara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
+    <string name="event_change_answer_recurring_single_edit_description">Acara ini telah diperbarui oleh penyelenggara. Apakah Anda ingin mengubah jawaban Anda hanya untuk keberlangsungan ini pada rangkaian ini?</string>
     <string name="event_change_answer_recurring_cancel">Batal</string>
     <string name="event_change_answer_recurring_confirm">Perbarui</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s telah menerima undangan Anda ke %2$s</string>
@@ -330,10 +330,10 @@
     <string name="snack_event_created_failed_mail">Acara dibuat namun undangan gagal dikirim</string>
     <string name="snack_event_created_error">Kesalahan membuat acara</string>
     <string name="snack_event_opening_edit_error">Kesalahan membuka acara untuk diedit</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Anda tidak dapat menyunting undangan berulang berisi ulangan satuan yang diubah</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Anda tidak dapat menghapus undangan berulang berisi ulangan satuan yang diubah</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Anda tidak dapat menyunting undangan berulang berisi ulangan yang dihapus</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">Anda tidak dapat menghapus undangan berulang berisi ulangan yang dihapus</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Anda tidak dapat menyunting undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Anda tidak dapat menghapus undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Anda tidak dapat menyunting undangan berulang yang mengandung keberlangsungan acara yang telah dihapus</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Anda tidak dapat menghapus undangan berulang yang mengandung keberlangsungan acara yang telah dihapus</string>
     <string name="snack_event_edit_with_attendees_error">Menyunting acara yang dihadiri oleh peserta saat ini tidak didukung</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Tidak dapat menambah peserta dan mengubah kalender secara bersamaan</string>
     <string name="snack_event_init_error">Gagal membuat acara baru</string>
@@ -370,7 +370,7 @@
     <string name="snack_ics_create_error">Terjadi masalah saat membuat acara</string>
     <string name="snack_ics_parsing_error">Terjadi masalah saat membaca kalender</string>
     <string name="snack_ics_unsupported_method_error">Tipe acara ini saat ini belum didukung</string>
-    <string name="snack_ics_unsupported_add_error">Menambahkan kegiatan ke dalam acara saat ini tidak didukung</string>
+    <string name="snack_ics_unsupported_add_error">Menambahkan keberlangsungan ke dalam acara saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_counter_error">Penjadwalan ulang acara untuk saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_refresh_error">Pemuatan ulang acara untuk saat ini tidak didukung</string>
     <string name="snack_ics_unsupported_publish_error">Impor acara untuk saat ini tidak didukung</string>
@@ -397,10 +397,10 @@
     <string name="snack_invite_in_shared_calendar_error">Pembuatan alamat pada kalender bersama tidak diperkenankan</string>
     <string name="snack_down_banner">Server Proton sedang down. Kunjungi halaman status kami untuk rincian selengkapnya.</string>
     <string name="snack_down_banner_action">Buka halaman status</string>
-    <string name="snack_color_per_event_paid_feature">Warna acara merupakan fitur berbayar</string>
+    <string name="snack_color_per_event_paid_feature">Tingkatkan akun untuk menyesuaikan warna acara</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
-    <string name="error_occurrence_does_not_exist">Peristiwa ini tidak ada</string>
+    <string name="error_occurrence_does_not_exist">Keberlangsungan ini tidak ada</string>
     <string name="update_timezone_dialog_title">Zona waktu telah diubah</string>
     <string name="update_timezone_dialog_message">Zona waktu sistem Anda sepertinya telah diubah menjadi %1$s. Apakah Anda ingin memperbarui preferensi zona waktu Anda?</string>
     <string name="update_timezone_dialog_confirmation">Perbarui</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Memperkenalkan mode tampilan kalender per <b>3 hari</b> dan per <b>Pekan</b>. Pilih mode tampilan yang Anda kehendaki pada <b>menu</b>.\n\n• Sesuaikan tinggi masing-masing baris dengan menggunakan dua jari untuk memperbesar atau memperkecil layar.</string>
     <string name="spotlight_dialog_search_title">Cari acara</string>
     <string name="spotlight_dialog_search_description">Cari acara yang Anda inginkan dengan mudah dengan fitur pencarian kami yang baru. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Libur telah tiba!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Tidak ada penjadwalan pertemuan ketika semuanya libur atau lupa merencanakan liburan akhir pekan yang panjang.\n\nTambahkan liburan publik negara mana pun ke kalender Anda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Tidak ada lagi pertemuan yang dijadwalkan ketika semuanya sedang libur atau melupakan untuk merencanakan liburan akhir pekan yang panjang.\n\nKarena Anda saat ini berada di batas kalender, untuk menambahkan kalender liburan, Anda harus menghapus kalender yang sudah ada terlebih dahulu.</string>
-    <string name="spotlight_dialog_color_per_event_title">Tandai acara Anda dengan warna</string>
-    <string name="spotlight_dialog_color_per_event_description">• Sesuaikan warna untuk acara pribadi untuk mengatur harimu.\n\n• Catat dan efisienkan waktumu.</string>
+    <string name="spotlight_dialog_color_per_event_title">Warna acara khusus</string>
+    <string name="spotlight_dialog_color_per_event_description">Sesuaikan warna masing-masing acara untuk:\n\n• Menandai kalender Anda berdasarkan warna\n\n• Mengorganisir hari dan melacak waktu Anda secara lebih baik\n\n• Menetapkan prioritas dan meningkatkan efisiensi</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Izinkan akses</string>
     <string name="dialog_google_auth_description">Untuk memulai proses impor, masuk ke Google Calendar dan izinkan Proton untuk mengakses data Anda.</string>
@@ -667,7 +669,7 @@
     <string name="import_assistant_in_progress_error_snack">Masih ada impor yang berlangsung</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Impor sebagai acara sederhana?</string>
-    <string name="import_event_disclaimer_dialog_description">\nUndangan yang diimpor akan muncul pada Proton Calendar dalam bentuk acara sederhana <b>tanpa rincian penyelenggara</b> dan <b>peserta</b>.\n\nUntuk mendapatkan pembaruan seputar acara dan melihat daftar peserta, mintalah penyelenggara acara untuk mengundang Anda menggunakan alamat email Proton Anda.</string>
+    <string name="import_event_disclaimer_dialog_description">\nUndangan yang diimpor akan muncul pada Proton Calendar sebagai acara sederhana <b>tanpa rincian seputar penyelenggara</b> dan <b>peserta</b>.\n\nUntuk memperoleh pembaruan seputar acara dan melihat daftar peserta, mintalah penyelenggara acara untuk mengundang Anda melalui alamat email Proton Anda.</string>
     <string name="import_event_disclaimer_dialog_positive">Impor</string>
     <string name="undefined_color">Belum ditentukan</string>
     <!--  STRING PLURALS  -->
@@ -723,7 +725,7 @@
         <item quantity="other">kali</item>
     </plurals>
     <plurals name="plural_occurrence">
-        <item quantity="other">peristiwa</item>
+        <item quantity="other">keberlangsungan</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="other">peserta</item>
@@ -782,7 +784,7 @@
         <item>Sabtu</item>
         <item>Minggu</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Ungu|#8080FF</item>
         <item>Arbei|#EC3E7C</item>
         <item>Merah Jambu|#DB60D6</item>
@@ -803,5 +805,49 @@
         <item>Pinus|#0F735A</item>
         <item>Hutan|#258723</item>
         <item>Acar|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Ungu</item>
+        <item>Arbei</item>
+        <item>Merah Jambu</item>
+        <item>Wortel</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Ceri</item>
+        <item>Tembaga</item>
+        <item>Tanah</item>
+        <item>Biru Keabuan</item>
+        <item>Pasifik</item>
+        <item>Karang</item>
+        <item>Perdu</item>
+        <item>Zaitun</item>
+        <item>Kobalt</item>
+        <item>Samudera</item>
+        <item>Pinus</item>
+        <item>Hutan</item>
+        <item>Acar</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

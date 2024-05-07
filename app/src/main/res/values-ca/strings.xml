@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">No es permet crear invitacions en un calendari compartit.</string>
     <string name="snack_down_banner">Els servidors de Proton estan caiguts. Visiteu la nostra pàgina d\'estat per a més informació.</string>
     <string name="snack_down_banner_action">Obre la pàgina d\'estat</string>
-    <string name="snack_color_per_event_paid_feature">El color de l\'esdeveniment és una característica de pagament</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Presentem les vistes de calendari de <b>3 dies</b> i <b>setmanal</b>. Seleccioneu la vostra vista preferida al <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
     <string name="spotlight_dialog_search_title">Cerca esdeveniments</string>
     <string name="spotlight_dialog_search_description">Trobeu fàcilment l\'esdeveniment que busqueu amb la nostra nova funció de cerca. <a href="https://proton.me/support/calendar-search">Saber-ne més</a></string>
+    <string name="spotlight_dialog_search_positive">Activa</string>
+    <string name="spotlight_dialog_search_negative">Omet</string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
     <string name="spotlight_dialog_import_description">• Importeu esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Els dies festius són aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
-    <string name="spotlight_dialog_color_per_event_title">Codifiqueu amb colors els vostres esdeveniments</string>
-    <string name="spotlight_dialog_color_per_event_description">• Personalitzeu el color dels esdeveniments individuals per organitzar millor el vostre dia.\n\n• Feu un seguiment del vostre temps i augmenteu l\'eficiència.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>
@@ -808,7 +810,7 @@
         <item>Dissabte</item>
         <item>Diumenge</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Porpra|#8080FF</item>
         <item>Maduixa|#EC3E7C</item>
         <item>Rosa|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Verd pi|#0F735A</item>
         <item>Verd bosc|#258723</item>
         <item>Verd cogombre|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Porpra</item>
+        <item>Maduixa</item>
+        <item>Rosa</item>
+        <item>Pastanaga</item>
+        <item>Sahara</item>
+        <item>Genciana</item>
+        <item>Pruna</item>
+        <item>Vermell cirera</item>
+        <item>Coure</item>
+        <item>Terra</item>
+        <item>Blau pissarra</item>
+        <item>Pacífic</item>
+        <item>Escull</item>
+        <item>Verd falguera</item>
+        <item>Verd oliva</item>
+        <item>Cobalt</item>
+        <item>Blau oceà</item>
+        <item>Verd pi</item>
+        <item>Verd bosc</item>
+        <item>Verd cogombre</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

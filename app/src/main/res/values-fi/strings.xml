@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Kutsujen luontia ei sallita jaetussa kalenterissa</string>
     <string name="snack_down_banner">Protonin palvelimet ovat poissa käytöstä. Käy tilasivullamme saadaksesi lisätietoja.</string>
     <string name="snack_down_banner_action">Avaa tilasivu</string>
-    <string name="snack_color_per_event_paid_feature">Tapahtuman väri on maksullinen ominaisuus</string>
+    <string name="snack_color_per_event_paid_feature">Mukauta tapahtumien värejä päivittämällä tilauksesi</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Tapahtumaa ei ole olemassa</string>
     <string name="error_occurrence_does_not_exist">Tapahtumakertaa ei ole olemassa</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Esittelyssä kalenterin <b>Kolme päivää</b> ja <b>Viikko</b> -näkymät. Valitse haluamasi näkymä <b>valikosta</b>.\n\n• Säädä päiväruudukon rivikorkeutta kahden sormen zoomauseleellä.</string>
     <string name="spotlight_dialog_search_title">Etsi tapahtumia</string>
     <string name="spotlight_dialog_search_description">Löydä etsimäsi tapahtuma helposti uudella hakutoiminnolla. <a href="https://proton.me/support/calendar-search">Lisätietoja</a></string>
+    <string name="spotlight_dialog_search_positive">Ota käyttöön</string>
+    <string name="spotlight_dialog_search_negative">Ohita</string>
     <string name="spotlight_dialog_import_title">Muita tapahtumien lisäystapoja</string>
     <string name="spotlight_dialog_import_description">• Tuo kalenteriisi tapahtumia puhelimesi tiedostoista.\n\n• Lisää matkavarauksia suoraan Proton Mailista.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenterin ominaisuudet</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Yleiset vapaapäivät ovat täällä!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai hukattuja pitkiä viikonloppuja.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ei enää vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nKoska olet jo saavuttanut kalenterien enimmäismäärän, on jokin nykyisistä kalentereista poistettava yleisten vapaapäivien lisäämiseksi.</string>
-    <string name="spotlight_dialog_color_per_event_title">Värikoodaa tapahtumasi</string>
-    <string name="spotlight_dialog_color_per_event_description">• Organisoi päiväsi paremmin mukauttamalla yksittäisten tapahtumien värejä.\n\n• Pysy ajan tasalla ja tehosta toimintaasi.</string>
+    <string name="spotlight_dialog_color_per_event_title">Omat tapahtumavärit</string>
+    <string name="spotlight_dialog_color_per_event_description">Mukauttamalla yksittäisten tapahtumien värejä voit:\n\n• Värikoodata kalenterisi\n\n• Hallita ja seurata ajankäyttöäsi paremmin\n\n• Korostaa tärkeitä tapahtumia ja tehostaa tuottavuutta</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Myönnä käyttöoikeus</string>
     <string name="dialog_google_auth_description">Aloittaaksesi tuonnin, kirjaudu Google Kalenteriin ja myönnä Protonille tietojesi käyttöoikeus.</string>
@@ -808,8 +810,8 @@
         <item>Lauantai</item>
         <item>Sunnuntai</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
-        <item>Purppura|#8080FF</item>
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
+        <item>Violetti|#8080FF</item>
         <item>Mansikka|#EC3E7C</item>
         <item>Pinkki|#DB60D6</item>
         <item>Porkkana|#F78400</item>
@@ -818,8 +820,8 @@
         <item>Luumu|#A839A4</item>
         <item>Kirsikka|#BA1E55</item>
         <item>Kupari|#C44800</item>
-        <item>Maa|#54473F</item>
-        <item>Liuskekiven sininen|#415DF0</item>
+        <item>Multa|#54473F</item>
+        <item>Liuskeensininen|#415DF0</item>
         <item>Tyynimeri|#179FD9</item>
         <item>Riutta|#1DA583</item>
         <item>Saniainen|#3CBB3A</item>
@@ -829,5 +831,49 @@
         <item>Mänty|#0F735A</item>
         <item>Metsä|#258723</item>
         <item>Suolakurkku|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Violetti</item>
+        <item>Mansikka</item>
+        <item>Pinkki</item>
+        <item>Porkkana</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Luumu</item>
+        <item>Kirsikka</item>
+        <item>Kupari</item>
+        <item>Multa</item>
+        <item>Liuskeensininen</item>
+        <item>Tyynimeri</item>
+        <item>Riutta</item>
+        <item>Saniainen</item>
+        <item>Oliivi</item>
+        <item>Koboltti</item>
+        <item>Valtameri</item>
+        <item>Mänty</item>
+        <item>Metsä</item>
+        <item>Suolakurkku</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

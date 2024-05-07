@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Paylaşılmış bir takvim için davet oluşturulmasına izin verilmiyor</string>
     <string name="snack_down_banner">Proton sunucuları çalışmıyor. Ayrıntılı bilgi almak için durum sayfamıza bakın.</string>
     <string name="snack_down_banner_action">Durum sayfasını aç</string>
-    <string name="snack_color_per_event_paid_feature">Etkinlik rengi, ücretli bir özelliktir</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• <b>3 günlük</b> ve <b>Haftalık</b> takvim görünümleriyle tanışın. <b>Menüden</b> kullanmak istediğiniz görünümü seçin.\n\n• Yakınlaştırmak ya da uzaklaştırmak için iki parmağınızı sıkıştırarak gün tablosundaki satırların yüksekliğini ayarlayın.</string>
     <string name="spotlight_dialog_search_title">Etkinlikleri arayın</string>
     <string name="spotlight_dialog_search_description">Yeni arama özelliği ile aradığınız etkinliği kolayca bulun. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
+    <string name="spotlight_dialog_search_positive">Kullanıma al</string>
+    <string name="spotlight_dialog_search_negative">Atla</string>
     <string name="spotlight_dialog_import_title">Etkinlik eklemenin diğer yolları</string>
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
     <string name="spotlight_dialog_calendar_provider_title">Takvim özellikleri</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Resmi tatiller burada!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nİstediğiniz ülkenin resmi tatillerini takviminize ekleyin.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nTakvim sayısı sınırına ulaşmış olduğunuzdan yeni bir tatil takvimi eklemek için önce var olan bir takvimi kaldırmanız gerekir.</string>
-    <string name="spotlight_dialog_color_per_event_title">Etkinliklerinizi renklerle kodlayın</string>
-    <string name="spotlight_dialog_color_per_event_description">• Gününüzü daha iyi düzenlemek için istediğiniz etkinliklerin rengini özelleştirin.\n\n• Zamanınızı planlayın ve verimliliği artırın.</string>
+    <string name="spotlight_dialog_color_per_event_title">Özel etkinlik renkleri</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>
@@ -808,7 +810,7 @@
         <item>Cumartesi</item>
         <item>Pazar</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Mor|#8080FF</item>
         <item>Çilek|#EC3E7C</item>
         <item>Pembe|#DB60D6</item>
@@ -829,5 +831,49 @@
         <item>Çam|#0F735A</item>
         <item>Orman|#258723</item>
         <item>Salatalık|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>

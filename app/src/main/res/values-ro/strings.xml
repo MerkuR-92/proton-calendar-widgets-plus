@@ -397,7 +397,7 @@
     <string name="snack_invite_in_shared_calendar_error">Crearea de invitații la un calendar partajat nu este permisă.</string>
     <string name="snack_down_banner">Serverele Proton nu sunt funcționale. Vizitați pagina noastră de stare pentru detalii.</string>
     <string name="snack_down_banner_action">Deschidere pagină stare</string>
-    <string name="snack_color_per_event_paid_feature">Culoarea pentru evenimente este o funcție cu plată.</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
     <string name="error_occurrence_does_not_exist">Căutarea nu există.</string>
@@ -589,6 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
     <string name="spotlight_dialog_search_title">Căutare evenimente</string>
     <string name="spotlight_dialog_search_description">Găsiți cu ușurință evenimentul pe care îl căutați cu noua funcție de căutare. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
+    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Alte metode de adăugat evenimente</string>
     <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Caracteristici calendar</string>
@@ -598,8 +600,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Sărbătorile publice sunt aici!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nu mai planificați întâlniri atunci când toată lumea pleacă sau uitați să planificați o escapadă lungă de weekend.\n\nAdăugați sărbătorile publice ale oricărei țări în calendarul personal.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nu mai planificați întâlniri atunci când toată lumea pleacă sau uitați să planificați o escapadă lungă de weekend.\n\nDeoarece sunteți în prezent la limita calendaristică, pentru a adăuga un calendar de sărbători, va trebui mai întâi să eliminați un calendar existent.</string>
-    <string name="spotlight_dialog_color_per_event_title">Codificați prin culori evenimentele</string>
-    <string name="spotlight_dialog_color_per_event_description">• Personalizați culoarea evenimentelor individuale pentru a vă organiza mai bine ziua.\n\n• Urmăriți-vă timpul și măriți-vă eficiența.</string>
+    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
@@ -834,7 +836,7 @@
         <item>Sâmbătă</item>
         <item>Duminică</item>
     </string-array>
-    <string-array name="colors_with_names" comment="Only the color name needs translation. Ignore what comes after the pipe (|)">
+    <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
         <item>Violet|#8080FF</item>
         <item>Căpșuniu|#EC3E7C</item>
         <item>Roz|#DB60D6</item>
@@ -855,5 +857,49 @@
         <item>Pin|#0F735A</item>
         <item>Pădure|#258723</item>
         <item>Murături|#807304</item>
+    </string-array>
+    <string-array name="colors_names" comment="Keep the same items order">
+        <item>Purple</item>
+        <item>Strawberry</item>
+        <item>Pink</item>
+        <item>Carrot</item>
+        <item>Sahara</item>
+        <item>Enzian</item>
+        <item>Plum</item>
+        <item>Cerise</item>
+        <item>Copper</item>
+        <item>Soil</item>
+        <item>Slate Blue</item>
+        <item>Pacific</item>
+        <item>Reef</item>
+        <item>Fern</item>
+        <item>Olive</item>
+        <item>Cobalt</item>
+        <item>Ocean</item>
+        <item>Pine</item>
+        <item>Forest</item>
+        <item>Pickle</item>
+    </string-array>
+    <string-array name="colors_values" comment="No translation needed">
+        <item>#8080FF</item>
+        <item>#EC3E7C</item>
+        <item>#DB60D6</item>
+        <item>#F78400</item>
+        <item>#936D58</item>
+        <item>#5252CC</item>
+        <item>#A839A4</item>
+        <item>#BA1E55</item>
+        <item>#C44800</item>
+        <item>#54473F</item>
+        <item>#415DF0</item>
+        <item>#179FD9</item>
+        <item>#1DA583</item>
+        <item>#3CBB3A</item>
+        <item>#B4A40E</item>
+        <item>#273EB2</item>
+        <item>#0A77A6</item>
+        <item>#0F735A</item>
+        <item>#258723</item>
+        <item>#807304</item>
     </string-array>
 </resources>
