@@ -571,6 +571,7 @@ data class Event private constructor(
         showBottomSpacing: Boolean,
         userEmails: List<String>,
         is24Hour: Boolean,
+        isFreeUser: Boolean,
         searchTerm: String
     ): TimelineEventAdapter.TimelineEvent {
 
@@ -626,7 +627,7 @@ data class Event private constructor(
             showBottomSpacing = showBottomSpacing,
             fullDayCounter = fullDayCounterString,
             occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
-            calendarColor = this.calendar.color,
+            color = this.getDisplayColor(isFreeUser),
             isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
             failedToDecrypt = this.decryptionStatus == DecryptionStatus.FAILURE,
