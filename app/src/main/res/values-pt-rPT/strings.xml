@@ -590,7 +590,7 @@
     <string name="spotlight_dialog_search_title">Pesquisar por eventos.</string>
     <string name="spotlight_dialog_search_description">Encontre facilmente o evento que pesquisa com a nossa nova funcionalidade de pesquisa. <a href="https://proton.me/support/calendar-search">Saiba mais</a>.</string>
     <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_negative">Ignorar</string>
     <string name="spotlight_dialog_import_title">Mais maneiras de adicionar eventos.</string>
     <string name="spotlight_dialog_import_description">• Importe eventos para o seu calendário a partir de ficheiros no seu telefone.\n\n• Adicione reservas de viagem diretamente do Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funcionalidades do calendário</string>
@@ -835,22 +835,22 @@
     <string-array name="colors_names" comment="Keep the same items order">
         <item>Purple</item>
         <item>Strawberry</item>
-        <item>Pink</item>
+        <item>Rosa</item>
         <item>Carrot</item>
         <item>Sahara</item>
         <item>Enzian</item>
-        <item>Plum</item>
+        <item>Ameixa</item>
         <item>Cerise</item>
         <item>Copper</item>
-        <item>Soil</item>
+        <item>Terra</item>
         <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
+        <item>Pacífico</item>
+        <item>Recife</item>
+        <item>Samambaia</item>
+        <item>Azeitona</item>
         <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
+        <item>Oceano</item>
+        <item>Pinho</item>
         <item>Forest</item>
         <item>Pickle</item>
     </string-array>
