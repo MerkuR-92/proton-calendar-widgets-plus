@@ -628,14 +628,24 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                         } else dtEnd
                                     }
                                     val timeZoneId = fallbackTimeZone(
-                                        intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE) ?: ZoneId.systemDefault().id,
+                                        intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE)?.let {
+                                            if (it == "null") "" else it
+                                        } ?: ZoneId.systemDefault().id,
                                         fallbackToDefault = true
                                     )
                                     val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
-                                    val title = intentExtras.getString(CalendarContract.Events.TITLE) ?: "" // We open event form so no need to provide title placeholder
-                                    val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION) ?: ""
-                                    val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION) ?: ""
-                                    val rRule = intentExtras.getString(CalendarContract.Events.RRULE) ?: ""
+                                    val title = intentExtras.getString(CalendarContract.Events.TITLE)?.let {
+                                        if (it == "null") "" else it
+                                    } ?: "" // We open event form so no need to provide title placeholder
+                                    val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION)?.let {
+                                        if (it == "null") "" else it
+                                    } ?: ""
+                                    val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION)?.let {
+                                        if (it == "null") "" else it
+                                    } ?: ""
+                                    val rRule = intentExtras.getString(CalendarContract.Events.RRULE)?.let {
+                                        if (it == "null") "" else it
+                                    } ?: ""
                                     safeNavigateToDialogFragment(
                                         Navigation.Deeplink.toEventCreatePrefill(
                                             startMillis,
