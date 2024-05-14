@@ -498,7 +498,7 @@ class HandleSaveUseCase @Inject constructor(
                             Recurrence.Builder(event.iCalEvent.recurrenceRule.value)
                                 .count(
                                     if (it.count != null) {
-                                        val originalCount = dbEventToCopy.iCalEvent.recurrenceRule.value.count
+                                        val originalCount = dbEventToCopy.iCalEvent.recurrenceRule?.value?.count
                                         if (originalCount != null && originalCount == it.count) {
                                             it.count - (occurrenceNumber - 1)
                                         } else {
