@@ -154,7 +154,7 @@
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
     <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään päivitetty kutsu.</string>
-    <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
+    <string name="update_recurring_event">Muuta toistuvaa tapahtumaa</string>
     <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
     <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään päivitetty kutsu.</string>
     <!-- SEARCH -->
@@ -802,7 +802,7 @@
     <string-array name="time_formats">
         <item>Seuraa järjestelmää</item>
         <item>13:00</item>
-        <item>1:00ip</item>
+        <item>1.00 ip</item>
     </string-array>
     <string-array name="week_start">
         <item>Seuraa järjestelmää</item>

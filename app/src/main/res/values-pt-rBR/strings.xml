@@ -601,7 +601,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de agendar reuniões quando todos estão de folga ou esquecer de planejar a viagem do feriadão.\n\n Adicione os feriados de qualquer país ao seu calendário.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Chega de agendar reuniões quando todos estão de folga ou esquecer de planejar a viagem do feriadão.\n\n Como atualmente você está no limite do calendário, para adicionar feriados, primeiro será necessário remover um calendário existente.</string>
     <string name="spotlight_dialog_color_per_event_title">Cores de evento personalizadas</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize a cor de eventos individuais Para:\n\n• Codificar seu calendário por cores\n\n• Organizar melhor o seu dia e administrar seu tempo\n\n• Escolher prioridades e aumentar sua eficiência</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalize a cor de eventos individuais Para:\n\n• Codificar seu calendário por cores\n\n• Organizar melhor o seu dia e administrar seu tempo\n\n• Escolher prioridades e aumentar sua eficiência</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Agenda e permita que o Proton acesse seus dados.</string>

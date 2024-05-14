@@ -589,7 +589,7 @@
     <string name="spotlight_dialog_week_view_description">• Memperkenalkan mode tampilan kalender per <b>3 hari</b> dan per <b>Pekan</b>. Pilih mode tampilan yang Anda kehendaki pada <b>menu</b>.\n\n• Sesuaikan tinggi masing-masing baris dengan menggunakan dua jari untuk memperbesar atau memperkecil layar.</string>
     <string name="spotlight_dialog_search_title">Cari acara</string>
     <string name="spotlight_dialog_search_description">Cari acara yang Anda inginkan dengan mudah dengan fitur pencarian kami yang baru. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_positive">Aktifkan</string>
     <string name="spotlight_dialog_search_negative">Skip</string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>

@@ -589,8 +589,8 @@
     <string name="spotlight_dialog_week_view_description">• Predstavljamo <b>tridnevni</b> in<b>tedenski</b> pogled koledarja. V <b>meniju</b> izberite želeni pogled.\n\n• Prilagodite višino vrstic v dnevni mreži tako, da jih z dvema prstoma približate ali oddaljite.</string>
     <string name="spotlight_dialog_search_title">Iskanje dogodkov</string>
     <string name="spotlight_dialog_search_description">Z našo novo funkcijo iskanja enostavno najdite dogodek, ki ga iščete. <a href="https://proton.me/support/calendar-search">Več informacij</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_positive">Omogoči</string>
+    <string name="spotlight_dialog_search_negative">Preskoči</string>
     <string name="spotlight_dialog_import_title">Več načinov dodajanja dogodkov</string>
     <string name="spotlight_dialog_import_description">• Uvozite dogodke v koledar iz datotek v telefonu.\n\n• Dodajanje rezervacij potovanj neposredno iz programa Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funkcije koledarja</string>
@@ -885,26 +885,26 @@
         <item>Kumarica|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
-        <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
-        <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>Vijolična</item>
+        <item>Jagodno rdeča</item>
+        <item>Rožnata</item>
+        <item>Korenčkasto oranžna</item>
+        <item>Saharsko rjava</item>
+        <item>Encijan</item>
+        <item>Slivnato vijolična</item>
+        <item>Češnjevo rdeča</item>
+        <item>Bakrena</item>
+        <item>Zemeljsko rjava</item>
+        <item>Skrilasto modra</item>
+        <item>Pacifiško modra</item>
+        <item>Koralno modra</item>
+        <item>Praprotno zelena</item>
+        <item>Olivno zelena</item>
+        <item>Kobaltna</item>
+        <item>Oceansko modra</item>
+        <item>Bor</item>
+        <item>Gozdno zelena</item>
+        <item>Kumarično zelena</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

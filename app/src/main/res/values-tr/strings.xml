@@ -833,26 +833,26 @@
         <item>Salatalık|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
+        <item>Mor</item>
         <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
+        <item>Pembe</item>
+        <item>Havuç</item>
+        <item>Çöl</item>
+        <item>Kantaron</item>
+        <item>Erik</item>
+        <item>Kiraz</item>
+        <item>Bakır</item>
+        <item>Toprak</item>
         <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
-        <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>Pasifik</item>
+        <item>Resif</item>
+        <item>Eğrelti otu</item>
+        <item>Zeytin</item>
+        <item>Kobalt</item>
+        <item>Okyanus</item>
+        <item>Çam</item>
+        <item>Orman</item>
+        <item>Salatalık</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

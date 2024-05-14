@@ -269,7 +269,7 @@
     <string name="event_remove_participants_dialog_description">Ліст пра скасаванне будзе адпраўлены выдаленым удзельнікам.</string>
     <string name="recurring_event_remove_participants_dialog_description">Ліст пра скасаванне будзе адпраўлены выдаленым удзельнікам для ўсіх падзей у гэтай серыі.</string>
     <string name="event_add_and_remove_participants_dialog_description">Дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне пра ўсе падзеі ў гэтай серыі.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Дададзеныя і выдаленыя ўдзельнікі атрымаюць апавяшчэнне аб усіх падзеях у гэтай серыі.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s было скасавана.</string>
     <string name="event_save_changes">Захаваць змены</string>
     <string name="event_update_add_participants_dialog_description">Існуючыя і дададзеныя ўдзельнікі атрымаюць апавяшчэнне.</string>
@@ -556,7 +556,7 @@
     <string name="dialog_feedback_text">Якія ў вас уражанні ад новай версіі Proton Calendar?</string>
     <string name="dialog_feedback_rating_worst">Жахліва</string>
     <string name="dialog_feedback_rating_best">Цудоўна</string>
-    <string name="dialog_feedback_hint">Падзяліцеся з намі вашымі ўражаннямі (неабавязкова).</string>
+    <string name="dialog_feedback_hint">Падзяліцеся з намі сваімі ўражаннямі (неабавязкова).</string>
     <string name="dialog_feedback_submit">Адправіць</string>
     <string name="dialog_feedback_submit_thank_you">Дзякуй! Ваш водгук дапаможа нам удасканаліць Proton.</string>
     <!-- Calendar Widget -->
