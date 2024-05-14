@@ -212,8 +212,11 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
                     it.extractEmail().equals(query, true)
                 }
                 if (index != -1) {
-                    val itemPress = binding.eventFormAttendeesSearchList.getChildAt(index).findViewById<View>(R.id.item_add_attendee_press)
-                    if (itemPress.isVisible) itemPress.performClick()
+                    binding.eventFormAttendeesSearchList.getChildAt(index)?.findViewById<View>(
+                        R.id.item_add_attendee_press
+                    )?.let { itemPress ->
+                        if (itemPress.isVisible) itemPress.performClick()
+                    }
                 }
             }
             false

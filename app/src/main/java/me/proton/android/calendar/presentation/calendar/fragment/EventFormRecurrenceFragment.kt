@@ -464,7 +464,7 @@ class EventFormRecurrenceFragment : BaseDialogFragment<FragmentEventFormRecurren
     }
 
     private fun setChipItemContent(index: Int, stringArrayIndex: Int, indexOfEventStartDay: Int, checkedDayIndices: List<Int>, dayName: String) {
-        ((binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.chipGroupDayOfWeekLayout as ViewGroup).getChildAt(index) as Chip).apply {
+        ((binding.eventFormRecurrenceCustomLayout.customRecurrenceChipsLayout.chipGroupDayOfWeekLayout as ViewGroup).getChildAt(index) as? Chip)?.apply {
             text = dayName
             isClickable =
                 (stringArrayIndex != indexOfEventStartDay) // we disable and check by default the day of event's start

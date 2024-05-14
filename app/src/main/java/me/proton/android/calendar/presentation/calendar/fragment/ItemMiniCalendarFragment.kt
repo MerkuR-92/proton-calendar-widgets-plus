@@ -383,8 +383,7 @@ class ItemMiniCalendarFragment : Fragment() {
         val processedViewIndexList = arrayListOf<Int>()
         indicators.forEach { (date, indicatorColors) ->
             val miniCalendarIndex = ChronoUnit.DAYS.between(firstMiniCalendarDay, date).toInt()
-            val itemView = binding.glMiniCalendar.getChildAt(miniCalendarIndex)
-            itemView?.let {
+            binding.glMiniCalendar.getChildAt(miniCalendarIndex)?.let { itemView ->
                 val llCalendarDotsView = itemView.findViewById<LinearLayout>(R.id.ll_calendar_dots)
                 llCalendarDotsView.visibleOrInvisible(true)
                 processedViewIndexList.add(miniCalendarIndex)
@@ -428,63 +427,65 @@ class ItemMiniCalendarFragment : Fragment() {
             val selectedMiniCalendarItem = selectedMiniCalendarItem
             if (selectedMiniCalendarItem != null && selectedMiniCalendarItem >= 0) {
 
-                val miniCalendarItemView = binding.glMiniCalendar.getChildAt(selectedMiniCalendarItem)
-                val miniCalendarText = miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)
-                if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now(ZoneId.of(timeZoneId))) {
-                    // Apply today's style
-                    miniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
-                        R.style.Text_DefaultSmall_Strong
-                    )
-                    miniCalendarText.setTextColor(
-                        requireContext().getColorFromAttr(
-                            R.attr.proton_text_accent
-                        )
-                    )
-                    miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
-                } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
-                        selectedMiniCalendarItem.toLong()
-                    ).month &&
-                    firstDayOfTheMonth.month != firstMiniCalendarDay.plusDays(
-                        selectedMiniCalendarItem.toLong()
-                    ).month &&
-                    newSelectedMiniCalendarItem >= 0 &&
-                    newSelectedMiniCalendarItem < binding.glMiniCalendar.childCount
-                ) {
-                    // Apply previous / upcoming month items style
-                    miniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
-                        R.style.Text_DefaultSmall_Strong
-                    )
-                    miniCalendarText.setTextColor(
-                        ContextCompat.getColor(
-                            miniCalendarItemView.context,
-                            R.color.text_hint
-                        )
-                    )
-                    miniCalendarText.setBackgroundResource(0)
-                } else {
-                    // Apply default items style
-                    miniCalendarText.setTextAppearance(
-                        miniCalendarItemView.context,
-                        R.style.Text_DefaultSmall_Strong
-                    )
-                    miniCalendarText.setBackgroundResource(0)
+                binding.glMiniCalendar.getChildAt(selectedMiniCalendarItem)?.let { miniCalendarItemView ->
+                    miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)?.let { miniCalendarText ->
+                        if (firstMiniCalendarDay.plusDays(selectedMiniCalendarItem.toLong()) == LocalDate.now(ZoneId.of(timeZoneId))) {
+                            // Apply today's style
+                            miniCalendarText.setTextAppearance(
+                                miniCalendarItemView.context,
+                                R.style.Text_DefaultSmall_Strong
+                            )
+                            miniCalendarText.setTextColor(
+                                requireContext().getColorFromAttr(
+                                    R.attr.proton_text_accent
+                                )
+                            )
+                            miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_today)
+                        } else if (selectedDate.month != firstMiniCalendarDay.plusDays(
+                                selectedMiniCalendarItem.toLong()
+                            ).month &&
+                            firstDayOfTheMonth.month != firstMiniCalendarDay.plusDays(
+                                selectedMiniCalendarItem.toLong()
+                            ).month &&
+                            newSelectedMiniCalendarItem >= 0 &&
+                            newSelectedMiniCalendarItem < binding.glMiniCalendar.childCount
+                        ) {
+                            // Apply previous / upcoming month items style
+                            miniCalendarText.setTextAppearance(
+                                miniCalendarItemView.context,
+                                R.style.Text_DefaultSmall_Strong
+                            )
+                            miniCalendarText.setTextColor(
+                                ContextCompat.getColor(
+                                    miniCalendarItemView.context,
+                                    R.color.text_hint
+                                )
+                            )
+                            miniCalendarText.setBackgroundResource(0)
+                        } else {
+                            // Apply default items style
+                            miniCalendarText.setTextAppearance(
+                                miniCalendarItemView.context,
+                                R.style.Text_DefaultSmall_Strong
+                            )
+                            miniCalendarText.setBackgroundResource(0)
+                        }
+                    }
                 }
             }
 
             this.selectedMiniCalendarItem = newSelectedMiniCalendarItem
             if (selectedDate.month == firstDayOfTheMonth.month) {
                 // Only display selected date style for month currently displayed
-                val miniCalendarItemView = binding.glMiniCalendar.getChildAt(newSelectedMiniCalendarItem)
-                val miniCalendarText = miniCalendarItemView?.findViewById<TextView>(R.id.itemMiniCalendarText)
-                miniCalendarItemView?.let {
-                    // Apply selected date item style
-                    miniCalendarText?.setTextAppearance(
-                        miniCalendarItemView.context,
-                        R.style.Text_DefaultSmall_Strong_Inverted
-                    )
-                    miniCalendarText?.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                binding.glMiniCalendar.getChildAt(newSelectedMiniCalendarItem)?.let { miniCalendarItemView ->
+                    miniCalendarItemView.findViewById<TextView>(R.id.itemMiniCalendarText)?.let { miniCalendarText ->
+                        // Apply selected date item style
+                        miniCalendarText.setTextAppearance(
+                            miniCalendarItemView.context,
+                            R.style.Text_DefaultSmall_Strong_Inverted
+                        )
+                        miniCalendarText.setBackgroundResource(R.drawable.ripple_mini_calendar_day_selected)
+                    }
                 }
             }
         }

@@ -412,6 +412,7 @@ class CalendarViewModel @Inject constructor(
                                 index == sortedEvents.size - 1,
                                 userEmails,
                                 is24Hour,
+                                isFreeUser() ?: true,
                                 searchTerm
                             )
                             timelineEvents.add(timelineEvent)

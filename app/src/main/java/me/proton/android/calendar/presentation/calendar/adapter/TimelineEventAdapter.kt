@@ -122,7 +122,7 @@ class TimelineEventAdapter(
                 }
 
                 // tint calendar bar
-                ivCalendarBar.background.setTint(Color.parseColor(event.calendarColor))
+                ivCalendarBar.background.setTint(Color.parseColor(event.color))
 
             }
 
@@ -153,7 +153,7 @@ class TimelineEventAdapter(
         val showBottomSpacing: Boolean,
         val fullDayCounter: String?,
         val occurrenceNumber: Int,
-        val calendarColor: String,
+        val color: String,
         val searchTerm: String
     )
 

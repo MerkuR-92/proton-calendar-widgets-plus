@@ -312,15 +312,17 @@ class CalendarFormFragment : BaseDialogFragment<FragmentCalendarFormBinding>(), 
             binding.calendarFormDefaultEventNotificationsPress.root.isEnabled = !processingEvent
             for (i in 0 until binding.calendarFormDefaultEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                binding.calendarFormDefaultEventNotificationsList.getChildAt(i)
-                    .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
+                binding.calendarFormDefaultEventNotificationsList.getChildAt(i)?.findViewById<View>(
+                    R.id.item_simple_text_button_delete
+                )?.isEnabled = !processingEvent
             }
 
             binding.calendarFormDefaultAllDayEventNotificationsPress.root.isEnabled = !processingEvent
             for (i in 0 until binding.calendarFormDefaultAllDayEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                binding.calendarFormDefaultAllDayEventNotificationsList.getChildAt(i)
-                    .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
+                binding.calendarFormDefaultAllDayEventNotificationsList.getChildAt(i).findViewById<View>(
+                    R.id.item_simple_text_button_delete
+                )?.isEnabled = !processingEvent
             }
         }
     }

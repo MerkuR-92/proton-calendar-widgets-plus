@@ -24,6 +24,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
@@ -45,6 +46,8 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.domain.getPrimaryAccount
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
+import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.takeIfNotBlank
 import org.koin.core.KoinComponent
@@ -244,6 +247,7 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
     private val resourceProvider: ResourceProvider by inject()
     private val calendarsRepository: CalendarsRepository by inject()
     private val accountManager: AccountManager by inject()
+    private val userManager: UserManager by inject()
     private val userAddressManager: UserAddressManager by inject()
     private val userSettingsRepository: UserSettingsRepository by inject()
     private val logger: Logger by inject()
@@ -268,6 +272,7 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
             resourceProvider,
             calendarsRepository,
             accountManager,
+            userManager,
             userAddressManager,
             userSettingsRepository,
             applicationContext,
@@ -291,7 +296,7 @@ internal data class WidgetEvent(
     val showNoEventsToday: Boolean,
     val fullDayCounter: String?,
     val occurrenceNumber: Int,
-    val calendarColor: String,
+    val color: String,
 )
 
 internal class CalendarWidgetRemoteViewsFactory(
@@ -299,6 +304,7 @@ internal class CalendarWidgetRemoteViewsFactory(
     private val resourceProvider: ResourceProvider,
     private val calendarsRepository: CalendarsRepository,
     private val accountManager: AccountManager,
+    private val userManager: UserManager,
     private val userAddressManager: UserAddressManager,
     private val userSettingsRepository: UserSettingsRepository,
     private val applicationContext: Context,
@@ -315,7 +321,8 @@ internal class CalendarWidgetRemoteViewsFactory(
         showBottomSpacing: Boolean,
         showNoEventsToday: Boolean,
         userEmails: List<String>,
-        is24Hour: Boolean
+        is24Hour: Boolean,
+        isFreeUser: Boolean
     ): WidgetEvent {
 
         val fullDayCounter = this.calculateFullDayCounter(happensOn, timeZoneId)
@@ -371,7 +378,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             showNoEventsToday = showNoEventsToday,
             fullDayCounter = fullDayCounterString,
             occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
-            calendarColor = this.calendar.color,
+            color = this.getDisplayColor(isFreeUser),
             isCancelledOrDeclined = this.decryptionStatus == Event.DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
             failedToDecrypt = this.decryptionStatus == Event.DecryptionStatus.FAILURE
@@ -460,7 +467,7 @@ internal class CalendarWidgetRemoteViewsFactory(
         }
 
         // tint calendar bar
-        remoteView.setInt(R.id.iv_calendar_bar, "setColorFilter", Color.parseColor(event.calendarColor))
+        remoteView.setInt(R.id.iv_calendar_bar, "setColorFilter", Color.parseColor(event.color))
 
         // setup tapping on occurrences
         val eventId = adapterData[position].id
@@ -530,6 +537,10 @@ internal class CalendarWidgetRemoteViewsFactory(
                     } else emptyList()
                 }
 
+                val isFreeUser = userId?.let {
+                    userManager.getUserOrNull(userId, logger)?.hasSubscriptionForMail() == false
+                } ?: true
+
                 // create a list of Events with correct time labels to display on Widget list
                 val widgetEvents = mutableListOf<WidgetEvent>()
                 events.explodeDayByDay(fromDate, toDate, zoneId.id).toSortedMap().forEach { entry ->
@@ -553,7 +564,8 @@ internal class CalendarWidgetRemoteViewsFactory(
                             index == sortedEvents.size - 1,
                             false,
                             userEmails,
-                            is24Hour
+                            is24Hour,
+                            isFreeUser
                         )
                         widgetEvents.add(widgetEvent)
                     }
@@ -572,7 +584,7 @@ internal class CalendarWidgetRemoteViewsFactory(
                             showDateColumn = true,
                             showBottomSpacing = true,
                             showNoEventsToday = true,
-                            calendarColor = resourceProvider.provideString(R.color.separator_norm)
+                            color = resourceProvider.provideString(R.color.separator_norm)
                         )
                     )
                 }

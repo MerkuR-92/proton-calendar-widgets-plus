@@ -105,7 +105,7 @@ const val IMPORT_VERSION_CODE = 186
 const val CALENDAR_PROVIDER_VERSION_CODE = 191
 const val HOLIDAY_CALENDAR_VERSION_CODE = 223
 const val COLOR_PER_EVENT_VERSION_CODE = 262
-const val SEARCH_VERSION_CODE = 270
+const val SEARCH_VERSION_CODE = 267
 
 const val FETCH_EVENTS_MAX_DAYS_WINDOW = 42 // Maximum number of days shown at once in a view (Currently month view)
 
@@ -124,7 +124,7 @@ val SPOTLIGHT_VERSION_CODES = arrayListOf(
     CALENDAR_PROVIDER_VERSION_CODE, // Calendar provider (2.9.1)
     HOLIDAY_CALENDAR_VERSION_CODE, // Holiday calendar (2.12.4)
     COLOR_PER_EVENT_VERSION_CODE, // Color per event (2.17.3)
-    SEARCH_VERSION_CODE // Search view (2.19.2)
+    SEARCH_VERSION_CODE // Search view (2.19.1)
 )
 
 object HttpResponseCode {

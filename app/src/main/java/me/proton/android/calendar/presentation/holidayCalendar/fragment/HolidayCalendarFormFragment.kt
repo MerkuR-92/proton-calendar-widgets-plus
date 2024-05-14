@@ -250,8 +250,9 @@ class HolidayCalendarFormFragment : BaseDialogFragment<FragmentHolidayCalendarFo
             binding.holidayCalendarFormDefaultAllDayEventNotificationsPress.root.isEnabled = !processingEvent
             for (i in 0 until binding.holidayCalendarFormDefaultAllDayEventNotificationsList.childCount) {
                 // Disable the delete buttons from inside alarm items views
-                binding.holidayCalendarFormDefaultAllDayEventNotificationsList.getChildAt(i)
-                    .findViewById<View>(R.id.item_simple_text_button_delete).isEnabled = !processingEvent
+                binding.holidayCalendarFormDefaultAllDayEventNotificationsList.getChildAt(i)?.findViewById<View>(
+                    R.id.item_simple_text_button_delete
+                )?.isEnabled = !processingEvent
             }
 
             // Disable save when calendar already exists
