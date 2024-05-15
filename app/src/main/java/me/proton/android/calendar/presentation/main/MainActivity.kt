@@ -864,7 +864,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         }
 
         // openInputStream blocks current thread and coroutine cannot be properly suspended so we call it before launch
-        val bufferedReader = BufferedReader(InputStreamReader(this@MainActivity.contentResolver.openInputStream(uri)))
+        val bufferedReader = BufferedReader(
+            InputStreamReader(
+                kotlin.runCatching {
+                    this@MainActivity.contentResolver.openInputStream(uri)
+                }.getOrElse {
+                    this@MainActivity.displaySnackBar(
+                        getString(R.string.snack_ics_file_not_found_error),
+                        Snackbar.LENGTH_LONG
+                    )
+                    return
+                }
+            )
+        )
         val iCalString = bufferedReader.use { it.readText() }
 
         val isOpeningFromFileSystem = senderEmail == null || recipientEmail == null
