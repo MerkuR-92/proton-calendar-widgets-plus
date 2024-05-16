@@ -2315,12 +2315,6 @@ class EventViewModel @Inject constructor(
             event.color
         )
 
-        if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
-            updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventResponse>()?.let {
-                calendarsRepository.persistEvents(it.toEventEntity())
-            } ?: logger.e("handleSavePersonal: Failed to cast updatePersonalPartUseCaseUseCaseResult to EventEntity")
-        }
-
         // Handle save result
         if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
             // Display event updated snack and return to month view with focus on the event's start date

@@ -6,6 +6,7 @@ import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Notification
@@ -64,7 +65,10 @@ class UpdatePersonalPartUseCase @Inject constructor(
             )
         )) {
             is ApiResponse.Success -> {
-                UseCase.Result.Success(updateEventPersonalPartResponse.data.event)
+                val eventResponse = updateEventPersonalPartResponse.data.event
+                calendarsRepository.persistEvents(eventResponse.toEventEntity())
+                calendarsRepository.persistEventsMetadata(eventResponse.toEventEntityMetadata())
+                UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
                 UseCase.Result.Error("api error updating event personal part: $updateEventPersonalPartResponse")
