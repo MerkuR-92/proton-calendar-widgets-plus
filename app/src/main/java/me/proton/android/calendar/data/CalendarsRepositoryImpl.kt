@@ -1246,8 +1246,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
             // If an event with the same UID has no recurrenceId then we have occurrence(s) of the main series
-            eventsSharingUidResponse.data.events.none { eventEntity ->
-                val sharedEvents = eventEntity.sharedEvents.map {
+            eventsSharingUidResponse.data.events.none { eventResponse ->
+                val sharedEvents = eventResponse.sharedEvents.map {
                     json.decodeFromJsonElement<Event.EventPart.Shared>(it)
                 }
                 val iCal = ICalUtilsImpl.parseICalString(sharedEvents.first { !it.isEncrypted }.data)
@@ -1264,8 +1264,8 @@ class CalendarsRepositoryImpl @Inject constructor(
         val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100) // TODO paging
         return if (eventsSharingUidResponse is ApiResponse.Success) {
 
-            val skeletonEvents = eventsSharingUidResponse.data.events.mapNotNull { eventEntity ->
-                val skeletonEventEntity = SkeletonEventEntity(eventEntity.id, eventEntity.calendarId, eventEntity.sharedEvents, eventEntity.modifyTime, eventEntity.addressId)
+            val skeletonEvents = eventsSharingUidResponse.data.events.mapNotNull { eventResponse ->
+                val skeletonEventEntity = SkeletonEventEntity(eventResponse.id, eventResponse.calendarId, eventResponse.sharedEvents, eventResponse.modifyTime, eventResponse.addressId)
                 skeletonEventEntity.toSkeletonEvent(json)
             }
 

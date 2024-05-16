@@ -83,7 +83,7 @@ class UpgradeEventUseCase @Inject constructor(
                 } else {
                     calendarsRepository.persistEvents(upgradeResponse.data.event.toEventEntity())
                     calendarsRepository.persistEventsMetadata(upgradeResponse.data.event.toEventEntityMetadata())
-                    UseCase.Result.Success(upgradeResponse.data.event)
+                    UseCase.Result.Success(upgradeResponse.data.event.toEventEntity())
                 }
             }
             is ApiResponse.Error -> {
@@ -98,7 +98,7 @@ class UpgradeEventUseCase @Inject constructor(
                     } else {
                         calendarsRepository.persistEvents(event.toEventEntity())
                         calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
-                        UseCase.Result.Success(event)
+                        UseCase.Result.Success(event.toEventEntity())
                     }
                 } else {
                     UseCase.Result.Error("UpgradeEventUseCase: error: ${upgradeResponse.error}")

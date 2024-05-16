@@ -73,6 +73,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -2296,7 +2297,7 @@ class EventViewModel @Inject constructor(
             eventId
         ) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
         if (upgradedEventEntity == null) {
-            logger.e("handleSavePersonal could not upgrade Event")
+            logger.e("handleSavePersonal could not upgrade Event. Failed to cast upgrade result to EventEntity")
             // Reset event form state
             eventFormState.value = EventState.Idle
             // Display error updating event snack
@@ -2315,9 +2316,9 @@ class EventViewModel @Inject constructor(
         )
 
         if (updatePersonalPartUseCaseUseCaseResult is UseCase.Result.Success<*>) {
-            updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventEntity>()?.let {
-                calendarsRepository.persistEvents(it)
-            }
+            updatePersonalPartUseCaseUseCaseResult.returnValue.tryCastOrNull<EventResponse>()?.let {
+                calendarsRepository.persistEvents(it.toEventEntity())
+            } ?: logger.e("handleSavePersonal: Failed to cast updatePersonalPartUseCaseUseCaseResult to EventEntity")
         }
 
         // Handle save result
@@ -3637,7 +3638,7 @@ class EventViewModel @Inject constructor(
 
         val updateTime = Instant.now()
 
-        val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>()
+        val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: logger.e("handleChangeAnswerProtonToProton failed to cast upgrade result to EventEntity")
 
         // For proton to proton we first update the participation status on BE
         val updateParticipationStatusUseCaseResult = if (upgradedEventEntity != null) {

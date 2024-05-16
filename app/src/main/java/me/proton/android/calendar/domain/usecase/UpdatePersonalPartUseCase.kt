@@ -5,6 +5,7 @@ import me.proton.android.calendar.data.api.PersonalEventContentApiRequest
 import me.proton.android.calendar.data.api.UpdateEventPersonalPartApiRequest
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.NotificationEntity
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.model.Notification
