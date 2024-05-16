@@ -80,7 +80,7 @@ class EditCreateEventUseCase @Inject constructor(
         sanitizedNewEvent.iCalEvent.sanitiseForExternal()
 
         val oldEventEntity = if (sanitizedNewEvent.isSyncedWithApi()) {
-            (upgradeEventUseCase.execute(userId, sanitizedNewEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event")
+            (upgradeEventUseCase.execute(userId, sanitizedNewEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("EditCreateEventUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
         } else null
 
         val userAddresses = userAddressManager.getAddressesOrNull(userId)?.takeIfNotEmpty() ?: return UseCase.Result.InvalidParams("EditCreateEventUseCase: User Addresses is empty")

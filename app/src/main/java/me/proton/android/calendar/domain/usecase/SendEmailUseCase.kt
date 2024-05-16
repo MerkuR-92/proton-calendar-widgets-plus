@@ -77,7 +77,7 @@ class SendEmailUseCase @Inject constructor(
 
         val ics = if (isProtonProtonInvite && eventEntity != null) {
 
-            val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event")
+            val upgradedEventEntity = (upgradeEventUseCase.execute(userId, eventEntity.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
 
             val sharedPropertiesResult = getSharedProperties(userId, upgradedEventEntity)
             if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
@@ -144,7 +144,7 @@ class SendEmailUseCase @Inject constructor(
 
         val mailContent = getEmailContent(newEvent, defaultTimeZone, timeFormatIs24Hours, MailType.INVITE, sendEmailUpdate = sendEmailUpdate)
 
-        val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event")
+        val newEventEntity = (upgradeEventUseCase.execute(userId, newEvent.id) as? UseCase.Result.Success<*>)?.returnValue.tryCastOrNull<EventEntity>() ?: return UseCase.Result.Error("SendEmailUseCase could not upgrade Event. Failed to cast upgrade result to EventEntity")
 
         val sharedPropertiesResult = getSharedProperties(userId, newEventEntity)
         if (sharedPropertiesResult !is UseCase.Result.Success<*>) return sharedPropertiesResult
