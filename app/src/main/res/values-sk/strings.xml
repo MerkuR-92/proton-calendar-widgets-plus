@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Kalendár bol vytvorený, ale niektoré informácie neboli aktualizované, skúste neskôr, prosím</string>
     <string name="snack_ics_default_error">Chyba pri otváraní kalendára</string>
     <string name="snack_ics_event_not_found_error">Udalosť nenájdená</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">Chyba pri vytváraní udalosti</string>
     <string name="snack_ics_parsing_error">Chyba pri čítaní kalendára</string>
     <string name="snack_ics_unsupported_method_error">Tento typ udalosti zatiaľ nie je podporovaný</string>

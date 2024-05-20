@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Der Kalender wurde erstellt, aber einige Informationen wurden nicht aktualisiert. Bitte versuche es später noch einmal.</string>
     <string name="snack_ics_default_error">Fehler beim Öffnen des Kalenders</string>
     <string name="snack_ics_event_not_found_error">Termin nicht gefunden</string>
+    <string name="snack_ics_file_not_found_error">Datei nicht gefunden</string>
     <string name="snack_ics_create_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_ics_parsing_error">Fehler beim Einlesen des Kalenders</string>
     <string name="snack_ics_unsupported_method_error">Dieser Termintyp wird noch nicht unterstützt</string>
@@ -397,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Das Erstellen von Einladungen in einem geteilten Kalender ist nicht erlaubt.</string>
     <string name="snack_down_banner">Die Proton-Server sind ausgefallen. Besuche unsere Statusseite für Details.</string>
     <string name="snack_down_banner_action">Statusseite öffnen</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade zum Anpassen der Terminfarben</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Termin existiert nicht</string>
     <string name="error_occurrence_does_not_exist">Wiederholung existiert nicht</string>
@@ -600,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Die Feiertage sind da!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben, oder vergessen, einen langen Wochenendausflug zu planen.\n\nFüge die Feiertage eines beliebigen Landes deinem Kalender hinzu.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Du musst keine Meetings mehr planen, wenn alle anderen frei haben oder vergessen, einen langen Wochenendausflug zu planen.\n\nDa du derzeit das Kalenderlimit erreicht hast, musst du zunächst einen bestehenden Kalender entfernen, um einen neuen Ferienkalender hinzuzufügen.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Benutzerdefinierte Terminfarben</string>
+    <string name="spotlight_dialog_color_per_event_description">Passe die Farbe einzelner Termine an, um:\n\n• Deine Kalender farblich zu markieren\n\n• Deinen Tag besser zu organisieren und deine Zeit zu erfassen\n\n• Prioritäten zu setzen und die Effizienz zu steigern</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Zugriff erlauben</string>
     <string name="dialog_google_auth_description">Um den Import zu starten, melde dich bei Google Calendar an und erlaube Proton den Zugriff auf deine Daten.</string>

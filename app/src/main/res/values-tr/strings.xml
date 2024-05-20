@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Takvim eklendi fakat bazı bilgiler güncellenmedi. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_ics_default_error">Takvim açılırken sorun çıktı</string>
     <string name="snack_ics_event_not_found_error">Etkinlik bulunamadı</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">Etkinlik eklenirken sorun çıktı</string>
     <string name="snack_ics_parsing_error">Takvim okunurken sorun çıktı</string>
     <string name="snack_ics_unsupported_method_error">Bu etkinlik türü henüz desteklenmiyor</string>

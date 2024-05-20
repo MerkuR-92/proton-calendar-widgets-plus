@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">A naptár elkészült, de néhány információ frissítése nem sikerült. Próbálja meg később</string>
     <string name="snack_ics_default_error">Hiba a naptár megnyitásakor</string>
     <string name="snack_ics_event_not_found_error">Az esemény nem található</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">Hiba az esemény létrehozása során</string>
     <string name="snack_ics_parsing_error">Hiba a naptár olvasásakor</string>
     <string name="snack_ics_unsupported_method_error">Ez az eseménytípus még nem támogatott</string>

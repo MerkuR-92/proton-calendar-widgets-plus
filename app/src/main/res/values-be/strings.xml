@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Каляндар створаны, але некаторая інфармацыя не была абноўлена. Паспрабуйце яшчэ раз пазней</string>
     <string name="snack_ics_default_error">Памылка адкрыцця календара</string>
     <string name="snack_ics_event_not_found_error">Падзея не знойдзена</string>
+    <string name="snack_ics_file_not_found_error">Файл не знойдзены</string>
     <string name="snack_ics_create_error">Памылка стварэння падзеі</string>
     <string name="snack_ics_parsing_error">Памылка чытання календара</string>
     <string name="snack_ics_unsupported_method_error">Такі тып падзеі яшчэ не падтрымліваецца</string>

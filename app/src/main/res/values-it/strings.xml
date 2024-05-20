@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Il calendario è stato creato ma alcune informazioni non sono state aggiornate, riprova più tardi</string>
     <string name="snack_ics_default_error">Errore nell\'apertura del calendario</string>
     <string name="snack_ics_event_not_found_error">Evento non trovato</string>
+    <string name="snack_ics_file_not_found_error">File non trovato</string>
     <string name="snack_ics_create_error">Errore nella creazione dell\'evento</string>
     <string name="snack_ics_parsing_error">Errore nella lettura del calendario</string>
     <string name="snack_ics_unsupported_method_error">Questo tipo di evento non è ancora supportato</string>

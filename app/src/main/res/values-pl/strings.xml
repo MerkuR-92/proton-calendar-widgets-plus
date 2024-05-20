@@ -367,9 +367,10 @@
     <string name="snack_create_calendar_settings_error">Kalendarz został utworzony, ale niektóre informacje nie zostały zaktualizowane. Spróbuj ponownie później</string>
     <string name="snack_ics_default_error">Wystąpił błąd podczas odczytywania kalendarza</string>
     <string name="snack_ics_event_not_found_error">Wydarzenie nie zostało znalezione</string>
+    <string name="snack_ics_file_not_found_error">Plik nie został znaleziony</string>
     <string name="snack_ics_create_error">Wystąpił błąd podczas tworzenia wydarzenia</string>
     <string name="snack_ics_parsing_error">Wystąpił błąd podczas odczytywania kalendarza</string>
-    <string name="snack_ics_unsupported_method_error">Ten typ wydarzenia nie jest obecnie obsługiwany</string>
+    <string name="snack_ics_unsupported_method_error">Ten typ wydarzenia nie jest obsługiwany</string>
     <string name="snack_ics_unsupported_add_error">Dodawanie powtórzeń do wydarzenia nie jest obecnie obsługiwane</string>
     <string name="snack_ics_unsupported_counter_error">Planowanie wydarzenia nie jest obecnie obsługiwane</string>
     <string name="snack_ics_unsupported_refresh_error">Odświeżanie wydarzenia nie jest obecnie obsługiwane</string>

@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Koledar je bil ustvarjen, vendar nekatere informacije niso posodobljene, poskusite znova pozneje</string>
     <string name="snack_ics_default_error">Napaka pri odpiranju koledarja</string>
     <string name="snack_ics_event_not_found_error">Dogodek ni bil najden</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">Napaka pri ustvarjanju dogodka</string>
     <string name="snack_ics_parsing_error">Napaka pri branju koledarja</string>
     <string name="snack_ics_unsupported_method_error">Ta vrsta dogodka še ni podprta</string>

@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Kalender berhasil dibuat namun sebagian informasi gagal diperbarui, silakan coba lagi nanti</string>
     <string name="snack_ics_default_error">Terjadi masalah saat membuka kalender</string>
     <string name="snack_ics_event_not_found_error">Acara tidak ditemukan</string>
+    <string name="snack_ics_file_not_found_error">Berkas tidak ditemukan</string>
     <string name="snack_ics_create_error">Terjadi masalah saat membuat acara</string>
     <string name="snack_ics_parsing_error">Terjadi masalah saat membaca kalender</string>
     <string name="snack_ics_unsupported_method_error">Tipe acara ini saat ini belum didukung</string>
