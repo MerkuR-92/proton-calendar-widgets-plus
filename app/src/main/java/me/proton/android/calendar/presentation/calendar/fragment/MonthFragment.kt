@@ -555,11 +555,12 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
                 // TODO schedule repeating worker job
                 mainViewModel.syncAlarms(userId).observe(viewLifecycleOwner) {
-                    if (it is Operation.State.IN_PROGRESS) {
-                        calendarViewModel.setLoading(true)
-                    } else {
-                        calendarViewModel.setLoading(false)
-                    }
+                    // TODO Do we want to display loader for syncAlarms ?
+//                    if (it is Operation.State.IN_PROGRESS) {
+//                        calendarViewModel.setLoading(true)
+//                    } else {
+//                        calendarViewModel.setLoading(false)
+//                    }
                 }
 
                 mainViewModel.fetchUserSettings(userId = userId)
