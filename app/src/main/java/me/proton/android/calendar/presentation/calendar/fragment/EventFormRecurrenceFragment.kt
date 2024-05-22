@@ -268,7 +268,7 @@ class EventFormRecurrenceFragment : BaseDialogFragment<FragmentEventFormRecurren
         // "after X occurrences" radio button
         binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCountSuffix.setText(
             resources.getQuantityString(
-                R.plurals.plural_occurrence,
+                R.plurals.plural_time,
                 FormValidation.OCCURRENCE_COUNT_DEFAULT
             )
         )
@@ -283,7 +283,7 @@ class EventFormRecurrenceFragment : BaseDialogFragment<FragmentEventFormRecurren
             ) {
                 binding.eventFormRecurrenceCustomLayout.customRecurrenceEndCountSuffix.setText(
                     resources.getQuantityString(
-                        R.plurals.plural_occurrence,
+                        R.plurals.plural_time,
                         it
                     )
                 )
