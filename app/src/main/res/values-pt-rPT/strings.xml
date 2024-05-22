@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">O calendário foi criado, mas algumas informações não foram actualizadas. Tente mais tarde.</string>
     <string name="snack_ics_default_error">Erro ao abrir o calendário</string>
     <string name="snack_ics_event_not_found_error">Evento não encontrado</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">Erro ao criar o evento</string>
     <string name="snack_ics_parsing_error">Erro ao ler o calendário</string>
     <string name="snack_ics_unsupported_method_error">Este tipo de evento ainda não é suportado</string>
@@ -452,7 +453,7 @@
     <string name="settings_week_numbers_title">Mostrar número da semana</string>
     <string name="settings_auto_invites_title">Adicione convites ao calendário e marque-os como pendentes</string>
     <string name="settings_search_title">Pesquisar calendários</string>
-    <string name="settings_search_subtitle">Descarrega e armazena o conteúdo do calendário no seu dispositivo para pesquisa. Se desativar esta opção, o conteúdo transferido será removido.\n\nA pesquisa é uma funcionalidade beta experimental. A ativação desta funcionalidade pode tornar a aplicação instável.</string>
+    <string name="settings_search_subtitle">Transfire e armazena o conteúdo do calendário no seu dispositivo para pesquisa. Se desativar esta opção, o conteúdo transferido será removido.\n\nA pesquisa é uma funcionalidade beta experimental. A ativação desta funcionalidade pode tornar a aplicação instável.</string>
     <string name="settings_alternative_routing_title">Permitir redirecionamento alternativo</string>
     <string name="settings_alternative_routing_subtitle">Caso as páginas do Proton estejam bloqueadas, esta definição permite à aplicação tentar redirecionar o tráfego para ligar ao Proton, o que pode ser útil para contornar firewalls ou problemas de rede. Recomendamos que mantenha esta definição para maior confiança.</string>
     <string name="settings_value_placeholder">Tocar para selecionar</string>
@@ -589,7 +590,7 @@
     <string name="spotlight_dialog_week_view_description">- Apresentando as vistas <b>3 dias</b> e <b>Semana</b> do calendário. Selecione a sua vista preferida no <b>menu</b>.\n\n- Ajuste a altura das linhas na grelha do dia tocando com dois dedos para aumentar ou diminuir o zoom.</string>
     <string name="spotlight_dialog_search_title">Pesquisar por eventos.</string>
     <string name="spotlight_dialog_search_description">Encontre facilmente o evento que pesquisa com a nossa nova funcionalidade de pesquisa. <a href="https://proton.me/support/calendar-search">Saiba mais</a>.</string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
+    <string name="spotlight_dialog_search_positive">Activar</string>
     <string name="spotlight_dialog_search_negative">Ignorar</string>
     <string name="spotlight_dialog_import_title">Mais maneiras de adicionar eventos.</string>
     <string name="spotlight_dialog_import_description">• Importe eventos para o seu calendário a partir de ficheiros no seu telefone.\n\n• Adicione reservas de viagem diretamente do Proton Mail.</string>
@@ -600,7 +601,7 @@
     <string name="spotlight_dialog_holiday_calendar_title">Os feriados públicos estão aqui!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nAdicione os feriados de qualquer país ao seu calendário.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nDado que está atualmente no limite do calendário, para adicionar um calendário de feriados, terá de remover primeiro um calendário existente.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_title">Cores de eventos personalizados</string>
     <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
@@ -833,26 +834,26 @@
         <item>Pepino|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
+        <item>Púrpura</item>
+        <item>Morango</item>
         <item>Rosa</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
+        <item>Cenoura</item>
+        <item>Saara</item>
+        <item>Genciana</item>
         <item>Ameixa</item>
-        <item>Cerise</item>
-        <item>Copper</item>
+        <item>Cereja</item>
+        <item>Cobre</item>
         <item>Terra</item>
-        <item>Slate Blue</item>
+        <item>Azul-ardósia</item>
         <item>Pacífico</item>
         <item>Recife</item>
         <item>Samambaia</item>
         <item>Azeitona</item>
-        <item>Cobalt</item>
+        <item>Cobalto</item>
         <item>Oceano</item>
         <item>Pinho</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>Floresta</item>
+        <item>Pepininhos</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">Kalendern skapades men viss information uppdaterades inte, försök igen senare</string>
     <string name="snack_ics_default_error">Fel att öppna kalender</string>
     <string name="snack_ics_event_not_found_error">Händelse hittades inte</string>
+    <string name="snack_ics_file_not_found_error">Fil hittades inte</string>
     <string name="snack_ics_create_error">Det gick inte att skapa händelse</string>
     <string name="snack_ics_parsing_error">Fel vid läsning av kalender</string>
     <string name="snack_ics_unsupported_method_error">Denna händelsetypen stöds inte än</string>

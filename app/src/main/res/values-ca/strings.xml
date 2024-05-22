@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">El calendari s\'ha creat, però algunes dades no s\'han actualitzat. Proveu de nou més tard</string>
     <string name="snack_ics_default_error">Error obrint el calendari</string>
     <string name="snack_ics_event_not_found_error">No s\'ha trobat l\'esdeveniment</string>
+    <string name="snack_ics_file_not_found_error">No s\'ha trobat el fitxer.</string>
     <string name="snack_ics_create_error">Error creant l\'esdeveniment</string>
     <string name="snack_ics_parsing_error">Error llegint el calendari</string>
     <string name="snack_ics_unsupported_method_error">Aquest tipus d\'esdeveniment encara no està suportat</string>
@@ -600,7 +601,7 @@
     <string name="spotlight_dialog_holiday_calendar_title">Els dies festius són aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_title">Colors d\'esdeveniments personalitzats</string>
     <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
@@ -840,7 +841,7 @@
         <item>Sàhara</item>
         <item>Genciana</item>
         <item>Pruna</item>
-        <item>Cirera</item>
+        <item>Vermell cirera</item>
         <item>Coure</item>
         <item>Terra</item>
         <item>Blau pissarra</item>

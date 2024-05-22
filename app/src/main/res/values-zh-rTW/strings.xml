@@ -367,6 +367,7 @@
     <string name="snack_create_calendar_settings_error">行事曆已創建，惟部分資訊未更新，請稍後再試</string>
     <string name="snack_ics_default_error">開啟行事曆時發生錯誤</string>
     <string name="snack_ics_event_not_found_error">找不到活動</string>
+    <string name="snack_ics_file_not_found_error">File not found</string>
     <string name="snack_ics_create_error">創建活動時發生錯誤</string>
     <string name="snack_ics_parsing_error">讀取行事曆時發生錯誤</string>
     <string name="snack_ics_unsupported_method_error">尚未支援此活動類型</string>
