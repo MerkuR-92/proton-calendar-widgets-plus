@@ -3,8 +3,11 @@ package me.proton.android.calendar.presentation.calendar.fragment
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
+import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +16,8 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.text.HtmlCompat
+import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -77,6 +82,7 @@ import me.proton.core.util.kotlin.nullIfBlank
 import org.koin.core.KoinComponent
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+
 
 @AndroidEntryPoint
 class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), KoinComponent {
@@ -517,8 +523,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
 
             event.location?.nullIfBlank()?.let {
                 with(binding.sectionLocation) {
-                    textHeader.text = event.location
-                    Linkify.addLinks(textHeader, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS)
+                    textHeader.text = linkifyAndParseHtml(event.location ?: "")
+                    textHeader.movementMethod = LinkMovementMethod.getInstance()
                     imageIcon.setImageResource(R.drawable.ic_proton_map_pin)
                     imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
                     imageButtonAction.visibleOrInvisible(true)
@@ -562,8 +568,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
 
             event.description?.nullIfBlank()?.let {
                 with(binding.sectionDescription) {
-                    textHeader.text = event.description
-                    Linkify.addLinks(textHeader, Linkify.ALL)
+                    textHeader.text = linkifyAndParseHtml(event.description ?: "")
+                    textHeader.movementMethod = LinkMovementMethod.getInstance()
                     imageIcon.setImageResource(R.drawable.ic_proton_text_align_left)
                     root.visibleOrGone(true)
                 }
@@ -590,6 +596,22 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             }
 
         })
+    }
+
+    private fun linkifyAndParseHtml(html: String): Spannable {
+        val text = HtmlCompat.fromHtml(
+            html.replace("\n", "<br>"),
+            FROM_HTML_MODE_COMPACT
+        )
+        val currentSpans = text.getSpans(0, text.length, URLSpan::class.java)
+        val buffer = SpannableString(text)
+        Linkify.addLinks(buffer, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS or Linkify.EMAIL_ADDRESSES)
+        for (span in currentSpans) {
+            val end = text.getSpanEnd(span)
+            val start = text.getSpanStart(span)
+            buffer.setSpan(span, start, end, 0)
+        }
+        return buffer
     }
 
     private fun onVerificationBadgeClicked(event: Event) {
