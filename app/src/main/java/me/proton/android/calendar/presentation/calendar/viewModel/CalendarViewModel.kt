@@ -1007,6 +1007,10 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
+    suspend fun allowDeleteEvent(calendarId: String): Boolean {
+        return calendarsRepository.selectCalendar(calendarId)?.allowEditEvents ?: false
+    }
+
     suspend fun getUserAddresses(): List<UserAddress>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {

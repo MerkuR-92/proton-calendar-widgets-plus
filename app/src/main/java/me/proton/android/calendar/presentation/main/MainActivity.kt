@@ -87,7 +87,6 @@ import me.proton.android.calendar.common.SERVER_DOWN_BANNER_DURATION_SECONDS
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
-import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -125,7 +124,6 @@ import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
-import me.proton.core.accountmanager.presentation.compose.SignOutDialogActivity
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.notification.presentation.deeplink.DeeplinkManager
 import me.proton.core.notification.presentation.deeplink.onActivityCreate
@@ -810,7 +808,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 }
                 is EventViewModel.EventLinkResult.DecryptionFailed -> {
                     safeNavigateToMonth()
-                    displayEventDecryptionErrorDialog(handleEventLinkResult.event.isRecurring()) { _, _ ->
+                    displayEventDecryptionErrorDialog(
+                        handleEventLinkResult.event.calendar.allowEditEvents,
+                        handleEventLinkResult.event.isRecurring()
+                    ) { _, _ ->
                         lifecycleScope.launch { // TODO
                             val deleteResult = withContext(Dispatchers.Default) {
                                 calendarViewModel.handleDeleteEvent(
@@ -1106,30 +1107,35 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     }
 
     private fun deleteFailedToDecryptEvent(eventId: String, calendarId: String, isRecurring: Boolean?) {
-        displayEventDecryptionErrorDialog(isRecurring == true) { _, _ ->
-            lifecycleScope.launch { // TODO
-                val deleteResult = withContext(Dispatchers.Default) {
-                    calendarViewModel.handleDeleteEvent(
-                        eventId,
-                        calendarId,
-                        EventEditDeleteOption.ALL_EVENTS
-                    )
-                }
-                if (deleteResult is UseCase.Result.Success<*>) {
-                    this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
-                } else {
-                    var userErrorMessage: String? = null
-                    if (deleteResult is UseCase.Result.Error) {
-                        logger.e("Error deleting event: ${deleteResult.message}")
-                        userErrorMessage = deleteResult.userErrorMessage
-                    } else if (deleteResult is UseCase.Result.InvalidParams) {
-                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                        userErrorMessage = deleteResult.userErrorMessage
+        lifecycleScope.launch { // TODO
+            displayEventDecryptionErrorDialog(
+                calendarViewModel.allowDeleteEvent(calendarId),
+                isRecurring == true
+            ) { _, _ ->
+                lifecycleScope.launch { // TODO
+                    val deleteResult = withContext(Dispatchers.Default) {
+                        calendarViewModel.handleDeleteEvent(
+                            eventId,
+                            calendarId,
+                            EventEditDeleteOption.ALL_EVENTS
+                        )
                     }
-                    this@MainActivity.displaySnackBar(
-                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                        else userErrorMessage
-                    )
+                    if (deleteResult is UseCase.Result.Success<*>) {
+                        this@MainActivity.displaySnackBar(getString(R.string.snack_event_deleted))
+                    } else {
+                        var userErrorMessage: String? = null
+                        if (deleteResult is UseCase.Result.Error) {
+                            logger.e("Error deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
+                        } else if (deleteResult is UseCase.Result.InvalidParams) {
+                            logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                            userErrorMessage = deleteResult.userErrorMessage
+                        }
+                        this@MainActivity.displaySnackBar(
+                            if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                            else userErrorMessage
+                        )
+                    }
                 }
             }
         }
