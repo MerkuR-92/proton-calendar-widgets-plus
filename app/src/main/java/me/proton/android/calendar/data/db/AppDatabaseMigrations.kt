@@ -63,6 +63,7 @@ import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.data.entity.AddressKeyEntity
 import me.proton.core.user.data.entity.UserEntity
 import me.proton.core.user.data.entity.UserKeyEntity
+import me.proton.core.userrecovery.data.db.DeviceRecoveryDatabase
 import me.proton.core.usersettings.data.db.OrganizationDatabase
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
 
@@ -531,6 +532,15 @@ object AppDatabaseMigrations {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_EVENTS_METADATA}` (`id` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `sharedEventId` TEXT NOT NULL, `addressId` TEXT, `startTime` INTEGER NOT NULL, `startTimeZone` TEXT NOT NULL, `endTime` INTEGER NOT NULL, `endTimeZone` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `uid` TEXT NOT NULL, `recurrenceID` INTEGER, `exDates` TEXT NOT NULL, `rRule` TEXT, `createTime` INTEGER NOT NULL, `modifyTime` INTEGER NOT NULL, `isOrganizer` INTEGER NOT NULL, `sharedKeyPacket` TEXT, `calendarKeyPacket` TEXT, `addressKeyPacket` TEXT, `isPersonalSingleEdit` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_events_metadata_calendarId` ON `${TABLE_EVENTS_METADATA}` (`calendarId`)")
+        }
+    }
+
+    val MIGRATION_66_68 = object : Migration(67, 68) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            UserSettingsDatabase.MIGRATION_6.migrate(db)
+            DeviceRecoveryDatabase.MIGRATION_0.migrate(db)
+            DeviceRecoveryDatabase.MIGRATION_1.migrate(db)
+            UserKeyDatabase.MIGRATION_1.migrate(db)
         }
     }
 }
