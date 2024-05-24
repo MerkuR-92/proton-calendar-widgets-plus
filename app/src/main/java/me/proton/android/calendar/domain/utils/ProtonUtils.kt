@@ -14,7 +14,7 @@ interface ProtonUtils {
     fun canonicalizeProtonEmail(email: String, forceCanonicalization: Boolean = false): String
     fun isProtonDomain(email: String): Boolean
     fun isShortDomainAddress(email: String): Boolean
-    fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener)
+    fun Context.displayEventDecryptionErrorDialog(isSharedEvent: Boolean, isRecurring: Boolean, callback: DialogInterface.OnClickListener)
     fun Context.displayFreeUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun Context.displayFreeUserMandatoryPersonalCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)
     fun Context.displayPaidUserCalendarLimitReached(manageCalendarsCallback: DialogInterface.OnClickListener? = null)

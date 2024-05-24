@@ -58,16 +58,16 @@ object ProtonUtilsImpl : ProtonUtils {
         return email.endsWith(PROTON_MAIL_SHORT_DOMAIN)
     }
 
-    override fun Context.displayEventDecryptionErrorDialog(isRecurring: Boolean, callback: DialogInterface.OnClickListener) {
+    override fun Context.displayEventDecryptionErrorDialog(allowDelete: Boolean, isRecurring: Boolean, callback: DialogInterface.OnClickListener) {
         val confirmationMessage =
             if (isRecurring) R.string.event_decryption_error_dialog_confirmation_recurring
             else R.string.event_decryption_error_dialog_confirmation
-        MaterialAlertDialogBuilder(this)
+        val dialog = MaterialAlertDialogBuilder(this)
             .setTitle(R.string.event_decryption_error_dialog_title)
             .setMessage(R.string.event_decryption_error_dialog_message)
-            .setPositiveButton(confirmationMessage, callback)
             .setNegativeButton(R.string.event_decryption_error_dialog_close) { _, _ -> }
-            .show()
+        if (allowDelete) dialog.setPositiveButton(confirmationMessage, callback)
+        dialog.show()
     }
 
     override fun Context.displayFreeUserCalendarLimitReached(

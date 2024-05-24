@@ -244,12 +244,14 @@ class CalendarsRepositoryImpl @Inject constructor(
 
             if (fetchEventsResult.first is UseCase.Result.Success<*>) {
                 if (fetchEventsResult.second == null) {
-                    logger.e("fetchEventsResult: null event list when Sucess")
+                    logger.e("fetchEventsResult: null event list when Success")
                 }
 
                 fetchEventsResult.second?.let {
                     logger.v("fetchEventsResult success: ${it.size}")
                     persistEvents(*it.toTypedArray()) // We already persisted metadata on fetch result
+                    fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
+
                     updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
                     fetchedWindows.add(fetchWindow)
                 }

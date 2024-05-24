@@ -111,30 +111,35 @@ class ItemCalendarAgendaFragment: Fragment() {
                         )
                     )
                 } else {
-                    requireContext().displayEventDecryptionErrorDialog(it.isRecurring) { _, _ ->
-                        lifecycleScope.launch {
-                            val deleteResult = withContext(Dispatchers.Default) {
-                                calendarViewModel.handleDeleteEvent(
-                                    it.id,
-                                    it.calendarId,
-                                    EventEditDeleteOption.ALL_EVENTS
-                                )
-                            }
-                            if (deleteResult is UseCase.Result.Success<*>) {
-                                requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
-                            } else {
-                                var userErrorMessage: String? = null
-                                if (deleteResult is UseCase.Result.Error) {
-                                    logger.e("Error deleting event: ${deleteResult.message}")
-                                    userErrorMessage = deleteResult.userErrorMessage
-                                } else if (deleteResult is UseCase.Result.InvalidParams) {
-                                    logger.e("InvalidParams deleting event: ${deleteResult.message}")
-                                    userErrorMessage = deleteResult.userErrorMessage
+                    lifecycleScope.launch {
+                        requireContext().displayEventDecryptionErrorDialog(
+                            calendarViewModel.allowDeleteEvent(it.calendarId),
+                            it.isRecurring
+                        ) { _, _ ->
+                            lifecycleScope.launch {
+                                val deleteResult = withContext(Dispatchers.Default) {
+                                    calendarViewModel.handleDeleteEvent(
+                                        it.id,
+                                        it.calendarId,
+                                        EventEditDeleteOption.ALL_EVENTS
+                                    )
                                 }
-                                requireActivity().displaySnackBar(
-                                    if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
-                                    else userErrorMessage
-                                )
+                                if (deleteResult is UseCase.Result.Success<*>) {
+                                    requireActivity().displaySnackBar(getString(R.string.snack_event_deleted))
+                                } else {
+                                    var userErrorMessage: String? = null
+                                    if (deleteResult is UseCase.Result.Error) {
+                                        logger.e("Error deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
+                                    } else if (deleteResult is UseCase.Result.InvalidParams) {
+                                        logger.e("InvalidParams deleting event: ${deleteResult.message}")
+                                        userErrorMessage = deleteResult.userErrorMessage
+                                    }
+                                    requireActivity().displaySnackBar(
+                                        if (userErrorMessage.isNullOrEmpty()) getString(R.string.snack_event_deleted_error)
+                                        else userErrorMessage
+                                    )
+                                }
                             }
                         }
                     }
