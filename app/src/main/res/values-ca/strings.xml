@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">No es permet crear invitacions en un calendari compartit.</string>
     <string name="snack_down_banner">Els servidors de Proton estan caiguts. Visiteu la nostra pàgina d\'estat per a més informació.</string>
     <string name="snack_down_banner_action">Obre la pàgina d\'estat</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Milloreu per a personalitzar els colors dels esdeveniments</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
@@ -602,7 +602,8 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
     <string name="spotlight_dialog_color_per_event_title">Colors d\'esdeveniments personalitzats</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalitzi es colors dels esdeveniments individualment per:\n\n
+:\n\n\n• Codificar el calendari per colors\n\n• Organitzar millor el dia i controlar el seu temps\n\n• Establir priortats i millorar l\'eficiència</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>
@@ -745,6 +746,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">ocurrència</item>
         <item quantity="other">ocurrències</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>

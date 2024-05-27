@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Kalendár bol vytvorený, ale niektoré informácie neboli aktualizované, skúste neskôr, prosím</string>
     <string name="snack_ics_default_error">Chyba pri otváraní kalendára</string>
     <string name="snack_ics_event_not_found_error">Udalosť nenájdená</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Súbor nebol nájdený</string>
     <string name="snack_ics_create_error">Chyba pri vytváraní udalosti</string>
     <string name="snack_ics_parsing_error">Chyba pri čítaní kalendára</string>
     <string name="snack_ics_unsupported_method_error">Tento typ udalosti zatiaľ nie je podporovaný</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváranie pozvánok v zdieľanom kalendári nie je povolené</string>
     <string name="snack_down_banner">Proton servery sú mimo prevádzky. Podrobnosti nájdete na našej stránke o stave.</string>
     <string name="snack_down_banner_action">Otvoriť stránku statusu</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Upgradujte pre prispôsobenie farieb udalosti</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Udalosť neexistuje</string>
     <string name="error_occurrence_does_not_exist">Opakovanie neexistuje</string>
@@ -601,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Štátne sviatky sú tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nPridajte si do kalendára štátne sviatky akejkoľvek krajiny.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Už žiadne plánovanie schôdzí, keď majú všetci voľno, alebo zabúdanie na plánovanie predĺženého víkendu.\n\nKeďže ste momentálne na limite kalendárov, na pridanie kalendára sviatkov budete musieť najprv odstrániť existujúci kalendár.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Vlastné farby udalostí</string>
+    <string name="spotlight_dialog_color_per_event_description">Prispôsobte si farbu jednotlivých udalostí, aby ste:\n\n- farebne rozlíšili svoj kalendár\n\n- lepšie zorganizovali svoj deň a sledovali svoj čas\n\n- stanovili priority a zvýšili efektivitu</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Povoliť prístup</string>
     <string name="dialog_google_auth_description">Na spustenie importu sa prihláste do Kalendára Google a povoľte Protonu prístup k vašim dátam.</string>
@@ -781,6 +781,12 @@
         <item quantity="few">výskyty</item>
         <item quantity="many">výskytov</item>
         <item quantity="other">výskytov</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="few">times</item>
+        <item quantity="many">times</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">účastník</item>

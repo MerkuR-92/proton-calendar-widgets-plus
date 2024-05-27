@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Non ti succederà più di pianificare riunioni quando gli altri sono in giro o di dimenticare di organizzare un lungo fine settimana di vacanza.\n\nAggiungi le festività pubbliche di qualsiasi paese al tuo calendario.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Non ti succederà più di pianificare riunioni quando gli altri sono in giro o di dimenticare di organizzare un lungo fine settimana di vacanza.\n\nPoiché hai raggiunto il limite di calendari devi eliminare un calendario esistente prima di poter aggiungere un calendario con le festività.</string>
     <string name="spotlight_dialog_color_per_event_title">Colori degli eventi personalizzati</string>
-    <string name="spotlight_dialog_color_per_event_description">Personalizza il colore dei singoli eventi per:\n\n• Organizzare il calendario\n\n• Pianificare al meglio la giornata e tenere traccia del tempo\n\n• Stabilire le priorità e migliorare l\'efficienza</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalizza il colore dei singoli eventi per:\n\n• Organizzare il tuo calendario\n\n• Pianificare al meglio la tua giornata e monitorare il tuo tempo\n\n• Stabilire le priorità e migliorare l\'efficienza</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Consenti accesso</string>
     <string name="dialog_google_auth_description">Per avviare l\'importazione, accedi a Google Calendar e consenti a Proton di accedere ai tuoi dati.</string>
@@ -745,6 +745,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">occorrenza</item>
         <item quantity="other">occorrenze</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">volta</item>
+        <item quantity="other">volte</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">partecipante</item>

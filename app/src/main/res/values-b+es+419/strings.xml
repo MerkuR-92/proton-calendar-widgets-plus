@@ -746,6 +746,10 @@
         <item quantity="one">ocurrencia</item>
         <item quantity="other">ocurrencias</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">vez</item>
+        <item quantity="other">veces</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participante</item>
         <item quantity="other">participantes</item>

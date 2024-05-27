@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Календар створено, але деяку інформацію не було оновлено. Спробуйте знову пізніше</string>
     <string name="snack_ics_default_error">Помилка відкриття календаря</string>
     <string name="snack_ics_event_not_found_error">Подію не знайдено</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Файл не знайдено</string>
     <string name="snack_ics_create_error">Помилка створення події</string>
     <string name="snack_ics_parsing_error">Помилка читання календаря</string>
     <string name="snack_ics_unsupported_method_error">Цей тип події ще не підтримується</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Створення запрошень у спільному календарі не дозволено</string>
     <string name="snack_down_banner">Сервери Proton не працюють. Відвідайте нашу сторінку стану, щоб переглянути подробиці.</string>
     <string name="snack_down_banner_action">Відкрити сторінку стану</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Оновлення до налаштування кольорів події</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Події не існує</string>
     <string name="error_occurrence_does_not_exist">Повторюваної події не існує</string>
@@ -590,8 +590,8 @@
     <string name="spotlight_dialog_week_view_description">• Представляємо перегляд календаря на <b>3 дні</b> й на <b>тиждень</b>. Виберіть потрібний вигляд у <b>меню</b>.\n\n• Налаштуйте висоту рядків у сітці дня, зводячи двома пальцями, щоб збільшити або зменшити масштаб.</string>
     <string name="spotlight_dialog_search_title">Пошук подій</string>
     <string name="spotlight_dialog_search_description">Легко знаходьте потрібні події за допомогою нашої нової функції пошуку. <a href="https://proton.me/support/calendar-search">Докладніше</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_positive">Увімкнути</string>
+    <string name="spotlight_dialog_search_negative">Пропустити</string>
     <string name="spotlight_dialog_import_title">Інші способи додавання подій</string>
     <string name="spotlight_dialog_import_description">• Імпортуйте події до календаря з файлів на телефоні.\n\n• Додавайте бронювання поїздок безпосередньо з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функції календаря</string>
@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Більше не потрібно призначати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nДодайте державні свята будь-якої країни до свого календаря.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Більше не потрібно планувати зустрічі, коли всі відпочивають, або забувати планувати відпочинок на довгі вихідні.\n\nОскільки ви досягли обмеження доступних календарів, щоб додати календар свят, потрібно спершу вилучити будь-який інший календар.</string>
     <string name="spotlight_dialog_color_per_event_title">Свій колір події</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">Налаштувати колір індивідуальної події до:\n\n• Кольорове кодування вашого календаря\n\n• Краще організуйте свій день і відстежуйте свій час\n\n• Визначте пріоритети та підвищіть ефективність</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Дозволити доступ</string>
     <string name="dialog_google_auth_description">Щоб розпочати імпорт, увійдіть у Календар Google і надайте Proton доступ до ваших даних.</string>
@@ -782,6 +782,12 @@
         <item quantity="many">повторень</item>
         <item quantity="other">повторення</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="few">times</item>
+        <item quantity="many">times</item>
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">учасник</item>
         <item quantity="few">учасники</item>
@@ -886,20 +892,20 @@
         <item>Розсіл|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
+        <item>Бузковий</item>
+        <item>Полуничний</item>
+        <item>Рожевий</item>
+        <item>Морквяний</item>
+        <item>Сахара</item>
         <item>Enzian</item>
-        <item>Plum</item>
+        <item>Сливовий</item>
         <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
+        <item>Мідний</item>
+        <item>Земляний</item>
         <item>Сіро-блакитний</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
+        <item>Тихоокеанський</item>
+        <item>Рифовий</item>
+        <item>Папороть</item>
         <item>Оливковий</item>
         <item>Кобальтовий</item>
         <item>Океанічний</item>

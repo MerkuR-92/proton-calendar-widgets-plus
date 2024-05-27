@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Календарь был создан, но часть информации не была обновлена, пожалуйста, повторите попытку позже</string>
     <string name="snack_ics_default_error">Ошибка открытия календаря</string>
     <string name="snack_ics_event_not_found_error">Событие не найдено</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Файл не найден</string>
     <string name="snack_ics_create_error">Ошибка создания события</string>
     <string name="snack_ics_parsing_error">Ошибка чтения календаря</string>
     <string name="snack_ics_unsupported_method_error">Этот тип события пока не поддерживается</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Создание приглашений в общем календаре не разрешается</string>
     <string name="snack_down_banner">Серверы Proton не работают. Посетите нашу статус-страницу, чтобы узнать детали.</string>
     <string name="snack_down_banner_action">Открыть страницу состояния</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Улучшите, чтобы настраивать цвета событий</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">События не существует</string>
     <string name="error_occurrence_does_not_exist">Повтор не существует</string>
@@ -601,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Государственные праздники здесь!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Бывает, что случайно планируйте встречи, когда все отдыхают, или забывайте запланировать поездку на долгие выходные?\n\nДобавьте государственные праздники любой страны в свой календарь.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больше не назначайте встречи, когда все отсутствуют, или не забывайте планировать долгие выходные.\n\nПоскольку у вас уже максимальное количество календарей, чтобы добавить календарь праздников, вам необходимо сначала удалить существующий календарь.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Свои цвета событий</string>
+    <string name="spotlight_dialog_color_per_event_description">Настройте цвет отдельных мероприятий:\n\n• Пометьте цветами ваш календарь\n\n• Улучшите организацию дня и отслеживание времени\n\n• Установите приоритеты и повысите эффективность</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Разрешить доступ</string>
     <string name="dialog_google_auth_description">Чтобы начать импорт, войдите в Google Calendar и разрешите Proton доступ к вашим данным.</string>
@@ -781,6 +781,12 @@
         <item quantity="few">повтора</item>
         <item quantity="many">повторов</item>
         <item quantity="other">повторов</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="few">times</item>
+        <item quantity="many">times</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">участник</item>
