@@ -17,10 +17,10 @@ abstract class EventsMetadataDao : BaseDao<EventEntityMetadata> {
 
     /** GET By Time Window **/
     @Transaction
-    @Query("SELECT * FROM events_metadata WHERE calendarId IN (:calendarIds) AND ((startTime >= :windowStartTime AND startTime <= :windowEndTime) OR (endTime >= :windowStartTime AND endTime <= :windowEndTime) OR rRule IS NOT null)")
+    @Query("SELECT * FROM events_metadata WHERE calendarId IN (:calendarIds) AND ((startTime >= :windowStartTime AND startTime <= :windowEndTime) OR (endTime >= :windowStartTime AND endTime <= :windowEndTime) OR (:windowStartTime >= startTime AND :windowEndTime <= endTime) OR rRule IS NOT null)")
     abstract suspend fun selectEventsMetadataForTimeWindow(calendarIds: List<String>, windowStartTime: Long, windowEndTime: Long): List<EventEntityMetadata>
     @Transaction
-    @Query("SELECT * FROM events_metadata WHERE (startTime >= :windowStartTime AND startTime <= :windowEndTime) OR (endTime >= :windowStartTime AND endTime <= :windowEndTime) OR rRule IS NOT null")
+    @Query("SELECT * FROM events_metadata WHERE (startTime >= :windowStartTime AND startTime <= :windowEndTime) OR (endTime >= :windowStartTime AND endTime <= :windowEndTime) OR (:windowStartTime >= startTime AND :windowEndTime <= endTime) OR rRule IS NOT null")
     abstract fun flowEventsMetadataForTimeWindow(windowStartTime: Long, windowEndTime: Long): Flow<List<EventEntityMetadata>>
 
     /** GET By Calendar IDs **/
