@@ -746,6 +746,10 @@
         <item quantity="one">forekomst</item>
         <item quantity="other">forekomster</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">gang</item>
+        <item quantity="other">gange</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">deltager</item>
         <item quantity="other">deltagere</item>

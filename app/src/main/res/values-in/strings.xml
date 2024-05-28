@@ -591,7 +591,7 @@
     <string name="spotlight_dialog_search_title">Cari acara</string>
     <string name="spotlight_dialog_search_description">Cari acara yang Anda inginkan dengan mudah dengan fitur pencarian kami yang baru. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="spotlight_dialog_search_positive">Aktifkan</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_negative">Lewati</string>
     <string name="spotlight_dialog_import_title">Lebih banyak cara untuk menambah acara</string>
     <string name="spotlight_dialog_import_description">• Impor acara ke kalender Anda melalui berkas yang terdapat pada ponsel Anda.\n\n• Tambahkan pemesanan perjalanan langsung dari Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Fitur kalender</string>
@@ -727,6 +727,9 @@
     </plurals>
     <plurals name="plural_occurrence">
         <item quantity="other">keberlangsungan</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="other">peserta</item>

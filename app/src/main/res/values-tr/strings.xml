@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Takvim eklendi fakat bazı bilgiler güncellenmedi. Lütfen bir süre sonra yeniden deneyin</string>
     <string name="snack_ics_default_error">Takvim açılırken sorun çıktı</string>
     <string name="snack_ics_event_not_found_error">Etkinlik bulunamadı</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Dosya bulunamadı</string>
     <string name="snack_ics_create_error">Etkinlik eklenirken sorun çıktı</string>
     <string name="snack_ics_parsing_error">Takvim okunurken sorun çıktı</string>
     <string name="snack_ics_unsupported_method_error">Bu etkinlik türü henüz desteklenmiyor</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Paylaşılmış bir takvim için davet oluşturulmasına izin verilmiyor</string>
     <string name="snack_down_banner">Proton sunucuları çalışmıyor. Ayrıntılı bilgi almak için durum sayfamıza bakın.</string>
     <string name="snack_down_banner_action">Durum sayfasını aç</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Etkinlik renklerini özelleştirmek için yükseltin</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
@@ -590,7 +590,7 @@
     <string name="spotlight_dialog_week_view_description">• <b>3 günlük</b> ve <b>Haftalık</b> takvim görünümleriyle tanışın. <b>Menüden</b> kullanmak istediğiniz görünümü seçin.\n\n• Yakınlaştırmak ya da uzaklaştırmak için iki parmağınızı sıkıştırarak gün tablosundaki satırların yüksekliğini ayarlayın.</string>
     <string name="spotlight_dialog_search_title">Etkinlikleri arayın</string>
     <string name="spotlight_dialog_search_description">Yeni arama özelliği ile aradığınız etkinliği kolayca bulun. <a href="https://proton.me/support/calendar-search">Ayrıntılı bilgi alın</a></string>
-    <string name="spotlight_dialog_search_positive">Kullanıma al</string>
+    <string name="spotlight_dialog_search_positive">Etkinleştir</string>
     <string name="spotlight_dialog_search_negative">Atla</string>
     <string name="spotlight_dialog_import_title">Etkinlik eklemenin diğer yolları</string>
     <string name="spotlight_dialog_import_description">• Etkinlikleri telefonunuzdaki dosyalardan takviminizin içine aktarın.\n\n• Yolculuk rezervasyonlarını doğrudan Proton Mail üzerinden ekleyin.</string>
@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nİstediğiniz ülkenin resmi tatillerini takviminize ekleyin.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Artık herkes tatildeyken ya da uzun bir hafta sonu kaçamağını kaydetmeyi unuttuğunuzda zamanlanmış toplantılarla karşılaşmayın.\n\nTakvim sayısı sınırına ulaşmış olduğunuzdan yeni bir tatil takvimi eklemek için önce var olan bir takvimi kaldırmanız gerekir.</string>
     <string name="spotlight_dialog_color_per_event_title">Özel etkinlik renkleri</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">Tek tek etkinliklerin rengini özelleştirerek:\n\n- Takviminizi renklerle kodlayın\n\n- Gününüzü daha iyi organize edin ve zamanınızı takip edin\n\n- Öncelikleri belirleyin ve verimliliği artırın</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Erişime izin ver</string>
     <string name="dialog_google_auth_description">İçe aktarmayı başlatmak için, Google Takvim oturumu açın ve verilerinize Proton tarafından erişilmesine izin verin.</string>
@@ -746,6 +746,10 @@
         <item quantity="one">yinelenme</item>
         <item quantity="other">yinelenme</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">katılımcı</item>
         <item quantity="other">katılımcı</item>
@@ -835,7 +839,7 @@
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
         <item>Mor</item>
-        <item>Strawberry</item>
+        <item>Çilek</item>
         <item>Pembe</item>
         <item>Havuç</item>
         <item>Çöl</item>
@@ -844,7 +848,7 @@
         <item>Kiraz</item>
         <item>Bakır</item>
         <item>Toprak</item>
-        <item>Slate Blue</item>
+        <item>Arduvaz Mavisi</item>
         <item>Pasifik</item>
         <item>Resif</item>
         <item>Eğrelti otu</item>

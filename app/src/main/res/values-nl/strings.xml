@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">De agenda is aangemaakt maar sommige informatie is niet bijgewerkt, probeer het later nog eens</string>
     <string name="snack_ics_default_error">Fout bij openen agenda</string>
     <string name="snack_ics_event_not_found_error">Afspraak niet gevonden</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Bestand niet gevonden</string>
     <string name="snack_ics_create_error">Fout bij maken afspraak</string>
     <string name="snack_ics_parsing_error">Fout bij lezen agenda</string>
     <string name="snack_ics_unsupported_method_error">Dit afspraaktype wordt nog niet ondersteund</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Uitnodigingen maken in een gedeelde agenda is niet toegestaan</string>
     <string name="snack_down_banner">Proton servers zijn down. Bezoek onze status pagina voor informatie.</string>
     <string name="snack_down_banner_action">Open status pagina</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Upgrade om kleuren van afspraken aan te passen</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">De afspraak bestaat niet</string>
     <string name="error_occurrence_does_not_exist">Het voorval bestaat niet</string>
@@ -601,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Aangepaste kleuren voor afspraken</string>
+    <string name="spotlight_dialog_color_per_event_description">Pas de kleur van individuele afspraken aan naar:\n\n• Kleuren van uw agenda aanpassen\n\n• Organiseer uw dag beter en houd uw tijd bij. \n\n• Stel prioriteiten en boost efficiëntie</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Toegang verlenen</string>
     <string name="dialog_google_auth_description">Om te beginnen met importeren logt u in bij Google Agenda en verleent u Proton toegang tot uw gegevens.</string>
@@ -747,6 +747,10 @@ Deselecteer minstens %1$d agenda\'s</item>
     <plurals name="plural_occurrence">
         <item quantity="one">voorkomen</item>
         <item quantity="other">voorkomens</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">deelnemer</item>

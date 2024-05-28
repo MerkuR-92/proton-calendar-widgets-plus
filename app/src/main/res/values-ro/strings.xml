@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Calendarul a fost creat, dar unele informații nu au fost actualizate. Reîncercați mai târziu.</string>
     <string name="snack_ics_default_error">Eroare la deschiderea calendarului</string>
     <string name="snack_ics_event_not_found_error">Evenimentul nu a fost găsit</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Fișierul nu a fost găsit.</string>
     <string name="snack_ics_create_error">Eroare la crearea evenimentului</string>
     <string name="snack_ics_parsing_error">Eroare la citirea calendarului</string>
     <string name="snack_ics_unsupported_method_error">Acest tip de eveniment nu este încă suportat</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Crearea de invitații la un calendar partajat nu este permisă.</string>
     <string name="snack_down_banner">Serverele Proton nu sunt funcționale. Vizitați pagina noastră de stare pentru detalii.</string>
     <string name="snack_down_banner_action">Deschidere pagină stare</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Modificați planul pentru a personaliza culorile evenimentelor</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Evenimentul nu există</string>
     <string name="error_occurrence_does_not_exist">Căutarea nu există.</string>
@@ -590,8 +590,8 @@
     <string name="spotlight_dialog_week_view_description">• Vă prezentăm afișarea pentru <b>3 zile</b> și <b>Săptămânală</b> a calendarului. Selectați afișarea preferată din <b>meniu</b>.\n\n• Ajustați înălțimea rândurilor în grila zilelor apucând cu două degete pentru mărire sau micșorare.</string>
     <string name="spotlight_dialog_search_title">Căutare evenimente</string>
     <string name="spotlight_dialog_search_description">Găsiți cu ușurință evenimentul pe care îl căutați cu noua funcție de căutare. <a href="https://proton.me/support/calendar-search">Detalii</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_positive">Activare</string>
+    <string name="spotlight_dialog_search_negative">Omitere</string>
     <string name="spotlight_dialog_import_title">Alte metode de adăugat evenimente</string>
     <string name="spotlight_dialog_import_description">• Importați evenimente în calendar din fișierele de pe dispozitivul mobil.\n\n• Adăugați rezervări de călătorie direct din Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Caracteristici calendar</string>
@@ -601,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Sărbătorile publice sunt aici!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nu mai planificați întâlniri atunci când toată lumea pleacă sau uitați să planificați o escapadă lungă de weekend.\n\nAdăugați sărbătorile publice ale oricărei țări în calendarul personal.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nu mai planificați întâlniri atunci când toată lumea pleacă sau uitați să planificați o escapadă lungă de weekend.\n\nDeoarece sunteți în prezent la limita calendaristică, pentru a adăuga un calendar de sărbători, va trebui mai întâi să eliminați un calendar existent.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Culori personale evenimente</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalizați culoarea evenimentelor individuale pentru a:\n\n• Utiliza marcarea prin culori a calendarului\n\n• Organiza mai bine ziua și urmări timpul\n\n• Stabili priorități și spori eficiența</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitere acces</string>
     <string name="dialog_google_auth_description">Pentru a începe importarea, conectați-vă la Google Calendar și permiteți ca Proton să vă acceseze datele.</string>
@@ -764,6 +764,11 @@
         <item quantity="few">apariții</item>
         <item quantity="other">de apariții</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="few">times</item>
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>
         <item quantity="few">participanți</item>
@@ -860,26 +865,26 @@
         <item>Murături|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
+        <item>Violet</item>
+        <item>Căpșună</item>
+        <item>Roz</item>
+        <item>Morcov</item>
         <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
-        <item>Slate Blue</item>
+        <item>Gențiană</item>
+        <item>Prună</item>
+        <item>Cireșiu</item>
+        <item>Cupru</item>
+        <item>Pământiu</item>
+        <item>Ardezie albastră</item>
         <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
+        <item>Recif</item>
+        <item>Ferigă</item>
+        <item>Măsliniu</item>
         <item>Cobalt</item>
         <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>Pin</item>
+        <item>Pădure</item>
+        <item>Murături</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

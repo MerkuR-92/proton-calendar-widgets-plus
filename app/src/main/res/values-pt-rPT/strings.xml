@@ -352,8 +352,8 @@
     <string name="snack_network_error">Erro de rede. Tente novamente mais tarde.</string>
     <string name="snack_import_event_signed_out">Tem de iniciar sessão para importar eventos</string>
     <string name="snack_app_link_signed_out">Tem de iniciar sessão para ver o evento</string>
-    <string name="snack_update_default_calendar">Calendário predefinido actualizado</string>
-    <string name="snack_update_default_calendar_error">Erro ao actualizar o calendário predefinido. Tente mais tarde.</string>
+    <string name="snack_update_default_calendar">O calendário padrão foi atualizado.</string>
+    <string name="snack_update_default_calendar_error">Erro ao atualizar o calendário padrão. Tente mais tarde.</string>
     <string name="snack_calendar_init_error">Erro ao carregar a informação do calendário</string>
     <string name="snack_holiday_calendar_init_error">Erro ao carregar as informações do calendário de feriados</string>
     <string name="snack_update_calendar_error">Erro ao actualizar informação do calendário. Por favor, tente mais tarde.</string>
@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">O calendário foi criado, mas algumas informações não foram actualizadas. Tente mais tarde.</string>
     <string name="snack_ics_default_error">Erro ao abrir o calendário</string>
     <string name="snack_ics_event_not_found_error">Evento não encontrado</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">O ficheiro não foi encontrado.</string>
     <string name="snack_ics_create_error">Erro ao criar o evento</string>
     <string name="snack_ics_parsing_error">Erro ao ler o calendário</string>
     <string name="snack_ics_unsupported_method_error">Este tipo de evento ainda não é suportado</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Não é permitido criar convites num calendário partilhado</string>
     <string name="snack_down_banner">Os servidores Proton estão indisponíveis. Visite a nossa página de status para obter detalhes.</string>
     <string name="snack_down_banner_action">Abrir a página de status</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Melhorar para personalizar as cores dos eventos</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
@@ -443,7 +443,7 @@
     <string name="settings_timezone_title">Fuso horário</string>
     <string name="settings_language_title">Idioma da aplicação</string>
     <string name="settings_language_default">Detetar automaticamente</string>
-    <string name="settings_default_view_title">Vista predefinida</string>
+    <string name="settings_default_view_title">Vista padrão</string>
     <string name="settings_default_view_default">Última visualização</string>
     <string name="settings_update_timezone_title">Pedir para actualizar a definição de fuso horário</string>
     <string name="settings_update_timezone_subtitle">Se o fuso horário do sistema não corresponder à definição actual do fuso horário, ser-lhe-á pedido que o actualize.</string>
@@ -494,7 +494,7 @@
     <string name="calendar_form_default_all_day_event_notifications">Notificação de eventos de dia inteiro</string>
     <string name="calendar_form_add_notification">Adicionar notificação</string>
     <string name="calendar_form_default_email">Endereço de e-mail</string>
-    <string name="calendar_form_default_email_value_error">Erro ao carregar o e-mail predefinido</string>
+    <string name="calendar_form_default_email_value_error">Erro ao carregar o e-mail padrão</string>
     <string name="calendar_form_name_hint">Adicionar um nome ao calendário</string>
     <string name="calendar_form_name_required_error">Nome obrigatório</string>
     <string name="calendar_form_description_hint">Adicionar uma descrição ao calendário</string>
@@ -514,7 +514,7 @@
     <string name="remove_calendar_dialog_message">Tem a certeza de que pretende remover este calendário?</string>
     <string name="leave_calendar_dialog_title">Sair do calendário</string>
     <string name="leave_calendar_dialog_message">Se sair deste calendário, terá de pedir ao proprietário para aderir novamente.</string>
-    <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário? \"%1$s\" será definido como calendário predefinido.</string>
+    <string name="delete_default_calendar_dialog_message">Tem a certeza de que deseja eliminar este calendário? \"%1$s\" será definido como calendário padrão.</string>
     <string name="delete_calendar_snack_deleted">Calendário eliminado</string>
     <string name="remove_calendar_snack_removed">Calendário removido</string>
     <string name="delete_calendar_snack_error">Erro ao eliminar o calendário</string>
@@ -595,14 +595,14 @@
     <string name="spotlight_dialog_import_title">Mais maneiras de adicionar eventos.</string>
     <string name="spotlight_dialog_import_description">• Importe eventos para o seu calendário a partir de ficheiros no seu telefone.\n\n• Adicione reservas de viagem diretamente do Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funcionalidades do calendário</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Adicione eventos diretamente no Proton Calendar a partir de outras aplicações. \n\n• Criar e gerir eventos em calendários que tenham sido partilhados consigo.\n\n• Definir a vista predefinida que pretende ver ao abrir a aplicação\n\n• 13 novos idiomas disponíveis...</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Adicione eventos diretamente no Proton Calendar a partir de outras aplicações. \n\n• Criar e gerir eventos em calendários que tenham sido partilhados consigo.\n\n• Definir a vista padrão que pretende ver ao abrir a aplicação\n\n• 13 novos idiomas disponíveis...</string>
     <string name="spotlight_dialog_wipe_search_title">Pesquisa removida para a melhorar</string>
     <string name="spotlight_dialog_wipe_search_description">Estamos a remover a capacidade de pesquisa experimental do Proton Calendar Beta, pois queremos torná-lo mais útil e fiável para si. Isto pode demorar alguns segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Os feriados públicos estão aqui!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nAdicione os feriados de qualquer país ao seu calendário.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Chega de marcar reuniões quando todos estão de folga ou de se esquecer de planear uma escapadela de fim de semana prolongado.\n\nDado que está atualmente no limite do calendário, para adicionar um calendário de feriados, terá de remover primeiro um calendário existente.</string>
     <string name="spotlight_dialog_color_per_event_title">Cores de eventos personalizados</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalize a cor de cada evento para:\n\n• Utilizar um código de cor no seu calendário\n\n• Organizar melhor o seu dia e gerir o seu tempo\n\n• Definir prioridades e aumentar a sua eficiência</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acesso</string>
     <string name="dialog_google_auth_description">Para iniciar a importação, inicie sessão no Google Calendar e permita que o Proton aceda aos seus dados.</string>
@@ -745,6 +745,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">ocorrência</item>
         <item quantity="other">ocorrências</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">vez</item>
+        <item quantity="other">vezes</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participante</item>

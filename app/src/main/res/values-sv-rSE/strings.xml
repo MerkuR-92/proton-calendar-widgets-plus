@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nLägg till ett lands allmänna helgdagar i din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Inga fler schemaläggning av möten när alla är lediga eller glömmer att planera en lång helgresa.\n\nEftersom du för närvarande har nått kalendergränsen måste du först ta bort en befintlig kalender för att lägga till en semesterkalender.</string>
     <string name="spotlight_dialog_color_per_event_title">Anpassa händelsefärger</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">Anpassa färgen på enskilda händelser för att:\n\n• Färgkoda din kalender\n\n• Bättre organisera din dag och spåra din tid\n\n• Ställa in prioriteringar och öka effektiviteten</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillåt åtkomst</string>
     <string name="dialog_google_auth_description">För att starta importen, logga in på Google Kalender och tillåt Proton att komma åt dina data.</string>
@@ -745,6 +745,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">förekomst</item>
         <item quantity="other">förekomster</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">gång</item>
+        <item quantity="other">gånger</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">deltagare</item>

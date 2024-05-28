@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">行事曆已創建，惟部分資訊未更新，請稍後再試</string>
     <string name="snack_ics_default_error">開啟行事曆時發生錯誤</string>
     <string name="snack_ics_event_not_found_error">找不到活動</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">找不到此檔案。</string>
     <string name="snack_ics_create_error">創建活動時發生錯誤</string>
     <string name="snack_ics_parsing_error">讀取行事曆時發生錯誤</string>
     <string name="snack_ics_unsupported_method_error">尚未支援此活動類型</string>
@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">從此不再確認是否於假日開會。\n\n及添加其他國家假期至行事曆。</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">不再需要在所有人都休息時安排會議或忘記計劃長週末度假。\n\n由於您目前已達到日曆限制，因此要新增假日行事曆，您需要先刪除現有行事曆。</string>
     <string name="spotlight_dialog_color_per_event_title">自訂行程顯示色彩</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">為您的行程自訂顏色：\n\n• 用顏色將行事曆分類\n\n• 管理您一整天的時間\n\n• 設定優先順序提升效率</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">允許存取</string>
     <string name="dialog_google_auth_description">要開始匯入，請登入 Google 日曆並允許 Proton 存取您的資料。</string>
@@ -728,6 +728,9 @@
     <plurals name="plural_occurrence">
         <item quantity="other">發生</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="other">位參與者</item>
     </plurals>
@@ -793,41 +796,41 @@
         <item>薩哈拉|#936D58</item>
         <item>暗岩藍|#5252CC</item>
         <item>梅|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
+        <item>櫻桃紅|#BA1E55</item>
         <item>銅|#C44800</item>
         <item>土壤|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
+        <item>板岩藍|#415DF0</item>
+        <item>太平洋藍|#179FD9</item>
+        <item>珊瑚綠|#1DA583</item>
+        <item>淺蕨綠|#3CBB3A</item>
         <item>橄欖|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
+        <item>鈷藍|#273EB2</item>
         <item>海洋|#0A77A6</item>
         <item>松木|#0F735A</item>
         <item>森林|#258723</item>
-        <item>Pickle|#807304</item>
+        <item>醬瓜黃|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
-        <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
-        <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>紫色</item>
+        <item>草莓紅</item>
+        <item>粉紅</item>
+        <item>胡蘿蔔橘</item>
+        <item>黃土色</item>
+        <item>龍膽紫</item>
+        <item>梅紅色</item>
+        <item>櫻桃紅</item>
+        <item>銅色</item>
+        <item>泥土色</item>
+        <item>板岩藍</item>
+        <item>太平洋藍</item>
+        <item>珊瑚綠</item>
+        <item>淺蕨綠</item>
+        <item>橄欖綠</item>
+        <item>鈷藍</item>
+        <item>海洋藍</item>
+        <item>墨松青</item>
+        <item>森林綠</item>
+        <item>醬瓜黃</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

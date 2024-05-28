@@ -81,7 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Törölve</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Letiltva)</i>]]></string>
-    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Default)</string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Alapértelmezett)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d igen</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d talán</string>
@@ -331,8 +331,8 @@
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
     <string name="snack_event_edit_recurring_invitation_single_edit_error">You cannot edit a recurring invitation containing changes to single occurrences</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">You cannot delete a recurring invitation containing changes to single occurrences</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">You cannot edit a recurring invitation containing deleted occurrences</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nem törölhetsz olyan ismétlődő meghívásokat, melyek az egyes előfordulásokban változtatásokat tartalmaznak.</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nem szerkeszthetsz olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">You cannot delete a recurring invitation containing deleted occurrences</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nem lehet egyszerre résztvevőket hozzáadni és az eseményt megváltoztatni</string>
@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">A naptár elkészült, de néhány információ frissítése nem sikerült. Próbálja meg később</string>
     <string name="snack_ics_default_error">Hiba a naptár megnyitásakor</string>
     <string name="snack_ics_event_not_found_error">Az esemény nem található</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">A fájl nem található</string>
     <string name="snack_ics_create_error">Hiba az esemény létrehozása során</string>
     <string name="snack_ics_parsing_error">Hiba a naptár olvasásakor</string>
     <string name="snack_ics_unsupported_method_error">Ez az eseménytípus még nem támogatott</string>
@@ -745,6 +745,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">esemény</item>
         <item quantity="other">események</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">résztvevő</item>

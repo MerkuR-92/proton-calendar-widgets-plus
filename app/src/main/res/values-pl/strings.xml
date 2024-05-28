@@ -782,6 +782,12 @@
         <item quantity="many">powtórzeniach</item>
         <item quantity="other">powtórzeniach</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">raz</item>
+        <item quantity="few"> razy</item>
+        <item quantity="many">razy</item>
+        <item quantity="other">razy</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">uczestnik</item>
         <item quantity="few">uczestników</item>

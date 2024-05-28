@@ -782,6 +782,12 @@
         <item quantity="few">ponovitve</item>
         <item quantity="other">ponovitve</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="two">times</item>
+        <item quantity="few">times</item>
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">udeleženec</item>
         <item quantity="two">udeleženca</item>

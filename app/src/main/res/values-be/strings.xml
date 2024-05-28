@@ -782,6 +782,12 @@
         <item quantity="many">паўтарэнняў</item>
         <item quantity="other">паўтарэнні</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">раз</item>
+        <item quantity="few">разы</item>
+        <item quantity="many">разоў</item>
+        <item quantity="other">разоў</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">удзельнік</item>
         <item quantity="few">удзельнікі</item>

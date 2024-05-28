@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Kalenteri luotiin, mutta joitakin tietoja ei päivitetty. Yritä myöhemmin uudelleen</string>
     <string name="snack_ics_default_error">Virhe avattaessa kalenteria</string>
     <string name="snack_ics_event_not_found_error">Tapahtumaa ei löytynyt</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Tiedostoa ei löytynyt</string>
     <string name="snack_ics_create_error">Virhe luotaessa tapahtumaa</string>
     <string name="snack_ics_parsing_error">Virhe luettaessa kalenteria</string>
     <string name="snack_ics_unsupported_method_error">Tapahtumatyyppiä ei tueta vielä</string>
@@ -745,6 +745,10 @@
     <plurals name="plural_occurrence">
         <item quantity="one">kerran jälkeen</item>
         <item quantity="other">kerran jälkeen</item>
+    </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">osallistuja</item>

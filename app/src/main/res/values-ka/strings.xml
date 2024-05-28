@@ -746,6 +746,10 @@
         <item quantity="one">მოვლენა</item>
         <item quantity="other">მოვლენა</item>
     </plurals>
+    <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
+        <item quantity="one">time</item>
+        <item quantity="other">times</item>
+    </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">მონაწილე</item>
         <item quantity="other">მონაწილე</item>
