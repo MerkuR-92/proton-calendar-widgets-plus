@@ -20,4 +20,7 @@ abstract class ManagedHolidayCalendarDao : BaseDao<ManagedHolidayCalendarEntity>
     @Transaction
     @Query("SELECT EXISTS(SELECT * FROM managed_holiday_calendars)")
     abstract suspend fun hasCalendar(): Boolean
+
+    @Query("DELETE FROM managed_holiday_calendars")
+    abstract suspend fun deleteAll()
 }

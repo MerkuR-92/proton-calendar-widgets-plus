@@ -124,6 +124,7 @@ import me.proton.android.calendar.presentation.main.adapter.CalendarListAdapter
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.subscription.PlansViewModel
+import me.proton.core.accountmanager.presentation.compose.SignOutDialogActivity
 import me.proton.core.accountmanager.presentation.viewmodel.AccountSwitcherViewModel
 import me.proton.core.notification.presentation.deeplink.DeeplinkManager
 import me.proton.core.notification.presentation.deeplink.onActivityCreate
@@ -1211,9 +1212,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             binding.navViewMainContent.navViewMoreLoginLayout.isGone = hasPrimary
         })
         binding.navViewMainContent.navViewMoreLogoutPress.setOnSingleClickListener {
-            accountViewModel.logoutPrimary()
-            displaySplashScreen(true, spinnerText = "")
-            safeFindNavController(R.id.nav_host_fragment_container_view).popBackStack(R.id.rootFragment, false)
+            SignOutDialogActivity.start(this)
             binding.drawerLayout.close()
         }
         binding.navViewMainContent.navViewMoreLoginPress.setOnSingleClickListener {
