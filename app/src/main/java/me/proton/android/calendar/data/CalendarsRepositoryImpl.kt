@@ -649,7 +649,7 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 val allSkeletonEvents =
                     recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(transformedNormalEvents)
-                val recurringUiEvents = recurringSkeletonEvents.map { skeletonEvent ->
+                val recurringUiEvents = recurringSkeletonEvents.mapNotNull { skeletonEvent ->
                     // occurrences are already filtered for time window
                     expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
                         skeletonEvent,
@@ -659,7 +659,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                         eventsWindow.timeZoneId,
                         userEmails,
                         isFreeUser
-                    )!!
+                    )
                 }.flatten()
 
                 val singleEditUiEvents = singleEditSkeletonEvents.map { skeletonEvent ->
@@ -1004,14 +1004,19 @@ class CalendarsRepositoryImpl @Inject constructor(
                     val skeletons = recurringSkeletonEventsInWindow.filter { it.id == skeletonEvent.id }
 
                     if (transformedEvent != null) {
-                        skeletons.map {
+                        skeletons.mapNotNull {
                             if (it.occurrence == null) { // non-recurring event
                                 transformedEvent
                             } else if (it.isSingleEdit()) { // single edits, copy occurrence it replaces
                                 transformedEvent.occurrence = it.occurrence
                                 transformedEvent
                             } else { // recurring event, apply occurrence
-                                Event.withOccurrence(transformedEvent, it.occurrence!!)
+                                it.occurrence?.let { occurrence ->
+                                    Event.withOccurrence(transformedEvent, occurrence)
+                                } ?: run {
+                                    logger.i("Recurring event occurrence was null in getEvents")
+                                    null
+                                }
                             }
                         }
                     } else null
@@ -1137,7 +1142,10 @@ class CalendarsRepositoryImpl @Inject constructor(
                 allEvents.filter { it.uid == event.uid },
                 toDateTime.toLocalDate(),
                 toDateTime.zone.id
-            )!!
+            ) ?: run {
+                logger.e("expandDbEvent: expandOccurrencesWithSingleEdits result was null")
+                return emptyList()
+            }
             val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event, toDateTime.zone.id)
 
             filteredByExdates
@@ -1165,7 +1173,10 @@ class CalendarsRepositoryImpl @Inject constructor(
                 eventsWindow.fromDate,
                 eventsWindow.toDate,
                 eventsWindow.timeZoneId
-            )!!
+            ) ?: run {
+                logger.e("expandSkeletonEventsAndFilterInWindow: expandOccurrencesWithSingleEdits result was null")
+                return emptyList()
+            }
             val filteredByExdates = expandedOccurrences.filterOutOccurrencesByExdates(event, eventsWindow.timeZoneId)
 
             filteredByExdates
