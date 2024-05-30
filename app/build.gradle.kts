@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.android.build.api.dsl.VariantDimension
 import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
@@ -67,6 +68,8 @@ android {
 
         buildConfigField("String", "ACCOUNT_SENTRY_DSN", null.toBuildConfigValue())
 
+        setAssetLinksResValue("proton.me")
+
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["room.schemaLocation"] = "$projectDir/schemas"
@@ -84,11 +87,13 @@ android {
             dimension = "env"
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "Atlas Proton Calendar")
+
+            val protonHost = "proton.black"
             protonEnvironment {
                 proxyToken = getProxyToken()
-                host = "proton.black"
+                host = protonHost
             }
-
+            setAssetLinksResValue(protonHost)
         }
         create("prod") {
             dimension = "env"
@@ -385,4 +390,16 @@ object Config {
 fun getProxyToken(): String {
     val proxyTokenUrl = System.getenv("ATLAS_PROXY_URL") ?: return ""
     return getTokenFromCurl(proxyTokenUrl)
+}
+
+fun VariantDimension.setAssetLinksResValue(host: String) {
+    resValue(
+        type = "string", name = "asset_statements",
+        value = """
+            [{
+              "relation": ["delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"],
+              "target": { "namespace": "web", "site": "https://$host" }
+            }]
+        """.trimIndent()
+    )
 }
