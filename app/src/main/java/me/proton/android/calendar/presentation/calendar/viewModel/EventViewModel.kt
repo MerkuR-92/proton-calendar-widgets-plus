@@ -2493,15 +2493,12 @@ class EventViewModel @Inject constructor(
         navigateToEditForm: () -> Unit,
         navigateToEditFormPersonal: () -> Unit
     ) {
-        // Post deleting event value to true to display loading state
-        eventDetailsState.value = EventState.Processing.Deleting
+        // Post edit loading event value to true to display loading state
+        eventDetailsState.value = EventState.Processing.EditLoading
 
         if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Edit)) {
             navigateToEditFormPersonal()
-            return
-        }
-
-        if (event.isAnInvitation) {
+        } else if (event.isAnInvitation) {
             val canonicalUserEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
                 ProtonUtilsImpl.canonicalizeProtonEmail(address.email, forceCanonicalization = true)
             }
@@ -2510,6 +2507,7 @@ class EventViewModel @Inject constructor(
             } else navigateToEditForm()
         } else if (!event.calendar.allowEditEvents) navigateToEditFormPersonal()
         else navigateToEditForm()
+        eventDetailsState.value = EventState.Idle
     }
 
     private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(actionType: EventDetailsActionType): Boolean {
