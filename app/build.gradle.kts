@@ -241,6 +241,7 @@ dependencies {
     implementation(libs.core.utilKotlin)
     implementation(libs.core.challenge)
     implementation(libs.core.challengePresentation)
+    implementation(libs.core.userRecovery)
 
     implementation(libs.androidx.core)
     implementation(libs.androidx.activity)
@@ -309,6 +310,7 @@ dependencies {
     androidTestImplementation(project(":shared-test-code"))
     androidTestImplementation(libs.dagger.hilt.android.testing)
     androidTestImplementation(libs.test.espresso.core)
+    androidTestImplementation(libs.core.userRecovery.test)
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)

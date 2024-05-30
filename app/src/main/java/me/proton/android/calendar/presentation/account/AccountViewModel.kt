@@ -20,8 +20,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.DEFAULT_CALENDAR_COLOR
 import me.proton.android.calendar.common.DEFAULT_HOLIDAY_CALENDAR_COLOR
-import me.proton.android.calendar.common.utils.ColorUtils
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
@@ -51,8 +49,6 @@ import me.proton.core.auth.presentation.onAddAccountResult
 import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
 import me.proton.core.presentation.utils.currentLocale
-import me.proton.core.usersettings.data.db.UserSettingsDatabase
-import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,15 +57,12 @@ class AccountViewModel @Inject constructor(
     private val authOrchestrator: AuthOrchestrator,
     private val bootstrapAllCalendarsUseCase: BootstrapAllCalendarsUseCase,
     private val valueStoreProvider: ValueStoreProvider,
-    private val userSettingsRepository: UserSettingsRepository,
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val logger: Logger,
     private val product: Product,
     private val widgetRefresher: WidgetRefresher,
     private val eventDecryptor: EventDecryptor,
-    private val database: AppDatabase,
-    private val userSettingsDatabase: UserSettingsDatabase,
     private val workManager: WorkManager,
 ) : ViewModel() {
 
@@ -119,7 +112,7 @@ class AccountViewModel @Inject constructor(
             setupUser(account.userId)
         }.onFailure {
             logger.e("checkAccount failed, removing user.", it)
-            removeUser(account.userId)
+            disableUser(account.userId)
 
             if (it is CancellationException) throw it
         }
@@ -145,7 +138,7 @@ class AccountViewModel @Inject constructor(
                     bootstrapResult.error == UseCase.Error.Bootstrap.UpdatePassphrase
                 ) return
             } else {
-                removeUser(userId)
+                disableUser(userId)
             }
             return
         }
@@ -153,17 +146,17 @@ class AccountViewModel @Inject constructor(
         _state.tryEmit(State.Ready)
     }
 
-    private suspend fun removeUser(userId: UserId) {
-        accountManager.removeAccount(userId)
+    private suspend fun disableUser(userId: UserId) {
+        accountManager.disableAccount(userId)
         valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
     private suspend fun cleanUser() {
         workManager.cancelAllWork()
         calendarsRepository.clearSearchDatabase()
-        calendarsRepository.shutdown()
         // Calendar currently do not support multi user.
         calendarsRepository.deleteAllCalendars()
+        calendarsRepository.shutdown()
         eventDecryptor.clearCache()
         widgetRefresher.refreshEventList()
     }
@@ -186,9 +179,9 @@ class AccountViewModel @Inject constructor(
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
-                .onAccountTwoPassModeFailed { removeUser(it.userId) }
-                .onAccountCreateAddressFailed { removeUser(it.userId) }
-                .onAccountDisabled { removeUser(it.userId) }
+                .onAccountTwoPassModeFailed { disableUser(it.userId) }
+                .onAccountCreateAddressFailed { disableUser(it.userId) }
+                .onAccountDisabled(initialState = false) { cleanUser() }
                 .onAccountRemoved { cleanUser() }
         }
 
@@ -224,7 +217,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun logoutPrimary() = viewModelScope.launch {
-        getPrimaryUserId()?.let { userId -> removeUser(userId) }
+        getPrimaryUserId()?.let { userId -> disableUser(userId) }
     }
 
     fun clearError() {
@@ -240,7 +233,7 @@ class AccountViewModel @Inject constructor(
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
             resetCalendarsKeyResult.ifSuccessAndLogErrors(logger) { }
             if (resetCalendarsKeyResult !is UseCase.Result.Success<*>) {
-                removeUser(userId)
+                disableUser(userId)
                 return@launch
             }
 

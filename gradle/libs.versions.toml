@@ -46,7 +46,7 @@ junit = "4.13.2"
 kotlin-stdlib = "1.9.22"
 desugar = "2.0.3"
 dagger = "2.49"
-core = "22.1.0"
+core = "24.0.0"
 fusion = "0.9.52"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
@@ -124,6 +124,8 @@ core-test-kotlin = { module = "me.proton.core:test-kotlin", version.ref = "core"
 core-test-quark = { module = "me.proton.core:test-quark", version.ref = "core" }
 core-telemetry = { module = "me.proton.core:telemetry", version.ref = "core" }
 core-user = { module = "me.proton.core:user", version.ref = "core" }
+core-userRecovery = { module = "me.proton.core:user-recovery", version.ref = "core" }
+core-userRecovery-test = { module = "me.proton.core:user-recovery-test", version.ref = "core" }
 core-mailMessage = { module = "me.proton.core:mail-message", version.ref = "core" }
 core-mailSettings = { module = "me.proton.core:mail-settings", version.ref = "core" }
 core-challengePresentation = { module = "me.proton.core:challenge-presentation", version.ref = "core" }

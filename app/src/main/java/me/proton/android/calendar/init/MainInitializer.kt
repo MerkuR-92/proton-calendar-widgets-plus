@@ -29,6 +29,7 @@ import me.proton.core.network.presentation.init.UnAuthSessionFetcherInitializer
 import me.proton.core.paymentiap.presentation.GooglePurchaseHandlerInitializer
 import me.proton.core.plan.presentation.PurchaseHandlerInitializer
 import me.proton.core.plan.presentation.UnredeemedPurchaseInitializer
+import me.proton.core.userrecovery.presentation.compose.DeviceRecoveryInitializer
 
 class MainInitializer : Initializer<Unit> {
 
@@ -49,7 +50,8 @@ class MainInitializer : Initializer<Unit> {
         PurchaseHandlerInitializer::class.java,
         GooglePurchaseHandlerInitializer::class.java,
         UnAuthSessionFetcherInitializer::class.java,
-        KeyTransparencyInitializer::class.java
+        KeyTransparencyInitializer::class.java,
+        DeviceRecoveryInitializer::class.java,
     )
 
     companion object {

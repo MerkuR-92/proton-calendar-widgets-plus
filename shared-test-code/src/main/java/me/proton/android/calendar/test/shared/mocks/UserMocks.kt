@@ -39,7 +39,8 @@ object UserMocks {
             earlyAccess = null,
             deviceRecovery = null,
             telemetry = null,
-            crashReports = null
+            crashReports = null,
+            sessionAccountRecovery = null
         )
     }
 

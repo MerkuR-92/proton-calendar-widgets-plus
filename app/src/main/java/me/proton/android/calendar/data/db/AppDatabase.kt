@@ -76,6 +76,8 @@ import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.data.entity.AddressKeyEntity
 import me.proton.core.user.data.entity.UserEntity
 import me.proton.core.user.data.entity.UserKeyEntity
+import me.proton.core.userrecovery.data.db.DeviceRecoveryDatabase
+import me.proton.core.userrecovery.data.entity.RecoveryFileEntity
 import me.proton.core.usersettings.data.db.OrganizationDatabase
 import me.proton.core.usersettings.data.db.UserSettingsConverters
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
@@ -116,6 +118,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         NotificationEntity::class,
         PushEntity::class,
         TelemetryEventEntity::class,
+        RecoveryFileEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -169,7 +172,8 @@ abstract class AppDatabase :
     KeyTransparencyDatabase,
     NotificationDatabase,
     PushDatabase,
-    TelemetryDatabase {
+    TelemetryDatabase,
+    DeviceRecoveryDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -204,7 +208,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 67
+        const val version = 68
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -253,7 +257,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_63_64,
             AppDatabaseMigrations.MIGRATION_64_65,
             AppDatabaseMigrations.MIGRATION_65_66,
-            AppDatabaseMigrations.MIGRATION_66_67
+            AppDatabaseMigrations.MIGRATION_66_67,
+            AppDatabaseMigrations.MIGRATION_66_68
         )
 
         fun buildDatabase(context: Context): AppDatabase =
