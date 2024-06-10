@@ -330,10 +330,10 @@
     <string name="snack_event_created_failed_mail">Esemény létrehozva, de a meghívó kiküldése során hiba lépett fel</string>
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">You cannot edit a recurring invitation containing changes to single occurrences</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Nem szerkeszthet olyan ismétlődő meghívót, amely egyszeri előfordulás módosításait tartalmazza.</string>
     <string name="snack_event_delete_recurring_invitation_single_edit_error">Nem törölhetsz olyan ismétlődő meghívásokat, melyek az egyes előfordulásokban változtatásokat tartalmaznak.</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Nem szerkeszthetsz olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">You cannot delete a recurring invitation containing deleted occurrences</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">Nem törölhet olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nem lehet egyszerre résztvevőket hozzáadni és az eseményt megváltoztatni</string>
     <string name="snack_event_init_error">Hiba az új esemény inicializálása közben</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Megosztott naptárakban nem engedélyezett a meghívók létrehozása</string>
     <string name="snack_down_banner">A Proton szerverek leálltak. A részletekért látogasson el a státusz oldalunkra.</string>
     <string name="snack_down_banner_action">Státusz oldal megtekintése</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Váltson nagyobb csomagra az esemény színeinek testreszabásához</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Az esemény nem létezik</string>
     <string name="error_occurrence_does_not_exist">Az esemény alkalom nem létezik</string>
@@ -412,8 +412,8 @@
     <string name="contacts_permission_dialog_open_settings">Beállítások megnyitása</string>
     <string name="contacts_permission_dialog_cancel">Megtagadás</string>
     <string name="dialog_title_calendar_picker">Naptár</string>
-    <string name="dialog_title_calendar_color_picker">Calendar color</string>
-    <string name="dialog_title_event_color_picker">Event color</string>
+    <string name="dialog_title_calendar_color_picker">Naptár színe</string>
+    <string name="dialog_title_event_color_picker">Esemény színe</string>
     <string name="import_from_google_title">Importálás Google fájlból</string>
     <string name="notifications_permission_dialog_title">Engedélyezi, hogy a Proton Calendar értesítéseket jelenítsen meg?</string>
     <string name="notifications_permission_dialog_message">A Proton Calendarnak engedélyre van szüksége, hogy az eseményekkel kapcsolatos emlékeztetőket megjelenítse.</string>
@@ -437,7 +437,7 @@
     <string name="bug_report_discard_changes_cancel">Szerkesztés folytatása</string>
     <string name="bug_report_discard_changes_confirm">Elvetés</string>
     <!-- Settings -->
-    <string name="settings_app_settings_title">App settings</string>
+    <string name="settings_app_settings_title">Alkalmazás beállításai</string>
     <string name="settings_theme_title">Téma</string>
     <string name="settings_theme_info">Ez a beállítás csak ezen az eszközön változtatja meg a Proton Calendar megjelenését. A változtatás után az alkalmazás újraindul.</string>
     <string name="settings_timezone_title">Időzóna</string>
@@ -590,8 +590,8 @@
     <string name="spotlight_dialog_week_view_description">Bemutatjuk a <b>3 napos</b> és <b>Heti</b> naptár nézetet. Válassza ki az önnek tetsző nézetet a <b>menüben</b>.\n\n• Állítsa be az oszlopok magasságát a napi rácson úgy, hogy két ujjával rácsíp a be- vagy kinagyításhoz.</string>
     <string name="spotlight_dialog_search_title">Események keresése</string>
     <string name="spotlight_dialog_search_description">Találja meg könnyen a keresett eseményt az új keresési lehetőséggel. <a href="https://proton.me/support/calendar-search">További információk</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_positive">Engedélyezés</string>
+    <string name="spotlight_dialog_search_negative">Kihagyás</string>
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
@@ -601,8 +601,10 @@
     <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nBármely ország munkaszüneti napjait hozzáadhatja a naptárhoz.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nMivel jelenleg az elérhető összes naptára használatban van, a munkaszüneti naptár hozzáadásához először el kell távolítania egy meglévő naptárat.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Egyéni eseményszínek</string>
+    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency
+
+Testreszabhatja az egyes események színét, hogy:\n\n- Színkódolja a naptárát\n\n\n- Jobban megszervezze a napját és nyomon kövesse az idejét\n\n- Állítsa be a prioritásokat és növelje a hatékonyságot.\n</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
@@ -672,7 +674,7 @@
     <string name="import_event_disclaimer_dialog_title">Importálás egyszerű eseményként?</string>
     <string name="import_event_disclaimer_dialog_description">\nAz importált meghívások a Proton Calendarban egyszerű eseményekként jelennek meg, <b>a szervező</b> és <b>a résztvevők nélkül</b>.\n\nHogy továbbra is kapjon értesítéseket a frissítésekről és a résztvevőkről, kérje meg a szervezőt, hogy a Proton e-mail címével hívja meg önt.</string>
     <string name="import_event_disclaimer_dialog_positive">Importálás</string>
-    <string name="undefined_color">Undefined</string>
+    <string name="undefined_color">Nem meghatározott</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">naptár</item>
@@ -747,8 +749,8 @@
         <item quantity="other">események</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="other">times</item>
+        <item quantity="one">időpont</item>
+        <item quantity="other">alkalommal</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">résztvevő</item>
@@ -816,48 +818,48 @@
         <item>Vasárnap</item>
     </string-array>
     <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
-        <item>Purple|#8080FF</item>
-        <item>Strawberry|#EC3E7C</item>
-        <item>Pink|#DB60D6</item>
-        <item>Carrot|#F78400</item>
-        <item>Sahara|#936D58</item>
-        <item>Enzian|#5252CC</item>
-        <item>Plum|#A839A4</item>
-        <item>Cerise|#BA1E55</item>
-        <item>Copper|#C44800</item>
-        <item>Soil|#54473F</item>
-        <item>Slate Blue|#415DF0</item>
-        <item>Pacific|#179FD9</item>
-        <item>Reef|#1DA583</item>
-        <item>Fern|#3CBB3A</item>
-        <item>Olive|#B4A40E</item>
-        <item>Cobalt|#273EB2</item>
-        <item>Ocean|#0A77A6</item>
-        <item>Pine|#0F735A</item>
-        <item>Forest|#258723</item>
-        <item>Pickle|#807304</item>
+        <item>Lila|#8080FF</item>
+        <item>Eper|#EC3E7C</item>
+        <item>Rózsaszín|#DB60D6</item>
+        <item>Sárgarépa|#F78400</item>
+        <item>Szahara|#936D58</item>
+        <item>Encián|#5252CC</item>
+        <item>Szilva|#A839A4</item>
+        <item>Cseresznye|#BA1E55</item>
+        <item>Réz|#C44800</item>
+        <item>Földbarna|#54473F</item>
+        <item>Palakék|#415DF0</item>
+        <item>Csendes-óceán|#179FD9</item>
+        <item>Zátony|#1DA583</item>
+        <item>Páfrány|#3CBB3A</item>
+        <item>Olíva|#B4A40E</item>
+        <item>Kobalt|#273EB2</item>
+        <item>Óceán|#0A77A6</item>
+        <item>Fenyő|#0F735A</item>
+        <item>Erdőzöld|#258723</item>
+        <item>Uborka|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
-        <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
-        <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>Lila</item>
+        <item>Eper</item>
+        <item>Rózsaszín</item>
+        <item>Sárgarépa</item>
+        <item>Szahara</item>
+        <item>Encián</item>
+        <item>Szilva</item>
+        <item>Cseresznye</item>
+        <item>Réz</item>
+        <item>Földbarna</item>
+        <item>Palakék</item>
+        <item>Csendes-óceán</item>
+        <item>Zátony</item>
+        <item>Páfrány</item>
+        <item>Olíva</item>
+        <item>Kobalt</item>
+        <item>Óceán</item>
+        <item>Fenyő</item>
+        <item>Erdőzöld</item>
+        <item>Uborka</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

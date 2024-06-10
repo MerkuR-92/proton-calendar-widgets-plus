@@ -19,9 +19,9 @@
     <string name="dialog_button_download">다운로드</string>
     <string name="dialog_button_update">업데이트</string>
     <!-- Delete as an organizer -->
-    <string name="dialog_description_delete_event_as_organizer">이벤트 참가자들에게 취소 이메일이 발송될 것입니다. 이 이벤트를 삭제하시겠습니까?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">당신의 주소가 비활성화되었습니다. 이벤트 참가자들에게 취소 이메일을 보낼 수 없습니다. 이 이벤트를 삭제하시겠습니까?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer">이벤트 참가자들에게 취소 이메일이 보내질 것입니다. 이 시리즈의 모든 이벤트를 삭제하시겠습니까?</string>
+    <string name="dialog_description_delete_event_as_organizer">이벤트 참가자들에게 취소 이메일이 발송됩니다. 이 이벤트를 삭제하시겠습니까?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">사용자의 주소가 비활성화되었습니다. 이벤트 참가자들에게 취소 이메일을 보낼 수 없습니다. 이 이벤트를 삭제하시겠습니까?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer">이벤트 참가자들에게 취소 이메일이 발송됩니다. 이 시리즈의 모든 이벤트를 삭제하시겠습니까?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">당신의 주소가 비활성화되었습니다. 이벤트 참가자들에게 취소 이메일을 보낼 수 없습니다. 그래도 이 시리즈의 모든 이벤트를 삭제하시겠습니까?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">초대를 거부한 것이 주최자에게 알려집니다. 정말 이 이벤트를 삭제하시겠습니까?</string>
@@ -31,7 +31,7 @@
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">이 이벤트가 업데이트되었습니다. 초대를 거부했다는 것이 주최자에게 알려집니다. 정말 이 이벤트를 삭제하시겠습니까?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">이 이벤트가 업데이트되었습니다. 초대된 주소에서 이메일을 보낼 수 없어 초대를 거부한 것이 주최자에게 알려지지 않습니다. 정말 이 이벤트를 삭제하시겠습니까?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
-    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">주최자가 이전에 업데이트한 일정은 유지되지만, 당신의 답변은 손실됩니다</string>
+    <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">주최자가 이전에 업데이트한 일정은 유지되지만, 사용자가 한 답변은 손실됩니다.</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">주최자가 이전에 업데이트한 일정은 유지됩니다.</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">초대를 거부한 것이 주최자에게 알려지지 않습니다:\n\n• %1$s\n\n정말 이벤트를 삭제하시겠습니까?</string>
     <string name="dialog_button_set">설정</string>
@@ -90,7 +90,7 @@
     <string name="event_attendee_is_organizer">주최자입니다</string>
     <string name="event_attendee_organizer">주최자</string>
     <string name="event_attendee_optional">선택 사항</string>
-    <string name="event_attendee_is_current_user">당신</string>
+    <string name="event_attendee_is_current_user">나</string>
     <string name="event_answer_attending">참석하나요?</string>
     <string name="event_answer_yes">네</string>
     <string name="event_answer_no">아니오</string>
@@ -113,7 +113,7 @@
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s가 %2$s의 초대를 거부했습니다</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s가 %2$s의 초대를 잠정적으로 수락했습니다</string>
     <string name="event_organizer_send_prefs_error_title">주최자에게 알려지지 않습니다</string>
-    <string name="event_organizer_send_prefs_message_accepted_title">당신이 초대를 수락한 것이 주최자에게 알려지지 않습니다</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">사용자가 초대를 수락한 것이 주최자에게 알려지지 않습니다</string>
     <string name="event_organizer_send_prefs_message_declined_title">당신이 초대를 거부한 것이 주최자에게 알려지지 않습니다</string>
     <string name="event_organizer_send_prefs_message_tentative_title">당신이 초대를 잠정적으로 수락한 것이 주최자에게 알려지지 않습니다</string>
     <string name="event_organizer_send_prefs_message_default_title">당신이 초대에 응답한 것이 주최자에게 알려지지 않습니다</string>
@@ -137,7 +137,7 @@
     <string name="event_hint_location">위치 추가</string>
     <string name="event_text_add_participants">참가자 추가</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">참가자 (%1$d/%2$d)</string>
-    <string name="event_current_user_organizer">당신</string>
+    <string name="event_current_user_organizer">나</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d명 더</string>
     <string name="event_text_switch_all_day">하루 종일</string>
     <string name="event_text_date_start">시작</string>
@@ -558,7 +558,7 @@
     <string name="dialog_feedback_text">Proton Calendar에 대한 경험을 어떻게 생각하시나요?</string>
     <string name="dialog_feedback_rating_worst">공포</string>
     <string name="dialog_feedback_rating_best">최고</string>
-    <string name="dialog_feedback_hint">당신의 경험에 대해 알려주세요. (선택사항)</string>
+    <string name="dialog_feedback_hint">회원님의 경험에 대해 알려주세요. (선택사항)</string>
     <string name="dialog_feedback_submit">제출</string>
     <string name="dialog_feedback_submit_thank_you">감사합니다! 고객님의 피드백은 Proton을 발전시키는데 도움을 줍니다.</string>
     <!-- Calendar Widget -->

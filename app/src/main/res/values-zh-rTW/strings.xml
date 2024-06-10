@@ -81,7 +81,7 @@
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d 個%2$s</string>
     <string name="event_status_canceled">已取消</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(已停用)</i>]]></string>
-    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">（預設）</string>
+    <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(預設)</string>
     <string name="event_attendee_status_separator">%1$s，%2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d 人會出席</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d 人或會出席</string>
@@ -729,7 +729,7 @@
         <item quantity="other">發生</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="other">times</item>
+        <item quantity="other">次</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="other">位參與者</item>
