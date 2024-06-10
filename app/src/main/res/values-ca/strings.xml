@@ -602,8 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
     <string name="spotlight_dialog_color_per_event_title">Colors d\'esdeveniments personalitzats</string>
-    <string name="spotlight_dialog_color_per_event_description">Personalitzi es colors dels esdeveniments individualment per:\n\n
-:\n\n\n• Codificar el calendari per colors\n\n• Organitzar millor el dia i controlar el seu temps\n\n• Establir priortats i millorar l\'eficiència</string>
+    <string name="spotlight_dialog_color_per_event_description">Personalitzeu el color dels esdeveniments individuals per a:\n\n• Codificar el calendari per colors\n\n• Organitzar millor el dia i fer un seguiment del vostre temps\n\n• Establir prioritats i augmentar l\'eficiència</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>
@@ -748,8 +747,8 @@
         <item quantity="other">ocurrències</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="other">times</item>
+        <item quantity="one">vegada</item>
+        <item quantity="other">vegades</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>

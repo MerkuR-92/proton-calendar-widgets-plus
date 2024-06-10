@@ -783,10 +783,10 @@
         <item quantity="other">výskytů</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="few">times</item>
-        <item quantity="many">times</item>
-        <item quantity="other">times</item>
+        <item quantity="one">krát</item>
+        <item quantity="few">krát</item>
+        <item quantity="many">krát</item>
+        <item quantity="other">krát</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">účastník</item>

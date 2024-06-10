@@ -509,7 +509,7 @@
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">Anda harus memiliki setidaknya satu kalender personal sebelum mencapai batas 3 kalender yang diperkenankan oleh paket Anda.</string>
     <string name="create_calendar_limit_reached_error">Kesalahan</string>
     <string name="delete_calendar_dialog_title">Hapus kalender</string>
-    <string name="delete_calendar_dialog_message">Anda yakin ingin menghapus kalender ini?</string>
+    <string name="delete_calendar_dialog_message">Apakah Anda yakin ingin menghapus kalender ini?</string>
     <string name="remove_calendar_dialog_title">Hapus kalender</string>
     <string name="remove_calendar_dialog_message">Apakah Anda yakin untuk menghapus kalender ini?</string>
     <string name="leave_calendar_dialog_title">Tinggalkan kalender</string>
@@ -729,7 +729,7 @@
         <item quantity="other">keberlangsungan</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="other">times</item>
+        <item quantity="other">kali</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="other">peserta</item>

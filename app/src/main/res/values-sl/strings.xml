@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">Koledar je bil ustvarjen, vendar nekatere informacije niso posodobljene, poskusite znova pozneje</string>
     <string name="snack_ics_default_error">Napaka pri odpiranju koledarja</string>
     <string name="snack_ics_event_not_found_error">Dogodek ni bil najden</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">Datoteke ni mogoče najti</string>
     <string name="snack_ics_create_error">Napaka pri ustvarjanju dogodka</string>
     <string name="snack_ics_parsing_error">Napaka pri branju koledarja</string>
     <string name="snack_ics_unsupported_method_error">Ta vrsta dogodka še ni podprta</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Ustvarjanje povabil v deljenem koledarju ni dovoljeno</string>
     <string name="snack_down_banner">Strežniki Proton ne delujejo. Za podrobnosti obiščite našo stran s stanjem.</string>
     <string name="snack_down_banner_action">Odpri stran s stanjem</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">Nadgradite za prilagajanje barv dogodkov</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Dogodek ne obstaja</string>
     <string name="error_occurrence_does_not_exist">Ponovitev ne obstaja</string>
@@ -601,8 +601,8 @@
     <string name="spotlight_dialog_holiday_calendar_title">Prazniki so tu!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nV svoj koledar dodajte državne praznike katere koli države.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nič več načrtovanja sestankov na praznične dni, hkrati pa ne boste pozabili načrtovati izletov med podaljšanimi konci tedna.\n\nKer ste trenutno na koledarski omejitvi, morate za dodajanje koledarja praznikov najprej odstraniti obstoječi koledar.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_title">Barve dogodka po meri</string>
+    <string name="spotlight_dialog_color_per_event_description">Prilagodite barvo posameznih dogodkov, da:\n\n• Označite dogodke z barvnimi oznakami\n\n• Bolje organizirate svoj dan in spremljajte svoj čas\n\n• Določite prednostne naloge in povečate učinkovitost</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Dovoli dostop</string>
     <string name="dialog_google_auth_description">Za uvoz podatkov se najprej prijavite v Googlov koledar in Protonu omogočite dostop do svojih podatkov.</string>
@@ -783,10 +783,10 @@
         <item quantity="other">ponovitve</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="two">times</item>
-        <item quantity="few">times</item>
-        <item quantity="other">times</item>
+        <item quantity="one">krat</item>
+        <item quantity="two">krat</item>
+        <item quantity="few">krat</item>
+        <item quantity="other">krat</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">udeleženec</item>

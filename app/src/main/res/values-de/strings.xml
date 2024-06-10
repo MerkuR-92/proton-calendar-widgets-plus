@@ -330,8 +330,8 @@
     <string name="snack_event_created_failed_mail">Termin erstellt, aber Einladung konnte nicht gesendet werden</string>
     <string name="snack_event_created_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_event_opening_edit_error">Fehler beim Öffnen des Termins zur Bearbeitung</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kannst keine wiederkehrende Einladung bearbeiten, die Änderungen an einzelnen Ereignissen enthält</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kannst eine wiederkehrende Einladung, die Änderungen an einzelnen Terminen enthält, nicht löschen</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kannst keine wiederkehrende Einladung bearbeiten, die Änderungen an einzelnen Terminen enthält</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kannst eine wiederkehrende Einladung löschen, die Änderungen an einzelnen Terminen enthält</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Du kannst eine wiederkehrende Einladung mit gelöschten Terminen nicht bearbeiten</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Du kannst keine wiederkehrenden Einladungen mit gelöschten Terminen löschen</string>
     <string name="snack_event_edit_with_attendees_error">Das Bearbeiten von Terminen mit Teilnehmern wird derzeit noch nicht unterstützt</string>
@@ -747,8 +747,8 @@
         <item quantity="other">Wiederholungen</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="other">times</item>
+        <item quantity="one">mal</item>
+        <item quantity="other">mal</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">Teilnehmer</item>

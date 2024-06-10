@@ -367,7 +367,7 @@
     <string name="snack_create_calendar_settings_error">კალენდარი შეიქმნა, მაგრამ გარკვეული ინფორმაცია არ განახლდა, გთხოვთ, სცადოთ მოგვიანებით</string>
     <string name="snack_ics_default_error">კალენდრის გახსნის შეცდომა</string>
     <string name="snack_ics_event_not_found_error">მოვლენა ნაპოვნი არაა</string>
-    <string name="snack_ics_file_not_found_error">File not found</string>
+    <string name="snack_ics_file_not_found_error">ფაილი ვერ მოიძებნა</string>
     <string name="snack_ics_create_error">მოვლენის შექმნის შეცდომა</string>
     <string name="snack_ics_parsing_error">კალენდრის წაკითხვის შეცდომა</string>
     <string name="snack_ics_unsupported_method_error">მოვლენის ეს ტიპი ჯერ მხარდაჭერილი არაა</string>
@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">გაზიარებულ კალენდარში მოსაწვევების შექმნა აკრძალულია</string>
     <string name="snack_down_banner">Proton-ის სერვერები გამორთულია. დეტალებისთვის იხილეთ სტატუსის გვერდი.</string>
     <string name="snack_down_banner_action">სტატუსის გვერდის გახსნა</string>
-    <string name="snack_color_per_event_paid_feature">Upgrade to customize event colors</string>
+    <string name="snack_color_per_event_paid_feature">ასწიეთ ტარიფი მოვლენის ფერების მოსარგებად</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
@@ -590,8 +590,8 @@
     <string name="spotlight_dialog_week_view_description">• წარმოგიდგენთ კალენდრების <b>3 დღიან</b> და <b> ერთკვირიან</b> ხედებს. აირჩიეთ თქვენთვის სასურველი ხედი <b>მენიუში</b>.\n\n• დღის ბადეში მწკრივების სიმაღლის გასწორება ორი თითის გასმით შეგიძლიათ.</string>
     <string name="spotlight_dialog_search_title">მოვლენების ძებნა</string>
     <string name="spotlight_dialog_search_description">ჩვენი ახალი ძებნის ფუნქციებით თქვენს მოვლენებს უფრო ადვილად იპოვით. <a href="https://proton.me/support/calendar-search">გაიგეთ მეტი</a></string>
-    <string name="spotlight_dialog_search_positive">Enable</string>
-    <string name="spotlight_dialog_search_negative">Skip</string>
+    <string name="spotlight_dialog_search_positive">ჩართვა</string>
+    <string name="spotlight_dialog_search_negative">გამოტოვება</string>
     <string name="spotlight_dialog_import_title">მოვლენების დამატების მეტი გზა</string>
     <string name="spotlight_dialog_import_description">• შემოიტანეთ მოვლენები თქვენს კალენდარში თქვენი ტელეფონის ფაილებიდან.\n\n• დაამატეთ მოგზაურობის ჯავშნები პირდაპირ Proton Mail-იდან.</string>
     <string name="spotlight_dialog_calendar_provider_title">კალენდრის ფუნქციები</string>
@@ -601,7 +601,7 @@
     <string name="spotlight_dialog_holiday_calendar_title">დასვენებაა!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და გეგმების დავიწყება გრძელი დასვენების დღეებისთვის.\n\nდაამატეთ ნებისმიერი ქვეყნის დასვენების დღე თქვენს კალენდარში.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და ნუ დაივიწყებთ გრძელი დასვენებების შესახებ.\n\nრადგან თქვენი კალენდარი თითქმის სავსეა, იმისათვის, რომ დასვენების დღე დაამატოთ, ჯერ არსებული უნდა წაშალოთ.</string>
-    <string name="spotlight_dialog_color_per_event_title">Custom event colors</string>
+    <string name="spotlight_dialog_color_per_event_title">მორგებული მოვლენის ფერები</string>
     <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
@@ -747,8 +747,8 @@
         <item quantity="other">მოვლენა</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="other">times</item>
+        <item quantity="one">დრო</item>
+        <item quantity="other">-ჯერ</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">მონაწილე</item>
@@ -821,7 +821,7 @@
         <item>ვარდისფერი|#DB60D6</item>
         <item>სტაფილოსფერი|#F78400</item>
         <item>უდაბნოსფერი|#936D58</item>
-        <item>ნაღველასფერი|#5252CC</item>
+        <item>მელნისფერი|#5252CC</item>
         <item>ქლიავი|#A839A4</item>
         <item>ღია ალუბლისფერი|#BA1E55</item>
         <item>სპილენძისფერი|#C44800</item>
@@ -835,29 +835,29 @@
         <item>ზღვისფერი|#0A77A6</item>
         <item>ფიჭვისფერი|#0F735A</item>
         <item>ტყისფერი|#258723</item>
-        <item>მწნილისფერი|#807304</item>
+        <item>პიკულისფერი|#807304</item>
     </string-array>
     <string-array name="colors_names" comment="Keep the same items order">
-        <item>Purple</item>
-        <item>Strawberry</item>
-        <item>Pink</item>
-        <item>Carrot</item>
-        <item>Sahara</item>
-        <item>Enzian</item>
-        <item>Plum</item>
-        <item>Cerise</item>
-        <item>Copper</item>
-        <item>Soil</item>
-        <item>Slate Blue</item>
-        <item>Pacific</item>
-        <item>Reef</item>
-        <item>Fern</item>
-        <item>Olive</item>
-        <item>Cobalt</item>
-        <item>Ocean</item>
-        <item>Pine</item>
-        <item>Forest</item>
-        <item>Pickle</item>
+        <item>იასამნისფერი</item>
+        <item>მარწყვისფერი</item>
+        <item>ვარდისფერი</item>
+        <item>სტაფილოსფერი</item>
+        <item>საჰარა</item>
+        <item>ენზიანი</item>
+        <item>ქლიავისფერი</item>
+        <item>ღია ალუბლისფერი</item>
+        <item>სპილენძისფერი</item>
+        <item>მიწისფერი</item>
+        <item>მოლურჯო-მონაცრისფრო</item>
+        <item>წყნარი ოკეანის</item>
+        <item>მარჯნისფერი</item>
+        <item>გვიმრისფერი</item>
+        <item>ზეთისხილისფერი</item>
+        <item>კობალტისფერი</item>
+        <item>ზღვისფერი</item>
+        <item>ფიჭვისფერი</item>
+        <item>ტყისფერი</item>
+        <item>კიტრი</item>
     </string-array>
     <string-array name="colors_values" comment="No translation needed">
         <item>#8080FF</item>

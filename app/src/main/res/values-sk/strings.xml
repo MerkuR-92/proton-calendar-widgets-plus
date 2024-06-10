@@ -398,7 +398,7 @@
     <string name="snack_invite_in_shared_calendar_error">Vytváranie pozvánok v zdieľanom kalendári nie je povolené</string>
     <string name="snack_down_banner">Proton servery sú mimo prevádzky. Podrobnosti nájdete na našej stránke o stave.</string>
     <string name="snack_down_banner_action">Otvoriť stránku statusu</string>
-    <string name="snack_color_per_event_paid_feature">Upgradujte pre prispôsobenie farieb udalosti</string>
+    <string name="snack_color_per_event_paid_feature">Ak chcete prispôsobiť farby udalostí, prejdite na vyššie predplatné</string>
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Udalosť neexistuje</string>
     <string name="error_occurrence_does_not_exist">Opakovanie neexistuje</string>
@@ -783,10 +783,10 @@
         <item quantity="other">výskytov</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">time</item>
-        <item quantity="few">times</item>
-        <item quantity="many">times</item>
-        <item quantity="other">times</item>
+        <item quantity="one">raze</item>
+        <item quantity="few">razoch</item>
+        <item quantity="many">razoch</item>
+        <item quantity="other">razoch</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">účastník</item>
