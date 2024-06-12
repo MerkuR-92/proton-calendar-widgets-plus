@@ -49,7 +49,7 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                 // personalPartICalString == null ignore alarms update, personalPartICalString == "" clear alarms, else update event with new alarms
                 if (personalPartICalString != null) {
                     // TODO Ignore update alarms errors or display snack ?
-                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, personalPartICalString, notifications)
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, notifications)
                     if (updatePersonalPartUseCaseUseCaseResult !is UseCase.Result.Success<*>) {
                         calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event.toEventEntity())
                         calendarsRepository.persistEventsMetadata(updateParticipationStatusResponse.data.event.toEventEntityMetadata())
@@ -88,7 +88,7 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                 is ApiResponse.Success -> {
                     // Clear alarms
                     // TODO Ignore update alarms errors or display snack ?
-                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, "", emptyList())
+                    val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, event.id, emptyList())
                     updatePersonalPartUseCaseUseCaseResult.ifSuccessAndLogErrors(logger) { }
                 }
                 is ApiResponse.Error -> {

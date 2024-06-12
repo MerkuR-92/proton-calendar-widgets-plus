@@ -80,8 +80,7 @@ class FetchPublicKeysUseCase @Inject constructor(
         return eventEntities.flatMap {
             try {
                 it.sharedEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                        it.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content } +
-                        it.personalEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content }
+                        it.calendarEvents.map { (it as? JsonObject)?.get("Author")?.jsonPrimitive?.content }
             } catch (e: IllegalStateException) {
                 logger.e("error getting event's author from JSON", e)
                 emptyList()
