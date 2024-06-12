@@ -181,10 +181,6 @@ class EditCreateEventUseCase @Inject constructor(
             kotlin.runCatching { newMemberKey.key.signText(cryptoContext, calendarPartToEncryptICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfEncryptedCalendarPart")
         }
 
-        // 7. sign Personal Part (not always present)
-        val personalPartICalString = calendarSplit.personalPart?.printToString()
-        val signatureOfPersonalPart = personalPartICalString?.run { kotlin.runCatching { newMemberKey.key.signText(cryptoContext, personalPartICalString) }.getOrNull() ?: return UseCase.Result.Error("EditCreateEventUseCase: could not create signatureOfPersonalPart") }
-
         // 8. sign and encrypt Attendees Part (not always present)
         val attendeesPartICalString = calendarSplit.attendeesPart?.printToString()
 
@@ -263,16 +259,6 @@ class EditCreateEventUseCase @Inject constructor(
             } else null
         ).ifEmpty { null }
 
-        val personalEventContent = if (personalPartICalString != null && signatureOfPersonalPart != null) {
-            Event.EventPart.Personal(
-                2,
-                personalPartICalString,
-                signatureOfPersonalPart,
-                "", // on server, "author" will be extracted from MemberID and this value ignored
-                newMemberKey.memberId
-            )
-        } else null
-
         val attendees = arrayListOf<Event.AttendeeStatusEvent>()
         val newEventAttendees =
             if (createLinkedEventAsAttendee) {
@@ -322,7 +308,6 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedEventContent = sharedEventContent,
                                 calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                                 calendarEventContent = calendarEventContent,
-                                personalEventContent = personalEventContent,
                                 sharedEventId = sanitizedNewEvent.sharedEventId,
                                 uid = sanitizedNewEvent.uid,
                                 sourceCalendarId = oldCalendarId,
@@ -344,7 +329,6 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedEventContent = sharedEventContent,
                                 calendarKeyPacket = if (oldSessionKeys?.calendar == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
                                 calendarEventContent = calendarEventContent,
-                                personalEventContent = personalEventContent,
                                 attendeesEventContent = attendeesEventContent,
                                 attendees = attendees.takeIfNotEmpty(), // TODO to remove all attendees from event, send null value
 
@@ -369,7 +353,6 @@ class EditCreateEventUseCase @Inject constructor(
                             event = SyncEvent(
                                 isOrganizer = isOrganizer,
                                 sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
-                                personalEventContent = personalEventContent,
                                 attendees = attendees,
                                 sharedEventId = sharedEventId,
                                 uid = sanitizedNewEvent.uid,
@@ -390,7 +373,6 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedEventContent = sharedEventContent,
                                 calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                                 calendarEventContent = calendarEventContent,
-                                personalEventContent = personalEventContent,
                                 attendeesEventContent =
                                 if (sanitizedNewEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
                                 else null, // We first create without attendees

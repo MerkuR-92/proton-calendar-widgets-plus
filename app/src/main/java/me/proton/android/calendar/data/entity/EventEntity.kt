@@ -50,16 +50,12 @@ data class EventEntity(
     val sharedEvents: List<JsonElement>, // shared between all calendars
     @SerialName("CalendarEvents")
     val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar
-    @SerialName("PersonalEvents")
-    val personalEvents: List<JsonElement>, // specific to a member
     @SerialName("AttendeesEvents")
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
     val attendees: List<JsonElement>,
     @SerialName("IsProtonProtonInvite")
     val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
-    @SerialName("IsPersonalMigrated")
-    val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
     @SerialName("Notifications")
     val notifications: List<JsonElement>? = null,
     @SerialName("Color")
@@ -80,11 +76,9 @@ fun EventResponse.toEventEntity(): EventEntity {
         sharedKeyPacket = this.sharedKeyPacket,
         sharedEvents = this.sharedEvents,
         calendarEvents = this.calendarEvents,
-        personalEvents = this.personalEvents,
         attendeesEvents = this.attendeesEvents,
         attendees = this.attendees,
         isProtonProtonInvite = this.isProtonProtonInvite,
-        isPersonalMigrated = this.isPersonalMigrated,
         notifications = this.notifications,
         color = this.color
     )

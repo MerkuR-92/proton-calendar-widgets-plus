@@ -680,8 +680,6 @@ data class SyncEvent(
     val sharedKeyPacket: String? = null,
     @SerialName("SharedEventContent")
     val sharedEventContent: List<Event.EventPart.Shared>? = null,
-    @SerialName("PersonalEventContent")
-    val personalEventContent: Event.EventPart.Personal? = null,
     @SerialName("AttendeesEventContent")
     val attendeesEventContent: List<Event.EventPart.Attendee>? = null,
     @SerialName("Attendees")
@@ -697,8 +695,7 @@ data class SyncEvent(
     @SerialName("Notifications") // notifications that used to be in the PersonalEventContent
     val notifications: List<NotificationEntity>? = null,
     @SerialName("Color")
-    val color: String? = null,
-
+    val color: String? = null
 )
 
 @Serializable
@@ -803,22 +800,10 @@ data class UpdateParticipationStatusApiRequest(
 
 @Serializable
 data class UpdateEventPersonalPartApiRequest(
-    @SerialName("PersonalEventContent")
-    val personalEventContent: PersonalEventContentApiRequest? = null,
     @SerialName("Notifications")
     val notifications: List<NotificationEntity>?,
     @SerialName("Color")
     val color: String? = null,
-)
-
-@Serializable
-data class PersonalEventContentApiRequest(
-    @SerialName("Type")
-    val type: Int,
-    @SerialName("Data")
-    val data: String,
-    @SerialName("Signature")
-    val signature: String
 )
 
 @Serializable
@@ -919,16 +904,12 @@ data class EventResponse(
     val sharedEvents: List<JsonElement>, // shared between all calendars
     @SerialName("CalendarEvents")
     val calendarEvents: List<JsonElement>, // specific to a calendar, shared between all calendar’s members, The data linked with the current calendar
-    @SerialName("PersonalEvents")
-    val personalEvents: List<JsonElement>, // specific to a member
     @SerialName("AttendeesEvents")
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
     val attendees: List<JsonElement>,
     @SerialName("IsProtonProtonInvite")
     val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
-    @SerialName("IsPersonalMigrated")
-    val isPersonalMigrated: Boolean? = null, // if PersonalEventContent has been moved into "Notifications" property
     @SerialName("Notifications")
     val notifications: List<JsonElement>? = null,
     @SerialName("Color")

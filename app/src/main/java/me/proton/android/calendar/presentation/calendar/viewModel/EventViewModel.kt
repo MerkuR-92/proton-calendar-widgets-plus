@@ -2310,7 +2310,6 @@ class EventViewModel @Inject constructor(
             userId,
             event.calendar.id,
             eventId,
-            "",
             event.notifications.notifications,
             event.color
         )

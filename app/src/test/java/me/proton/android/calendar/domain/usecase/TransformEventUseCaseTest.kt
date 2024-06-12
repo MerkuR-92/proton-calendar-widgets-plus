@@ -86,7 +86,6 @@ internal class TransformEventUseCaseTest {
                 "sharedKeyPacket",
                 getMockedNonEncryptedSharedEvents(),
                 getMockedNonEncryptedCalendarEvents(),
-                getMockedPersonalEvents(),
                 getMockedNonEncryptedAttendeesEvents(),
                 getMockedAttendees(),
                 null
@@ -213,12 +212,6 @@ internal class TransformEventUseCaseTest {
     private fun getMockedNonEncryptedCalendarEvents(): List<JsonElement> {
         val list = ArrayList<JsonElement>()
         list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nSTATUS:CONFIRMED\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za6lgAQCzed5ovcz9WykC5+wSFxDCAToI8D5i+p3q0OVPrbIEVAEAvOe6\\r\\nEChxa70XES8QIhF4ddaC5XcU1uiUxNW/zIcTnwA=\\r\\n=pZlu\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\"}"))
-        return list
-    }
-
-    private fun getMockedPersonalEvents(): List<JsonElement> {
-        val list = ArrayList<JsonElement>()
-        list.add(Json.decodeFromString<JsonElement>("{\"Type\":2,\"Data\":\"BEGIN:VCALENDAR\\r\\nVERSION:2.0\\r\\nBEGIN:VEVENT\\r\\nUID:4vi99f4jksbjr1472nir63suvk@google.com\\r\\nDTSTAMP:20201020T144514Z\\r\\nBEGIN:VALARM\\r\\nTRIGGER:-PT15M\\r\\nACTION:DISPLAY\\r\\nEND:VALARM\\r\\nEND:VEVENT\\r\\nEND:VCALENDAR\",\"Signature\":\"-----BEGIN PGP SIGNATURE-----\\r\\nVersion: OpenPGP.js v4.10.8\\r\\nComment: https://openpgpjs.org\\r\\n\\r\\nwnUEARYKAAYFAl+PFFEAIQkQvfbFISx9GWsWIQSFmVz3NIh7rYVWIdi99sUh\\r\\nLH0Za+0BAQDXHpVzCj6vvV7uRRMoVOe+/YSyn8PS66b/A3Cqp0QDrAD/XI2u\\r\\nlP9dOR9rxR54GBHeGLhZqiGHW/VEIvSF7ru9IAU=\\r\\n=D+sP\\r\\n-----END PGP SIGNATURE-----\\r\\n\",\"Author\":\"calendarSingle9@proton.dev\",\"MemberID\":\"uMjs3RbhmCfyC6d1w-xjPzjvji-PjVbL8YST3eBzr5I0-3UKmZv9Q9l_sGUf422xNkLtlsh7ZHoYS1poeYsRVQ==\"}"))
         return list
     }
 

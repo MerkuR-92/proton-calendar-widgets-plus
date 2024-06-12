@@ -89,8 +89,7 @@ class HandleIcsUseCase @Inject constructor(
             calendarsRepository.selectCalendar(defaultCalendarId)
         } ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultCalendarFound
 
-        // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones
-        val notifications = NotificationMigration(false, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
+        val notifications = NotificationMigration(true, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
 
         val newEvent = Event.from(
             ICalUtilsImpl.generateOfflineEventId(), Calendar(
@@ -369,8 +368,7 @@ class HandleIcsUseCase @Inject constructor(
             existingCalendarEntity
         } else null
 
-        // we never set isPersonalMigrated = true on our own, only backend does it -- so here we assume false even though we just mapped old alarms to new ones
-        val notifications = NotificationMigration(false, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
+        val notifications = NotificationMigration(true, iCalendar.events.firstOrNull()?.alarms?.mapNotNull { Notification.fromVAlarm(it) })
 
         // Create a new event with the clean iCalendar
         val newEvent = Event.from(

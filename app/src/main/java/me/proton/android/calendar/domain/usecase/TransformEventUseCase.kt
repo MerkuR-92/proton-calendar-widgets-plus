@@ -141,23 +141,6 @@ class TransformEventUseCase @Inject constructor(
                 }
             }
 
-            // process Personal Events
-            val processedPersonalEvents = async {
-                eventEntity.personalEvents.map {
-                    json.decodeFromJsonElement<Event.EventPart.Personal>(it)
-                }.map { personalEvent ->
-                    getPlainText(
-                        null, // personal parts are only signed
-                        personalEvent,
-                        EncryptedWith.CalendarKey(
-                            calendarPrivateKeys,
-                            keyPassphrase,
-                            getPublicKeysForAuthor(UserId(userId), personalEvent, userAddresses, allowApiCall)
-                        )
-                    )
-                }
-            }
-
             // process Attendees Events
             val processedAttendeesEvents = async {
                 eventEntity.attendeesEvents.map {
@@ -191,7 +174,7 @@ class TransformEventUseCase @Inject constructor(
                 }
             }
 
-            listOf(processedSharedEvents, processedCalendarEvents, processedPersonalEvents, processedAttendeesEvents)
+            listOf(processedSharedEvents, processedCalendarEvents, processedAttendeesEvents)
                 .awaitAll().flatten().forEach { processResult ->
                     processResult.plainText?.let { calendarParts.add(it) }
                     decryptionStatuses.add(processResult.decryptionStatus)
@@ -284,8 +267,7 @@ class TransformEventUseCase @Inject constructor(
             currentUserAttendeeId = currentUserAttendeeId,
             sharedEventId = eventEntity.sharedEventId,
             isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean(),
-            // if isPersonalMigrated is not provided, we fallback to `true` for subscribed calendars and `false` otherwise
-            notifications = NotificationMigration(eventEntity.isPersonalMigrated ?: calendar.isSubscribed, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() }),
+            notifications = NotificationMigration(true, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() }),
             color = eventEntity.color
         )
 
