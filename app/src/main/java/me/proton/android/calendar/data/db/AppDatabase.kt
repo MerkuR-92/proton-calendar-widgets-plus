@@ -50,6 +50,8 @@ import me.proton.core.key.data.db.KeySaltDatabase
 import me.proton.core.key.data.db.PublicAddressDatabase
 import me.proton.core.key.data.entity.KeySaltEntity
 import me.proton.core.key.data.entity.PublicAddressEntity
+import me.proton.core.key.data.entity.PublicAddressInfoEntity
+import me.proton.core.key.data.entity.PublicAddressKeyDataEntity
 import me.proton.core.key.data.entity.PublicAddressKeyEntity
 import me.proton.core.keytransparency.data.local.KeyTransparencyDatabase
 import me.proton.core.keytransparency.data.local.entity.AddressChangeEntity
@@ -98,6 +100,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         KeySaltEntity::class,
         PublicAddressEntity::class,
         PublicAddressKeyEntity::class,
+        PublicAddressInfoEntity::class,
+        PublicAddressKeyDataEntity::class,
         HumanVerificationEntity::class,
         MailSettingsEntity::class,
         me.proton.core.usersettings.data.entity.UserSettingsEntity::class,
@@ -208,7 +212,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 69
+        const val version = 70
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -259,7 +263,8 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_65_66,
             AppDatabaseMigrations.MIGRATION_66_67,
             AppDatabaseMigrations.MIGRATION_67_68,
-            AppDatabaseMigrations.MIGRATION_68_69
+            AppDatabaseMigrations.MIGRATION_68_69,
+            AppDatabaseMigrations.MIGRATION_69_70
         )
 
         fun buildDatabase(context: Context): AppDatabase =
