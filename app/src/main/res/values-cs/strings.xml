@@ -460,7 +460,7 @@
     <string name="settings_general_title">Obecné</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s atd.</string>
     <string name="settings_general_info_separator" comment="Theme, language">%1$s, %2$s</string>
-    <string name="settings_general_info_theme">vzhled</string>
+    <string name="settings_general_info_theme">motiv</string>
     <string name="settings_general_info_language">jazyk</string>
     <string name="settings_general_info_time_zone">časové pásmo</string>
     <string name="settings_general_info_calendar_layout">uspořádání kalendáře</string>

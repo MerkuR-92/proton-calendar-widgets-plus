@@ -612,7 +612,7 @@
     <string name="import_assistant_summary_title">Resum de la importació</string>
     <string name="import_assistant_summary_customize_import">Personalitzar importació</string>
     <string name="import_assistant_error">Error aconseguint informació</string>
-    <string name="import_assistant_data_gathering_error">Recollida d\'informació fallida</string>
+    <string name="import_assistant_data_gathering_error">No s\'han pogut recollir les dades.</string>
     <string name="import_assistant_update_import_error">No s\'ha pogut actualitzar la importació. Proveu de nou més tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">El compte no és correcte. Inicieu la sessió amb el compte que heu utilitzat per a la importació del calendari.</string>
     <string name="import_assistant_start_import_error">No s\'ha pogut començar la importació. Proveu de nou més tard.</string>

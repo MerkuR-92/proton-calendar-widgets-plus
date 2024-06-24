@@ -541,13 +541,13 @@
     <string name="bootstrap_error_some_calendars_failed_title">Takvimler hazırlanırken sorun çıktı</string>
     <string name="bootstrap_error_some_calendars_failed_message">Şu takvimler kurulamadı</string>
     <string name="bootstrap_error_no_active_calendar_title">Bu hesap ile ilişkilendirilmiş etkin bir kişisel takvim bulunamadı.</string>
-    <string name="bootstrap_error_no_active_calendar_message">Bir takvimin nasıl kullanıma alınacağını öğrenmek için <a href="https://proton.me/support">bilgi bankasına</a> bakabilirsiniz</string>
+    <string name="bootstrap_error_no_active_calendar_message">Bir takvimin nasıl etkinleştirileceğini öğrenmek için <a href="https://proton.me/support">bilgi bankasına</a> bakabilirsiniz</string>
     <string name="bootstrap_error_store_quota_reached_message">Kullanılabilecek depolama alanı kalmadı.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Ayrıntılı bilgi alın</string>
     <string name="bootstrap_error_reset_needed_title">Takvim anahtarlarını sıfırla</string>
     <string name="bootstrap_error_reset_needed_message">Parolanızı sıfırladınız ve şu takvimlere bağlı etkinliklerin şifresi çözülemedi. Abone olunmuş takvimler birkaç dakika sonra yeniden eşitlenecek.</string>
-    <string name="bootstrap_error_update_passphrase_title">Takvim anahtarlarını yeniden kullanıma al</string>
-    <string name="bootstrap_error_update_passphrase_message">Anahtarlarınızı yeniden kullanıma aldınız ve artık şu takvimlere bağlı etkinliklerin şifresi çözülebilir.</string>
+    <string name="bootstrap_error_update_passphrase_title">Takvim anahtarlarını yeniden etkinleştir</string>
+    <string name="bootstrap_error_update_passphrase_message">Anahtarlarınızı yeniden etkinleştirdiniz ve artık şu takvimlere bağlı etkinliklerin şifreleri çözülebilir.</string>
     <string name="bootstrap_error_continue_button">İlerle</string>
     <string name="splash_after_login_init">Takvimler hazırlanıyor</string>
     <string name="splash_init">Etkinliklerin şifresi çözülüyor</string>

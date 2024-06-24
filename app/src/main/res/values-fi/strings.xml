@@ -527,8 +527,8 @@
     <string name="recreate_calendar_snack_deleted">Kalenteri tyhjennettiin</string>
     <string name="recreate_calendar_snack_clearing">Kalenteria tyhjennetään…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">Lisää juhlapäiväkalenteri</string>
-    <string name="holiday_calendar_title">Juhlapäiväkalenteri</string>
+    <string name="add_holiday_calendar_title">Lisää yleiset vapaapäivät</string>
+    <string name="holiday_calendar_title">Yleiset vapaapäivät</string>
     <string name="add_holiday_calendar_country_search_hint">Etsi maata</string>
     <string name="holiday_calendar_form_picker_title">Maa</string>
     <string name="holiday_calendar_time_zone_based">Perustuu aikavyöhykkeeseesi</string>
