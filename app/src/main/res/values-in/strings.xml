@@ -225,7 +225,7 @@
     <string name="event_recurring_edit_all_events">Semua acara</string>
     <string name="event_discard_changes_title">Buang perubahan?</string>
     <string name="event_discard_changes_description">Anda akan kehilangan seluruh perubahan yang belum disimpan.</string>
-    <string name="event_discard_changes_cancel">Lanjutkan perubahan</string>
+    <string name="event_discard_changes_cancel">Lanjut menyunting</string>
     <string name="event_discard_changes_confirm">Buang</string>
     <string name="event_recurring_update_this_title">Sunting acara berulang</string>
     <string name="event_recurring_update_this_description">Perubahan frekuensi akan hilang</string>
@@ -315,7 +315,7 @@
     <string name="snack_event_deleted_as_organizer">Pembatalan dikirim dan acara dihapus</string>
     <string name="snack_event_deleted_as_attendee">Jawaban dikirim dan acara dihapus</string>
     <string name="snack_event_deleted_error">Kesalahan menghapus acara</string>
-    <string name="snack_event_deleted_as_organizer_error">Email pembatalan tidak dapat terkirim, mohon coba kembali</string>
+    <string name="snack_event_deleted_as_organizer_error">Email pembatalan tidak dapat dikirim. Silakan coba lagi</string>
     <string name="snack_event_opening_error">Kesalahan membuka acara</string>
     <string name="snack_event_saving">Menyimpan acara</string>
     <string name="snack_event_deleting">Menghapus acara</string>
@@ -329,12 +329,12 @@
     <string name="snack_event_created">Acara telah dibuat</string>
     <string name="snack_event_created_failed_mail">Acara dibuat namun undangan gagal dikirim</string>
     <string name="snack_event_created_error">Kesalahan membuat acara</string>
-    <string name="snack_event_opening_edit_error">Kesalahan membuka acara untuk diedit</string>
+    <string name="snack_event_opening_edit_error">Terdapat kesalahan dalam membuka acara untuk penyuntingan</string>
     <string name="snack_event_edit_recurring_invitation_single_edit_error">Anda tidak dapat menyunting undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
     <string name="snack_event_delete_recurring_invitation_single_edit_error">Anda tidak dapat menghapus undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Anda tidak dapat menyunting undangan berulang yang mengandung keberlangsungan acara yang telah dihapus</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Anda tidak dapat menghapus undangan berulang yang mengandung keberlangsungan acara yang telah dihapus</string>
-    <string name="snack_event_edit_with_attendees_error">Menyunting acara yang dihadiri oleh peserta saat ini tidak didukung</string>
+    <string name="snack_event_edit_with_attendees_error">Penyuntingan acara yang memiliki peserta saat ini belum didukung</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Tidak dapat menambah peserta dan mengubah kalender secara bersamaan</string>
     <string name="snack_event_init_error">Gagal membuat acara baru</string>
     <string name="snack_event_calendar_error">Kesalahan beralih kalender</string>
@@ -483,7 +483,7 @@
     <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">dari %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Buat kalender</string>
-    <string name="calendar_form_update_title">Ubah kalender</string>
+    <string name="calendar_form_update_title">Sunting kalender</string>
     <string name="calendar_form_save">Simpan</string>
     <string name="calendar_form_name">Nama</string>
     <string name="calendar_form_description">Deskripsi</string>
@@ -559,7 +559,7 @@
     <string name="dialog_feedback_rating_best">Sangat Baik</string>
     <string name="dialog_feedback_hint">Ceritakan pengalaman Anda. (Opsional)</string>
     <string name="dialog_feedback_submit">Kirim</string>
-    <string name="dialog_feedback_submit_thank_you">Terima kasih! Masukan Anda dapat membantu kami meningkatkan Proton.</string>
+    <string name="dialog_feedback_submit_thank_you">Terima kasih! Masukan Anda membantu kami meningkatkan Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Widget Proton Calendar</string>
     <string name="calendar_widget_no_upcoming_events_today">Tidak ada acara berikutnya di hari ini</string>

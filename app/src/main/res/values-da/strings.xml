@@ -158,7 +158,7 @@
     <string name="update_recurring_all_events">Vil du opdatere alle begivenheder i denne serie?</string>
     <string name="update_recurring_invite_send_email">Alle begivenheder i denne serie vil blive opdateret. En invitationsopdatering vil blive sendt til begivenhedens deltagere.</string>
     <!-- SEARCH -->
-    <string name="search_hint_input_field">Hvad ønsker du at finde?</string>
+    <string name="search_hint_input_field">Hvad leder du efter?</string>
     <string name="search_empty_results_title">Ingen resultater fundet</string>
     <string name="search_empty_results_subtitle">Prøv et andet udtryk, f.eks. Erik, fødselsdag, webinar, bogklub.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Kalendere hentes (%1$s)</string>

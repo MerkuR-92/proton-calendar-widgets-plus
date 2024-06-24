@@ -766,7 +766,7 @@
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
         <item quantity="one">dată</item>
-        <item quantity="few">times</item>
+        <item quantity="few">ori</item>
         <item quantity="other">de ori</item>
     </plurals>
     <plurals name="plural_participant_uppercase">
