@@ -347,7 +347,7 @@
     <string name="snack_add_self_as_participant">Auto-invito non consentito</string>
     <string name="snack_maximum_participants_reached">È stato raggiunto il numero massimo di partecipanti.</string>
     <string name="snack_add_participant_error">Errore nell\'aggiunta dell\'utente</string>
-    <string name="snack_add_participant_invalid_email">Email non valida</string>
+    <string name="snack_add_participant_invalid_email">Indirizzo email non valido</string>
     <string name="snack_change_attendee_answer_error">Errore nell\'invio della risposta, riprova più tardi</string>
     <string name="snack_network_error">Errore di rete. Riprova più tardi</string>
     <string name="snack_import_event_signed_out">Devi accedere per importare eventi</string>

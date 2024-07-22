@@ -195,7 +195,7 @@
     <string name="event_alarm_partial_day_3">30 minuuttia</string>
     <string name="event_alarm_partial_day_4">1 tunti</string>
     <string name="event_alarm_partial_day_5">Viikkoa</string>
-    <string name="event_alarm_all_day_1">samana päivänä klo %1$s</string>
+    <string name="event_alarm_all_day_1">Samana päivänä klo %1$s</string>
     <string name="event_alarm_all_day_2">Päivää aiemmin klo %1$s</string>
     <string name="event_alarm_all_day_3">Viikkoa aiemmin klo %1$s</string>
     <string name="event_alarm_all_day_4">Kolmea viikkoa aiemmin klo %1$s</string>
@@ -219,7 +219,7 @@
     <string name="event_recurrence_ends_never">Ei koskaan</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">Tiettynä päivänä</string>
     <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
-    <string name="event_recurrence_ends_after_count_prefix"/>
+    <string name="event_recurrence_ends_after_count_prefix">Kun toistettu</string>
     <string name="event_recurring_edit_this">Tämä tapahtuma</string>
     <string name="event_recurring_edit_this_and_future">Ketjun tämä ja tulevat tapahtumat</string>
     <string name="event_recurring_edit_all_events">Kaikki tapahtumat</string>
@@ -453,7 +453,7 @@
     <string name="settings_week_numbers_title">Näytä viikkonumerot</string>
     <string name="settings_auto_invites_title">Lisää kutsut kalenteriin ja merkitse ne odottaviksi</string>
     <string name="settings_search_title">Etsi kalentereista</string>
-    <string name="settings_search_subtitle">Lataa ja tallentaa kalenterin sisällön laitteellesi hakua varten. Ominaisuuden käytöstäpoisto poistaa myös ladatun sisällön.\n\nHaku on kokeellinen beta-ominaisuus ja sen käyttöönotto voi tehdä sovelluksesta epävakaan.</string>
+    <string name="settings_search_subtitle">Lataa ja tallentaa kalenterin sisällön laitteellesi hakua varten. Ominaisuuden käytöstäpoisto poistaa myös ladatun sisällön.\n\nHaku on kokeellinen beetaominaisuus ja sen käyttöönotto voi tehdä sovelluksesta epävakaan.</string>
     <string name="settings_alternative_routing_title">Salli vaihtoehtoinen reititys</string>
     <string name="settings_alternative_routing_subtitle">Jos Protonin sivustoja ei tavoiteta, sallii tämä asetus niiden tavoittamiseksi verkkoyhteyden vaihtoehtoisen reitityksen, joka voi auttaa palomuurien tai yhteysongelmien kierrossa. Tämä on suositeltavaa luotettavuuden lisäämiseksi.</string>
     <string name="settings_value_placeholder">Valitse napauttamalla</string>
@@ -531,8 +531,8 @@
     <string name="holiday_calendar_title">Yleiset vapaapäivät</string>
     <string name="add_holiday_calendar_country_search_hint">Etsi maata</string>
     <string name="holiday_calendar_form_picker_title">Maa</string>
-    <string name="holiday_calendar_time_zone_based">Perustuu aikavyöhykkeeseesi</string>
-    <string name="holiday_calendar_already_exists">Yleiset vapaapäivät on jo lisätty.</string>
+    <string name="holiday_calendar_time_zone_based">Aikavyöhykkeesi perusteella</string>
+    <string name="holiday_calendar_already_exists">Nämä yleiset vapaapäivät on jo lisätty.</string>
     <string name="holiday_calendar_value_placeholder">Valitse maa</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -597,7 +597,7 @@
     <string name="spotlight_dialog_calendar_provider_title">Kalenterin ominaisuudet</string>
     <string name="spotlight_dialog_calendar_provider_description">• Lisää tapahtumia muista sovelluksista suoraan Proton Calendariin.\n\n• Luo ja hallinnoi sinulle jaettujen kalenterien tapahtumia.\n\n• Aseta oletusnäkymä, jonka haluat nähdä avatessasi sovelluksen.\n\n• 13 uutta kieltä.</string>
     <string name="spotlight_dialog_wipe_search_title">Haku on poistettu sen parantamiseksi</string>
-    <string name="spotlight_dialog_wipe_search_description">Poistamme kokeellisen hakutoiminnon Proton Calendar Betasta, koska haluamme tehdä siitä sinulle hyödyllisemmän ja luotettavamman. Tämä saattaa kestää muutaman sekunnin.</string>
+    <string name="spotlight_dialog_wipe_search_description">Poistamme kokeellisen hakutoiminnon Proton Calendarin beetaversiosta, koska haluamme tehdä siitä sinulle hyödyllisemmän ja luotettavamman. Tämä saattaa kestää muutaman sekunnin.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Yleiset vapaapäivät ovat täällä!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ei enää yleisille vapaille ajoitettuja kokouksia tai hukattuja pitkiä viikonloppuja.\n\nLisää minkä tahansa maan yleiset vapaapäivät kalenteriisi.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ei enää vapaille ajoitettuja kokouksia tai viikonloppusuunnitelmien unohtelua.\n\nKoska olet jo saavuttanut kalenterien enimmäismäärän, on jokin nykyisistä kalentereista poistettava yleisten vapaapäivien lisäämiseksi.</string>
