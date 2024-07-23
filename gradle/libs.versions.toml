@@ -46,7 +46,7 @@ junit = "4.13.2"
 kotlin-stdlib = "1.9.22"
 desugar = "2.0.3"
 dagger = "2.49"
-core = "25.0.1"
+core = "26.0.1"
 fusion = "0.9.52"
 arch-testing = "2.1.0"
 leak-canary = "2.9.1"
@@ -88,6 +88,7 @@ core-accountManager-dagger = { module = "me.proton.core:account-manager-dagger",
 core-accountRecovery = { module = "me.proton.core:account-recovery", version.ref = "core" }
 core-accountRecovery-test = { module = "me.proton.core:account-recovery-test", version.ref = "core" }
 core-auth = { module = "me.proton.core:auth", version.ref = "core" }
+core-auth-fido = { module = "me.proton.core:auth-fido", version.ref = "core" }
 core-auth-test = { module = "me.proton.core:auth-test", version.ref = "core" }
 core-contact = { module = "me.proton.core:contact", version.ref = "core" }
 core-auth-domain = { module = "me.proton.core:auth-domain", version.ref = "core" }

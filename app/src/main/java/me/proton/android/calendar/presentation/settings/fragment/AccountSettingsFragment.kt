@@ -19,6 +19,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.presentation.compose.AccountSettingsList
 import me.proton.core.compose.theme.ProtonTheme
 import me.proton.core.usersettings.presentation.UserSettingsOrchestrator
+import me.proton.core.usersettings.presentation.compose.view.SecurityKeysActivity
 import org.koin.core.KoinComponent
 import javax.inject.Inject
 
@@ -78,6 +79,7 @@ class AccountSettingsFragment :
                     AccountSettingsList(
                         onPasswordManagementClick = { startPasswordManagement() },
                         onRecoveryEmailClick = { startUpdateRecoveryEmail() },
+                        onSecurityKeysClick = { startSecurityKeys() },
                         divider = {}
                     )
                 }
@@ -99,5 +101,9 @@ class AccountSettingsFragment :
                 userSettingsOrchestrator.startUpdateRecoveryEmailWorkflow(it)
             }
         }
+    }
+
+    private fun startSecurityKeys() {
+        SecurityKeysActivity.start(requireContext())
     }
 }

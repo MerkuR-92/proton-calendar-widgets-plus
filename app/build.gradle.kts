@@ -207,6 +207,7 @@ dependencies {
     implementation(libs.core.accountManager)
     implementation(libs.core.accountRecovery)
     implementation(libs.core.auth)
+    implementation(libs.core.auth.fido)
     implementation(libs.core.contact)
     implementation(libs.core.country)
     implementation(libs.core.crypto)

@@ -83,7 +83,8 @@ internal class ObtainSendPreferencesUseCaseTest {
                 contactId = ContactId("contact_1"),
                 "contact_external_pinned_key@email.com",
                 labelIds = emptyList(),
-                isProton = null
+                isProton = null,
+                lastUsedTime = 0
             )
         )
 
@@ -378,7 +379,8 @@ internal class ObtainSendPreferencesUseCaseTest {
                         contactId = ContactId("contact_1"),
                         canonicalEmail = null,
                         labelIds = emptyList(),
-                        isProton = null
+                        isProton = null,
+                        lastUsedTime = 0
                     ) /* this is deliberately null here, API doesn't return it */
                 ),
             ),
