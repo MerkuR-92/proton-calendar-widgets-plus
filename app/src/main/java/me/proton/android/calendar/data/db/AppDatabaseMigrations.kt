@@ -573,4 +573,10 @@ object AppDatabaseMigrations {
             EventMetadataDatabase.MIGRATION_3.migrate(db)
         }
     }
+
+    val MIGRATION_70_71 = object : Migration(70, 71) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            ContactDatabase.MIGRATION_2.migrate(db)
+        }
+    }
 }

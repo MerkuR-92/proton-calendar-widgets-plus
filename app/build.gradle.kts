@@ -207,6 +207,7 @@ dependencies {
     implementation(libs.core.accountManager)
     implementation(libs.core.accountRecovery)
     implementation(libs.core.auth)
+    implementation(libs.core.auth.fido)
     implementation(libs.core.contact)
     implementation(libs.core.country)
     implementation(libs.core.crypto)
@@ -355,9 +356,9 @@ object Config {
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"
     const val targetSdk = 33
-    const val versionCode = 288
+    const val versionCode = 289
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
-    const val versionName = "2.21.2"
+    const val versionName = "2.21.3"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(
