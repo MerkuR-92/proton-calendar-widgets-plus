@@ -171,7 +171,7 @@
     <string name="search_settings_dialog_toggle_on_title">Unduh kalender ke perangkat ini?</string>
     <string name="search_settings_dialog_toggle_on_text">Hal ini dibutuhkan agar Anda dapat melangsungkan pencarian.</string>
     <string name="search_onboarding_header">Ingin mencari kalender Anda?</string>
-    <string name="search_onboarding_text">Pertama-tama, Anda perlu untuk mengunduh salinan kalender terenkripsi Anda. Hal ini akan memakan waktu sejenak, dan Anda akan tetap dapat menggunakan aplikasi kalender seperti biasa dalam prosesnya. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
+    <string name="search_onboarding_text">Pertama-tama, Anda perlu untuk mengunduh salinan kalender terenkripsi Anda. Hal ini hanya akan memakan waktu sejenak, dan Anda akan tetap dapat menggunakan aplikasi kalender seperti biasa dalam prosesnya. <a href="https://proton.me/support/calendar-search">Pelajari lebih lanjut</a></string>
     <string name="search_onboarding_action_download_calendars">Unduh kalender</string>
     <string name="search_onboarding_action_pause">Jeda</string>
     <string name="search_onboarding_action_resume">Lanjutkan</string>

@@ -72,7 +72,7 @@
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s los %2$s</string>
     <string name="event_recurrence_none">No se repite</string>
     <string name="event_recurrence_daily">Cada día</string>
-    <string name="event_recurrence_weekly">Cada semana</string>
+    <string name="event_recurrence_weekly">Semanalmente</string>
     <string name="event_recurrence_monthly">Cada mes</string>
     <string name="event_recurrence_yearly">Cada año</string>
     <string name="event_recurrence_weekly_on_all_days">todos los días</string>
