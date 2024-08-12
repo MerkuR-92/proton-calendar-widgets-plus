@@ -170,8 +170,8 @@
     <string name="search_settings_dialog_toggle_off_text">Tienes que descargar los calendarios de nuevo si quieres realizar búsquedas.</string>
     <string name="search_settings_dialog_toggle_on_title">¿Descargar los calendarios a este dispositivo?</string>
     <string name="search_settings_dialog_toggle_on_text">Esto es necesario para que puedas realizar búsquedas.</string>
-    <string name="search_onboarding_header">¿Quiere buscar en su calendario?</string>
-    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto llevará un momento y, mientras tanto, podrá seguir utilizando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="search_onboarding_header">¿Quieres buscar en tu calendario?</string>
+    <string name="search_onboarding_text">Primero necesita descargar una copia cifrada de sus calendarios. Esto llevará un momento y, mientras tanto, podrá seguir usando la aplicación. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="search_onboarding_action_download_calendars">Descargar calendarios</string>
     <string name="search_onboarding_action_pause">Pausar</string>
     <string name="search_onboarding_action_resume">Reanudar</string>
@@ -358,9 +358,9 @@
     <string name="snack_holiday_calendar_init_error">Error al cargar la información del calendario de días festivos</string>
     <string name="snack_update_calendar_error">Error al actualizar las informaciones del calendario. Inténtalo de nuevo más tarde.</string>
     <string name="snack_update_calendar_settings_error">Error al actualizar algunas informaciones del calendario. Inténtalo de nuevo más tarde.</string>
-    <string name="snack_update_calendar_success">El calendario se ha actualizado</string>
+    <string name="snack_update_calendar_success">Se ha actualizado el calendario.</string>
     <string name="snack_create_calendar_success">Calendario creado</string>
-    <string name="snack_add_calendar_success">El calendario se ha añadido</string>
+    <string name="snack_add_calendar_success">Se ha añadido el calendario.</string>
     <string name="snack_calendar_saving">Guardando calendario</string>
     <string name="snack_create_calendar_error">Error al crear el calendario. Inténtalo de nuevo más tarde.</string>
     <string name="snack_add_calendar_error">Error al añadir el calendario. Inténtelo de nuevo más tarde</string>
@@ -463,7 +463,7 @@
     <string name="settings_general_info_theme">tema</string>
     <string name="settings_general_info_language">idioma</string>
     <string name="settings_general_info_time_zone">zona horaria</string>
-    <string name="settings_general_info_calendar_layout">disposición del calendario</string>
+    <string name="settings_general_info_calendar_layout">diseño del calendario</string>
     <string name="settings_calendars">Mis calendarios</string>
     <string name="settings_calendars_empty">No hay calendarios</string>
     <string name="settings_subscribed_calendars">Calendarios suscritos</string>
@@ -516,7 +516,7 @@
     <string name="leave_calendar_dialog_message">Si abandonas este calendario, deberás pedirle permiso al propietario para unirte de nuevo.</string>
     <string name="delete_default_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
-    <string name="remove_calendar_snack_removed">El calendario ha sido borrado.</string>
+    <string name="remove_calendar_snack_removed">Se ha borrado el calendario.</string>
     <string name="delete_calendar_snack_error">Error al eliminar el calendario</string>
     <string name="remove_calendar_snack_error">Error al eliminar el calendario</string>
     <string name="leave_calendar_snack_error">Error al abandonar el calendario</string>
@@ -531,7 +531,7 @@
     <string name="holiday_calendar_title">Calendario de días festivos</string>
     <string name="add_holiday_calendar_country_search_hint">Búsqueda por país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
-    <string name="holiday_calendar_time_zone_based">Basado en su zona horaria</string>
+    <string name="holiday_calendar_time_zone_based">Basado en tu zona horaria</string>
     <string name="holiday_calendar_already_exists">Este calendario de días festivos ya está añadido.</string>
     <string name="holiday_calendar_value_placeholder">Seleccionar un país</string>
     <!-- Bootstrap errors -->
@@ -575,7 +575,7 @@
     <string name="spotlight_dialog_skip">Omitir</string>
     <string name="spotlight_dialog_confirmation_button">Aceptar</string>
     <string name="spotlight_dialog_month_view_title">Vista mensual</string>
-    <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas utilizando el menú.</string>
+    <string name="spotlight_dialog_month_view_description">Da un vistazo a tus eventos con nuestra nueva vista mensual. Cambia entre vistas usando el menú.</string>
     <string name="spotlight_dialog_easy_switch_description">Importar eventos y otros datos de Google Calendar a Proton Calendar es más fácil que nunca. Nuestro importador Easy Switch te guiará con cada paso.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Iniciar importación</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ahora no</string>
@@ -589,16 +589,16 @@
     <string name="spotlight_dialog_week_view_title">Más opciones de visualización</string>
     <string name="spotlight_dialog_week_view_description">• Presentamos las vistas de calendario de <b>3 días</b> y <b>Semana</b>. Selecciona tu vista preferida en el <b>menú</b>.\n\n• Ajusta la altura de las filas de la rejilla de un día pellizcando con dos dedos para ampliar o reducir.</string>
     <string name="spotlight_dialog_search_title">Buscar eventos</string>
-    <string name="spotlight_dialog_search_description">Encuentre fácilmente el evento que está buscando con nuestra nueva función de búsqueda. <a href="https://proton.me/support/calendar-search">Más información</a></string>
+    <string name="spotlight_dialog_search_description">Encuentra fácilmente el evento que estás buscando con nuestra función de búsqueda nueva. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_search_positive">Activar</string>
     <string name="spotlight_dialog_search_negative">Omitir</string>
     <string name="spotlight_dialog_import_title">Más maneras de añadir eventos</string>
     <string name="spotlight_dialog_import_description">• Importar eventos a tu calenario desde ficheros en tu teléfono.\n\n• Añadir reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Características del calendario</string>
     <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que se hayan compartido con usted.\n\n• Defina la vista por defecto que quiera ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
-    <string name="spotlight_dialog_wipe_search_title">La búsqueda ha sido borrada para mejorarla.</string>
+    <string name="spotlight_dialog_wipe_search_title">Se ha borrado la búsqueda para mejorarla.</string>
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y fiable. Esto puede llevar unos segundos.</string>
-    <string name="spotlight_dialog_holiday_calendar_title">Calendario de festivos</string>
+    <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nAñade los días festivos de cualquier país a tu calendario.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo actualmente estás al límite del calendario, para añadir un calendario de días festivos, necesitarás borrar un calendario existente primero.</string>
     <string name="spotlight_dialog_color_per_event_title">Colores de eventos personalizados</string>
@@ -670,7 +670,7 @@
     <string name="import_assistant_in_progress_error_snack">Todavía hay una importación en curso</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">¿Importar el evento sin detalles?</string>
-    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones del evento y ver los participantes, pide a los organizadores que te inviten utilizando tu dirección de correo electrónico Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nLas invitaciones importadas aparecen en Proton Calendar como eventos simples sin detalles del <b>organizador</b> ni de los <b>participantes</b>.\n\nPara recibir actualizaciones del evento y ver los participantes, pide a los organizadores que te inviten usando tu dirección de correo electrónico Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importar</string>
     <string name="undefined_color">Sin definir</string>
     <!--  STRING PLURALS  -->

@@ -602,7 +602,7 @@
     <string name="spotlight_dialog_holiday_calendar_add_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და გეგმების დავიწყება გრძელი დასვენების დღეებისთვის.\n\nდაამატეთ ნებისმიერი ქვეყნის დასვენების დღე თქვენს კალენდარში.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">აიცილეთ თავიდან შეხვედრები, სადაც არავინაა და ნუ დაივიწყებთ გრძელი დასვენებების შესახებ.\n\nრადგან თქვენი კალენდარი თითქმის სავსეა, იმისათვის, რომ დასვენების დღე დაამატოთ, ჯერ არსებული უნდა წაშალოთ.</string>
     <string name="spotlight_dialog_color_per_event_title">მორგებული მოვლენის ფერები</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency</string>
+    <string name="spotlight_dialog_color_per_event_description">მოირგეთ მოვლენების ფერი სათთაოდ:\n\n• გააფერადეთ თქვენი კალენდარი\n\n• უკეთესად დააორგანიზეთ თქვენი დღე და ადევნეთ თვალყური თქვენს დროს\n\n• დააყენეთ პრიორიტეტები და ასწიეთ ეფექტურობა</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">წვდომის დაშვება</string>
     <string name="dialog_google_auth_description">შემოტანის დასაწყებად, შედით Google Calendar-ში და მიეცით Proton-ს თქვენს მონაცემებზე წვდომა.</string>
