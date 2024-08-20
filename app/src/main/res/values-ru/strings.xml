@@ -599,7 +599,7 @@
     <string name="spotlight_dialog_wipe_search_title">Убрали поиск, чтобы сделать его лучше</string>
     <string name="spotlight_dialog_wipe_search_description">Мы удаляем функцию экспериментального поиска из Proton Calendar Beta, так как мы хотим сделать его полезнее и надежнее для вас. Это может занять несколько секунд.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Государственные праздники здесь!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">Бывает, что случайно планируйте встречи, когда все отдыхают, или забывайте запланировать поездку на долгие выходные?\n\nДобавьте государственные праздники любой страны в свой календарь.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">Бывает, что вы случайно планируете встречи, когда все отдыхают, или забываете запланировать поездку на долгие выходные?\n\nДобавьте государственные праздники любой страны в свой календарь.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Больше не назначайте встречи, когда все отсутствуют, или не забывайте планировать долгие выходные.\n\nПоскольку у вас уже максимальное количество календарей, чтобы добавить календарь праздников, вам необходимо сначала удалить существующий календарь.</string>
     <string name="spotlight_dialog_color_per_event_title">Свои цвета событий</string>
     <string name="spotlight_dialog_color_per_event_description">Настройте цвет отдельных мероприятий:\n\n• Пометьте цветами ваш календарь\n\n• Улучшите организацию дня и отслеживание времени\n\n• Установите приоритеты и повысите эффективность</string>
