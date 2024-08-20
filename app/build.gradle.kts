@@ -355,7 +355,7 @@ object Config {
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"
-    const val targetSdk = 33
+    const val targetSdk = 34
     const val versionCode = 291
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
     const val versionName = "2.21.5"
