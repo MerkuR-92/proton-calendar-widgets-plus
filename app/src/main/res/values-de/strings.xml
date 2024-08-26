@@ -816,7 +816,7 @@
         <item>Sonntag</item>
     </string-array>
     <string-array name="colors_with_names" comment="DEPRECATED: Remove when new arrays are translated.">
-        <item>Hellblau|#8080FF</item>
+        <item>Violett|#8080FF</item>
         <item>Rosa|#EC3E7C</item>
         <item>Magenta|#DB60D6</item>
         <item>Rostrot|#F78400</item>
@@ -824,7 +824,7 @@
         <item>Blauviolett|#5252CC</item>
         <item>Purpurrot|#A839A4</item>
         <item>Fuchsiarot|#BA1E55</item>
-        <item>Scharlachrot|#C44800</item>
+        <item>Kupfer|#C44800</item>
         <item>Rostbraun|#54473F</item>
         <item>Königsblau|#415DF0</item>
         <item>Himmelblau|#179FD9</item>
