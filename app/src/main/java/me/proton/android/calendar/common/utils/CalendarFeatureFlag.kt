@@ -12,6 +12,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     // Unleash
     ColorPerEventAndroid(FeatureId("ColorPerEventAndroid"), false, false),
     EventSearchAndroid(FeatureId("EventSearchAndroid"), false, false),
+    SplitViewVerticalScrollingAndroid(FeatureId("SplitViewVerticalScrollingAndroid"), false, false),
 
     /** Local only flag (unknown to remote API) **/
     // Enabled

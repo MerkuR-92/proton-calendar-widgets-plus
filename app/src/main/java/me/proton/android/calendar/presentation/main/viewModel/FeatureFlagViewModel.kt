@@ -37,6 +37,7 @@ class FeatureFlagViewModel @Inject constructor(
 
     var colorPerEventFeatureFlag: LiveData<Boolean> = MutableLiveData()
     var eventSearchFeatureFlag: LiveData<Boolean> = MutableLiveData()
+    var splitViewVerticalScrollingFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
@@ -60,12 +61,21 @@ class FeatureFlagViewModel @Inject constructor(
         ).map {
             it?.value ?: CalendarFeatureFlag.ColorPerEventAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
+
         // Event search feature flag
         eventSearchFeatureFlag = featureFlagManager.observe(
             userId,
             CalendarFeatureFlag.EventSearchAndroid.featureId
         ).map {
             it?.value ?: CalendarFeatureFlag.EventSearchAndroid.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+
+        // Split agenda view vertical scrolling flag, CALAND-2905
+        splitViewVerticalScrollingFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
     }
 
@@ -106,6 +116,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     fun isEventSearchEnabled(): Boolean {
         return eventSearchFeatureFlag.value ?: CalendarFeatureFlag.EventSearchAndroid.fallbackValue
+    }
+
+    fun isSplitViewVerticalScrollingEnabled(): Boolean {
+        return splitViewVerticalScrollingFlag.value ?: CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.fallbackValue
     }
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {
