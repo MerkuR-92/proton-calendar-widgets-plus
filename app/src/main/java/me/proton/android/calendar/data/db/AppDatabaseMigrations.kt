@@ -35,6 +35,7 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
+import me.proton.core.auth.data.db.AuthDatabase
 import me.proton.core.challenge.data.db.ChallengeDatabase
 import me.proton.core.contact.data.local.db.ContactDatabase
 import me.proton.core.data.room.db.extension.addTableColumn
@@ -577,6 +578,13 @@ object AppDatabaseMigrations {
     val MIGRATION_70_71 = object : Migration(70, 71) {
         override fun migrate(db: SupportSQLiteDatabase) {
             ContactDatabase.MIGRATION_2.migrate(db)
+        }
+    }
+
+    val MIGRATION_71_72 = object : Migration(71, 72) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            AuthDatabase.MIGRATION_0.migrate(db)
+            AuthDatabase.MIGRATION_1.migrate(db)
         }
     }
 }
