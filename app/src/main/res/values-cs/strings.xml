@@ -578,7 +578,7 @@
     <string name="spotlight_dialog_month_view_description">Získejte přehled svých událostí s naším novým měsíčním zobrazením. Přepínejte mezi zobrazeními v menu.</string>
     <string name="spotlight_dialog_easy_switch_description">Import událostí a dalších dat z Google Calendar do Proton Calendar je snazší než dříve. Náš nástroj pro import Easy Switch vás provede krok za krokem.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Spustit import</string>
-    <string name="spotlight_dialog_easy_switch_negative_button">Teď ne</string>
+    <string name="spotlight_dialog_easy_switch_negative_button">Nyní ne</string>
     <string name="spotlight_dialog_auto_invites_title">Snadné přijímání pozvánek</string>
     <string name="spotlight_dialog_auto_invites_description">Nyní se pozvánky zobrazují v kalendáři jako události bez odpovědi. Stačí otevřít událost a odpovědět na ni.\n\nChcete-li to spravovat, přejděte do nastavení.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Další</string>

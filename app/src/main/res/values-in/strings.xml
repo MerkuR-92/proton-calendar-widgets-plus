@@ -134,7 +134,7 @@
     <string name="title_create_event">Acara baru</string>
     <string name="event_text_edit_event">Edit acara</string>
     <string name="event_hint_title">Tambahkan judul</string>
-    <string name="event_hint_location">Tambahkan lokasi</string>
+    <string name="event_hint_location">Tambah lokasi</string>
     <string name="event_text_add_participants">Tambah peserta</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Peserta (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Anda</string>
@@ -158,7 +158,7 @@
     <string name="update_recurring_all_events">Apakah Anda ingin memperbarui seluruh acara dalam rangkaian ini?</string>
     <string name="update_recurring_invite_send_email">Anda akan memperbarui semua acara dalam rangkaian ini. Perubahan undangan akan dikirim ke peserta acara.</string>
     <!-- SEARCH -->
-    <string name="search_hint_input_field">Apa yang Anda tunggu?</string>
+    <string name="search_hint_input_field">Apa yang ingin Anda cari?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>
     <string name="search_empty_results_subtitle">Coba gunakan kata kunci pencarian yang berbeda, mis. Eric, ulang tahun, webinar, klub buku.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Mengunduh kalender (%1$s)</string>

@@ -595,7 +595,7 @@
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendar-ba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
     <string name="spotlight_dialog_wipe_search_title">Keresés eltávolítva, hogy jobbá tegyük</string>
     <string name="spotlight_dialog_wipe_search_description">Eltávolítjuk a kísérleti keresési lehetőséget a Proton Calendar Béta változatából, mivel szeretnénk, ha az még hasznosabb és megbízhatóbb legyen. Ez néhány másodpercet vehet igénybe.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
