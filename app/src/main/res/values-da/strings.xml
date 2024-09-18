@@ -455,7 +455,7 @@
     <string name="settings_search_title">Søg i kalendere</string>
     <string name="settings_search_subtitle">Downloader og gemmer kalenderindhold på din enhed, så du kan søge i det. Hvis du slår dette fra, fjernes det downloadede indhold.\n\nSøgning er en eksperimentel beta-funktion. Hvis du aktiverer den, kan appen blive ustabil.</string>
     <string name="settings_alternative_routing_title">Tillad alternativ routing</string>
-    <string name="settings_alternative_routing_subtitle">Hvis Proton-websteder er blokeret giver denne indstilling appen mulighed for at prøve alternativ netværksrouting for at nå Proton, hvilket kan være nyttige til at omgå firewalls eller ved netværksproblemer. Vi anbefaler at holde denne indstilling slået til for større pålidelighed.</string>
+    <string name="settings_alternative_routing_subtitle">Hvis Proton-websteder er blokeret giver denne indstilling appen mulighed for at prøve alternativ netværksrouting for at nå Proton, hvilket kan være nyttigt til at omgå firewalls eller ved netværksproblemer. Vi anbefaler at holde denne indstilling slået til for større pålidelighed.</string>
     <string name="settings_value_placeholder">Tryk for at vælge</string>
     <string name="settings_general_title">Generelt</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s etc.</string>

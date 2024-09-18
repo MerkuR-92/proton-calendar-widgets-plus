@@ -585,7 +585,7 @@
     <string name="spotlight_v5_dialog_got_it_button">Anladım</string>
     <string name="spotlight_v5_dialog_learn_more_button">Ayrıntılı bilgi alın</string>
     <string name="spotlight_v5_dialog_rebranding_title">Güncellenmiş Proton, birleşik koruma</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Yenilenmiş Proton böyle görünüyor. Bir çok hizmet, tek amaç. Gizliliğe odaklanmış bir İnternet fikrine hoş geldiniz. <a href="https://proton.me/news/updated-proton">Ayrıntılı bilgi alın</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Yenilenmiş Proton böyle görünüyor. Bir çok hizmet, tek amaç. Gizliliğe odaklanmış bir internet fikrine hoş geldiniz. <a href="https://proton.me/news/updated-proton">Ayrıntılı bilgi alın</a></string>
     <string name="spotlight_dialog_week_view_title">Diğer görüntüleme seçenekleri</string>
     <string name="spotlight_dialog_week_view_description">• <b>3 günlük</b> ve <b>Haftalık</b> takvim görünümleriyle tanışın. <b>Menüden</b> kullanmak istediğiniz görünümü seçin.\n\n• Yakınlaştırmak ya da uzaklaştırmak için iki parmağınızı sıkıştırarak gün tablosundaki satırların yüksekliğini ayarlayın.</string>
     <string name="spotlight_dialog_search_title">Etkinlikleri arayın</string>
