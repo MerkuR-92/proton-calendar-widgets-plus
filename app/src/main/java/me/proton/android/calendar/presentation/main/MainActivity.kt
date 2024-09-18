@@ -1794,6 +1794,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             eventSearchFeatureFlag ?: return@Observer
         })
 
+        featureFlagViewModel.splitViewVerticalScrollingFlag.observe(this@MainActivity, Observer { splitViewVerticalScrollingFlag ->
+            splitViewVerticalScrollingFlag ?: return@Observer
+        })
+
         lifecycleScope.launch {
             calendarViewModel.fixCalendars()
         }

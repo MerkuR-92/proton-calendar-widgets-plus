@@ -640,9 +640,17 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
 
         calendarViewModel.monthView.observe(viewLifecycleOwner) { monthView ->
-            binding.fragmentMonthLayout.allowScrolling = !monthView ||
-                    calendarViewModel.viewMode.value == ViewMode.AGENDA ||
-                    calendarViewModel.viewMode.value == ViewMode.MONTH
+
+            // Addresses CALAND-2905, once we're confident it does not introduce side effects, remove the FF
+            // and update the logic.
+            if (featureFlagViewModel.isSplitViewVerticalScrollingEnabled()) {
+                binding.fragmentMonthLayout.allowScrolling = true
+                binding.weekView.isHorizontalScrollingEnabled = !monthView
+            } else {
+                binding.fragmentMonthLayout.allowScrolling = !monthView ||
+                        calendarViewModel.viewMode.value == ViewMode.AGENDA ||
+                        calendarViewModel.viewMode.value == ViewMode.MONTH
+            }
         }
 
         calendarViewModel.userCalendars.observe(viewLifecycleOwner) { userCalendars ->
@@ -1005,11 +1013,17 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
         )
 
-        binding.fragmentMonthLayout.setOnTouchListener(onTouchListener)
         binding.fragmentMonthLayout.agendaPager = binding.agendaPager
         binding.fragmentMonthLayout.weekView = binding.weekView
 
         binding.miniCalendarPager.registerOnPageChangeCallback(miniCalendarPageChangeCallback)
+
+        // Addresses CALAND-2905, once we're confident it does not introduce side effects, remove the FF
+        // and update the logic.
+        featureFlagViewModel.splitViewVerticalScrollingFlag.observe(viewLifecycleOwner) { isSplitViewScrollingEnabled ->
+            val listener = if (isSplitViewScrollingEnabled) null else onTouchListener
+            binding.fragmentMonthLayout.setOnTouchListener(listener)
+        }
     }
 
     private fun initAgendaPager(viewMode: ViewMode) {
