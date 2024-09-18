@@ -26,6 +26,10 @@ import me.proton.core.account.data.entity.AccountEntity
 import me.proton.core.account.data.entity.AccountMetadataEntity
 import me.proton.core.account.data.entity.SessionDetailsEntity
 import me.proton.core.account.data.entity.SessionEntity
+import me.proton.core.auth.data.db.AuthConverters
+import me.proton.core.auth.data.db.AuthDatabase
+import me.proton.core.auth.data.entity.AuthDeviceEntity
+import me.proton.core.auth.data.entity.DeviceSecretEntity
 import me.proton.core.challenge.data.db.ChallengeConverters
 import me.proton.core.challenge.data.db.ChallengeDatabase
 import me.proton.core.challenge.data.entity.ChallengeFrameEntity
@@ -123,6 +127,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         PushEntity::class,
         TelemetryEventEntity::class,
         RecoveryFileEntity::class,
+        AuthDeviceEntity::class,
+        DeviceSecretEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -153,6 +159,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
     ChallengeConverters::class,
     NotificationConverters::class,
     PushConverters::class,
+    AuthConverters::class,
     // Calendar
     DatabaseTypeConverters::class
 )
@@ -177,7 +184,8 @@ abstract class AppDatabase :
     NotificationDatabase,
     PushDatabase,
     TelemetryDatabase,
-    DeviceRecoveryDatabase {
+    DeviceRecoveryDatabase,
+    AuthDatabase {
 
     abstract fun calendarsDao(): CalendarsDao
     abstract fun eventsDao(): EventsDao
@@ -212,7 +220,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 71
+        const val version = 72
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -266,6 +274,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_68_69,
             AppDatabaseMigrations.MIGRATION_69_70,
             AppDatabaseMigrations.MIGRATION_70_71,
+            AppDatabaseMigrations.MIGRATION_71_72,
         )
 
         fun buildDatabase(context: Context): AppDatabase =
