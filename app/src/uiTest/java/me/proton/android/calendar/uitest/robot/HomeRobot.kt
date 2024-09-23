@@ -20,6 +20,7 @@ package me.proton.android.calendar.uitest.robot
 
 import me.proton.android.calendar.R
 import me.proton.test.fusion.Fusion.view
+import kotlin.time.Duration.Companion.seconds
 
 object HomeRobot : Robot {
     private val splashLogo = view.withId(R.id.root_splash_logo)
@@ -30,11 +31,10 @@ object HomeRobot : Robot {
 
     fun clickHamburgerButton() = hamburgerButton.clickTo(SidebarRobot)
 
-    fun splashAfterLoginIsDisplayed() =
-        splashLogo.checkIsDisplayed()
+    fun splashAfterLoginIsDisplayed() = splashLogo.checkIsDisplayed()
 
     fun robotDisplayed() = let {
-        plusButton.checkIsDisplayed()
-        hamburgerButton.checkIsDisplayed()
+        plusButton.await(60.seconds) { checkIsDisplayed() }
+        hamburgerButton.await(60.seconds) { checkIsDisplayed() }
     }
 }

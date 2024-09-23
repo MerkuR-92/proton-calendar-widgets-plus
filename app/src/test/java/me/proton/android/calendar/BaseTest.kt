@@ -25,5 +25,4 @@ internal abstract class BaseTest {
             emptyList()
         ), ICalUtilsImpl.parseICalString(iCalString)!!, 0, null, null)!!
     }
-
 }

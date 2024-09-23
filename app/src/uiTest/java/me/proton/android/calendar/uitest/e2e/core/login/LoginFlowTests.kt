@@ -20,6 +20,7 @@ package me.proton.android.calendar.uitest.e2e.core.login
 
 import dagger.hilt.android.testing.HiltAndroidTest
 import me.proton.android.calendar.uitest.BaseTest
+import me.proton.android.calendar.uitest.robot.HomeRobot
 import me.proton.core.auth.test.MinimalSignInInternalTests
 import me.proton.core.auth.test.rule.AcceptExternalRule
 import me.proton.core.auth.test.usecase.WaitForPrimaryAccount
@@ -29,6 +30,9 @@ import javax.inject.Inject
 
 @HiltAndroidTest
 class LoginFlowTests : BaseTest(), MinimalSignInInternalTests {
+
+    // TODO: rework tests to use ProtonRule - CP-8722.
+
     @get:Rule
     val acceptExternalRule = AcceptExternalRule { extraHeaderProvider }
 
@@ -40,6 +44,6 @@ class LoginFlowTests : BaseTest(), MinimalSignInInternalTests {
 
     override fun verifyAfter() {
         waitForPrimaryAccount()
-        //HomeRobot.splashAfterLoginIsDisplayed()
+        HomeRobot.splashAfterLoginIsDisplayed()
     }
 }

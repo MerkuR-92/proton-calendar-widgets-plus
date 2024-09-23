@@ -8,7 +8,6 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.logger.AppLogger
 import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
@@ -16,6 +15,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
+import me.proton.core.auth.data.db.AuthDatabase
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.util.android.sentry.TimberLogger
 import me.proton.core.util.kotlin.CoreLogger
@@ -34,6 +34,9 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var forceUpdateViewModel: ForceUpdateViewModel
+
+    @Inject
+    lateinit var authDatabase: AuthDatabase
 
     override fun onCreate() {
         super.onCreate()
@@ -63,7 +66,8 @@ class ProtonCalendarApplication : Application() {
 
     fun getAppTheme(): AppTheme {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val appTheme = sharedPreferences.getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)
+        val appTheme =
+            sharedPreferences.getInt(SharedPreferencesKeys.THEME, AppTheme.SYSTEM_DEFAULT.value)
         return AppTheme.values()[appTheme]
     }
 

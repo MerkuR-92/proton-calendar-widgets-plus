@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.getUserSettingsEntityFlow
 import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.ResourceProvider
@@ -34,6 +35,7 @@ import me.proton.android.calendar.domain.usecase.SendEmailUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
+import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
@@ -78,6 +80,7 @@ open class EventViewModelTestCommon: KoinComponent {
     val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     val upgradeEventUseCaseMock: UpgradeEventUseCase = mockk()
     val workManagerMock: WorkManager = mockk()
+    val updatePersonalPartUseCase: UpdatePersonalPartUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -102,7 +105,7 @@ open class EventViewModelTestCommon: KoinComponent {
         coEvery { userManagerMock.getUser(userId) } returns UserMocks.provideUser()
         coEvery { userManagerMock.getAddresses(userId) } returns listOf(UserMocks.provideUserAddress())
 
-        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventResponse()
+        coEvery { calendarsRepositoryMock.selectEventEntity(eventId) } returns EventMocks.provideEventResponse().toEventEntity()
 
         coEvery { calendarWidgetRefresherMock.refreshEventList() } just Runs
     }
@@ -140,7 +143,8 @@ open class EventViewModelTestCommon: KoinComponent {
             eventDecryptor = eventDecryptorMock,
             database = appDatabaseMock,
             upgradeEventUseCase = upgradeEventUseCaseMock,
-            workManager = workManagerMock
+            workManager = workManagerMock,
+            updatePersonalPartUseCase = updatePersonalPartUseCase
         )
     }
 

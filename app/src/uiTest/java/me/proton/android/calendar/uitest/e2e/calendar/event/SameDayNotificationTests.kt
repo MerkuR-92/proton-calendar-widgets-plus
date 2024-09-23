@@ -4,22 +4,18 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import me.proton.android.calendar.uitest.AuthenticatedTest
 import me.proton.android.calendar.uitest.robot.HomeRobot
 import me.proton.android.calendar.uitest.robot.NotificationRobot.Notification
-import me.proton.android.calendar.uitest.rule.userLoginRule
+import me.proton.android.calendar.uitest.verify
+import me.proton.core.test.rule.annotation.PrepareUser
 import org.junit.Test
-import org.junit.rules.ExternalResource
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
 @HiltAndroidTest
-class SameDayNotificationTests(
-    private val notification: Notification
-) : AuthenticatedTest() {
-
-    override val userLoginRule: ExternalResource
-        get() = userLoginRule(users.getUser(), false)
+class SameDayNotificationTests(private val notification: Notification) : AuthenticatedTest() {
 
     @Test
+    @PrepareUser(loginBefore = true)
     fun notificationIsAdded() {
         HomeRobot
             .clickAddEvent()
