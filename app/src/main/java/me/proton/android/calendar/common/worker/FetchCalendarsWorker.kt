@@ -1,6 +1,7 @@
 package me.proton.android.calendar.common.worker
 
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -311,7 +312,18 @@ class FetchCalendarsWorker @AssistedInject constructor(
                 .addAction(0, applicationContext.getString(R.string.search_downloading_pause), intent)
                 .build()
 
-        return ForegroundInfo(NOTIFICATION_ID_FETCH_CALENDARS_WORKER, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ForegroundInfo(
+                NOTIFICATION_ID_FETCH_CALENDARS_WORKER,
+                notification,
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(
+                NOTIFICATION_ID_FETCH_CALENDARS_WORKER,
+                notification
+            )
+        }
     }
 
     companion object {
