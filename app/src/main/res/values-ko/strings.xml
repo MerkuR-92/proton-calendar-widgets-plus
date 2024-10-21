@@ -523,7 +523,7 @@
     <string name="leave_calendar_snack_error">캘린더 나가기 오류</string>
     <string name="delete_calendar_snack_error_password_confirmation">비밀번호 확인 실패</string>
     <string name="recreate_calendar_dialog_title">캘린더 삭제</string>
-    <string name="recreate_calendar_dialog_message">이렇게 하면 모든 이벤트 및 초대된 사용자들이 삭제됩니다.\n\n정말로 이 캘린더를 삭제하시겠어요?</string>
+    <string name="recreate_calendar_dialog_message">이 동작은 모든 이벤트 및 초대된 사용자들이 삭제합니다.\n\n정말로 이 캘린더를 삭제하시겠어요?</string>
     <string name="recreate_calendar_snack_error">캘린더 삭제 오류</string>
     <string name="recreate_calendar_snack_deleted">캘린더 삭제됨</string>
     <string name="recreate_calendar_snack_clearing">캘린더 삭제...</string>
@@ -581,7 +581,7 @@
     <string name="spotlight_dialog_easy_switch_positive_button">불러오기 시작</string>
     <string name="spotlight_dialog_easy_switch_negative_button">다음에</string>
     <string name="spotlight_dialog_auto_invites_title">쉬운 초대 수락</string>
-    <string name="spotlight_dialog_auto_invites_description">이제 초대가 캘린더에 대기 중인 이벤트로 표시됩니다. 그냥 이벤트를 열어서 응답하면 됩니다.\n\n이것을 관리하려면, 설정으로 이동하세요.</string>
+    <string name="spotlight_dialog_auto_invites_description">이제 초대가 캘린더에 대기 중인 이벤트로 표시됩니다. 그저 이벤트를 열어서 응답하면 됩니다.\n\n이를 관리하려면, 설정으로 이동하세요.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">다음</string>
     <string name="spotlight_v5_dialog_got_it_button">알겠습니다</string>
     <string name="spotlight_v5_dialog_learn_more_button">더 알아보기</string>

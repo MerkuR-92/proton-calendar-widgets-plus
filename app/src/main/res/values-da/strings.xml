@@ -103,7 +103,7 @@
     <string name="event_signature_verification_failure">Verifikationen af begivenhedssignaturen mislykkedes. <a href="https://proton.me/support/what-is-a-digital-signature">Få mere at vide</a></string>
     <string name="event_signature_verification_in_progress">Verifikation af begivenhedssignaturen er i gang.</string>
     <string name="event_signature_verification_network_error">Verifikation af begivenhedssignaturen blev afbrudt af en fejl. <a href="">Prøv igen</a></string>
-    <string name="event_change_answer_recurring_title">Opdater tilbagevendende begivenhed</string>
+    <string name="event_change_answer_recurring_title">Opdatér tilbagevendende begivenhed</string>
     <string name="event_change_answer_recurring_description">Vil du ændre dit svar for alle begivenhederne i denne serie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Vil du ændre dit svar for alle begivenhederne i denne serie?\nNogle af dine svar på tidligere opdaterede hændelser fra arrangøren vil gå tabt.</string>
     <string name="event_change_answer_recurring_single_edit_description">Denne begivenhed er blevet opdateret af arrangøren. Vil du kun ændre dit svar for denne hændelse i denne serie?</string>

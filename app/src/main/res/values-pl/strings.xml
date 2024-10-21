@@ -73,7 +73,7 @@
     <string name="event_recurrence_none">Nie powtarza się</string>
     <string name="event_recurrence_daily">Codziennie</string>
     <string name="event_recurrence_weekly">Co tydzień</string>
-    <string name="event_recurrence_monthly">Co miesiąc</string>
+    <string name="event_recurrence_monthly">Miesięcznie</string>
     <string name="event_recurrence_yearly">Co rok</string>
     <string name="event_recurrence_weekly_on_all_days">wszystkie dni</string>
     <string name="event_recurrence_until" comment="Event happens regularly until a date">do %1$s</string>

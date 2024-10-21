@@ -331,8 +331,8 @@
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
     <string name="snack_event_edit_recurring_invitation_single_edit_error">Nem szerkeszthet olyan ismétlődő meghívót, amely egyszeri előfordulás módosításait tartalmazza.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nem törölhetsz olyan ismétlődő meghívásokat, melyek az egyes előfordulásokban változtatásokat tartalmaznak.</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nem szerkeszthetsz olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nem törölhet olyan ismétlődő meghívót, amely egyszeri előfordulás módosításait tartalmazza</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nem szerkeszthet olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Nem törölhet olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nem lehet egyszerre résztvevőket hozzáadni és az eseményt megváltoztatni</string>
@@ -595,16 +595,14 @@
     <string name="spotlight_dialog_import_title">Több lehetőség események felvételére</string>
     <string name="spotlight_dialog_import_description">• Importálhat eseményeket az eszközén lévő fájlokból.\n\n• Utazási foglalásokat vehet fel, közvetlenül a Proton Mailből.</string>
     <string name="spotlight_dialog_calendar_provider_title">Naptár funkciók</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendar-ba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Események felvétele a Proton Calendarba más alkalmazásokból.\n\n• Események létrehozása és kezelése az önnel megosztott naptárakban.\n\n• Az alapértelmezett nézet kiválasztása.\n\n• 13 új elérhető nyelv.</string>
     <string name="spotlight_dialog_wipe_search_title">Keresés eltávolítva, hogy jobbá tegyük</string>
     <string name="spotlight_dialog_wipe_search_description">Eltávolítjuk a kísérleti keresési lehetőséget a Proton Calendar Béta változatából, mivel szeretnénk, ha az még hasznosabb és megbízhatóbb legyen. Ez néhány másodpercet vehet igénybe.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Már elérhetők a munkaszüneti napok!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nBármely ország munkaszüneti napjait hozzáadhatja a naptárhoz.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Nem lesz többé megbeszélés betervezve, amikor mindenki szabadnapos, vagy elfelejtve a hosszú hétvégei kiruccanás.\n\nMivel jelenleg az elérhető összes naptára használatban van, a munkaszüneti naptár hozzáadásához először el kell távolítania egy meglévő naptárat.</string>
     <string name="spotlight_dialog_color_per_event_title">Egyéni eseményszínek</string>
-    <string name="spotlight_dialog_color_per_event_description">Customize the color of individual events to:\n\n• Color-code your calendar\n\n• Better organize your day and track your time\n\n• Set priorities and boost efficiency
-
-Testreszabhatja az egyes események színét, hogy:\n\n- Színkódolja a naptárát\n\n\n- Jobban megszervezze a napját és nyomon kövesse az idejét\n\n- Állítsa be a prioritásokat és növelje a hatékonyságot.\n</string>
+    <string name="spotlight_dialog_color_per_event_description">Testreszabhatja az egyes események színét, hogy:\n\n• Színkódolja a naptárát\n\n• Jobban megszervezze a napját és nyomon kövesse az idejét\n\n• Állítsa be a prioritásokat és növelje a hatékonyságot</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Hozzáférés engedélyezése</string>
     <string name="dialog_google_auth_description">Az importálás megkezdéséhez, lépjen be a Google Naptárba, és adjon engedélyt a Protonnak az adatok elérésére.</string>
