@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">fins el %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancel·lat</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Deshabilitat)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Desactivat)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Per defecte)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
@@ -204,7 +204,7 @@
     <string name="event_alarm_action_notification">notificació</string>
     <string name="event_alarm_action_email">correu electrònic</string>
     <string name="event_alarm_same_day">el mateix dia</string>
-    <string name="event_recurrence_1">no repetir</string>
+    <string name="event_recurrence_1">no repeteix</string>
     <string name="event_recurrence_2">cada dia</string>
     <string name="event_recurrence_3">cada setmana</string>
     <string name="event_recurrence_4">cada mes</string>

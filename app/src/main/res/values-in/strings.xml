@@ -104,7 +104,7 @@
     <string name="event_signature_verification_in_progress">Verifikasi tanda tangan acara sedang berlangsung.</string>
     <string name="event_signature_verification_network_error">Verifikasi tanda tangan acara terhenti akibat kesalahan yang tidak diduga. <a href="">Coba lagi</a></string>
     <string name="event_change_answer_recurring_title">Perbarui acara berulang</string>
-    <string name="event_change_answer_recurring_description">Ingin mengubah jawaban Anda untuk semua rangkaian acara ini?</string>
+    <string name="event_change_answer_recurring_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara yang terdapat pada rangkaian ini?</string>
     <string name="event_change_answer_recurring_overwrite_description">Apkaah Anda ingin mengubah jawaban Anda untuk seluruh acara pada rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan cara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
     <string name="event_change_answer_recurring_single_edit_description">Acara ini telah diperbarui oleh penyelenggara. Apakah Anda ingin mengubah jawaban Anda hanya untuk keberlangsungan ini pada rangkaian ini?</string>
     <string name="event_change_answer_recurring_cancel">Batal</string>
@@ -182,7 +182,7 @@
     <string name="search_onboarding_progress_header_error">Terdapat masalah dalam mengunduh kalender</string>
     <string name="search_spotlight_activation_snack">Pencarian kalender diaktifkan</string>
     <!-- TODO Start Timezone / End Timezone? -->
-    <string name="event_text_add_alarm">Tambahkan pemberitahuan</string>
+    <string name="event_text_add_alarm">Tambah notifikasi</string>
     <string name="event_text_description">Deskripsi</string>
     <string name="event_hint_description">Tambahkan deskripsi</string>
     <string name="event_text_custom">sesuaikan</string>
@@ -402,7 +402,7 @@
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">Acara tidak ditemukan</string>
     <string name="error_occurrence_does_not_exist">Keberlangsungan ini tidak ada</string>
-    <string name="update_timezone_dialog_title">Zona waktu telah diubah</string>
+    <string name="update_timezone_dialog_title">Zona waktu diubah</string>
     <string name="update_timezone_dialog_message">Zona waktu sistem Anda sepertinya telah diubah menjadi %1$s. Apakah Anda ingin memperbarui preferensi zona waktu Anda?</string>
     <string name="update_timezone_dialog_confirmation">Perbarui</string>
     <string name="update_timezone_dialog_cancel">Batal</string>
@@ -420,9 +420,9 @@
     <string name="notifications_permission_dialog_open_settings">Buka Pengaturan</string>
     <string name="notifications_permission_dialog_cancel">Tolak</string>
     <!-- NOTIFICATIONS -->
-    <string name="notification_channel_alarms">Pemberitahuan Acara</string>
+    <string name="notification_channel_alarms">Notifikasi Acara</string>
     <string name="notification_channel_sync">Sinkronisasi Kalender</string>
-    <string name="notification_channel_calendar_fetch">Mengambil Daftar Kalender</string>
+    <string name="notification_channel_calendar_fetch">Memperoleh Kalender</string>
     <string name="notification_sync">Menyinkronkan Kalender…</string>
     <string name="notification_text_today">Hari ini</string>
     <string name="notification_text_today_part_time">Hari ini pada pukul %1$s</string>
