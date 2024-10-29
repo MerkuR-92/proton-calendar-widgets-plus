@@ -30,6 +30,7 @@ import me.proton.core.auth.data.db.AuthConverters
 import me.proton.core.auth.data.db.AuthDatabase
 import me.proton.core.auth.data.entity.AuthDeviceEntity
 import me.proton.core.auth.data.entity.DeviceSecretEntity
+import me.proton.core.auth.data.entity.MemberDeviceEntity
 import me.proton.core.challenge.data.db.ChallengeConverters
 import me.proton.core.challenge.data.db.ChallengeDatabase
 import me.proton.core.challenge.data.entity.ChallengeFrameEntity
@@ -129,6 +130,7 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         RecoveryFileEntity::class,
         AuthDeviceEntity::class,
         DeviceSecretEntity::class,
+        MemberDeviceEntity::class,
         // Calendar
         CalendarEntity::class,
         EventEntity::class,
@@ -220,7 +222,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 72
+        const val version = 73
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -275,6 +277,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_69_70,
             AppDatabaseMigrations.MIGRATION_70_71,
             AppDatabaseMigrations.MIGRATION_71_72,
+            AppDatabaseMigrations.MIGRATION_72_73,
         )
 
         fun buildDatabase(context: Context): AppDatabase =

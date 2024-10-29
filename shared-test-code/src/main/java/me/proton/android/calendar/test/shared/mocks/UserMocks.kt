@@ -63,7 +63,8 @@ object UserMocks {
             subscribed = subscribed,
             delinquent = delinquent,
             recovery = null,
-            keys = emptyList()
+            keys = emptyList(),
+            flags = emptyMap()
         )
     }
 
