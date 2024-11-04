@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">frem til %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Avbrutt</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(deaktivert)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(deaktivert)</i></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
@@ -315,7 +315,7 @@
     <string name="snack_event_deleted_as_organizer">Kansellering sendt og hendelse slettet</string>
     <string name="snack_event_deleted_as_attendee">Svar sendt og hendelse slettet</string>
     <string name="snack_event_deleted_error">Det oppstod en feil under sletting av hendelsen.</string>
-    <string name="snack_event_deleted_as_organizer_error">Kansellerings-e-post kan ikke sendes, vennligst prøv igjen.</string>
+    <string name="snack_event_deleted_as_organizer_error">Kansellerings-e-post kan ikke sendes. Prøv igjen.</string>
     <string name="snack_event_opening_error">Feil ved åpning av hendelse</string>
     <string name="snack_event_saving">Lagrer hendelse</string>
     <string name="snack_event_deleting">Sletter hendelse</string>
@@ -340,7 +340,7 @@
     <string name="snack_event_calendar_error">Feil ved bytte av kalender</string>
     <string name="snack_event_maximum_alarm_reached_error">Maksimalt antall varsler er nådd</string>
     <string name="snack_send_bug_report_success">Rapport sendt, takk for tilbakemeldingen</string>
-    <string name="snack_send_bug_report_error">Feil ved sending av rapport. Vennligst prøv igjen senere.</string>
+    <string name="snack_send_bug_report_error">Feil ved sending av rapport. Prøv igjen senere.</string>
     <string name="snack_send_bug_report_description_empty">Vennligst gi en beskrivelse av rapporten din.</string>
     <string name="snack_create_event_no_active_personal_calendar">Du trenger en personlig aktiv kalender for å opprette hendelser.</string>
     <string name="snack_create_event_no_active_calendar">Du trenger en aktiv kalender for å opprette hendelser.</string>
@@ -348,23 +348,23 @@
     <string name="snack_maximum_participants_reached">Maksimalt antall deltakere er nådd</string>
     <string name="snack_add_participant_error">Feil under tilføyelse av deltakeren</string>
     <string name="snack_add_participant_invalid_email">Ugyldig e-post</string>
-    <string name="snack_change_attendee_answer_error">Feil ved sending av svar, vennligst prøv igjen senere.</string>
-    <string name="snack_network_error">Nettverksfeil, vennligst prøv igjen senere</string>
+    <string name="snack_change_attendee_answer_error">Feil ved sending av svar. Prøv igjen senere.</string>
+    <string name="snack_network_error">Nettverksfeil. Prøv igjen senere.</string>
     <string name="snack_import_event_signed_out">Du må logge deg på for å importere hendelser</string>
     <string name="snack_app_link_signed_out">Du må logge deg på for å se hendelsen din</string>
     <string name="snack_update_default_calendar">Standardkalender oppdatert</string>
-    <string name="snack_update_default_calendar_error">Feil ved oppdatering av standardkalender, vennligst prøv igjen senere.</string>
+    <string name="snack_update_default_calendar_error">Feil ved oppdatering av standardkalender. Prøv igjen senere.</string>
     <string name="snack_calendar_init_error">Feil ved lasting av kalenderinformasjon</string>
     <string name="snack_holiday_calendar_init_error">Feil ved lasting av feriekalenderinformasjon</string>
-    <string name="snack_update_calendar_error">Feil ved oppdatering av kalenderinformasjon, vennligst prøv igjen senere.</string>
-    <string name="snack_update_calendar_settings_error">Feil ved oppdatering av noe kalenderinformasjon, vennligst prøv igjen senere.</string>
+    <string name="snack_update_calendar_error">Feil ved oppdatering av kalenderinformasjon. Prøv igjen senere.</string>
+    <string name="snack_update_calendar_settings_error">Feil ved oppdatering av noe kalenderinformasjon. Prøv igjen senere.</string>
     <string name="snack_update_calendar_success">Kalender oppdatert</string>
     <string name="snack_create_calendar_success">Kalender oprettet</string>
     <string name="snack_add_calendar_success">Kalender lagt til</string>
     <string name="snack_calendar_saving">Larger kalender</string>
-    <string name="snack_create_calendar_error">Feil ved oppretting av kalender, vennligst prøv igjen senere.</string>
-    <string name="snack_add_calendar_error">Feil ved å legge til kalender, vennligst prøv igjen senere.</string>
-    <string name="snack_create_calendar_settings_error">Kalenderen ble opprettet, men noe informasjon ble ikke oppdatert, vennligst prøv igjen senere.</string>
+    <string name="snack_create_calendar_error">Feil ved oppretting av kalender. Prøv igjen senere.</string>
+    <string name="snack_add_calendar_error">Feil ved å legge til kalender. Prøv igjen senere.</string>
+    <string name="snack_create_calendar_settings_error">Kalenderen ble opprettet, men noe informasjon ble ikke oppdatert. Prøv igjen senere.</string>
     <string name="snack_ics_default_error">Feil ved åpning av kalender</string>
     <string name="snack_ics_event_not_found_error">Hendelse ikke funnet</string>
     <string name="snack_ics_file_not_found_error">Fil ikke funnet</string>
@@ -606,22 +606,22 @@
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillat tilgang</string>
     <string name="dialog_google_auth_description">For å starte importen må du logge på hos Google Calendar og gi Proton tilgang til dataene dine.</string>
-    <string name="import_assistant_prepare_import_error">Feil ved forberedelse av import, vennligst prøv igjen senere.</string>
+    <string name="import_assistant_prepare_import_error">Feil ved forberedelse av import. Prøv igjen senere.</string>
     <string name="import_assistant_prepare_import">Forbereder import</string>
     <string name="import_assistant_gathering_data_loader_title">Samler dataene dine</string>
     <string name="import_assistant_summary_title">Importoversikt</string>
     <string name="import_assistant_summary_customize_import">Tilpass import</string>
     <string name="import_assistant_error">Feil ved henting av data</string>
     <string name="import_assistant_data_gathering_error">Datainnsamling mislyktes</string>
-    <string name="import_assistant_update_import_error">Kan ikke oppdatere importen, vennligst prøv på nytt senere.</string>
-    <string name="import_assistant_update_import_wrong_account_error">Feil konto. Vennligst logg på med kontoen du brukte for kalenderimporten.</string>
-    <string name="import_assistant_start_import_error">Start av import mislyktes, vennligst prøv igjen senere.</string>
+    <string name="import_assistant_update_import_error">Kan ikke oppdatere importen. Prøv igjen senere.</string>
+    <string name="import_assistant_update_import_wrong_account_error">Feil konto. Logg på med kontoen du brukte for kalenderimporten.</string>
+    <string name="import_assistant_start_import_error">Start av import mislyktes. Prøv igjen senere.</string>
     <string name="import_assistant_delete_import_success">Importpost slettet</string>
-    <string name="import_assistant_delete_import_error">Kunne ikke slette importen, vennligst prøv igjen senere.</string>
-    <string name="import_assistant_cancel_import_error">Kunne ikke avbryte importen, vennligst prøv igjen senere.</string>
-    <string name="import_assistant_resume_import_error">Kunne ikke gjenoppta importen, vennligst prøv igjen senere.</string>
+    <string name="import_assistant_delete_import_error">Kunne ikke slette importen. Prøv igjen senere.</string>
+    <string name="import_assistant_cancel_import_error">Kunne ikke avbryte importen. Prøv igjen senere.</string>
+    <string name="import_assistant_resume_import_error">Kunne ikke gjenoppta importen. Prøv igjen senere.</string>
     <string name="import_assistant_create_calendar_error">Én eller flere kalendere ble ikke opprettet</string>
-    <string name="import_assistant_start_import_empty_error">Kunne ikke starte importen, vennligst prøv igjen senere.</string>
+    <string name="import_assistant_start_import_empty_error">Kunne ikke starte importen. Prøv igjen senere.</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importer som</string>
     <string name="import_assistant_new_calendar_badge">Ny</string>
     <string name="import_assistant_merge_calendar_badge">Slått sammen</string>
