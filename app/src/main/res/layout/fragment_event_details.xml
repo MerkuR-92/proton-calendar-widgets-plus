@@ -62,6 +62,12 @@
                 tools:visibility="visible" />
 
             <include
+                android:id="@+id/section_zoom"
+                layout="@layout/item_form_conference_section"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <include
                 android:id="@+id/section_alarms"
                 layout="@layout/item_form_section"
                 android:visibility="gone"

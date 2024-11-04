@@ -54,7 +54,7 @@
         app:layout_constraintStart_toEndOf="@+id/text_header"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_proton_squares"
-        app:tint="@color/icon_weak"
+        app:tint="@color/icon_norm"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
