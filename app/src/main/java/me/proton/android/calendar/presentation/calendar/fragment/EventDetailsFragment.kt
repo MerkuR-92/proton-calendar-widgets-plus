@@ -1,12 +1,15 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
+import android.text.style.ForegroundColorSpan
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.view.LayoutInflater
@@ -44,10 +47,12 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.ATTENDEE_AUTO_EXPAND_LIMIT
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
+import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getDeviceContacts
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.getParticipationStatusPriorityValue
@@ -62,6 +67,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartEndForA
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.matchAttendeesWithContacts
 import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
@@ -97,6 +103,9 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
     private lateinit var buttonDelete: View
     private lateinit var loadingAction: View
     private lateinit var attendeeListAdapter: AttendeeListAdapter
+
+    private var isConferenceDetailsVisible = false
+    private var conferenceDetailsHeight: Int? = null
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
 
@@ -351,7 +360,17 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
                 } else {
-                    logger.i("could not copy to clipboard")
+                    logger.i("could not copy location to clipboard")
+                }
+            }
+        }
+
+        binding.sectionZoom.imageButtonAction.setOnSingleClickListener {
+            eventViewModel.eventLiveData.value?.zoomUrl?.let {
+                if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.zoomUrl as String /*TODO after get()*/)) {
+                    view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
+                } else {
+                    logger.i("could not copy zoom URL to clipboard")
                 }
             }
         }
@@ -528,6 +547,79 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     imageIcon.setImageResource(R.drawable.ic_proton_map_pin)
                     imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
                     imageButtonAction.visibleOrInvisible(true)
+                    root.visibleOrGone(true)
+                }
+            }
+
+            TimberLogger.e("Test test ${event.description}")
+            TimberLogger.e("Test test ${event.iCalendar.printToString()}")
+
+            event.zoomUrl?.nullIfBlank()?.let { zoomUrl ->
+                with(binding.sectionZoom) {
+
+                    joinMeetingButton.setOnSingleClickListener {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(zoomUrl))
+                        startActivity(intent)
+                    }
+
+                    imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
+                    imageButtonAction.visibleOrInvisible(true)
+
+                    event.zoomConferenceId?.let { zoomConferenceId ->
+                        val spannableConferenceId: Spannable = SpannableString(
+                            getString(R.string.zoom_meeting_id, zoomConferenceId)
+                        )
+                        spannableConferenceId.setSpan(
+                            ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
+                            spannableConferenceId.indexOf(zoomConferenceId),
+                            spannableConferenceId.indexOf(zoomConferenceId).plus(zoomConferenceId.length),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        textConferenceId.text = spannableConferenceId
+                        textConferenceId.visibleOrGone(true)
+                    }
+
+                    event.zoomConferencePasscode?.let { zoomConferencePasscode ->
+                        val spannableConferencePasscode: Spannable = SpannableString(
+                            getString(R.string.zoom_meeting_passcode, zoomConferencePasscode)
+                        )
+                        spannableConferencePasscode.setSpan(
+                            ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
+                            spannableConferencePasscode.indexOf(zoomConferencePasscode),
+                            spannableConferencePasscode.indexOf(zoomConferencePasscode).plus(zoomConferencePasscode.length),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                        )
+                        textConferencePasscode.text = spannableConferencePasscode
+                        textConferencePasscode.visibleOrGone(true)
+                    }
+
+                    textConferenceMeetingHostValue.text = linkifyAndParseHtml("john.doe@proton.ch") // TODO USE ACTUAL MEETING HOST VALUE
+                    textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
+
+                    textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
+                    textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
+
+                    textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
+
+                    conferenceMoreDetailsTitleLayout.setOnClickListener {
+                        if (isConferenceDetailsVisible) {
+                            // Save expanded view height once so we can animate it
+                            val height = collapse(conferenceMoreDetailsContentLayout).first
+                            if (conferenceDetailsHeight == null) conferenceDetailsHeight = height
+                            rotateArrowDownward(textConferenceMoreDetailsButton)
+                            isConferenceDetailsVisible = false
+                        } else {
+                            conferenceDetailsHeight?.let {
+                                if (it > 0) expand(conferenceMoreDetailsContentLayout, height = it)
+                                else conferenceMoreDetailsContentLayout.visibleOrGone(true)
+                            } ?: run {
+                                conferenceMoreDetailsContentLayout.visibleOrGone(true)
+                            }
+                            rotateArrowUpward(textConferenceMoreDetailsButton)
+                            isConferenceDetailsVisible = true
+                        }
+                    }
+
                     root.visibleOrGone(true)
                 }
             }
