@@ -9,6 +9,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSCODE
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatShort
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
@@ -193,6 +196,11 @@ data class Event private constructor(
     val summary: String? get() = iCalEvent.summary?.value
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
+    val zoomConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
+    val zoomUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
+    val zoomConferencePasscode: String? get() = iCalEvent.getExperimentalProperty(
+        X_PM_CONFERENCE_URL
+    )?.getParameter(PARAMETER_CONFERENCE_PASSCODE)?.takeIfNotBlank()
 
     val status: Status? get() = iCalEvent.status
 
