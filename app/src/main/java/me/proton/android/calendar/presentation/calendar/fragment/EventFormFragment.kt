@@ -55,8 +55,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
@@ -419,6 +419,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormColorPress.root.isEnabled = !processingEvent
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
+                binding.eventFormConferenceRemove.isEnabled = !processingEvent
 
                 for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
@@ -458,6 +459,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormTitle.doAfterTextChanged { if (binding.eventFormTitle.hasFocus()) persistFormData() }
             binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
             binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
+
+            binding.eventFormConferenceLayout.visibleOrGone(!event.zoomUrl.isNullOrBlank())
 
             ImageViewCompat.setImageTintList(
                 binding.eventFormLocationIcon,
@@ -883,6 +886,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
                 checkNavigationToAttendees()
             }
+        }
+
+        binding.eventFormConferenceRemove.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            eventViewModel.removeConferenceLink()
         }
     }
 

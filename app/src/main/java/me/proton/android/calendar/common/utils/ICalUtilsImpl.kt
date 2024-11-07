@@ -301,15 +301,16 @@ object ICalUtilsImpl : ICalUtils {
                 }
                 setOrganizer(originalEvent.organizer)
 
-                val originalConferenceIdProperty = originalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)
-                setExperimentalProperty(
-                    X_PM_CONFERENCE_ID,
-                    originalConferenceIdProperty.value
-                ).run {
-                    val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)
-                    if (!originalProvider.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PROVIDER, originalProvider)
-                    val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR)
-                    if (!originalCreator.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_CREATOR, originalCreator)
+                originalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.let { originalConferenceIdProperty ->
+                    setExperimentalProperty(
+                        X_PM_CONFERENCE_ID,
+                        originalConferenceIdProperty.value
+                    ).run {
+                        val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)
+                        if (!originalProvider.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PROVIDER, originalProvider)
+                        val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR)
+                        if (!originalCreator.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_CREATOR, originalCreator)
+                    }
                 }
 
                 // copy timezone assignments
@@ -329,13 +330,14 @@ object ICalUtilsImpl : ICalUtils {
                 setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
                 setLocation(originalEvent.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
 
-                val originalConferenceUrlProperty = originalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)
-                setExperimentalProperty(
-                    X_PM_CONFERENCE_URL,
-                    originalConferenceUrlProperty.value
-                ).run {
-                    val originalPasscode = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSCODE)
-                    if (!originalPasscode.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSCODE, originalPasscode)
+                originalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let { originalConferenceUrlProperty ->
+                    setExperimentalProperty(
+                        X_PM_CONFERENCE_URL,
+                        originalConferenceUrlProperty.value
+                    ).run {
+                        val originalPasscode = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSCODE)
+                        if (!originalPasscode.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSCODE, originalPasscode)
+                    }
                 }
 
                 wrapInICalendar()

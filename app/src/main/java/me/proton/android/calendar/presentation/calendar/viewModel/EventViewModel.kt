@@ -1297,6 +1297,12 @@ class EventViewModel @Inject constructor(
         updateCalendarUseCase.executeUpdateDisplayFromDb(userId, calendar.id)
     }
 
+    fun removeConferenceLink() {
+        markEventAsEdited()
+        event.removeConference()
+        _event.postValue(event)
+    }
+
     fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {

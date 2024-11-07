@@ -4,19 +4,21 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.ParticipationStatus
-import biweekly.property.*
+import biweekly.property.Action
+import biweekly.property.Status
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter
+import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_HEADER
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSCODE
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
+import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
+import me.proton.android.calendar.common.PROTON_OLD_UID
+import me.proton.android.calendar.common.PROTON_UID
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatShort
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
-import java.time.*
-import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
@@ -27,6 +29,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
@@ -36,6 +39,11 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.core.util.kotlin.takeIfNotBlank
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(
@@ -285,6 +293,17 @@ data class Event private constructor(
         }
 
         notifications = notifications.copy(notifications = notificationsWithAlarmRemoved)
+    }
+
+    fun removeConference() {
+        this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_ID)
+        this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_URL)
+        if (this.iCalEvent.description != null && this.iCalEvent.description.value.contains(CONFERENCE_DESCRIPTION_HEADER)) {
+            this.iCalEvent.description.value = this.iCalEvent.description.value.removeRange(
+                this.iCalEvent.description.value.indexOf(CONFERENCE_DESCRIPTION_HEADER),
+                this.iCalEvent.description.value.lastIndexOf(CONFERENCE_DESCRIPTION_HEADER).plus(CONFERENCE_DESCRIPTION_HEADER.length)
+            ).trim()
+        }
     }
 
     val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
