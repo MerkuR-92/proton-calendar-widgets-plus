@@ -22,6 +22,11 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSCODE
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
@@ -296,6 +301,17 @@ object ICalUtilsImpl : ICalUtils {
                 }
                 setOrganizer(originalEvent.organizer)
 
+                val originalConferenceIdProperty = originalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)
+                setExperimentalProperty(
+                    X_PM_CONFERENCE_ID,
+                    originalConferenceIdProperty.value
+                ).run {
+                    val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)
+                    if (!originalProvider.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PROVIDER, originalProvider)
+                    val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR)
+                    if (!originalCreator.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_CREATOR, originalCreator)
+                }
+
                 // copy timezone assignments
                 newCalendar.timezoneInfo.setTimezone(this.dateStart, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateStart) ?: originalCalendar.timezoneInfo.defaultTimezone)
                 newCalendar.timezoneInfo.setTimezone(this.dateEnd, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateEnd) ?: originalCalendar.timezoneInfo.defaultTimezone)
@@ -312,6 +328,16 @@ object ICalUtilsImpl : ICalUtils {
                 setDescription(originalEvent.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
                 setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
                 setLocation(originalEvent.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
+
+                val originalConferenceUrlProperty = originalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)
+                setExperimentalProperty(
+                    X_PM_CONFERENCE_URL,
+                    originalConferenceUrlProperty.value
+                ).run {
+                    val originalPasscode = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSCODE)
+                    if (!originalPasscode.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSCODE, originalPasscode)
+                }
+
                 wrapInICalendar()
             },
             calendarPart = if (originalEvent.status != null || originalEvent.transparency != null) {

@@ -551,9 +551,6 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 }
             }
 
-            TimberLogger.e("Test test ${event.description}")
-            TimberLogger.e("Test test ${event.iCalendar.printToString()}")
-
             event.zoomUrl?.nullIfBlank()?.let { zoomUrl ->
                 with(binding.sectionZoom) {
 
@@ -599,6 +596,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
                     textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
 
+                    textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
                     textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
 
                     conferenceMoreDetailsTitleLayout.setOnClickListener {
