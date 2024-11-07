@@ -32,7 +32,7 @@ import javax.inject.Inject
     CoreAccountRecoveryFeaturesModule::class,
     CoreNotificationFeaturesModule::class,
 )
-class AccountRecoveryFlowTest : BaseTest(), MinimalAccountRecoveryNotificationTest {
+open class AccountRecoveryFlowTest : BaseTest(), MinimalAccountRecoveryNotificationTest {
 
     @get:Rule(order = Rule.DEFAULT_ORDER - 2)
     val grantPermissionRule = NotificationPermissionRule()

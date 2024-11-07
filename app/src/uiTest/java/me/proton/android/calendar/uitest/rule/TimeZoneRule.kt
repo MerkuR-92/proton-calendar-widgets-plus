@@ -1,7 +1,6 @@
 package me.proton.android.calendar.uitest.rule
 
 import freemarker.template.utility.DateUtil.UTC
-import me.proton.android.calendar.domain.utils.DateTimeUtils
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement

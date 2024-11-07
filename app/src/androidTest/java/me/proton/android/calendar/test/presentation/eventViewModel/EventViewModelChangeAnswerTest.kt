@@ -20,6 +20,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.EventApiResponse
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -48,9 +49,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
@@ -159,9 +160,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
@@ -261,9 +262,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 participationStatus = ParticipationStatus.DECLINED,
@@ -335,9 +336,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isAttendee = true,
                 isProtonProtonInvite = true,
@@ -415,7 +416,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 participationStatus = ParticipationStatus.ACCEPTED,
                 sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = EventMocks.provideEventResponse(),
+                eventEntity = EventMocks.provideEventResponse().toEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -452,9 +453,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
@@ -542,7 +543,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 participationStatus = ParticipationStatus.ACCEPTED,
                 sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = EventMocks.provideEventResponse(),
+                eventEntity = EventMocks.provideEventResponse().toEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -585,9 +586,9 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
 
             // Mock event with user as attendee
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isRecurring = true,
                 isAttendee = true,
@@ -677,7 +678,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 participationStatus = ParticipationStatus.ACCEPTED,
                 sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = EventMocks.provideEventResponse(),
+                eventEntity = EventMocks.provideEventResponse().toEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -719,11 +720,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true)
+            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true))
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse(isSingleEdit = true))
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
@@ -813,7 +814,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 participationStatus = ParticipationStatus.DECLINED,
                 sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = EventMocks.provideEventResponse(isSingleEdit = true),
+                eventEntity = EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()
@@ -853,11 +854,11 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
         runBlocking {
 
             // Mock single edit event with user as attendee
-            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true)
+            coEvery { calendarsRepositoryMock.selectEventEntity(singleEditEventId) } returns EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity()
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true))
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse(isSingleEdit = true))
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity())
             } } returns EventMocks.provideEvent(
                 isSingleEdit = true,
                 isAttendee = true,
@@ -939,7 +940,7 @@ internal class EventViewModelChangeAnswerTest: KoinComponent, EventViewModelTest
                 participationStatus = ParticipationStatus.DECLINED,
                 sendPreferences = mapOf(Pair(organizerEmail, UserMocks.provideSendPreferences())),
                 dtStamp = any(), // updateTime = Instant.now()
-                eventEntity = EventMocks.provideEventResponse(isSingleEdit = true),
+                eventEntity = EventMocks.provideEventResponse(isSingleEdit = true).toEventEntity(),
                 isProtonProtonInvite = true,
                 defaultTimeZone = defaultTimezone,
                 timeFormatIs24Hours = timeFormat.toBoolean()

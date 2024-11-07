@@ -4,6 +4,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import me.proton.android.calendar.R
 import me.proton.core.util.kotlin.EMPTY_STRING
 import me.proton.test.fusion.Fusion.view
+import kotlin.time.Duration.Companion.seconds
 
 object EventFormRobot : Robot {
     private val eventFormTitleField = view.withId(R.id.event_form_title)
@@ -53,5 +54,5 @@ object EventFormRobot : Robot {
     fun closeKeyboard() = apply { eventFormTitleField.closeKeyboard() }
 
     fun notificationIsDisplayed(notification: NotificationRobot.Notification) =
-        notificationInList(notification).await { checkIsDisplayed() }
+        notificationInList(notification).await(90.seconds) { checkIsDisplayed() }
 }

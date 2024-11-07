@@ -190,6 +190,7 @@ androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref =
 androidx-appcompat-alpha = { module = "androidx.appcompat:appcompat", version.ref = "appcompat-alpha" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security" }
+core-test-android-test-rule = { module = "me.proton.core:test-rule", version.ref = "core" }
 
 # Hilt
 androidx-hilt-lifecycleViewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hilt-androidx" }

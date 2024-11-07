@@ -1,31 +1,38 @@
 package me.proton.android.calendar.uitest.e2e.core.plan
 
 import dagger.hilt.android.testing.HiltAndroidTest
-import me.proton.android.calendar.uitest.BaseTest
+import me.proton.android.calendar.init.MainInitializer
+import me.proton.android.calendar.presentation.main.MainActivity
+import me.proton.android.calendar.uitest.BaseTest.Companion.sharedPreferences
+import me.proton.android.calendar.uitest.BaseTest.Companion.timeZone
 import me.proton.android.calendar.uitest.robot.HomeRobot
-import me.proton.android.calendar.uitest.rule.NotificationPermissionRule
-import me.proton.core.auth.test.robot.AddAccountRobot
+import me.proton.android.calendar.uitest.rule.SharedPreferencesRule
+import me.proton.android.calendar.uitest.rule.TimeZoneRule
+import me.proton.android.calendar.uitest.verify
 import me.proton.core.plan.test.MinimalSubscriptionTests
-import me.proton.core.test.quark.data.User
-import org.junit.rules.RuleChain
-import kotlin.time.Duration.Companion.seconds
+import me.proton.core.plan.test.robot.SubscriptionRobot
+import me.proton.core.test.rule.ProtonRule
+import me.proton.core.test.rule.extension.protonActivityScenarioRule
+import org.junit.Rule
 
 @HiltAndroidTest
-class SubscriptionTests : BaseTest(), MinimalSubscriptionTests {
-    override val baseChain: RuleChain = super.baseChain.around(NotificationPermissionRule())
+class SubscriptionTests : MinimalSubscriptionTests() {
 
+    @get:Rule
+    val protonRule: ProtonRule = protonActivityScenarioRule<MainActivity>(
+        additionalRules = linkedSetOf(
+            TimeZoneRule(timeZone),
+            SharedPreferencesRule(sharedPreferences)
+        ),
+        afterHilt = { MainInitializer.init(it.targetContext) },
+        logoutBefore = true
+    )
 
-    override fun startSubscription(user: User) {
-        AddAccountRobot
-            .clickSignIn()
-            .login(user)
-
-        HomeRobot.verify(60.seconds) {
-            robotDisplayed()
-        }
-
+    override fun startSubscription(): SubscriptionRobot {
         HomeRobot
+            .verify { robotDisplayed() }
             .clickHamburgerButton()
             .clickSubscriptions()
+        return SubscriptionRobot
     }
 }

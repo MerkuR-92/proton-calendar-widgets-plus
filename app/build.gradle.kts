@@ -5,6 +5,8 @@ import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import configuration.util.getTokenFromCurl
+import java.io.FileNotFoundException
+import java.util.Properties
 
 plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
@@ -27,6 +29,14 @@ sonarqube {
 
 jacoco { toolVersion = "0.8.8" }
 kapt { correctErrorTypes = true }
+
+val localProperties = Properties().apply {
+    try {
+        load(rootDir.resolve("local.properties").inputStream())
+    } catch (e: FileNotFoundException) {
+        logger.warn("No local.properties found")
+    }
+}
 
 android {
     buildToolsVersion = Config.buildToolsVersion
@@ -88,12 +98,13 @@ android {
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "Atlas Proton Calendar")
 
-            val protonHost = "proton.black"
+            val protonBlack = "proton.black"
+            val atlasHost: String = localProperties.getProperty("HOST") ?: protonBlack
             protonEnvironment {
                 proxyToken = getProxyToken()
-                host = protonHost
+                host = atlasHost
             }
-            setAssetLinksResValue(protonHost)
+            setAssetLinksResValue(atlasHost)
         }
         create("prod") {
             dimension = "env"
@@ -312,6 +323,7 @@ dependencies {
     androidTestImplementation(libs.dagger.hilt.android.testing)
     androidTestImplementation(libs.test.espresso.core)
     androidTestImplementation(libs.core.userRecovery.test)
+    androidTestImplementation(libs.core.test.android.test.rule)
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)

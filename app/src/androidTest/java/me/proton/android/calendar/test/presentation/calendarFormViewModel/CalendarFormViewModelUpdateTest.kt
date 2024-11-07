@@ -56,7 +56,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.calendarName.value == calendarName)
 
-        assert(calendarFormViewModel.calendarColor.value == Color.parseColor(calendarColor))
+        assert(calendarFormViewModel.calendarColor.value == calendarColor)
 
         assert(calendarFormViewModel.calendarEmail.value == userEmail)
 
@@ -207,7 +207,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
+        calendarFormViewModel.handleCalendarColor(customCalendarColor)
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)
@@ -266,7 +266,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
+        calendarFormViewModel.handleCalendarColor(customCalendarColor)
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)
@@ -326,7 +326,7 @@ internal class CalendarFormViewModelUpdateTest : KoinComponent, CalendarFormView
 
         assert(calendarFormViewModel.hasFormBeenEdited() == false)
 
-        calendarFormViewModel.handleCalendarColor(Color.parseColor(customCalendarColor))
+        calendarFormViewModel.handleCalendarColor(customCalendarColor)
         calendarFormViewModel.handleCalendarName(customCalendarName)
 
         calendarFormViewModel.handleDefaultEventDuration(customDefaultEventDuration)

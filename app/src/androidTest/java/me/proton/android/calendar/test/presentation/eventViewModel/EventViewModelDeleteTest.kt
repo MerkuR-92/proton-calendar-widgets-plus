@@ -14,6 +14,7 @@ import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
+import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
@@ -42,9 +43,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent()
 
             // Handle delete use case
@@ -108,9 +109,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent()
 
             // Handle delete use case
@@ -177,9 +178,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             // Set recurrence count to 1
             event.iCalEvent.setRecurrenceRule(Recurrence.Builder(event.iCalEvent.recurrenceRule.value).count(1).build())
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns event
 
             // Handle delete use case
@@ -244,9 +245,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             // Mock event
             val event = EventMocks.provideEvent(isRecurring = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns event
 
             // Handle delete use case
@@ -316,9 +317,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             // Mock event
             val event = EventMocks.provideEvent(isRecurring = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns event
 
             // Handle delete use case
@@ -390,9 +391,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             // Mock event
             val event = EventMocks.provideEvent(isRecurring = true)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns event
 
             // Handle delete use case
@@ -463,9 +464,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock recurring event with disabled calendar
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isRecurring = true,
                 hasDisabledCalendar = true
@@ -571,9 +572,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true
             )
@@ -660,9 +661,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer) and disabled calendar
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true,
                 hasDisabledCalendar = true
@@ -750,9 +751,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true,
                 isRecurring = true
@@ -840,9 +841,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer) and disabled calendar
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true,
                 isRecurring = true,
@@ -931,9 +932,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true
             )
@@ -1002,9 +1003,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the organizer)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns EventMocks.provideEvent(
                 isOrganizer = true
             )
@@ -1130,9 +1131,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
             secondAttendee.participationStatus = ParticipationStatus.DECLINED
             event.iCalEvent.addAttendee(secondAttendee)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns event
 
             // Handle delete use case with emailSent to true
@@ -1252,9 +1253,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the attendee)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns
                     EventMocks.provideEvent(isAttendee = true, participationStatus = ParticipationStatus.ACCEPTED)
 
@@ -1343,9 +1344,9 @@ internal class EventViewModelDeleteTest: KoinComponent, EventViewModelTestCommon
 
             // Mock event with attendees (user as the attendee)
             coEvery { if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                eventDecryptorMock.decrypt(EventMocks.provideEventResponse())
+                eventDecryptorMock.decrypt(EventMocks.provideEventResponse().toEventEntity())
             } else {
-                transformEventUseCaseMock.execute(EventMocks.provideEventResponse())
+                transformEventUseCaseMock.execute(EventMocks.provideEventResponse().toEventEntity())
             } } returns
                     EventMocks.provideEvent(isAttendee = true, participationStatus = ParticipationStatus.ACCEPTED)
 
