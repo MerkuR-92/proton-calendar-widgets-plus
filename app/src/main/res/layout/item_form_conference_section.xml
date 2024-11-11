@@ -115,8 +115,8 @@
         android:visibility="gone"
         tools:visibility="visible"
         android:animateLayoutChanges="true"
-        app:layout_constraintStart_toStartOf="@+id/text_conference_password"
-        app:layout_constraintEnd_toEndOf="@+id/text_conference_password"
+        app:layout_constraintStart_toStartOf="@+id/text_conference_id"
+        app:layout_constraintEnd_toEndOf="@+id/text_conference_id"
         app:layout_constraintTop_toBottomOf="@+id/conference_more_details_title_layout">
 
         <TextView
