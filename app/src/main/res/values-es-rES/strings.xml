@@ -148,7 +148,7 @@
     <string name="event_text_attendees_none">Ninguno</string>
     <string name="event_text_calendar">Calendario</string>
     <string name="event_text_timezone_start">Zona horaria</string>
-    <string name="invite_in_shared_calendar_disclaimer">El envío de invitaciones solo está disponible dentro de calendarios personales.</string>
+    <string name="invite_in_shared_calendar_disclaimer">El envío de invitaciones solo está disponible para calendarios personales.</string>
     <string name="invite_change_calendar_disclaimer">No es posible modificar el calendario asociado a invitaciones.</string>
     <string name="invite_change_attendees_disclaimer">Aún no es posible modificar los participantes asociados a invitaciones.</string>
     <string name="change_calendar_recurring_disclaimer">Todavía no es posible cambiar el calendario de un evento periódico.</string>
@@ -269,17 +269,17 @@
     <string name="event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes borrados.</string>
     <string name="recurring_event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes borrados para todos los eventos de esta serie.</string>
     <string name="event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y borrados.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y borrados de todos los eventos de esta serie.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Se notificará a los participantes añadidos y borrados de todos los eventos de esta serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s ha sido cancelado.</string>
     <string name="event_save_changes">Guardar los cambios</string>
     <string name="event_update_add_participants_dialog_description">Se notificarán a los participantes existentes y añadidos.</string>
-    <string name="recurring_event_update_add_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes y añadidos.</string>
-    <string name="event_update_remove_participants_dialog_description">Se notificarán a los participantes existentes y borrados.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes existentes y añadidos.</string>
+    <string name="event_update_remove_participants_dialog_description">Se notificará a los participantes existentes y borrados.</string>
     <string name="event_update_remove_all_participants_dialog_description">Se notificarán a los participantes borrados.</string>
     <string name="recurring_event_update_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes y borrados.</string>
     <string name="recurring_event_update_remove_all_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes eliminados.</string>
     <string name="event_update_add_and_remove_participants_dialog_description">Se notificarán a los participantes existentes, añadidos y borrados.</string>
-    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes, añadidos y borrados.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes existentes, añadidos y borrados.</string>
     <string name="success_snack_email_update_recurring">Los participantes han sido notificados y todos los eventos han sido actualizados.</string>
     <string name="success_snack_email_update">Los participantes han sido notificados y el evento ha sido actualizado.</string>
     <string name="success_snack_add_attendees_recurring">La invitación ha sido enviada y los participantes han sido añadidos a todos los eventos.</string>
@@ -330,10 +330,10 @@
     <string name="snack_event_created_failed_mail">Se ha creado el evento pero no se ha podido enviar la invitación.</string>
     <string name="snack_event_created_error">Error al crear el evento</string>
     <string name="snack_event_opening_edit_error">Error al abrir el evento para editarlo</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">No puedes editar una invitación periódica que contiene cambios a una sola ocurrencia.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">No puedes eliminar una invitación periódica que contiene cambios a una sola ocurrencia.</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">No puedes editar una invitación periódica que contiene ocurrencias eliminadas.</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">No puedes eliminar una invitación periódica que contiene ocurrencias eliminadas.</string>
+    <string name="snack_event_edit_recurring_invitation_single_edit_error">No se puede editar una invitación periódica que contiene cambios a una sola ocurrencia.</string>
+    <string name="snack_event_delete_recurring_invitation_single_edit_error">No se puede eliminar una invitación periódica que contiene cambios a una sola ocurrencia.</string>
+    <string name="snack_event_edit_recurring_invitation_ex_date_error">No se puede editar una invitación periódica que contiene ocurrencias eliminadas.</string>
+    <string name="snack_event_delete_recurring_invitation_ex_date_error">No se puede eliminar una invitación periódica que contiene ocurrencias eliminadas.</string>
     <string name="snack_event_edit_with_attendees_error">No se puede aún editar los eventos con invitados.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">No se pueden añadir participantes y cambiar el calendario al mismo tiempo.</string>
     <string name="snack_event_init_error">Error al inicializar el nuevo evento</string>
@@ -380,7 +380,7 @@
     <string name="snack_ics_reply_party_crasher_error">No se pueden añadir participantes que no hayan sido invitados por el organizador.</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento.</string>
     <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta.</string>
-    <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta.</string>
+    <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado a esta cuenta.</string>
     <string name="snack_ics_unsupported_duration_error">No se reconoce esta duración.</string>
     <string name="snack_ics_too_many_events_error">Los eventos múltiples aún no son compatibles.</string>
     <string name="snack_ics_no_events_error">Este calendario no contiene ningún evento.</string>
@@ -513,7 +513,7 @@
     <string name="remove_calendar_dialog_title">Borrar el calendario</string>
     <string name="remove_calendar_dialog_message">¿Estás seguro de que quieres borrar este calendario?</string>
     <string name="leave_calendar_dialog_title">Abandonar calendario</string>
-    <string name="leave_calendar_dialog_message">Si abandonas este calendario, deberás pedirle permiso al propietario para unirte de nuevo.</string>
+    <string name="leave_calendar_dialog_message">Si abandonas este calendario, deberás solicitar permiso al propietario para unirte de nuevo.</string>
     <string name="delete_default_calendar_dialog_message">¿Estás seguro de que quieres eliminar este calendario? Se establecerá \"%1$s\" como calendario por defecto.</string>
     <string name="delete_calendar_snack_deleted">Calendario eliminado</string>
     <string name="remove_calendar_snack_removed">Se ha borrado el calendario.</string>
@@ -600,9 +600,9 @@
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y fiable. Esto puede llevar unos segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nAñade los días festivos de cualquier país a tu calendario.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo actualmente estás al límite del calendario, para añadir un calendario de días festivos, necesitarás borrar un calendario existente primero.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo ya has llegado al límite de calendarios, para añadir un calendario de días festivos necesitarás borrar un calendario existente primero.</string>
     <string name="spotlight_dialog_color_per_event_title">Colores de eventos personalizados</string>
-    <string name="spotlight_dialog_color_per_event_description">Personaliza el color de cada evento para:\n\n• Codificar el calendario con colores\n\n• Mejorar la organización diaria y la gestión del tiempo.\n\n• Definir prioridades y aumentar la eficiencia</string>
+    <string name="spotlight_dialog_color_per_event_description">Personaliza el color de cada evento para:\n\n• Codificar por colores el calendario\n\n• Mejorar la organización diaria y la gestión del tiempo.\n\n• Definir prioridades y aumentar la eficiencia</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Permitir acceso</string>
     <string name="dialog_google_auth_description">Para comenzar la importación, inicia sesión en Google Calendar y permite a Proton acceder a tus datos.</string>
