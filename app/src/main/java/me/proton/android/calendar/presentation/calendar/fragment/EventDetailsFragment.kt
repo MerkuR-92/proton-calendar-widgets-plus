@@ -47,7 +47,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.ATTENDEE_AUTO_EXPAND_LIMIT
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
@@ -67,7 +66,6 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.formatStartEndForA
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.common.utils.EventUtilsImpl.isUserAddressAllowedSend
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.matchAttendeesWithContacts
 import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
@@ -576,18 +574,18 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         textConferenceId.visibleOrGone(true)
                     }
 
-                    event.zoomConferencePasscode?.let { zoomConferencePasscode ->
-                        val spannableConferencePasscode: Spannable = SpannableString(
-                            getString(R.string.zoom_meeting_passcode, zoomConferencePasscode)
+                    event.zoomConferencePassword?.let { zoomConferencePassword ->
+                        val spannableConferencePassword: Spannable = SpannableString(
+                            getString(R.string.zoom_meeting_password, zoomConferencePassword)
                         )
-                        spannableConferencePasscode.setSpan(
+                        spannableConferencePassword.setSpan(
                             ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                            spannableConferencePasscode.indexOf(zoomConferencePasscode),
-                            spannableConferencePasscode.indexOf(zoomConferencePasscode).plus(zoomConferencePasscode.length),
+                            spannableConferencePassword.indexOf(zoomConferencePassword),
+                            spannableConferencePassword.indexOf(zoomConferencePassword).plus(zoomConferencePassword.length),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                         )
-                        textConferencePasscode.text = spannableConferencePasscode
-                        textConferencePasscode.visibleOrGone(true)
+                        textConferencePassword.text = spannableConferencePassword
+                        textConferencePassword.visibleOrGone(true)
                     }
 
                     textConferenceMeetingHostValue.text = linkifyAndParseHtml("john.doe@proton.ch") // TODO USE ACTUAL MEETING HOST VALUE

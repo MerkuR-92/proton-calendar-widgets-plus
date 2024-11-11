@@ -133,7 +133,7 @@
     <string name="join_zoom_meeting_action">Join Zoom meeting</string>
     <string name="zoom_meeting_title">Zoom meeting</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_passcode">Passcode: %1$s</string>
+    <string name="zoom_meeting_password">Password: %1$s</string>
     <string name="zoom_meeting_more_details">More details</string>
     <string name="zoom_meeting_less_details">Less details</string>
     <string name="zoom_meeting_host">Meeting host</string>
