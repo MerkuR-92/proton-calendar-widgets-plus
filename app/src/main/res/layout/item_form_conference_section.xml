@@ -126,6 +126,8 @@
             style="@style/Text.Default"
             android:textIsSelectable="true"
             android:layout_marginTop="@dimen/spacing_element_small"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -137,6 +139,8 @@
             android:layout_height="wrap_content"
             style="@style/Text.Default"
             android:textIsSelectable="true"
+            android:visibility="gone"
+            tools:visibility="visible"
             app:layout_constraintStart_toStartOf="@+id/text_conference_meeting_host"
             app:layout_constraintEnd_toEndOf="@+id/text_conference_meeting_host"
             app:layout_constraintTop_toBottomOf="@+id/text_conference_meeting_host"
@@ -149,8 +153,8 @@
             style="@style/Text.Default"
             android:textIsSelectable="true"
             android:layout_marginTop="@dimen/spacing_element_small"
-            app:layout_constraintStart_toStartOf="@+id/text_conference_meeting_host_value"
-            app:layout_constraintEnd_toEndOf="@+id/text_conference_meeting_host_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_conference_meeting_host_value"
             android:text="@string/zoom_meeting_link" />
 

@@ -73,7 +73,6 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
-import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -544,10 +543,11 @@ class EventViewModel @Inject constructor(
             } else {
                 transformEventUseCase.execute(dbEventEntity)
             }
-        }
-        else null
+        } else null
 
         if (dbEvent == null) return InitResult.EventDoesNotExist
+
+        dbEvent?.removeConferenceDescription()
 
         val eventStartTimeZone =
             dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id
@@ -1402,6 +1402,11 @@ class EventViewModel @Inject constructor(
 
             // Allow saving with no edition if creating an event
             if (eventId.isNullOrEmpty() || hasEventBeenEdited()) {
+
+                // Add back the Zoom description
+                if (!event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
+                    event.addZoomDescription()
+                }
 
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving

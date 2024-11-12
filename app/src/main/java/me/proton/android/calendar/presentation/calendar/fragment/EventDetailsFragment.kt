@@ -588,8 +588,12 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         textConferencePassword.visibleOrGone(true)
                     }
 
-                    textConferenceMeetingHostValue.text = linkifyAndParseHtml("john.doe@proton.ch") // TODO USE ACTUAL MEETING HOST VALUE
-                    textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
+                    event.zoomMeetingHost?.let { zoomMeetingHost ->
+                        textConferenceMeetingHostValue.text = linkifyAndParseHtml(zoomMeetingHost)
+                        textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
+                        textConferenceMeetingHost.visibleOrGone(true)
+                        textConferenceMeetingHostValue.visibleOrGone(true)
+                    }
 
                     textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
                     textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()

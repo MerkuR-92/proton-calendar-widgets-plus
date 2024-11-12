@@ -23,6 +23,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
@@ -337,6 +338,8 @@ object ICalUtilsImpl : ICalUtils {
                     ).run {
                         val originalPassword = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSWORD)
                         if (!originalPassword.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSWORD, originalPassword)
+                        val originalHost = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_HOST)
+                        if (!originalHost.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_HOST, originalHost)
                     }
                 }
 

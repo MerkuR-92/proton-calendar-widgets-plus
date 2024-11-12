@@ -350,9 +350,12 @@ object CustomICalPropertyParameter {
     const val X_PM_CONFERENCE_ID = "X-PM-CONFERENCE-ID"
     const val X_PM_CONFERENCE_URL = "X-PM-CONFERENCE-URL"
     const val PARAMETER_CONFERENCE_PASSWORD = "PASSWORD"
+    const val PARAMETER_CONFERENCE_HOST = "HOST"
     const val PARAMETER_CONFERENCE_PROVIDER = "PROVIDER"
     const val PARAMETER_CONFERENCE_CREATOR = "CREATOR"
+
     const val CONFERENCE_DESCRIPTION_HEADER = "~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~"
+    const val CONFERENCE_DESCRIPTION_REGEX_STRING = "~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~[\\s\\S]*?~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~"
 }
 
 object MessageDigestHashType {

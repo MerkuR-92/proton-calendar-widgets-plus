@@ -11,6 +11,8 @@ import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CustomICalPropertyParameter
 import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_HEADER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_REGEX_STRING
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
@@ -209,6 +211,9 @@ data class Event private constructor(
     val zoomConferencePassword: String? get() = iCalEvent.getExperimentalProperty(
         X_PM_CONFERENCE_URL
     )?.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank()
+    val zoomMeetingHost: String? get() = iCalEvent.getExperimentalProperty(
+        X_PM_CONFERENCE_URL
+    )?.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank()
 
     val status: Status? get() = iCalEvent.status
 
@@ -295,13 +300,41 @@ data class Event private constructor(
         notifications = notifications.copy(notifications = notificationsWithAlarmRemoved)
     }
 
+    fun containsZoomDescription(): Boolean {
+        return this.iCalEvent.description?.value?.contains(
+            Regex(CONFERENCE_DESCRIPTION_REGEX_STRING)
+        ) == true
+    }
+
+    fun addZoomDescription() {
+        val description = this.iCalEvent.description?.value?.takeIfNotBlank() ?: ""
+        this.iCalEvent.setDescription(
+            description.plus(
+                /*
+                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+                Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
+
+                Meeting host: john.doe@proton.ch
+                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+                 */
+
+                // We do not translate this
+                "\n$CONFERENCE_DESCRIPTION_HEADER\nJoin Zoom Meeting: $zoomUrl (ID: $zoomConferenceId${zoomConferencePassword?.let { ", passcode: $zoomConferencePassword" }})\n\nMeeting host: $zoomMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
+            )
+        )
+    }
+
     fun removeConference() {
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_ID)
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_URL)
-        if (this.iCalEvent.description != null && this.iCalEvent.description.value.contains(CONFERENCE_DESCRIPTION_HEADER)) {
-            this.iCalEvent.description.value = this.iCalEvent.description.value.removeRange(
-                this.iCalEvent.description.value.indexOf(CONFERENCE_DESCRIPTION_HEADER),
-                this.iCalEvent.description.value.lastIndexOf(CONFERENCE_DESCRIPTION_HEADER).plus(CONFERENCE_DESCRIPTION_HEADER.length)
+        this.removeConferenceDescription()
+    }
+
+    fun removeConferenceDescription() {
+        if (this.containsZoomDescription() && !this.zoomUrl.isNullOrBlank()) {
+            this.iCalEvent.description.value = this.iCalEvent.description.value.replace(
+                Regex(CONFERENCE_DESCRIPTION_REGEX_STRING),
+                ""
             ).trim()
         }
     }
