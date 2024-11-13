@@ -9,11 +9,12 @@ import java.io.FileNotFoundException
 import java.util.Properties
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+    alias(libs.plugins.kotlin.serialization)
     id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("androidx.navigation.safeargs.kotlin")
     id("dagger.hilt.android.plugin")
     id("jacoco")
@@ -50,10 +51,7 @@ android {
         dataBinding = true
         viewBinding = true
         compose = true
-    }
-
-    composeOptions{
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get().toString()
+        buildConfig = true
     }
 
     signingConfigs {
