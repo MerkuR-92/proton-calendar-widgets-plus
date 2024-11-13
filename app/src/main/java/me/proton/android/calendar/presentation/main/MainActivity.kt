@@ -1798,6 +1798,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             splitViewVerticalScrollingFlag ?: return@Observer
         })
 
+        featureFlagViewModel.zoomIntegrationAndroidFlag.observe(this@MainActivity, Observer { zoomIntegrationAndroidFlag ->
+            zoomIntegrationAndroidFlag ?: return@Observer
+        })
+
         lifecycleScope.launch {
             calendarViewModel.fixCalendars()
         }

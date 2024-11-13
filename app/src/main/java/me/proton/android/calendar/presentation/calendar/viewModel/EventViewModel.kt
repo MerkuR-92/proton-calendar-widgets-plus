@@ -182,6 +182,7 @@ class EventViewModel @Inject constructor(
     var eventEdited = false
     private var editMode = false
     private var isCreate = false
+    private var zoomIntegrationEnabled = false
 
     private lateinit var event: Event
 
@@ -303,6 +304,7 @@ class EventViewModel @Inject constructor(
     suspend fun initialise(
         userId: UserId,
         editMode: Boolean,
+        zoomIntegrationEnabled: Boolean,
         eventId: String?,
         occurrenceNumber: Int?,
         initStartDate: String?,
@@ -322,6 +324,7 @@ class EventViewModel @Inject constructor(
         this.editMode = editMode
         this.userId = userId
         this.isCreate = eventId == null
+        this.zoomIntegrationEnabled = zoomIntegrationEnabled
 
         // Default calendar and its settings is only needed in create mode
         val defaultCalendar: Calendar? =
@@ -374,7 +377,10 @@ class EventViewModel @Inject constructor(
 
         } else {
 
-            val initialiseEditEventResult = initialiseExistingEvent(eventId, occurrenceNumber)
+            val initialiseEditEventResult = initialiseExistingEvent(
+                eventId,
+                occurrenceNumber
+            )
             if (initialiseEditEventResult !is InitResult.InitEventSuccess) {
                 // Handle initialisation error
                 return initialiseEditEventResult
@@ -547,7 +553,9 @@ class EventViewModel @Inject constructor(
 
         if (dbEvent == null) return InitResult.EventDoesNotExist
 
-        dbEvent?.removeConferenceDescription()
+        if (zoomIntegrationEnabled) {
+            dbEvent?.removeConferenceDescription()
+        }
 
         val eventStartTimeZone =
             dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id
@@ -1404,7 +1412,7 @@ class EventViewModel @Inject constructor(
             if (eventId.isNullOrEmpty() || hasEventBeenEdited()) {
 
                 // Add back the Zoom description
-                if (!event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
+                if (zoomIntegrationEnabled && !event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
                     event.addZoomDescription()
                 }
 

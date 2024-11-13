@@ -78,6 +78,7 @@ import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewMo
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.user.domain.entity.UserAddress
@@ -114,6 +115,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
     private val eventViewModel: EventViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
 
     private fun jumpToMonthView() {
         // TODO this is a workaround for deeplinks not navigating up to direct parent, but to navigation's start destination
@@ -277,6 +279,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     eventViewModel.initialise(
                         userId,
                         editMode = false,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         null,
@@ -549,78 +552,81 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 }
             }
 
-            event.zoomUrl?.nullIfBlank()?.let { zoomUrl ->
-                with(binding.sectionZoom) {
+            if (featureFlagViewModel.isZoomIntegrationEnabled()) {
+                event.zoomUrl?.nullIfBlank()?.let { zoomUrl ->
+                    with(binding.sectionZoom) {
 
-                    joinMeetingButton.setOnSingleClickListener {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(zoomUrl))
-                        startActivity(intent)
-                    }
-
-                    imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
-                    imageButtonAction.visibleOrInvisible(true)
-
-                    event.zoomConferenceId?.let { zoomConferenceId ->
-                        val spannableConferenceId: Spannable = SpannableString(
-                            getString(R.string.zoom_meeting_id, zoomConferenceId)
-                        )
-                        spannableConferenceId.setSpan(
-                            ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                            spannableConferenceId.indexOf(zoomConferenceId),
-                            spannableConferenceId.indexOf(zoomConferenceId).plus(zoomConferenceId.length),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
-                        textConferenceId.text = spannableConferenceId
-                        textConferenceId.visibleOrGone(true)
-                    }
-
-                    event.zoomConferencePassword?.let { zoomConferencePassword ->
-                        val spannableConferencePassword: Spannable = SpannableString(
-                            getString(R.string.zoom_meeting_password, zoomConferencePassword)
-                        )
-                        spannableConferencePassword.setSpan(
-                            ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                            spannableConferencePassword.indexOf(zoomConferencePassword),
-                            spannableConferencePassword.indexOf(zoomConferencePassword).plus(zoomConferencePassword.length),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                        )
-                        textConferencePassword.text = spannableConferencePassword
-                        textConferencePassword.visibleOrGone(true)
-                    }
-
-                    event.zoomMeetingHost?.let { zoomMeetingHost ->
-                        textConferenceMeetingHostValue.text = linkifyAndParseHtml(zoomMeetingHost)
-                        textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
-                        textConferenceMeetingHost.visibleOrGone(true)
-                        textConferenceMeetingHostValue.visibleOrGone(true)
-                    }
-
-                    textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
-                    textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
-
-                    textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
-                    textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
-
-                    conferenceMoreDetailsTitleLayout.setOnClickListener {
-                        if (isConferenceDetailsVisible) {
-                            // Save expanded view height once so we can animate it
-                            val height = collapse(conferenceMoreDetailsContentLayout).first
-                            if (conferenceDetailsHeight == null) conferenceDetailsHeight = height
-                            rotateArrowDownward(textConferenceMoreDetailsButton)
-                            isConferenceDetailsVisible = false
-                        } else {
-                            conferenceDetailsHeight?.let {
-                                if (it > 0) expand(conferenceMoreDetailsContentLayout, height = it)
-                                else conferenceMoreDetailsContentLayout.visibleOrGone(true)
-                            } ?: run {
-                                conferenceMoreDetailsContentLayout.visibleOrGone(true)
-                            }
-                            rotateArrowUpward(textConferenceMoreDetailsButton)
-                            isConferenceDetailsVisible = true
+                        joinMeetingButton.setOnSingleClickListener {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(zoomUrl))
+                            startActivity(intent)
                         }
-                    }
 
-                    root.visibleOrGone(true)
+                        imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
+                        imageButtonAction.visibleOrInvisible(true)
+
+                        event.zoomConferenceId?.let { zoomConferenceId ->
+                            val spannableConferenceId: Spannable = SpannableString(
+                                getString(R.string.zoom_meeting_id, zoomConferenceId)
+                            )
+                            spannableConferenceId.setSpan(
+                                ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
+                                spannableConferenceId.indexOf(zoomConferenceId),
+                                spannableConferenceId.indexOf(zoomConferenceId).plus(zoomConferenceId.length),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                            textConferenceId.text = spannableConferenceId
+                            textConferenceId.visibleOrGone(true)
+                        }
+
+                        event.zoomConferencePassword?.let { zoomConferencePassword ->
+                            val spannableConferencePassword: Spannable = SpannableString(
+                                getString(R.string.zoom_meeting_password, zoomConferencePassword)
+                            )
+                            spannableConferencePassword.setSpan(
+                                ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
+                                spannableConferencePassword.indexOf(zoomConferencePassword),
+                                spannableConferencePassword.indexOf(zoomConferencePassword)
+                                    .plus(zoomConferencePassword.length),
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                            textConferencePassword.text = spannableConferencePassword
+                            textConferencePassword.visibleOrGone(true)
+                        }
+
+                        event.zoomMeetingHost?.let { zoomMeetingHost ->
+                            textConferenceMeetingHostValue.text = linkifyAndParseHtml(zoomMeetingHost)
+                            textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
+                            textConferenceMeetingHost.visibleOrGone(true)
+                            textConferenceMeetingHostValue.visibleOrGone(true)
+                        }
+
+                        textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
+                        textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
+
+                        textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
+                        textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
+
+                        conferenceMoreDetailsTitleLayout.setOnClickListener {
+                            if (isConferenceDetailsVisible) {
+                                // Save expanded view height once so we can animate it
+                                val height = collapse(conferenceMoreDetailsContentLayout).first
+                                if (conferenceDetailsHeight == null) conferenceDetailsHeight = height
+                                rotateArrowDownward(textConferenceMoreDetailsButton)
+                                isConferenceDetailsVisible = false
+                            } else {
+                                conferenceDetailsHeight?.let {
+                                    if (it > 0) expand(conferenceMoreDetailsContentLayout, height = it)
+                                    else conferenceMoreDetailsContentLayout.visibleOrGone(true)
+                                } ?: run {
+                                    conferenceMoreDetailsContentLayout.visibleOrGone(true)
+                                }
+                                rotateArrowUpward(textConferenceMoreDetailsButton)
+                                isConferenceDetailsVisible = true
+                            }
+                        }
+
+                        root.visibleOrGone(true)
+                    }
                 }
             }
 

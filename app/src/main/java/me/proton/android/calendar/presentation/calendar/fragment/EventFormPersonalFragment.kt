@@ -119,6 +119,7 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                 else eventViewModel.initialise(
                     userId,
                     editMode = false,
+                    zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     null,
@@ -218,6 +219,7 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         null,

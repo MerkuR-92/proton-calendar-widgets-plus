@@ -140,6 +140,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 else eventViewModel.initialise(
                     userId,
                     editMode = false,
+                    zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     null,
@@ -328,6 +329,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         null,
                         null,
                         startZonedDateTime.toLocalDate().toString(),
@@ -345,6 +347,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         navigationArguments.initStartDate,
@@ -460,7 +463,9 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
             binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
 
-            binding.eventFormConferenceLayout.visibleOrGone(!event.zoomUrl.isNullOrBlank())
+            binding.eventFormConferenceLayout.visibleOrGone(
+                featureFlagViewModel.isZoomIntegrationEnabled() && !event.zoomUrl.isNullOrBlank()
+            )
 
             ImageViewCompat.setImageTintList(
                 binding.eventFormLocationIcon,
