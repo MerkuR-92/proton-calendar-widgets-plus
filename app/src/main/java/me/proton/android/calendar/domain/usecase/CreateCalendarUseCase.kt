@@ -147,12 +147,10 @@ class CreateCalendarUseCase @Inject constructor(
                             logger.e("CreateCalendarUseCase: Error in KeySetupUseCase: ${keySetupResult.message}")
                             keySetupResult
                         } else { // key setup has been done on the server in the meantime
-                            val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-                                ?: ZoneId.systemDefault().id
 
                             val fetchedCalendarEntity = calendarsRepository.fetchCalendarEntity(userId, calendarEntity.id)
                             if (fetchedCalendarEntity != null) {
-                                val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(fetchedCalendarEntity, userId, timezone)
+                                val executeBootstrapResult = bootstrapCalendarUseCase.executeBootstrap(fetchedCalendarEntity, userId)
                                 executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
                                 executeBootstrapResult
                             } else UseCase.Result.Error("could not fetch CalendarEntity to execute bootstrap")
