@@ -602,9 +602,12 @@ class CalendarsRepositoryImpl @Inject constructor(
             val userEmails = userAddresses.map { it.email }
 
             coroutineScope {
-                val normalEventsMetadata = visibleEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
-                val recurringEventsMetadata = visibleEventsMetadata.filter { it.rRule != null }
-                val singleEditEventsMetadata = visibleEventsMetadata.filter { it.recurrenceID != null }
+                val deduplicatedEventsMetadata = visibleEventsMetadata.filterOutDuplicatesInSubscribedCalendars(
+                    visibleCalendars
+                ).first
+                val normalEventsMetadata = deduplicatedEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
+                val recurringEventsMetadata = deduplicatedEventsMetadata.filter { it.rRule != null }
+                val singleEditEventsMetadata = deduplicatedEventsMetadata.filter { it.recurrenceID != null }
 
                 val transformedNormalEvents = normalEventsMetadata.distinct().map { eventMetadata ->
                     async {
@@ -690,7 +693,9 @@ class CalendarsRepositoryImpl @Inject constructor(
                     }
                 }.awaitAll().filterNotNull()
 
-                val allUiEvents = normalUiEvents.plus(recurringUiEvents).plus(singleEditUiEvents)
+                val allUiEvents = normalUiEvents
+                    .plus(recurringUiEvents)
+                    .plus(singleEditUiEvents)
                 emit(CalendarsRepository.GetEventsResult.Success(allUiEvents))
             }
         }.onStart {
@@ -736,9 +741,12 @@ class CalendarsRepositoryImpl @Inject constructor(
             }
 
             coroutineScope {
-                val normalEventsMetadata = visibleEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
-                val recurringEventsMetadata = visibleEventsMetadata.filter { it.rRule != null }
-                val singleEditEventsMetadata = visibleEventsMetadata.filter { it.recurrenceID != null }
+                val deduplicatedEventsMetadata = visibleEventsMetadata.filterOutDuplicatesInSubscribedCalendars(
+                    visibleCalendars
+                ).first
+                val normalEventsMetadata = deduplicatedEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
+                val recurringEventsMetadata = deduplicatedEventsMetadata.filter { it.rRule != null }
+                val singleEditEventsMetadata = deduplicatedEventsMetadata.filter { it.recurrenceID != null }
 
                 val normalSkeletonEventsInWindow = database.eventsDao().selectSkeletonEventsById(
                     normalEventsMetadata.map { it.id }
@@ -942,9 +950,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
 
         return coroutineScope {
-            val normalEventsMetadata = visibleEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
-            val recurringEventsMetadata = visibleEventsMetadata.filter { it.rRule != null }
-            val singleEditEventsMetadata = visibleEventsMetadata.filter { it.recurrenceID != null }
+            val deduplicatedEventsMetadata = visibleEventsMetadata.filterOutDuplicatesInSubscribedCalendars(
+                visibleCalendars
+            ).first
+            val normalEventsMetadata = deduplicatedEventsMetadata.filterNot { it.rRule != null || it.recurrenceID != null }
+            val recurringEventsMetadata = deduplicatedEventsMetadata.filter { it.rRule != null }
+            val singleEditEventsMetadata = deduplicatedEventsMetadata.filter { it.recurrenceID != null }
 
             val transformedNormalEvents = normalEventsMetadata.distinct().map { eventMetadata ->
                 async {
