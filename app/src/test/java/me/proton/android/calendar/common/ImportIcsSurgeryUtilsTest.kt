@@ -2509,7 +2509,7 @@ internal class ImportIcsSurgeryUtilsTest {
     DESCRIPTION:blalbla
     DTSTART;VALUE=DATE:20221024
     DTEND;VALUE=DATE:20221024
-    RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=MO,FR;BYSETPOS=2
+    RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=MO,FR
     DTSTAMP:20221024T113000Z
     TRANSP:OPAQUE
     SEQUENCE:3
@@ -2527,6 +2527,33 @@ internal class ImportIcsSurgeryUtilsTest {
             assertThat(iCalendar).isNotNull()
             assertThat(iCalendar?.events?.first()?.recurrenceRule?.value?.frequency).isEqualTo(Frequency.MONTHLY)
         }
+    }
+
+    @Test
+    fun `MONTHLY BYSETPOS invalid RRule test`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    METHOD:PUBLISH
+    BEGIN:VEVENT
+    CLASS:PUBLIC
+    SUMMARY:blalbla
+    DESCRIPTION:blalbla
+    DTSTART;VALUE=DATE:20221024
+    DTEND;VALUE=DATE:20221024
+    RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=MO,FR;BYSETPOS=2
+    DTSTAMP:20221024T113000Z
+    TRANSP:OPAQUE
+    SEQUENCE:3
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val cleanIcsResult = IcsSurgeryUtils.cleanIcs(iCalString, timeZoneId = "Europe/Paris")
+
+        // this RRULE does not create DTSTART as 1st occurrence so we treat it as invalid
+        assertThat(cleanIcsResult).isInstanceOf(IcsSurgeryUtils.HandleIcsResult.Error.Invalid.RRule::class)
     }
 
     @Test
