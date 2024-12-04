@@ -1411,11 +1411,6 @@ class EventViewModel @Inject constructor(
             // Allow saving with no edition if creating an event
             if (eventId.isNullOrEmpty() || hasEventBeenEdited()) {
 
-                // Add back the Zoom description
-                if (zoomIntegrationEnabled && !event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
-                    event.addZoomDescription()
-                }
-
                 // Update Event Form state
                 eventFormState.value = EventState.Processing.Saving
 
@@ -2221,6 +2216,11 @@ class EventViewModel @Inject constructor(
         // Post saving event value to true to trigger loading state
         eventFormState.value = EventState.Processing.Saving
 
+        // Add back the Zoom description
+        if (zoomIntegrationEnabled && !event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
+            event.addZoomDescription()
+        }
+
         val eventCopy = Event.from(event)
 
         val handleSaveResult = handleSaveUseCase.handleSave(
@@ -2239,6 +2239,10 @@ class EventViewModel @Inject constructor(
         )
 
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
+
+        if (handleSaveResult !is UseCase.Result.Success<*> && zoomIntegrationEnabled) {
+            event.removeConferenceDescription()
+        }
 
         // Schedule alarms if any
         handleAlarmsUseCase.execute(userId)
