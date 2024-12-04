@@ -422,7 +422,24 @@ class EditCreateEventUseCase @Inject constructor(
                 // TODO collect and handle multiple errors
                 val syncError = syncResponse.data.responses.firstOrNull { !it.response.isSuccessful }
                 if (syncError != null) {
-                    UseCase.Result.Error("EditCreateEventUseCase: one of sync responses is an error ${syncError.response.code} ${syncError.response.error}", userErrorMessage = syncError.response.error)
+                    if (syncError.response.code == 2904) {
+                        return UseCase.Result.Error(
+                            "EditCreateEventUseCase: one of sync responses is an error ${syncError.response.code} ${syncError.response.error}",
+                            error = UseCase.Error.Sync.LostZoomAccess,
+                            userErrorMessage = syncError.response.error
+                        )
+                    } else if (syncError.response.code == 2905) {
+                        return UseCase.Result.Error(
+                            "EditCreateEventUseCase: one of sync responses is an error ${syncError.response.code} ${syncError.response.error}",
+                            error = UseCase.Error.Sync.ZoomLinkDoesNotExist,
+                            userErrorMessage = syncError.response.error
+                        )
+                    } else {
+                        UseCase.Result.Error(
+                            "EditCreateEventUseCase: one of sync responses is an error ${syncError.response.code} ${syncError.response.error}",
+                            userErrorMessage = syncError.response.error
+                        )
+                    }
                 } else {
                     UseCase.Result.Success(eventsToInsertOrUpdate.map { it.id })
                 }

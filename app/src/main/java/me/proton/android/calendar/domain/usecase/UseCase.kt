@@ -27,6 +27,10 @@ interface UseCase {
             object UserAddressInvalidForEncryption : Crypto()
         }
 
+        sealed class Sync: Error() {
+            object LostZoomAccess : HandleSave()
+            object ZoomLinkDoesNotExist : HandleSave()
+        }
     }
 }
 

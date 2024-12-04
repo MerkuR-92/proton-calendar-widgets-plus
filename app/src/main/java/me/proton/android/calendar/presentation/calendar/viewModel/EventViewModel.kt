@@ -1393,6 +1393,8 @@ class EventViewModel @Inject constructor(
         CREATE_ERROR_SEND_MAIL,
         EDIT_ERROR_SEND_MAIL,
         USER_ADDRESS_INVALID_FOR_ENCRYPTION, // TODO remove the hack when UserAddress problem is solved
+        LOST_ZOOM_ACCESS,
+        ZOOM_MEETING_DOES_NOT_EXIST,
         ERROR
     }
 
@@ -2255,6 +2257,8 @@ class EventViewModel @Inject constructor(
                         UseCase.Error.HandleSave.EditSendEmail -> SaveResult.EDIT_ERROR_SEND_MAIL
                         UseCase.Error.HandleSave.CreateSendEmail -> SaveResult.CREATE_ERROR_SEND_MAIL
                         UseCase.Error.Crypto.UserAddressInvalidForEncryption -> SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                        UseCase.Error.Sync.LostZoomAccess -> SaveResult.LOST_ZOOM_ACCESS
+                        UseCase.Error.Sync.ZoomLinkDoesNotExist -> SaveResult.ZOOM_MEETING_DOES_NOT_EXIST
                         else -> {
                             userErrorMessage = handleSaveResult.userErrorMessage
                             SaveResult.ERROR
@@ -2446,6 +2450,30 @@ class EventViewModel @Inject constructor(
 
                     // Update event form state to handle invalid sender address issue
                     eventFormState.value = EventState.UserAddressInvalidForEncryption
+                }
+                SaveResult.LOST_ZOOM_ACCESS -> {
+
+                    // Reset event form state
+                    eventFormState.value = EventState.Idle
+
+                    // Display snack
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(
+                        resourceProvider.provideString(
+                            R.string.snack_lost_zoom_access
+                        )
+                    )
+                }
+                SaveResult.ZOOM_MEETING_DOES_NOT_EXIST -> {
+
+                    // Reset event form state
+                    eventFormState.value = EventState.Idle
+
+                    // Display snack
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(
+                        resourceProvider.provideString(
+                            R.string.snack_zoom_meeting_does_not_exist
+                        )
+                    )
                 }
                 else -> {
 
