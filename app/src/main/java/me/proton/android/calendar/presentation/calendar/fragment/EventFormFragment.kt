@@ -79,7 +79,9 @@ import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
+import me.proton.core.presentation.utils.SnackType
 import me.proton.core.presentation.utils.clearText
+import me.proton.core.presentation.utils.snack
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
@@ -672,6 +674,20 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 when (it) {
                     is EventViewModel.EventSnackState.DisplaySnack -> {
                         view?.displaySnackBar(it.message)
+                    }
+                    is EventViewModel.EventSnackState.DisplaySnackWithUriAction -> {
+                        view?.snack(
+                            message = it.message,
+                            type = SnackType.Error,
+                            action = it.action,
+                            actionOnClick = {
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(it.uri)
+                                )
+                                startActivity(browserIntent)
+                            },
+                        )
                     }
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)

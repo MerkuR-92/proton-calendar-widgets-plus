@@ -412,6 +412,8 @@ class EventFormPersonalFragment() : BaseDialogFragment<FragmentEventFormPersonal
                         // Use jumpToMonthView to handle navigation when opening details from notification
                         jumpToMonthView()
                     }
+
+                    else -> {}
                 }
                 eventViewModel.eventFormSnackState.value = null
             }

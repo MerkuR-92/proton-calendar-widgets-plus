@@ -341,6 +341,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         // Use jumpToMonthView to handle navigation when opening details from notification
                         jumpToMonthView()
                     }
+
+                    else -> {}
                 }
                 eventViewModel.eventDetailsSnackState.value = null
             }

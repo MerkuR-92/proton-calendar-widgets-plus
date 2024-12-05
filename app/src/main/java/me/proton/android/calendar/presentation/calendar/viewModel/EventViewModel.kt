@@ -249,6 +249,12 @@ class EventViewModel @Inject constructor(
             val message: String
         ): EventSnackState()
 
+        data class DisplaySnackWithUriAction(
+            val message: String,
+            val action: String,
+            val uri: String
+        ): EventSnackState()
+
         data class DisplaySnackReturnToMonth(
             val message: String,
             val newSelectedDate: LocalDate? = null,
@@ -2457,10 +2463,14 @@ class EventViewModel @Inject constructor(
                     eventFormState.value = EventState.Idle
 
                     // Display snack
-                    eventFormSnackState.value = EventSnackState.DisplaySnack(
+                    eventFormSnackState.value = EventSnackState.DisplaySnackWithUriAction(
                         resourceProvider.provideString(
                             R.string.snack_lost_zoom_access
-                        )
+                        ),
+                        resourceProvider.provideString(
+                            R.string.snack_lost_zoom_access_acion
+                        ),
+                        "https://account.proton.me/calendar/security#third-party"
                     )
                 }
                 SaveResult.ZOOM_MEETING_DOES_NOT_EXIST -> {
