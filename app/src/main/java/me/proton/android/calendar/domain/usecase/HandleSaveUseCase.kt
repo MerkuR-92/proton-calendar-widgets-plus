@@ -286,6 +286,7 @@ class HandleSaveUseCase @Inject constructor(
                     return HandleSaveOptionResult.Error(
                         UseCase.Result.Error(
                             "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                            error = editOriginalEventResult.error,
                             userErrorMessage = editOriginalEventResult.userErrorMessage
                         )
                     )
@@ -339,6 +340,7 @@ class HandleSaveUseCase @Inject constructor(
                         return HandleSaveOptionResult.Error(
                             UseCase.Result.Error(
                                 "HandleSaveUseCase: handleOriginalEventNullSequence error editing original event ${editOriginalEventResult.message}",
+                                error = editOriginalEventResult.error,
                                 userErrorMessage = editOriginalEventResult.userErrorMessage
                             )
                         )
@@ -462,6 +464,7 @@ class HandleSaveUseCase @Inject constructor(
         if (editOriginalEventResult is UseCase.Result.Error) {
             return HandleSaveOptionResult.Error(UseCase.Result.Error(
                 "HandleSaveUseCase: error editing original event:  ${editOriginalEventResult.message}",
+                error = editOriginalEventResult.error,
                 userErrorMessage = editOriginalEventResult.userErrorMessage
             ))
         } else if (editOriginalEventResult is UseCase.Result.InvalidParams) {

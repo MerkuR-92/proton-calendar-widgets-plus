@@ -596,13 +596,62 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/event_form_conference_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            tools:visibility="visible"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageView
+                android:id="@+id/event_form_conference_icon"
+                style="@style/Icon.Form"
+                app:srcCompat="@drawable/ic_video_camera"
+                app:layout_constraintTop_toTopOf="@+id/event_form_conference"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/event_form_conference"
+                style="@style/Text.Default.Form"
+                android:text="@string/zoom_meeting_title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <View
+                android:id="@+id/event_form_conference_separator"
+                style="@style/Separator"
+                android:layout_marginTop="@dimen/default_separator_margin_top"
+                app:layout_constraintTop_toBottomOf="@+id/event_form_conference"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <ImageButton
+                android:id="@+id/event_form_conference_remove"
+                style="@style/Icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="@color/icon_weak"
+                android:background="?android:selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="@+id/event_form_conference"
+                app:layout_constraintTop_toTopOf="@+id/event_form_conference"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:srcCompat="@drawable/ic_proton_cross" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <LinearLayout
             android:id="@+id/event_form_alarm_list"
             android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/event_form_location_layout"
+            app:layout_constraintTop_toBottomOf="@+id/event_form_conference_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 

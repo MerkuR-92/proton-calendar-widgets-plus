@@ -159,6 +159,7 @@ open class EventViewModelTestCommon: KoinComponent {
         eventViewModel.initialise(
             userId,
             editMode,
+            true,
             eventId,
             occurrenceNumber,
             initStartDate,

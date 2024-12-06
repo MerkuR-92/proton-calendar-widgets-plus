@@ -55,8 +55,8 @@ import me.proton.android.calendar.common.utils.AndroidUtils.showKeyboard
 import me.proton.android.calendar.common.utils.AndroidUtils.sortFormattedTimeZoneIds
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
-import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
+import me.proton.android.calendar.common.utils.ColorUtils
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.firstDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTimeZoneId
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.getTimeWithPadding
@@ -79,7 +79,9 @@ import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.core.contact.domain.entity.ContactEmail
+import me.proton.core.presentation.utils.SnackType
 import me.proton.core.presentation.utils.clearText
+import me.proton.core.presentation.utils.snack
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
@@ -140,6 +142,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 else eventViewModel.initialise(
                     userId,
                     editMode = false,
+                    zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     null,
@@ -328,6 +331,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         null,
                         null,
                         startZonedDateTime.toLocalDate().toString(),
@@ -345,6 +349,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
+                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         navigationArguments.initStartDate,
@@ -419,6 +424,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormColorPress.root.isEnabled = !processingEvent
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
+                binding.eventFormConferenceRemove.isEnabled = !processingEvent
 
                 for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
@@ -458,6 +464,10 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormTitle.doAfterTextChanged { if (binding.eventFormTitle.hasFocus()) persistFormData() }
             binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
             binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
+
+            binding.eventFormConferenceLayout.visibleOrGone(
+                featureFlagViewModel.isZoomIntegrationEnabled() && !event.zoomUrl.isNullOrBlank()
+            )
 
             ImageViewCompat.setImageTintList(
                 binding.eventFormLocationIcon,
@@ -664,6 +674,20 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 when (it) {
                     is EventViewModel.EventSnackState.DisplaySnack -> {
                         view?.displaySnackBar(it.message)
+                    }
+                    is EventViewModel.EventSnackState.DisplaySnackWithUriAction -> {
+                        view?.snack(
+                            message = it.message,
+                            type = SnackType.Error,
+                            action = it.action,
+                            actionOnClick = {
+                                val browserIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(it.uri)
+                                )
+                                startActivity(browserIntent)
+                            },
+                        )
                     }
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
@@ -883,6 +907,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
                 checkNavigationToAttendees()
             }
+        }
+
+        binding.eventFormConferenceRemove.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            eventViewModel.removeConferenceLink()
         }
     }
 

@@ -130,6 +130,16 @@
     <string name="event_send_prefs_public_keys_invalid">public keys are invalid</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">contact signature invalid</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Join Zoom meeting</string>
+    <string name="zoom_meeting_title">Zoom meeting</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Password: %1$s</string>
+    <string name="zoom_meeting_more_details">More details</string>
+    <string name="zoom_meeting_less_details">Less details</string>
+    <string name="zoom_meeting_host">Meeting host</string>
+    <string name="zoom_meeting_link">Meeting link</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    More details
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>
     <string name="event_text_edit_event">Edit event</string>
@@ -325,6 +335,9 @@
     <string name="snack_event_updated_recurring">All events updated</string>
     <string name="snack_event_updated_error_failed_mail">Invitation failed to be sent</string>
     <string name="snack_update_event_error_failed_mail">Update failed</string>
+    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
+    <string name="snack_lost_zoom_access_acion">Connect</string>
+    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
     <string name="snack_event_updated_error">Error updating event</string>
     <string name="snack_event_created">Event created</string>
     <string name="snack_event_created_failed_mail">Event created but invitation failed to be sent</string>

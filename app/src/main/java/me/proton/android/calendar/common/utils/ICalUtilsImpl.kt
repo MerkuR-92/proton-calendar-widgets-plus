@@ -22,6 +22,12 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SESSION_KEY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_SHARED_EVENT_ID
@@ -296,6 +302,18 @@ object ICalUtilsImpl : ICalUtils {
                 }
                 setOrganizer(originalEvent.organizer)
 
+                originalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.let { originalConferenceIdProperty ->
+                    setExperimentalProperty(
+                        X_PM_CONFERENCE_ID,
+                        originalConferenceIdProperty.value
+                    ).run {
+                        val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)
+                        if (!originalProvider.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PROVIDER, originalProvider)
+                        val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR)
+                        if (!originalCreator.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_CREATOR, originalCreator)
+                    }
+                }
+
                 // copy timezone assignments
                 newCalendar.timezoneInfo.setTimezone(this.dateStart, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateStart) ?: originalCalendar.timezoneInfo.defaultTimezone)
                 newCalendar.timezoneInfo.setTimezone(this.dateEnd, originalCalendar.timezoneInfo.getTimezone(originalEvent.dateEnd) ?: originalCalendar.timezoneInfo.defaultTimezone)
@@ -312,6 +330,19 @@ object ICalUtilsImpl : ICalUtils {
                 setDescription(originalEvent.description) // TODO force substring to be max VALIDATION_EVENT_DESCRIPTION_MAX_LENGTH long?
                 setSummary(originalEvent.summary) // TODO force substring to be max VALIDATION_EVENT_SUMMARY_MAX_LENGTH long?
                 setLocation(originalEvent.location) // TODO force substring to be max VALIDATION_EVENT_LOCATION_MAX_LENGTH long?
+
+                originalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let { originalConferenceUrlProperty ->
+                    setExperimentalProperty(
+                        X_PM_CONFERENCE_URL,
+                        originalConferenceUrlProperty.value
+                    ).run {
+                        val originalPassword = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSWORD)
+                        if (!originalPassword.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSWORD, originalPassword)
+                        val originalHost = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_HOST)
+                        if (!originalHost.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_HOST, originalHost)
+                    }
+                }
+
                 wrapInICalendar()
             },
             calendarPart = if (originalEvent.status != null || originalEvent.transparency != null) {
@@ -391,6 +422,7 @@ object ICalUtilsImpl : ICalUtils {
                 // We use setProperty to avoid having duplicates, but we need to use addProperty for Attendees
                 // to properly add multiple ones
                 if (iCalProperty::class == Attendee::class) left.events.first().addProperty(iCalProperty)
+                else if (iCalProperty::class == RawProperty::class) left.events.first().addProperty(iCalProperty)
                 else if (iCalProperty::class == ExceptionDates::class) left.events.first().addProperty(iCalProperty)
                 else if (iCalProperty::class == DateTimeStamp::class) {
                     // Take latest DateTimeStamp

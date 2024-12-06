@@ -73,7 +73,6 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.common.worker.UseCaseWorker
-import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -103,6 +102,7 @@ import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
@@ -183,6 +183,7 @@ class EventViewModel @Inject constructor(
     var eventEdited = false
     private var editMode = false
     private var isCreate = false
+    private var zoomIntegrationEnabled = false
 
     private lateinit var event: Event
 
@@ -249,6 +250,12 @@ class EventViewModel @Inject constructor(
             val message: String
         ): EventSnackState()
 
+        data class DisplaySnackWithUriAction(
+            val message: String,
+            val action: String,
+            val uri: String
+        ): EventSnackState()
+
         data class DisplaySnackReturnToMonth(
             val message: String,
             val newSelectedDate: LocalDate? = null,
@@ -304,6 +311,7 @@ class EventViewModel @Inject constructor(
     suspend fun initialise(
         userId: UserId,
         editMode: Boolean,
+        zoomIntegrationEnabled: Boolean,
         eventId: String?,
         occurrenceNumber: Int?,
         initStartDate: String?,
@@ -323,6 +331,7 @@ class EventViewModel @Inject constructor(
         this.editMode = editMode
         this.userId = userId
         this.isCreate = eventId == null
+        this.zoomIntegrationEnabled = zoomIntegrationEnabled
 
         // Default calendar and its settings is only needed in create mode
         val defaultCalendar: Calendar? =
@@ -375,7 +384,10 @@ class EventViewModel @Inject constructor(
 
         } else {
 
-            val initialiseEditEventResult = initialiseExistingEvent(eventId, occurrenceNumber)
+            val initialiseEditEventResult = initialiseExistingEvent(
+                eventId,
+                occurrenceNumber
+            )
             if (initialiseEditEventResult !is InitResult.InitEventSuccess) {
                 // Handle initialisation error
                 return initialiseEditEventResult
@@ -544,10 +556,13 @@ class EventViewModel @Inject constructor(
             } else {
                 transformEventUseCase.execute(dbEventEntity)
             }
-        }
-        else null
+        } else null
 
         if (dbEvent == null) return InitResult.EventDoesNotExist
+
+        if (zoomIntegrationEnabled) {
+            dbEvent?.removeConferenceDescription()
+        }
 
         val eventStartTimeZone =
             dbEvent?.iCalendar?.timezoneInfo?.getTimezone(dbEvent?.iCalEvent?.dateStart)?.timeZone?.id
@@ -1297,6 +1312,12 @@ class EventViewModel @Inject constructor(
         updateCalendarUseCase.executeUpdateDisplayFromDb(userId, calendar.id)
     }
 
+    fun removeConferenceLink() {
+        markEventAsEdited()
+        event.removeConference()
+        _event.postValue(event)
+    }
+
     fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
@@ -1379,6 +1400,8 @@ class EventViewModel @Inject constructor(
         CREATE_ERROR_SEND_MAIL,
         EDIT_ERROR_SEND_MAIL,
         USER_ADDRESS_INVALID_FOR_ENCRYPTION, // TODO remove the hack when UserAddress problem is solved
+        LOST_ZOOM_ACCESS,
+        ZOOM_MEETING_DOES_NOT_EXIST,
         ERROR
     }
 
@@ -2202,6 +2225,11 @@ class EventViewModel @Inject constructor(
         // Post saving event value to true to trigger loading state
         eventFormState.value = EventState.Processing.Saving
 
+        // Add back the Zoom description
+        if (zoomIntegrationEnabled && !event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
+            event.addZoomDescription()
+        }
+
         val eventCopy = Event.from(event)
 
         val handleSaveResult = handleSaveUseCase.handleSave(
@@ -2221,6 +2249,10 @@ class EventViewModel @Inject constructor(
 
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
 
+        if (handleSaveResult !is UseCase.Result.Success<*> && zoomIntegrationEnabled) {
+            event.removeConferenceDescription()
+        }
+
         // Schedule alarms if any
         handleAlarmsUseCase.execute(userId)
 
@@ -2232,6 +2264,8 @@ class EventViewModel @Inject constructor(
                         UseCase.Error.HandleSave.EditSendEmail -> SaveResult.EDIT_ERROR_SEND_MAIL
                         UseCase.Error.HandleSave.CreateSendEmail -> SaveResult.CREATE_ERROR_SEND_MAIL
                         UseCase.Error.Crypto.UserAddressInvalidForEncryption -> SaveResult.USER_ADDRESS_INVALID_FOR_ENCRYPTION
+                        UseCase.Error.Sync.LostZoomAccess -> SaveResult.LOST_ZOOM_ACCESS
+                        UseCase.Error.Sync.ZoomLinkDoesNotExist -> SaveResult.ZOOM_MEETING_DOES_NOT_EXIST
                         else -> {
                             userErrorMessage = handleSaveResult.userErrorMessage
                             SaveResult.ERROR
@@ -2423,6 +2457,34 @@ class EventViewModel @Inject constructor(
 
                     // Update event form state to handle invalid sender address issue
                     eventFormState.value = EventState.UserAddressInvalidForEncryption
+                }
+                SaveResult.LOST_ZOOM_ACCESS -> {
+
+                    // Reset event form state
+                    eventFormState.value = EventState.Idle
+
+                    // Display snack
+                    eventFormSnackState.value = EventSnackState.DisplaySnackWithUriAction(
+                        resourceProvider.provideString(
+                            R.string.snack_lost_zoom_access
+                        ),
+                        resourceProvider.provideString(
+                            R.string.snack_lost_zoom_access_acion
+                        ),
+                        "https://account.${EnvironmentConfigurationDefaults.host}/calendar/security#third-party"
+                    )
+                }
+                SaveResult.ZOOM_MEETING_DOES_NOT_EXIST -> {
+
+                    // Reset event form state
+                    eventFormState.value = EventState.Idle
+
+                    // Display snack
+                    eventFormSnackState.value = EventSnackState.DisplaySnack(
+                        resourceProvider.provideString(
+                            R.string.snack_zoom_meeting_does_not_exist
+                        )
+                    )
                 }
                 else -> {
 

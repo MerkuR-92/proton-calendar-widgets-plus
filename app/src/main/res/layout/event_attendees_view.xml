@@ -50,7 +50,7 @@
         android:id="@+id/event_attendees_button"
         android:layout_width="10dp"
         android:layout_height="10dp"
-        app:tint="@color/icon_weak"
+        app:tint="@color/icon_norm"
         android:layout_marginEnd="@dimen/spacing_page"
         android:layout_marginStart="@dimen/spacing_element_small"
         app:layout_constraintEnd_toEndOf="parent"

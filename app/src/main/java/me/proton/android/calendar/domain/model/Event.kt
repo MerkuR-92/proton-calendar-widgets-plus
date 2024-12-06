@@ -4,16 +4,23 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.ParticipationStatus
-import biweekly.property.*
+import biweekly.property.Action
+import biweekly.property.Status
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.CustomICalPropertyParameter
+import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_HEADER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_REGEX_STRING
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
+import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
+import me.proton.android.calendar.common.PROTON_OLD_UID
+import me.proton.android.calendar.common.PROTON_UID
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatShort
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
-import java.time.*
-import java.time.temporal.ChronoUnit
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
@@ -24,6 +31,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.getStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setDefaultTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEndTimeZone
@@ -33,6 +41,11 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.core.util.kotlin.takeIfNotBlank
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 
 // TODO remove nullability from signature verification and decryption statuses
 data class Event private constructor(
@@ -193,6 +206,14 @@ data class Event private constructor(
     val summary: String? get() = iCalEvent.summary?.value
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
+    val zoomConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
+    val zoomUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
+    val zoomConferencePassword: String? get() = iCalEvent.getExperimentalProperty(
+        X_PM_CONFERENCE_URL
+    )?.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank()
+    val zoomMeetingHost: String? get() = iCalEvent.getExperimentalProperty(
+        X_PM_CONFERENCE_URL
+    )?.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank()
 
     val status: Status? get() = iCalEvent.status
 
@@ -277,6 +298,45 @@ data class Event private constructor(
         }
 
         notifications = notifications.copy(notifications = notificationsWithAlarmRemoved)
+    }
+
+    fun containsZoomDescription(): Boolean {
+        return this.iCalEvent.description?.value?.contains(
+            Regex(CONFERENCE_DESCRIPTION_REGEX_STRING)
+        ) == true
+    }
+
+    fun addZoomDescription() {
+        val description = this.iCalEvent.description?.value?.takeIfNotBlank() ?: ""
+        this.iCalEvent.setDescription(
+            description.plus(
+                /*
+                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+                Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
+
+                Meeting host: john.doe@proton.ch
+                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+                 */
+
+                // We do not translate this
+                "\n$CONFERENCE_DESCRIPTION_HEADER\nJoin Zoom Meeting: $zoomUrl (ID: $zoomConferenceId${zoomConferencePassword?.let { ", passcode: $zoomConferencePassword" }})\n\nMeeting host: $zoomMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
+            )
+        )
+    }
+
+    fun removeConference() {
+        this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_ID)
+        this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_URL)
+        this.removeConferenceDescription()
+    }
+
+    fun removeConferenceDescription() {
+        if (this.containsZoomDescription() && !this.zoomUrl.isNullOrBlank()) {
+            this.iCalEvent.description.value = this.iCalEvent.description.value.replace(
+                Regex(CONFERENCE_DESCRIPTION_REGEX_STRING),
+                ""
+            ).trim()
+        }
     }
 
     val hasProtonUid: Boolean get() = uid.endsWith(PROTON_UID) || uid.startsWith(PROTON_OLD_UID)
