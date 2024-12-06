@@ -102,6 +102,7 @@ import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
@@ -2470,7 +2471,7 @@ class EventViewModel @Inject constructor(
                         resourceProvider.provideString(
                             R.string.snack_lost_zoom_access_acion
                         ),
-                        "https://account.proton.me/calendar/security#third-party"
+                        "https://account.${EnvironmentConfigurationDefaults.host}/calendar/security#third-party"
                     )
                 }
                 SaveResult.ZOOM_MEETING_DOES_NOT_EXIST -> {
