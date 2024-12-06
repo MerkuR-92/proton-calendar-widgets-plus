@@ -7,12 +7,14 @@ import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
+import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.util.kotlin.takeIfNotEmpty
+import timber.log.Timber
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -22,7 +24,8 @@ class FixCalendarsUseCase @Inject constructor(
     private val json: Json,
     private val userAddressManager: UserAddressManager,
     private val bootstrapCalendarUseCase: BootstrapCalendarUseCase,
-    private val valueStoreProvider: ValueStoreProvider
+    private val valueStoreProvider: ValueStoreProvider,
+    private val calendarsRepository: CalendarsRepository
 ): UseCase {
 
     companion object {
@@ -43,9 +46,15 @@ class FixCalendarsUseCase @Inject constructor(
                 return UseCase.Result.InvalidParams("FixCalendarsUseCase, userAddresses are null")
             }
 
+        val backendCalendarEntities = calendarsRepository.fetchCalendarEntities(userId) ?: return UseCase.Result.Error("FixCalendarsUseCase, error fetching calendars from backend")
         val calendarEntities = database.calendarsDao().selectCalendars(userId.id)
+
+        if (calendarEntities.size < backendCalendarEntities.size) {
+            Timber.e("FixCalendarsUseCase, more calendars on backend than locally")
+        }
+
         val calendarsToBootstrap = arrayListOf<CalendarEntity>()
-        calendarEntities.forEach { calendarEntity ->
+        backendCalendarEntities.forEach { calendarEntity ->
             val calendarId = calendarEntity.id
 
             // Check calendar private keys
