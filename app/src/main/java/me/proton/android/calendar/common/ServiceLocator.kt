@@ -177,7 +177,7 @@ val useCaseModule = module {
     factory<LeaveManagedCalendarUseCase> { LeaveManagedCalendarUseCase(get(), get(), get()) }
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get()) }
+    factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get(), get()) }
 }
 
 fun coreModule(
