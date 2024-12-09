@@ -17,6 +17,12 @@ import biweekly.property.Status
 import biweekly.property.Transparency
 import biweekly.property.Trigger
 import biweekly.util.Duration
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
+import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -61,6 +67,16 @@ internal class EditCreateEventUseCaseTest {
             addAttendee(attendee)
 
             setOrganizer(Organizer("organizer@pm.me", "organizer@pm.me"))
+
+            setExperimentalProperty(X_PM_CONFERENCE_ID, "77896951805").run {
+                this.setParameter(PARAMETER_CONFERENCE_PROVIDER, "1")
+                this.setParameter(PARAMETER_CONFERENCE_CREATOR, "WStPKICb69ynQxIR5GXm6OuK4okqkADvrnC-K4D8VfZ4f0fbSnqNDek6XrfygCqAvRdZX43YAWG8M-xjF8IDDQ==")
+            }
+
+            setExperimentalProperty(X_PM_CONFERENCE_URL, "https://us06web.zoom.us/j/89317403034?pwd=mv5ztORtJOHVQkl8KUc9mFLsClS3te.1").run {
+                this.setParameter(PARAMETER_CONFERENCE_PASSWORD, "356224")
+                this.setParameter(PARAMETER_CONFERENCE_HOST, "proton662@urey.proton.black")
+            }
         }
 
         TestsLogger.d("original event: ${event.wrapInICalendar().printToString()}")
@@ -91,6 +107,10 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.comments).isEmpty()
             assertThat(calendarSplit.sharedPart.timezoneInfo.timezones).isEmpty()
             assertThat(this.organizer).isEqualTo(Organizer("organizer@pm.me", "organizer@pm.me"))
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).value).isEqualTo("77896951805")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).getParameter(PARAMETER_CONFERENCE_PROVIDER)).isEqualTo("1")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).getParameter(PARAMETER_CONFERENCE_CREATOR)).isEqualTo("WStPKICb69ynQxIR5GXm6OuK4okqkADvrnC-K4D8VfZ4f0fbSnqNDek6XrfygCqAvRdZX43YAWG8M-xjF8IDDQ==")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL)).isNull()
         }
 
         with (calendarSplit.sharedPartToEncrypt.events[0]) {
@@ -100,6 +120,9 @@ internal class EditCreateEventUseCaseTest {
             assertThat(this.description.value.toString()).isEqualTo("2 alarms, 30 minutes (display) and 2 hours (email) before")
             assertThat(this.summary.value.toString()).isEqualTo("All-day event on 2nd April")
             assertThat(this.location.value.toString()).isEqualTo("Zurich")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).value).isEqualTo("https://us06web.zoom.us/j/89317403034?pwd=mv5ztORtJOHVQkl8KUc9mFLsClS3te.1")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).getParameter(PARAMETER_CONFERENCE_PASSWORD)).isEqualTo("356224")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).getParameter(PARAMETER_CONFERENCE_HOST)).isEqualTo("proton662@urey.proton.black")
         }
 
         with (calendarSplit.calendarPart!!.events[0]) {
