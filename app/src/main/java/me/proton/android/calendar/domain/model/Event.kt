@@ -13,7 +13,9 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter
 import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_HEADER
 import me.proton.android.calendar.common.CustomICalPropertyParameter.CONFERENCE_DESCRIPTION_REGEX_STRING
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
@@ -208,12 +210,12 @@ data class Event private constructor(
     val description: String? get() = iCalEvent.description?.value
     val zoomConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
     val zoomUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
-    val zoomConferencePassword: String? get() = iCalEvent.getExperimentalProperty(
-        X_PM_CONFERENCE_URL
-    )?.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank()
-    val zoomMeetingHost: String? get() = iCalEvent.getExperimentalProperty(
-        X_PM_CONFERENCE_URL
-    )?.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank()
+    val zoomConferencePassword: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+        it.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_PASSWORD_READONLY)?.takeIfNotBlank()
+    }
+    val zoomMeetingHost: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+        it.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_HOST_READONLY)?.takeIfNotBlank()
+    }
 
     val status: Status? get() = iCalEvent.status
 

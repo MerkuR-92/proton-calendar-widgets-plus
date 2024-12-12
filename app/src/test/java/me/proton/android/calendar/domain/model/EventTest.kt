@@ -554,6 +554,15 @@ internal class EventTest {
 
     }
 
+    @Test
+    fun `correctly fallback to legacy Zoom properties`() {
+
+        val event = Event.from("id", Calendar("id", "name", "email", "ownerEmail", "description", "color", 0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()), calendarWithLegacyZoomProperties!!, 0)!!
+
+        assertThat(event.zoomConferencePassword).isEqualTo("976610")
+        assertThat(event.zoomMeetingHost).isEqualTo("proton662@urey.proton.black")
+    }
+
 
     val calendarStartEndTimeDifferentDays = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
@@ -752,6 +761,29 @@ internal class EventTest {
     DTSTART;TZID=Europe/Zurich:20210901T183000
     DTEND;TZID=Europe/Zurich:20210901T193000
     RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=WE;WKST=MO
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    val calendarWithLegacyZoomProperties = ICalUtilsImpl.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//web-calendar 5.0.39.1//EN
+    BEGIN:VTIMEZONE
+    TZID:Europe/Zurich
+    END:VTIMEZONE
+    BEGIN:VEVENT
+    DTSTAMP:20241212T094445Z
+    DTSTART;TZID=Europe/Zurich:20241213T160000
+    DTEND;TZID=Europe/Zurich:20241213T163000
+    SEQUENCE:0
+    X-PM-CONFERENCE-ID;PROVIDER=1;CREATOR=N_RkrPd8rv_ROy0c97jLs0qLUPy78THKRBMTk
+     7w2JViaz5ltqMKR8TU-77Ow6tkcF71FNdmdy2mjS-uPQzf9Fg==:81286437055
+    X-PM-CONFERENCE-URL;PASSWORD=976610;HOST=proton662@urey.proton.black:https:
+     //us06web.zoom.us/j/81286437055?pwd=TLiIPx6nsXEbkliKJ2Yz0nV1V1pHpI.1
+    SUMMARY:Adam test 4
+    UID:truTFaFpsynBGob4bLfoAm-j7kgL@proton.me
+    STATUS:CONFIRMED
     END:VEVENT
     END:VCALENDAR
     """.trimIndent())
