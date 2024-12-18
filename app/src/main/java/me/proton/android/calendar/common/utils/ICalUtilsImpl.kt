@@ -23,9 +23,13 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.*
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_PROTON_REPLY
@@ -51,6 +55,7 @@ import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.utils.ICalUtils
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.security.MessageDigest
 import java.time.*
 import java.time.temporal.ChronoUnit
@@ -307,9 +312,12 @@ object ICalUtilsImpl : ICalUtils {
                         X_PM_CONFERENCE_ID,
                         originalConferenceIdProperty.value
                     ).run {
-                        val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)
+                        val originalProvider = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER)?.takeIfNotEmpty()
+                            ?: originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_PROVIDER_READONLY)
                         if (!originalProvider.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PROVIDER, originalProvider)
-                        val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR)
+
+                        val originalCreator = originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR).takeIfNotEmpty()
+                            ?: originalConferenceIdProperty.parameters.get(PARAMETER_CONFERENCE_CREATOR_READONLY)
                         if (!originalCreator.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_CREATOR, originalCreator)
                     }
                 }
@@ -336,9 +344,12 @@ object ICalUtilsImpl : ICalUtils {
                         X_PM_CONFERENCE_URL,
                         originalConferenceUrlProperty.value
                     ).run {
-                        val originalPassword = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSWORD)
+                        val originalPassword = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSWORD).takeIfNotEmpty()
+                            ?: originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_PASSWORD_READONLY)
                         if (!originalPassword.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_PASSWORD, originalPassword)
-                        val originalHost = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_HOST)
+
+                        val originalHost = originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_HOST).takeIfNotEmpty()
+                            ?: originalConferenceUrlProperty.parameters.get(PARAMETER_CONFERENCE_HOST_READONLY)
                         if (!originalHost.isNullOrEmpty()) this.setParameter(PARAMETER_CONFERENCE_HOST, originalHost)
                     }
                 }

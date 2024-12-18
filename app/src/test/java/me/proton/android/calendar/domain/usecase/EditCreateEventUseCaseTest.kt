@@ -18,9 +18,13 @@ import biweekly.property.Transparency
 import biweekly.property.Trigger
 import biweekly.util.Duration
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_CREATOR_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import java.time.Instant
@@ -179,6 +183,45 @@ internal class EditCreateEventUseCaseTest {
         //System.out.println(scribe.writeText(rrule, context));
         ////prints: FREQ=WEEKLY;INTERVAL=2
 
+    }
+
+    @Test
+    fun `split iCalendar according to the matrix and migrate legacy Zoom properties`() {
+
+        val event = VEvent().apply {
+            setUid(ICalUtilsImpl.generateProtonUid())
+
+            setExperimentalProperty(X_PM_CONFERENCE_ID, "77896951805").run {
+                this.setParameter(PARAMETER_CONFERENCE_PROVIDER_READONLY, "1")
+                this.setParameter(PARAMETER_CONFERENCE_CREATOR_READONLY, "WStPKICb69ynQxIR5GXm6OuK4okqkADvrnC-K4D8VfZ4f0fbSnqNDek6XrfygCqAvRdZX43YAWG8M-xjF8IDDQ==")
+            }
+            setExperimentalProperty(X_PM_CONFERENCE_URL, "https://us06web.zoom.us/j/89317403034?pwd=mv5ztORtJOHVQkl8KUc9mFLsClS3te.1").run {
+                this.setParameter(PARAMETER_CONFERENCE_PASSWORD_READONLY, "356224")
+                this.setParameter(PARAMETER_CONFERENCE_HOST_READONLY, "proton662@urey.proton.black")
+            }
+        }
+
+        TestsLogger.d("original event: ${event.wrapInICalendar().printToString()}")
+
+        val calendarSplit = ICalUtilsImpl.splitICalendarIntoParts(event.wrapInICalendar())
+
+        TestsLogger.d("raw shared split:\n${Biweekly.write(calendarSplit.sharedPart).go()}")
+        TestsLogger.d("raw shared encrypted split:\n${Biweekly.write(calendarSplit.sharedPartToEncrypt).go()}")
+
+        with (calendarSplit.sharedPart.events[0]) {
+            assertThat(this.uid).isEqualTo(event.uid)
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).value).isEqualTo("77896951805")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).getParameter(PARAMETER_CONFERENCE_PROVIDER)).isEqualTo("1")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_ID).getParameter(PARAMETER_CONFERENCE_CREATOR)).isEqualTo("WStPKICb69ynQxIR5GXm6OuK4okqkADvrnC-K4D8VfZ4f0fbSnqNDek6XrfygCqAvRdZX43YAWG8M-xjF8IDDQ==")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL)).isNull()
+        }
+
+        with (calendarSplit.sharedPartToEncrypt.events[0]) {
+            assertThat(this.uid).isEqualTo(event.uid)
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).value).isEqualTo("https://us06web.zoom.us/j/89317403034?pwd=mv5ztORtJOHVQkl8KUc9mFLsClS3te.1")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).getParameter(PARAMETER_CONFERENCE_PASSWORD)).isEqualTo("356224")
+            assertThat(this.getExperimentalProperty(X_PM_CONFERENCE_URL).getParameter(PARAMETER_CONFERENCE_HOST)).isEqualTo("proton662@urey.proton.black")
+        }
     }
 
     @Test
