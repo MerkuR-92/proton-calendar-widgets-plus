@@ -81,11 +81,10 @@ class CalendarUserAddressListenerTest {
     }
 
     @Test
-    fun `onResetAll removes all the user addresses and fetches new ones`() {
+    fun `onResetAll refresh all the user addresses`() {
         runBlocking {
             listener.onResetAll(config)
 
-            coVerify { userAddressRepository.deleteAllAddresses(any()) }
             coVerify { userAddressRepository.getAddresses(any(), true) }
         }
     }

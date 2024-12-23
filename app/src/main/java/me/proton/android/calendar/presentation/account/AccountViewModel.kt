@@ -30,7 +30,6 @@ import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.core.account.domain.entity.Account
-import me.proton.core.account.domain.entity.AccountType
 import me.proton.core.account.domain.entity.isDisabled
 import me.proton.core.account.domain.entity.isReady
 import me.proton.core.account.domain.entity.isStepNeeded
@@ -38,6 +37,7 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.accountmanager.presentation.observe
 import me.proton.core.accountmanager.presentation.onAccountCreateAddressFailed
 import me.proton.core.accountmanager.presentation.onAccountCreateAddressNeeded
+import me.proton.core.accountmanager.presentation.onAccountDeviceSecretNeeded
 import me.proton.core.accountmanager.presentation.onAccountDisabled
 import me.proton.core.accountmanager.presentation.onAccountReady
 import me.proton.core.accountmanager.presentation.onAccountRemoved
@@ -46,7 +46,6 @@ import me.proton.core.accountmanager.presentation.onAccountTwoPassModeNeeded
 import me.proton.core.accountmanager.presentation.onSessionSecondFactorNeeded
 import me.proton.core.auth.presentation.AuthOrchestrator
 import me.proton.core.auth.presentation.onAddAccountResult
-import me.proton.core.domain.entity.Product
 import me.proton.core.domain.entity.UserId
 import me.proton.core.presentation.utils.currentLocale
 import javax.inject.Inject
@@ -60,7 +59,6 @@ class AccountViewModel @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val resetCalendarsKeyUseCase: ResetCalendarsKeyUseCase,
     private val logger: Logger,
-    private val product: Product,
     private val widgetRefresher: WidgetRefresher,
     private val eventDecryptor: EventDecryptor,
     private val workManager: WorkManager,
@@ -179,6 +177,7 @@ class AccountViewModel @Inject constructor(
                 .onSessionSecondFactorNeeded { startSecondFactorWorkflow(it) }
                 .onAccountTwoPassModeNeeded { startTwoPassModeWorkflow(it) }
                 .onAccountCreateAddressNeeded { startChooseAddressWorkflow(it) }
+                .onAccountDeviceSecretNeeded { startDeviceSecretWorkflow(it) }
                 .onAccountTwoPassModeFailed { disableUser(it.userId) }
                 .onAccountCreateAddressFailed { disableUser(it.userId) }
                 .onAccountDisabled(initialState = false) { cleanUser() }
@@ -201,11 +200,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun addAccount() {
-        authOrchestrator.startAddAccountWorkflow(
-            requiredAccountType = AccountType.Internal,
-            creatableAccountType = AccountType.Internal,
-            product = product
-        )
+        authOrchestrator.startAddAccountWorkflow()
     }
 
     fun onAddAccountClosed(block: () -> Unit) {
