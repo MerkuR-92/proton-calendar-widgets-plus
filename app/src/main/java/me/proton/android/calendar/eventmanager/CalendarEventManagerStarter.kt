@@ -1,7 +1,9 @@
 package me.proton.android.calendar.eventmanager
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -19,6 +21,7 @@ import me.proton.core.eventmanager.domain.EventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.EventManagerProvider
 import me.proton.core.util.kotlin.CoroutineScopeProvider
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -50,6 +53,7 @@ class CalendarEventManagerStarter @Inject constructor(
     private fun observeAllCalendarsForUsers(userIds: List<UserId>): Flow<Map<UserId, Set<Calendar>>> =
         combine(userIds.map { userId -> observeUserCalendars(userId).map { userId to it } }) { it.toMap() }
 
+    @OptIn(FlowPreview::class)
     private fun observeUserCalendars(userId: UserId): Flow<Set<Calendar>> =
         combine(
             calendarsRepository.flowUserCalendars(userId.id),
@@ -57,7 +61,7 @@ class CalendarEventManagerStarter @Inject constructor(
             calendarsRepository.flowHolidayCalendars(userId.id)
         ) { calendars, subscriptions, holidayCalendars ->
             (calendars + subscriptions + holidayCalendars).toSet()
-        }.distinctUntilChanged()
+        }.debounce(TimeUnit.SECONDS.toMillis(2)).distinctUntilChanged()
 
     private suspend fun stopAllCalendarLoop(userId: UserId) {
         // Stop all calendars managers, for this userId.

@@ -92,12 +92,10 @@ class FixCalendarsUseCase @Inject constructor(
 
         // Retry bootstrap for calendars with missing data
         if (calendarsToBootstrap.isNotEmpty()) {
-            val timezone = database.calendarUserSettingsDao().select(userId.id)?.primaryTimezone
-                ?: ZoneId.systemDefault().id
             coroutineScope {
                 calendarsToBootstrap.map {
                     async {
-                        when (val bootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, userId, timezone, userAddresses)) {
+                        when (val bootstrapResult = bootstrapCalendarUseCase.executeBootstrap(it, userId, userAddresses)) {
                             is UseCase.Result.Success<*> -> logger.i("FixCalendarsUseCase successfully fixed calendar")
                             is UseCase.Result.InvalidParams -> logger.i("FixCalendarsUseCase failed to fix calendar ${bootstrapResult.message}")
                             is UseCase.Result.Error -> logger.i("FixCalendarsUseCase failed to fix calendar ${bootstrapResult.message}")

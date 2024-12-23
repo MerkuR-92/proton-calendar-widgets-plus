@@ -1,9 +1,15 @@
 package me.proton.android.calendar.domain.usecase
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -27,11 +33,9 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
     private val cacheCalendarPassphraseUseCase: CacheCalendarPassphraseUseCase,
-    private val fetchEventsUseCase: FetchEventsUseCase,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val serverEventsApi: ServerEventsApi,
     private val valueStoreProvider: ValueStoreProvider,
-    private val widgetRefresher: WidgetRefresher
+    private val workManager: WorkManager
 ): UseCase {
 
     companion object {
@@ -42,7 +46,6 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     suspend fun executeBootstrap(
         calendarEntity: CalendarEntity,
         userId: UserId,
-        displayTimeZoneId: String,
         addresses: List<UserAddress>? = null
     ): UseCase.Result {
         when (val bootstrapResponse = calendarsApi.getBootstrap(userId, calendarEntity.id)) {
@@ -68,6 +71,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                 // extract passphrase for just saved Calendar
                 when (val cachePassphraseResult = cacheCalendarPassphraseUseCase.execute(userId, calendarEntity.id)) {
                     is UseCase.Result.Success<*> -> {
+
                         // fetch events
                         val calendarMembers = bootstrapResponse.data.members.filter { it.calendarId == calendarEntity.id }
                         val userMember = addresses?.let {
@@ -77,27 +81,18 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                             )
                         } ?: calendarMembers.first()
                         if (userMember.display == 1) {
-                            val now = ZonedDateTime.now(ZoneId.of(displayTimeZoneId))
-                            val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
-                                userId,
-                                listOf(calendarEntity.id),
-                                now.with(TemporalAdjusters.firstDayOfMonth()).toLocalDate(),
-                                now.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate(),
-                                displayTimeZoneId
-                            )
 
-                            fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
-                                if (fetchEventsResult.second == null) {
-                                    logger.e("fetchEventsResult: null event list when Sucess")
-                                } else {
-                                    fetchEventsResult.second?.let {
-                                        logger.v("persisting events in bootstrap: ${it.size}")
-                                        calendarsRepository.persistEvents(*it.toTypedArray()) // We already persisted events metadata in split fetch
-                                        updateAlarmsUseCase.execute(userId.id, it.map { it.id })
-                                        widgetRefresher.refreshEventList()
-                                    }
-                                }
-                            }
+                            // Launch worker to fetch minimal events for calendar
+                            workManager.enqueueWorkHelper(
+                                workDataOf(
+                                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
+                                    UseCaseWorker.INPUT_USER_ID to userId.id,
+                                    UseCaseWorker.INPUT_CALENDAR_ID to calendarEntity.id
+                                ),
+                                UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
+                                ExistingWorkPolicy.APPEND,
+                                NetworkType.CONNECTED
+                            )
                         }
 
                         // for each bootstrapped calendar, get its latest Event ID
@@ -108,7 +103,6 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                         } else {
                             logger.e("could not get latest calendar server event ID response in BootstrapCalendarsUseCase")
                         }
-
 
                         return UseCase.Result.Success<Unit>()
                     }
@@ -130,15 +124,12 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     }
 
     suspend fun executeCalendarsBootstrap(userId: UserId, calendarIds: List<String>): UseCase.Result {
-        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-            ?: ZoneId.systemDefault().id
-
         val failedBootstraps = arrayListOf<String>()
         coroutineScope {
             calendarIds.map {
                 async {
                     calendarsRepository.selectCalendarEntity(it)?.let { calendarEntity ->
-                        val executeBootstrapResult = executeBootstrap(calendarEntity, userId, timezone)
+                        val executeBootstrapResult = executeBootstrap(calendarEntity, userId)
                         // We don't want the result to be blocking
                         executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
                         if (executeBootstrapResult !is UseCase.Result.Success<*>) failedBootstraps.add(it)
@@ -159,9 +150,6 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
     }
 
     suspend fun executeAllCalendarsBootstrap(userId: UserId): UseCase.Result {
-        val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
-            ?: ZoneId.systemDefault().id
-
         val allCalendarEntities = calendarsRepository.fetchCalendarEntities(userId)
             ?: return UseCase.Result.Error("BootstrapCalendarsUseCase: error getting Calendar Entities from API")
 
@@ -170,7 +158,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
             allCalendarEntities.map { calendarEntity ->
                 async {
                     // TODO Test this without fetchEvents to see if we somehow already refresh current views events
-                    val executeBootstrapResult = executeBootstrap(calendarEntity, userId, timezone)
+                    val executeBootstrapResult = executeBootstrap(calendarEntity, userId)
                     // We don't want the result to be blocking
                     executeBootstrapResult.ifSuccessAndLogErrors(logger) { }
                     if (executeBootstrapResult !is UseCase.Result.Success<*>) failedBootstraps.add(calendarEntity.id)

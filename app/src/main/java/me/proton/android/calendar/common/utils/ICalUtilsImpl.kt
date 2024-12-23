@@ -48,8 +48,11 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekInMonth
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
+import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.SearchEventEntity
+import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SkeletonEvent
@@ -697,6 +700,48 @@ object ICalUtilsImpl : ICalUtils {
             } else {
                 // Calendar is regular type, add all Skeletons to result (in theory it should be only one)
                 unique.addAll(skeletons)
+            }
+
+        }
+
+        return Pair(unique, duplicated)
+    }
+
+    override fun List<EventEntityMetadata>.filterOutDuplicatesInSubscribedCalendars(
+        calendars: List<Calendar>
+    ): Pair<List<EventEntityMetadata>, List<EventEntityMetadata>> {
+
+        val subscribedCalendarIds = calendars.filter { it.isSubscribed }.map { it.id }
+        val grouped = this.groupBy {
+            "${it.uid}, ${it.calendarId}, ${it.recurrenceID}, ${it.startTime}"
+        }
+
+        val unique = mutableListOf<EventEntityMetadata>()
+        val duplicated = mutableListOf<EventEntityMetadata>()
+
+        grouped.forEach {
+
+            val entities = it.value
+
+            // Calendar is subscribed, find the best Skeleton
+            if (subscribedCalendarIds.contains(entities.first().calendarId)) {
+                // find max modifyTime
+                val maxModifyTime = entities.maxByOrNull { it.modifyTime }?.modifyTime
+
+                // in case of different Skeletons with the same modifyTime, make sure to always return the same one
+                val uniqueSkeletonId = entities.filter { it.modifyTime == maxModifyTime }.maxByOrNull { it.id }?.id
+
+                // split skeletons for this one event into 1 unique and the rest are duplicates
+                entities.forEach { sk ->
+                    if (sk.id == uniqueSkeletonId) {
+                        unique.add(sk)
+                    } else {
+                        duplicated.add(sk)
+                    }
+                }
+            } else {
+                // Calendar is regular type, add all Skeletons to result (in theory it should be only one)
+                unique.addAll(entities)
             }
 
         }

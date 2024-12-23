@@ -229,7 +229,6 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
                         boostrapCalendarUseCase.executeBootstrap(
                             calendarEntity,
                             userId,
-                            refreshedCalendarUserSettings.primaryTimezone,
                             addresses
                         )
                     } else UseCase.Result.InvalidParams("could not select CalendarEntity for executeBootstrapResult")
