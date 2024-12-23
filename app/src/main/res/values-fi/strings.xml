@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">päättyen %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Peruttu</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(ei käytössä)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(ei käytössä)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Oletus)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d kyllä</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">julkiset avaimet ovat virheellisiä</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">yhteystiedon allekirjoitus on virheellinen</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Liity Zoom-kokoukseen</string>
+    <string name="zoom_meeting_title">Zoom-kokous</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Salasana: %1$s</string>
+    <string name="zoom_meeting_more_details">Enemmän tietoja</string>
+    <string name="zoom_meeting_less_details">Vähemmän tietoja</string>
+    <string name="zoom_meeting_host">Kokouksen järjestäjä</string>
+    <string name="zoom_meeting_link">Kokouslinkki</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Liittymisohjeet</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Uusi tapahtuma</string>
     <string name="event_text_edit_event">Muokkaa tapahtumaa</string>
@@ -159,7 +168,7 @@
     <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään päivitetty kutsu.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Mitä etsit?</string>
-    <string name="search_empty_results_title">Ei tuloksia</string>
+    <string name="search_empty_results_title">Tuloksia ei löytynyt</string>
     <string name="search_empty_results_subtitle">Kokeile eri termiä, kuten Matti, syntymäpäivä, webinaari tai kirjakerho.</string>
     <string name="search_downloading_calendars" comment="Downloading calendars (1h 20m remaining...)">Kalentereita ladataan (%1$s)</string>
     <string name="search_downloading_time_remaining" comment="Example: Time remaining: 3min / Downloading calendars (Time remaining: 3min)">Jäljellä oleva aika: %1$s</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Kaikki tapahtumat päivitettiin</string>
     <string name="snack_event_updated_error_failed_mail">Kutsun lähetys epäonnistui</string>
     <string name="snack_update_event_error_failed_mail">Päivitys epäonnistui</string>
+    <string name="snack_lost_zoom_access">Yhdistä Zoomiin muokataksesi tätä tapahtumaa.</string>
+    <string name="snack_lost_zoom_access_acion">Yhdistä</string>
+    <string name="snack_zoom_meeting_does_not_exist">Tämä Zoom-istunto on peruttu. Poista linkki muokataksesi tätä tapahtumaa.</string>
     <string name="snack_event_updated_error">Virhe päivitettäessä tapahtumaa</string>
     <string name="snack_event_created">Tapahtuma luotiin</string>
     <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
@@ -703,8 +715,8 @@
         <item quantity="other">Yhdistä %1$d kalenteria Proton Calendarissa.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenteri</item>
-        <item quantity="other">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenteria</item>
+        <item quantity="one">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenterivalinta</item>
+        <item quantity="other">Uusia kalentereita ei voida kalenterirajoituksen vuoksi luoda kaikille tuoduille kalentereille.\n • Poista ainakin %1$d kalenterivalintaa</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020tai\n • Yhdistä ainakin %1$d kalenteri olemassa oleviin Proton-kalentereihin.</item>

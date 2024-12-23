@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">indtil %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Annulleret</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(deaktiveret)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(deaktiveret)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">offentlige nøgler er ugyldige</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">kontaktsignatur ugyldig</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Deltag i Zoom-møde</string>
+    <string name="zoom_meeting_title">Zoom-møde</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Adgangskode: %1$s</string>
+    <string name="zoom_meeting_more_details">Flere detaljer</string>
+    <string name="zoom_meeting_less_details">Færre detaljer</string>
+    <string name="zoom_meeting_host">Mødevært</string>
+    <string name="zoom_meeting_link">Møde-link</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instruktioner om tilslutning</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Ny begivenhed</string>
     <string name="event_text_edit_event">Redigér begivenhed</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Alle arrangementer opdateret</string>
     <string name="snack_event_updated_error_failed_mail">Invitation kunne ikke sendes</string>
     <string name="snack_update_event_error_failed_mail">Opdatering mislykkedes</string>
+    <string name="snack_lost_zoom_access">Opret forbindelse til Zoom for at redigere denne begivenhed.</string>
+    <string name="snack_lost_zoom_access_acion">Forbind</string>
+    <string name="snack_zoom_meeting_does_not_exist">Denne Zoom-session er blevet aflyst. Fjern linket til at redigere denne begivenhed.</string>
     <string name="snack_event_updated_error">Fejl ved opdatering af begivenhed</string>
     <string name="snack_event_created">Begivenhed oprettet</string>
     <string name="snack_event_created_failed_mail">Begivenhed oprettet, men invitation blev ikke sendt</string>

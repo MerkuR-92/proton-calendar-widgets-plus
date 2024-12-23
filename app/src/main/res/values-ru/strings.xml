@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">до %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Отменено</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(Отключен)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Отключен)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(По умолчанию)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d да</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">открытые ключи недействительны</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">недействительная подпись контакта</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Join Zoom meeting</string>
+    <string name="zoom_meeting_title">Zoom meeting</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Password: %1$s</string>
+    <string name="zoom_meeting_more_details">More details</string>
+    <string name="zoom_meeting_less_details">Less details</string>
+    <string name="zoom_meeting_host">Meeting host</string>
+    <string name="zoom_meeting_link">Meeting link</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Новое событие</string>
     <string name="event_text_edit_event">Изменить событие</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Все события обновлены</string>
     <string name="snack_event_updated_error_failed_mail">Не удалось отправить приглашение</string>
     <string name="snack_update_event_error_failed_mail">Сбой обновления</string>
+    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
+    <string name="snack_lost_zoom_access_acion">Connect</string>
+    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
     <string name="snack_event_updated_error">Ошибка обновления события</string>
     <string name="snack_event_created">Событие создано</string>
     <string name="snack_event_created_failed_mail">Событие обновлено, но приглашение отправить не удалось</string>
@@ -516,7 +528,7 @@
     <string name="leave_calendar_dialog_message">Если вы покинете этот календарь, вам потребуется разрешение владельца, чтобы снова к нему присоединиться.</string>
     <string name="delete_default_calendar_dialog_message">Вы уверены, что хотите удалить этот календарь? \"%1$s\" будет установлен в качестве календаря по умолчанию.</string>
     <string name="delete_calendar_snack_deleted">Календарь удален</string>
-    <string name="remove_calendar_snack_removed">Календарь удален</string>
+    <string name="remove_calendar_snack_removed">Календарь удалён</string>
     <string name="delete_calendar_snack_error">Ошибка удаления календаря</string>
     <string name="remove_calendar_snack_error">Ошибка при удалении календаря</string>
     <string name="leave_calendar_snack_error">Ошибка при выходе из календаря</string>
@@ -533,7 +545,7 @@
     <string name="holiday_calendar_form_picker_title">Страна</string>
     <string name="holiday_calendar_time_zone_based">На основе вашего часового пояса</string>
     <string name="holiday_calendar_already_exists">Этот календарь выходных дней уже добавлен.</string>
-    <string name="holiday_calendar_value_placeholder">Выберите страну</string>
+    <string name="holiday_calendar_value_placeholder">Выбрать страну</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">ОК</string>
     <string name="bootstrap_error_no_calendar_title">Нет календарей, связанных с этой учетной записью.</string>
@@ -783,7 +795,7 @@
         <item quantity="other">повторов</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
-        <item quantity="one">время</item>
+        <item quantity="one">раз</item>
         <item quantity="few">раза</item>
         <item quantity="many">раз</item>
         <item quantity="other">раз</item>

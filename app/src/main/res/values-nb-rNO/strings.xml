@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">frem til %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Avbrutt</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(deaktivert)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(deaktivert)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">offentlige nøkler er ugyldige</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">kontaktsignaturen er ugyldig</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Bli med på Zoom-møte</string>
+    <string name="zoom_meeting_title">Zoom-møte</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Passord: %1$s</string>
+    <string name="zoom_meeting_more_details">Mer informasjon</string>
+    <string name="zoom_meeting_less_details">Mindre informasjon</string>
+    <string name="zoom_meeting_host">Møtevert</string>
+    <string name="zoom_meeting_link">Møtekobling</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instruksjoner for å bli med</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Ny hendelse</string>
     <string name="event_text_edit_event">Rediger hendelse</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Alle hendelser oppdatert</string>
     <string name="snack_event_updated_error_failed_mail">Invitasjon ble ikke sendt</string>
     <string name="snack_update_event_error_failed_mail">Oppdatering mislyktes</string>
+    <string name="snack_lost_zoom_access">Koble til Zoom for å redigere denne hendelsen.</string>
+    <string name="snack_lost_zoom_access_acion">Koble til</string>
+    <string name="snack_zoom_meeting_does_not_exist">Denne Zoom-økten er kansellert. Fjern koblingen for å redigere denne hendelsen.</string>
     <string name="snack_event_updated_error">Feil ved oppdatering av hendelse</string>
     <string name="snack_event_created">Hendelse opprettet</string>
     <string name="snack_event_created_failed_mail">Hendelse opprettet, men invitasjon kunne ikke sendes.</string>
@@ -582,7 +594,7 @@
     <string name="spotlight_dialog_auto_invites_title">Aksepter invitasjoner enkelt</string>
     <string name="spotlight_dialog_auto_invites_description">Invitasjoner vises nå i kalenderen din som ventende hendelser. Åpne en hendelse for å svare.\n\nGå til innstillinger for å administrere dette.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Neste</string>
-    <string name="spotlight_v5_dialog_got_it_button">Forstått</string>
+    <string name="spotlight_v5_dialog_got_it_button">Skjønner</string>
     <string name="spotlight_v5_dialog_learn_more_button">Lær mer</string>
     <string name="spotlight_v5_dialog_rebranding_title">Oppdaterte Proton, enhetlig beskyttelse</string>
     <string name="spotlight_v5_dialog_rebranding_description">Vi presenterer Protons oppdaterte utseende. Mange tjenester, ett oppdrag. Velkommen til et internett der personvern er standard. <a href="https://proton.me/news/updated-proton">Lær mer</a>.</string>

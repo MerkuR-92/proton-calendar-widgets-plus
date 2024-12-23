@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">直到 %1$s (%2$s) 為止</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d 個%2$s</string>
     <string name="event_status_canceled">已取消</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(已停用)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(已停用)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(預設)</string>
     <string name="event_attendee_status_separator">%1$s，%2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d 人會出席</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">公開金鑰無效</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">聯絡人簽章無效</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">加入Zoom會議</string>
+    <string name="zoom_meeting_title">Zoom 會議</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Password: %1$s</string>
+    <string name="zoom_meeting_more_details">More details</string>
+    <string name="zoom_meeting_less_details">Less details</string>
+    <string name="zoom_meeting_host">Meeting host</string>
+    <string name="zoom_meeting_link">Meeting link</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">加入活動</string>
     <string name="event_text_edit_event">編輯活動</string>
@@ -260,13 +269,13 @@
     <string name="event_send_invite_dialog_confirm">傳送</string>
     <string name="event_send_invite_dialog_cancel">取消</string>
     <string name="event_add_participants_dialog_title">加入參與者</string>
-    <string name="event_add_participants_dialog_description">邀請將傳送給已新增的參與者。</string>
+    <string name="event_add_participants_dialog_description">邀請將傳送以新增的參與者。</string>
     <string name="recurring_event_add_participants_dialog_description">邀請將傳給此系列中全部活動的參與者。</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">邀請將傳給此系列中全部活動的參與者。\n此系列中先前所作的修改將會消失。</string>
     <string name="event_add_participants_dialog_confirm">傳送</string>
     <string name="event_add_participants_dialog_cancel">取消</string>
     <string name="event_remove_participants_dialog_title">移除參與者</string>
-    <string name="event_remove_participants_dialog_description">取消電子郵件將傳送給已移除的參與者。</string>
+    <string name="event_remove_participants_dialog_description">取消函將發送給已移除的參與者。</string>
     <string name="recurring_event_remove_participants_dialog_description">取消電子郵件將傳送給此一系列中全部事件的已移除參與者。</string>
     <string name="event_add_and_remove_participants_dialog_description">已加入及已移除的參與者將獲通知。</string>
     <string name="recurring_event_add_and_remove_participants_dialog_description">已加入及已移除的參與者將獲通知此一系列中的全部事件。</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">所有活動已更新</string>
     <string name="snack_event_updated_error_failed_mail">邀請傳送失敗</string>
     <string name="snack_update_event_error_failed_mail">更新失敗</string>
+    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
+    <string name="snack_lost_zoom_access_acion">Connect</string>
+    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
     <string name="snack_event_updated_error">更新活動時發生錯誤</string>
     <string name="snack_event_created">活動已創建</string>
     <string name="snack_event_created_failed_mail">活動已創建，但邀請傳送失敗</string>
