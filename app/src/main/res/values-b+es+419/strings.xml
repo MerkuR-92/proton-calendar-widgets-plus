@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">hasta %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancelado</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(Desactivado)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Desactivado)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Por defecto)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">las claves públicas no son válidas</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">firma del contacto inválida</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Unirse a la reunión de Zoom</string>
+    <string name="zoom_meeting_title">Reunión de Zoom</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Contraseña: %1$s</string>
+    <string name="zoom_meeting_more_details">Más detalles</string>
+    <string name="zoom_meeting_less_details">Menos detalles</string>
+    <string name="zoom_meeting_host">Organizador de la reunión</string>
+    <string name="zoom_meeting_link">Enlace de la reunión</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instrucciones para unirse</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Evento nuevo</string>
     <string name="event_text_edit_event">Editar evento</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Todos los eventos actualizados</string>
     <string name="snack_event_updated_error_failed_mail">No se pudo enviar la invitación.</string>
     <string name="snack_update_event_error_failed_mail">Error al actualizar</string>
+    <string name="snack_lost_zoom_access">Conéctese para editar este evento.</string>
+    <string name="snack_lost_zoom_access_acion">Conectar</string>
+    <string name="snack_zoom_meeting_does_not_exist">Se canceló esta sesión de Zoom. Elimine el enlace para editar este evento.</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
     <string name="snack_event_created">Evento creado</string>
     <string name="snack_event_created_failed_mail">Evento creado pero no se pudo enviar la invitación</string>

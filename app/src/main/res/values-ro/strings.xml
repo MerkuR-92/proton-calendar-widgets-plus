@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">până la %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Anulat</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(Dezactivat)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Dezactivat)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Implicită)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d da</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">cheile publice nu sunt valide</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">semnătura contactului nu este validă</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Accesare conferință Zoom</string>
+    <string name="zoom_meeting_title">Conferință pe Zoom</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Parola: %1$s</string>
+    <string name="zoom_meeting_more_details">Mai multe detalii</string>
+    <string name="zoom_meeting_less_details">Mai puține detalii</string>
+    <string name="zoom_meeting_host">Gazdă conferință</string>
+    <string name="zoom_meeting_link">Legătură web conferință</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instrucțiuni accesare</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Eveniment nou</string>
     <string name="event_text_edit_event">Editare eveniment</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Toate evenimentele sunt actualizate.</string>
     <string name="snack_event_updated_error_failed_mail">Invitația nu a putut fi trimisă</string>
     <string name="snack_update_event_error_failed_mail">Actualizare eșuată</string>
+    <string name="snack_lost_zoom_access">Conectați-vă la Zoom pentru a edita acest eveniment.</string>
+    <string name="snack_lost_zoom_access_acion">Conectare</string>
+    <string name="snack_zoom_meeting_does_not_exist">Această sesiune Zoom a fost anulată. Eliminați legătura web pentru a edita acest eveniment.</string>
     <string name="snack_event_updated_error">Eroare la actualizarea evenimentului</string>
     <string name="snack_event_created">Eveniment creat</string>
     <string name="snack_event_created_failed_mail">Eveniment creat, dar invitația nu a putut fi trimisă.</string>

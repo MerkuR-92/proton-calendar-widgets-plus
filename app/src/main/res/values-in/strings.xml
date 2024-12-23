@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">hingga %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Dibatalkan</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(Nonaktif)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Nonaktif)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Bawaan)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ya</string>
@@ -105,7 +105,7 @@
     <string name="event_signature_verification_network_error">Verifikasi tanda tangan acara terhenti akibat kesalahan yang tidak diduga. <a href="">Coba lagi</a></string>
     <string name="event_change_answer_recurring_title">Perbarui acara berulang</string>
     <string name="event_change_answer_recurring_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara yang terdapat pada rangkaian ini?</string>
-    <string name="event_change_answer_recurring_overwrite_description">Apkaah Anda ingin mengubah jawaban Anda untuk seluruh acara pada rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan cara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
+    <string name="event_change_answer_recurring_overwrite_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara pada rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan cara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
     <string name="event_change_answer_recurring_single_edit_description">Acara ini telah diperbarui oleh penyelenggara. Apakah Anda ingin mengubah jawaban Anda hanya untuk keberlangsungan ini pada rangkaian ini?</string>
     <string name="event_change_answer_recurring_cancel">Batal</string>
     <string name="event_change_answer_recurring_confirm">Perbarui</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">kunci publik tidak valid</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">tanda tangan kontak tidak valid</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Gabung ke pertemuan Zoom</string>
+    <string name="zoom_meeting_title">Pertemuan Zoom</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Kata sandi: %1$s</string>
+    <string name="zoom_meeting_more_details">Lebih banyak rincian</string>
+    <string name="zoom_meeting_less_details">Lebih sedikit rincian</string>
+    <string name="zoom_meeting_host">Host pertemuan</string>
+    <string name="zoom_meeting_link">Tautan undangan</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Petunjuk untuk bergabung</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Acara baru</string>
     <string name="event_text_edit_event">Edit acara</string>
@@ -233,7 +242,7 @@
     <string name="event_recurring_update_this_cancel">Batal</string>
     <string name="event_recurring_update_this_confirm">Perbarui</string>
     <string name="event_allow_contacts_title">Izinkan Kalender Proton mengakses kontak Anda?</string>
-    <string name="event_allow_contacts_description">Kalender Proton membutuhkan akses kontak Anda untuk menyediakan pelengkapan otomatis</string>
+    <string name="event_allow_contacts_description">Proton Calendar memerlukan akses ke kontak Anda untuk menyediakan pelengkapan otomatis bagi Anda</string>
     <string name="event_allow_contacts_cancel">Tolak</string>
     <string name="event_allow_contacts_confirm">Izinkan</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Ttg: Undangan untuk acara yang akan dimulai pada tanggal %1$s pukul %2$s %3$s</string>
@@ -256,12 +265,12 @@
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nDi mana: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDeskripsi: %1$s</string>
     <string name="event_send_invite_dialog_title">Kirim undangan</string>
-    <string name="event_send_invite_dialog_description">Undangan akan dikirim ke peserta yang sudah ditambahkan.</string>
+    <string name="event_send_invite_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan.</string>
     <string name="event_send_invite_dialog_confirm">Kirim</string>
     <string name="event_send_invite_dialog_cancel">Batal</string>
     <string name="event_add_participants_dialog_title">Tambah peserta</string>
     <string name="event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan.</string>
-    <string name="recurring_event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua rangkaian acara ini.</string>
+    <string name="recurring_event_add_participants_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk seluruh acara dalam rangkaian ini.</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">Undangan akan dikirim ke peserta yang ditambahkan untuk semua acara di rangkaian ini.\nPerubahan sebelumnya pada rangkaian ini akan hilang.</string>
     <string name="event_add_participants_dialog_confirm">Kirim</string>
     <string name="event_add_participants_dialog_cancel">Batal</string>
@@ -310,7 +319,7 @@
     <string name="nav_view_more_login">Masuk</string>
     <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
-    <string name="snack_feature_coming_soon">Fitur ini segera hadir</string>
+    <string name="snack_feature_coming_soon">Fitur ini akan segera hadir</string>
     <string name="snack_event_deleted">Acara dihapus</string>
     <string name="snack_event_deleted_as_organizer">Pembatalan dikirim dan acara dihapus</string>
     <string name="snack_event_deleted_as_attendee">Jawaban dikirim dan acara dihapus</string>
@@ -325,10 +334,13 @@
     <string name="snack_event_updated_recurring">Semua acara berhasil diperbarui</string>
     <string name="snack_event_updated_error_failed_mail">Undangan gagal dikirim</string>
     <string name="snack_update_event_error_failed_mail">Pembaruan gagal</string>
+    <string name="snack_lost_zoom_access">Hubungkan ke Zoom untuk menyunting acara ini.</string>
+    <string name="snack_lost_zoom_access_acion">Hubungkan</string>
+    <string name="snack_zoom_meeting_does_not_exist">Sesi Zoom ini telah dibatalkan. Hapus tautan untuk menyunting acara ini.</string>
     <string name="snack_event_updated_error">Kesalahan memperbarui acara</string>
     <string name="snack_event_created">Acara telah dibuat</string>
     <string name="snack_event_created_failed_mail">Acara dibuat namun undangan gagal dikirim</string>
-    <string name="snack_event_created_error">Kesalahan membuat acara</string>
+    <string name="snack_event_created_error">Terdapat kesalahan dalam membuat acara</string>
     <string name="snack_event_opening_edit_error">Terdapat kesalahan dalam membuka acara untuk penyuntingan</string>
     <string name="snack_event_edit_recurring_invitation_single_edit_error">Anda tidak dapat menyunting undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
     <string name="snack_event_delete_recurring_invitation_single_edit_error">Anda tidak dapat menghapus undangan berulang yang mengandung perubahan bagi keberlangsungan acara tunggal</string>
@@ -348,7 +360,7 @@
     <string name="snack_maximum_participants_reached">Jumlah peserta telah mencapai batas maksimal.</string>
     <string name="snack_add_participant_error">Terjadi masalah saat menambah peserta</string>
     <string name="snack_add_participant_invalid_email">Alamat email tidak valid</string>
-    <string name="snack_change_attendee_answer_error">Pengiriman jawaban gagal, mohon coba kembali</string>
+    <string name="snack_change_attendee_answer_error">Terdapat kesalahan dalam mengirim jawaban. Silakan coba lagi nanti</string>
     <string name="snack_network_error">Terjadi masalah jaringan, mohon coba kembali nanti</string>
     <string name="snack_import_event_signed_out">Anda harus masuk untuk mengimpor acara</string>
     <string name="snack_app_link_signed_out">Anda harus masuk untuk melihat acara Anda</string>
@@ -396,7 +408,7 @@
     <string name="snack_notification_already_added">Pemberitahuan sudah ditambahkan</string>
     <string name="snack_opening_ics">Membuka acara…</string>
     <string name="snack_invite_in_shared_calendar_error">Pembuatan alamat pada kalender bersama tidak diperkenankan</string>
-    <string name="snack_down_banner">Server Proton sedang down. Kunjungi halaman status kami untuk rincian selengkapnya.</string>
+    <string name="snack_down_banner">Server Proton sedang tidak operasional. Kunjungi halaman status kami untuk rincian selengkapnya.</string>
     <string name="snack_down_banner_action">Buka halaman status</string>
     <string name="snack_color_per_event_paid_feature">Tingkatkan akun untuk menyesuaikan warna acara</string>
     <!-- Dialogs -->
@@ -513,7 +525,7 @@
     <string name="remove_calendar_dialog_title">Hapus kalender</string>
     <string name="remove_calendar_dialog_message">Apakah Anda yakin untuk menghapus kalender ini?</string>
     <string name="leave_calendar_dialog_title">Tinggalkan kalender</string>
-    <string name="leave_calendar_dialog_message">Apabila Anda tinggalkan dari kalender ini, Anda akan perlu untuk meminta kepada pemilik kalender untuk dapat bergabung kembali ke depannya.</string>
+    <string name="leave_calendar_dialog_message">Apabila Anda meninggalkan kalender ini, Anda akan perlu meminta kepada pemilik kalender untuk kembali bergabung.</string>
     <string name="delete_default_calendar_dialog_message">Apakah Anda yakin ingin menghapus kalender ini? \"%1$s\" akan ditetapkan sebagai kalender bawaan.</string>
     <string name="delete_calendar_snack_deleted">Kalender terhapus</string>
     <string name="remove_calendar_snack_removed">Kalender dihapus</string>
@@ -547,7 +559,7 @@
     <string name="bootstrap_error_reset_needed_title">Atur ulang kunci kalender</string>
     <string name="bootstrap_error_reset_needed_message">Anda telah mengatur ulang kata sandi dan acara yang terhubung dengan kalender berikut tidak dapat didekripsi. Kalender langganan yang masih aktif akan disinkronkan kembali setelah beberapa menit.</string>
     <string name="bootstrap_error_update_passphrase_title">Aktivasi ulang kunci kalender</string>
-    <string name="bootstrap_error_update_passphrase_message">Anda telah mengaktifkan ulang kunci dan acara yang terhubung dengan kalender berikut dapat didekripsi sekarang.</string>
+    <string name="bootstrap_error_update_passphrase_message">Anda telah mengaktifkan ulang kunci Anda, dan acara yang terhubung dengan rangkaian kalender berikut kini dapat didekripsi.</string>
     <string name="bootstrap_error_continue_button">Lanjut</string>
     <string name="splash_after_login_init">Menyiapkan kalender</string>
     <string name="splash_init">Sedang mendekripsi acara</string>
@@ -628,7 +640,7 @@
     <string name="import_assistant_creating_calendars">Buat kalender baru</string>
     <string name="import_assistant_creating_calendars_finish" comment="Finishing calendar creation required for import">Hampir selesai…</string>
     <string name="import_assistant_new_calendar_header">Buat baru</string>
-    <string name="import_assistant_merge_calendar_header">Gabungkan dengan yang telah ada</string>
+    <string name="import_assistant_merge_calendar_header">Gabungkan dengan yang sudah ada</string>
     <string name="import_assistant_in_progress_title">Proses impor sedang berlangsung</string>
     <string name="import_assistant_in_progress_description" comment="Importing data from test@gmail.com to test@proton.me">Mengimpor data dari %1s menuju %2s.</string>
     <string name="import_assistant_in_progress_redirect">Periksa proses impor</string>
@@ -699,7 +711,7 @@
         <item quantity="other">Tidak dapat membuat kalender baru untuk seluruh kalender yang diimpor karena batas jumlah kalender yang ada.\n• Hapus setidaknya %1$d kalender dari pilihan</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="other">\u0020atau\n • Gabungkan setidaknya %1$d kalender dengan kalender Proton yang telah ada.</item>
+        <item quantity="other">\u0020atau\n • Gabungkan setidaknya %1$d kalender dengan kalender Proton yang sudah ada.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="other">detik</item>
@@ -767,7 +779,7 @@
     <string-array name="ordinals_as_words_backwards">
         <item translatable="false"/>
         <item>terakhir</item>
-        <item>kedua sampai terakhir</item>
+        <item>kedua terakhir</item>
         <item>ketiga sampai terakhir</item>
         <item>keempat sampai terakhir</item>
         <item>kelima sampai terakhir</item>

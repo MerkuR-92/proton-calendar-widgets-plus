@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">tot %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Geannuleerd</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)">%1$s <i>(Uitgeschakeld)</i></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Uitgeschakeld)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Standaard)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ja</string>
@@ -113,7 +113,7 @@
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s heeft uw uitnodiging aan %2$s geweigerd</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s heeft uw uitnodiging voor %2$s onder voorbehoud geaccepteerd</string>
     <string name="event_organizer_send_prefs_error_title">Organisator kan niet worden geïnformeerd</string>
-    <string name="event_organizer_send_prefs_message_accepted_title">De organisator kan niet worden geïnformeerd dat je de uitnodiging hebt geaccepteerd</string>
+    <string name="event_organizer_send_prefs_message_accepted_title">De organisator kan niet worden geïnformeerd dat u de uitnodiging hebt geaccepteerd</string>
     <string name="event_organizer_send_prefs_message_declined_title">De organisator kan niet worden geïnformeerd dat u de uitnodiging hebt geweigerd</string>
     <string name="event_organizer_send_prefs_message_tentative_title">De organisator kan niet worden geïnformeerd dat u de uitnodiging voorlopig geaccepteerd hebt</string>
     <string name="event_organizer_send_prefs_message_default_title">De organisator kan niet worden geïnformeerd dat u op de uitnodiging hebt gereageerd</string>
@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">publieke sleutels zijn ongeldig</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">ongeldig contact handtekening</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s, %2$s</string>
+    <string name="join_zoom_meeting_action">Deelnemen aan Zoom vergadering</string>
+    <string name="zoom_meeting_title">Zoom meeting</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Wachtwoord: %1$s</string>
+    <string name="zoom_meeting_more_details">Meer details</string>
+    <string name="zoom_meeting_less_details">Minder details</string>
+    <string name="zoom_meeting_host">Gastheer van de bijeenkomst</string>
+    <string name="zoom_meeting_link">Meeting link</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support"> Instructies om deel te nemen </a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nieuwe afspraak</string>
     <string name="event_text_edit_event">Afspraak bewerken</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Alle afspraken bijgewerkt</string>
     <string name="snack_event_updated_error_failed_mail">Uitnodiging kon niet verzonden worden</string>
     <string name="snack_update_event_error_failed_mail">Update mislukt</string>
+    <string name="snack_lost_zoom_access">Verbind met Zoom om dit event te bewerken.</string>
+    <string name="snack_lost_zoom_access_acion">Verbinden</string>
+    <string name="snack_zoom_meeting_does_not_exist">Deze Zoom-sessie is geannuleerd. Verwijder de link om dit event te bewerken.</string>
     <string name="snack_event_updated_error">Fout bij bijwerken afspraak</string>
     <string name="snack_event_created">Afspraak aangemaakt</string>
     <string name="snack_event_created_failed_mail">Afspraak aangemaakt, maar uitnodiging kon niet verzonden worden</string>
@@ -453,7 +465,7 @@
     <string name="settings_week_numbers_title">Weeknummers weergeven</string>
     <string name="settings_auto_invites_title">Voeg uitnodigingen toe aan uw agenda en markeer als in afwachting</string>
     <string name="settings_search_title">Agenda\'s doorzoeken</string>
-    <string name="settings_search_subtitle">Downloadt agenda-inhoud en slaat deze op uw apparaat op zodat u deze kunt doorzoeken. Als u deze functie uitschakelt, wordt de gedownloade inhoud verwijderd. \n\nZoeken is een experimentele bètafunctie. Als je deze inschakelt, kan de app onstabiel worden.</string>
+    <string name="settings_search_subtitle">Downloadt agenda-inhoud en slaat deze op uw apparaat op zodat u deze kunt doorzoeken. Als u deze functie uitschakelt, wordt de gedownloade inhoud verwijderd. \n\nZoeken is een experimentele bètafunctie. Als u deze inschakelt, kan de app onstabiel worden.</string>
     <string name="settings_alternative_routing_title">Alternatieve routing toestaan</string>
     <string name="settings_alternative_routing_subtitle">In het geval dat Proton-sites worden geblokkeerd, stelt deze instelling de app in staat om alternatieve netwerkroutering te proberen om Proton te bereiken, wat nuttig kan zijn voor het omzeilen van firewalls of netwerkproblemen. We raden aan deze instelling aan te houden voor een grotere betrouwbaarheid.</string>
     <string name="settings_value_placeholder">Tik om te selecteren</string>
@@ -600,7 +612,7 @@
     <string name="spotlight_dialog_wipe_search_description">We verwijderen de experimentele zoekfunctie van Proton Calendar Beta, omdat we het bruikbaarder en betrouwbaarder willen maken. Dit duurt slechts enkele seconden.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Wettelijke feestdagen zijn er!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Geen vergaderingen meer plannen wanneer iedereen vrij is of een lang weekendje weg vergeten te plannen.\n\nVoeg de feestdagen van elk land toe aan uw agenda.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\nSince je momenteel aan de agendalimiet zit, moet je om een vakantiekalender toe te voegen eerst een bestaande kalender verwijderen.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Geen vergaderingen meer plannen als iedereen vrij is of vergeten een lang weekend weg te plannen. \n\Aangezien u momenteel aan de agendalimiet zit, moet u om een vakantieagenda toe te voegen eerst een bestaande agenda verwijderen.</string>
     <string name="spotlight_dialog_color_per_event_title">Aangepaste kleuren voor afspraken</string>
     <string name="spotlight_dialog_color_per_event_description">Pas de kleur van individuele afspraken aan naar:\n\n• Kleuren van uw agenda aanpassen\n\n• Organiseer uw dag beter en houd uw tijd bij. \n\n• Stel prioriteiten en boost efficiëntie</string>
     <!-- Import -->

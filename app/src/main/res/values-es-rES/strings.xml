@@ -130,6 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">las claves públicas no son válidas</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">firma del contacto no válida</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
+    <string name="join_zoom_meeting_action">Unirte a la reunión de Zoom</string>
+    <string name="zoom_meeting_title">Reunión de Zoom</string>
+    <string name="zoom_meeting_id">ID: %1$s</string>
+    <string name="zoom_meeting_password">Contraseña: %1$s</string>
+    <string name="zoom_meeting_more_details">Más detalles</string>
+    <string name="zoom_meeting_less_details">Menos detalles</string>
+    <string name="zoom_meeting_host">Organizador de la reunión</string>
+    <string name="zoom_meeting_link">Enlace de la reunión</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instrucciones para unirte</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nuevo evento</string>
     <string name="event_text_edit_event">Editar evento</string>
@@ -325,6 +334,9 @@
     <string name="snack_event_updated_recurring">Se han actualizado todos los eventos.</string>
     <string name="snack_event_updated_error_failed_mail">Error al enviar la invitación</string>
     <string name="snack_update_event_error_failed_mail">Error al actualizar</string>
+    <string name="snack_lost_zoom_access">Conéctate para editar este evento.</string>
+    <string name="snack_lost_zoom_access_acion">Conectar</string>
+    <string name="snack_zoom_meeting_does_not_exist">Se ha cancelado esta sesión de Zoom. Elimina el enlace para editar este evento.</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
     <string name="snack_event_created">Evento creado</string>
     <string name="snack_event_created_failed_mail">Se ha creado el evento pero no se ha podido enviar la invitación.</string>
