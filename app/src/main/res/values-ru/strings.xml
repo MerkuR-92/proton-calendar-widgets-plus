@@ -130,14 +130,14 @@
     <string name="event_send_prefs_public_keys_invalid">открытые ключи недействительны</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">недействительная подпись контакта</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
-    <string name="join_zoom_meeting_action">Join Zoom meeting</string>
-    <string name="zoom_meeting_title">Zoom meeting</string>
+    <string name="join_zoom_meeting_action">Присоединиться к встрече в Zoom</string>
+    <string name="zoom_meeting_title">Встреча в Zoom</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Password: %1$s</string>
-    <string name="zoom_meeting_more_details">More details</string>
-    <string name="zoom_meeting_less_details">Less details</string>
-    <string name="zoom_meeting_host">Meeting host</string>
-    <string name="zoom_meeting_link">Meeting link</string>
+    <string name="zoom_meeting_password">Пароль: %1$s</string>
+    <string name="zoom_meeting_more_details">Подробнее</string>
+    <string name="zoom_meeting_less_details">Меньше подробностей</string>
+    <string name="zoom_meeting_host">Хозяин встречи</string>
+    <string name="zoom_meeting_link">Ссылка на встречу</string>
     <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Новое событие</string>
@@ -335,8 +335,8 @@
     <string name="snack_event_updated_error_failed_mail">Не удалось отправить приглашение</string>
     <string name="snack_update_event_error_failed_mail">Сбой обновления</string>
     <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
-    <string name="snack_lost_zoom_access_acion">Connect</string>
-    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
+    <string name="snack_lost_zoom_access_acion">Подключить</string>
+    <string name="snack_zoom_meeting_does_not_exist">Этот сеанс Zoom отменен. Для редактирования этого события, удалите ссылку.</string>
     <string name="snack_event_updated_error">Ошибка обновления события</string>
     <string name="snack_event_created">Событие создано</string>
     <string name="snack_event_created_failed_mail">Событие обновлено, но приглашение отправить не удалось</string>
