@@ -159,7 +159,7 @@
     <string name="event_text_timezone_start">Aikavyöhyke</string>
     <string name="invite_in_shared_calendar_disclaimer">Kutsujen lähettäminen on mahdollista vain henkilökohtaisista kalentereista.</string>
     <string name="invite_change_calendar_disclaimer">Kutsuihin liitettyä kalenteria ei ole mahdollista muokata.</string>
-    <string name="invite_change_attendees_disclaimer">Kutsuihin liittyviä osallistujia ei ole vielä mahdollista muokata.</string>
+    <string name="invite_change_attendees_disclaimer">Kutsuihin liitettyjä osallistujia ei ole vielä mahdollista muokata.</string>
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
     <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään päivitetty kutsu.</string>

@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">加入Zoom會議</string>
     <string name="zoom_meeting_title">Zoom 會議</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Password: %1$s</string>
-    <string name="zoom_meeting_more_details">More details</string>
-    <string name="zoom_meeting_less_details">Less details</string>
-    <string name="zoom_meeting_host">Meeting host</string>
-    <string name="zoom_meeting_link">Meeting link</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="zoom_meeting_password">密碼: %1$s</string>
+    <string name="zoom_meeting_more_details">更多詳細資料</string>
+    <string name="zoom_meeting_less_details">較少詳細資料</string>
+    <string name="zoom_meeting_host">會議主持人</string>
+    <string name="zoom_meeting_link">會議連結</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">加入說明</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">加入活動</string>
     <string name="event_text_edit_event">編輯活動</string>
@@ -334,9 +334,9 @@
     <string name="snack_event_updated_recurring">所有活動已更新</string>
     <string name="snack_event_updated_error_failed_mail">邀請傳送失敗</string>
     <string name="snack_update_event_error_failed_mail">更新失敗</string>
-    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
-    <string name="snack_lost_zoom_access_acion">Connect</string>
-    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
+    <string name="snack_lost_zoom_access">連接Zoom以編輯此行程。</string>
+    <string name="snack_lost_zoom_access_acion">連接</string>
+    <string name="snack_zoom_meeting_does_not_exist">此Zoom作業階段已被取消。移除此編輯以編輯事件。</string>
     <string name="snack_event_updated_error">更新活動時發生錯誤</string>
     <string name="snack_event_created">活動已創建</string>
     <string name="snack_event_created_failed_mail">活動已創建，但邀請傳送失敗</string>

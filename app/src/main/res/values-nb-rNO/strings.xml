@@ -353,7 +353,7 @@
     <string name="snack_event_maximum_alarm_reached_error">Maksimalt antall varsler er nådd</string>
     <string name="snack_send_bug_report_success">Rapport sendt, takk for tilbakemeldingen</string>
     <string name="snack_send_bug_report_error">Feil ved sending av rapport. Prøv igjen senere.</string>
-    <string name="snack_send_bug_report_description_empty">Vennligst gi en beskrivelse av rapporten din.</string>
+    <string name="snack_send_bug_report_description_empty">Gjerne gi en beskrivelse av rapporten din.</string>
     <string name="snack_create_event_no_active_personal_calendar">Du trenger en personlig aktiv kalender for å opprette hendelser.</string>
     <string name="snack_create_event_no_active_calendar">Du trenger en aktiv kalender for å opprette hendelser.</string>
     <string name="snack_add_self_as_participant">Invitasjon av deg selv ikke mulig</string>
