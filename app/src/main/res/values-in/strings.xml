@@ -104,8 +104,8 @@
     <string name="event_signature_verification_in_progress">Verifikasi tanda tangan acara sedang berlangsung.</string>
     <string name="event_signature_verification_network_error">Verifikasi tanda tangan acara terhenti akibat kesalahan yang tidak diduga. <a href="">Coba lagi</a></string>
     <string name="event_change_answer_recurring_title">Perbarui acara berulang</string>
-    <string name="event_change_answer_recurring_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara yang terdapat pada rangkaian ini?</string>
-    <string name="event_change_answer_recurring_overwrite_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara pada rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan cara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
+    <string name="event_change_answer_recurring_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara dalam rangkaian ini?</string>
+    <string name="event_change_answer_recurring_overwrite_description">Apakah Anda ingin mengubah jawaban Anda untuk seluruh acara dalam rangkaian ini?\nSebagian jawaban Anda untuk keberlangsungan acara yang sebelumnya telah diperbarui oleh penyelenggara akan hilang.</string>
     <string name="event_change_answer_recurring_single_edit_description">Acara ini telah diperbarui oleh penyelenggara. Apakah Anda ingin mengubah jawaban Anda hanya untuk keberlangsungan ini pada rangkaian ini?</string>
     <string name="event_change_answer_recurring_cancel">Batal</string>
     <string name="event_change_answer_recurring_confirm">Perbarui</string>
@@ -165,7 +165,7 @@
     <string name="update_invite_send_email">Perubahan undangan akan dikirim ke peserta acara.</string>
     <string name="update_recurring_event">Perbarui acara berulang</string>
     <string name="update_recurring_all_events">Apakah Anda ingin memperbarui seluruh acara dalam rangkaian ini?</string>
-    <string name="update_recurring_invite_send_email">Anda akan memperbarui semua acara dalam rangkaian ini. Perubahan undangan akan dikirim ke peserta acara.</string>
+    <string name="update_recurring_invite_send_email">Anda akan memperbarui seluruh acara dalam rangkaian ini. Pembaruan seputar undangan akan dikirim kepada para peserta acara.</string>
     <!-- SEARCH -->
     <string name="search_hint_input_field">Apa yang ingin Anda cari?</string>
     <string name="search_empty_results_title">Tidak ada hasil yang ditemukan</string>

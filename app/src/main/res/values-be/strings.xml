@@ -63,10 +63,10 @@
     <string name="event_alarm_label_before">%1$s да падзеі</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s да падзеі па электроннай пошце</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s а %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s а %2$s па электроннай пошце</string>
-    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s да падзеі а %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s да падзеі а %2$s па электроннай пошце</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s у %2$s</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s у %2$s па электроннай пошце</string>
+    <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s да падзеі у %2$s</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s да падзеі у %2$s па электроннай пошце</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s у %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s на %2$d чысло</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s у %2$s</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Дадаць удзельнікаў</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Удзельнікі (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Вы</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d яшчэ</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ яшчэ %1$d</string>
     <string name="event_text_switch_all_day">Увесь дзень</string>
     <string name="event_text_date_start">Пачатак</string>
     <string name="event_text_date_end">Завяршэнне</string>
@@ -261,7 +261,7 @@
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s было абноўлена.\nКалі:%2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (увесь дзень)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
-    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s а %2$s%3$s — %4$s а %5$s %6$s</string>
+    <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s у %2$s%3$s — %4$s у %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nДзе: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nАпісанне: %1$s</string>
     <string name="event_send_invite_dialog_title">Адправіць запрашэнне</string>
@@ -440,7 +440,7 @@
     <string name="notification_text_today_part_time">Сёння а %1$s</string>
     <string name="notification_text_tomorrow">Заўтра</string>
     <string name="notification_text_tomorrow_part_time">Заўтра а %1$s</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s а %2$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s у %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Тэма</string>
     <string name="bug_report_hint_description">Апішыце праблему і далучыце ўсе паведамленні з памылкамі.</string>
@@ -599,13 +599,13 @@
     <string name="spotlight_v5_dialog_rebranding_title">Абноўлены Proton, уніфікаваная абарона</string>
     <string name="spotlight_v5_dialog_rebranding_description">Уводзіны ў абноўлены выгляд Proton. Шмат сэрвісаў, адна місія. Вітаем у інтэрнэце, дзе прыватнасць з\'яўляецца паўсядзённасцю. <a href="https://proton.me/news/updated-proton">Даведацца больш</a></string>
     <string name="spotlight_dialog_week_view_title">Больш параметраў прагляду</string>
-    <string name="spotlight_dialog_week_view_description">• Уводзіны ў прагляд календара на <b>тры дні</b> і <b>тыдзень</b>. Выберыце пажаданы спосаб прагляду ў <b>меню</b>.\n\n• Адрэгулюйце вышыню радкоў у сетцы з днямі з дапамогай двух пальцаў, павялічваючы або памяншаючы маштаб.</string>
+    <string name="spotlight_dialog_week_view_description">• Уводзіны ў прагляд календара на <b>тры дні</b> і на <b>тыдзень</b>. Выберыце пажаданы спосаб прагляду ў <b>меню</b>.\n\n• Адрэгулюйце вышыню радкоў у сетцы з днямі пры дапамозе двух пальцаў, павялічваючы або памяншаючы маштаб.</string>
     <string name="spotlight_dialog_search_title">Пошук падзей</string>
     <string name="spotlight_dialog_search_description">Лёгка знаходзьце падзеі, якія вы шукаеце з нашай новай функцыяй пошуку. <a href="https://proton.me/support/calendar-search">Даведацца больш</a></string>
     <string name="spotlight_dialog_search_positive">Уключыць</string>
     <string name="spotlight_dialog_search_negative">Прапусціць</string>
     <string name="spotlight_dialog_import_title">Больш спосабаў дадаць падзеі</string>
-    <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў наўпрост з Proton Mail.</string>
+    <string name="spotlight_dialog_import_description">• Імпартуйце падзеі ў ваш каляндар з файлаў на тэлефоне.\n\n• Дадавайце браніраванне падарожжаў непасрэдна з Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Функцыі календара</string>
     <string name="spotlight_dialog_calendar_provider_description">• Дадавайце падзеі непасрэдна ў Proton Calendar з іншых праграм.\n\n• Стварайце і кіруйце падзеямі ў календарах, якія абагулілі з вамі.\n\n• Задавайце менавіта той прадвызначаны выгляд, які вы хочаце бачыць пры адкрыцці праграмы.\n\n• Даступна 13 новых моў.</string>
     <string name="spotlight_dialog_wipe_search_title">Пошук выдалены, каб зрабіць яго лепш</string>
@@ -682,7 +682,7 @@
     <string name="import_assistant_in_progress_error_snack">Працягваецца выкананне працэсу імпартавання</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Імпартаваць як простую падзею?</string>
-    <string name="import_event_disclaimer_dialog_description">\nІмпартаваныя запрашэнні з\'явяцца ў Proton Calendar як простыя падзеі без падрабязнасцяў пра <b>арганізатара</b> і <b>ўдзельніка</b>.\n\nДля таго, каб атрымліваць абнаўленні падзей і бачыць удзельнікаў, папрасіце арганізатараў запрасіць вас пры дапамозе вашага адраса электроннай пошты Proton.</string>
+    <string name="import_event_disclaimer_dialog_description">\nІмпартаваныя запрашэнні з\'явяцца ў Proton Calendar як простыя падзеі без падрабязнасцяў аб <b>арганізатары</b> і <b>ўдзельніку</b>.\n\nДля таго, каб атрымліваць абнаўленні падзей і бачыць удзельнікаў, папрасіце арганізатараў запрасіць вас пры дапамозе вашага адраса электроннай пошты Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Імпартаванне</string>
     <string name="undefined_color">Не вызначана</string>
     <!--  STRING PLURALS  -->
@@ -702,7 +702,7 @@
         <item quantity="one">%1$d бягучае імпартаванне</item>
         <item quantity="few">%1$d бягучыя імпартаванні</item>
         <item quantity="many">%1$d бягучых імпартаванняў</item>
-        <item quantity="other">%1$d бягучыя імпартаванні</item>
+        <item quantity="other">%1$d бягучых імпартаванняў</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
         <item quantity="one">%1$d з %2$d створаны ў %3$s</item>
@@ -738,7 +738,7 @@
         <item quantity="one">\u0020або\n • Аб\'яднайце прынамсі %1$d каляндар з існуючымі календарамі Proton.</item>
         <item quantity="few">\u0020або\n • Аб\'яднайце прынамсі %1$d календары з існуючымі календарамі Proton.</item>
         <item quantity="many">\u0020або\n • Аб\'яднайце прынамсі %1$d календароў з існуючымі календарамі Proton.</item>
-        <item quantity="other">\u0020або\n • Аб\'яднайце прынамсі %1$d календары з існуючымі календарамі Proton.</item>
+        <item quantity="other">\u0020або\n • Аб\'яднайце прынамсі %1$d календароў з існуючымі календарамі Proton.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">секунда</item>
@@ -834,19 +834,19 @@
         <item quantity="one">%1$s хвіліна</item>
         <item quantity="few">%1$s хвіліны</item>
         <item quantity="many">%1$s хвілін</item>
-        <item quantity="other">%1$s хвіліны</item>
+        <item quantity="other">%1$s хвілін</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="one">%1$d сімвал з %2$d</item>
         <item quantity="few">%1$d сімвалы з %2$d</item>
         <item quantity="many">%1$d сімвалаў з %2$d</item>
-        <item quantity="other">%1$d сімвалы з %2$d</item>
+        <item quantity="other">%1$d сімвалаў з %2$d</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%1$d сімвал з %2$d</item>
         <item quantity="few">%1$d сімвалы з %2$d</item>
         <item quantity="many">%1$d сімвалаў з %2$d</item>
-        <item quantity="other">%1$d сімвалы з %2$d</item>
+        <item quantity="other">%1$d сімвалаў з %2$d</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">
