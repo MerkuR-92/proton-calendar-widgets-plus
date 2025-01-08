@@ -244,18 +244,12 @@ object EventUtilsImpl : EventUtils {
     override fun Event.generateOccurrences(timeZoneId: String, toDate: LocalDate?, firstOccurrenceFromDateTime: ZonedDateTime?, occurrenceCount: Int?): List<Event.Occurrence>? {
 
         // localize Date created by iterator in display TimeZone, handling the BySetPos
-        fun localizeIteratorDate(iteratorDate: Date, iteratorZoneId: ZoneId, iteratorZonedDateTimeStart: ZonedDateTime, formatZoneId: ZoneId, hasBySetPos: Boolean): ZonedDateTime {
+        fun localizeIteratorDate(iteratorDate: Date, iteratorZoneId: ZoneId, iteratorZonedDateTimeStart: ZonedDateTime, formatZoneId: ZoneId): ZonedDateTime {
             return if (isAllDay()) {
                 iteratorDate.toInstant().atZone(iteratorZoneId).withZoneSameLocal(formatZoneId)
             } else {
-                if (hasBySetPos) {
-                    iteratorDate.toInstant().atZone(iteratorZoneId)
-                        .withHour(iteratorZonedDateTimeStart.hour) // fix hour
-                        .withMinute(iteratorZonedDateTimeStart.minute) // fix minute
-                        .withZoneSameInstant(formatZoneId) // localize in display TZ
-                } else {
-                    iteratorDate.toInstant().atZone(formatZoneId) // localize in display TZ
-                }
+                iteratorDate.toInstant().atZone(formatZoneId) // localize in display TZ
+
             }
         }
 
@@ -280,11 +274,6 @@ object EventUtilsImpl : EventUtils {
         val formatZoneId = ZoneId.of(timeZoneId)
         val formatToZonedDateTime = if (isAllDay()) toDate?.atStartOfDay(ZoneId.of(timeZoneId)) else toDate?.plusDays(1)?.atStartOfDay(ZoneId.of(timeZoneId))
 
-        // hack: if Event contains BySetPos
-        //  1. first occurrence is skipped
-        //  2. all the occurrences are returned as happening at 00:00, so we lose time of day
-        val hasBySetPos = iCalEvent.recurrenceRule.value?.bySetPos?.isNullOrEmpty() == false
-
         var count = 0
         val occurrences = mutableListOf<Event.Occurrence>()
 
@@ -294,7 +283,7 @@ object EventUtilsImpl : EventUtils {
 
             val iteratorDateStart = iterator.next()
 
-            val occurrenceStart = localizeIteratorDate(iteratorDateStart, iteratorZoneId, iteratorZonedDateTimeStart, formatZoneId, hasBySetPos)
+            val occurrenceStart = localizeIteratorDate(iteratorDateStart, iteratorZoneId, iteratorZonedDateTimeStart, formatZoneId)
             val occurrenceEnd = if (isAllDay()) {
                 occurrenceStart.plus(eventDurationInDays, ChronoUnit.DAYS)
             } else {
@@ -322,55 +311,7 @@ object EventUtilsImpl : EventUtils {
             }
         }
 
-        return if (hasBySetPos) { // apply BySetPos hack
-
-            val potentiallySkippedStart =
-                if (this.isAllDay()) iteratorZonedDateTimeStart.withZoneSameLocal(formatZoneId)
-                else iteratorZonedDateTimeStart.withZoneSameInstant(formatZoneId)
-
-            val potentiallySkippedEnd = if (isAllDay()) {
-                potentiallySkippedStart.plus(eventDurationInDays, ChronoUnit.DAYS)
-            } else {
-                val calculatedEnd = potentiallySkippedStart.plus(eventDurationInMillis, ChronoUnit.MILLIS)
-
-                val startTZOffset = ZoneId.of(timeZoneId).rules.getOffset(potentiallySkippedStart.toInstant())
-                val endTZOffset = ZoneId.of(timeZoneId).rules.getOffset(calculatedEnd.toInstant())
-                val startEndOffsetDifference = startTZOffset.compareTo(endTZOffset)
-
-                calculatedEnd.minusSeconds(startEndOffsetDifference.toLong())
-            }
-
-            val potentiallySkippedOccurrence = Event.Occurrence(
-                potentiallySkippedStart,
-                potentiallySkippedEnd,
-                1
-            )
-
-            // potentiallySkippedOccurrence was not skipped after all
-            if (potentiallySkippedOccurrence == occurrences.firstOrNull()) return occurrences
-
-            // potentiallySkippedOccurrence starts after the [toDate]
-            if (toDate != null && potentiallySkippedOccurrence.startDateTime.isAfter(formatToZonedDateTime)) return occurrences
-
-            val shiftedOccurrences = occurrences.map { it.copy(occurrenceNumber = it.occurrenceNumber + 1) }.toMutableList()
-
-            // ignore potentiallySkippedOccurrence before the [firstOccurrenceFromDateTime]
-            if (firstOccurrenceFromDateTime != null) {
-                if (firstOccurrenceFromDateTime.isAfter(potentiallySkippedOccurrence.startDateTime)) {
-                    return shiftedOccurrences // because the generated ones are 1 behind
-                } else {
-                    // potentiallySkippedOccurrence is the first occurrence
-                    return listOf(potentiallySkippedOccurrence)
-                }
-            }
-
-            // add missing one if it was indeed skipped
-            shiftedOccurrences.add(index = 0, potentiallySkippedOccurrence)
-
-            // take requested `occurrence count` into consideration
-            shiftedOccurrences.take(occurrenceCount ?: shiftedOccurrences.size)
-
-        } else occurrences
+        return occurrences
 
     }
 
