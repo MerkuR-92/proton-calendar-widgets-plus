@@ -190,15 +190,27 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
                     }
                     LoaderManager.getInstance(this).restartLoader(0, args, this)
                 } else {
-                    val searchResult =
-                        when {
-                            validateEmail(query) -> {
-                                val participant = Attendee("", query.toString())
-                                listOf(participant)
-                            }
-                            else -> listOf()
-                        }
+                    val currentlyTypedAttendeeList = if (validateEmail(query)) {
+                        listOf(Attendee("", query.toString()))
+                    } else emptyList()
 
+                    val protonAttendees = cachedProtonContacts.asSequence().filter {
+                        it.commonName.contains(query.toString(), ignoreCase = true)
+                                || it.extractEmail()?.contains(query.toString(), ignoreCase = true) == true
+                    }
+
+                    val protonAttendeesContainTypedAttendee = protonAttendees.any { it.commonName.equals(query.toString(), ignoreCase = true)
+                            || it.extractEmail()?.equals(query.toString(), ignoreCase = true) == true }
+
+                    // if typed Attendee is in Proton Contacts, don't add it to the result list
+                    val protonAttendeesAndTypedAttendee = if (protonAttendeesContainTypedAttendee) {
+                        protonAttendees
+                    } else {
+                        protonAttendees + currentlyTypedAttendeeList
+                    }
+
+                    val searchResult = protonAttendeesAndTypedAttendee.groupBy { it.extractEmail() }.flatMap { it.value.sortedBy { it.commonName } }
+                    
                     binding.eventFormAttendeesSearchList.visibleOrGone(searchResult.isNotEmpty())
                     _searchAttendeeList.postValue(searchResult)
                 }
