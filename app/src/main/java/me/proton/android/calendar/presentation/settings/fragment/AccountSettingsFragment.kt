@@ -104,6 +104,10 @@ class AccountSettingsFragment :
     }
 
     private fun startSecurityKeys() {
-        SecurityKeysActivity.start(requireContext())
+        viewLifecycleOwner.lifecycleScope.launch {
+            accountManager.getPrimaryUserId().firstOrNull()?.let {
+                userSettingsOrchestrator.startSecurityKeysWorkflow(it)
+            }
+        }
     }
 }
