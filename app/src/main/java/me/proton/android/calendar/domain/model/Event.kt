@@ -616,9 +616,12 @@ data class Event private constructor(
         NOT_SIGNED
     }
 
-    enum class DecryptionStatus {
-        SUCCESS,
-        FAILURE
+    sealed interface DecryptionStatus {
+        data object SUCCESS : DecryptionStatus
+        sealed interface FAILURE : DecryptionStatus {
+            data object NoAddressKey : FAILURE
+            data object Generic : FAILURE
+        }
     }
 
     /**
@@ -692,7 +695,7 @@ data class Event private constructor(
             color = this.getDisplayColor(isFreeUser),
             isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            failedToDecrypt = this.decryptionStatus == DecryptionStatus.FAILURE,
+            failedToDecrypt = this.decryptionStatus is DecryptionStatus.FAILURE,
             searchTerm = searchTerm
         )
     }
@@ -709,7 +712,7 @@ data class Event private constructor(
         isAllDay(),
         occurrence?.occurrenceNumber ?: 0,
         this.getDisplayColor(isFreeUser),
-        decryptionStatus ?: DecryptionStatus.FAILURE, // TODO when can this be null? only in SkeletonEvents?
+        decryptionStatus ?: DecryptionStatus.FAILURE.Generic, // TODO when can this be null? only in SkeletonEvents?
         getParticipationStatus(userEmails),
         this.status ?: Status.confirmed()
     )

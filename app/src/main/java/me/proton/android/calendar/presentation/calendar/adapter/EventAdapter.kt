@@ -116,7 +116,7 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+                if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
                     decryptionErrorIcon.visibleOrGone(true)
                     decryptionErrorView.visibleOrGone(true)
                     textViewSubheader.visibleOrGone(false)
@@ -193,7 +193,7 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+                if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
                     decryptionErrorIcon.visibleOrGone(true)
                     decryptionErrorView.visibleOrGone(true)
                     textViewHeader.visibleOrGone(false)

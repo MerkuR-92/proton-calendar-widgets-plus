@@ -70,7 +70,7 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
             WeekViewCalendarEntity.Event(
                 id = weekViewEventId,
                 // Use empty title for failed to decrypt event state
-                title = if (this.decryptionStatus == Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
+                title = if (this.decryptionStatus is Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
                 location = "",
                 startTime = this.dateStart.toLocalDateTime(),
                 endTime = this.dateEnd.toLocalDateTime(),
@@ -90,7 +90,7 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
         val startEvent = WeekViewCalendarEntity.Event(
             id = weekViewEventId,
             // Use empty title for failed to decrypt event state
-            title = if (this.decryptionStatus == Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
+            title = if (this.decryptionStatus is Event.DecryptionStatus.FAILURE) "" else this.summary ?: defaultEventTitle,
             location = "",
             startTime = this.dateStart.toLocalDateTime(),
             endTime = this.dateStart.with(LocalTime.MAX).toLocalDateTime(),

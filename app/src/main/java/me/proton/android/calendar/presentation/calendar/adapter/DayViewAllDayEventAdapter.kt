@@ -110,7 +110,7 @@ class DayViewAllDayEventAdapter(
                 eventItemTitleSide.visibleOrGone(true)
             } else eventItemTitleSide.visibleOrGone(false)
 
-            if (event.decryptionStatus == Event.DecryptionStatus.FAILURE) {
+            if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
                 decryptionErrorIcon.visibleOrGone(true)
                 decryptionErrorView.visibleOrGone(true)
                 eventItemTitle.visibleOrGone(false)

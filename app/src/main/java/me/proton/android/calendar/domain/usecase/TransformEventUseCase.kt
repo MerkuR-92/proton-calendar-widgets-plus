@@ -108,7 +108,7 @@ class TransformEventUseCase @Inject constructor(
                                     getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses, allowApiCall)
                                 )
                             )
-                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE.NoAddressKey, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
@@ -158,7 +158,7 @@ class TransformEventUseCase @Inject constructor(
                                     getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
                                 )
                             )
-                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE.NoAddressKey, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
@@ -259,8 +259,8 @@ class TransformEventUseCase @Inject constructor(
                 decryptionStatuses.all { it == Event.DecryptionStatus.SUCCESS } -> {
                     Event.DecryptionStatus.SUCCESS
                 }
-                decryptionStatuses.any { it == Event.DecryptionStatus.FAILURE } -> {
-                    Event.DecryptionStatus.FAILURE
+                decryptionStatuses.any { it is Event.DecryptionStatus.FAILURE } -> {
+                    decryptionStatuses.firstOrNull { it is Event.DecryptionStatus.FAILURE.NoAddressKey } ?: Event.DecryptionStatus.FAILURE.Generic
                 }
                 else -> null
             },
@@ -395,7 +395,7 @@ class TransformEventUseCase @Inject constructor(
 
             ProcessResult(plainText, Event.DecryptionStatus.SUCCESS, signatureVerification)
         } else {
-            ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+            ProcessResult(null, Event.DecryptionStatus.FAILURE.Generic, Event.SignatureVerification.FAILURE)
         }
 
     }

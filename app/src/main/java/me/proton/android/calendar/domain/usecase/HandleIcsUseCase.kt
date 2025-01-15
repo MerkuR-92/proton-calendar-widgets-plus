@@ -343,7 +343,7 @@ class HandleIcsUseCase @Inject constructor(
         if (iCalendar.method.isReply && !isOrganizerMode) {
             return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
         }
-        if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
+        if (existingEvent?.decryptionStatus is Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
         if (isCurrentUserSender && existingEvent != null) {
@@ -352,7 +352,7 @@ class HandleIcsUseCase @Inject constructor(
             return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
         }
 
-        val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
+        val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus is Event.DecryptionStatus.FAILURE)
 
         // If a series already exist, use the same calendar, else use the default one
         val existingCalendar = if (!eventsSharingUidResponse.isNullOrEmpty()) {

@@ -381,7 +381,7 @@ internal class CalendarWidgetRemoteViewsFactory(
             color = this.getDisplayColor(isFreeUser),
             isCancelledOrDeclined = this.decryptionStatus == Event.DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            failedToDecrypt = this.decryptionStatus == Event.DecryptionStatus.FAILURE
+            failedToDecrypt = this.decryptionStatus is Event.DecryptionStatus.FAILURE
         )
     }
 

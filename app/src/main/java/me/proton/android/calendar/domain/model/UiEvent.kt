@@ -44,7 +44,7 @@ data class UiEvent(
         false,
         0,
         "#CCCCCC",
-        Event.DecryptionStatus.FAILURE,
+        Event.DecryptionStatus.FAILURE.Generic,
         null,
         Status.confirmed()
     )
