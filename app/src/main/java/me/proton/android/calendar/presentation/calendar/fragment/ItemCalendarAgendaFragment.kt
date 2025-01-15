@@ -103,7 +103,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         binding.rvAgenda.layoutManager = eventsListLayoutManager
         eventsListLayoutAdapter =
             EventAdapter {
-                if (it.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
+                if (it.decryptionStatus == Event.DecryptionStatus.Success) {
                     findNavController().navigate(
                         Navigation.Deeplink.toEventDetails(
                             it.id,

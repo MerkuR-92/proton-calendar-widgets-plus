@@ -116,7 +116,7 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
+                if (event.decryptionStatus is Event.DecryptionStatus.Failure) {
                     decryptionErrorIcon.visibleOrGone(true)
                     decryptionErrorView.visibleOrGone(true)
                     textViewSubheader.visibleOrGone(false)
@@ -137,7 +137,7 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(context, R.style.Text_Default)
                 }
 
-                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
@@ -193,7 +193,7 @@ class EventAdapter(
                     textViewSubheaderSide.visibleOrGone(true)
                 }
 
-                if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
+                if (event.decryptionStatus is Event.DecryptionStatus.Failure) {
                     decryptionErrorIcon.visibleOrGone(true)
                     decryptionErrorView.visibleOrGone(true)
                     textViewHeader.visibleOrGone(false)
@@ -212,9 +212,9 @@ class EventAdapter(
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default_Weak)
                     ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(context, R.color.icon_weak)))
 
-                    if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                    if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                         viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
-                    } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    } else if (event.decryptionStatus == Event.DecryptionStatus.Success && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                         viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
                         setStripedBackground(
                             viewBackgroundStriped,
@@ -231,9 +231,9 @@ class EventAdapter(
                     textViewSubheader.setTextAppearance(R.style.Text_Default)
                     textViewSubheaderSide.setTextAppearance(R.style.Text_Default)
 
-                    if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                    if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                         viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
-                    } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                    } else if (event.decryptionStatus == Event.DecryptionStatus.Success && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                         viewMainSurface.setTint(ContextCompat.getColor(context, R.color.background_norm))
                         textViewHeader.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
                         textViewSubheader.setTextColor(ContextCompat.getColor(context, R.color.text_norm))
@@ -254,7 +254,7 @@ class EventAdapter(
                     }
                 }
 
-                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     textViewHeader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                     textViewSubheader.paintFlags = textViewSubheader.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {

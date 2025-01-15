@@ -110,7 +110,7 @@ class DayViewAllDayEventAdapter(
                 eventItemTitleSide.visibleOrGone(true)
             } else eventItemTitleSide.visibleOrGone(false)
 
-            if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) {
+            if (event.decryptionStatus is Event.DecryptionStatus.Failure) {
                 decryptionErrorIcon.visibleOrGone(true)
                 decryptionErrorView.visibleOrGone(true)
                 eventItemTitle.visibleOrGone(false)
@@ -126,9 +126,9 @@ class DayViewAllDayEventAdapter(
                 eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_weak))
                 ImageViewCompat.setImageTintList(decryptionErrorIcon, ColorStateList.valueOf(ContextCompat.getColor(itemView.context, R.color.icon_weak)))
 
-                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                } else if (event.decryptionStatus == Event.DecryptionStatus.Success && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     AndroidUtils.setStripedBackground(
                         viewBackgroundStriped,
@@ -141,11 +141,11 @@ class DayViewAllDayEventAdapter(
                     decryptionErrorView.alpha = 0.1f
                 }
             } else {
-                if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+                if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                     eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
-                } else if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && participationStatus == ParticipationStatus.NEEDS_ACTION) {
+                } else if (event.decryptionStatus == Event.DecryptionStatus.Success && participationStatus == ParticipationStatus.NEEDS_ACTION) {
                     viewMainSurface.setTint(ContextCompat.getColor(itemView.context, R.color.background_norm))
                     eventItemTitle.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
                     eventItemTitleSide.setTextColor(ContextCompat.getColor(itemView.context, R.color.text_norm))
@@ -164,7 +164,7 @@ class DayViewAllDayEventAdapter(
                 }
             }
 
-            if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
+            if (event.decryptionStatus == Event.DecryptionStatus.Success && (event.isCancelled() || participationStatus == ParticipationStatus.DECLINED)) {
                 eventItemTitle.paintFlags = eventItemTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             } else {
                 eventItemTitle.paintFlags = eventItemTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()

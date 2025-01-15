@@ -617,10 +617,10 @@ data class Event private constructor(
     }
 
     sealed interface DecryptionStatus {
-        data object SUCCESS : DecryptionStatus
-        sealed interface FAILURE : DecryptionStatus {
-            data object NoAddressKey : FAILURE
-            data object Generic : FAILURE
+        data object Success : DecryptionStatus
+        sealed interface Failure : DecryptionStatus {
+            data object NoAddressKey : Failure
+            data object Generic : Failure
         }
     }
 
@@ -693,9 +693,9 @@ data class Event private constructor(
             fullDayCounter = fullDayCounterString,
             occurrenceNumber = this.occurrence?.occurrenceNumber ?: 0,
             color = this.getDisplayColor(isFreeUser),
-            isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.SUCCESS && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
+            isCancelledOrDeclined = this.decryptionStatus == DecryptionStatus.Success && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
             needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            failedToDecrypt = this.decryptionStatus is DecryptionStatus.FAILURE,
+            failedToDecrypt = this.decryptionStatus is DecryptionStatus.Failure,
             searchTerm = searchTerm
         )
     }
@@ -712,7 +712,7 @@ data class Event private constructor(
         isAllDay(),
         occurrence?.occurrenceNumber ?: 0,
         this.getDisplayColor(isFreeUser),
-        decryptionStatus ?: DecryptionStatus.FAILURE.Generic, // TODO when can this be null? only in SkeletonEvents?
+        decryptionStatus ?: DecryptionStatus.Failure.Generic, // TODO when can this be null? only in SkeletonEvents?
         getParticipationStatus(userEmails),
         this.status ?: Status.confirmed()
     )

@@ -31,7 +31,7 @@ class IndexEventForSearchUseCase @Inject constructor(
             val searchEvents = entitiesToIndex.map {
                 async {
                     transformEventUseCase.execute(it)?.let { event ->
-                        if (event.decryptionStatus == Event.DecryptionStatus.SUCCESS) {
+                        if (event.decryptionStatus == Event.DecryptionStatus.Success) {
                             SearchEventEntity.from(userId, event)
                         } else null
                     }

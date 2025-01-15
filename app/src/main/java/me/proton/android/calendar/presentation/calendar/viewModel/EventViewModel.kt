@@ -3839,7 +3839,7 @@ class EventViewModel @Inject constructor(
         } else {
             transformEventUseCase.execute(eventEntity)
         }) ?: return EventLinkResult.Error
-        if (event.decryptionStatus is Event.DecryptionStatus.FAILURE) return EventLinkResult.DecryptionFailed(event)
+        if (event.decryptionStatus is Event.DecryptionStatus.Failure) return EventLinkResult.DecryptionFailed(event)
         if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
         return if (event.isRecurring()) {
             val calendarUserSettings =
