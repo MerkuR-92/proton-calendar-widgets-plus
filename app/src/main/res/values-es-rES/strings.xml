@@ -136,7 +136,7 @@
     <string name="zoom_meeting_password">Contraseña: %1$s</string>
     <string name="zoom_meeting_more_details">Más detalles</string>
     <string name="zoom_meeting_less_details">Menos detalles</string>
-    <string name="zoom_meeting_host">Organizador de la reunión</string>
+    <string name="zoom_meeting_host">Anfitrión de la reunión</string>
     <string name="zoom_meeting_link">Enlace de la reunión</string>
     <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instrucciones para unirte</a></string>
     <!-- CREATE / EDIT EVENT   -->
@@ -335,7 +335,7 @@
     <string name="snack_event_updated_error_failed_mail">Error al enviar la invitación</string>
     <string name="snack_update_event_error_failed_mail">Error al actualizar</string>
     <string name="snack_lost_zoom_access">Conéctate para editar este evento.</string>
-    <string name="snack_lost_zoom_access_acion">Conectar</string>
+    <string name="snack_lost_zoom_access_acion">Conectarte</string>
     <string name="snack_zoom_meeting_does_not_exist">Se ha cancelado esta sesión de Zoom. Elimina el enlace para editar este evento.</string>
     <string name="snack_event_updated_error">Error al actualizar el evento</string>
     <string name="snack_event_created">Evento creado</string>

@@ -116,7 +116,7 @@
     <string name="event_organizer_send_prefs_message_accepted_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menerima undangan</string>
     <string name="event_organizer_send_prefs_message_declined_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menolak undangan</string>
     <string name="event_organizer_send_prefs_message_tentative_title">Penyelenggara tidak dapat diberi tahu bahwa Anda sementara menerima undangan</string>
-    <string name="event_organizer_send_prefs_message_default_title">Penyelenggara tidak dapat diberi tahu bahwa Anda merespons undangan</string>
+    <string name="event_organizer_send_prefs_message_default_title">Penyelenggara tidak dapat diberi tahu bahwa Anda telah merespons undangan ini</string>
     <string name="event_organizer_send_prefs_button_title">OK</string>
     <string name="event_attendees_send_prefs_error_title">Peserta tidak dapat diberi tahu</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Tidak ada peserta yang dapat diberi tahu mengenai perubahan Anda:\n\n• %1$s\n\nApakah Anda ingin tetap melanjutkan?</string>
@@ -502,7 +502,7 @@
     <string name="calendar_form_color">Warna kalender</string>
     <string name="calendar_form_language">Bahasa</string>
     <string name="calendar_form_default_event_duration">Durasi acara</string>
-    <string name="calendar_form_default_event_notifications">Pemberitahuan acara</string>
+    <string name="calendar_form_default_event_notifications">Notifikasi acara</string>
     <string name="calendar_form_default_all_day_event_notifications">Notifikasi acara sepanjang hari</string>
     <string name="calendar_form_add_notification">Tambahkan pemberitahuan</string>
     <string name="calendar_form_default_email">Alamat email</string>

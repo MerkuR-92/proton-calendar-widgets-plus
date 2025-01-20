@@ -334,7 +334,7 @@
     <string name="snack_event_updated_recurring">Alla händelser uppdaterade</string>
     <string name="snack_event_updated_error_failed_mail">Inbjudan kunde inte skickas</string>
     <string name="snack_update_event_error_failed_mail">Uppdatering misslyckades</string>
-    <string name="snack_lost_zoom_access">Anslut till Zoom för att redigera denna händelse</string>
+    <string name="snack_lost_zoom_access">Anslut till Zoom för att redigera denna händelse.</string>
     <string name="snack_lost_zoom_access_acion">Anslut</string>
     <string name="snack_zoom_meeting_does_not_exist">Detta Zoommöte has kansellerats. Ta bort länken för att redigera denna händelse.</string>
     <string name="snack_event_updated_error">Fel vid uppdatering av händelse</string>
@@ -482,7 +482,7 @@
     <string name="settings_other_calendars">Andra kalendrar</string>
     <string name="settings_calendar_default" comment="Default calendar">Standard</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Inaktiverad</string>
-    <string name="settings_calendar_not_synced" comment="Calendar not synced">Ej synkad</string>
+    <string name="settings_calendar_not_synced" comment="Calendar not synced">Inte synkroniserad</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">Synkroniserar</string>
     <string name="settings_calendar_subscribed_invalid_ics">Kalenderformat stöds inte</string>
     <string name="settings_calendar_subscribed_too_big">Kalender är för stor</string>
@@ -835,7 +835,7 @@
         <item>Sahara|#936D58</item>
         <item>Enzian|#5252CC</item>
         <item>Plommon|#A839A4</item>
-        <item>Körsbär|#BA1E55</item>
+        <item>Cerise|#BA1E55</item>
         <item>Koppar|#C44800</item>
         <item>Jord|#54473F</item>
         <item>Skifferblå|#415DF0</item>

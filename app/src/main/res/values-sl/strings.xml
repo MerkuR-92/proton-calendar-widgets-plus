@@ -130,15 +130,15 @@
     <string name="event_send_prefs_public_keys_invalid">javni ključi so neveljavni</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">podpis stika ni veljaven</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
-    <string name="join_zoom_meeting_action">Join Zoom meeting</string>
-    <string name="zoom_meeting_title">Zoom meeting</string>
+    <string name="join_zoom_meeting_action">Pridružite se sestanku Zoom</string>
+    <string name="zoom_meeting_title">Sestanek prek Zooma</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Password: %1$s</string>
-    <string name="zoom_meeting_more_details">More details</string>
-    <string name="zoom_meeting_less_details">Less details</string>
-    <string name="zoom_meeting_host">Meeting host</string>
-    <string name="zoom_meeting_link">Meeting link</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="zoom_meeting_password">Geslo: %1$s</string>
+    <string name="zoom_meeting_more_details">Več podrobnosti</string>
+    <string name="zoom_meeting_less_details">Manj podrobnosti</string>
+    <string name="zoom_meeting_host">Gostitelj sestanka</string>
+    <string name="zoom_meeting_link">Povezava do sestanka</string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Navodila za pridružitev</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nov dogodek</string>
     <string name="event_text_edit_event">Uredi dogodek</string>
@@ -334,9 +334,9 @@
     <string name="snack_event_updated_recurring">Vsi dogodki posodobljeni</string>
     <string name="snack_event_updated_error_failed_mail">Povabilo ni bilo poslano</string>
     <string name="snack_update_event_error_failed_mail">Posodobitev ni uspela</string>
-    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
-    <string name="snack_lost_zoom_access_acion">Connect</string>
-    <string name="snack_zoom_meeting_does_not_exist">This Zoom session has been cancelled. Remove the link to edit this event.</string>
+    <string name="snack_lost_zoom_access">Povežite se s Zoomom, da uredite ta dogodek.</string>
+    <string name="snack_lost_zoom_access_acion">Poveži</string>
+    <string name="snack_zoom_meeting_does_not_exist">Ta seja Zoom je bila preklicana. Odstranite povezavo, da uredite ta dogodek.</string>
     <string name="snack_event_updated_error">Napaka pri posodabljanju dogodka</string>
     <string name="snack_event_created">Ustvarjen je dogodek</string>
     <string name="snack_event_created_failed_mail">Dogodek je bil ustvarjen, vendar povabila ni bilo mogoče poslati</string>
