@@ -1,6 +1,13 @@
 package me.proton.android.calendar.common.utils
 
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.take
 import me.proton.android.calendar.domain.utils.KotlinUtils
+import kotlin.time.Duration
 
 object KotlinUtilsImpl : KotlinUtils {
 
@@ -23,5 +30,11 @@ object KotlinUtilsImpl : KotlinUtils {
 
         return filtered
     }
+
+    @OptIn(FlowPreview::class)
+    override fun <T> Flow<T>.debounceExceptFirst(debounceDuration: Duration): Flow<T> = merge(
+        take(1),
+        drop(1).debounce(debounceDuration)
+    )
 
 }

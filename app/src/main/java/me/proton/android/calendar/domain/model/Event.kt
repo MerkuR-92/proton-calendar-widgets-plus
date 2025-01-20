@@ -436,6 +436,12 @@ data class Event private constructor(
 
     fun isRecurring(): Boolean = this.iCalEvent.recurrenceRule != null
 
+    fun isFiniteRecurring(): Boolean = when {
+        this.iCalEvent.recurrenceRule?.value?.count != null -> true
+        this.iCalEvent.recurrenceRule?.value?.until != null -> true
+        else -> false
+    }
+
     fun isSingleEdit(): Boolean = this.iCalEvent.recurrenceId != null
 
     fun isSingleOccurrenceRecurring(timeZoneId: String): Boolean =

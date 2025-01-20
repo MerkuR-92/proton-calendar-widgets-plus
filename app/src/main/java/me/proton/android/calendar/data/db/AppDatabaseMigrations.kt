@@ -27,6 +27,7 @@ import me.proton.android.calendar.data.api.MailSettingsEntity
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS_METADATA
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS_OCCURRENCES
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENT_ALARMS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MANAGED_HOLIDAY_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
@@ -597,6 +598,13 @@ object AppDatabaseMigrations {
             UserDatabase.MIGRATION_6.migrate(db)
             AccountDatabase.MIGRATION_9.migrate(db)
             MailSettingsDatabase.MIGRATION_1.migrate(db)
+        }
+    }
+
+    val MIGRATION_73_74 = object : Migration(73, 74) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_EVENTS_OCCURRENCES}` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `eventId` TEXT NOT NULL, `eventUid` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `startTime` INTEGER, `endTime` INTEGER, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `lastOccurrenceEndTime` INTEGER, `rRule` TEXT, `modifyTime` INTEGER NOT NULL, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`eventId`) REFERENCES `events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_events_occurrences_eventId` ON `${TABLE_EVENTS_OCCURRENCES}` (`eventId`)")
         }
     }
 }

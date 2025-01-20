@@ -1,4 +1,5 @@
 @file:Suppress("MaxLineLength", "RedundantExplicitType")
+
 package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json
@@ -51,27 +52,23 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.FetchPublicKeysUseCase
 import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
+import me.proton.android.calendar.domain.usecase.GetUserInfoUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
-import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
 import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
-import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
-import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
-import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
-import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
-import me.proton.android.calendar.domain.usecase.RefreshCalendarSubscriptionUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
-import me.proton.android.calendar.domain.usecase.RefreshMembersFlagsUseCase
-import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
 import me.proton.android.calendar.domain.usecase.ResetCalendarsKeyUseCase
+import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
 import me.proton.android.calendar.domain.usecase.SendBugReportUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailUseCase
@@ -177,7 +174,9 @@ val useCaseModule = module {
     factory<LeaveManagedCalendarUseCase> { LeaveManagedCalendarUseCase(get(), get(), get()) }
     factory<FetchCachedViewsEventsUseCase> { FetchCachedViewsEventsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<GetUserInfoUseCase> { GetUserInfoUseCase(get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get(), get()) }
+    factory<GetUiEventsUseCase> { GetUiEventsUseCase(get(), get(), get(), get()) }
 }
 
 fun coreModule(
