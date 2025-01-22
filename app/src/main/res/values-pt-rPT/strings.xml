@@ -134,8 +134,8 @@
     <string name="zoom_meeting_title">Reunião Zoom</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
     <string name="zoom_meeting_password">Palavra-passe: %1$s</string>
-    <string name="zoom_meeting_more_details">Mais informações</string>
-    <string name="zoom_meeting_less_details">Menos informações</string>
+    <string name="zoom_meeting_more_details">Mais detalhes</string>
+    <string name="zoom_meeting_less_details">Menos detalhes</string>
     <string name="zoom_meeting_host">Organizador da reunião</string>
     <string name="zoom_meeting_link">Ligação da reunião</string>
     <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Instruções para entrar</a></string>
@@ -485,7 +485,7 @@
     <string name="settings_calendar_not_synced" comment="Calendar not synced">Não sincronizado</string>
     <string name="settings_calendar_syncing" comment="Calendar syncing">A sincronizar</string>
     <string name="settings_calendar_subscribed_invalid_ics">Formato de calendário não suportado</string>
-    <string name="settings_calendar_subscribed_too_big">O calendário é demasiado grande.</string>
+    <string name="settings_calendar_subscribed_too_big">O calendário é muito grande.</string>
     <string name="settings_calendar_subscribed_not_accessible">Ligação ao evento inacessível</string>
     <string name="settings_calendar_subscribed_tmp_not_accessible">Ligação ao evento temporariamente inacessível</string>
     <string name="settings_calendar_subscribed_last_sync_old">Mais de 12 horas decorreram desde a última actualização</string>

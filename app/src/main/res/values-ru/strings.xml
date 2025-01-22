@@ -138,7 +138,7 @@
     <string name="zoom_meeting_less_details">Меньше подробностей</string>
     <string name="zoom_meeting_host">Хозяин встречи</string>
     <string name="zoom_meeting_link">Ссылка на встречу</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Прилагаемые инструкции</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Новое событие</string>
     <string name="event_text_edit_event">Изменить событие</string>
@@ -334,7 +334,7 @@
     <string name="snack_event_updated_recurring">Все события обновлены</string>
     <string name="snack_event_updated_error_failed_mail">Не удалось отправить приглашение</string>
     <string name="snack_update_event_error_failed_mail">Сбой обновления</string>
-    <string name="snack_lost_zoom_access">Connect to Zoom to edit this event.</string>
+    <string name="snack_lost_zoom_access">Соединиться в Zoom-е для редактирования данного события</string>
     <string name="snack_lost_zoom_access_acion">Подключить</string>
     <string name="snack_zoom_meeting_does_not_exist">Этот сеанс Zoom отменен. Для редактирования этого события, удалите ссылку.</string>
     <string name="snack_event_updated_error">Ошибка обновления события</string>
