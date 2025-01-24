@@ -1,6 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.overlaps
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
@@ -80,12 +81,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
 
                 // this can be one of many occurrences in a given window but we only care about hit inside window, not particular start/end-times
                 val occurrenceInThisWindow = occurrences?.find {
-                    it.startDateTime.isBetween(
-                        windowStart,
-                        windowEnd,
-                        excludeFrom = false,
-                        excludeTo = false
-                    )
+                    Pair(it.startDateTime, it.endDateTime).overlaps(Pair(windowStart, windowEnd))
                 }
 
                 // don't save unnecessary occurrences if their window starts after last occurrence

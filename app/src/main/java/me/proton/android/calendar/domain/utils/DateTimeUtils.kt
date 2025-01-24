@@ -16,6 +16,9 @@ interface DateTimeUtils {
      */
     fun ZonedDateTime.isBetween(fromDateTime: ZonedDateTime, toDateTime: ZonedDateTime, excludeFrom: Boolean, excludeTo: Boolean): Boolean
 
+    fun Pair<ZonedDateTime, ZonedDateTime>.overlaps(other: Pair<ZonedDateTime, ZonedDateTime>): Boolean
+    fun Pair<Long, Long>.overlapsLong(other: Pair<Long, Long>): Boolean
+
     fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean
 
     /**
