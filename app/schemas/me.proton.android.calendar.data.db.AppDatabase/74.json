@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 74,
-    "identityHash": "32038ba06db0e4e441ba5cd7454d1240",
+    "identityHash": "d8a3a094a0d7f7b8b31c060426d5de3c",
     "entities": [
       {
         "tableName": "AccountEntity",
@@ -4406,7 +4406,7 @@
       },
       {
         "tableName": "events_occurrences",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `eventId` TEXT NOT NULL, `eventUid` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `startTime` INTEGER, `endTime` INTEGER, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `lastOccurrenceEndTime` INTEGER, `rRule` TEXT, `modifyTime` INTEGER NOT NULL, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`eventId`) REFERENCES `events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `eventId` TEXT NOT NULL, `eventUid` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `startTime` INTEGER, `endTime` INTEGER, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `firstOccurrenceStartTime` INTEGER NOT NULL, `lastOccurrenceEndTime` INTEGER, `rRule` TEXT, `modifyTime` INTEGER NOT NULL, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`eventId`) REFERENCES `events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "userId",
@@ -4459,6 +4459,12 @@
           {
             "fieldPath": "windowEndTime",
             "columnName": "windowEndTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "firstOccurrenceStartTime",
+            "columnName": "firstOccurrenceStartTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -4522,7 +4528,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '32038ba06db0e4e441ba5cd7454d1240')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd8a3a094a0d7f7b8b31c060426d5de3c')"
     ]
   }
 }

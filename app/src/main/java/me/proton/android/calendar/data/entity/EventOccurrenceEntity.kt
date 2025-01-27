@@ -28,6 +28,7 @@ data class EventOccurrenceEntity(
     val endTime: Long? = null,
     val windowStartTime: Long,
     val windowEndTime: Long,
+    val firstOccurrenceStartTime: Long,
     val lastOccurrenceEndTime: Long? = null, // if non-null it means we generated last occurrence in one of the windows
     val rRule: String? = null,
     val modifyTime: Long,

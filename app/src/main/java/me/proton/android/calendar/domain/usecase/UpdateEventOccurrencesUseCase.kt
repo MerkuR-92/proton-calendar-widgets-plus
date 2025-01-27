@@ -44,7 +44,8 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                     endTime = eventEntityMetadata.endTime,
                     windowStartTime = eventEntityMetadata.startTime,
                     windowEndTime = eventEntityMetadata.endTime,
-                    modifyTime = eventEntityMetadata.modifyTime
+                    modifyTime = eventEntityMetadata.modifyTime,
+                    firstOccurrenceStartTime = eventEntityMetadata.startTime
                 )
             )
 
@@ -66,6 +67,11 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 startOfEventsFirstMonth.plusMonths(generatedWindowsCount + 1).atStartOfDay(ZoneId.of("UTC"))
             )
 
+            val firstOccurrenceStartTime = occurrences?.firstOrNull()?.startDateTime?.toEpochSecond() ?: run {
+                logger.e("UpdateEventOccurrencesUseCase.execute() failed to get first occurrence, RRULE: ${eventEntityMetadata.rRule}")
+                return
+            }
+
             val lastOccurrenceEndTime = if (firstOccurrenceAfterWindows == null) {
                 occurrences?.lastOrNull()?.endDateTime?.toEpochSecond()
             } else null
@@ -80,7 +86,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 // first generated occurrence should be happening in the first window for sure
 
                 // this can be one of many occurrences in a given window but we only care about hit inside window, not particular start/end-times
-                val occurrenceInThisWindow = occurrences?.find {
+                val occurrenceInThisWindow = occurrences.find {
                     Pair(it.startDateTime, it.endDateTime).overlaps(Pair(windowStart, windowEnd))
                 }
 
@@ -103,6 +109,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                             rRule = eventEntityMetadata.rRule,
                             windowStartTime = windowStart.toEpochSecond(),
                             windowEndTime = windowEnd.toEpochSecond(),
+                            firstOccurrenceStartTime = firstOccurrenceStartTime,
                             lastOccurrenceEndTime = lastOccurrenceEndTime,
                             modifyTime = eventEntityMetadata.modifyTime
                         )
