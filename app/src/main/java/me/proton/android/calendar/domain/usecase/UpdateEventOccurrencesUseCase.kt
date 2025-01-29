@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.isBetween
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.overlaps
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
@@ -95,6 +94,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                     lastOccurrenceEndTime != null && windowStart.toEpochSecond() > lastOccurrenceEndTime
 
                 if (occurrenceInThisWindow != null || isWindowAfterLastOccurrence.not()) {
+
                     eventOccurrenceEntities.add(
 
                         // if there is no occurrence in this window, startTime and endTime will be null -- this is a useful information for lookup
