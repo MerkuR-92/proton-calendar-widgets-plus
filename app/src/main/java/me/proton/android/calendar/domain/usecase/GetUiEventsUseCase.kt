@@ -50,6 +50,7 @@ class GetUiEventsUseCase @Inject constructor(
                 combine(
                     getUserInfoUseCase(),
 
+                    // trivial case, only 1 row for each event, start + end times are well defined
                     database.eventOccurrencesDao().selectNonRecurringBetweenInclusive(
                         userId.id,
                         calendars.map { it.id },
@@ -57,6 +58,7 @@ class GetUiEventsUseCase @Inject constructor(
                         toEpoch.toEpochSecond()
                     ),
 
+                    // we know first and last occurrence time, it can be selected like non-recurring above
                     database.eventOccurrencesDao().selectFiniteRecurring(
                         userId.id,
                         calendars.map { it.id },
@@ -64,11 +66,13 @@ class GetUiEventsUseCase @Inject constructor(
                         toEpoch.toEpochSecond()
                     ),
 
+                    // we don't know when the last occurrence happens, so we have to select all events
+                    // except for the ones that start after our window
                     database.eventOccurrencesDao().selectInfiniteRecurring(
                         userId.id,
-                        calendars.map { it.id }
+                        calendars.map { it.id },
+                        toEpoch.toEpochSecond()
                     )
-
 
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
 
