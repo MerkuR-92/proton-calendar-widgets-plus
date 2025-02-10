@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import androidx.annotation.VisibleForTesting
 import biweekly.io.TimezoneInfo
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Attendee
@@ -22,7 +23,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.getResponseIcs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressOrNull
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
@@ -45,7 +45,6 @@ class SendEmailUseCase @Inject constructor(
     private val logger: Logger,
     private val sendEmailDirectUseCase: SendEmailDirect,
     private val userAddressManager: UserAddressManager,
-    private val database: AppDatabase,
     private val json: Json,
     private val transformEventUseCase: TransformEventUseCase,
     private val calendarsRepository: CalendarsRepository,
@@ -396,7 +395,8 @@ class SendEmailUseCase @Inject constructor(
         }
     }
 
-    private fun getInviteMailBody(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun getInviteMailBody(
         event: Event,
         timezone: String,
         timeFormatIs24Hours: Boolean,
@@ -408,7 +408,7 @@ class SendEmailUseCase @Inject constructor(
             if (sendEmailUpdate == true) R.string.event_send_update_invite_mail_body
             else R.string.event_send_invite_mail_body,
             event.summary ?: resourceProvider.provideString(R.string.default_event_summary),
-            if (event.isAllDay() && !event.spansSingleDay(true, timeZoneId = timezone)) {
+            if (event.isAllDay() && !event.spansSingleDay(timeZoneId = timezone)) {
                 resourceProvider.provideString(
                     R.string.event_send_invite_mail_body_all_day_multiple,
                     formattedDateStart.first,
