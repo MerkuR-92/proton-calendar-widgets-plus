@@ -236,7 +236,7 @@
     <string name="event_discard_changes_description">U zal alle wijzigingen kwijtraken.</string>
     <string name="event_discard_changes_cancel">Blijven bewerken</string>
     <string name="event_discard_changes_confirm">Weggooien</string>
-    <string name="event_recurring_update_this_title">Terugkerende afspraak updaten</string>
+    <string name="event_recurring_update_this_title">Terugkerende afspraak bijwerken</string>
     <string name="event_recurring_update_this_description">Frequentie wijzigingen zullen verloren gaan</string>
     <string name="event_recurring_update_all_description">Eerdere wijzigingen in deze serie zullen verloren gaan</string>
     <string name="event_recurring_update_this_cancel">Annuleer</string>
@@ -583,7 +583,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Eindigt op %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Wat is er nieuw</string>
-    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_beta_header">Calendar bèta</string>
     <string name="spotlight_dialog_skip">Overslaan</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Maandweergave</string>

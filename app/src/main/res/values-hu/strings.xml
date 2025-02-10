@@ -583,7 +583,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Befejezés: %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Újdonságok</string>
-    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_beta_header">Calendar béta</string>
     <string name="spotlight_dialog_skip">Kihagyás</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Havi nézet</string>
