@@ -88,6 +88,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
+import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
@@ -167,12 +168,6 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val visibleCalendarsFlow =
         allCalendarsFlow.map { it.filterVisibleCalendars() }.distinctUntilChanged()
             .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
-
-    private fun List<Calendar>.filterVisibleCalendars(): List<Calendar> {
-        return this.filter {
-            it.display && (it.isActive || it.isDisabled)
-        }
-    }
 
     private fun removeDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
         // status at 1 means the address is active

@@ -16,6 +16,7 @@ import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
+import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -143,7 +144,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
         MemberEntity::class,
         PassphraseEntity::class,
         UserSettingsEntity::class,
-        ManagedHolidayCalendarEntity::class
+        ManagedHolidayCalendarEntity::class,
+        EventOccurrenceEntity::class
     ],
     version = AppDatabase.version,
     exportSchema = true
@@ -199,6 +201,7 @@ abstract class AppDatabase :
     abstract fun deprecatedUserSettingsDao(): UserSettingsDao
     abstract fun calendarKeysDao(): CalendarKeysDao
     abstract fun eventAlarmsDao(): EventAlarmsDao
+    abstract fun eventOccurrencesDao(): EventOccurrencesDao
     abstract fun membersDao(): MembersDao
     abstract fun passphrasesDao(): PassphrasesDao
     abstract fun managedHolidayCalendarDao(): ManagedHolidayCalendarDao
@@ -208,6 +211,7 @@ abstract class AppDatabase :
         const val TABLE_CALENDARS = "calendars"
         const val TABLE_EVENTS = "events"
         const val TABLE_EVENTS_METADATA = "events_metadata"
+        const val TABLE_EVENTS_OCCURRENCES = "events_occurrences"
         const val TABLE_USERS = "users"
         const val TABLE_ADDRESSES = "addresses"
         const val TABLE_CALENDAR_SETTINGS = "calendar_settings"
@@ -222,7 +226,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 73
+        const val version = 74
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -278,6 +282,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_70_71,
             AppDatabaseMigrations.MIGRATION_71_72,
             AppDatabaseMigrations.MIGRATION_72_73,
+            AppDatabaseMigrations.MIGRATION_73_74
         )
 
         fun buildDatabase(context: Context): AppDatabase =

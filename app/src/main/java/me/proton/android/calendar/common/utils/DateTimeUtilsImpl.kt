@@ -60,6 +60,15 @@ object DateTimeUtilsImpl : DateTimeUtils {
         return (if (excludeFrom) thisInstant > fromInstant else thisInstant >= fromInstant) && (if (excludeTo) thisInstant < toInstant else thisInstant <= toInstant)
     }
 
+
+    override fun Pair<ZonedDateTime, ZonedDateTime>.overlaps(other: Pair<ZonedDateTime, ZonedDateTime>): Boolean {
+        return this.first <= other.second && this.second >= other.first
+    }
+
+    override fun Pair<Long, Long>.overlapsLong(other: Pair<Long, Long>): Boolean {
+        return this.first <= other.second && this.second >= other.first
+    }
+
     override fun LocalDate.isBetween(fromDate: LocalDate, toDate: LocalDate): Boolean {
         val thisLocalDate = this.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)
         val fromZonedDateTime = fromDate.atTime(LocalTime.MIDNIGHT).atZone(ZoneOffset.UTC)

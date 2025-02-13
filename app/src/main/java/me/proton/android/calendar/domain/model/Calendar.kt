@@ -72,3 +72,9 @@ data class Calendar(
 
 }
 // TODO fields need to be duplicated here, plus local metadata added
+
+fun List<Calendar>.filterVisibleCalendars(): List<Calendar> {
+    return this.filter {
+        it.display && (it.isActive || it.isDisabled)
+    }
+}
