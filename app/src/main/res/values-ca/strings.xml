@@ -583,7 +583,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Acaba a les %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Novetats</string>
-    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_beta_header">Calendar beta</string>
     <string name="spotlight_dialog_skip">Omet</string>
     <string name="spotlight_dialog_confirmation_button">D\'acord</string>
     <string name="spotlight_dialog_month_view_title">Vista mensual</string>

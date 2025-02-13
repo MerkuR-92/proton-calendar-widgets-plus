@@ -86,7 +86,7 @@
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d ya</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d mungkin</string>
     <string name="event_attendee_no" comment="How many attendees answered no">%1$d tidak</string>
-    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d tertunda</string>
+    <string name="event_attendee_unanswered" comment="How many attendees didn't answer yet">%1$d belum ditanggapi</string>
     <string name="event_attendee_is_organizer">Anda adalah penyelenggara</string>
     <string name="event_attendee_organizer">Penyelenggara</string>
     <string name="event_attendee_optional">Opsional</string>
@@ -116,7 +116,7 @@
     <string name="event_organizer_send_prefs_message_accepted_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menerima undangan</string>
     <string name="event_organizer_send_prefs_message_declined_title">Penyelenggara tidak dapat diberi tahu bahwa Anda menolak undangan</string>
     <string name="event_organizer_send_prefs_message_tentative_title">Penyelenggara tidak dapat diberi tahu bahwa Anda sementara menerima undangan</string>
-    <string name="event_organizer_send_prefs_message_default_title">Penyelenggara tidak dapat diberi tahu bahwa Anda telah merespons undangan ini</string>
+    <string name="event_organizer_send_prefs_message_default_title">Penyelenggara tidak dapat diberi tahu bahwa Anda telah menjawab undangan ini</string>
     <string name="event_organizer_send_prefs_button_title">OK</string>
     <string name="event_attendees_send_prefs_error_title">Peserta tidak dapat diberi tahu</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Tidak ada peserta yang dapat diberi tahu mengenai perubahan Anda:\n\n• %1$s\n\nApakah Anda ingin tetap melanjutkan?</string>
@@ -566,7 +566,7 @@
     <string name="default_calendar_name">Kalender saya</string>
     <!-- FEEDBACK DIALOG -->
     <string name="dialog_feedback_header">Beri kami masukan</string>
-    <string name="dialog_feedback_text">Bagaimana pengalaman Anda menggunakan Kalender Proton?</string>
+    <string name="dialog_feedback_text">Bagaimana Anda menggambarkan pengalaman Anda dengan Proton Calendar?</string>
     <string name="dialog_feedback_rating_worst">Sangat Buruk</string>
     <string name="dialog_feedback_rating_best">Sangat Baik</string>
     <string name="dialog_feedback_hint">Ceritakan pengalaman Anda. (Opsional)</string>
@@ -662,7 +662,7 @@
     <string name="import_assistant_status_paused_lost_connection_description">Untuk melanjutkan proses impor, ketuk Hubungkan Ulang, masuk ke akun Google Anda, dan izinkan kembali Proton untuk mengakses data Google Anda.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Hubungkan Ulang</string>
     <string name="import_assistant_status_paused_storage_full_title">Ruang penyimpanan Anda penuh</string>
-    <string name="import_assistant_status_paused_storage_full_description">Akun Proton Anda tidak memiliki ruang penyimpanan yang cukup untuk menyelesaikan impor kalender ini. Kosongkan atau perbesar ruang penyimpanan Anda, lalu kembali ke halaman ini dan pilih Lanjutkan.</string>
+    <string name="import_assistant_status_paused_storage_full_description">Akun Proton Anda tidak memiliki ruang penyimpanan yang memadai untuk menyelesaikan impor kalender ini. Kosongkan atau tambah ruang penyimpanan Anda, lalu kembali ke halaman ini dan pilih Lanjutkan.</string>
     <string name="import_assistant_status_paused_storage_full_button">Lanjutkan</string>
     <string name="import_assistant_delete_report_title">Hapus dari daftar?</string>
     <string name="import_assistant_delete_report_message">Anda tidak akan lagi melihat rekaman impor ini pada daftar yang ada.</string>
