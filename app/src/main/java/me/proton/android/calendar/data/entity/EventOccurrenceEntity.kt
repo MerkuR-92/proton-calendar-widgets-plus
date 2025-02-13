@@ -37,3 +37,6 @@ data class EventOccurrenceEntity(
     var _id: Int = 0
 )
 
+fun List<EventOccurrenceEntity>.distinct(): List<EventOccurrenceEntity> =
+    this.distinctBy { (Triple(it.userId, it.calendarId, it.eventId)) }
+

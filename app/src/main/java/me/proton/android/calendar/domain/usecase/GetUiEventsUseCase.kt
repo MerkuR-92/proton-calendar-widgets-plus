@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
+import me.proton.android.calendar.data.entity.distinct
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.model.Event
@@ -50,6 +50,7 @@ class GetUiEventsUseCase @Inject constructor(
                 combine(
                     getUserInfoUseCase(),
 
+                    // trivial case, only 1 row for each event, start + end times are well defined
                     database.eventOccurrencesDao().selectNonRecurringBetweenInclusive(
                         userId.id,
                         calendars.map { it.id },
@@ -57,6 +58,7 @@ class GetUiEventsUseCase @Inject constructor(
                         toEpoch.toEpochSecond()
                     ),
 
+                    // we know first and last occurrence time, it can be selected like non-recurring above
                     database.eventOccurrencesDao().selectFiniteRecurring(
                         userId.id,
                         calendars.map { it.id },
@@ -64,23 +66,47 @@ class GetUiEventsUseCase @Inject constructor(
                         toEpoch.toEpochSecond()
                     ),
 
+                    // we don't know when the last occurrence happens, so we have to select all events
+                    // except for the ones that start after our window
                     database.eventOccurrencesDao().selectInfiniteRecurring(
                         userId.id,
-                        calendars.map { it.id }
+                        calendars.map { it.id },
+                        toEpoch.toEpochSecond()
                     )
-
 
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
 
                     // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
                     // to filter out even more events here, before decryption takes place
 
-                    /* TODO we should use windows for selection of these rows, right now we're selecting all of them */
+                    // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
+                    //  - select from by windowStart and windowEnd, only the rows that overlap with eventsWindow (problem: false negatives if the window was never generated for those events)
+                    //  - groupBy events before performing discarding below and early-return for each event that for sure happens or doesn't happen in the window (problem: higher memory usage)
 
+                    val notOccurring = infiniteRecurring.filter { occurrence ->
+
+                        val isSelectedWindowFullyInOccurrenceWindow = isFullyBetween(fromEpoch.toEpochSecond() to toEpoch.toEpochSecond(), occurrence.windowStartTime to occurrence.windowEndTime)
+                        val isEventNotHappeningInOccurrenceWindow = occurrence.startTime == null
+                        // optimization: event is happening in the entire window selected from DB, but after the time we are searching for,
+                        //  so we can only do this for events happening *after*, but not *outside* the searched window, because [occurrence.startTime]
+                        //  is the first occurrence overlapping generated window, but we don't know if it's the only one
+                        val isFirstEventOccurenceAfterSelectedWindow = (occurrence.startTime ?: 0) > toEpoch.toEpochSecond()
+
+                        // check if this event for sure does not occur in <from, to>
+                        isSelectedWindowFullyInOccurrenceWindow && (isEventNotHappeningInOccurrenceWindow || isFirstEventOccurenceAfterSelectedWindow)
+                    }.distinct()
+
+                    val filteredInfiniteRecurring = infiniteRecurring.filterNot { recurring -> notOccurring.find {
+                        recurring.userId == it.userId && recurring.calendarId == it.calendarId && recurring.eventId == it.eventId } != null
+                    }
+
+                    // we are returning first out of potentially many EventOccurrence objects for infiniteRecurring events
+                    //  it doesn't matter because in the next step we're not using metadata, we only need to know which events
+                    //  to decrypt and expand
                     Triple(
                         userInfo,
-                        nonRecurring,
-                        (finiteRecurring + infiniteRecurring)
+                        nonRecurring.distinct(),
+                        (finiteRecurring.distinct() + filteredInfiniteRecurring.distinct())
                     )
                 }
 
@@ -138,6 +164,13 @@ class GetUiEventsUseCase @Inject constructor(
                 CalendarsRepository.GetEventsResult.Success(transformedNonRecurring + transformedRecurring)
             }
 
+    }
+
+    /**
+     * If [fromEpoch] -- [toEpoch] is fully between [windowStartTime] -- [windowEndTime]
+     */
+    private fun isFullyBetween(smallerWindow: Pair<Long, Long>, largerWindow: Pair<Long, Long>): Boolean {
+        return smallerWindow.first >= largerWindow.first && smallerWindow.second <= largerWindow.second
     }
 
 }
