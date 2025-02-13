@@ -889,7 +889,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                         transformedEvent.isAllDay(),
                         if (transformedEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
                         transformedEvent.getDisplayColor (isFreeUser),
-                        transformedEvent.decryptionStatus ?: Event.DecryptionStatus.FAILURE, // TODO
+                        transformedEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
                         transformedEvent.getParticipationStatus(userEmails),
                         transformedEvent.status ?: Status.confirmed()
                     )

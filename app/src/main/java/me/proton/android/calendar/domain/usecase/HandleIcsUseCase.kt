@@ -23,7 +23,6 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRecurrenceId
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
-import me.proton.android.calendar.common.utils.ProtonUtilsImpl.sortPersonalCalendars
 import me.proton.android.calendar.common.utils.getAddressesOrNull
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.entity.EventEntity
@@ -343,7 +342,7 @@ class HandleIcsUseCase @Inject constructor(
         if (iCalendar.method.isReply && !isOrganizerMode) {
             return IcsSurgeryUtils.HandleIcsResult.Error.Method(existingEvent?.id)
         }
-        if (existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
+        if (existingEvent?.decryptionStatus is Event.DecryptionStatus.Failure) return IcsSurgeryUtils.HandleIcsResult.Error.DecryptionFailed(existingEvent?.id, existingEvent?.calendar?.id, existingEvent?.isRecurring())
         if (existingEvent?.calendar?.isActive == false) return IcsSurgeryUtils.HandleIcsResult.Error.DisabledCalendar(existingEvent?.id)
 
         if (isCurrentUserSender && existingEvent != null) {
@@ -352,7 +351,7 @@ class HandleIcsUseCase @Inject constructor(
             return IcsSurgeryUtils.HandleIcsResult.Success(existingEvent?.id ?: return IcsSurgeryUtils.HandleIcsResult.Error.EventNotFound, IcsSurgeryUtils.HandleIcsAction.OPEN_EVENT, isRecurring = existingEvent?.isRecurring())
         }
 
-        val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus == Event.DecryptionStatus.FAILURE)
+        val isNew = eventsSharingUidResponse.isNullOrEmpty() || existingEvent == null || (existingEvent != null && existingEvent?.decryptionStatus is Event.DecryptionStatus.Failure)
 
         // If a series already exist, use the same calendar, else use the default one
         val existingCalendar = if (!eventsSharingUidResponse.isNullOrEmpty()) {

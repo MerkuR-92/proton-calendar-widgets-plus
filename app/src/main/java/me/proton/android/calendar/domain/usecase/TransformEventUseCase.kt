@@ -108,7 +108,7 @@ class TransformEventUseCase @Inject constructor(
                                     getPublicKeysForAuthor(UserId(userId), sharedEvent, userAddresses, allowApiCall)
                                 )
                             )
-                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                        } else ProcessResult(null, Event.DecryptionStatus.Failure.NoAddressKey, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
@@ -158,7 +158,7 @@ class TransformEventUseCase @Inject constructor(
                                     getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
                                 )
                             )
-                        } else ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+                        } else ProcessResult(null, Event.DecryptionStatus.Failure.NoAddressKey, Event.SignatureVerification.FAILURE)
                     } else { // use Calendar Key with SharedKeyPacket
                         getPlainText(
                             eventEntity.sharedKeyPacket,
@@ -256,11 +256,11 @@ class TransformEventUseCase @Inject constructor(
                 else -> null
             },
             decryptionStatus = when {
-                decryptionStatuses.all { it == Event.DecryptionStatus.SUCCESS } -> {
-                    Event.DecryptionStatus.SUCCESS
+                decryptionStatuses.all { it == Event.DecryptionStatus.Success } -> {
+                    Event.DecryptionStatus.Success
                 }
-                decryptionStatuses.any { it == Event.DecryptionStatus.FAILURE } -> {
-                    Event.DecryptionStatus.FAILURE
+                decryptionStatuses.any { it is Event.DecryptionStatus.Failure } -> {
+                    decryptionStatuses.firstOrNull { it is Event.DecryptionStatus.Failure.NoAddressKey } ?: Event.DecryptionStatus.Failure.Generic
                 }
                 else -> null
             },
@@ -393,9 +393,9 @@ class TransformEventUseCase @Inject constructor(
                 signatureVerification = Event.SignatureVerification.NOT_SIGNED
             }
 
-            ProcessResult(plainText, Event.DecryptionStatus.SUCCESS, signatureVerification)
+            ProcessResult(plainText, Event.DecryptionStatus.Success, signatureVerification)
         } else {
-            ProcessResult(null, Event.DecryptionStatus.FAILURE, Event.SignatureVerification.FAILURE)
+            ProcessResult(null, Event.DecryptionStatus.Failure.Generic, Event.SignatureVerification.FAILURE)
         }
 
     }

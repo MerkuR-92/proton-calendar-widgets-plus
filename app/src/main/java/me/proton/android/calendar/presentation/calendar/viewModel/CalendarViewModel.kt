@@ -1309,7 +1309,7 @@ class CalendarViewModel @Inject constructor(
                         pastEvent = event.isInThePast(),
                         isUnanswered = !event.isCancelled() && event.participationStatus == ParticipationStatus.NEEDS_ACTION,
                         strikeThroughTitle = event.isCancelled() || event.participationStatus == ParticipationStatus.DECLINED,
-                        decryptionFailed = event.decryptionStatus == Event.DecryptionStatus.FAILURE,
+                        decryptionFailed = event.decryptionStatus is Event.DecryptionStatus.Failure,
                         eventTitle = if (isSkeletonEvent) null
                         else event.summary?.nullIfBlank() ?: resourceProvider.provideString(R.string.default_event_summary)
                     )
