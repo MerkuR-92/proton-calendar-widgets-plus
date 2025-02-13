@@ -247,8 +247,11 @@ object ProtonUtilsImpl : ProtonUtils {
             }
             // Take the entry that has a name, with priority on Proton contact
             if (protonContact != null && protonContact.name.isNotEmpty()) {
-                Attendee(protonContact.name, protonContact.email)
+                val protonAttendee = Attendee(protonContact.name, protonContact.email)
+                protonAttendee.participationStatus = attendee.participationStatus
+                protonAttendee
             } else if (deviceContact != null && !deviceContact.commonName.isNullOrEmpty()) {
+                deviceContact.participationStatus = attendee.participationStatus
                 deviceContact
             } else {
                 attendee
