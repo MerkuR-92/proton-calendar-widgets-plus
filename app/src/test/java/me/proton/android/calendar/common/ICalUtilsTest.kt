@@ -3242,6 +3242,58 @@ internal class ICalUtilsTest {
     }
 
     @Test
+    fun `generate occurrences of all-day event with UNTIL, GMT-3, displayed in GMT-3`() {
+
+        val iCalString = """
+        BEGIN:VCALENDAR
+        VERSION:2.0
+        PRODID:-//Proton AG//web-calendar 5.0.43.6//EN
+        BEGIN:VTIMEZONE
+        TZID:America/Sao_Paulo
+        END:VTIMEZONE
+        BEGIN:VEVENT
+        DTSTAMP:20250217T160959Z
+        RRULE:FREQ=DAILY;UNTIL=20250210
+        SEQUENCE:1
+        SUMMARY:Daily full-day Feb 6 - 10
+        UID:wRArtJZq-iG91uqKotDOCkx5wA8k@proton.me
+        STATUS:CONFIRMED
+        DTSTART;VALUE=DATE:20250206
+        DTEND;VALUE=DATE:20250206
+        END:VEVENT
+        END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = ICalUtilsImpl.parseICalString(iCalString)!!
+        val displayTimeZoneId = "America/Sao_Paulo"
+        val event = Event.from("id", me.proton.android.calendar.domain.model.Calendar(
+            "id",
+            "calendar",
+            "email",
+            "ownerEmail",
+            "description",
+            "",
+            0,
+            "addressId",
+            "memberId",
+            1,
+            true,
+            0,
+            127,
+            30,
+            emptyList(),
+            emptyList()
+        ), iCal, 0, null)!!
+
+        val occurrences = event.generateOccurrencesUntil(LocalDate.of(2025, 2, 20), displayTimeZoneId)
+
+        assertThat(occurrences!!.size).isEqualTo(5)
+        occurrences.all {
+            it.startDateTime.toLocalTime() == LocalTime.of(0, 0, 0)
+        }
+    }
+
+    @Test
     fun `generate first occurrence SINCE of all-day event`() {
 
         val iCalString = """
