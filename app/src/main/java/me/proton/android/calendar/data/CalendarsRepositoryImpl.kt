@@ -649,9 +649,12 @@ class CalendarsRepositoryImpl @Inject constructor(
                     recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(transformedNormalEvents)
                 val recurringUiEvents = recurringSkeletonEvents.mapNotNull { skeletonEvent ->
                     // occurrences are already filtered for time window
+
+                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+
                     expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
                         skeletonEvent,
-                        allSkeletonEvents.filter { it.uid == skeletonEvent.uid },
+                        skeletonEventsSharingUid,
                         eventsWindow.fromDate,
                         eventsWindow.toDate,
                         eventsWindow.timeZoneId,
@@ -773,9 +776,12 @@ class CalendarsRepositoryImpl @Inject constructor(
                 val allSkeletonEvents =
                     recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(normalSkeletonEventsInWindow)
                 val recurringSkeletonEventsInWindow = recurringSkeletonEvents.map { skeletonEvent ->
+
+                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+
                     expandSkeletonEventsAndFilterInWindow(
                         skeletonEvent,
-                        allSkeletonEvents,
+                        skeletonEventsSharingUid,
                         eventsWindow
                     )
                 }.flatten()
@@ -990,9 +996,12 @@ class CalendarsRepositoryImpl @Inject constructor(
             val allSkeletonEvents =
                 recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(transformedNormalEvents)
             val recurringSkeletonEventsInWindow = recurringSkeletonEvents.map { skeletonEvent ->
+
+                val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+
                 expandSkeletonEventsAndFilterInWindow(
                     skeletonEvent,
-                    allSkeletonEvents,
+                    skeletonEventsSharingUid,
                     eventsWindow
                 )
             }.flatten()
