@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Afspraak aangemaakt, maar uitnodiging kon niet verzonden worden</string>
     <string name="snack_event_created_error">Fout bij maken evenement</string>
     <string name="snack_event_opening_edit_error">Fout bij openen afspraak voor bewerken</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">U kunt geen terugkerende uitnodiging bewerken die wijzigingen aan een eenmalige gebeurtenis bevat.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">U kunt geen terugkerende uitnodiging verwijderen die wijzigingen aan een eenmalige gebeurtenis bevat.</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">U kunt geen terugkerende uitnodiging bewerken die verwijderde gebeurtenissen bevat</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">U kunt geen terugkerende uitnodiging verwijderen die verwijderde gebeurtenissen bevat</string>
     <string name="snack_event_edit_with_attendees_error">Het bewerken van evenementen met deelnemers is nog niet ondersteund</string>

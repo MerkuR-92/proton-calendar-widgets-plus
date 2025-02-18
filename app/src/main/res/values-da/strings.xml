@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Begivenhed oprettet, men invitation blev ikke sendt</string>
     <string name="snack_event_created_error">Fejl ved opretning af begivenhed</string>
     <string name="snack_event_opening_edit_error">Fejl under åbning af begivenhed for redigering</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Du kan ikke redigere en tilbagevendende invitation, der indeholder ændringer for enkelte forekomster.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Du kan ikke slette en tilbagevendende invitation, der indeholder ændringer af enkelte forekomster.</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Du kan ikke redigere en tilbagevendende invitation, der indeholder slettede forekomster.</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Du kan ikke slette en tilbagevendende invitation, der indeholder slettede forekomster.</string>
     <string name="snack_event_edit_with_attendees_error">Redigering af begivenheder med deltagere understøttes endnu ikke</string>

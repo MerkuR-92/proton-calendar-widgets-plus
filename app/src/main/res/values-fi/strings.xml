@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
     <string name="snack_event_created_error">Virhe luotaessa tapahtumaa</string>
     <string name="snack_event_opening_edit_error">Virhe avattaessa tapahtuman muokkausta</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Et voi muokata toistuvaa kutsua, jossa on muutoksia yksittäisiin tapahtumiin</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Et voi poistaa toistuvaa kutsua, jossa on muutoksia yksittäisiin tapahtumiin</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Et voi muokata toistuvaa kutsua, joka sisältää poistettuja tapahtumia</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Et voi poistaa toistuvaa kutsua, joka sisältää poistettuja tapahtumia</string>
     <string name="snack_event_edit_with_attendees_error">Osallistujia sisältävien tapahtumien muokkausta ei vielä tueta</string>

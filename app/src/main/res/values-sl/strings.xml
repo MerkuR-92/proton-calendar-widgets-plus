@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Dogodek je bil ustvarjen, vendar povabila ni bilo mogoče poslati</string>
     <string name="snack_event_created_error">Napaka pri ustvarjanju dogodka</string>
     <string name="snack_event_opening_edit_error">Napaka pri odpiranju dogodka za urejanje</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Ponavljajočega se vabila, ki vsebuje spremembe enega samega dogodka, ne morete urejati.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Ponavljajočega se vabila, ki vsebuje spremembe enega samega dogodka, ne morete izbrisati.</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Ponavljajočega se vabila, ki vsebuje izbrisane dogodke, ne morete urejati.</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Ponavljajočega se vabila, ki vsebuje izbrisane dogodke, ne morete izbrisati.</string>
     <string name="snack_event_edit_with_attendees_error">Urejanje dogodkov z udeleženci še ni podprto</string>
