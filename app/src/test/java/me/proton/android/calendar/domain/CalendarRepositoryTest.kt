@@ -26,16 +26,15 @@ import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
-import me.proton.android.calendar.test.shared.mocks.eventUid
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
@@ -45,7 +44,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.TimeZone
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 @FlowPreview
@@ -68,6 +66,7 @@ internal class CalendarRepositoryTest {
     private val userAddressManagerMock: UserAddressManager = mockk()
     private val accountManagerMock: AccountManager = mockk()
     private val networkManagerMock: NetworkManager = mockk()
+    private val updateEventOccurrencesUseCaseMock: UpdateEventOccurrencesUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -381,7 +380,8 @@ internal class CalendarRepositoryTest {
             userManagerMock,
             userAddressManagerMock,
             accountManagerMock,
-            networkManagerMock
+            networkManagerMock,
+            updateEventOccurrencesUseCaseMock
         )
     }
 

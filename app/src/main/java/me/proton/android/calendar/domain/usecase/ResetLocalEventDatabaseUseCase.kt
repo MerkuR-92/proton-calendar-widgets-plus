@@ -23,7 +23,8 @@ class ResetLocalEventDatabaseUseCase @Inject constructor(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val userSettingsRepository: UserSettingsRepository,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val widgetRefresher: CalendarWidgetRefresher
+    private val widgetRefresher: CalendarWidgetRefresher,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) {
 
     suspend operator fun invoke(
@@ -64,8 +65,11 @@ class ResetLocalEventDatabaseUseCase @Inject constructor(
                 } else {
                     fetchEventsResult.second?.let {
                         logger.v("persisting events in bootstrap: ${it.size}")
-                        calendarsRepository.persistEvents(*it.toTypedArray()) // We already persisted events metadata in split fetch
-                        updateAlarmsUseCase.execute(userId.id, it.map { it.id })
+                        calendarsRepository.persistEvents(*(it.map { it.first }).toTypedArray()) // We already persisted events metadata in split fetch
+                        it.map { it.second }.forEach {
+                            updateEventOccurrencesUseCase.execute(userId.id, it)
+                        }
+                        updateAlarmsUseCase.execute(userId.id, it.map { it.first.id })
                         widgetRefresher.refreshEventList()
                     }
                 }

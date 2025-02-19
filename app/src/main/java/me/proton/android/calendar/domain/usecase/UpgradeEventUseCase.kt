@@ -33,6 +33,7 @@ class UpgradeEventUseCase @Inject constructor(
     private val userAddressManager: UserAddressManager,
     private val crypto: Crypto,
     private val database: AppDatabase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) : UseCase {
 
     suspend fun execute(userId: UserId, eventId: String): UseCase.Result {
@@ -83,6 +84,7 @@ class UpgradeEventUseCase @Inject constructor(
                 } else {
                     calendarsRepository.persistEvents(upgradeResponse.data.event.toEventEntity())
                     calendarsRepository.persistEventsMetadata(upgradeResponse.data.event.toEventEntityMetadata())
+                    updateEventOccurrencesUseCase.execute(userId.id, upgradeResponse.data.event.toEventEntityMetadata())
                     UseCase.Result.Success(upgradeResponse.data.event.toEventEntity())
                 }
             }
@@ -98,6 +100,7 @@ class UpgradeEventUseCase @Inject constructor(
                     } else {
                         calendarsRepository.persistEvents(event.toEventEntity())
                         calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
+                        updateEventOccurrencesUseCase.execute(userId.id, event.toEventEntityMetadata())
                         UseCase.Result.Success(event.toEventEntity())
                     }
                 } else {

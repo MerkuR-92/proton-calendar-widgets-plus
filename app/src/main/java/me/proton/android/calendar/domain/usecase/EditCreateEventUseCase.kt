@@ -59,7 +59,7 @@ class EditCreateEventUseCase @Inject constructor(
     private val userAddressManager: UserAddressManager,
     private val crypto: Crypto,
     private val valueStoreProvider: ValueStoreProvider,
-    private val database: AppDatabase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val upgradeEventUseCase: UpgradeEventUseCase
 ): UseCase {
@@ -404,6 +404,9 @@ class EditCreateEventUseCase @Inject constructor(
                 calendarsRepository.persistEvents(*eventsToInsertOrUpdate.map { it.toEventEntity() }.toTypedArray())
                 calendarsRepository.persistEventsMetadata(*eventsToInsertOrUpdate.map { it.toEventEntityMetadata() }.toTypedArray())
                 updateAlarmsUseCase.execute(userId.id, eventsToInsertOrUpdate.map { it.id })
+                eventsToInsertOrUpdate.map { it.toEventEntityMetadata() }.forEach {
+                    updateEventOccurrencesUseCase.execute(userId.id, it)
+                }
 
                 // TODO we don't need it anymore, since all alarms are calculated locally
                 // fetch and store alarms for just changed events

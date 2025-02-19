@@ -93,6 +93,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
@@ -133,7 +134,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val userManager: UserManager,
     private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
-    private val networkManager: NetworkManager
+    private val networkManager: NetworkManager,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) : CalendarsRepository {
 
     private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
@@ -242,12 +244,15 @@ class CalendarsRepositoryImpl @Inject constructor(
                     logger.e("fetchEventsResult: null event list when Success")
                 }
 
-                fetchEventsResult.second?.let {
-                    logger.v("fetchEventsResult success: ${it.size}")
-                    persistEvents(*it.toTypedArray()) // We already persisted metadata on fetch result
+                fetchEventsResult.second?.let { fetchingResult ->
+                    logger.v("fetchEventsResult success: ${fetchingResult.size}")
+                    persistEvents(*(fetchingResult.map { it.first }).toTypedArray()) // We already persisted metadata on fetch result
+                    fetchingResult.forEach {
+                        updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, it.second)
+                    }
                     fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
-                    updateAlarmsUseCase.execute(fetchWindow.userId.id, it.map { it.id })
+                    updateAlarmsUseCase.execute(fetchWindow.userId.id, fetchingResult.map { it.first.id })
                     fetchedWindows.add(fetchWindow)
                 }
             } else {
