@@ -246,7 +246,7 @@ object EventUtilsImpl : EventUtils {
         // localize Date created by iterator in display TimeZone, handling the BySetPos
         fun localizeIteratorDate(iteratorDate: Date, iteratorZoneId: ZoneId, iteratorZonedDateTimeStart: ZonedDateTime, formatZoneId: ZoneId): ZonedDateTime {
             return if (isAllDay()) {
-                iteratorDate.toInstant().atZone(iteratorZoneId).withZoneSameLocal(formatZoneId)
+                iteratorDate.toInstant().atZone(ZoneId.of("UTC")).withZoneSameLocal(formatZoneId)
             } else {
                 iteratorDate.toInstant().atZone(formatZoneId) // localize in display TZ
 
@@ -259,7 +259,13 @@ object EventUtilsImpl : EventUtils {
 
         val iteratorZoneId = ZoneId.of(if (isAllDay()) TimeZone.getDefault().id else this.iCalendar.timezoneInfo.getTimezone(this.iCalEvent.dateStart)?.timeZone?.id ?: TimeZone.getTimeZone("UTC").id)
         val iteratorZonedDateTimeStart = this.iCalEvent.dateStart.value.toZonedDateTime(iteratorZoneId.id)
-        val iterator = this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
+        val iteratorZonedDateTimeStartInUtc = iteratorZonedDateTimeStart.withZoneSameLocal(ZoneId.of("UTC"))
+
+        val iterator = if (isAllDay()) {
+            this.iCalEvent.recurrenceRule.getDateIterator(Date.from(iteratorZonedDateTimeStartInUtc.toInstant()), TimeZone.getTimeZone(ZoneId.of("UTC")))
+        } else {
+            this.iCalEvent.recurrenceRule.getDateIterator(this.iCalEvent.dateStart.value, TimeZone.getTimeZone(iteratorZoneId.id))
+        }
 
         val eventDurationInMillis = (iCalEvent.dateEnd.value.time - iCalEvent.dateStart.value.time)
         val eventStart = Instant.ofEpochMilli(iCalEvent.dateStart.value.time).atZone(iteratorZoneId)
