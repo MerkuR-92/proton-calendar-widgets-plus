@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">L\'événement est créé, mais l\'invitation n\'a pas été envoyée.</string>
     <string name="snack_event_created_error">Une erreur s\'est produite pendant la création de l\'événement.</string>
     <string name="snack_event_opening_edit_error">Une erreur s\'est produite pendant l\'ouverture de l\'événement pour le modifier.</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Vous ne pouvez pas modifier une invitation récurrente contenant des changements à des occurrences individuelles.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Vous ne pouvez pas supprimer une invitation récurrente contenant des changements à des occurrences individuelles.</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Vous ne pouvez pas modifier une invitation récurrente contenant des occurrences supprimées.</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Vous ne pouvez pas supprimer une invitation récurrente contenant des occurrences supprimées.</string>
     <string name="snack_event_edit_with_attendees_error">La modification des événements avec des participants n\'est pas encore possible.</string>

@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Udalosť bola vytvorená, ale pozvánku sa nepodarilo odoslať</string>
     <string name="snack_event_created_error">Chyba pri vytváraní udalosti</string>
     <string name="snack_event_opening_edit_error">Chyba pri otváraní udalosti na úpravu</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Nemôžete upravovať opakujúcu sa udalosť, ktorá obsahuje zmeny v jednotlivých výskytoch</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nemôžete vymazať opakujúcu sa pozvánku, ktorá obsahuje zmeny v jednotlivých výskytoch</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Nemôžete upravovať opakujúcu sa pozvánku obsahujúcu vymazané výskyty</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Nemôžete vymazať opakujúcu sa pozvánku obsahujúcu vymazané výskyty</string>
     <string name="snack_event_edit_with_attendees_error">Úprava udalostí s účastníkmi zatiaľ nie je podporovaná</string>

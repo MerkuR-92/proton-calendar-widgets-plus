@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Etkinlik eklendi ancak davet gönderilemedi</string>
     <string name="snack_event_created_error">Etkinlik eklenirken sorun çıktı</string>
     <string name="snack_event_opening_edit_error">Etkinlik düzenlenmek için açılırken sorun çıktı</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Tek bir yinelenmede değişikliklerin olduğu yinelenen bir daveti düzenleyemezsiniz</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Tek bir yinelenmede değişikliklerin olduğu yinelenen bir daveti silemezsiniz</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Silinmiş yinelenmelerin olduğu yinelenen bir daveti düzenleyemezsiniz</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Silinmiş yinelenmelerin olduğu yinelenen bir daveti silemezsiniz</string>
     <string name="snack_event_edit_with_attendees_error">Şimdilik katılımcıları olan etkinliklerin düzenlenmesi desteklenmiyor</string>

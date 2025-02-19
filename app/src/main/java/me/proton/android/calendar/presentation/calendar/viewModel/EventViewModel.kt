@@ -2571,14 +2571,17 @@ class EventViewModel @Inject constructor(
         eventDetailsState.value = EventState.Idle
     }
 
-    private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(actionType: EventDetailsActionType): Boolean {
+    private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(
+        actionType: EventDetailsActionType,
+        isOrganizer: Boolean = false
+    ): Boolean {
         val event = eventLiveData.value!!
         if (event.isAnInvitation && (event.isRecurring() || event.isSingleEdit())) {
             var errorResId: Int? = null
             if (event.isSingleEdit()) {
                 errorResId = when (actionType) {
-                    EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_single_edit_error
-                    EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_single_edit_error
+                    EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                    EventDetailsActionType.Delete -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
                 }
             } else if (hasExDates()) {
                 errorResId = when (actionType) {
@@ -2594,8 +2597,12 @@ class EventViewModel @Inject constructor(
                     }
                 } else if (immutableSingleEditsInfo.hasSingleEdit) {
                     errorResId = when (actionType) {
-                        EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_single_edit_error
-                        EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_single_edit_error
+                        EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                        EventDetailsActionType.Delete -> {
+                            if (!isOrganizer)
+                                R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                            else null
+                        }
                     }
                 }
             }
@@ -2642,7 +2649,7 @@ class EventViewModel @Inject constructor(
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
-        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Delete)) {
+        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Delete, deleteAsAnOrganizer)) {
             eventDetailsState.value = EventState.Idle
             return
         }

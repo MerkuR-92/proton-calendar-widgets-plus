@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Esemény létrehozva, de a meghívó kiküldése során hiba lépett fel</string>
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
-    <string name="snack_event_edit_recurring_invitation_single_edit_error">Nem szerkeszthet olyan ismétlődő meghívót, amely egyszeri előfordulás módosításait tartalmazza.</string>
-    <string name="snack_event_delete_recurring_invitation_single_edit_error">Nem törölhet olyan ismétlődő meghívót, amely egyszeri előfordulás módosításait tartalmazza</string>
     <string name="snack_event_edit_recurring_invitation_ex_date_error">Nem szerkeszthet olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak</string>
     <string name="snack_event_delete_recurring_invitation_ex_date_error">Nem törölhet olyan ismétlődő meghívókat, melyek törölt előfordulásokat tartalmaznak.</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
