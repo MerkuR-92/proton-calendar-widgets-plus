@@ -62,6 +62,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZon
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeEventDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
@@ -389,7 +390,7 @@ class CalendarViewModel @Inject constructor(
 
                     // explode events for UI
                     val timelineEvents = mutableListOf<TimelineEventAdapter.TimelineEvent>()
-                    expandedEvents.explodeDayByDay(fromDate, toDate, timeZoneId).toSortedMap().forEach { entry ->
+                    expandedEvents.explodeEventDayByDay(fromDate, toDate, timeZoneId).toSortedMap().forEach { entry ->
 
                         yield() // support coroutine cancellation
 

@@ -1117,7 +1117,7 @@ object ICalUtilsImpl : ICalUtils {
         return this.sortedWith(comparator)
     }
 
-    override fun List<Event>.explodeDayByDay(
+    override fun List<Event>.explodeEventDayByDay(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
@@ -1133,6 +1133,32 @@ object ICalUtilsImpl : ICalUtils {
                 result[startDate] = (result[startDate] ?: mutableListOf()).apply { add(event) }
             } else {
                 val spansDays = event.calculateFullDayCounter(startDate, timeZoneId).second
+                for (dayNumber in 0 until spansDays) {
+                    result[startDate.plusDays(dayNumber.toLong())] = (result[startDate.plusDays(dayNumber.toLong())] ?: mutableListOf()).apply { add(event) }
+                }
+            }
+
+        }
+
+        return result.filterKeys { it.isBetween(fromDate, toDate) }
+    }
+
+    override fun List<UiEvent>.explodeDayByDay(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String
+    ): Map<LocalDate, List<UiEvent>> {
+
+        val result = mutableMapOf<LocalDate, MutableList<UiEvent>>()
+
+        this.forEach { event ->
+
+            val startDate = event.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate()
+
+            if (event.spansSingleDay()) {
+                result[startDate] = (result[startDate] ?: mutableListOf()).apply { add(event) }
+            } else {
+                val spansDays = event.calculateFullDayCounter(startDate).second
                 for (dayNumber in 0 until spansDays) {
                     result[startDate.plusDays(dayNumber.toLong())] = (result[startDate.plusDays(dayNumber.toLong())] ?: mutableListOf()).apply { add(event) }
                 }
