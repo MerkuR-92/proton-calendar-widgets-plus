@@ -809,7 +809,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
     }
 
-    private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
+    private suspend fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             binding.weekView.showLoadingEvents = false
             if (fromDate == currentFromDate && toDate == currentToDate && timeZoneId == currentTimeZoneId) {
@@ -822,7 +822,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         currentFromDate = fromDate
         currentToDate = toDate
         currentTimeZoneId = timeZoneId
-        eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
         if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 

@@ -147,12 +147,6 @@ interface CalendarsRepository {
 
     suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event?
 
-    fun getUiEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<GetEventsResult<UiEvent>>
-
     suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
         originalEvent: Event,
         eventsSharingUid: List<Event>,
@@ -162,13 +156,6 @@ interface CalendarsRepository {
         userEmails: List<String>,
         isFreeUser: Boolean
     ): List<UiEvent>?
-
-    suspend fun getEvents(
-        userId: String,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): List<Event>
 
     fun getSearchEvents(
         userId: String,

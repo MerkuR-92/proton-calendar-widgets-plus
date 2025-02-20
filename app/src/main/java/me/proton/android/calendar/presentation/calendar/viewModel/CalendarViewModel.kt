@@ -81,6 +81,7 @@ import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
 import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
@@ -131,7 +132,7 @@ class CalendarViewModel @Inject constructor(
     private val updateCalendarUserSettingsUseCase: UpdateCalendarUserSettingsUseCase,
     private val resourceProvider: ResourceProvider,
     private val database: AppDatabase,
-    private val json: Json,
+    private val getUiEventsUseCase: GetUiEventsUseCase,
     private val workManager: WorkManager,
     private val fixCalendarsUseCase: FixCalendarsUseCase
 ) : AndroidViewModel(application) {
@@ -479,8 +480,16 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun getUiEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
-        return calendarsRepository.getUiEventsFlow(fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+    suspend fun getUiEventsLookup(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
+        return withContext(Dispatchers.IO) {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
+                return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
+            }
+
+            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+        }
     }
 
     suspend fun handleDeleteEvent(eventId: String,

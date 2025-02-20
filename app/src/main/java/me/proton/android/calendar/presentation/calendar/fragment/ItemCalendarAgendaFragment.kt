@@ -181,7 +181,9 @@ class ItemCalendarAgendaFragment: Fragment() {
 
         eventsListLayoutAdapter.submitList(listOf(fakeHeaderEvent))
 
-        getEvents(immutableDate, timeZoneId)
+        lifecycleScope.launch {
+            getEvents(immutableDate, timeZoneId)
+        }
 
         calendarViewModel.selectedDateTime.distinctUntilChanged().observe(viewLifecycleOwner) { selectedDateTime ->
             val selectedDate = selectedDateTime.first
@@ -209,19 +211,21 @@ class ItemCalendarAgendaFragment: Fragment() {
                         immutableDate == selectedDate.minusDays(1) ||
                         immutableDate == selectedDate.plusDays(1))) {
                 logger.v("events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId)
+                lifecycleScope.launch {
+                    getEvents(immutableDate, timeZoneId)
+                }
             }
         }
     }
 
-    private fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
+    private suspend fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
         if (this::uiEventsLiveData.isInitialized && uiEventsLiveData.hasActiveObservers()) {
             logger.v("events flow: remove already existing observer for $immutableDate")
             calendarViewModel.setLoading(false, position)
             uiEventsLiveData.removeObservers(viewLifecycleOwner)
         }
 
-        uiEventsLiveData = calendarViewModel.getUiEvents(immutableDate, immutableDate, timeZoneId, this.lifecycle)
+        uiEventsLiveData = calendarViewModel.getUiEventsLookup(immutableDate, immutableDate, timeZoneId, this.lifecycle)
         uiEventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
         eventsResult?.let {

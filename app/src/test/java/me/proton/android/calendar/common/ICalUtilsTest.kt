@@ -47,6 +47,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.createNewVEvent
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.eventStartZonedDateTimeToDate
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
+import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeEventDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOccurencesByRecurrenceId
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutDuplicates
@@ -74,7 +75,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.filterFromTheEnd
-import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
@@ -5344,7 +5344,7 @@ internal class ICalUtilsTest {
             Event.from("event-1-hour", Calendar("id", "name", "email", "ownerEmail", "description", DEFAULT_CALENDAR_COLOR,0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()), ICalUtilsImpl.parseICalString(oneHourEvent)!!, 0)!!,
         )
 
-        val explodedEvents = events.explodeDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)
+        val explodedEvents = events.explodeEventDayByDay(LocalDate.of(2021, 9, 20), LocalDate.of(2021, 9, 22), displayTimeZoneId)
 
         // multi-day events start on first day of the window
         with(explodedEvents) {
@@ -5360,7 +5360,7 @@ internal class ICalUtilsTest {
             assertThat(this[LocalDate.of(2021, 9, 22)]?.find { it.summary == "Regular 1-hour event" }).isNotNull()
         }
 
-        val explodedEventsAlreadyHappening = events.explodeDayByDay(LocalDate.of(2021, 9, 21), LocalDate.of(2021, 9, 21), displayTimeZoneId)
+        val explodedEventsAlreadyHappening = events.explodeEventDayByDay(LocalDate.of(2021, 9, 21), LocalDate.of(2021, 9, 21), displayTimeZoneId)
 
         // multi-day events start before the window and end after it
         with(explodedEventsAlreadyHappening) {

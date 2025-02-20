@@ -334,12 +334,12 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
     }
 
-    private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
+    private suspend fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
         if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
             eventsLiveData.removeObservers(viewLifecycleOwner)
         }
         // Get and display decrypted events
-        eventsLiveData = calendarViewModel.getUiEvents(fromDate, toDate, timeZoneId, this.lifecycle)
+        eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
         eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
             eventsResult?.let {
                 when (it) {
