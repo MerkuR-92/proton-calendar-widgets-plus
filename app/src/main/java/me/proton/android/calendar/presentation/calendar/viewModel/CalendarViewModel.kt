@@ -14,6 +14,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -339,27 +340,26 @@ class CalendarViewModel @Inject constructor(
     }
 
     private fun calculateCalendarIndicators(
-        events: List<Event>,
+        events: List<UiEvent>,
         timeZoneId: String,
-        isFreeUser: Boolean
     ): Map<LocalDate, List<String>> {
 
         val indicators = mutableMapOf<LocalDate, MutableList<String>>().withDefault { mutableListOf() }
 
         events.forEach { event ->
-            val partTimeEndsOnMidnight = (!event.isAllDay() && event.getOccurrenceEnd(timeZoneId).toLocalTime() == LocalTime.MIDNIGHT)
-            var start = event.getOccurrenceStart(timeZoneId).toLocalDate()
-            val end = event.getOccurrenceEnd(timeZoneId).toLocalDate()
+            val partTimeEndsOnMidnight = (!event.isAllDay && event.dateEnd.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalTime() == LocalTime.MIDNIGHT)
+            var start = event.dateStart.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate()
+            val end = event.dateEnd.withZoneSameInstant(ZoneId.of(timeZoneId)).toLocalDate()
 
             // Use !start.isAfter(end) to iterate inclusive
             while (!start.isAfter(end)) {
                 val current = indicators.getValue(start)
-                current.add(event.getDisplayColor(isFreeUser))
+                current.add(event.displayColor)
                 indicators[start] = current
                 start = start.plusDays(1)
 
                 // All day events end on next day 00:00 so we need to break loop to exclude end day
-                if (start == end && (event.isAllDay() || partTimeEndsOnMidnight)) break
+                if (start == end && (event.isAllDay || partTimeEndsOnMidnight)) break
             }
         }
 
@@ -438,29 +438,28 @@ class CalendarViewModel @Inject constructor(
 
     }
 
-    fun calendarIndicators(
+    suspend fun calendarIndicators(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        isFreeUser: Boolean
+        lifecycle: Lifecycle
     ): LiveData<Map<LocalDate, List<String>>> {
-
-        return calendarsRepository.getSkeletonEventsFlow(fromDate, toDate, timeZoneId).map { skeletonResult ->
-            when (skeletonResult) {
+        // TODO we could optimize this by operating on EventOccurrenceEntity only, not full UiEvents
+        return getUiEventsLookup(fromDate, toDate, timeZoneId, lifecycle).map { eventsResult ->
+            when (eventsResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()
                 }
                 is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
-                    skeletonResult.events,
-                    timeZoneId,
-                    isFreeUser
+                    eventsResult.events,
+                    timeZoneId
                 )
                 is CalendarsRepository.GetEventsResult.Exception -> {
-                    logger.e("exception getting skeletonEventsLiveData", skeletonResult.throwable)
+                    logger.e("exception getting skeletonEventsLiveData", eventsResult.throwable)
                     emptyMap()
                 }
             }
-        }.asLiveData()
+        }
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState

@@ -168,15 +168,6 @@ interface CalendarsRepository {
 
     suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>)
 
-    /**
-     * @return SkeletonEvents with correct Calendar Color.
-     */
-    fun getSkeletonEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<GetEventsResult<SkeletonEvent>>
-
     suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean
 
     suspend fun eventExistsOnServer(userId: UserId, eventId: String, calendarId: String): Boolean?
