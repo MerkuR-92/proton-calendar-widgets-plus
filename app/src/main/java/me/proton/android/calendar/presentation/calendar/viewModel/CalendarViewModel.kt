@@ -1366,6 +1366,24 @@ class CalendarViewModel @Inject constructor(
         return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FIX_CALENDARS, ExistingWorkPolicy.REPLACE, work).state
     }
 
+    suspend fun migrateEventMetadataToOccurrences(): LiveData<Operation.State> {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        val constraints = Constraints.Builder()
+            .build()
+
+        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MIGRATE_EVENT_METADATA_TO_OCCURRENCES,
+                    UseCaseWorker.INPUT_USER_ID to userId?.id
+                )
+            )
+            .build()
+
+        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.MIGRATE_EVENT_METADATA_TO_OCCURRENCES, ExistingWorkPolicy.KEEP, work).state
+    }
+
     fun shouldDisplayServerDownBanner(): LiveData<Boolean> {
         return calendarsRepository.getDisplayServerDownBannerFlow().asLiveData(Dispatchers.Default)
     }

@@ -18,6 +18,7 @@ import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
+import me.proton.android.calendar.domain.usecase.MigrateEventMetadataToOccurrencesUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
@@ -61,7 +62,8 @@ class UseCaseWorker @AssistedInject constructor(
     private val refreshCalendarPassphraseUseCase: RefreshCalendarPassphraseUseCase,
     private val refreshCalendarKeysUseCase: RefreshCalendarKeysUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val handleAlarmsWithMissingEventUseCase: HandleAlarmsWithMissingEventUseCase
+    private val handleAlarmsWithMissingEventUseCase: HandleAlarmsWithMissingEventUseCase,
+    private val migrateEventMetadataToOccurrencesUseCase: MigrateEventMetadataToOccurrencesUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -97,6 +99,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val REFRESH_CALENDAR_KEYS = RefreshCalendarKeysUseCase.REFRESH_CALENDAR_KEYS
             const val UPDATE_ALARMS = UpdateAlarmsUseCase.UPDATE_ALARMS
             const val HANDLE_ALARMS_WITH_MISSING_EVENT = HandleAlarmsWithMissingEventUseCase.HANDLE_ALARMS_WITH_MISSING_EVENT
+            const val MIGRATE_EVENT_METADATA_TO_OCCURRENCES = MigrateEventMetadataToOccurrencesUseCase.WORKER_ID
         }
     }
 
@@ -171,6 +174,7 @@ class UseCaseWorker @AssistedInject constructor(
             const val REFRESH_CALENDAR_KEYS = "REFRESH_CALENDAR_KEYS"
             const val UPDATE_ALARMS = "UPDATE_ALARMS"
             const val HANDLE_ALARMS_WITH_MISSING_EVENT = "HANDLE_ALARMS_WITH_MISSING_EVENT"
+            const val MIGRATE_EVENT_METADATA_TO_OCCURRENCES = "MIGRATE_EVENT_METADATA_TO_OCCURRENCES"
         }
     }
 
@@ -334,6 +338,9 @@ class UseCaseWorker @AssistedInject constructor(
                 val calendarId = inputData.getString(INPUT_CALENDAR_ID) ?: return Result.failure()
                 val eventId = inputData.getString(INPUT_EVENT_ID) ?: return Result.failure()
                 handleAlarmsWithMissingEventUseCase.invoke(userId, calendarId, eventId)
+            }
+            UseCaseId.MIGRATE_EVENT_METADATA_TO_OCCURRENCES -> {
+                migrateEventMetadataToOccurrencesUseCase.execute()
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")
