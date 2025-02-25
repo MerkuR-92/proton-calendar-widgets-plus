@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
 import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.MigrateEventMetadataToOccurrencesUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import javax.inject.Inject
@@ -32,6 +33,8 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
     lateinit var accountManager: AccountManager
     @Inject
     lateinit var workManager: WorkManager
+    @Inject
+    lateinit var migrateEventMetadataToOccurrencesUseCase: MigrateEventMetadataToOccurrencesUseCase
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -59,6 +62,19 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
                         }
                     } catch (e: Exception) {
                         logger.e("ProtonCalendarBroadcastReceiver, boot completed handle alarms error", e)
+                    }
+                }
+            }
+            Intent.ACTION_MY_PACKAGE_REPLACED -> {
+                if (context == null) {
+                    logger.e("null Context in ProtonCalendarBroadcastReceiver ACTION_MY_PACKAGE_REPLACED")
+                } else {
+                    try {
+                        GlobalScope.launch(Dispatchers.IO) {
+                            migrateEventMetadataToOccurrencesUseCase.execute()
+                        }
+                    } catch (e: Exception) {
+                        logger.e("ProtonCalendarBroadcastReceiver, migrateEventMetadataToOccurrencesUseCase error", e)
                     }
                 }
             }
