@@ -343,8 +343,6 @@
     <string name="snack_event_created_failed_mail">Event created but invitation failed to be sent</string>
     <string name="snack_event_created_error">Error creating event</string>
     <string name="snack_event_opening_edit_error">Error opening event for edit</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">You cannot edit a recurring invitation containing deleted occurrences</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">You cannot delete a recurring invitation containing deleted occurrences</string>
     <string name="snack_event_recurring_invitation_only_supported_on_web_message">This recurring event can only be deleted in the Calendar web app.</string>
     <string name="snack_event_edit_with_attendees_error">Editing events with attendees is not supported yet</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Cannot add participants and change calendar simultaneously</string>

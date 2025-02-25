@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Eveniment creat, dar invitația nu a putut fi trimisă.</string>
     <string name="snack_event_created_error">Eroare la crearea evenimentului</string>
     <string name="snack_event_opening_edit_error">Eroare la deschiderea evenimentului pentru editare</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Nu puteți edita o invitație recurentă care conține apariții șterse.</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">Nu puteți șterge o invitație recurentă care conține apariții șterse.</string>
     <string name="snack_event_edit_with_attendees_error">Editarea evenimentelor cu participanţii nu este încă suportată</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nu puteți adăuga participanți și modifica calendarul în același timp.</string>
     <string name="snack_event_init_error">Eroare la inițializarea unui nou eveniment</string>

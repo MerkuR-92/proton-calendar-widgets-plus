@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">მოვლენა შექმნილია, მაგრამ მოსაწვევის გაგზავნა შეუძლებელია</string>
     <string name="snack_event_created_error">მოვლენის შექმნის შეცდომა</string>
     <string name="snack_event_opening_edit_error">მოვლენის ჩასასწორებლად გახსნის შეცდომა</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">განმეორებადი მოსაწვევს, რომელიც წაშლილ მოხდენებს შიცავს, ვერ ჩაასწორებთ</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">განმეორებადი მოსაწვევს, რომელიც წაშლილ მოხდენებს შიცავს, ვერ წაშლით</string>
     <string name="snack_event_edit_with_attendees_error">დამსწრეებთან ღონისძიებების რედაქტირება ჯერ არ არის მხარდაჭერილი</string>
     <string name="snack_event_edit_calendar_with_attendees_error">არ შეიძლება მონაწილეების დამატება და კალენდრის ერთდროულად შეცვლა</string>
     <string name="snack_event_init_error">ახალი მოვლენის ინიციალიზაციის პრობლემა</string>

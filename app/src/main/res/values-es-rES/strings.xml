@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Se ha creado el evento pero no se ha podido enviar la invitación.</string>
     <string name="snack_event_created_error">Error al crear el evento</string>
     <string name="snack_event_opening_edit_error">Error al abrir el evento para editarlo</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">No se puede editar una invitación periódica que contiene ocurrencias eliminadas.</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">No se puede eliminar una invitación periódica que contiene ocurrencias eliminadas.</string>
     <string name="snack_event_edit_with_attendees_error">No se puede aún editar los eventos con invitados.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">No se pueden añadir participantes y cambiar el calendario al mismo tiempo.</string>
     <string name="snack_event_init_error">Error al inicializar el nuevo evento</string>
