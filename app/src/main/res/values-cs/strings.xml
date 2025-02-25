@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Událost byla vytvořena ale pozvánku se nepodařilo odeslat</string>
     <string name="snack_event_created_error">Chyba při vytváření události</string>
     <string name="snack_event_opening_edit_error">Chyba při otevírání události kvůli změnám</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Opakující se pozvánku obsahující smazané výskyty nelze upravit</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">Opakující se pozvánku obsahující smazané výskyty nelze smazat</string>
     <string name="snack_event_edit_with_attendees_error">Úprava událostí s účastníky ještě není podporována</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nemůžete přidávat účastníky a měnit kalendář zároveň</string>
     <string name="snack_event_init_error">Chyba při založení nové události</string>

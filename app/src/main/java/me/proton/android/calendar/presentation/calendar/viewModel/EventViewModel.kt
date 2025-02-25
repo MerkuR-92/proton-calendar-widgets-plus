@@ -2585,8 +2585,12 @@ class EventViewModel @Inject constructor(
                 }
             } else if (hasExDates()) {
                 errorResId = when (actionType) {
-                    EventDetailsActionType.Edit -> R.string.snack_event_edit_recurring_invitation_ex_date_error
-                    EventDetailsActionType.Delete -> R.string.snack_event_delete_recurring_invitation_ex_date_error
+                    EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                    EventDetailsActionType.Delete -> {
+                        if (!isOrganizer)
+                            R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                        else null
+                    }
                 }
             } else {
                 val immutableSingleEditsInfo = singleEditsInfo ?: getSingleEditsInfo()

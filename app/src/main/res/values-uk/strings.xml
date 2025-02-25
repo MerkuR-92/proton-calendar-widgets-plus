@@ -342,8 +342,6 @@
     <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>
     <string name="snack_event_created_error">Помилка створення події</string>
     <string name="snack_event_opening_edit_error">Помилка відкриття події для редагування</string>
-    <string name="snack_event_edit_recurring_invitation_ex_date_error">Ви не можете редагувати запрошення на повторювану подію, що містить видалені повторювані події</string>
-    <string name="snack_event_delete_recurring_invitation_ex_date_error">Ви не можете видалити запрошення на повторювану подію, що містить видалені повторювані події</string>
     <string name="snack_event_edit_with_attendees_error">Редагування подій з учасниками ще не підтримується</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Не можна додавати учасників та змінювати календар одночасно</string>
     <string name="snack_event_init_error">Помилка ініціалізації нової події</string>
