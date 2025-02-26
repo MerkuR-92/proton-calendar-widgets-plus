@@ -376,6 +376,10 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).transform<List<Calendar>, List<Calendar>> { it.filter { it.isInactive } }.distinctUntilChanged()
     }
 
+    override fun flowAllCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowCalendars(userId).joinToCalendars(database, json)
+    }
+
     override fun flowUserCalendars(userId: String): Flow<List<Calendar>> {
         return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).distinctUntilChanged()
     }

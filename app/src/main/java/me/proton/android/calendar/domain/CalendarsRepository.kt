@@ -80,6 +80,8 @@ interface CalendarsRepository {
 
     fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>>
 
+    fun flowAllCalendars(userId: String): Flow<List<Calendar>>
+
     fun flowUserCalendars(userId: String): Flow<List<Calendar>>
 
     fun flowUserPersonalCalendars(userId: String): Flow<List<Calendar>>
