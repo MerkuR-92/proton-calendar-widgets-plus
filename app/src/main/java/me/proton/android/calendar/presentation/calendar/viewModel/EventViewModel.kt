@@ -2583,15 +2583,6 @@ class EventViewModel @Inject constructor(
                     EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
                     EventDetailsActionType.Delete -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
                 }
-            } else if (hasExDates()) {
-                errorResId = when (actionType) {
-                    EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
-                    EventDetailsActionType.Delete -> {
-                        if (!isOrganizer)
-                            R.string.snack_event_recurring_invitation_only_supported_on_web_message
-                        else null
-                    }
-                }
             } else {
                 val immutableSingleEditsInfo = singleEditsInfo ?: getSingleEditsInfo()
                 if (immutableSingleEditsInfo == null) {
@@ -2600,6 +2591,11 @@ class EventViewModel @Inject constructor(
                         EventDetailsActionType.Delete -> R.string.snack_event_deleted_error
                     }
                 } else if (immutableSingleEditsInfo.hasSingleEdit) {
+                    errorResId = when (actionType) {
+                        EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                        EventDetailsActionType.Delete -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
+                    }
+                } else if (hasExDates()) {
                     errorResId = when (actionType) {
                         EventDetailsActionType.Edit -> R.string.snack_event_recurring_invitation_only_supported_on_web_message
                         EventDetailsActionType.Delete -> {
