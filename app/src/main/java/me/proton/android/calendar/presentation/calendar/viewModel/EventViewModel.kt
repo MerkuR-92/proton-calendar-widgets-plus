@@ -2573,7 +2573,8 @@ class EventViewModel @Inject constructor(
 
     private suspend fun isRecurringInvitationWithSingleOccurrenceChanges(
         actionType: EventDetailsActionType,
-        isOrganizer: Boolean = false
+        isOrganizer: Boolean = false,
+        showSnackBar: Boolean = false,
     ): Boolean {
         val event = eventLiveData.value!!
         if (event.isAnInvitation && (event.isRecurring() || event.isSingleEdit())) {
@@ -2608,9 +2609,11 @@ class EventViewModel @Inject constructor(
             }
 
             if (errorResId != null) {
-                eventDetailsSnackState.value = EventSnackState.DisplaySnack(
-                    resourceProvider.provideString(errorResId)
-                )
+                if (showSnackBar) {
+                    eventDetailsSnackState.value = EventSnackState.DisplaySnack(
+                        resourceProvider.provideString(errorResId)
+                    )
+                }
                 return true
             }
         }
@@ -2649,7 +2652,7 @@ class EventViewModel @Inject constructor(
         val event = eventLiveData.value!!
         val dbEvent = this.dbEvent
 
-        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Delete, deleteAsAnOrganizer)) {
+        if (isRecurringInvitationWithSingleOccurrenceChanges(EventDetailsActionType.Delete, deleteAsAnOrganizer, true)) {
             eventDetailsState.value = EventState.Idle
             return
         }
