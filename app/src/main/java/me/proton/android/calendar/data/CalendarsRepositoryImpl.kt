@@ -650,7 +650,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 val recurringUiEvents = recurringSkeletonEvents.mapNotNull { skeletonEvent ->
                     // occurrences are already filtered for time window
 
-                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid).filter { sharingUid -> visibleCalendars.firstOrNull { it.id == sharingUid.calendar.id } != null }
 
                     expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
                         skeletonEvent,
@@ -777,7 +777,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                     recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(normalSkeletonEventsInWindow)
                 val recurringSkeletonEventsInWindow = recurringSkeletonEvents.map { skeletonEvent ->
 
-                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+                    val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid).filter { sharingUid -> visibleCalendars.firstOrNull { it.id == sharingUid.calendar.id } != null }
 
                     expandSkeletonEventsAndFilterInWindow(
                         skeletonEvent,
@@ -997,7 +997,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 recurringSkeletonEvents.plus(singleEditSkeletonEvents).plus(transformedNormalEvents)
             val recurringSkeletonEventsInWindow = recurringSkeletonEvents.map { skeletonEvent ->
 
-                val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid)
+                val skeletonEventsSharingUid = selectEventsByUid(skeletonEvent.uid).filter { sharingUid -> visibleCalendars.firstOrNull { it.id == sharingUid.calendar.id } != null }
 
                 expandSkeletonEventsAndFilterInWindow(
                     skeletonEvent,
