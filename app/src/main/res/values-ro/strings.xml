@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Eveniment creat, dar invitația nu a putut fi trimisă.</string>
     <string name="snack_event_created_error">Eroare la crearea evenimentului</string>
     <string name="snack_event_opening_edit_error">Eroare la deschiderea evenimentului pentru editare</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Evenimentul recurent poate fi șters doar din aplicația Calendar de pe web.</string>
     <string name="snack_event_edit_with_attendees_error">Editarea evenimentelor cu participanţii nu este încă suportată</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nu puteți adăuga participanți și modifica calendarul în același timp.</string>
     <string name="snack_event_init_error">Eroare la inițializarea unui nou eveniment</string>
@@ -371,7 +372,7 @@
     <string name="snack_add_calendar_success">Calendar adăugat</string>
     <string name="snack_calendar_saving">Se salvează calendarul</string>
     <string name="snack_create_calendar_error">Eroare la crearea calendarului. Reîncercați mai târziu.</string>
-    <string name="snack_add_calendar_error">Eroare la adăugarea calendarului. Mai reîncercați.</string>
+    <string name="snack_add_calendar_error">Eroare la adăugarea calendarului. Mai încercați.</string>
     <string name="snack_create_calendar_settings_error">Calendarul a fost creat, dar unele informații nu au fost actualizate. Reîncercați mai târziu.</string>
     <string name="snack_ics_default_error">Eroare la deschiderea calendarului</string>
     <string name="snack_ics_event_not_found_error">Evenimentul nu a fost găsit</string>

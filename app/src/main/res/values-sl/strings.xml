@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Dogodek je bil ustvarjen, vendar povabila ni bilo mogoče poslati</string>
     <string name="snack_event_created_error">Napaka pri ustvarjanju dogodka</string>
     <string name="snack_event_opening_edit_error">Napaka pri odpiranju dogodka za urejanje</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">This recurring event can only be deleted in the Calendar web app.</string>
     <string name="snack_event_edit_with_attendees_error">Urejanje dogodkov z udeleženci še ni podprto</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Ni mogoče hkrati dodati udeležence in spreminjati koledar</string>
     <string name="snack_event_init_error">Napaka pri inicializaciji novega dogodka</string>

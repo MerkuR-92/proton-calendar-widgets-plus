@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Событие обновлено, но приглашение отправить не удалось</string>
     <string name="snack_event_created_error">Ошибка создания события</string>
     <string name="snack_event_opening_edit_error">Ошибка открытия события для редактирования</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Это повторяющееся событие можно удалить только в веб-приложении Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">Редактирование событий с участниками пока не поддерживается</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Невозможно одновременно добавлять участников и изменять календарь</string>
     <string name="snack_event_init_error">Ошибка инициализации нового события</string>

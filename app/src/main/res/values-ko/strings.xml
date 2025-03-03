@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">이벤트가 생성되었으나 초대 전송을 실패함</string>
     <string name="snack_event_created_error">이벤트 생성 실패</string>
     <string name="snack_event_opening_edit_error">이벤트 편집 실패</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">해당 반복 이벤트는 Calendar 웹 앱에서 삭제할 수 있습니다.</string>
     <string name="snack_event_edit_with_attendees_error">참여자와 이벤트를 편집하는 것은 아직 지원되지 않습니다</string>
     <string name="snack_event_edit_calendar_with_attendees_error">참가자를 추가하면서 캘린더를 동시에 변경할 수 없습니다.</string>
     <string name="snack_event_init_error">새로운 이벤트 구성 오류</string>

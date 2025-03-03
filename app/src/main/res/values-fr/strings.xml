@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">L\'événement est créé, mais l\'invitation n\'a pas été envoyée.</string>
     <string name="snack_event_created_error">Une erreur s\'est produite pendant la création de l\'événement.</string>
     <string name="snack_event_opening_edit_error">Une erreur s\'est produite pendant l\'ouverture de l\'événement pour le modifier.</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Cet événement récurrent peut être supprimé uniquement depuis l\'application web du calendrier.</string>
     <string name="snack_event_edit_with_attendees_error">La modification des événements avec des participants n\'est pas encore possible.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Il n\'est pas possible d\'ajouter des participants et de modifier le calendrier en même temps.</string>
     <string name="snack_event_init_error">Une erreur s\'est produite pendant l\'initialisation du nouvel événement.</string>

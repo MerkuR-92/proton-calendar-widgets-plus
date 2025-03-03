@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">S\'ha creat l\'esdeveniment, però no s\'ha pogut enviar la invitació.</string>
     <string name="snack_event_created_error">Error creant l\'esdeveniment</string>
     <string name="snack_event_opening_edit_error">Error accedint a l\'edició de l\'esdeveniment</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Aquest esdeveniment recurrent només es pot eliminar a l\'aplicació web Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">Encara no s\'admet l\'edició d\'esdeveniments amb participants</string>
     <string name="snack_event_edit_calendar_with_attendees_error">No es poden afegir participants i canviar el calendari simultàniament</string>
     <string name="snack_event_init_error">Error inicialitzant el nou esdeveniment</string>

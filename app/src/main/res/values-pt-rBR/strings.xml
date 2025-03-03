@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Evento criado, mas o convite não foi enviado</string>
     <string name="snack_event_created_error">Erro ao criar o evento</string>
     <string name="snack_event_opening_edit_error">Erro ao abrir o evento para editá-lo</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Esse evento recorrente somente pode ser excluído no aplicativo web do Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">A edição de eventos com participantes ainda não é suportada</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Não é possível adicionar participantes e alterar o calendário simultaneamente</string>
     <string name="snack_event_init_error">Erro ao inicializar novo evento</string>

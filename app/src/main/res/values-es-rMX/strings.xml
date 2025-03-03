@@ -40,7 +40,7 @@
     <string name="action_done">Hecho</string>
     <string name="action_edit">Editar</string>
     <string name="action_delete">Eliminar</string>
-    <string name="action_add">Añadir</string>
+    <string name="action_add">Agregar</string>
     <string name="action_remove">Eliminar</string>
     <string name="action_leave">Abandonar</string>
     <string name="action_recreate">Borrar</string>
@@ -142,9 +142,9 @@
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Evento nuevo</string>
     <string name="event_text_edit_event">Editar evento</string>
-    <string name="event_hint_title">Añadir título</string>
-    <string name="event_hint_location">Añadir ubicación</string>
-    <string name="event_text_add_participants">Añadir participantes</string>
+    <string name="event_hint_title">Agregar un título</string>
+    <string name="event_hint_location">Agregar una ubicación</string>
+    <string name="event_text_add_participants">Agregar participantes</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participantes (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Usted</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d más</string>
@@ -191,9 +191,9 @@
     <string name="search_onboarding_progress_header_error">Error al descargar calendarios</string>
     <string name="search_spotlight_activation_snack">Búsqueda en calendarios activada</string>
     <!-- TODO Start Timezone / End Timezone? -->
-    <string name="event_text_add_alarm">Añadir notificación</string>
+    <string name="event_text_add_alarm">Agregar una notificación</string>
     <string name="event_text_description">Descripción</string>
-    <string name="event_hint_description">Añadir descripción</string>
+    <string name="event_hint_description">Agregar una descripción</string>
     <string name="event_text_custom">personalizado</string>
     <string name="event_alert_invalid_start_end_date">La fecha inicial del evento no puede ser posterior a la fecha final</string>
     <string name="event_alarms_title">Notificaciones</string>
@@ -265,34 +265,34 @@
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nDónde: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDescripción: %1$s</string>
     <string name="event_send_invite_dialog_title">Enviar invitación</string>
-    <string name="event_send_invite_dialog_description">Se enviará una invitación a los participantes añadidos.</string>
+    <string name="event_send_invite_dialog_description">Se enviará una invitación a los participantes agregados.</string>
     <string name="event_send_invite_dialog_confirm">Enviar</string>
     <string name="event_send_invite_dialog_cancel">Cancelar</string>
-    <string name="event_add_participants_dialog_title">Añadir participantes</string>
-    <string name="event_add_participants_dialog_description">Se enviará una invitación a los participantes añadidos.</string>
-    <string name="recurring_event_add_participants_dialog_description">Se enviará una invitación a los participantes añadidos para todos los eventos de esta serie.</string>
-    <string name="recurring_event_add_participants_overwrite_dialog_description">Se enviará una invitación a los participantes añadidos para todos los eventos de esta serie.\nLas modificaciones anteriores de esta serie se perderán.</string>
+    <string name="event_add_participants_dialog_title">Agregar participantes</string>
+    <string name="event_add_participants_dialog_description">Se enviará una invitación a los participantes agregados.</string>
+    <string name="recurring_event_add_participants_dialog_description">Se enviará una invitación a los participantes agregados para todos los eventos de esta serie.</string>
+    <string name="recurring_event_add_participants_overwrite_dialog_description">Se enviará una invitación a los participantes agregados para todos los eventos de esta serie.\nLas modificaciones anteriores de esta serie se perderán.</string>
     <string name="event_add_participants_dialog_confirm">Enviar</string>
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
     <string name="event_remove_participants_dialog_title">Eliminar los participantes</string>
     <string name="event_remove_participants_dialog_description">Se enviará un correo de cancelación a los participantes eliminados.</string>
     <string name="recurring_event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes eliminados para todos los eventos de esta serie.</string>
-    <string name="event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y eliminados.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Los participantes añadidos y eliminados serán notificados de todos los eventos de esta serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Se notificarán a los participantes agregados y eliminados.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Los participantes agregados y eliminados serán notificados de todos los eventos de esta serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s ha sido cancelado.</string>
     <string name="event_save_changes">Guardar cambios</string>
-    <string name="event_update_add_participants_dialog_description">Se notificarán a los participantes existentes y añadidos.</string>
-    <string name="recurring_event_update_add_participants_dialog_description">Actualizará todos los eventos de esta serie. Los participantes existentes y añadidos serán notificados.</string>
+    <string name="event_update_add_participants_dialog_description">Se notificarán a los participantes existentes y agregados.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Actualizará todos los eventos de esta serie. Los participantes existentes y agregados serán notificados.</string>
     <string name="event_update_remove_participants_dialog_description">Se notificará a los participantes existentes y eliminados.</string>
     <string name="event_update_remove_all_participants_dialog_description">Se notificarán a los participantes eliminados.</string>
     <string name="recurring_event_update_remove_participants_dialog_description">Actualizará todos los eventos de esta serie. Los participantes existentes y eliminados serán notificados.</string>
     <string name="recurring_event_update_remove_all_participants_dialog_description">Actualizará todos los eventos de esta serie. Se notificarán a los participantes eliminados.</string>
-    <string name="event_update_add_and_remove_participants_dialog_description">Se notificarán a los participantes existentes, añadidos y eliminados.</string>
-    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizará todos los eventos de esta serie. Se notificarán a los participantes existentes, añadidos y eliminados.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Se notificarán a los participantes existentes, agregados y eliminados.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizará todos los eventos de esta serie. Se notificarán a los participantes existentes, agregados y eliminados.</string>
     <string name="success_snack_email_update_recurring">Participantes notificados y todos los eventos actualizados</string>
     <string name="success_snack_email_update">Participantes notificados y evento actualizado</string>
-    <string name="success_snack_add_attendees_recurring">Invitación enviada y participantes añadidos a todos los eventos</string>
-    <string name="success_snack_add_attendees">Invitación enviada y participantes añadidos</string>
+    <string name="success_snack_add_attendees_recurring">Invitación enviada y participantes agregados a todos los eventos</string>
+    <string name="success_snack_add_attendees">Invitación enviada y participantes agregados</string>
     <string name="success_snack_remove_attendees_recurring">Cancelación enviada y participantes eliminados de todos los eventos</string>
     <string name="success_snack_remove_attendees">Se envió la cancelación y se eliminaron los participantes.</string>
     <!-- NAVIGATION VIEW   -->
@@ -342,8 +342,9 @@
     <string name="snack_event_created_failed_mail">Evento creado pero no se pudo enviar la invitación</string>
     <string name="snack_event_created_error">Error al crear el evento</string>
     <string name="snack_event_opening_edit_error">Error al abrir el evento para editar</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Este evento recurrente solo se puede eliminar en la aplicación web de Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">La edición de eventos con asistentes aún no es compatible</string>
-    <string name="snack_event_edit_calendar_with_attendees_error">No se pueden añadir participantes y cambiar el calendario a la vez</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">No se pueden agregar participantes y cambiar el calendario a la vez</string>
     <string name="snack_event_init_error">Error al inicializar el evento nuevo</string>
     <string name="snack_event_calendar_error">Error al cambiar el calendario</string>
     <string name="snack_event_maximum_alarm_reached_error">Se ha alcanzado el número máximo de notificaciones</string>
@@ -354,7 +355,7 @@
     <string name="snack_create_event_no_active_calendar">Necesita un calendario activo para crear eventos</string>
     <string name="snack_add_self_as_participant">Autoinvitación no permitida</string>
     <string name="snack_maximum_participants_reached">Se ha alcanzado el número máximo de participantes.</string>
-    <string name="snack_add_participant_error">Error al añadir al participante</string>
+    <string name="snack_add_participant_error">Error al agregar al participante</string>
     <string name="snack_add_participant_invalid_email">Correo inválido</string>
     <string name="snack_change_attendee_answer_error">Error al enviar la respuesta, intente de nuevo más tarde</string>
     <string name="snack_network_error">Error de red, intente de nuevo más tarde</string>
@@ -368,10 +369,10 @@
     <string name="snack_update_calendar_settings_error">Error al actualizar alguna información del calendario, intente de nuevo</string>
     <string name="snack_update_calendar_success">Calendario actualizado</string>
     <string name="snack_create_calendar_success">Calendario creado</string>
-    <string name="snack_add_calendar_success">Calendario añadido</string>
+    <string name="snack_add_calendar_success">Calendario agregado</string>
     <string name="snack_calendar_saving">Guardando calendario</string>
     <string name="snack_create_calendar_error">Error al crear el calendario, intente de nuevo</string>
-    <string name="snack_add_calendar_error">Error al añadir el calendario, intente de nuevo</string>
+    <string name="snack_add_calendar_error">Error al agregar el calendario, intente de nuevo</string>
     <string name="snack_create_calendar_settings_error">Se creó el calendario, pero alguna información no se actualizó, intente de nuevo</string>
     <string name="snack_ics_default_error">Error al abrir el calendario</string>
     <string name="snack_ics_event_not_found_error">Evento no encontrado</string>
@@ -379,13 +380,13 @@
     <string name="snack_ics_create_error">Error al crear el evento</string>
     <string name="snack_ics_parsing_error">Error al leer el calendario</string>
     <string name="snack_ics_unsupported_method_error">Este tipo de evento aún no es compatible</string>
-    <string name="snack_ics_unsupported_add_error">Añadir ocurrencias a un evento no es compatible por el momento</string>
+    <string name="snack_ics_unsupported_add_error">Agregar ocurrencias a un evento no es compatible por el momento</string>
     <string name="snack_ics_unsupported_counter_error">La reprogramación de eventos no es compatible por el momento</string>
     <string name="snack_ics_unsupported_refresh_error">La actualización de eventos no es compatible por el momento</string>
     <string name="snack_ics_unsupported_publish_error">La importación de eventos no es compatible por el momento</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Solo admitimos las respuestas a todos los eventos de una serie por el momento</string>
     <string name="snack_ics_party_crasher_error">El correo electrónico no está en la lista de participantes</string>
-    <string name="snack_ics_reply_party_crasher_error">Los participantes que no fueron invitados por el organizador no pueden ser añadidos</string>
+    <string name="snack_ics_reply_party_crasher_error">Los participantes que no fueron invitados por el organizador no pueden ser agregados</string>
     <string name="snack_ics_missing_uid_error">Falta el UID del evento</string>
     <string name="snack_ics_no_active_personal_calendar_error">No hay un calendario personal activo asociado con esta cuenta</string>
     <string name="snack_ics_no_active_calendar_error">No hay un calendario activo asociado con esta cuenta</string>
@@ -401,7 +402,7 @@
     <string name="snack_app_link_invalid">Enlace al evento inválido</string>
     <string name="snack_app_link_error">Error al abrir evento</string>
     <string name="snack_app_link_import_error">Autenticación cancelada</string>
-    <string name="snack_notification_already_added">La notificación ya fue añadida</string>
+    <string name="snack_notification_already_added">La notificación ya fue agregada</string>
     <string name="snack_opening_ics">Abriendo evento…</string>
     <string name="snack_invite_in_shared_calendar_error">No se permite crear invitaciones en un calendario compartido</string>
     <string name="snack_down_banner">Los servidores de Proton no funcionan. Visite nuestra página de estado para más detalles.</string>
@@ -415,7 +416,7 @@
     <string name="update_timezone_dialog_confirmation">Actualizar</string>
     <string name="update_timezone_dialog_cancel">Cancelar</string>
     <string name="contacts_permission_dialog_title">¿Permitir que Proton Calendar acceda a los contactos?</string>
-    <string name="contacts_permission_dialog_message">Proton Calendar necesita acceder a los contactos del teléfono para ayudarle a añadirlos fácilmente a los eventos.</string>
+    <string name="contacts_permission_dialog_message">Proton Calendar necesita acceder a los contactos del teléfono para ayudarle a agregarlos fácilmente a los eventos.</string>
     <string name="contacts_permission_dialog_allow">Permitir</string>
     <string name="contacts_permission_dialog_open_settings">Abrir los ajustes</string>
     <string name="contacts_permission_dialog_cancel">Denegar</string>
@@ -459,7 +460,7 @@
     <string name="settings_week_start_title">Inicio de semana</string>
     <string name="settings_time_format_title">Formato de hora</string>
     <string name="settings_week_numbers_title">Mostrar números de semana</string>
-    <string name="settings_auto_invites_title">Añadir invitaciones al calendario y marcarlas como pendiente</string>
+    <string name="settings_auto_invites_title">Agregar invitaciones al calendario y marcarlas como pendiente</string>
     <string name="settings_search_title">Buscar en calendarios</string>
     <string name="settings_search_subtitle">Descargue y almacene el contenido del calendario en el dispositivo para búsquedas. Desactivar esta opción eliminará el contenido descargado.\n\nLa búsqueda es una función beta experimental. Activarla podría hacer la aplicación inestable.</string>
     <string name="settings_alternative_routing_title">Permitir ruta alternativa</string>
@@ -500,20 +501,20 @@
     <string name="calendar_form_default_event_duration">Duración del evento</string>
     <string name="calendar_form_default_event_notifications">Notificaciones del evento</string>
     <string name="calendar_form_default_all_day_event_notifications">Notificaciones de eventos de todo el día</string>
-    <string name="calendar_form_add_notification">Añadir notificación</string>
+    <string name="calendar_form_add_notification">Agregar notificación</string>
     <string name="calendar_form_default_email">Dirección de correo</string>
     <string name="calendar_form_default_email_value_error">Error al cargar el correo por defecto</string>
-    <string name="calendar_form_name_hint">Añadir nombre al calendario</string>
+    <string name="calendar_form_name_hint">Agregar nombre al calendario</string>
     <string name="calendar_form_name_required_error">Nombre requerido</string>
-    <string name="calendar_form_description_hint">Añadir una descripción del calendario</string>
-    <string name="add_calendar_text">Añadir calendario</string>
-    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Añadir</string>
+    <string name="calendar_form_description_hint">Agregar una descripción del calendario</string>
+    <string name="add_calendar_text">Agregar calendario</string>
+    <string name="add_calendar_button" comment="Text for the button to add a new calendar">Agregar</string>
     <string name="create_calendar_limit_reached">Ha alcanzado el número máximo de calendarios.</string>
-    <string name="create_calendar_limit_reached_title">No se pueden añadir más calendarios</string>
-    <string name="create_calendar_limit_reached_paid_description">Ha alcanzado el número máximo de 25 calendarios disponibles en el plan.\n\nPara añadir un calendario, elimine uno existente.</string>
+    <string name="create_calendar_limit_reached_title">No se pueden agregar más calendarios</string>
+    <string name="create_calendar_limit_reached_paid_description">Ha alcanzado el número máximo de 25 calendarios disponibles en el plan.\n\nPara agregar un calendario, elimine uno existente.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Necesita al menos un calendario personal antes de alcanzar el límite de 25 calendarios del plan.</string>
     <string name="create_calendar_limit_reached_manage">Gestionar calendarios</string>
-    <string name="create_calendar_limit_reached_free_description">Ha alcanzado el número máximo de 3 calendarios disponibles en el plan.\n\nPara añadir un calendario, elimine uno existente.</string>
+    <string name="create_calendar_limit_reached_free_description">Ha alcanzado el número máximo de 3 calendarios disponibles en el plan.\n\nPara agregar un calendario, elimine uno existente.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_free_description">Necesita al menos un calendario personal antes de alcanzar el límite de 3 calendarios del plan.</string>
     <string name="create_calendar_limit_reached_error">Error</string>
     <string name="delete_calendar_dialog_title">Eliminar calendario</string>
@@ -535,12 +536,12 @@
     <string name="recreate_calendar_snack_deleted">Calendario borrado</string>
     <string name="recreate_calendar_snack_clearing">Borrando calendario…</string>
     <!-- Holiday calendar form -->
-    <string name="add_holiday_calendar_title">Añadir un calendario de días festivos</string>
+    <string name="add_holiday_calendar_title">Agregar un calendario de días festivos</string>
     <string name="holiday_calendar_title">Calendario de días festivos</string>
     <string name="add_holiday_calendar_country_search_hint">Búsqueda por país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">Basado en la zona horaria</string>
-    <string name="holiday_calendar_already_exists">Este calendario de días festivos ya está añadido.</string>
+    <string name="holiday_calendar_already_exists">Este calendario de días festivos ya está agregado.</string>
     <string name="holiday_calendar_value_placeholder">Seleccionar país</string>
     <!-- Bootstrap errors -->
     <string name="bootstrap_error_default_confirm">OK</string>
@@ -600,15 +601,15 @@
     <string name="spotlight_dialog_search_description">Encuentre fácilmente el evento que está buscando con nuestra función de búsqueda nueva. <a href="https://proton.me/support/calendar-search">Más información</a></string>
     <string name="spotlight_dialog_search_positive">Activar</string>
     <string name="spotlight_dialog_search_negative">Omitir</string>
-    <string name="spotlight_dialog_import_title">Más formas de añadir eventos</string>
-    <string name="spotlight_dialog_import_description">• Importe eventos a el calendario desde archivos en el teléfono.\n\n• Añada reservas de viajes directamente desde Proton Mail.</string>
+    <string name="spotlight_dialog_import_title">Más formas de agregar eventos</string>
+    <string name="spotlight_dialog_import_description">• Importe eventos a el calendario desde archivos en el teléfono.\n\n• Agregue reservas de viajes directamente desde Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Funciones del calendario</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Añada eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que han sido compartidos con usted.\n\n• Defina la vista predeterminada que quiere ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Agregue eventos directamente a Proton Calendar desde otras aplicaciones.\n\n• Cree y gestione eventos en calendarios que han sido compartidos con usted.\n\n• Defina la vista predeterminada que quiere ver al abrir la aplicación.\n\n• 13 idiomas nuevos disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">Se eliminó la búsqueda para mejorarla.</string>
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
-    <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nAñada los días festivos de cualquier país a el calendario.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nComo actualmente está al límite del calendario, para añadir un calendario de días festivos, necesitará eliminar un calendario existente primero.</string>
+    <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nAgregue los días festivos de cualquier país a el calendario.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nComo actualmente está al límite del calendario, para agregar un calendario de días festivos, necesitará eliminar un calendario existente primero.</string>
     <string name="spotlight_dialog_color_per_event_title">Colores de eventos personalizados</string>
     <string name="spotlight_dialog_color_per_event_description">Personalice el color de cada evento para:\n\n• Codificar el calendario con colores\n\n• Mejorar la organización diaria y la gestión del tiempo.\n\n• Definir prioridades y aumentar la eficiencia</string>
     <!-- Import -->
@@ -658,7 +659,7 @@
     <string name="import_assistant_status_paused_lost_connection_description">Para continuar con la importación, pulse reconectar, inicie sesión en Google y permita el acceso de Proton a los datos de Google otra vez.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconectar</string>
     <string name="import_assistant_status_paused_storage_full_title">El almacenamiento está lleno</string>
-    <string name="import_assistant_status_paused_storage_full_description">La cuenta de Proton no tiene espacio suficiente para terminar de importar este calendario. Libere espacio o añada más, luego regrese aquí para reanudar la importación.</string>
+    <string name="import_assistant_status_paused_storage_full_description">La cuenta de Proton no tiene espacio suficiente para terminar de importar este calendario. Libere espacio o agregue más, luego regrese aquí para reanudar la importación.</string>
     <string name="import_assistant_status_paused_storage_full_button">Reanudar</string>
     <string name="import_assistant_delete_report_title">¿Eliminar de la lista?</string>
     <string name="import_assistant_delete_report_message">Ya no verá este registro de importación en la lista.</string>

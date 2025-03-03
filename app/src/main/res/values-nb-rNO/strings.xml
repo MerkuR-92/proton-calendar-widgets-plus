@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Hendelse opprettet, men invitasjon kunne ikke sendes.</string>
     <string name="snack_event_created_error">Feil ved opprettelse av hendelse</string>
     <string name="snack_event_opening_edit_error">Feil ved åpning av hendelse for redigering</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Denne regelmessige hendelsen kan bare slettes i Calendar-nettappen.</string>
     <string name="snack_event_edit_with_attendees_error">Redigering av hendelser med deltakere støttes ikke ennå.</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Kan ikke legge til deltakere og forandre kalender samtidig.</string>
     <string name="snack_event_init_error">Feil ved initialisering av ny hendelse</string>
@@ -367,7 +368,7 @@
     <string name="snack_update_calendar_error">Feil ved oppdatering av kalenderinformasjon. Prøv igjen senere.</string>
     <string name="snack_update_calendar_settings_error">Feil ved oppdatering av noe kalenderinformasjon. Prøv igjen senere.</string>
     <string name="snack_update_calendar_success">Kalender oppdatert</string>
-    <string name="snack_create_calendar_success">Kalender oprettet</string>
+    <string name="snack_create_calendar_success">Kalender opprettet</string>
     <string name="snack_add_calendar_success">Kalender lagt til</string>
     <string name="snack_calendar_saving">Larger kalender</string>
     <string name="snack_create_calendar_error">Feil ved oppretting av kalender. Prøv igjen senere.</string>

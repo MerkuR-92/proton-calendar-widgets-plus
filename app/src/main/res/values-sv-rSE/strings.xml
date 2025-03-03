@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Händelse skapad men inbjudan misslyckades att skickas</string>
     <string name="snack_event_created_error">Det gick inte att skapa händelse</string>
     <string name="snack_event_opening_edit_error">Det gick inte att öppna händelse för redigering</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Denna återkommande händelse kan endast tas bort i webbappen Kalender.</string>
     <string name="snack_event_edit_with_attendees_error">Redigering av händelser med deltagare stöds inte ännu</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Kan inte lägga till deltagare och byta kalender samtidigt</string>
     <string name="snack_event_init_error">Fel vid initialisering av ny händelse</string>
@@ -609,7 +610,7 @@
     <string name="spotlight_dialog_holiday_calendar_title">Allmänna helgdagar är här!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ingen mer schemaläggning av möten när alla är borta eller oplanerade utflykter under långhelger.\n\nLägg till allmänna helgdagar för vilket land som helst i din kalender.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ingen mer schemaläggning av möten när alla är borta eller oplanerade utflykter under långhelger.\n\nDå du har nått kalendergränsen så behöver du ta bort en kalender innan du kan lägga till en helgdagskalender.</string>
-    <string name="spotlight_dialog_color_per_event_title">Anpassade händelsefärger</string>
+    <string name="spotlight_dialog_color_per_event_title">Anpassa händelsefärger</string>
     <string name="spotlight_dialog_color_per_event_description">Anpassa färgen på enskilda händelser för att:\n\n• Färgkoda din kalender\n\n• Bättre organisera din dag och spåra din tid\n\n• Prioriteringar och öka effektiviteten</string>
     <!-- Import -->
     <string name="dialog_google_auth_title">Tillåt åtkomst</string>
