@@ -35,7 +35,7 @@
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Паўтарэнні, якія былі раней абноўлены арганізатарам, будуць захаваны</string>
     <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">Немагчыма апавясціць арганізатара, што вы адхілілі запрашэнне:\n\n• %1$s\n\nЦі хочаце вы ўсё роўна выдаліць падзею?</string>
     <string name="dialog_button_set">Задаць</string>
-    <string name="dialog_button_ok">Добра</string>
+    <string name="dialog_button_ok">OK</string>
     <string name="action_save">Захаваць</string>
     <string name="action_done">Гатова</string>
     <string name="action_edit">Рэдагаваць</string>
@@ -117,7 +117,7 @@
     <string name="event_organizer_send_prefs_message_declined_title">Немагчыма апавясціць арганізатара, што вы адхілілі запрашэнне</string>
     <string name="event_organizer_send_prefs_message_tentative_title">Немагчыма апавясціць арганізатара, што вы ўмоўна прынялі запрашэнне</string>
     <string name="event_organizer_send_prefs_message_default_title">Немагчыма апавясціць арганізатара, што вы адказалі на запрашэнне</string>
-    <string name="event_organizer_send_prefs_button_title">Добра</string>
+    <string name="event_organizer_send_prefs_button_title">OK</string>
     <string name="event_attendees_send_prefs_error_title">Немагчыма апавясціць удзельнікаў</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Ніводны з удзельнікаў не атрымаў апавяшчэнне, што вы рабілі змены:\n\n• %1$s\n\nЦі хочаце вы ўсё роўна працягнуць?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Наступныя ўдзельнікі не могуць атрымаць апавяшчэнне, што вы рабілі змены:\n\n• %1$s\n\nЦі хочаце вы ўсё роўна працягнуць?</string>
@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Падзея створана, але не ўдалося адправіць запрашэнне</string>
     <string name="snack_event_created_error">Памылка стварэння падзеі</string>
     <string name="snack_event_opening_edit_error">Памылка адкрыцця падзеі для змянення</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Гэта перыядычная падзея можа быць выдалена толькі ў вэб-праграме календара.</string>
     <string name="snack_event_edit_with_attendees_error">Змяненне падзей з удзельнікамі пакуль не падтрымліваецца</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Немагчыма дадаваць удзельнікаў і змяняць каляндар адначасова</string>
     <string name="snack_event_init_error">Памылка ініцыялізацыі новай падзеі</string>
@@ -433,7 +434,7 @@
     <string name="notification_channel_calendar_fetch">Атрыманне календароў</string>
     <string name="notification_sync">Сінхранізацыя з календарамі…</string>
     <string name="notification_text_today">Сёння</string>
-    <string name="notification_text_today_part_time">Сёння а %1$s</string>
+    <string name="notification_text_today_part_time">Сёння ў %1$s</string>
     <string name="notification_text_tomorrow">Заўтра</string>
     <string name="notification_text_tomorrow_part_time">Заўтра а %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s у %2$s</string>
@@ -543,7 +544,7 @@
     <string name="holiday_calendar_already_exists">Каляндар са святамі ўжо дадзены.</string>
     <string name="holiday_calendar_value_placeholder">Выберыце краіну</string>
     <!-- Bootstrap errors -->
-    <string name="bootstrap_error_default_confirm">Добра</string>
+    <string name="bootstrap_error_default_confirm">OK</string>
     <string name="bootstrap_error_no_calendar_title">Адсутнічаюць календары, якія звязаны з гэтым уліковым запісам.</string>
     <string name="bootstrap_error_no_calendar_message">Для таго, каб наладзіць яго цяпер, наведайце <a href="https://calendar.proton.me">calendar.proton.me</a></string>
     <string name="bootstrap_error_some_calendars_failed_title">Памылка падрыхтоўкі календароў</string>
@@ -579,9 +580,9 @@
     <string name="calendar_widget_part_day_event_ends_at">Завяршаецца %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Што новага</string>
-    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_beta_header">Каляндар бэта</string>
     <string name="spotlight_dialog_skip">Прапусціць</string>
-    <string name="spotlight_dialog_confirmation_button">Добра</string>
+    <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Прагляд месяца</string>
     <string name="spotlight_dialog_month_view_description">Атрымайце агляд падзей с дапамогай нашага новага прагляду месяца. Пераключайцеся паміж праглядамі выкарыстоўваючы меню.</string>
     <string name="spotlight_dialog_easy_switch_description">Імпартаванне падзей і іншых даных з Google Calendar у Proton Calendar стала простым як ніколі. Памочнік імпартавання Easy Switch будзе накіроўваць вас на кожным кроку.</string>

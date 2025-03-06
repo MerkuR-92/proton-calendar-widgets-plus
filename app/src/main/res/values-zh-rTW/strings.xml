@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">活動已創建，但邀請傳送失敗</string>
     <string name="snack_event_created_error">創建活動時發生錯誤</string>
     <string name="snack_event_opening_edit_error">開啟活動以作編輯時發生錯誤</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">此定期行程可於Calendar網頁應用程式中刪除</string>
     <string name="snack_event_edit_with_attendees_error">暫未支援編輯帶有參與者的活動</string>
     <string name="snack_event_edit_calendar_with_attendees_error">無法同時加入參與者及變更行事曆</string>
     <string name="snack_event_init_error">初始化新活動時發生錯誤</string>

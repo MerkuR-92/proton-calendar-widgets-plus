@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Termin erstellt, aber Einladung konnte nicht gesendet werden</string>
     <string name="snack_event_created_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_event_opening_edit_error">Fehler beim Öffnen des Termins zur Bearbeitung</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Dieser wiederkehrende Termin kann nur in der Kalender-Web--App gelöscht werden.</string>
     <string name="snack_event_edit_with_attendees_error">Das Bearbeiten von Terminen mit Teilnehmern wird derzeit noch nicht unterstützt</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Teilnehmer hinzufügen und gleichzeitig den Kalender wechseln ist nicht möglich</string>
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termins</string>

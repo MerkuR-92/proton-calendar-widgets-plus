@@ -204,7 +204,7 @@
     <string name="event_alarm_partial_day_3">30 dakika</string>
     <string name="event_alarm_partial_day_4">1 saat</string>
     <string name="event_alarm_partial_day_5">1 hafta</string>
-    <string name="event_alarm_all_day_1">aynı gün saat $%1$s</string>
+    <string name="event_alarm_all_day_1">aynı gün %1$s saatinde</string>
     <string name="event_alarm_all_day_2">1 gün önce %1$s saatinde</string>
     <string name="event_alarm_all_day_3">1 hafta önce %1$s saatinde</string>
     <string name="event_alarm_all_day_4">3 hafta önce %1$s saatinde</string>
@@ -311,7 +311,7 @@
     <string name="nav_view_switcher_month">Aylık</string>
     <string name="nav_view_timezone">Saat dilimi</string>
     <string name="nav_view_settings">Ayarlar</string>
-    <string name="nav_view_feedback">Bize geri bildirim verin</string>
+    <string name="nav_view_feedback">Geri bildirimde bulunun</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Genel</string>
     <string name="nav_view_more_bug">Sorun bildirin</string>
     <string name="nav_view_more_subscription">Abonelik</string>
@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Etkinlik eklendi ancak davet gönderilemedi</string>
     <string name="snack_event_created_error">Etkinlik eklenirken sorun çıktı</string>
     <string name="snack_event_opening_edit_error">Etkinlik düzenlenmek için açılırken sorun çıktı</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Bu yinelenen etkinlik yalnızca Calendar internet uygulamasından silinebilir.</string>
     <string name="snack_event_edit_with_attendees_error">Şimdilik katılımcıları olan etkinliklerin düzenlenmesi desteklenmiyor</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Aynı anda hem katılımcı ekleyip hem takvimi değiştiremezsiniz</string>
     <string name="snack_event_init_error">Yeni etkinlik hazırlanırken sorun çıktı</string>
@@ -447,7 +448,7 @@
     <!-- Settings -->
     <string name="settings_app_settings_title">Uygulama ayarları</string>
     <string name="settings_theme_title">Tema</string>
-    <string name="settings_theme_info">Bu ayar, yalnızca bu aygıttaki Proton Calendar uygulamasının görünümünü etkiler. Temayı değiştirdikten sonra uygulama yeniden başlatılacaktır.</string>
+    <string name="settings_theme_info">Bu ayar, yalnızca bu aygıttaki Proton Calendar uygulamasının görünümünü etkiler. Tema değiştirildikten sonra uygulama yeniden başlatılır.</string>
     <string name="settings_timezone_title">Saat dilimi</string>
     <string name="settings_language_title">Uygulama dili</string>
     <string name="settings_language_default">Otomatik algılansın</string>
@@ -463,7 +464,7 @@
     <string name="settings_search_title">Takvimlerde arama</string>
     <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Açılması, uygulamayı kararsız hale getirebilir.</string>
     <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
-    <string name="settings_alternative_routing_subtitle">Açıldığında, uygulama Proton sitelerinin engellenmiş olması durumunda Proton ağına erişmek için alternatif ağ yöneltmesini dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
+    <string name="settings_alternative_routing_subtitle">Proton sitelerine erişimin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yöneltmesi kullanmayı dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
     <string name="settings_value_placeholder">Seçmek için dokunun</string>
     <string name="settings_general_title">Genel</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s vb.</string>
@@ -561,7 +562,7 @@
     <string name="splash_init">Etkinliklerin şifresi çözülüyor</string>
     <string name="default_calendar_name">Takvimim</string>
     <!-- FEEDBACK DIALOG -->
-    <string name="dialog_feedback_header">Bize geri bildirim verin</string>
+    <string name="dialog_feedback_header">Geri bildirimde bulunun</string>
     <string name="dialog_feedback_text">Proton Calendar ile yaşadığınız deneyimi nasıl değerlendirirsiniz?</string>
     <string name="dialog_feedback_rating_worst">Kötü</string>
     <string name="dialog_feedback_rating_best">Harika</string>

@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Esemény létrehozva, de a meghívó kiküldése során hiba lépett fel</string>
     <string name="snack_event_created_error">Hiba az esemény létrehozása során</string>
     <string name="snack_event_opening_edit_error">Hiba az esemény szerkesztésre való megnyitása során</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Ez az ismétlődő esemény csak a Calendar webes alkalmazásban törölhető.</string>
     <string name="snack_event_edit_with_attendees_error">A résztvevőkkel létrehozott események szerkesztése még nem elérhető</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nem lehet egyszerre résztvevőket hozzáadni és az eseményt megváltoztatni</string>
     <string name="snack_event_init_error">Hiba az új esemény inicializálása közben</string>

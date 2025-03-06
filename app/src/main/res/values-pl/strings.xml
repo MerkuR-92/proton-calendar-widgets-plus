@@ -342,6 +342,7 @@
     <string name="snack_event_created_failed_mail">Wydarzenie zostało utworzone, ale nie udało się wysłać zaproszenia</string>
     <string name="snack_event_created_error">Wystąpił błąd podczas tworzenia wydarzenia</string>
     <string name="snack_event_opening_edit_error">Wystąpił błąd podczas odczytywania wydarzenia do edycji</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">To wydarzenie cykliczne można usunąć tylko w aplikacji internetowej Kalendarz.</string>
     <string name="snack_event_edit_with_attendees_error">Edytowanie wydarzeń z uczestnikami nie jest obsługiwane</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Nie możesz dodawać uczestników i zmieniać ustawienia kalendarza jednocześnie</string>
     <string name="snack_event_init_error">Wystąpił błąd podczas tworzenia wydarzenia</string>
