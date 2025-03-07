@@ -30,6 +30,16 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
         eventEntityMetadata: EventEntityMetadata
     ) {
 
+        // early return if there is no need to update the Occurrences
+        if (database.inTransaction {
+            database.eventOccurrencesDao().hasOccurrenceWithEqualOrHigherModifyTime(
+                userId,
+                eventEntityMetadata.calendarId,
+                eventEntityMetadata.id,
+                eventEntityMetadata.modifyTime
+            )
+        }) return
+
         val eventOccurrenceEntities = if (eventEntityMetadata.rRule == null) { // normal event or single edit
 
             listOf(
