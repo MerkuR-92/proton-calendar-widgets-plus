@@ -277,7 +277,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
 
         val eventEntities = events.map { it.toEventEntity() }
         calendarsRepository.persistEvents(*eventEntities.toTypedArray())
-        calendarsRepository.persistEventsMetadata(*events.map { it.toEventEntityMetadata() }.toTypedArray())
         events.map { it.toEventEntityMetadata() }.forEach {
             updateEventOccurrencesUseCase.execute(userId, it)
         }

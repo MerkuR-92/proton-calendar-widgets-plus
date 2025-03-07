@@ -3,12 +3,9 @@ package me.proton.android.calendar.domain.usecase
 import biweekly.parameter.ParticipationStatus
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.toParticipationStatus
-import me.proton.android.calendar.common.utils.AndroidUtils.tryCastOrNull
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
 import me.proton.android.calendar.data.api.ApiResponse
-import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -53,12 +50,10 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                     val updatePersonalPartUseCaseUseCaseResult = updatePersonalPartUseCase.execute(userId, calendarId, eventId, notifications)
                     if (updatePersonalPartUseCaseUseCaseResult !is UseCase.Result.Success<*>) {
                         calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event.toEventEntity())
-                        calendarsRepository.persistEventsMetadata(updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                         updateEventOccurrencesUseCase.execute(userId.id, updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                     }
                 } else {
                     calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event.toEventEntity())
-                    calendarsRepository.persistEventsMetadata(updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                     updateEventOccurrencesUseCase.execute(userId.id, updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                 }
 
@@ -108,7 +103,6 @@ class UpdateParticipationStatusUseCase @Inject constructor(
         when (val eventsSharingUidResponse = calendarsApi.getEventsByUid(userId, eventUid, 0, 100)) { // TODO pagination
             is ApiResponse.Success -> {
                 calendarsRepository.persistEvents(*eventsSharingUidResponse.data.events.map { it.toEventEntity() }.toTypedArray())
-                calendarsRepository.persistEventsMetadata(*eventsSharingUidResponse.data.events.map { it.toEventEntityMetadata() }.toTypedArray())
                 eventsSharingUidResponse.data.events.map { it.toEventEntityMetadata() }.forEach {
                     updateEventOccurrencesUseCase.execute(userId.id, it)
                 }

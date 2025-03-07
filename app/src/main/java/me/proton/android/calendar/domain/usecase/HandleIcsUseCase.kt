@@ -139,7 +139,6 @@ class HandleIcsUseCase @Inject constructor(
                 if (event?.iCalEvent?.recurrenceId == iCalendar.events.first().recurrenceId) {
                     existingEvent = event
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
-                    calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
                     listOf(eventResponse.toEventEntityMetadata()).forEach {
                         updateEventOccurrencesUseCase.execute(userId.id, it)
                     }
@@ -327,7 +326,6 @@ class HandleIcsUseCase @Inject constructor(
                     existingEvent = event
                     existingEventEntity = eventEntity
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
-                    calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
                     listOf(eventResponse.toEventEntityMetadata()).forEach {
                         updateEventOccurrencesUseCase.execute(userId.id, it)
                     }

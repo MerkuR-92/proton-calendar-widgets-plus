@@ -46,7 +46,7 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
 
         val events = fetchEventsResult.second
         return if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
-            calendarsRepository.persistEvents(*(events.map { it.first }).toTypedArray()) // We already persisted events metadata in split fetch
+            calendarsRepository.persistEvents(*(events.map { it.first }).toTypedArray())
             events.forEach {
                 updateEventOccurrencesUseCase.execute(userId.id, it.second)
             }

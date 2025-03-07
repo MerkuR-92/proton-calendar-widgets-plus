@@ -49,7 +49,7 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
 
             fetchEventsResult.second?.let {
                 logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${it.size}")
-                calendarsRepository.persistEvents(*(it.map { it.first }).toTypedArray()) // We already persisted events metadata in split fetch
+                calendarsRepository.persistEvents(*(it.map { it.first }).toTypedArray())
                 it.map { it.second }.forEach {
                     updateEventOccurrencesUseCase.execute(userId.id, it)
                 }

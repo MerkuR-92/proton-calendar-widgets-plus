@@ -244,7 +244,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 fetchEventsResult.second?.let { fetchingResult ->
                     logger.v("fetchEventsResult success: ${fetchingResult.size}")
-                    persistEvents(*(fetchingResult.map { it.first }).toTypedArray()) // We already persisted metadata on fetch result
+
+                    // TODO persist events where we download fresh ones, not here
+
+                    persistEvents(*(fetchingResult.map { it.first }).toTypedArray())
                     fetchingResult.forEach {
                         updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, it.second)
                     }
@@ -927,41 +930,6 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
         return calendarsApi.getEvent(userId, calendarId, eventId)
-    }
-
-    override suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata) {
-        val eventsMetadataByCalendar = eventsMetadata.groupBy { it.calendarId }
-        database.inTransaction {
-            eventsMetadataByCalendar.forEach {
-                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
-                if (calendarUserId != null /* Calendar exists */) {
-                    try {
-                        it.value.forEach {
-                            // don't overwrite Event it we already have newer one in DB
-                            val hasEventMetadataWithHigherModifyTime = database.eventsMetadataDao().hasEventMetadataWithHigherModifyTime(
-                                it.id,
-                                it.calendarId,
-                                it.modifyTime
-                            )
-                            if (!hasEventMetadataWithHigherModifyTime) {
-                                database.eventsMetadataDao().updateOrInsert(it)
-                            }
-                        }
-                    } catch (e: SQLiteConstraintException) {
-                        // hack for different SQLite implementations formatting message differently
-                        if (e.message?.contains("787") == true
-                            && e.message?.contains("foreign", ignoreCase = true) == true
-                            && e.message?.contains("constraint", ignoreCase = true) == true
-                        ) {
-                            // ignore, it means this Event's Calendar doesn't exist
-                            logger.e("persistEventsMetadata couldn't insert because ${e.message}", e)
-                        } else throw e
-                    }
-                } else {
-                    logger.i("persistEventsMetadata couldn't insert because calendar doesn't exist")
-                }
-            }
-        }
     }
 
     override suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>) {
