@@ -164,7 +164,7 @@ class CalendarEventListener @Inject constructor(
         if (entitiesToPostProcess.isEmpty()) return
 
         // Post process received events
-        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
+        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess)
         widgetRefresher.refreshEventList()
 
         // Clean cached entities

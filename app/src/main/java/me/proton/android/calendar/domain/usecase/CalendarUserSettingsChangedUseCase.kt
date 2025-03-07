@@ -19,7 +19,7 @@ class CalendarUserSettingsChangedUseCase @Inject constructor(
         val events = database.eventsDao().selectAllDayOnly()
 
         // 2. recalculate their alarms
-        updateAlarmsUseCase.execute(userId, events.map { it.id })
+        updateAlarmsUseCase.execute(userId, events)
 
         return UseCase.Result.Success<Unit>()
     }

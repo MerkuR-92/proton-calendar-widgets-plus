@@ -247,13 +247,14 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                     // TODO persist events where we download fresh ones, not here
 
-                    persistEvents(*(fetchingResult.map { it.first }).toTypedArray())
+                    val eventEntities = fetchingResult.map { it.first }
+                    persistEvents(*(eventEntities).toTypedArray())
                     fetchingResult.forEach {
                         updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, it.second)
                     }
                     fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
-                    updateAlarmsUseCase.execute(fetchWindow.userId.id, fetchingResult.map { it.first.id })
+                    updateAlarmsUseCase.execute(fetchWindow.userId.id, eventEntities)
                     fetchedWindows.add(fetchWindow)
                 }
             } else {
