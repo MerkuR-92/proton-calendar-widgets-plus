@@ -948,12 +948,11 @@ class CalendarsRepositoryImpl @Inject constructor(
                 if (calendarUserId != null /* Calendar exists */) {
                     try {
                         it.value.forEach {
-                            // don't overwrite Event it we already have newer one in DB
-                            if (!database.eventsDao().hasEventWithHigherModifyTime(it.id, it.calendarId, it.modifyTime)) {
+                            // don't overwrite Event it we already have the same or newer one in DB
+                            if (!database.eventsDao().hasEventWithHigherOrEqualModifyTime(it.id, it.calendarId, it.modifyTime)) {
                                 database.eventsDao().updateOrInsert(it)
+                                indexEventForSearchUseCase.execute(calendarUserId, listOf(it))
                             }
-
-                            indexEventForSearchUseCase.execute(calendarUserId, listOf(it))
                         }
                     } catch (e: SQLiteConstraintException) {
                         // hack for different SQLite implementations formatting message differently
