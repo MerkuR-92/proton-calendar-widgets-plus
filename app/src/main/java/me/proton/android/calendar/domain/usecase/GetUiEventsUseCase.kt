@@ -3,6 +3,7 @@ package me.proton.android.calendar.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -15,6 +16,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.core.domain.entity.UserId
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -38,6 +40,8 @@ class GetUiEventsUseCase @Inject constructor(
 
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
+        Timber.e("getUiEventsUseCase: $eventsWindow")
+
         val fromEpoch = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
         val toEpoch = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
@@ -48,7 +52,7 @@ class GetUiEventsUseCase @Inject constructor(
             .flatMapLatest { calendars ->
 
                 combine(
-                    getUserInfoUseCase(),
+                    getUserInfoUseCase().debounceExceptFirst(1.seconds).distinctUntilChanged(),
 
                     // trivial case, only 1 row for each event, start + end times are well defined
                     database.eventOccurrencesDao().selectNonRecurringBetweenInclusive(
@@ -56,7 +60,7 @@ class GetUiEventsUseCase @Inject constructor(
                         calendars.map { it.id },
                         fromEpoch.toEpochSecond(),
                         toEpoch.toEpochSecond()
-                    ),
+                    ).debounceExceptFirst(1.seconds).distinctUntilChanged(),
 
                     // we know first and last occurrence time, it can be selected like non-recurring above
                     database.eventOccurrencesDao().selectFiniteRecurring(
@@ -64,7 +68,7 @@ class GetUiEventsUseCase @Inject constructor(
                         calendars.map { it.id },
                         fromEpoch.toEpochSecond(),
                         toEpoch.toEpochSecond()
-                    ),
+                    ).debounceExceptFirst(1.seconds).distinctUntilChanged(),
 
                     // we don't know when the last occurrence happens, so we have to select all events
                     // except for the ones that start after our window
@@ -72,9 +76,11 @@ class GetUiEventsUseCase @Inject constructor(
                         userId.id,
                         calendars.map { it.id },
                         toEpoch.toEpochSecond()
-                    )
+                    ).debounceExceptFirst(1.seconds).distinctUntilChanged()
 
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
+
+                    Timber.e("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
 
                     // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
                     // to filter out even more events here, before decryption takes place
