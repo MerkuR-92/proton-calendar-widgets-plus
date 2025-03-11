@@ -1,9 +1,11 @@
 package me.proton.android.calendar.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -118,53 +120,57 @@ class GetUiEventsUseCase @Inject constructor(
 
             }.map { (userInfo, nonRecurring, recurring) ->
 
-                val transformedNonRecurring = nonRecurring.mapNotNull { occurrenceEntity ->
+                val transformedNonRecurring = coroutineScope {
+                    nonRecurring.map { occurrenceEntity ->
+                        async {
+                            val transformedEvent =
+                                eventDecryptor.getFromCache(
+                                    occurrenceEntity.eventId,
+                                    occurrenceEntity.calendarId,
+                                    occurrenceEntity.modifyTime
+                                ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
+                                    ?.let { eventDecryptor.decrypt(it) }
 
-                    val transformedEvent =
-                        eventDecryptor.getFromCache(
-                            occurrenceEntity.eventId,
-                            occurrenceEntity.calendarId,
-                            occurrenceEntity.modifyTime
-                        ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
-                            ?.let { eventDecryptor.decrypt(it) }
-
-                    // hide events that we can't decrypt
-                    transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
-                        ?.toUiEvent(
-                            userEmails = userInfo.emails,
-                            timeZoneId = timeZoneId,
-                            isFreeUser = userInfo.hasSubscriptionForMail
-                        )
-
+                            // hide events that we can't decrypt
+                            transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                                ?.toUiEvent(
+                                    userEmails = userInfo.emails,
+                                    timeZoneId = timeZoneId,
+                                    isFreeUser = userInfo.hasSubscriptionForMail
+                                )
+                        }
+                    }.awaitAll().filterNotNull()
                 }
 
-                val transformedRecurring = recurring.mapNotNull { occurrenceEntity ->
+                val transformedRecurring = coroutineScope {
+                    recurring.map { occurrenceEntity ->
+                        async {
+                            val transformedEvent =
+                                eventDecryptor.getFromCache(
+                                    occurrenceEntity.eventId,
+                                    occurrenceEntity.calendarId,
+                                    occurrenceEntity.modifyTime
+                                ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
+                                    ?.let { eventDecryptor.decrypt(it) }
 
-                    val transformedEvent =
-                        eventDecryptor.getFromCache(
-                            occurrenceEntity.eventId,
-                            occurrenceEntity.calendarId,
-                            occurrenceEntity.modifyTime
-                        ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
-                            ?.let { eventDecryptor.decrypt(it) }
+                            // hide events that we can't decrypt
+                            transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                                ?.let {
 
-                    // hide events that we can't decrypt
-                    transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
-                        ?.let {
+                                    val eventsSharingUid = calendarsRepository.selectEventsByUid(occurrenceEntity.eventUid)
 
-                            val eventsSharingUid = calendarsRepository.selectEventsByUid(occurrenceEntity.eventUid)
-
-                            calendarsRepository.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-                                transformedEvent,
-                                eventsSharingUid,
-                                eventsWindow.fromDate,
-                                eventsWindow.toDate,
-                                eventsWindow.timeZoneId,
-                                userInfo.emails,
-                                userInfo.hasSubscriptionForMail.not()
-                            )
+                                    calendarsRepository.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                                        transformedEvent,
+                                        eventsSharingUid,
+                                        eventsWindow.fromDate,
+                                        eventsWindow.toDate,
+                                        eventsWindow.timeZoneId,
+                                        userInfo.emails,
+                                        userInfo.hasSubscriptionForMail.not()
+                                    )
+                                }
                         }
-
+                    }.awaitAll().filterNotNull()
                 }.flatten()
 
                 CalendarsRepository.GetEventsResult.Success(transformedNonRecurring + transformedRecurring)
