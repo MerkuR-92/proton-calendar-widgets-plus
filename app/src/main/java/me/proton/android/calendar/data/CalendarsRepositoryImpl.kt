@@ -83,7 +83,6 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
@@ -588,8 +587,8 @@ class CalendarsRepositoryImpl @Inject constructor(
      * Combines expanding, including single edits and filtering by exdates.
      */
     override suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-        originalEvent: SkeletonEvent,
-        eventsSharingUid: List<SkeletonEvent>,
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
@@ -639,36 +638,22 @@ class CalendarsRepositoryImpl @Inject constructor(
             ) {
                 null
             } else {
-                val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                    // get Event from cache based on metadata, or select entire EventEntity and decrypt it in case of cache miss
-                    eventDecryptor.getFromCache(
-                        event.id,
-                        event.calendar.id,
-                        event.modifyTime
-                    ) ?: database.eventsDao().selectById(event.id)?.let {
-                        eventDecryptor.decrypt(it)
-                    }
-                } else database.eventsDao().selectById(event.id)?.let {
-                    transformEventUseCase.execute(it)
-                }
-                transformedEvent?.let {
-                    UiEvent(
-                        transformedEvent.id,
-                        transformedEvent.calendar.id,
-                        transformedEvent.uid,
-                        transformedEvent.summary,
-                        transformedEvent.location,
-                        transformedEvent.description,
-                        if (transformedEvent.isSingleEdit()) transformedEvent.getStart(timeZoneId) else occurrence.startDateTime,
-                        if (transformedEvent.isSingleEdit()) transformedEvent.getEnd(timeZoneId) else occurrence.endDateTime,
-                        transformedEvent.isAllDay(),
-                        if (transformedEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
-                        transformedEvent.getDisplayColor (isFreeUser),
-                        transformedEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
-                        transformedEvent.getParticipationStatus(userEmails),
-                        transformedEvent.status ?: Status.confirmed()
-                    )
-                }
+                UiEvent(
+                    originalEvent.id,
+                    originalEvent.calendar.id,
+                    originalEvent.uid,
+                    originalEvent.summary,
+                    originalEvent.location,
+                    originalEvent.description,
+                    if (originalEvent.isSingleEdit()) originalEvent.getStart(timeZoneId) else occurrence.startDateTime,
+                    if (originalEvent.isSingleEdit()) originalEvent.getEnd(timeZoneId) else occurrence.endDateTime,
+                    originalEvent.isAllDay(),
+                    if (originalEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
+                    originalEvent.getDisplayColor(isFreeUser),
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
+                    originalEvent.getParticipationStatus(userEmails),
+                    originalEvent.status ?: Status.confirmed()
+                )
             }
 
         }
