@@ -21,11 +21,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -93,14 +91,16 @@ import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
+import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
@@ -133,7 +133,9 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
     private val networkManager: NetworkManager,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
+    private val featureFlagManager: FeatureFlagManager
 ) : CalendarsRepository {
 
     private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
@@ -223,6 +225,24 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
 
+        val shouldUseFetchedEventsMetadata = featureFlagManager.getOrDefault(
+            fetchWindow.userId,
+            CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId,
+            FeatureFlag.default(
+                CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId.id,
+                CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
+            )
+        ).value
+
+        // only fetch calendars that have not been fetched before
+        val calendarIdsToFetch = if (shouldUseFetchedEventsMetadata) fetchWindow.calendarIds.filter {
+            updateFetchedEventsMetadataUseCase.shouldFetch(fetchWindow.userId.id,
+                it,
+                fetchWindow.fromDate,
+                fetchWindow.toDate,
+                fetchWindow.timeZoneId)
+        } else fetchWindow.calendarIds
+
         if (!fetchedWindows.contains(fetchWindow)) {
             logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
@@ -231,7 +251,7 @@ class CalendarsRepositoryImpl @Inject constructor(
             // fetch from API
             val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
                 fetchWindow.userId,
-                fetchWindow.calendarIds,
+                calendarIdsToFetch,
                 fetchWindow.fromDate,
                 fetchWindow.toDate,
                 fetchWindow.timeZoneId

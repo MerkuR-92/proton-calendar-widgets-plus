@@ -2,7 +2,6 @@
 
 package me.proton.android.calendar.domain.usecase
 
-import android.database.sqlite.SQLiteConstraintException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -20,7 +19,6 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.toEventEntity
-import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -33,7 +31,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase
 ) : UseCase {
 
     suspend fun splitFetchEvents(
@@ -46,6 +44,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
         val daysInTimeWindow = ChronoUnit.DAYS.between(fromDate, toDate)
         val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
+
+        // chunk fetching Events in case of large time window
         if (daysInTimeWindow > FETCH_EVENTS_MAX_DAYS_WINDOW) {
             var timeWindowsCount = 0
             while (timeWindowsCount < kotlin.math.ceil(daysInTimeWindow / FETCH_EVENTS_MAX_DAYS_WINDOW.toDouble())) {
@@ -83,6 +83,9 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         }
 
         return if (results.isNotEmpty() && results.all { it.first is UseCase.Result.Success<*> }) {
+
+            updateFetchedEventsMetadataUseCase.execute(userId.id, calendarIds, fromDate, toDate, timeZoneId)
+
             Pair(
                 UseCase.Result.Success<Unit>(),
                 results.flatMap { it.second ?: arrayListOf() }

@@ -33,10 +33,12 @@ import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
+import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
@@ -67,6 +69,8 @@ internal class CalendarRepositoryTest {
     private val accountManagerMock: AccountManager = mockk()
     private val networkManagerMock: NetworkManager = mockk()
     private val updateEventOccurrencesUseCaseMock: UpdateEventOccurrencesUseCase = mockk()
+    private val updateFetchedEventsMetadataUseCaseMock: UpdateFetchedEventsMetadataUseCase = mockk()
+    private val featureFlagManagerMock: FeatureFlagManager = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -381,7 +385,9 @@ internal class CalendarRepositoryTest {
             userAddressManagerMock,
             accountManagerMock,
             networkManagerMock,
-            updateEventOccurrencesUseCaseMock
+            updateEventOccurrencesUseCaseMock,
+            updateFetchedEventsMetadataUseCaseMock,
+            featureFlagManagerMock
         )
     }
 
