@@ -133,7 +133,6 @@ class SyncAlarmsUseCase @Inject constructor(
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
                                     calendarsRepository.persistEvents(event.data.event.toEventEntity())
-                                    calendarsRepository.persistEventsMetadata(event.data.event.toEventEntityMetadata())
                                     updateEventOccurrencesUseCase.execute(userId.id, event.data.event.toEventEntityMetadata())
                                     safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
                                 }

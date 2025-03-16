@@ -401,9 +401,9 @@ class EditCreateEventUseCase @Inject constructor(
                     }
                 }
 
-                calendarsRepository.persistEvents(*eventsToInsertOrUpdate.map { it.toEventEntity() }.toTypedArray())
-                calendarsRepository.persistEventsMetadata(*eventsToInsertOrUpdate.map { it.toEventEntityMetadata() }.toTypedArray())
-                updateAlarmsUseCase.execute(userId.id, eventsToInsertOrUpdate.map { it.id })
+                val eventEntities = eventsToInsertOrUpdate.map { it.toEventEntity() }
+                calendarsRepository.persistEvents(*eventEntities.toTypedArray())
+                updateAlarmsUseCase.execute(userId.id, eventEntities)
                 eventsToInsertOrUpdate.map { it.toEventEntityMetadata() }.forEach {
                     updateEventOccurrencesUseCase.execute(userId.id, it)
                 }

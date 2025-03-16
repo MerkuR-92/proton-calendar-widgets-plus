@@ -27,15 +27,8 @@ class UpdateAlarmsUseCase @Inject constructor(
         const val UPDATE_ALARMS = "UPDATE_ALARMS"
     }
 
-    suspend fun execute(userId: String, eventIds: List<String>): UseCase.Result {
-        val dbEvents = eventIds.mapNotNull {
-            database.eventsDao().selectById(it) ?: run {
-                logger.e("could not get dbOriginalEvent in UpdateAlarmsUseCase")
-                null
-            }
-        }
-
-        return handleAlarms(userId, dbEvents)
+    suspend fun execute(userId: String, eventEntities: List<EventEntity>): UseCase.Result {
+        return handleAlarms(userId, eventEntities)
     }
 
     suspend fun execute(userId: String, calendarId: String, updateAllDayAlarms: Boolean, updatePartDayAlarms: Boolean): UseCase.Result {

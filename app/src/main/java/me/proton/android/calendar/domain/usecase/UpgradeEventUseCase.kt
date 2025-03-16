@@ -83,7 +83,6 @@ class UpgradeEventUseCase @Inject constructor(
                     UseCase.Result.Error("UpgradeEventUseCase: Event returned after upgrading has empty sharedKeyPacket")
                 } else {
                     calendarsRepository.persistEvents(upgradeResponse.data.event.toEventEntity())
-                    calendarsRepository.persistEventsMetadata(upgradeResponse.data.event.toEventEntityMetadata())
                     updateEventOccurrencesUseCase.execute(userId.id, upgradeResponse.data.event.toEventEntityMetadata())
                     UseCase.Result.Success(upgradeResponse.data.event.toEventEntity())
                 }
@@ -99,7 +98,6 @@ class UpgradeEventUseCase @Inject constructor(
                         UseCase.Result.Error("UpgradeEventUseCase: Event fetched after NOT_ALLOWED has empty sharedKeyPacket")
                     } else {
                         calendarsRepository.persistEvents(event.toEventEntity())
-                        calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
                         updateEventOccurrencesUseCase.execute(userId.id, event.toEventEntityMetadata())
                         UseCase.Result.Success(event.toEventEntity())
                     }

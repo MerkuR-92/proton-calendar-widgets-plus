@@ -52,7 +52,6 @@ class HandleAlarmsWithMissingEventUseCase @Inject constructor(
 
         // Persist the newly fetched events
         calendarsRepository.persistEvents(event.toEventEntity())
-        calendarsRepository.persistEventsMetadata(event.toEventEntityMetadata())
         updateEventOccurrencesUseCase.execute(userId.id, event.toEventEntityMetadata())
 
         // Fetch alarms for event

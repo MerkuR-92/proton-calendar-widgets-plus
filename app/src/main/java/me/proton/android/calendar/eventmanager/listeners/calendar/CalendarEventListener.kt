@@ -90,8 +90,6 @@ class CalendarEventListener @Inject constructor(
             return
         }
 
-        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
-
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
         val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
@@ -108,9 +106,7 @@ class CalendarEventListener @Inject constructor(
             logger.i("action UPDATE for calendarEvent in deleted calendar")
             return
         }
-
-        calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
-
+        
         val entityIds = entities.map { it.id }
         if (entityIds.isEmpty()) return
         val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
@@ -168,7 +164,7 @@ class CalendarEventListener @Inject constructor(
         if (entitiesToPostProcess.isEmpty()) return
 
         // Post process received events
-        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess.map { it.id })
+        updateAlarmsUseCase.execute(config.userId.id, entitiesToPostProcess)
         widgetRefresher.refreshEventList()
 
         // Clean cached entities

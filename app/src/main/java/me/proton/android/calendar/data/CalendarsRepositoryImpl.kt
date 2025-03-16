@@ -244,13 +244,17 @@ class CalendarsRepositoryImpl @Inject constructor(
 
                 fetchEventsResult.second?.let { fetchingResult ->
                     logger.v("fetchEventsResult success: ${fetchingResult.size}")
-                    persistEvents(*(fetchingResult.map { it.first }).toTypedArray()) // We already persisted metadata on fetch result
+
+                    // TODO persist events where we download fresh ones, not here
+
+                    val eventEntities = fetchingResult.map { it.first }
+                    persistEvents(*(eventEntities).toTypedArray())
                     fetchingResult.forEach {
                         updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, it.second)
                     }
                     fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
-                    updateAlarmsUseCase.execute(fetchWindow.userId.id, fetchingResult.map { it.first.id })
+                    updateAlarmsUseCase.execute(fetchWindow.userId.id, eventEntities)
                     fetchedWindows.add(fetchWindow)
                 }
             } else {
@@ -929,41 +933,6 @@ class CalendarsRepositoryImpl @Inject constructor(
         return calendarsApi.getEvent(userId, calendarId, eventId)
     }
 
-    override suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata) {
-        val eventsMetadataByCalendar = eventsMetadata.groupBy { it.calendarId }
-        database.inTransaction {
-            eventsMetadataByCalendar.forEach {
-                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
-                if (calendarUserId != null /* Calendar exists */) {
-                    try {
-                        it.value.forEach {
-                            // don't overwrite Event it we already have newer one in DB
-                            val hasEventMetadataWithHigherModifyTime = database.eventsMetadataDao().hasEventMetadataWithHigherModifyTime(
-                                it.id,
-                                it.calendarId,
-                                it.modifyTime
-                            )
-                            if (!hasEventMetadataWithHigherModifyTime) {
-                                database.eventsMetadataDao().updateOrInsert(it)
-                            }
-                        }
-                    } catch (e: SQLiteConstraintException) {
-                        // hack for different SQLite implementations formatting message differently
-                        if (e.message?.contains("787") == true
-                            && e.message?.contains("foreign", ignoreCase = true) == true
-                            && e.message?.contains("constraint", ignoreCase = true) == true
-                        ) {
-                            // ignore, it means this Event's Calendar doesn't exist
-                            logger.e("persistEventsMetadata couldn't insert because ${e.message}", e)
-                        } else throw e
-                    }
-                } else {
-                    logger.i("persistEventsMetadata couldn't insert because calendar doesn't exist")
-                }
-            }
-        }
-    }
-
     override suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>) {
         database.eventsMetadataDao().deleteByEventIds(eventIds)
     }
@@ -980,12 +949,11 @@ class CalendarsRepositoryImpl @Inject constructor(
                 if (calendarUserId != null /* Calendar exists */) {
                     try {
                         it.value.forEach {
-                            // don't overwrite Event it we already have newer one in DB
-                            if (!database.eventsDao().hasEventWithHigherModifyTime(it.id, it.calendarId, it.modifyTime)) {
+                            // don't overwrite Event it we already have the same or newer one in DB
+                            if (!database.eventsDao().hasEventWithHigherOrEqualModifyTime(it.id, it.calendarId, it.modifyTime)) {
                                 database.eventsDao().updateOrInsert(it)
+                                indexEventForSearchUseCase.execute(calendarUserId, listOf(it))
                             }
-
-                            indexEventForSearchUseCase.execute(calendarUserId, listOf(it))
                         }
                     } catch (e: SQLiteConstraintException) {
                         // hack for different SQLite implementations formatting message differently

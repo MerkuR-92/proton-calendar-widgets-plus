@@ -41,7 +41,6 @@ class UpdatePersonalPartUseCase @Inject constructor(
             is ApiResponse.Success -> {
                 val eventResponse = updateEventPersonalPartResponse.data.event
                 calendarsRepository.persistEvents(eventResponse.toEventEntity())
-                calendarsRepository.persistEventsMetadata(eventResponse.toEventEntityMetadata())
                 updateEventOccurrencesUseCase.execute(userId.id, eventResponse.toEventEntityMetadata())
                 UseCase.Result.Success<Unit>()
             }

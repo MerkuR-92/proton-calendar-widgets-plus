@@ -19,7 +19,6 @@ import me.proton.android.calendar.data.entity.MemberEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.entity.UserAddress
@@ -195,8 +194,6 @@ interface CalendarsRepository {
     suspend fun isOrphanSingleEdit(userId: UserId, eventUid: String): Boolean?
 
     suspend fun isStandaloneSingleEdit(userId: UserId, eventUid: String, eventRecurrenceId: RecurrenceId, timeZoneId: String): Boolean?
-
-    suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata)
 
     suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>)
 

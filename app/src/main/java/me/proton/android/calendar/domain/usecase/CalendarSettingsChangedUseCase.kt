@@ -41,13 +41,13 @@ class CalendarSettingsChangedUseCase @Inject constructor(
         if (currentPartDayAlarms?.isTheSameAs(newPartDayAlarms) == false) {
             logger.d("handleDefaultAlarmsChange recalculating part day")
 
-            updateAlarmsUseCase.execute(userId.id, database.eventsDao().selectPartDayOnly(newCalendarSettings.calendarId).map { it.id })
+            updateAlarmsUseCase.execute(userId.id, database.eventsDao().selectPartDayOnly(newCalendarSettings.calendarId))
         }
 
         if (currentFullDayAlarms?.isTheSameAs(newFullDayAlarms) == false) {
             logger.d("handleDefaultAlarmsChange recalculating all day")
 
-            updateAlarmsUseCase.execute(userId.id, database.eventsDao().selectAllDayOnly(newCalendarSettings.calendarId).map { it.id })
+            updateAlarmsUseCase.execute(userId.id, database.eventsDao().selectAllDayOnly(newCalendarSettings.calendarId))
         }
     }
 
