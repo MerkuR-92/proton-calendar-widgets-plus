@@ -7,6 +7,10 @@ import me.proton.android.calendar.data.entity.EventEntityMetadata
 @Dao
 abstract class EventsMetadataDao : BaseDao<EventEntityMetadata> {
 
+    /** GET All **/
+    @Query("SELECT * FROM events_metadata")
+    abstract suspend fun selectEventsMetadata(): List<EventEntityMetadata>
+
     /** DELETE **/
     @Query("DELETE FROM events_metadata")
     abstract suspend fun deleteAll()

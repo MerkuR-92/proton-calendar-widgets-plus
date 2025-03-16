@@ -41,7 +41,7 @@ class GetUiEventsUseCase @Inject constructor(
         val fromEpoch = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
         val toEpoch = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
 
-        return calendarsRepository.flowUserCalendars(userId.id)
+        return calendarsRepository.flowAllCalendars(userId.id)
             .map { if (onlyVisibleCalendars) it.filterVisibleCalendars() else it }
             .distinctUntilChanged()
             .debounceExceptFirst(1.seconds)

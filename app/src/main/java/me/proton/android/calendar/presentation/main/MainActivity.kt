@@ -1805,6 +1805,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         lifecycleScope.launch {
             calendarViewModel.fixCalendars()
         }
+
+        lifecycleScope.launch {
+            calendarViewModel.migrateEventMetadataToOccurrences()
+        }
     }
 
     private fun refreshCalendarsWithMissingFields(calendars: List<Calendar>) {

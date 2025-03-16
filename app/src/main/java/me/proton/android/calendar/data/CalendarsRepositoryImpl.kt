@@ -39,7 +39,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.PING_INTERVAL_SECONDS
-import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
@@ -103,7 +102,6 @@ import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
-import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
@@ -376,6 +374,10 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     override fun flowInactiveUserCalendars(userId: String): Flow<List<Calendar>> {
         return database.calendarsDao().flowUserCalendars(userId).joinToCalendars(database, json).transform<List<Calendar>, List<Calendar>> { it.filter { it.isInactive } }.distinctUntilChanged()
+    }
+
+    override fun flowAllCalendars(userId: String): Flow<List<Calendar>> {
+        return database.calendarsDao().flowCalendars(userId).joinToCalendars(database, json)
     }
 
     override fun flowUserCalendars(userId: String): Flow<List<Calendar>> {
