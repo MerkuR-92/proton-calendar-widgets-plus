@@ -278,7 +278,9 @@ interface ICalUtils {
     /**
      * Copies all multi-day events across each day in the range, so we can display them day by day.
      */
-    fun List<Event>.explodeDayByDay(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Map<LocalDate, List<Event>>
+    fun List<Event>.explodeEventDayByDay(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Map<LocalDate, List<Event>>
+
+    fun List<UiEvent>.explodeDayByDay(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String): Map<LocalDate, List<UiEvent>>
 
     /**
      * Filters out original Events that have occurrences with RECURRENCE-ID pointing to

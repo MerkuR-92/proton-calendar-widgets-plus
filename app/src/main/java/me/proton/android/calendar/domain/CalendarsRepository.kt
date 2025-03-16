@@ -147,12 +147,6 @@ interface CalendarsRepository {
 
     suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event?
 
-    fun getUiEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<GetEventsResult<UiEvent>>
-
     suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
         originalEvent: Event,
         eventsSharingUid: List<Event>,
@@ -162,13 +156,6 @@ interface CalendarsRepository {
         userEmails: List<String>,
         isFreeUser: Boolean
     ): List<UiEvent>?
-
-    suspend fun getEvents(
-        userId: String,
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): List<Event>
 
     fun getSearchEvents(
         userId: String,
@@ -180,15 +167,6 @@ interface CalendarsRepository {
     suspend fun deleteAllSearchEventsInCalendar(userId: String, calendarId: String)
 
     suspend fun deleteSearchEventsForEvents(userId: String, calendarId: String, eventIds: List<String>)
-
-    /**
-     * @return SkeletonEvents with correct Calendar Color.
-     */
-    fun getSkeletonEventsFlow(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String
-    ): Flow<GetEventsResult<SkeletonEvent>>
 
     suspend fun hasEvent(eventId: String, calendarId: String, ): Boolean
 
