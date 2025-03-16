@@ -20,6 +20,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
@@ -31,7 +32,8 @@ import javax.inject.Inject
 class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) : UseCase {
 
     suspend fun splitFetchEvents(
@@ -40,7 +42,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ): Pair<UseCase.Result, List<EventEntity>?> { // TODO introduce new type of result with payload
+    ): Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?> { // TODO introduce new type of result with payload
 
         val daysInTimeWindow = ChronoUnit.DAYS.between(fromDate, toDate)
         val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
@@ -63,7 +65,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
             )
         }
 
-        var results: List<Pair<UseCase.Result, List<EventEntity>?>> = emptyList()
+        var results: List<Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?>> = emptyList()
 
         try {
             coroutineScope {
@@ -203,7 +205,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     }
 
     /**
-     * Fetch [EventEntity] in given range if needed, or return from local DB.
+     * Fetch [EventEntity] in given range if needed, or return from local DB. Also returns matching [EventEntityMetadata].
      */
     private suspend fun fetchEventEntitiesLocalOrRemote(
         userId: UserId,
@@ -212,9 +214,9 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         toDate: LocalDate,
         timeZoneId: String,
         coroutineScope: CoroutineScope
-    ): Pair<UseCase.Result, List<EventEntity>?> {
+    ): Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?> {
 
-        var result: Pair<UseCase.Result, List<EventEntity>?>
+        var result: Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?>
 
         try {
 
@@ -232,7 +234,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                     coroutineScope
                 )
 
-                val eventEntitiesResult = mutableListOf<EventEntity>()
+                val eventEntitiesResult = mutableListOf<Pair<EventEntity, EventEntityMetadata>>()
 
                 result = try {
                     for (eventEntities in eventEntitiesChannel) {
@@ -365,10 +367,10 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     private suspend fun ReceiveChannel<List<EventEntityMetadata>>.fetchRemoteEventEntities(
         userId: UserId,
         coroutineScope: CoroutineScope
-    ): ReceiveChannel<List<EventEntity>> {
+    ): ReceiveChannel<List<Pair<EventEntity, EventEntityMetadata>>> {
 
         val eventMetadatasChannel = this
-        val eventEntitiesChannel = Channel<List<EventEntity>>(10)
+        val eventEntitiesChannel = Channel<List<Pair<EventEntity, EventEntityMetadata>>>(10)
 
         coroutineScope.launch {
             for (eventMetadatas in eventMetadatasChannel) { // CONSUME
@@ -380,7 +382,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                         // return EventEnity from DB if it's up to date, otherwise call API
                         if (dbEventEntity != null && metaData.modifyTime <= dbEventEntity.modifyTime) {
-                            dbEventEntity
+                            Pair(dbEventEntity, metaData)
                         } else {
                             when (val apiEventEntity = calendarsApi.getEvent(
                                 userId,
@@ -398,8 +400,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                     null
                                 }
                                 is ApiResponse.Success -> {
-                                    // We only care about EventEntity as we already persisted the metadata in DB
-                                    apiEventEntity.data.event.toEventEntity()
+                                    Pair(apiEventEntity.data.event.toEventEntity(), metaData)
                                 }
                             }
                         }

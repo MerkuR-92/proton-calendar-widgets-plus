@@ -23,7 +23,8 @@ class UpdateParticipationStatusUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
     private val updatePersonalPartUseCase: UpdatePersonalPartUseCase,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ): UseCase {
 
     companion object {
@@ -53,10 +54,12 @@ class UpdateParticipationStatusUseCase @Inject constructor(
                     if (updatePersonalPartUseCaseUseCaseResult !is UseCase.Result.Success<*>) {
                         calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event.toEventEntity())
                         calendarsRepository.persistEventsMetadata(updateParticipationStatusResponse.data.event.toEventEntityMetadata())
+                        updateEventOccurrencesUseCase.execute(userId.id, updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                     }
                 } else {
                     calendarsRepository.persistEvents(updateParticipationStatusResponse.data.event.toEventEntity())
                     calendarsRepository.persistEventsMetadata(updateParticipationStatusResponse.data.event.toEventEntityMetadata())
+                    updateEventOccurrencesUseCase.execute(userId.id, updateParticipationStatusResponse.data.event.toEventEntityMetadata())
                 }
 
                 handleAlarmsUseCase.execute(userId)
@@ -106,6 +109,9 @@ class UpdateParticipationStatusUseCase @Inject constructor(
             is ApiResponse.Success -> {
                 calendarsRepository.persistEvents(*eventsSharingUidResponse.data.events.map { it.toEventEntity() }.toTypedArray())
                 calendarsRepository.persistEventsMetadata(*eventsSharingUidResponse.data.events.map { it.toEventEntityMetadata() }.toTypedArray())
+                eventsSharingUidResponse.data.events.map { it.toEventEntityMetadata() }.forEach {
+                    updateEventOccurrencesUseCase.execute(userId.id, it)
+                }
                 handleAlarmsUseCase.execute(userId)
             }
             is ApiResponse.Error -> {

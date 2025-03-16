@@ -54,7 +54,8 @@ class HandleIcsUseCase @Inject constructor(
     private val updateCalendarUseCase: UpdateCalendarUseCase,
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase,
-    private val eventDecryptor: EventDecryptor
+    private val eventDecryptor: EventDecryptor,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) {
 
     suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
@@ -139,6 +140,9 @@ class HandleIcsUseCase @Inject constructor(
                     existingEvent = event
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
                     calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
+                    listOf(eventResponse.toEventEntityMetadata()).forEach {
+                        updateEventOccurrencesUseCase.execute(userId.id, it)
+                    }
                     break
                 }
             }
@@ -324,6 +328,9 @@ class HandleIcsUseCase @Inject constructor(
                     existingEventEntity = eventEntity
                     calendarsRepository.persistEvents(*(listOf(eventEntity)).toTypedArray())
                     calendarsRepository.persistEventsMetadata(*(listOf(eventResponse.toEventEntityMetadata())).toTypedArray())
+                    listOf(eventResponse.toEventEntityMetadata()).forEach {
+                        updateEventOccurrencesUseCase.execute(userId.id, it)
+                    }
                     break
                 }
             }

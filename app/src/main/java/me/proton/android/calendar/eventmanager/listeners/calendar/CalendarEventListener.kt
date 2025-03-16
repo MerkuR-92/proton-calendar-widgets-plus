@@ -15,10 +15,12 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.toEventEntity
+import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
@@ -37,7 +39,8 @@ class CalendarEventListener @Inject constructor(
     private val logger: Logger,
     private val workManager: WorkManager,
     private val widgetRefresher: WidgetRefresher,
-    private val updateAlarmsUseCase: UpdateAlarmsUseCase
+    private val updateAlarmsUseCase: UpdateAlarmsUseCase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ): CalendarBaseEventListener<String, EventEntityMetadata>(db) {
     override val order: Int = 3
     override val type: Type = Type.Calendar
@@ -93,6 +96,11 @@ class CalendarEventListener @Inject constructor(
         if (entityIds.isEmpty()) return
         val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToCreate.toTypedArray())
+
+        // at this point all Events corresponding to EventEntityMetadatas should be persisted in DB
+        entities.forEach {
+            updateEventOccurrencesUseCase.execute(config.userId.id, it)
+        }
     }
 
     override suspend fun onUpdate(config: EventManagerConfig, entities: List<EventEntityMetadata>) {
@@ -107,6 +115,11 @@ class CalendarEventListener @Inject constructor(
         if (entityIds.isEmpty()) return
         val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToUpdate.toTypedArray())
+
+        // at this point all Events corresponding to EventEntityMetadatas should be persisted in DB
+        entities.forEach {
+            updateEventOccurrencesUseCase.execute(config.userId.id, it)
+        }
     }
 
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {

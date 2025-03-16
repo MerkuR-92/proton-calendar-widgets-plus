@@ -19,6 +19,7 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
     private val widgetRefresher: WidgetRefresher,
     private val userSettingsRepository: UserSettingsRepository,
     private val database: AppDatabase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ): UseCase {
 
     companion object {
@@ -45,8 +46,11 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
 
         val events = fetchEventsResult.second
         return if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
-            calendarsRepository.persistEvents(*events.toTypedArray()) // We already persisted events metadata in split fetch
-            updateAlarmsUseCase.execute(userId.id, events.map { it.id })
+            calendarsRepository.persistEvents(*(events.map { it.first }).toTypedArray()) // We already persisted events metadata in split fetch
+            events.forEach {
+                updateEventOccurrencesUseCase.execute(userId.id, it.second)
+            }
+            updateAlarmsUseCase.execute(userId.id, events.map { it.first.id })
             widgetRefresher.refreshEventList()
             UseCase.Result.Success<Unit>()
         } else {

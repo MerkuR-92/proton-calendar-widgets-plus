@@ -23,7 +23,8 @@ class SyncAlarmsUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
     private val calendarsRepository: CalendarsRepository,
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
-    private val handleAlarmsUseCase: HandleAlarmsUseCase
+    private val handleAlarmsUseCase: HandleAlarmsUseCase,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ): UseCase {
 
     companion object {
@@ -133,6 +134,7 @@ class SyncAlarmsUseCase @Inject constructor(
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
                                     calendarsRepository.persistEvents(event.data.event.toEventEntity())
                                     calendarsRepository.persistEventsMetadata(event.data.event.toEventEntityMetadata())
+                                    updateEventOccurrencesUseCase.execute(userId.id, event.data.event.toEventEntityMetadata())
                                     safePersistEventAlarmUseCase.invoke(listOf(alarmEntity))
                                 }
                                 // TODO maybe ignore some errors like non-existing Event, but let's see what kind of error reports we get

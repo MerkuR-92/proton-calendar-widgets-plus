@@ -19,6 +19,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.ResetCalendarSearchUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
 import me.proton.android.calendar.test.shared.mocks.calendarId
 import me.proton.android.calendar.test.shared.mocks.calendarKeyPacket
@@ -41,6 +42,7 @@ class CalendarEventListenerTest {
     private val widgetRefresher: WidgetRefresher = mockk()
     private val updateAlarmsUseCase: UpdateAlarmsUseCase = mockk(relaxed = true)
     private val resetCalendarSearchUseCase: ResetCalendarSearchUseCase = mockk(relaxed = true)
+    private val updateEventOccurrencesUseCaseMock: UpdateEventOccurrencesUseCase = mockk(relaxed = true)
     private val workManager: WorkManager = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
 
@@ -57,7 +59,8 @@ class CalendarEventListenerTest {
             logger,
             workManager,
             widgetRefresher,
-            updateAlarmsUseCase
+            updateAlarmsUseCase,
+            updateEventOccurrencesUseCaseMock
         )
         coEvery { calendarsRepository.hasCalendar(any()) } returns true
     }

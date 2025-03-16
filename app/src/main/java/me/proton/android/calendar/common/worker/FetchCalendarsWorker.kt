@@ -24,7 +24,6 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.SearchDatabase
-import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.data.entity.toEventEntityMetadata
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -37,6 +36,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase.Companion.NOTIFICATION_ID_FETCH_CALENDARS_WORKER
+import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import java.time.Instant
@@ -56,7 +56,8 @@ class FetchCalendarsWorker @AssistedInject constructor(
     private val searchDatabase: SearchDatabase,
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ) : CoroutineWorker(context, workerParameters) {
 
     private lateinit var startInstant: Instant
@@ -277,6 +278,9 @@ class FetchCalendarsWorker @AssistedInject constructor(
         val eventEntities = events.map { it.toEventEntity() }
         calendarsRepository.persistEvents(*eventEntities.toTypedArray())
         calendarsRepository.persistEventsMetadata(*events.map { it.toEventEntityMetadata() }.toTypedArray())
+        events.map { it.toEventEntityMetadata() }.forEach {
+            updateEventOccurrencesUseCase.execute(userId, it)
+        }
 
         indexEventForSearchUseCase.execute(userId, eventEntities)
 

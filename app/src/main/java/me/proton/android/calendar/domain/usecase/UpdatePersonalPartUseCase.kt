@@ -13,7 +13,8 @@ import javax.inject.Inject
 
 class UpdatePersonalPartUseCase @Inject constructor(
     private val calendarsApi: CalendarsApi,
-    private val calendarsRepository: CalendarsRepository
+    private val calendarsRepository: CalendarsRepository,
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
 ): UseCase {
 
     companion object {
@@ -41,6 +42,7 @@ class UpdatePersonalPartUseCase @Inject constructor(
                 val eventResponse = updateEventPersonalPartResponse.data.event
                 calendarsRepository.persistEvents(eventResponse.toEventEntity())
                 calendarsRepository.persistEventsMetadata(eventResponse.toEventEntityMetadata())
+                updateEventOccurrencesUseCase.execute(userId.id, eventResponse.toEventEntityMetadata())
                 UseCase.Result.Success<Unit>()
             }
             is ApiResponse.Error -> {
