@@ -39,6 +39,7 @@ class FeatureFlagViewModel @Inject constructor(
     var eventSearchFeatureFlag: LiveData<Boolean> = MutableLiveData()
     var splitViewVerticalScrollingFlag: LiveData<Boolean> = MutableLiveData()
     var zoomIntegrationAndroidFlag: LiveData<Boolean> = MutableLiveData()
+    var fetchedEventsCacheAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
@@ -77,6 +78,14 @@ class FeatureFlagViewModel @Inject constructor(
             CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.featureId
         ).map {
             it?.value ?: CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+
+        // Fetched Events Cache feature flag
+        fetchedEventsCacheAndroidFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
 
         // Zoom integration feature flag
@@ -129,6 +138,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     fun isSplitViewVerticalScrollingEnabled(): Boolean {
         return splitViewVerticalScrollingFlag.value ?: CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.fallbackValue
+    }
+
+    fun isFetchedEventsCacheEnabled(): Boolean {
+        return fetchedEventsCacheAndroidFlag.value ?: CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
     }
 
     fun isZoomIntegrationEnabled(): Boolean {

@@ -21,6 +21,7 @@ package me.proton.android.calendar.data.db
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import androidx.room.RoomMasterTable.TABLE_NAME
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import me.proton.android.calendar.data.api.MailSettingsEntity
@@ -29,6 +30,7 @@ import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS_METADATA
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENTS_OCCURRENCES
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_EVENT_ALARMS
+import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_FETCHED_EVENTS_METADATA
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MANAGED_HOLIDAY_CALENDARS
 import me.proton.android.calendar.data.db.AppDatabase.Companion.TABLE_MEMBERS
 import me.proton.core.account.data.db.AccountDatabase
@@ -605,6 +607,13 @@ object AppDatabaseMigrations {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_EVENTS_OCCURRENCES}` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `eventId` TEXT NOT NULL, `eventUid` TEXT NOT NULL, `fullDay` INTEGER NOT NULL, `startTime` INTEGER, `endTime` INTEGER, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `firstOccurrenceStartTime` INTEGER NOT NULL, `lastOccurrenceEndTime` INTEGER, `rRule` TEXT, `modifyTime` INTEGER NOT NULL, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`eventId`) REFERENCES `events`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_events_occurrences_eventId` ON `${TABLE_EVENTS_OCCURRENCES}` (`eventId`)")
+        }
+    }
+
+    val MIGRATION_74_75 = object : Migration(74, 75) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS `${TABLE_FETCHED_EVENTS_METADATA}` (`userId` TEXT NOT NULL, `calendarId` TEXT NOT NULL, `windowStartTime` INTEGER NOT NULL, `windowEndTime` INTEGER NOT NULL, `_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, FOREIGN KEY(`calendarId`) REFERENCES `calendars`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_fetched_events_metadata_calendarId` ON `${TABLE_FETCHED_EVENTS_METADATA}` (`calendarId`)")
         }
     }
 }

@@ -79,6 +79,7 @@ import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCase
 import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpdateUserSettingsUseCase
@@ -177,6 +178,7 @@ val useCaseModule = module {
     factory<GetUserInfoUseCase> { GetUserInfoUseCase(get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<GetUiEventsUseCase> { GetUiEventsUseCase(get(), get(), get(), get()) }
+    factory<UpdateFetchedEventsMetadataUseCase> { UpdateFetchedEventsMetadataUseCase(get()) }
 }
 
 fun coreModule(

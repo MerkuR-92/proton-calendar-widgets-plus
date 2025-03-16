@@ -21,11 +21,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
@@ -85,7 +83,6 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
@@ -93,14 +90,16 @@ import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
+import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
@@ -133,7 +132,9 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
     private val networkManager: NetworkManager,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
+    private val featureFlagManager: FeatureFlagManager
 ) : CalendarsRepository {
 
     private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
@@ -223,6 +224,24 @@ class CalendarsRepositoryImpl @Inject constructor(
 
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
 
+        val shouldUseFetchedEventsMetadata = featureFlagManager.getOrDefault(
+            fetchWindow.userId,
+            CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId,
+            FeatureFlag.default(
+                CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId.id,
+                CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
+            )
+        ).value
+
+        // only fetch calendars that have not been fetched before
+        val calendarIdsToFetch = if (shouldUseFetchedEventsMetadata) fetchWindow.calendarIds.filter {
+            updateFetchedEventsMetadataUseCase.shouldFetch(fetchWindow.userId.id,
+                it,
+                fetchWindow.fromDate,
+                fetchWindow.toDate,
+                fetchWindow.timeZoneId)
+        } else fetchWindow.calendarIds
+
         if (!fetchedWindows.contains(fetchWindow)) {
             logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
@@ -231,7 +250,7 @@ class CalendarsRepositoryImpl @Inject constructor(
             // fetch from API
             val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
                 fetchWindow.userId,
-                fetchWindow.calendarIds,
+                calendarIdsToFetch,
                 fetchWindow.fromDate,
                 fetchWindow.toDate,
                 fetchWindow.timeZoneId
@@ -568,8 +587,8 @@ class CalendarsRepositoryImpl @Inject constructor(
      * Combines expanding, including single edits and filtering by exdates.
      */
     override suspend fun expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-        originalEvent: SkeletonEvent,
-        eventsSharingUid: List<SkeletonEvent>,
+        originalEvent: Event,
+        eventsSharingUid: List<Event>,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
@@ -619,36 +638,22 @@ class CalendarsRepositoryImpl @Inject constructor(
             ) {
                 null
             } else {
-                val transformedEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
-                    // get Event from cache based on metadata, or select entire EventEntity and decrypt it in case of cache miss
-                    eventDecryptor.getFromCache(
-                        event.id,
-                        event.calendar.id,
-                        event.modifyTime
-                    ) ?: database.eventsDao().selectById(event.id)?.let {
-                        eventDecryptor.decrypt(it)
-                    }
-                } else database.eventsDao().selectById(event.id)?.let {
-                    transformEventUseCase.execute(it)
-                }
-                transformedEvent?.let {
-                    UiEvent(
-                        transformedEvent.id,
-                        transformedEvent.calendar.id,
-                        transformedEvent.uid,
-                        transformedEvent.summary,
-                        transformedEvent.location,
-                        transformedEvent.description,
-                        if (transformedEvent.isSingleEdit()) transformedEvent.getStart(timeZoneId) else occurrence.startDateTime,
-                        if (transformedEvent.isSingleEdit()) transformedEvent.getEnd(timeZoneId) else occurrence.endDateTime,
-                        transformedEvent.isAllDay(),
-                        if (transformedEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
-                        transformedEvent.getDisplayColor (isFreeUser),
-                        transformedEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
-                        transformedEvent.getParticipationStatus(userEmails),
-                        transformedEvent.status ?: Status.confirmed()
-                    )
-                }
+                UiEvent(
+                    originalEvent.id,
+                    originalEvent.calendar.id,
+                    originalEvent.uid,
+                    originalEvent.summary,
+                    originalEvent.location,
+                    originalEvent.description,
+                    if (originalEvent.isSingleEdit()) originalEvent.getStart(timeZoneId) else occurrence.startDateTime,
+                    if (originalEvent.isSingleEdit()) originalEvent.getEnd(timeZoneId) else occurrence.endDateTime,
+                    originalEvent.isAllDay(),
+                    if (originalEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
+                    originalEvent.getDisplayColor(isFreeUser),
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
+                    originalEvent.getParticipationStatus(userEmails),
+                    originalEvent.status ?: Status.confirmed()
+                )
             }
 
         }
