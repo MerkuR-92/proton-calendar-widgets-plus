@@ -1801,6 +1801,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             zoomIntegrationAndroidFlag ?: return@Observer
         })
 
+        featureFlagViewModel.rsvpCommentsAndroidFlag.observe(this@MainActivity, Observer { rsvpCommentsAndroidFlag ->
+            rsvpCommentsAndroidFlag ?: return@Observer
+        })
+
         lifecycleScope.launch {
             calendarViewModel.fixCalendars()
         }
