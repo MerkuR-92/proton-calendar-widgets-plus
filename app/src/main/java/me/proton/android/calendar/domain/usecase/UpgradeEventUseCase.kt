@@ -33,7 +33,8 @@ class UpgradeEventUseCase @Inject constructor(
     private val userAddressManager: UserAddressManager,
     private val crypto: Crypto,
     private val database: AppDatabase,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase
 ) : UseCase {
 
     suspend fun execute(userId: UserId, eventId: String): UseCase.Result {
@@ -90,7 +91,7 @@ class UpgradeEventUseCase @Inject constructor(
             is ApiResponse.Error -> {
                 if (upgradeResponse.errorCode == ResponseCodes.NOT_ALLOWED) {
                     // race condition with another client, Event is already upgraded, fetch and persist it
-                    val event = calendarsApi.getEvent(userId, eventEntity.calendarId, eventEntity.id)
+                    val event = fetchEventWithCommentsUseCase.execute(userId, eventEntity.calendarId, eventEntity.id)
                         .valueOrNullAndLogErrors(logger, "UpgradeEventUseCase")?.event
                     if (event == null) {
                         UseCase.Result.Error("UpgradeEventUseCase: could not fetch Event after NOT_ALLOWED")

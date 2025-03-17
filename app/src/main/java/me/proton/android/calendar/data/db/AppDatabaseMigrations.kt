@@ -630,4 +630,10 @@ object AppDatabaseMigrations {
             AccountDatabase.MIGRATION_10.migrate(db)
         }
     }
+
+    val MIGRATION_77_78 = object : Migration(77, 78) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.addTableColumn(TABLE_EVENTS, "attendeesInfo", "TEXT")
+        }
+    }
 }

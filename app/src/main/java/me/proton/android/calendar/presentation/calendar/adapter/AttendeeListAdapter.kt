@@ -22,8 +22,14 @@ import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.databinding.ItemAttendeeBinding
+import me.proton.android.calendar.domain.model.Event
 
-class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
+class AttendeeListAdapter(
+    val canonicalUserEmails: List<String>?,
+    val attendeeComments: Map<String, Pair<Event.SignatureVerification, String?>>,
+    val rsvpCommentsEnabled: Boolean
+)
+    : ListAdapter<Attendee, AttendeeListAdapter.ViewHolder>(AttendeeDiffCallback()) {
 
     class AttendeeDiffCallback : DiffUtil.ItemCallback<Attendee>() {
         override fun areItemsTheSame(oldItem: Attendee, newItem: Attendee): Boolean {
@@ -53,6 +59,9 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
         private val attendeeItemInitials: TextView = itemBinding.itemAttendeeInitials
         private val attendeeItemStatus: ImageView = itemBinding.itemAttendeeStatus
         private val attendeeItemOptional: TextView = itemBinding.itemAttendeeOptional
+        private val attendeeCommentIcon: ImageView = itemBinding.itemAttendeeCommentIcon
+        private val attendeeComment: TextView = itemBinding.itemAttendeeComment
+        private val attendeeCommentFailedVerificationIcon: ImageView = itemBinding.itemAttendeeFailedVerificationIcon
 
         fun bind(attendee : Attendee, position : Int) {
             val context = itemView.context
@@ -106,8 +115,40 @@ class AttendeeListAdapter(val canonicalUserEmails: List<String>?) : ListAdapter<
                 attendeeItemOptional.visibleOrGone(false)
             }
 
+            initAttendeeComment(attendee, attendeeCommentIcon, attendeeComment, attendeeCommentFailedVerificationIcon, attendeeComments, rsvpCommentsEnabled)
             initAttendeeStatus(attendeeItemStatus, attendee.participationStatus ?: ParticipationStatus.NEEDS_ACTION, context)
         }
+    }
+}
+
+fun initAttendeeComment(
+    attendee: Attendee?,
+    commentIcon: ImageView,
+    comment: TextView,
+    failedVerificationIcon: ImageView,
+    attendeeComments: Map<String, Pair<Event.SignatureVerification, String?>>,
+    rsvpCommentsEnabled: Boolean
+) {
+    if (!rsvpCommentsEnabled) {
+        commentIcon.visibleOrGone(false)
+        comment.visibleOrGone(false)
+        failedVerificationIcon.visibleOrGone(false)
+        return
+    }
+    val attendeeCommentText = attendee?.extractEmail()?.let { attendeeComments[it]?.second }
+    if (attendeeCommentText?.isBlank() == false) {
+        commentIcon.visibleOrGone(true)
+        comment.visibleOrGone(true)
+        comment.text = attendeeCommentText
+        val failedVerification = attendee.extractEmail()?.let { attendeeComments[it]?.first }
+        // TODO is this correct or should we do something else based on SignatureVerification?
+        if (failedVerification != null && failedVerification != Event.SignatureVerification.SUCCESS) {
+            failedVerificationIcon.visibleOrGone(true)
+        }
+    } else {
+        commentIcon.visibleOrGone(false)
+        comment.visibleOrGone(false)
+        failedVerificationIcon.visibleOrGone(false)
     }
 }
 

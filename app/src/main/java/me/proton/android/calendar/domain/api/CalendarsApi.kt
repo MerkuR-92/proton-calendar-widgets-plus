@@ -68,6 +68,11 @@ interface CalendarsApi {
     suspend fun getEvent(userId: UserId, calendarId: String, eventId: String) : ApiResponse<EventApiResponse>
 
     /**
+     * Get event attendees with comments.
+     */
+    suspend fun getEventAttendees(userId: UserId, calendarId: String, eventId: String, page: Int): ApiResponse<AttendeesInfoResponse>
+
+    /**
      * Upgrades Event using AddressKeyPacket to use SharedKeyPacket (applicable for auto-added invites).
      */
     suspend fun upgradeEvent(userId: UserId, calendarId: String, eventId: String, body: UpgradeEventApiRequest): ApiResponse<UpgradeEventApiResponse>

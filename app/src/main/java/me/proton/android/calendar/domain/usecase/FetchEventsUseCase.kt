@@ -33,7 +33,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
-    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase
+    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase,
+    private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase,
 ) : UseCase {
 
     suspend fun splitFetchEvents(
@@ -173,7 +174,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                     val fetchedEntities = chunkForAllWorkers.chunked(workerBatchSize).map { eventIds ->
                         async {
                             eventIds.mapNotNull { eventId ->
-                                when (val eventResponse = calendarsApi.getEvent(userId, calendarId, eventId)) {
+                                when (val eventResponse = fetchEventWithCommentsUseCase.execute(userId, calendarId, eventId)) {
                                     is ApiResponse.Error -> if (eventResponse.isNotFound()) {
                                         null // legitimate situation if Event was deleted in the meantime
                                     } else {
@@ -366,7 +367,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                         if (dbEventEntity != null && metaData.modifyTime <= dbEventEntity.modifyTime) {
                             Pair(dbEventEntity, metaData)
                         } else {
-                            when (val apiEventEntity = calendarsApi.getEvent(
+                            when (val apiEventEntity = fetchEventWithCommentsUseCase.execute(
                                 userId,
                                 metaData.calendarId,
                                 metaData.id

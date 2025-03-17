@@ -61,6 +61,7 @@ data class Event private constructor(
     val sharedEventId: String? = null,
     val isProtonProtonInvite: Boolean? = null,
     var notifications: NotificationMigration = NotificationMigration(false, null),
+    val attendeeComments: Map<String, Pair<SignatureVerification, String?>> = emptyMap(),
     val color: String? = null
 ) : BaseModel() {
 
@@ -77,6 +78,7 @@ data class Event private constructor(
             sharedEventId: String? = null,
             isProtonProtonInvite: Boolean? = null,
             notifications: NotificationMigration? = null,
+            attendeeComments: Map<String, Pair<SignatureVerification, String?>> = emptyMap(),
             color: String? = null
         ): Event? {
 
@@ -94,6 +96,7 @@ data class Event private constructor(
                     sharedEventId,
                     isProtonProtonInvite,
                     notifications ?: NotificationMigration(false, null),
+                    attendeeComments,
                     color
                 )
             } else null
@@ -591,7 +594,9 @@ data class Event private constructor(
         @SerialName("Status")
         val status: Int,
         @SerialName("UpdateTime")
-        val updateTime: Int? = null
+        val updateTime: Int? = null,
+        @SerialName("Comment")
+        val comment: AttendeeStatusEventComment? = null
     ) {
         val participationStatus: ParticipationStatus get() = when (status) {
             1 -> ParticipationStatus.TENTATIVE
@@ -600,6 +605,14 @@ data class Event private constructor(
             else -> ParticipationStatus.NEEDS_ACTION
         }
     }
+
+    @Serializable
+    data class AttendeeStatusEventComment(
+        @SerialName("Message")
+        val message: String? = null,
+        @SerialName("Type")
+        val type: Int
+    )
 
     /**
      * Used for sending SharedSessionKey encrypted with Attendee's AddressKey

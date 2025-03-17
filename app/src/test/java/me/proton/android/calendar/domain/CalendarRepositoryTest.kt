@@ -22,6 +22,7 @@ import me.proton.android.calendar.common.logger.TestsLogger
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.api.ApiResponse
+import me.proton.android.calendar.data.api.AttendeesInfoResponse
 import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
@@ -29,6 +30,7 @@ import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
@@ -59,6 +61,7 @@ internal class CalendarRepositoryTest {
 
     private val transformEventUseCaseMock: TransformEventUseCase = mockk()
     private val fetchEventsUseCaseMock: FetchEventsUseCase = mockk()
+    private val getEventWithCommentsUseCaseMock: GetEventWithCommentsUseCase = mockk()
     private val updateAlarmsUseCaseMock: UpdateAlarmsUseCase = mockk()
     private val calendarWidgetRefresherMock: CalendarWidgetRefresher = mockk()
     private val eventDecryptorMock: EventDecryptor = mockk()
@@ -372,6 +375,7 @@ internal class CalendarRepositoryTest {
             transformEventUseCaseMock,
             testsLogger,
             fetchEventsUseCaseMock,
+            getEventWithCommentsUseCaseMock,
             updateAlarmsUseCaseMock,
             calendarsApiMock,
             testsApiMock,
@@ -412,6 +416,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632441600L,
                     startTimeZone = "GMT",
@@ -452,6 +460,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -484,6 +496,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632441600L,
                     startTimeZone = "GMT",
@@ -524,6 +540,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -556,6 +576,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -588,6 +612,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -620,6 +648,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -660,6 +692,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -692,6 +728,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -724,6 +764,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -763,6 +807,10 @@ internal class CalendarRepositoryTest {
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
                     attendees = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,
                     startTimeZone = "GMT",
@@ -794,6 +842,10 @@ internal class CalendarRepositoryTest {
                     ),
                     calendarEvents = emptyList(),
                     attendeesEvents = emptyList(),
+                    attendeesInfo = AttendeesInfoResponse(
+                        attendees = emptyList(),
+                        moreAttendees = 0,
+                    ),
                     attendees = emptyList(),
                     isProtonProtonInvite = 0,
                     startTime = 1632355200L,

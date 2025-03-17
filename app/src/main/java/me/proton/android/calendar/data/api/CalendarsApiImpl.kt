@@ -83,6 +83,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}")
     suspend fun getEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String) : EventApiResponse
 
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/attendees")
+    suspend fun getEventAttendees(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String, @Query("Page") page: Int) : AttendeesInfoResponse
+
     @PUT("calendar/$API_VERSION_CALENDAR/{calendarId}/events/{eventId}/upgrade")
     suspend fun upgradeEvent(@Path("calendarId") calendarId: String, @Path("eventId") eventId: String, @Body body: UpgradeEventApiRequest): UpgradeEventApiResponse
 
@@ -288,6 +291,15 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
         eventId: String
     ): ApiResponse<EventApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
         getEvent(calendarId, eventId)
+    }.toApiResponse()
+
+    override suspend fun getEventAttendees(
+        userId: UserId,
+        calendarId: String,
+        eventId: String,
+        page: Int
+    ): ApiResponse<AttendeesInfoResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
+        getEventAttendees(calendarId, eventId, page)
     }.toApiResponse()
 
     override suspend fun upgradeEvent(
@@ -883,6 +895,14 @@ data class JoinCalendarApiResponse(
 )
 
 @Serializable
+data class AttendeesInfoResponse(
+    @SerialName("Attendees")
+    val attendees: List<JsonElement>,
+    @SerialName("MoreAttendees")
+    val moreAttendees: Int,
+)
+
+@Serializable
 data class EventResponse(
     @SerialName("ID")
     @PrimaryKey
@@ -916,6 +936,8 @@ data class EventResponse(
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
     val attendees: List<JsonElement>,
+    @SerialName("AttendeesInfo")
+    val attendeesInfo: AttendeesInfoResponse? = null,
     @SerialName("IsProtonProtonInvite")
     val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
     @SerialName("Notifications")

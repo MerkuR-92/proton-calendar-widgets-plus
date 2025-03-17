@@ -86,6 +86,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
+import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
@@ -120,6 +121,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val transformEventUseCase: TransformEventUseCase,
     private val logger: Logger,
     private val fetchEventsUseCase: FetchEventsUseCase,
+    private val getEventWithCommentsUseCase: GetEventWithCommentsUseCase,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val calendarsApi: CalendarsApi,
     private val testsApi: TestsApi,
@@ -929,7 +931,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
-        return calendarsApi.getEvent(userId, calendarId, eventId)
+        return getEventWithCommentsUseCase.execute(userId, calendarId, eventId)
     }
 
     override suspend fun deleteEventsMetadataByEventIds(eventIds: List<String>) {

@@ -54,6 +54,8 @@ data class EventEntity(
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
     val attendees: List<JsonElement>,
+    @SerialName("AttendeesInfo")
+    val attendeesInfo: List<JsonElement>?,
     @SerialName("IsProtonProtonInvite")
     val isProtonProtonInvite: Int?, // 1 if is proton to proton invite,
     @SerialName("Notifications")
@@ -78,6 +80,7 @@ fun EventResponse.toEventEntity(): EventEntity {
         calendarEvents = this.calendarEvents,
         attendeesEvents = this.attendeesEvents,
         attendees = this.attendees,
+        attendeesInfo = this.attendeesInfo?.attendees ?: emptyList(),
         isProtonProtonInvite = this.isProtonProtonInvite,
         notifications = this.notifications,
         color = this.color
