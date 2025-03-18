@@ -230,9 +230,26 @@ class TransformEventUseCase @Inject constructor(
                         attendeeStatusEvent.id
                     attendee.participationStatus = status
                 }
-                // TODO do proper verification and decryption of attendee comments
-                attendee.extractEmail()?.let { attendeeComments[it] = Event.SignatureVerification.SUCCESS to (attendeeStatusEvent?.comment?.message ?: "") } ?: run {
-                    logger.e("TransformEventUseCase, attendee email is null")
+                // decrypt and match comments to attendee emails
+                attendee.extractEmail()?.let { attendeeEmail ->
+                    val plaintextComment = attendeeStatusEvent?.comment?.let {
+                        decryptAttendeeComment(
+                            it,
+                            eventEntity,
+                            userId,
+                            attendeeEmail,
+                            userAddressForAddressKeyPacket,
+                            userAddresses,
+                            allowApiCall,
+                            calendarPrivateKeys,
+                            keyPassphrase
+                        )
+                    }
+                    plaintextComment?.takeIf { it.decryptionStatus == Event.DecryptionStatus.Success && it.plainText?.isNotBlank() == true }?.let {
+                        attendeeComments[attendeeEmail] = it.signatureVerification to (it.plainText ?: "")
+                    }
+                } ?: run {
+                    logger.e("TransformEventUseCase, attendee email is null when matching comments")
                 }
             }
         }
@@ -425,6 +442,50 @@ class TransformEventUseCase @Inject constructor(
             ProcessResult(null, Event.DecryptionStatus.Failure.Generic, Event.SignatureVerification.FAILURE)
         }
 
+    }
+
+    private suspend fun decryptAttendeeComment(
+        comment: Event.AttendeeStatusEventComment,
+        eventEntity: EventEntity,
+        userId: String,
+        attendeeEmail: String,
+        userAddressForAddressKeyPacket: UserAddress?,
+        userAddresses: List<UserAddress>,
+        allowApiCall: Boolean,
+        calendarPrivateKeys: List<String>,
+        keyPassphrase: String
+    ): ProcessResult {
+
+        val attendeeEvent = Event.EventPart.Attendee(
+            comment.type,
+            comment.message,
+            null,
+            attendeeEmail
+        )
+
+        return if (eventEntity.addressKeyPacket != null) { // use Address Key with AddressKeyPacket
+            if (userAddressForAddressKeyPacket != null) {
+                getPlainText(
+                    eventEntity.addressKeyPacket,
+                    attendeeEvent,
+                    EncryptedWith.AddressKey(
+                        userAddressForAddressKeyPacket,
+                        cryptoContext,
+                        getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
+                    )
+                )
+            } else ProcessResult(null, Event.DecryptionStatus.Failure.NoAddressKey, Event.SignatureVerification.FAILURE)
+        } else { // use Calendar Key with SharedKeyPacket
+            getPlainText(
+                eventEntity.sharedKeyPacket,
+                attendeeEvent,
+                EncryptedWith.CalendarKey(
+                    calendarPrivateKeys,
+                    keyPassphrase,
+                    getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
+                )
+            )
+        }
     }
 
 }

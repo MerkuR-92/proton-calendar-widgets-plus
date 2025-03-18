@@ -140,11 +140,11 @@ fun initAttendeeComment(
         commentIcon.visibleOrGone(true)
         comment.visibleOrGone(true)
         comment.text = attendeeCommentText
-        val failedVerification = attendee.extractEmail()?.let { attendeeComments[it]?.first }
-        // TODO is this correct or should we do something else based on SignatureVerification?
-        if (failedVerification != null && failedVerification != Event.SignatureVerification.SUCCESS) {
-            failedVerificationIcon.visibleOrGone(true)
-        }
+        // TODO bring back warning icon when we get comment signatures
+//        val failedVerification = attendee.extractEmail()?.let { attendeeComments[it]?.first }
+//        if (failedVerification != Event.SignatureVerification.SUCCESS) {
+//            failedVerificationIcon.visibleOrGone(true)
+//        }
     } else {
         commentIcon.visibleOrGone(false)
         comment.visibleOrGone(false)

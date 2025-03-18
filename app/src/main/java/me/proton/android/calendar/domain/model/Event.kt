@@ -609,7 +609,7 @@ data class Event private constructor(
     @Serializable
     data class AttendeeStatusEventComment(
         @SerialName("Message")
-        val message: String? = null,
+        val message: String,
         @SerialName("Type")
         val type: Int
     )
