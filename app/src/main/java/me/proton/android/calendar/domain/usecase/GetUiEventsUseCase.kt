@@ -1,14 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.distinct
@@ -42,7 +35,7 @@ class GetUiEventsUseCase @Inject constructor(
 
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
 
-        Timber.e("getUiEventsUseCase: $eventsWindow")
+        Timber.d("getUiEventsUseCase: $eventsWindow")
 
         val fromEpoch = fromDate.atStartOfDay(ZoneId.of(timeZoneId))
         val toEpoch = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId))
@@ -82,100 +75,147 @@ class GetUiEventsUseCase @Inject constructor(
 
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
 
-                    Timber.e("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
+                    Timber.d("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
 
-                    // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
-                    // to filter out even more events here, before decryption takes place
+                    withContext(Dispatchers.Default) {
 
-                    // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
-                    //  - select from by windowStart and windowEnd, only the rows that overlap with eventsWindow (problem: false negatives if the window was never generated for those events)
-                    //  - groupBy events before performing discarding below and early-return for each event that for sure happens or doesn't happen in the window (problem: higher memory usage)
+                        // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
+                        // to filter out even more events here, before decryption takes place
 
-                    val notOccurring = infiniteRecurring.filter { occurrence ->
+                        // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
+                        //  - select from by windowStart and windowEnd, only the rows that overlap with eventsWindow (problem: false negatives if the window was never generated for those events)
+                        //  - groupBy events before performing discarding below and early-return for each event that for sure happens or doesn't happen in the window (problem: higher memory usage)
 
-                        val isSelectedWindowFullyInOccurrenceWindow = isFullyBetween(fromEpoch.toEpochSecond() to toEpoch.toEpochSecond(), occurrence.windowStartTime to occurrence.windowEndTime)
-                        val isEventNotHappeningInOccurrenceWindow = occurrence.startTime == null
-                        // optimization: event is happening in the entire window selected from DB, but after the time we are searching for,
-                        //  so we can only do this for events happening *after*, but not *outside* the searched window, because [occurrence.startTime]
-                        //  is the first occurrence overlapping generated window, but we don't know if it's the only one
-                        val isFirstEventOccurenceAfterSelectedWindow = (occurrence.startTime ?: 0) > toEpoch.toEpochSecond()
+                        val notOccurring = infiniteRecurring.filter { occurrence ->
 
-                        // check if this event for sure does not occur in <from, to>
-                        isSelectedWindowFullyInOccurrenceWindow && (isEventNotHappeningInOccurrenceWindow || isFirstEventOccurenceAfterSelectedWindow)
-                    }.distinct()
+                            val isSelectedWindowFullyInOccurrenceWindow = isFullyBetween(
+                                fromEpoch.toEpochSecond() to toEpoch.toEpochSecond(),
+                                occurrence.windowStartTime to occurrence.windowEndTime
+                            )
+                            val isEventNotHappeningInOccurrenceWindow = occurrence.startTime == null
+                            // optimization: event is happening in the entire window selected from DB, but after the time we are searching for,
+                            //  so we can only do this for events happening *after*, but not *outside* the searched window, because [occurrence.startTime]
+                            //  is the first occurrence overlapping generated window, but we don't know if it's the only one
+                            val isFirstEventOccurenceAfterSelectedWindow =
+                                (occurrence.startTime ?: 0) > toEpoch.toEpochSecond()
 
-                    val filteredInfiniteRecurring = infiniteRecurring.filterNot { recurring -> notOccurring.find {
-                        recurring.userId == it.userId && recurring.calendarId == it.calendarId && recurring.eventId == it.eventId } != null
+                            // check if this event for sure does not occur in <from, to>
+                            isSelectedWindowFullyInOccurrenceWindow && (isEventNotHappeningInOccurrenceWindow || isFirstEventOccurenceAfterSelectedWindow)
+                        }
+
+                        val filteredInfiniteRecurring = infiniteRecurring.filterNot { recurring ->
+                            notOccurring.find {
+                                recurring.userId == it.userId && recurring.calendarId == it.calendarId && recurring.eventId == it.eventId
+                            } != null
+                        }
+
+                        // we are returning first out of potentially many EventOccurrence objects for infiniteRecurring events
+                        //  it doesn't matter because in the next step we're not using metadata, we only need to know which events
+                        //  to decrypt and expand
+                        Pair(
+                            userInfo,
+                            Triple(
+                                nonRecurring.distinct().asFlow(),
+                                finiteRecurring.distinct().asFlow(),
+                                filteredInfiniteRecurring.distinct().asFlow()
+                            )
+                        )
+                    }
+                }
+
+            }.transform { (userInfo, events) ->
+
+                val (nonRecurring, finiteRecurring, infiniteRecurring) = events
+
+                val result = withContext(Dispatchers.Default) {
+
+                    val transformedNonRecurring = nonRecurring.mapNotNull { occurrenceEntity ->
+
+                        val transformedEvent =
+                            eventDecryptor.getFromCache(
+                                occurrenceEntity.eventId,
+                                occurrenceEntity.calendarId,
+                                occurrenceEntity.modifyTime
+                            ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
+                                ?.let { eventDecryptor.decrypt(it) }
+
+                        // hide events that we can't decrypt
+                        transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            ?.toUiEvent(
+                                userEmails = userInfo.emails,
+                                timeZoneId = timeZoneId,
+                                isFreeUser = userInfo.hasSubscriptionForMail
+                            )
+
                     }
 
-                    // we are returning first out of potentially many EventOccurrence objects for infiniteRecurring events
-                    //  it doesn't matter because in the next step we're not using metadata, we only need to know which events
-                    //  to decrypt and expand
-                    Triple(
-                        userInfo,
-                        nonRecurring.distinct(),
-                        (finiteRecurring.distinct() + filteredInfiniteRecurring.distinct())
-                    )
-                }
+                    val transformedFiniteRecurring = finiteRecurring.mapNotNull { occurrenceEntity ->
 
-            }.map { (userInfo, nonRecurring, recurring) ->
+                        val transformedEvent =
+                            eventDecryptor.getFromCache(
+                                occurrenceEntity.eventId,
+                                occurrenceEntity.calendarId,
+                                occurrenceEntity.modifyTime
+                            ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
+                                ?.let { eventDecryptor.decrypt(it) }
 
-                val transformedNonRecurring = coroutineScope {
-                    nonRecurring.map { occurrenceEntity ->
-                        async {
-                            val transformedEvent =
-                                eventDecryptor.getFromCache(
-                                    occurrenceEntity.eventId,
-                                    occurrenceEntity.calendarId,
-                                    occurrenceEntity.modifyTime
-                                ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
-                                    ?.let { eventDecryptor.decrypt(it) }
+                        // hide events that we can't decrypt
+                        transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            ?.let {
 
-                            // hide events that we can't decrypt
-                            transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
-                                ?.toUiEvent(
-                                    userEmails = userInfo.emails,
-                                    timeZoneId = timeZoneId,
-                                    isFreeUser = userInfo.hasSubscriptionForMail
+                                val eventsSharingUid = calendarsRepository.selectEventsByUid(occurrenceEntity.eventUid)
+
+                                calendarsRepository.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                                    transformedEvent,
+                                    eventsSharingUid,
+                                    eventsWindow.fromDate,
+                                    eventsWindow.toDate,
+                                    eventsWindow.timeZoneId,
+                                    userInfo.emails,
+                                    userInfo.hasSubscriptionForMail.not()
                                 )
-                        }
-                    }.awaitAll().filterNotNull()
+                            }
+                    }.flatMapConcat {
+                        it.asFlow()
+                    }
+
+                    val transformedInfiniteRecurring = infiniteRecurring.mapNotNull { occurrenceEntity ->
+
+                        val transformedEvent =
+                            eventDecryptor.getFromCache(
+                                occurrenceEntity.eventId,
+                                occurrenceEntity.calendarId,
+                                occurrenceEntity.modifyTime
+                            ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
+                                ?.let { eventDecryptor.decrypt(it) }
+
+                        // hide events that we can't decrypt
+                        transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            ?.let {
+
+                                val eventsSharingUid = calendarsRepository.selectEventsByUid(occurrenceEntity.eventUid)
+
+                                calendarsRepository.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                                    transformedEvent,
+                                    eventsSharingUid,
+                                    eventsWindow.fromDate,
+                                    eventsWindow.toDate,
+                                    eventsWindow.timeZoneId,
+                                    userInfo.emails,
+                                    userInfo.hasSubscriptionForMail.not()
+                                )
+                            }
+                    }.flatMapConcat {
+                        it.asFlow()
+                    }
+
+                    flowOf(transformedNonRecurring, transformedFiniteRecurring, transformedInfiniteRecurring).flattenConcat().toList()
                 }
 
-                val transformedRecurring = coroutineScope {
-                    recurring.map { occurrenceEntity ->
-                        async {
-                            val transformedEvent =
-                                eventDecryptor.getFromCache(
-                                    occurrenceEntity.eventId,
-                                    occurrenceEntity.calendarId,
-                                    occurrenceEntity.modifyTime
-                                ) ?: database.eventsDao().selectById(occurrenceEntity.eventId)
-                                    ?.let { eventDecryptor.decrypt(it) }
+                Timber.d("getUiEventsUseCase emitting ${result.size} for $eventsWindow")
 
-                            // hide events that we can't decrypt
-                            transformedEvent?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
-                                ?.let {
-
-                                    val eventsSharingUid = calendarsRepository.selectEventsByUid(occurrenceEntity.eventUid)
-
-                                    calendarsRepository.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
-                                        transformedEvent,
-                                        eventsSharingUid,
-                                        eventsWindow.fromDate,
-                                        eventsWindow.toDate,
-                                        eventsWindow.timeZoneId,
-                                        userInfo.emails,
-                                        userInfo.hasSubscriptionForMail.not()
-                                    )
-                                }
-                        }
-                    }.awaitAll().filterNotNull()
-                }.flatten()
-
-                CalendarsRepository.GetEventsResult.Success(transformedNonRecurring + transformedRecurring)
+                emit(CalendarsRepository.GetEventsResult.Success(result))
             }
-
     }
 
     /**
