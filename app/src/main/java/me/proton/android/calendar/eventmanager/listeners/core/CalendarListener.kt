@@ -80,18 +80,19 @@ class CalendarListener @Inject constructor(
 
     override suspend fun onSuccess(config: EventManagerConfig) {
         super.onSuccess(config)
-
-        // Launch worker to bootstrap calendars
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap.toTypedArray()
-            ),
-            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS,
-            ExistingWorkPolicy.APPEND,
-            NetworkType.CONNECTED
-        )
+        if (calendarsToBootstrap.isNotEmpty()) {
+            // Launch worker to bootstrap calendars
+            workManager.enqueueWorkHelper(
+                workDataOf(
+                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
+                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
+                    UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap.toTypedArray()
+                ),
+                UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS,
+                ExistingWorkPolicy.APPEND,
+                NetworkType.CONNECTED
+            )
+        }
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
