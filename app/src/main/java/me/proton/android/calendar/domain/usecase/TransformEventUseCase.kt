@@ -248,6 +248,8 @@ class TransformEventUseCase @Inject constructor(
                     plaintextComment?.takeIf { it.decryptionStatus == Event.DecryptionStatus.Success && it.plainText?.isNotBlank() == true }?.let {
                         attendeeComments[attendeeEmail] = it.signatureVerification to (it.plainText ?: "")
                     }
+
+                    Unit // prevent false positive error logs below
                 } ?: run {
                     logger.e("TransformEventUseCase, attendee email is null when matching comments")
                 }
