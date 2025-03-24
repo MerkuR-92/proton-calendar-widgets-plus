@@ -4,12 +4,11 @@ import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
-import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.core.domain.entity.UserId
 import javax.inject.Inject
 
 /**
- * Fetches from API and saves CalendarUserSettings in DB.
+ * Fetches Calendar Keys from API and saves CalendarUserSettings in DB.
  */
 class RefreshCalendarKeysUseCase @Inject constructor(
     private val logger: Logger,

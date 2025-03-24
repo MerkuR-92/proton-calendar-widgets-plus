@@ -126,6 +126,9 @@ interface CalendarsApiService : BaseRetrofitApi {
     suspend fun setupKey(@Path("calendarId") calendarId: String, @Body body: SetupKeyApiRequest) : SetupKeyApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/keys/all")
+    suspend fun getAllKeys(@Path("calendarId") calendarId: String) : KeysApiResponse
+
+    @GET("calendar/$API_VERSION_CALENDAR/{calendarId}/keys")
     suspend fun getKeys(@Path("calendarId") calendarId: String) : KeysApiResponse
 
     @GET("calendar/$API_VERSION_CALENDAR/keys/reset")
@@ -363,6 +366,11 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
     override suspend fun updateMember(userId: UserId, calendarId: String, memberId: String, body: UpdateMemberApiRequest): ApiResponse<MemberApiResponse> =
         apiProvider.get<CalendarsApiService>(userId).invoke {
             updateMember(calendarId, memberId, body)
+        }.toApiResponse()
+
+    override suspend fun getAllKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse> =
+        apiProvider.get<CalendarsApiService>(userId).invoke {
+            getAllKeys(calendarId)
         }.toApiResponse()
 
     override suspend fun getKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse> =
