@@ -79,7 +79,7 @@ fun EventResponse.toEventEntity(): EventEntity {
         sharedEvents = this.sharedEvents,
         calendarEvents = this.calendarEvents,
         attendeesEvents = this.attendeesEvents,
-        attendees = this.attendees,
+        attendees = this.attendees ?: emptyList(),
         attendeesInfo = this.attendeesInfo?.attendees ?: emptyList(),
         isProtonProtonInvite = this.isProtonProtonInvite,
         notifications = this.notifications,

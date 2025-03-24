@@ -935,7 +935,7 @@ data class EventResponse(
     @SerialName("AttendeesEvents")
     val attendeesEvents: List<JsonElement>, // shared between all calendars
     @SerialName("Attendees")
-    val attendees: List<JsonElement>,
+    val attendees: List<JsonElement>? = emptyList(), // deprecated in favor of attendeesInfo
     @SerialName("AttendeesInfo")
     val attendeesInfo: AttendeesInfoResponse? = null,
     @SerialName("IsProtonProtonInvite")
