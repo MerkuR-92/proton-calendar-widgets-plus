@@ -129,6 +129,11 @@ interface CalendarsApi {
     /**
      * Retrieves all keys associated with the calendar, active or not. Available with admin permissions.
      */
+    suspend fun getAllKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse>
+
+    /**
+     * Retrieves active keys associated with the calendar.
+     */
     suspend fun getKeys(userId: UserId, calendarId: String): ApiResponse<KeysApiResponse>
 
     /**

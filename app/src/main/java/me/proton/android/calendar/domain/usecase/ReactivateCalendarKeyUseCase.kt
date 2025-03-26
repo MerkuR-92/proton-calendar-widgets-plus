@@ -35,7 +35,7 @@ class ReactivateCalendarKeyUseCase @Inject constructor(
         val userAddresses = addresses ?: userAddressManager.getAddressesOrNull(userId)
 
         // Get all keys
-        val keysResponse = calendarsApi.getKeys(userId, calendarId)
+        val keysResponse = calendarsApi.getAllKeys(userId, calendarId)
         if (keysResponse !is ApiResponse.Success) {
             return UseCase.Result.Error("ReactivateCalendarKeyUseCase: error getting keys from API: $keysResponse")
         }
