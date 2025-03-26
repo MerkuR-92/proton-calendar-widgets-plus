@@ -52,8 +52,6 @@ class AttendeeListAdapter(
     }
 
     inner class ViewHolder(itemBinding: ItemAttendeeBinding) : RecyclerView.ViewHolder(itemBinding.root) {
-        private val attendeeItemLayout: ConstraintLayout = itemBinding.itemAttendeeLayout
-        private val attendeeItemTextLayout: LinearLayout = itemBinding.itemAttendeeTextLayout
         private val attendeeItemTitle: TextView = itemBinding.itemAttendeeTitle
         private val attendeeItemDescription: TextView = itemBinding.itemAttendeeDescription
         private val attendeeItemInitials: TextView = itemBinding.itemAttendeeInitials
@@ -104,12 +102,6 @@ class AttendeeListAdapter(
                     attendeeItemDescription.text = context.getString(R.string.event_attendee_optional)
                 } else {
                     attendeeItemOptional.visibleOrGone(true)
-                    // If has Optional label, we need to clear LinearLayout constraint
-                    //  to bottom of view to keep the same spacing
-                    val constraintSet = ConstraintSet()
-                    constraintSet.clone(attendeeItemLayout)
-                    constraintSet.clear(attendeeItemTextLayout.id, ConstraintSet.BOTTOM)
-                    constraintSet.applyTo(attendeeItemLayout)
                 }
             } else {
                 attendeeItemOptional.visibleOrGone(false)

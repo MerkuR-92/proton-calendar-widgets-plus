@@ -52,6 +52,7 @@
         android:layout_marginTop="@dimen/spacing_element"
         android:layout_marginEnd="@dimen/spacing_element_small"
         android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/item_attendee_barrier"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/item_attendee_photo"
         app:layout_constraintTop_toTopOf="parent">
@@ -85,9 +86,10 @@
         android:layout_height="wrap_content"
         android:text="@string/event_attendee_optional"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@+id/item_attendee_text_layout"
-        app:layout_constraintStart_toStartOf="@+id/item_attendee_text_layout"
-        app:layout_constraintTop_toBottomOf="@+id/item_attendee_text_layout"
+        app:layout_constraintEnd_toEndOf="@id/item_attendee_text_layout"
+        app:layout_constraintStart_toStartOf="@id/item_attendee_text_layout"
+        app:layout_constraintTop_toBottomOf="@id/item_attendee_text_layout"
+        app:layout_constraintBottom_toTopOf="@+id/item_attendee_barrier"
         tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Barrier
@@ -95,7 +97,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="item_attendee_optional, item_attendee_status" />
+        app:barrierAllowsGoneWidgets="false"
+        app:constraint_referenced_ids="item_attendee_status, item_attendee_optional, item_attendee_text_layout" />
 
     <ImageView
         android:id="@+id/item_attendee_comment_icon"
