@@ -257,8 +257,10 @@ class ItemMiniCalendarFragment : Fragment() {
                 timeZoneId,
                 lifecycle
             ).observe(viewLifecycleOwner) { indicators ->
-                this@ItemMiniCalendarFragment.indicators = indicators
-                applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
+                view?.run {
+                    this@ItemMiniCalendarFragment.indicators = indicators
+                    applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
+                }
             }
 
             calendarViewModel.selectedDateTime.observe(viewLifecycleOwner) { selectedDateTime ->
