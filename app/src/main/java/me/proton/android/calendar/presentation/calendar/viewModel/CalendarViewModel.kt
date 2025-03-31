@@ -32,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
@@ -490,6 +491,9 @@ class CalendarViewModel @Inject constructor(
 
             getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onStart {
                 emit(CalendarsRepository.GetEventsResult.InProgress)
+            }.catch {
+                logger.e("Exception in getUiEventsLookup", it)
+                emit(CalendarsRepository.GetEventsResult.Exception(it))
             }.asLiveData()
         }
     }
