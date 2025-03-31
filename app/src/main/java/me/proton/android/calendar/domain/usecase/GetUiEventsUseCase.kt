@@ -144,7 +144,7 @@ class GetUiEventsUseCase @Inject constructor(
                             ?.toUiEvent(
                                 userEmails = userInfo.emails,
                                 timeZoneId = timeZoneId,
-                                isFreeUser = userInfo.hasSubscriptionForMail
+                                isFreeUser = userInfo.hasSubscriptionForMail.not()
                             )
 
                     }
