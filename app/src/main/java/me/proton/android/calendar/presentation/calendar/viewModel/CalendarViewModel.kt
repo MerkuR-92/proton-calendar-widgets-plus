@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -487,7 +488,9 @@ class CalendarViewModel @Inject constructor(
                 return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
             }
 
-            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onStart {
+                emit(CalendarsRepository.GetEventsResult.InProgress)
+            }.asLiveData()
         }
     }
 
