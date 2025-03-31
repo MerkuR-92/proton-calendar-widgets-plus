@@ -25,13 +25,15 @@ import me.proton.core.domain.entity.UserId
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MULTIPLE CALENDARS
     private val logger: Logger,
     private val calendarsApi: CalendarsApi,
     private val database: AppDatabase,
-    private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase
+    private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
+    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase
 ) : UseCase {
 
     suspend fun splitFetchEvents(
@@ -270,10 +272,13 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     ): ReceiveChannel<List<EventEntityMetadata>> {
 
         val eventMetadatasChannel = Channel<List<EventEntityMetadata>>(8)
+        val notFoundErrors = ConcurrentHashMap<String, Int>()
 
         coroutineScope.launch {
 
             calendarIds.map { calendarId ->
+
+                notFoundErrors[calendarId] = 0
 
                 async {
                     (0..3).map { type -> // we need to fire off 4 requests with different types
@@ -302,7 +307,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                                 } else if (eventsResponse is ApiResponse.Error) {
                                     if (eventsResponse.isNotFound()) {
-                                        logger.i("NOT_FOUND requesting events in fetchMetadataOnly, type = $type")
+                                        notFoundErrors[calendarId] = (notFoundErrors[calendarId] ?: 0) + 1
+                                        logger.e("NOT_FOUND requesting events in fetchMetadataOnly, type = $type")
                                     } else {
                                         eventsResponse.logErrorIfNeeded("api error fetching events for calendar in fetchMetadataOnly", logger)
                                         eventMetadatasChannel.close(Exception("api error in fetchMetadataOnly: ${eventsResponse}"))
@@ -319,6 +325,16 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                     }.awaitAll()
                 }
             }.awaitAll()
+
+            // all 4 types of event requests failed with NOT_FOUND, delete calendar after double-checking
+            notFoundErrors.forEach { calendarId, notFoundErrorCount ->
+                if (notFoundErrorCount == 4) {
+                    launch {
+                        logger.e("NOT_FOUND requesting events in fetchMetadataOnly, calling deleteCalendarIfNeededUseCase")
+                        deleteCalendarIfNeededUseCase.execute(userId.id, calendarId)
+                    }
+                }
+            }
 
             eventMetadatasChannel.close()
 
