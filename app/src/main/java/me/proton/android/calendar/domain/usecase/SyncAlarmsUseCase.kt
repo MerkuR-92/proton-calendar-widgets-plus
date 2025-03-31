@@ -24,7 +24,8 @@ class SyncAlarmsUseCase @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase
 ): UseCase {
 
     companion object {
@@ -161,6 +162,10 @@ class SyncAlarmsUseCase @Inject constructor(
                 }
                 is ApiResponse.Error -> {
                     return if (alarmsResponse.isNotFound()) {
+
+                        logger.e("NOT_FOUND requesting alarms in SyncAlarmsUseCase, calling deleteCalendarIfNeededUseCase for ${calendarEntity.id}")
+                        deleteCalendarIfNeededUseCase.execute(userId.id, calendarEntity.id)
+
                         logger.e("SyncAlarmsUseCase: NOT_FOUND requesting alarms for calendar in handleCalendarAlarms")
                         UseCase.Result.Success<Unit>()
                     } else {
