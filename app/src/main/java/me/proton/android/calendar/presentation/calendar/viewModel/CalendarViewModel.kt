@@ -7,6 +7,7 @@ import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateFormat
+import android.text.format.DateFormat.getTimeFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
@@ -45,7 +46,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.yield
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.MAX_CALENDAR_FREE
@@ -64,7 +64,6 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.areTimeZoneOffs
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.fallbackTimeZone
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeEventDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySearchTerm
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
@@ -106,6 +105,7 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
+import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -481,11 +481,33 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUiEventsLookup(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, lifecycle: Lifecycle): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
+    suspend fun getUiEventsLookup(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        lifecycle: Lifecycle
+    ): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
         return withContext(Dispatchers.IO) {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
                 logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
+                return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
+            }
+
+            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
+        }
+    }
+
+    suspend fun getUiEventsLookupWithInProgressResult(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        lifecycle: Lifecycle
+    ): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
+        return withContext(Dispatchers.IO) {
+            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+            if (userId == null) {
+                logger.e("User ID was null in CalendarViewModel getUiEventsLookupWithInProgressResult")
                 return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
             }
 
