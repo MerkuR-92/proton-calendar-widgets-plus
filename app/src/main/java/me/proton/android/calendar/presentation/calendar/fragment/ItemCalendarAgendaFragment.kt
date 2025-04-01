@@ -162,7 +162,7 @@ class ItemCalendarAgendaFragment: Fragment() {
                 agendaMediator.value = Pair(timeZoneId!!, timeFormatIs24Hour!!)
             }
         }
-        agendaMediator.observe(viewLifecycleOwner) {
+        agendaMediator.distinctUntilChanged().observe(viewLifecycleOwner) {
             it?.let {
                 setupItemMiniCalendarContent(it.first, it.second)
             }
@@ -225,7 +225,7 @@ class ItemCalendarAgendaFragment: Fragment() {
             uiEventsLiveData.removeObservers(viewLifecycleOwner)
         }
 
-        uiEventsLiveData = calendarViewModel.getUiEventsLookup(immutableDate, immutableDate, timeZoneId, this.lifecycle)
+        uiEventsLiveData = calendarViewModel.getUiEventsLookupWithInProgressResult(immutableDate, immutableDate, timeZoneId, this.lifecycle)
         uiEventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
         eventsResult?.let {

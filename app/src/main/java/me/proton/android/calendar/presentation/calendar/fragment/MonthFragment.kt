@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
@@ -824,7 +825,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         currentTimeZoneId = timeZoneId
         eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
         if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
-        eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
+        eventsLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { eventsResult ->
 
             eventsResult?.let {
                 when (it) {

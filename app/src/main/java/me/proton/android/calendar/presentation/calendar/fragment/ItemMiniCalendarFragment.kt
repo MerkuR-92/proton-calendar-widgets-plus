@@ -16,6 +16,7 @@ import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.distinctUntilChanged
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -172,7 +173,7 @@ class ItemMiniCalendarFragment : Fragment() {
             }
         }
 
-        miniCalendarMediator.observe(viewLifecycleOwner) {
+        miniCalendarMediator.distinctUntilChanged().observe(viewLifecycleOwner) {
             it?.let {
                 setupItemMiniCalendarContent(it.first, it.second)
             }
