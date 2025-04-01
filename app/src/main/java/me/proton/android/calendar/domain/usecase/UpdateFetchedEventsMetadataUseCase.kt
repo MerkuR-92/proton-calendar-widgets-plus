@@ -30,7 +30,7 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
                     it,
                     windowStart,
                     windowEnd
-                ).not()
+                ).not() && database.calendarsDao().hasCalendar(it)
 
                 if (shouldAddNewEntry) {
                     database.fetchedEventsMetadataDao().insert(
