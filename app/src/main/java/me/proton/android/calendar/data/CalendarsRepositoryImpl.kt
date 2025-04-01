@@ -628,7 +628,8 @@ class CalendarsRepositoryImpl @Inject constructor(
                     toDate,
                     timeZoneId
                 ))) {
-                // occurrence is exdated
+
+                // occurrence is exdated or outside of the date range
                 null
             } else if (event.isSingleEdit() && !DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
                     event.getStart(
@@ -636,6 +637,9 @@ class CalendarsRepositoryImpl @Inject constructor(
                     ), event.getEnd(timeZoneId), fromDate, toDate, timeZoneId
                 )
             ) {
+                null
+            } else if (event.isSingleEdit() && event.getRecurrenceId(timeZoneId) == occurrence.startDateTime) {
+                // occurrence is filtered out because of another SE RecurrenceID
                 null
             } else {
                 UiEvent(
