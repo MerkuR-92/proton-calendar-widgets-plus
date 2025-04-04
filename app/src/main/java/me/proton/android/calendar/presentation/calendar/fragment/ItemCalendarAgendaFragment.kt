@@ -23,6 +23,7 @@ import me.proton.android.calendar.common.FragmentArguments.POSITION_ARG
 import me.proton.android.calendar.common.Navigation
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
+import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortUiEventsForAgendaView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.databinding.ItemCalendarAgendaFragmentBinding
@@ -241,7 +242,17 @@ class ItemCalendarAgendaFragment: Fragment() {
                     is CalendarsRepository.GetEventsResult.Success -> {
 
                         // Sort the events
-                        val sortedEvents = it.events.sortUiEventsForAgendaView(timeZoneId)
+                        val sortedEvents = it.events.filter {
+                            // filter all-day events that are technically happening until Midnight the next day,
+                            //  but we're not presenting them like this in UI
+                            DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+                                it.dateStart,
+                                it.dateEnd,
+                                immutableDate,
+                                immutableDate,
+                                timeZoneId
+                            )
+                        }.sortUiEventsForAgendaView(timeZoneId)
 
                         val partDayEvents = it.events.filter {
                             !it.isAllDay && it.spansSingleDay(true) // Multi day events are displayed in the day view header
@@ -264,10 +275,6 @@ class ItemCalendarAgendaFragment: Fragment() {
                         }
 
                         lifecycleScope.launch {
-                            val userAddresses = calendarViewModel.getUserAddresses()
-                            userAddresses?.let {
-                                eventsListLayoutAdapter.setUserEmails(it.map { it.email })
-                            }
                             eventsListLayoutAdapter.submitList(
                                 listOf(fakeHeaderEvent).plus(sortedEvents)
                             )

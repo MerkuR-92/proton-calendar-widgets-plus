@@ -42,7 +42,6 @@ class EventAdapter(
     private val clickListener: ((UiEvent) -> Unit)?
 ) : ListAdapter<UiEvent, EventAdapter.EventViewHolder>(GenericDiffCallback()) {
 
-    private val userEmails = mutableListOf<String>()
     private var timeZoneId: String? = null
     private var is24Hour: Boolean? = null
     private var date: LocalDate? = null
@@ -57,11 +56,6 @@ class EventAdapter(
 
     fun setTimeFormatIs24Hour(is24Hour: Boolean) {
         this.is24Hour = is24Hour
-    }
-
-    fun setUserEmails(userEmails: List<String>) {
-        this.userEmails.clear()
-        this.userEmails.addAll(userEmails)
     }
 
     sealed class EventViewHolder(itemBinding: ViewBinding) : RecyclerView.ViewHolder(itemBinding.root) {
