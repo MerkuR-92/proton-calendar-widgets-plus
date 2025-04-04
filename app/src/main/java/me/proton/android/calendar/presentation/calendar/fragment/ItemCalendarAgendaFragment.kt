@@ -264,10 +264,6 @@ class ItemCalendarAgendaFragment: Fragment() {
                         }
 
                         lifecycleScope.launch {
-                            val userAddresses = calendarViewModel.getUserAddresses()
-                            userAddresses?.let {
-                                eventsListLayoutAdapter.setUserEmails(it.map { it.email })
-                            }
                             eventsListLayoutAdapter.submitList(
                                 listOf(fakeHeaderEvent).plus(sortedEvents)
                             )
