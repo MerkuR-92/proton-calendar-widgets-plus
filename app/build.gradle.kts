@@ -3,7 +3,6 @@
 import com.android.build.api.dsl.VariantDimension
 import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import configuration.util.getTokenFromCurl
 import java.io.FileNotFoundException
 import java.util.Properties
@@ -69,10 +68,13 @@ android {
         targetSdk = Config.targetSdk
         versionCode = Config.versionCode
         versionName = Config.versionName
-        archivesName.set(Config.archivesBaseName)
         testInstrumentationRunner = Config.testInstrumentationRunner
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         resourceConfigurations.addAll(Config.resourceConfigurations)
+
+        base {
+            archivesName.set(Config.archivesBaseName)
+        }
 
         buildConfigField("String", "ACCOUNT_SENTRY_DSN", null.toBuildConfigValue())
 
@@ -362,7 +364,7 @@ val isGitlabCI: Boolean get() = !System.getenv("CI_SERVER_NAME").isNullOrEmpty()
 
 object Config {
     const val applicationId = "me.proton.android.calendar"
-    const val compileSdk = 34
+    const val compileSdk = 35
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"

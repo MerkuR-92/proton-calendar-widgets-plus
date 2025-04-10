@@ -249,12 +249,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         restartApplication()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent?.let {
-            if (mainViewModel.shouldHandleIntent(intent)) {
-                mainViewModel.handleIntent(intent)
-            }
+        if (mainViewModel.shouldHandleIntent(intent)) {
+            mainViewModel.handleIntent(intent)
         }
     }
 
