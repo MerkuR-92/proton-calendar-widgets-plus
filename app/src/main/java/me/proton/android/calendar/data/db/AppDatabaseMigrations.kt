@@ -623,4 +623,11 @@ object AppDatabaseMigrations {
             MailSettingsDatabase.MIGRATION_3.migrate(db)
         }
     }
+
+    val MIGRATION_76_77 = object : Migration(76, 77) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            UserSettingsDatabase.MIGRATION_8.migrate(db)
+            AccountDatabase.MIGRATION_10.migrate(db)
+        }
+    }
 }

@@ -89,10 +89,10 @@ class AccountViewModel @Inject constructor(
         runCatching {
             if (account.isBootstrapped()) return
 
-            val valueStore = valueStoreProvider.provideValueStore(account.userId.id)
-            val eventId = checkNotNull(account.details.session?.initialEventId)
-
-            valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
+            account.details.session?.initialEventId?.let { eventId ->
+                val valueStore = valueStoreProvider.provideValueStore(account.userId.id)
+                valueStore.putString(ValueKey.LAST_SERVER_EVENT_ID, eventId)
+            }
 
             val colorValuesArray = context.resources.getStringArray(R.array.colors_values)
             defaultCalendarName = context.resources.getString(R.string.default_calendar_name)
