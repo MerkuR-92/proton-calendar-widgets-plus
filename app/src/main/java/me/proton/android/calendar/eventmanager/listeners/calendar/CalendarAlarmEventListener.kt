@@ -123,6 +123,8 @@ class CalendarAlarmEventListener @Inject constructor(
     override suspend fun onResetAll(config: EventManagerConfig) {
         super.onResetAll(config)
 
+        logger.e("CalendarAlarmEventListener onResetAll [${config.asCalendar().calendarId}]")
+
         val calendarId = config.asCalendar().calendarId
 
         // We wipe the alarms from the DB
