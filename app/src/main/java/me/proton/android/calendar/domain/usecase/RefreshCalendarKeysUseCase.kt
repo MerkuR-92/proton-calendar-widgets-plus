@@ -1,5 +1,11 @@
 package me.proton.android.calendar.domain.usecase
 
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
+import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -13,7 +19,8 @@ import javax.inject.Inject
 class RefreshCalendarKeysUseCase @Inject constructor(
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
-    private val calendarsApi: CalendarsApi
+    private val calendarsApi: CalendarsApi,
+    private val workManager: WorkManager
 ) {
 
     companion object {
@@ -36,6 +43,18 @@ class RefreshCalendarKeysUseCase @Inject constructor(
         calendarKeys.forEach {
             calendarsRepository.persistCalendarKey(it)
         }
+
+        // Launch worker to fetch minimal events for calendar
+        workManager.enqueueWorkHelper(
+            workDataOf(
+                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
+                UseCaseWorker.INPUT_USER_ID to userId.id,
+                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
+            ),
+            UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
+            ExistingWorkPolicy.APPEND,
+            NetworkType.CONNECTED
+        )
 
         return UseCase.Result.Success(calendarKeys)
     }

@@ -4,11 +4,13 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.overlaps
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
+import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import net.sqlcipher.database.SQLiteException
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -131,10 +133,15 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
             eventOccurrenceEntities
         }
 
-        database.inTransaction {
-            database.eventOccurrencesDao()
-                .deleteAllForEvent(userId, eventEntityMetadata.calendarId, eventEntityMetadata.id)
-            database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
+        kotlin.runCatching {
+            database.inTransaction {
+                database.eventOccurrencesDao()
+                    .deleteAllForEvent(userId, eventEntityMetadata.calendarId, eventEntityMetadata.id)
+                database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
+            }
+        }.onFailure {
+            val calendarExists = database.calendarsDao().hasCalendar(eventEntityMetadata.calendarId)
+            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} ev=${eventEntityMetadata.id}, calendar exists?=$calendarExists", it)
         }
 
     }
