@@ -20,6 +20,7 @@ import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.deserialize
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class CalendarMemberEventListener @Inject constructor(
@@ -33,7 +34,7 @@ class CalendarMemberEventListener @Inject constructor(
     override val type: Type = Type.Core
 
     private val membersWithIncompleteKeySetup: HashSet<String> = hashSetOf()
-    private val deletedMembersToCalendars: MutableMap<String, String> = mutableMapOf()
+    private val deletedMembersToCalendars: ConcurrentHashMap<String, String> = ConcurrentHashMap()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
