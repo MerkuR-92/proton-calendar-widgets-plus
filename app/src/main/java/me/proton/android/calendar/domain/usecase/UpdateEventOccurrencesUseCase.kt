@@ -140,8 +140,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
             }
         }.onFailure {
-            val calendarExists = database.calendarsDao().hasCalendar(eventEntityMetadata.calendarId)
-            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} ev=${eventEntityMetadata.id}, calendar exists?=$calendarExists", it)
+            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId}", it)
         }
 
     }
