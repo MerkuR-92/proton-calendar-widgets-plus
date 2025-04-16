@@ -20,6 +20,7 @@ import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.deserialize
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class CalendarMemberEventListener @Inject constructor(
@@ -33,7 +34,7 @@ class CalendarMemberEventListener @Inject constructor(
     override val type: Type = Type.Core
 
     private val membersWithIncompleteKeySetup: HashSet<String> = hashSetOf()
-    private val deletedMemberIds: HashSet<String> = hashSetOf()
+    private val deletedMembersToCalendars: ConcurrentHashMap<String, String> = ConcurrentHashMap()
 
     override suspend fun deserializeEvents(
         config: EventManagerConfig,
@@ -59,10 +60,16 @@ class CalendarMemberEventListener @Inject constructor(
     override suspend fun onDelete(config: EventManagerConfig, keys: List<String>) {
         super.onDelete(config, keys)
 
-        keys.forEach {
-            calendarsRepository.deleteMemberById(it)
+        keys.forEach { memberId ->
+            // Member is about to be deleted so let's remember its CalendarID
+            val calendarId = calendarsRepository.selectMemberById(memberId)?.calendarId
+
+            calendarsRepository.deleteMemberById(memberId)
+
             // We keep the id so that we can check if calendar linked to that member needs to be deleted too
-            deletedMemberIds.add(it)
+            calendarId?.let {
+                deletedMembersToCalendars[memberId] = calendarId
+            }
         }
     }
 
@@ -71,23 +78,21 @@ class CalendarMemberEventListener @Inject constructor(
 
         // Get user addresses emails to compare with members email
         var addresses: List<UserAddress>? = null
-        deletedMemberIds.forEach {
-            val calendarId = calendarsRepository.selectMemberById(it)?.calendarId
-            calendarId?.let {
-                if (addresses.isNullOrEmpty()) {
-                    addresses = userAddressManager.getAddressesOrNull(config.userId)
-                }
+        deletedMembersToCalendars.forEach { (_, calendarId) ->
 
-                // Check that member is last user member for that calendar
-                addresses?.let { addresses ->
-                    // Get all members for that calendar
-                    val calendarMembers = calendarsRepository.selectCalendarMembers(calendarId)
-                    // Find the member that belongs to the current user
-                    val userMember = calendarsRepository.getUserMember(addresses, calendarMembers)
-                    // If user member doesn't exists, safely delete calendar
-                    if (userMember == null) {
-                        calendarsRepository.deleteCalendarById(calendarId)
-                    }
+            if (addresses.isNullOrEmpty()) {
+                addresses = userAddressManager.getAddressesOrNull(config.userId)
+            }
+
+            // Check that member is last user member for that calendar
+            addresses?.let { addresses ->
+                // Get all members for that calendar
+                val calendarMembers = calendarsRepository.selectCalendarMembers(calendarId)
+                // Find the member that belongs to the current user
+                val userMember = calendarsRepository.getUserMember(addresses, calendarMembers)
+                // If user member doesn't exists, safely delete calendar
+                if (userMember == null) {
+                    calendarsRepository.deleteCalendarById(calendarId)
                 }
             }
         }
@@ -108,7 +113,7 @@ class CalendarMemberEventListener @Inject constructor(
     override suspend fun onComplete(config: EventManagerConfig) {
         super.onComplete(config)
 
-        deletedMemberIds.clear()
+        deletedMembersToCalendars.clear()
         membersWithIncompleteKeySetup.clear()
     }
 

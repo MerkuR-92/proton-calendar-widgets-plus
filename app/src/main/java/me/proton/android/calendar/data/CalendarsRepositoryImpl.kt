@@ -439,6 +439,8 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun deleteCalendarById(id: String) {
         database.calendarsDao().deleteById(id)
 
+        // TODO this will never succeed, we just deleted this Calendar from DB
+        //  but search is not ON at the moment
         database.calendarsDao().selectCalendarUserId(id)?.let {
             deleteAllSearchEventsInCalendar(it, id)
         }
