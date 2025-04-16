@@ -95,8 +95,11 @@ class CalendarEventListener @Inject constructor(
         val entitiesToCreate = entityIds.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToCreate.toTypedArray())
 
-        // at this point all Events corresponding to EventEntityMetadatas should be persisted in DB
-        entities.forEach {
+        val affectedEventEntityMetadatas = entities.filter {
+            eventEntityMetadata -> entitiesToCreate.firstOrNull { it.id == eventEntityMetadata.id } != null
+        }
+
+        affectedEventEntityMetadatas.forEach {
             updateEventOccurrencesUseCase.execute(config.userId.id, it)
         }
     }
@@ -112,8 +115,11 @@ class CalendarEventListener @Inject constructor(
         val entitiesToUpdate = entityIds.mapNotNull { eventEntities[it] }
         calendarsRepository.persistEvents(*entitiesToUpdate.toTypedArray())
 
-        // at this point all Events corresponding to EventEntityMetadatas should be persisted in DB
-        entities.forEach {
+        val affectedEventEntityMetadatas = entities.filter {
+            eventEntityMetadata -> entitiesToUpdate.firstOrNull { it.id == eventEntityMetadata.id } != null
+        }
+
+        affectedEventEntityMetadatas.forEach {
             updateEventOccurrencesUseCase.execute(config.userId.id, it)
         }
     }
