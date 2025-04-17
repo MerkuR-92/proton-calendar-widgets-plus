@@ -52,6 +52,7 @@ class MainInitializer : Initializer<Unit> {
         UnAuthSessionFetcherInitializer::class.java,
         KeyTransparencyInitializer::class.java,
         DeviceRecoveryInitializer::class.java,
+        SentryInitializer::class.java
     )
 
     companion object {

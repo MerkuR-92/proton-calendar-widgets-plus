@@ -8,7 +8,6 @@ import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.SharedPreferencesKeys
-import me.proton.android.calendar.common.logger.SentryIntegration
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CustomLocale
 import me.proton.android.calendar.domain.Logger
@@ -19,8 +18,6 @@ import me.proton.core.auth.data.db.AuthDatabase
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.util.android.sentry.TimberLogger
 import me.proton.core.util.kotlin.CoreLogger
-import timber.log.Timber
-import timber.log.Timber.DebugTree
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -44,12 +41,6 @@ class ProtonCalendarApplication : Application() {
 
         // Forward Core Logs to Timber, using TimberLogger.
         CoreLogger.set(TimberLogger)
-
-        if (BuildConfig.DEBUG) {
-            Timber.plant(DebugTree())
-        } else {
-            SentryIntegration.initSentry(this, defaultSharedPreferencesProvider.sharedPreferences)
-        }
 
         ShowNotificationUseCase.createNotificationChannels(this)
 

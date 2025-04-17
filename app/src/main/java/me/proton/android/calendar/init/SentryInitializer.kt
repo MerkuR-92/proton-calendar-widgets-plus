@@ -1,44 +1,24 @@
-package me.proton.android.calendar.common.logger
+package me.proton.android.calendar.init
 
-import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.core.content.edit
+import androidx.startup.Initializer
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import io.sentry.Sentry
 import io.sentry.SentryLevel
 import io.sentry.android.core.SentryAndroid
-import io.sentry.protocol.User
 import me.proton.android.calendar.BuildConfig
-import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.logging.SentryUserObserver
 import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.util.android.sentry.TimberLoggerIntegration
 import me.proton.core.util.android.sentry.project.AccountSentryHubBuilder
-import java.util.UUID
 
-object SentryIntegration {
+class SentryInitializer : Initializer<Unit> {
 
-    @JvmStatic
-    fun getInstallationId(sharedPreferences: SharedPreferences): String =
-        sharedPreferences.getString(SharedPreferencesKeys.APP_INSTALLATION_ID, null)
-            ?: UUID.randomUUID().toString().also {
-                sharedPreferences.edit(commit = true) { putString(SharedPreferencesKeys.APP_INSTALLATION_ID, it) }
-            }
-
-    @JvmStatic
-    fun initSentry(app: Application, sharedPreferences: SharedPreferences) {
-        val installationId = getInstallationId(sharedPreferences)
-        initSentry(app, installationId)
-        initAccountSentry(app, installationId)
-    }
-
-    private fun initSentry(context: Context, installationId: String) {
-        val sentryDsn = BuildConfig.SENTRY_DSN_NEW ?: ""
+    override fun create(context: Context) {
         SentryAndroid.init(context) { options ->
-            options.dsn = sentryDsn
+            options.dsn = BuildConfig.SENTRY_DSN_NEW ?: ""
             options.release = BuildConfig.VERSION_NAME
             options.isAnrEnabled = true
             options.isAttachStacktrace = true
@@ -46,6 +26,7 @@ object SentryIntegration {
             options.isEnableActivityLifecycleBreadcrumbs = false
             options.environment =
                 "${if (BuildConfig.DEBUG) "debug" else "release"}\\${EnvironmentConfigurationDefaults.apiHost}"
+
             options.addIntegration(
                 TimberLoggerIntegration(
                     minEventLevel = SentryLevel.ERROR,
@@ -53,24 +34,24 @@ object SentryIntegration {
                 )
             )
         }
-        Sentry.setUser(User().apply { id = installationId })
-    }
 
-    private fun initAccountSentry(context: Context, installationId: String) {
         val entryPoint = EntryPointAccessors.fromApplication(
             context.applicationContext,
             SentryInitializerEntryPoint::class.java
         )
+        entryPoint.observer().start()
 
         entryPoint.accountSentryHubBuilder().invoke(
-            sentryDsn = BuildConfig.ACCOUNT_SENTRY_DSN.takeIf { !BuildConfig.DEBUG }.orEmpty(),
-            installationId = installationId
+            sentryDsn = BuildConfig.ACCOUNT_SENTRY_DSN.takeIf { !BuildConfig.DEBUG }.orEmpty()
         )
     }
 
+    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
+
     @EntryPoint
     @InstallIn(SingletonComponent::class)
-    internal interface SentryInitializerEntryPoint {
+    interface SentryInitializerEntryPoint {
         fun accountSentryHubBuilder(): AccountSentryHubBuilder
+        fun observer(): SentryUserObserver
     }
 }

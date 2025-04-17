@@ -305,6 +305,7 @@ dependencies {
 
     testImplementation(libs.test.mockk)
     testImplementation(libs.test.assertk.jvm)
+    testImplementation(libs.core.test.kotlin)
     testImplementation(project(":shared-test-code"))
 
     androidTestImplementation(libs.test.mockk.android)

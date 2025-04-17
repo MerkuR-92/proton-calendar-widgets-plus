@@ -1,6 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
-import me.proton.android.calendar.common.logger.SentryIntegration
+import me.proton.android.calendar.common.logger.SentryUtils
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.BugReportsApiRequest
@@ -29,7 +29,7 @@ class SendBugReportUseCase @Inject constructor(
         email: String
     ): UseCase.Result {
 
-        val installationId = SentryIntegration.getInstallationId(defaultSharedPreferencesProvider.sharedPreferences)
+        val installationId = SentryUtils.getInstallationId(defaultSharedPreferencesProvider.sharedPreferences)
 
         val bugReportsApiRequest = BugReportsApiRequest(
             osName,
