@@ -128,7 +128,6 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val searchDatabase: SearchDatabase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
-    private val userManager: UserManager,
     private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
     private val networkManager: NetworkManager,
@@ -136,8 +135,6 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
     private val featureFlagManager: FeatureFlagManager
 ) : CalendarsRepository {
-
-    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
 
     override val fetchingState =
         MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
@@ -154,48 +151,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var maxRequestedWindowToFetch: FetchWindow? = null
 
-    private var coroutineScope = CoroutineScope(Dispatchers.Default)
     private var scopeEventFetching = CoroutineScope(Dispatchers.Default)
 
     private val displayServerDownBannerFlow = MutableStateFlow(false)
     private var lastPingMs: Long = 0L
-
-    private val allCalendarsFlow =
-        database.calendarsDao().flowCalendars().joinToCalendars(database, json).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
-            .distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1).onEach {
-                eventDecryptor.setCalendars(it)
-            }
-
-    private val visibleCalendarsFlow =
-        allCalendarsFlow.map { it.filterVisibleCalendars() }.distinctUntilChanged()
-            .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
-
-    private fun removeDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
-        // status at 1 means the address is active
-
-        // if the calendar is inactive we keep the same flags but remove the disabled flag
-        // we also check if the calendar is simply disabled or super owner disabled to correctly update it
-        return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
-            flags - MemberEntity.CalendarFlags.DISABLED.value
-        } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
-            flags - MemberEntity.CalendarFlags.SUPER_OWNER_DISABLED.value
-        } else {
-            // if the calendar is simply disabled we set the flags at active
-            MemberEntity.CalendarFlags.ACTIVE.value
-        }
-    }
-
-    private fun addDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
-        // status at 0 means the address is disabled
-
-        // if the calendar is inactive we keep the same flags but add the disabled flag
-        return if (dbCalendar.isInactive) {
-            flags + MemberEntity.CalendarFlags.DISABLED.value
-        } else {
-            // if the calendar is simply active we set the flags at disabled
-            MemberEntity.CalendarFlags.DISABLED.value
-        }
-    }
 
     override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
 
@@ -691,7 +650,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 }
             }
 
-        return originalUiEvents + singleEditUiEvents
+        return (originalUiEvents + singleEditUiEvents)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
