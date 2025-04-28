@@ -45,6 +45,7 @@ class GetUiEventsUseCase @Inject constructor(
             .distinctUntilChanged()
             .debounceExceptFirst(1.seconds)
             .flatMapLatest { calendars ->
+                Timber.d("Calendars count -> ${calendars.count()}")
 
                 combine(
                     getUserInfoUseCase().debounceExceptFirst(1.seconds).distinctUntilChanged(),
@@ -214,7 +215,7 @@ class GetUiEventsUseCase @Inject constructor(
 
                 Timber.d("getUiEventsUseCase emitting ${result.size} for $eventsWindow")
 
-                emit(CalendarsRepository.GetEventsResult.Success(result))
+                emit(CalendarsRepository.GetEventsResult.Success(result.distinct()))
             }
     }
 
