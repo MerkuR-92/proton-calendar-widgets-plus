@@ -2,7 +2,6 @@ package me.proton.android.calendar.domain.usecase
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.distinct
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -25,6 +24,7 @@ class GetUiEventsUseCase @Inject constructor(
     private val getUserInfoUseCase: GetUserInfoUseCase
 ) : UseCase {
 
+    @OptIn(FlowPreview::class)
     fun execute(
         userId: UserId,
         fromDate: LocalDate,
@@ -43,12 +43,10 @@ class GetUiEventsUseCase @Inject constructor(
         return calendarsRepository.flowAllCalendars(userId.id)
             .map { if (onlyVisibleCalendars) it.filterVisibleCalendars() else it }
             .distinctUntilChanged()
-            .debounceExceptFirst(1.seconds)
+            .debounce(1.seconds)
             .flatMapLatest { calendars ->
-                Timber.d("Calendars count -> ${calendars.count()}")
-
                 combine(
-                    getUserInfoUseCase().debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                    getUserInfoUseCase().debounce(1.seconds).distinctUntilChanged(),
 
                     // trivial case, only 1 row for each event, start + end times are well defined
                     database.eventOccurrencesDao().selectNonRecurringBetweenInclusive(
@@ -56,7 +54,7 @@ class GetUiEventsUseCase @Inject constructor(
                         calendars.map { it.id },
                         fromEpoch.toEpochSecond(),
                         toEpoch.toEpochSecond()
-                    ).debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                    ).debounce(1.seconds).distinctUntilChanged(),
 
                     // we know first and last occurrence time, it can be selected like non-recurring above
                     database.eventOccurrencesDao().selectFiniteRecurring(
@@ -64,7 +62,7 @@ class GetUiEventsUseCase @Inject constructor(
                         calendars.map { it.id },
                         fromEpoch.toEpochSecond(),
                         toEpoch.toEpochSecond()
-                    ).debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                    ).debounce(1.seconds).distinctUntilChanged(),
 
                     // we don't know when the last occurrence happens, so we have to select all events
                     // except for the ones that start after our window
@@ -72,7 +70,7 @@ class GetUiEventsUseCase @Inject constructor(
                         userId.id,
                         calendars.map { it.id },
                         toEpoch.toEpochSecond()
-                    ).debounceExceptFirst(1.seconds).distinctUntilChanged()
+                    ).debounce(1.seconds).distinctUntilChanged()
 
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
 
