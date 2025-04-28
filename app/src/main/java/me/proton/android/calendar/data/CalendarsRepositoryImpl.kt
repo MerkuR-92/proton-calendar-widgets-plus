@@ -604,44 +604,39 @@ class CalendarsRepositoryImpl @Inject constructor(
             toDate
         }
 
-        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
+        val potentialOccurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
-        val exZonedDateTimes =
-            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
-                exDates.values.map { exDate ->
-                    exDate.toZonedDateTime(timeZoneId)
-                }
+        // Extract EXDATEs from the original event
+        val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+            exDates.values.map { exDate ->
+                exDate.toZonedDateTime(timeZoneId)
             }
+        }.toSet()
 
-        return occurrences.mapNotNull { occurrence ->
+        // Get start times of all single edits (events with RECURRENCE-ID valued) separately
+        val singleEditRecurrenceIds = eventsSharingUid
+            .filter { it.isSingleEdit() }
+            .mapNotNull { it.getRecurrenceId(timeZoneId) }
+            .toSet()
 
-            val event = // single edit or original event
-                eventsSharingUid.find {
-                    it.iCalEvent.recurrenceId?.value == ICalUtilsImpl.eventStartZonedDateTimeToDate(
-                        occurrence.startDateTime,
-                        originalEvent.isAllDay()
-                    )
-                } ?: originalEvent
+        // Process all occurrences and filter out EXDATEs + times replaced by single edits
+        val originalUiEvents = potentialOccurrences.mapNotNull { occurrence ->
+            // If this occurrence time is excluded by exdate, do not process it
+            if (occurrence.startDateTime in exZonedDateTimes) {
+                null
 
-            if (!event.isSingleEdit() && (occurrence.startDateTime in exZonedDateTimes || !DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+            // If this occurrence time is replaced by a single edit, do not process it (otherwise it duplicates)
+            } else if (occurrence.startDateTime in singleEditRecurrenceIds) {
+                null
+
+            // Ensure it's within range
+            } else if (!DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
                     occurrence.startDateTime,
                     occurrence.endDateTime,
                     fromDate,
                     toDate,
                     timeZoneId
-                ))) {
-
-                // occurrence is exdated or outside of the date range
-                null
-            } else if (event.isSingleEdit() && !DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
-                    event.getStart(
-                        timeZoneId
-                    ), event.getEnd(timeZoneId), fromDate, toDate, timeZoneId
-                )
-            ) {
-                null
-            } else if (event.isSingleEdit() && event.getRecurrenceId(timeZoneId) == occurrence.startDateTime) {
-                // occurrence is filtered out because of another SE RecurrenceID
+                )) {
                 null
             } else {
                 UiEvent(
@@ -651,18 +646,52 @@ class CalendarsRepositoryImpl @Inject constructor(
                     originalEvent.summary,
                     originalEvent.location,
                     originalEvent.description,
-                    if (originalEvent.isSingleEdit()) originalEvent.getStart(timeZoneId) else occurrence.startDateTime,
-                    if (originalEvent.isSingleEdit()) originalEvent.getEnd(timeZoneId) else occurrence.endDateTime,
+                    occurrence.startDateTime,
+                    occurrence.endDateTime,
                     originalEvent.isAllDay(),
-                    if (originalEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
+                    occurrence.occurrenceNumber,
                     originalEvent.getDisplayColor(isFreeUser),
-                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
                     originalEvent.getParticipationStatus(userEmails),
                     originalEvent.status ?: Status.confirmed()
                 )
             }
-
         }
+
+        // Handle single edit events separately
+        val singleEditUiEvents = eventsSharingUid
+            .filter { it.isSingleEdit() }
+            .mapNotNull { singleEditEvent ->
+                // Ensure it's in the active date range
+                if (DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+                        singleEditEvent.getStart(timeZoneId),
+                        singleEditEvent.getEnd(timeZoneId),
+                        fromDate,
+                        toDate,
+                        timeZoneId
+                    )) {
+                    UiEvent(
+                        singleEditEvent.id,
+                        singleEditEvent.calendar.id,
+                        singleEditEvent.uid,
+                        singleEditEvent.summary,
+                        singleEditEvent.location,
+                        singleEditEvent.description,
+                        singleEditEvent.getStart(timeZoneId),
+                        singleEditEvent.getEnd(timeZoneId),
+                        singleEditEvent.isAllDay(),
+                        0, // N/A, fallback to 0 as it's a single edit
+                        singleEditEvent.getDisplayColor(isFreeUser),
+                        singleEditEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
+                        singleEditEvent.getParticipationStatus(userEmails),
+                        singleEditEvent.status ?: Status.confirmed()
+                    )
+                } else {
+                    null
+                }
+            }
+
+        return originalUiEvents + singleEditUiEvents
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
