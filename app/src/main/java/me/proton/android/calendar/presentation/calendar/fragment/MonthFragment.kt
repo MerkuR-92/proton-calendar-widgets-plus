@@ -28,6 +28,7 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import com.alamkanak.weekview.firstVisibleDateAsLocalDate
+import com.alamkanak.weekview.lastVisibleDateAsLocalDate
 import com.alamkanak.weekview.scrollToDate
 import com.alamkanak.weekview.scrollToDateTime
 import com.alamkanak.weekview.scrollToTime
@@ -148,6 +149,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private var currentFromDate: LocalDate? = null
     private var currentToDate: LocalDate? = null
     private var currentTimeZoneId: String? = null
+    private var loadedRangeStart: LocalDate? = null
+    private var loadedRangeEnd: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
     private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
@@ -824,6 +827,15 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         currentToDate = toDate
         currentTimeZoneId = timeZoneId
         eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
+
+        val visibleStart = binding.weekView.firstVisibleDateAsLocalDate
+        val visibleEnd = binding.weekView.lastVisibleDateAsLocalDate
+        val loadedStart = loadedRangeStart
+        val loadedEnd = loadedRangeEnd
+
+        val hasEventsForView = loadedStart != null && loadedEnd != null &&  loadedStart < visibleEnd && visibleStart < loadedEnd
+        binding.calendarProgress.isVisible = !hasEventsForView
+
         if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
         eventsLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { eventsResult ->
 
@@ -831,20 +843,30 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 when (it) {
                     CalendarsRepository.GetEventsResult.InProgress -> {
                         binding.weekView.showLoadingEvents = true
+                        binding.calendarProgress.isVisible = true
                     }
                     is CalendarsRepository.GetEventsResult.Success -> {
                         lifecycleScope.launch {
                             val weekViewCalendarEntities = it.events.flatMap { event ->
                                 event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
                             }
+                            loadedRangeStart = it.events.minByOrNull { e ->
+                                e.dateStart
+                            }?.dateStart?.toLocalDate() ?: fromDate
+                            loadedRangeEnd = it.events.maxByOrNull { e ->
+                                e.dateStart
+                            }?.dateStart?.toLocalDate() ?: toDate
+
                             weekViewAdapter.submitList(
                                 weekViewCalendarEntities
                             )
                             binding.weekView.showLoadingEvents = false
+                            binding.calendarProgress.isVisible = false
                         }
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         binding.weekView.showLoadingEvents = false
+                        binding.calendarProgress.isVisible = false
                     }
                 }
             }
