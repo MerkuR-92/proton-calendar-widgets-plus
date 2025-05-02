@@ -30,11 +30,4 @@ object KotlinUtilsImpl : KotlinUtils {
 
         return filtered
     }
-
-    @OptIn(FlowPreview::class)
-    override fun <T> Flow<T>.debounceExceptFirst(debounceDuration: Duration): Flow<T> = merge(
-        take(1),
-        drop(1).debounce(debounceDuration)
-    )
-
 }

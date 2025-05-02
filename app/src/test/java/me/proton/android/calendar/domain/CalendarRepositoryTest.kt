@@ -64,7 +64,6 @@ internal class CalendarRepositoryTest {
     private val eventDecryptorMock: EventDecryptor = mockk()
     private val searchDatabaseMock: SearchDatabase = mockk()
     private val indexEventForSearchUseCaseMock: IndexEventForSearchUseCase = mockk()
-    private val userManagerMock: UserManager = mockk()
     private val userAddressManagerMock: UserAddressManager = mockk()
     private val accountManagerMock: AccountManager = mockk()
     private val networkManagerMock: NetworkManager = mockk()
@@ -381,7 +380,6 @@ internal class CalendarRepositoryTest {
             eventDecryptorMock,
             searchDatabaseMock,
             indexEventForSearchUseCaseMock,
-            userManagerMock,
             userAddressManagerMock,
             accountManagerMock,
             networkManagerMock,

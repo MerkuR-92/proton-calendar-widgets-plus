@@ -128,7 +128,6 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val eventDecryptor: EventDecryptor,
     private val searchDatabase: SearchDatabase,
     private val indexEventForSearchUseCase: IndexEventForSearchUseCase,
-    private val userManager: UserManager,
     private val userAddressManager: UserAddressManager,
     private val accountManager: AccountManager,
     private val networkManager: NetworkManager,
@@ -136,8 +135,6 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
     private val featureFlagManager: FeatureFlagManager
 ) : CalendarsRepository {
-
-    private val DEBOUNCE_CALENDARS_UPDATE = Duration.ofMillis(1000)
 
     override val fetchingState =
         MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
@@ -154,48 +151,10 @@ class CalendarsRepositoryImpl @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var maxRequestedWindowToFetch: FetchWindow? = null
 
-    private var coroutineScope = CoroutineScope(Dispatchers.Default)
     private var scopeEventFetching = CoroutineScope(Dispatchers.Default)
 
     private val displayServerDownBannerFlow = MutableStateFlow(false)
     private var lastPingMs: Long = 0L
-
-    private val allCalendarsFlow =
-        database.calendarsDao().flowCalendars().joinToCalendars(database, json).debounce(DEBOUNCE_CALENDARS_UPDATE.toMillis())
-            .distinctUntilChanged().shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1).onEach {
-                eventDecryptor.setCalendars(it)
-            }
-
-    private val visibleCalendarsFlow =
-        allCalendarsFlow.map { it.filterVisibleCalendars() }.distinctUntilChanged()
-            .shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
-
-    private fun removeDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
-        // status at 1 means the address is active
-
-        // if the calendar is inactive we keep the same flags but remove the disabled flag
-        // we also check if the calendar is simply disabled or super owner disabled to correctly update it
-        return if (dbCalendar.isInactive && !dbCalendar.isSuperOwnerDisabled) {
-            flags - MemberEntity.CalendarFlags.DISABLED.value
-        } else if (dbCalendar.isInactive && dbCalendar.isSuperOwnerDisabled) {
-            flags - MemberEntity.CalendarFlags.SUPER_OWNER_DISABLED.value
-        } else {
-            // if the calendar is simply disabled we set the flags at active
-            MemberEntity.CalendarFlags.ACTIVE.value
-        }
-    }
-
-    private fun addDisabledFlag(flags: Int, dbCalendar: Calendar): Int {
-        // status at 0 means the address is disabled
-
-        // if the calendar is inactive we keep the same flags but add the disabled flag
-        return if (dbCalendar.isInactive) {
-            flags + MemberEntity.CalendarFlags.DISABLED.value
-        } else {
-            // if the calendar is simply active we set the flags at disabled
-            MemberEntity.CalendarFlags.DISABLED.value
-        }
-    }
 
     override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
 
@@ -604,44 +563,39 @@ class CalendarsRepositoryImpl @Inject constructor(
             toDate
         }
 
-        val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
+        val potentialOccurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
-        val exZonedDateTimes =
-            originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
-                exDates.values.map { exDate ->
-                    exDate.toZonedDateTime(timeZoneId)
-                }
+        // Extract EXDATEs from the original event
+        val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
+            exDates.values.map { exDate ->
+                exDate.toZonedDateTime(timeZoneId)
             }
+        }.toSet()
 
-        return occurrences.mapNotNull { occurrence ->
+        // Get start times of all single edits (events with RECURRENCE-ID valued) separately
+        val singleEditRecurrenceIds = eventsSharingUid
+            .filter { it.isSingleEdit() }
+            .mapNotNull { it.getRecurrenceId(timeZoneId) }
+            .toSet()
 
-            val event = // single edit or original event
-                eventsSharingUid.find {
-                    it.iCalEvent.recurrenceId?.value == ICalUtilsImpl.eventStartZonedDateTimeToDate(
-                        occurrence.startDateTime,
-                        originalEvent.isAllDay()
-                    )
-                } ?: originalEvent
+        // Process all occurrences and filter out EXDATEs + times replaced by single edits
+        val originalUiEvents = potentialOccurrences.mapNotNull { occurrence ->
+            // If this occurrence time is excluded by exdate, do not process it
+            if (occurrence.startDateTime in exZonedDateTimes) {
+                null
 
-            if (!event.isSingleEdit() && (occurrence.startDateTime in exZonedDateTimes || !DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+            // If this occurrence time is replaced by a single edit, do not process it (otherwise it duplicates)
+            } else if (occurrence.startDateTime in singleEditRecurrenceIds) {
+                null
+
+            // Ensure it's within range
+            } else if (!DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
                     occurrence.startDateTime,
                     occurrence.endDateTime,
                     fromDate,
                     toDate,
                     timeZoneId
-                ))) {
-
-                // occurrence is exdated or outside of the date range
-                null
-            } else if (event.isSingleEdit() && !DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
-                    event.getStart(
-                        timeZoneId
-                    ), event.getEnd(timeZoneId), fromDate, toDate, timeZoneId
-                )
-            ) {
-                null
-            } else if (event.isSingleEdit() && event.getRecurrenceId(timeZoneId) == occurrence.startDateTime) {
-                // occurrence is filtered out because of another SE RecurrenceID
+                )) {
                 null
             } else {
                 UiEvent(
@@ -651,18 +605,52 @@ class CalendarsRepositoryImpl @Inject constructor(
                     originalEvent.summary,
                     originalEvent.location,
                     originalEvent.description,
-                    if (originalEvent.isSingleEdit()) originalEvent.getStart(timeZoneId) else occurrence.startDateTime,
-                    if (originalEvent.isSingleEdit()) originalEvent.getEnd(timeZoneId) else occurrence.endDateTime,
+                    occurrence.startDateTime,
+                    occurrence.endDateTime,
                     originalEvent.isAllDay(),
-                    if (originalEvent.isSingleEdit()) 0 else occurrence.occurrenceNumber,
+                    occurrence.occurrenceNumber,
                     originalEvent.getDisplayColor(isFreeUser),
-                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic, // TODO
+                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
                     originalEvent.getParticipationStatus(userEmails),
                     originalEvent.status ?: Status.confirmed()
                 )
             }
-
         }
+
+        // Handle single edit events separately
+        val singleEditUiEvents = eventsSharingUid
+            .filter { it.isSingleEdit() }
+            .mapNotNull { singleEditEvent ->
+                // Ensure it's in the active date range
+                if (DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+                        singleEditEvent.getStart(timeZoneId),
+                        singleEditEvent.getEnd(timeZoneId),
+                        fromDate,
+                        toDate,
+                        timeZoneId
+                    )) {
+                    UiEvent(
+                        singleEditEvent.id,
+                        singleEditEvent.calendar.id,
+                        singleEditEvent.uid,
+                        singleEditEvent.summary,
+                        singleEditEvent.location,
+                        singleEditEvent.description,
+                        singleEditEvent.getStart(timeZoneId),
+                        singleEditEvent.getEnd(timeZoneId),
+                        singleEditEvent.isAllDay(),
+                        0, // N/A, fallback to 0 as it's a single edit
+                        singleEditEvent.getDisplayColor(isFreeUser),
+                        singleEditEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
+                        singleEditEvent.getParticipationStatus(userEmails),
+                        singleEditEvent.status ?: Status.confirmed()
+                    )
+                } else {
+                    null
+                }
+            }
+
+        return (originalUiEvents + singleEditUiEvents)
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
