@@ -40,7 +40,8 @@ object UserMocks {
             deviceRecovery = null,
             telemetry = null,
             crashReports = null,
-            sessionAccountRecovery = null
+            sessionAccountRecovery = null,
+            easyDeviceMigrationOptOut = null
         )
     }
 
