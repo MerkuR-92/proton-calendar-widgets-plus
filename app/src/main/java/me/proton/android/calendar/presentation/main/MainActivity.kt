@@ -453,7 +453,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         binding.navViewMainContent.navViewVersion.text = getString(
             R.string.nav_view_version_name,
-            BuildConfig.VERSION_NAME
+            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
         )
 
         initDrawerHeader()
