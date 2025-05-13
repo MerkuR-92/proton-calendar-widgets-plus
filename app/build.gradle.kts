@@ -4,11 +4,13 @@ import com.android.build.api.dsl.VariantDimension
 import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import configuration.util.getTokenFromCurl
+import studio.forface.easygradle.dsl.version
 import java.io.FileNotFoundException
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlin.serialization)
+    id("io.sentry.android.gradle") version libs.versions.sentry.gradle.plugin
     id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
@@ -24,6 +26,12 @@ sonarqube {
     properties {
         property("sonar.projectKey", "android_calendar_proton-calendar-android_AYGvp8U7f_vcScryKn5V")
         property("sonar.qualitygate.wait", true)
+    }
+}
+
+sentry {
+    autoInstallation {
+        sentryVersion = libs.versions.sentry.asProvider()
     }
 }
 
