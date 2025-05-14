@@ -18,6 +18,7 @@ import me.proton.core.auth.data.db.AuthDatabase
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.util.android.sentry.TimberLogger
 import me.proton.core.util.kotlin.CoreLogger
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -41,6 +42,10 @@ class ProtonCalendarApplication : Application() {
 
         // Forward Core Logs to Timber, using TimberLogger.
         CoreLogger.set(TimberLogger)
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
 
         ShowNotificationUseCase.createNotificationChannels(this)
 
