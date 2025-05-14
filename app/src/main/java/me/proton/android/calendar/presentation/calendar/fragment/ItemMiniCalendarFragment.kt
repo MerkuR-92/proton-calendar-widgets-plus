@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -250,7 +251,7 @@ class ItemMiniCalendarFragment : Fragment() {
         val skeletonList = AndroidUtils.concatenate(previousMonthDayItems, dayItems, upcomingMonthDayItems)
         setMiniCalendarSkeletonList(skeletonList, forDate, firstDayOfTheMonth, firstMiniCalendarDay, startWeekOn, timeZoneId)
 
-        calendarViewModel.lifeCycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
 
             calendarViewModel.calendarIndicators(
                 fromDate,
