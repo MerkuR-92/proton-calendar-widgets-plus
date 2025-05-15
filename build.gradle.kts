@@ -11,6 +11,7 @@ buildscript {
         classpath(libs.gradle.plugin.navigation)
         classpath(libs.gradle.plugin.hilt)
         classpath(libs.jacoco)
+        classpath(libs.gradle.plugin.compose.compiler)
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle.kts files
     }

@@ -3,17 +3,19 @@
 import com.android.build.api.dsl.VariantDimension
 import configuration.extensions.protonEnvironment
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 import configuration.util.getTokenFromCurl
+import studio.forface.easygradle.dsl.version
 import java.io.FileNotFoundException
 import java.util.Properties
 
 plugins {
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
+    alias(libs.plugins.kotlin.serialization)
+    id("io.sentry.android.gradle") version libs.versions.sentry.gradle.plugin
     id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("androidx.navigation.safeargs.kotlin")
     id("dagger.hilt.android.plugin")
     id("jacoco")
@@ -24,6 +26,12 @@ sonarqube {
     properties {
         property("sonar.projectKey", "android_calendar_proton-calendar-android_AYGvp8U7f_vcScryKn5V")
         property("sonar.qualitygate.wait", true)
+    }
+}
+
+sentry {
+    autoInstallation {
+        sentryVersion = libs.versions.sentry.asProvider()
     }
 }
 
@@ -50,10 +58,7 @@ android {
         dataBinding = true
         viewBinding = true
         compose = true
-    }
-
-    composeOptions{
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get().toString()
+        buildConfig = true
     }
 
     signingConfigs {
@@ -71,10 +76,13 @@ android {
         targetSdk = Config.targetSdk
         versionCode = Config.versionCode
         versionName = Config.versionName
-        archivesName.set(Config.archivesBaseName)
         testInstrumentationRunner = Config.testInstrumentationRunner
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
         resourceConfigurations.addAll(Config.resourceConfigurations)
+
+        base {
+            archivesName.set(Config.archivesBaseName)
+        }
 
         buildConfigField("String", "ACCOUNT_SENTRY_DSN", null.toBuildConfigValue())
 
@@ -219,12 +227,14 @@ dependencies {
     implementation(libs.core.accountRecovery)
     implementation(libs.core.auth)
     implementation(libs.core.auth.fido)
+    implementation(libs.core.biometric)
     implementation(libs.core.contact)
     implementation(libs.core.country)
     implementation(libs.core.crypto)
     implementation(libs.core.cryptoValidator)
     implementation(libs.core.data)
     implementation(libs.core.dataRoom)
+    implementation(libs.core.deviceMigration)
     implementation(libs.core.domain)
     implementation(libs.core.eventManager)
     implementation(libs.core.featureFlag)
@@ -364,14 +374,14 @@ val isGitlabCI: Boolean get() = !System.getenv("CI_SERVER_NAME").isNullOrEmpty()
 
 object Config {
     const val applicationId = "me.proton.android.calendar"
-    const val compileSdk = 34
+    const val compileSdk = 35
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"
     const val targetSdk = 34
-    const val versionCode = 316
+    const val versionCode = 318
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
-    const val versionName = "2.23.11"
+    const val versionName = "2.23.13"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(

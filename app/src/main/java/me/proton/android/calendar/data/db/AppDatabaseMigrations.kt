@@ -616,4 +616,18 @@ object AppDatabaseMigrations {
             db.execSQL("CREATE INDEX IF NOT EXISTS `index_fetched_events_metadata_calendarId` ON `${TABLE_FETCHED_EVENTS_METADATA}` (`calendarId`)")
         }
     }
+
+    val MIGRATION_75_76 = object : Migration(75, 76) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            MailSettingsDatabase.MIGRATION_2.migrate(db)
+            MailSettingsDatabase.MIGRATION_3.migrate(db)
+        }
+    }
+
+    val MIGRATION_76_77 = object : Migration(76, 77) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            UserSettingsDatabase.MIGRATION_8.migrate(db)
+            AccountDatabase.MIGRATION_10.migrate(db)
+        }
+    }
 }

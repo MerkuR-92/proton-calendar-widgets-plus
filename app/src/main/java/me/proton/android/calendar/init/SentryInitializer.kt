@@ -43,7 +43,9 @@ class SentryInitializer : Initializer<Unit> {
 
         entryPoint.accountSentryHubBuilder().invoke(
             sentryDsn = BuildConfig.ACCOUNT_SENTRY_DSN.takeIf { !BuildConfig.DEBUG }.orEmpty()
-        )
+        ) { options ->
+            options.isEnableUncaughtExceptionHandler = false // send uncaught exceptions to Calendar sentry, not Core
+        }
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()

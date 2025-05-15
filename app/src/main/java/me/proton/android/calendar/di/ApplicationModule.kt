@@ -14,6 +14,8 @@ import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.core.account.domain.entity.AccountType
+import me.proton.core.compose.theme.AppTheme
+import me.proton.core.compose.theme.ProtonTheme
 import me.proton.core.domain.entity.AppStore
 import me.proton.core.domain.entity.Product
 import javax.inject.Singleton
@@ -53,4 +55,7 @@ object ApplicationModule {
     @Provides
     fun provideResourceProvider(@ApplicationContext context: Context): ResourceProvider =
         ResourceProviderImpl(context.resources)
+
+    @Provides
+    fun provideAppTheme(): AppTheme = AppTheme { content -> ProtonTheme { content() } }
 }

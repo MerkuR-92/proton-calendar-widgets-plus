@@ -249,12 +249,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         restartApplication()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent?.let {
-            if (mainViewModel.shouldHandleIntent(intent)) {
-                mainViewModel.handleIntent(intent)
-            }
+        if (mainViewModel.shouldHandleIntent(intent)) {
+            mainViewModel.handleIntent(intent)
         }
     }
 
@@ -455,7 +453,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
 
         binding.navViewMainContent.navViewVersion.text = getString(
             R.string.nav_view_version_name,
-            BuildConfig.VERSION_NAME
+            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
         )
 
         initDrawerHeader()
