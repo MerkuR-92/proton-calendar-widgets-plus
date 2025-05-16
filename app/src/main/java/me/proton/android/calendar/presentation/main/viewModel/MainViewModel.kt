@@ -50,7 +50,7 @@ class MainViewModel @Inject constructor(
     private val feedbackApi: FeedbackApi,
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
     private val logger: Logger,
-    private val workManager: WorkManager,
+    private val scheduleSyncAlarmsUseCase: ScheduleSyncAlarmsUseCase,
     private val reviewManager: ReviewManager,
     private val resetLocalEventDatabaseUseCase: ResetLocalEventDatabaseUseCase,
     private val contactEmailsRepository: ContactRepository,
@@ -160,7 +160,7 @@ class MainViewModel @Inject constructor(
 
     // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
-        return SyncAlarmsUseCase.scheduleWorker(workManager, userId, initialDelay = Duration.ofSeconds(10)).state
+        return scheduleSyncAlarmsUseCase.execute(userId, initialDelay = Duration.ofSeconds(10)).state
     }
 
     /**

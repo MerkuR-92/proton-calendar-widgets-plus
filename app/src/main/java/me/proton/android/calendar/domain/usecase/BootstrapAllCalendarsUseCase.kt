@@ -30,7 +30,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val settingsApi: SettingsApi,
     private val calendarsRepository: CalendarsRepository,
     private val createCalendarUseCase: CreateCalendarUseCase,
-    private val syncAlarmsUseCase: SyncAlarmsUseCase,
+    private val scheduleSyncAlarmsUseCase: ScheduleSyncAlarmsUseCase,
     private val keySetupUseCase: KeySetupUseCase,
     private val reactivateCalendarKeyUseCase: ReactivateCalendarKeyUseCase,
     private val userAddressManager: UserAddressManager,
@@ -268,7 +268,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         } else {
 
             // sync alarms after downloading calendars and events
-            SyncAlarmsUseCase.scheduleWorker(workManager, userId, initialDelay = Duration.ofSeconds(10))
+            scheduleSyncAlarmsUseCase.execute(userId, initialDelay = Duration.ofSeconds(10))
 
             UseCase.Result.Success<Unit>()
         }

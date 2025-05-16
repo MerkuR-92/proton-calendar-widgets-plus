@@ -1,17 +1,9 @@
 package me.proton.android.calendar.domain.usecase
 
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.Operation
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import me.proton.android.calendar.common.utils.isNotFound
-import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -30,7 +22,6 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -48,37 +39,6 @@ class SyncAlarmsUseCase @Inject constructor(
 
     companion object {
         const val SYNC_ALARMS = "SYNC_ALARMS"
-
-        fun scheduleWorker(
-            workManager: WorkManager,
-            userId: UserId,
-            initialDelay: Duration = Duration.ofSeconds(0),
-            force: Boolean = false
-        ): Operation {
-
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-                .setConstraints(constraints)
-                .setInitialDelay(initialDelay.toMillis(), TimeUnit.MILLISECONDS)
-                .setInputData(
-                    workDataOf(
-                        UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                        UseCaseWorker.INPUT_USER_ID to userId.id,
-                        UseCaseWorker.INPUT_FORCE_SYNC_ALARMS to force
-                    )
-                )
-                .build()
-
-            // TODO work is unique per user-id, make sure different inputdata => different unique work
-            return workManager.enqueueUniqueWork(
-                UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-                ExistingWorkPolicy.REPLACE,
-                work
-            )
-        }
     }
 
     private val ALARMS_CACHE_OVERLAP_WINDOW_SIZE = Duration.ofDays(3) // minimum time that has to pass after last sync

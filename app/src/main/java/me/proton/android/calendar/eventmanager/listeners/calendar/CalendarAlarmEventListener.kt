@@ -13,7 +13,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
-import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.ScheduleSyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
@@ -21,7 +21,6 @@ import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
 import me.proton.core.util.kotlin.deserialize
-import java.time.Duration
 import javax.inject.Inject
 
 class CalendarAlarmEventListener @Inject constructor(
@@ -29,7 +28,8 @@ class CalendarAlarmEventListener @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val workManager: WorkManager,
-    private val logger: Logger
+    private val logger: Logger,
+    private val scheduleSyncAlarmsUseCase: ScheduleSyncAlarmsUseCase
 ): CalendarBaseEventListener<String, EventAlarmEntity>(db) {
     override val order: Int = 4
     override val type: Type = Type.Calendar
@@ -106,7 +106,7 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onFailure(config: EventManagerConfig) {
         // Launch worker to force refresh and sync alarms
-        SyncAlarmsUseCase.scheduleWorker(workManager, config.userId, force = true)
+        scheduleSyncAlarmsUseCase.execute(config.userId, force = true)
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
@@ -124,6 +124,6 @@ class CalendarAlarmEventListener @Inject constructor(
         calendarsRepository.deleteAllEventAlarmsByCalendar(calendarId)
 
         // Launch worker to force refresh and sync alarms
-        SyncAlarmsUseCase.scheduleWorker(workManager, config.userId, force = true)
+        scheduleSyncAlarmsUseCase.execute(config.userId, force = true)
     }
 }
