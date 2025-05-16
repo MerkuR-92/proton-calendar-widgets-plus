@@ -13,6 +13,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
+import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
@@ -20,6 +21,7 @@ import me.proton.core.eventmanager.domain.entity.Event
 import me.proton.core.eventmanager.domain.entity.EventsResponse
 import me.proton.core.eventmanager.domain.extension.asCalendar
 import me.proton.core.util.kotlin.deserialize
+import java.time.Duration
 import javax.inject.Inject
 
 class CalendarAlarmEventListener @Inject constructor(
@@ -104,16 +106,7 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onFailure(config: EventManagerConfig) {
         // Launch worker to force refresh and sync alarms
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_FORCE_SYNC_ALARMS to true // Force sync alarms
-            ),
-            UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        SyncAlarmsUseCase.scheduleWorker(workManager, config.userId, force = true)
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
@@ -131,15 +124,6 @@ class CalendarAlarmEventListener @Inject constructor(
         calendarsRepository.deleteAllEventAlarmsByCalendar(calendarId)
 
         // Launch worker to force refresh and sync alarms
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_FORCE_SYNC_ALARMS to true // Force sync alarms
-            ),
-            UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        SyncAlarmsUseCase.scheduleWorker(workManager, config.userId, force = true)
     }
 }

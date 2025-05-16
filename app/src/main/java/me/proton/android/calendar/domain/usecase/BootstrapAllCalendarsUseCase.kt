@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import androidx.work.WorkManager
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -14,12 +15,11 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.SettingsApi
-import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
-import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
+import java.time.Duration
 import java.util.TimeZone
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
     private val userSettingsRepository: UserSettingsRepository,
     private val refreshCalendarUserSettingsUseCase: RefreshCalendarUserSettingsUseCase,
     private val joinCalendarUseCase: JoinCalendarUseCase,
-    private val accountManager: AccountManager,
+    private val workManager: WorkManager,
     private val featureFlagManager: FeatureFlagManager
 ): UseCase {
 
@@ -267,8 +267,8 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
             )
         } else {
 
-            // sync alarms right after downloading calendars and events
-            syncAlarmsUseCase.execute(userId).ifSuccessAndLogErrors(logger) { }
+            // sync alarms after downloading calendars and events
+            SyncAlarmsUseCase.scheduleWorker(workManager, userId, initialDelay = Duration.ofSeconds(10))
 
             UseCase.Result.Success<Unit>()
         }

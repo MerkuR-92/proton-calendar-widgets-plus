@@ -160,22 +160,7 @@ class MainViewModel @Inject constructor(
 
     // TODO run only after bootstrap & successful "cold fetch" of events for the first required period
     fun syncAlarms(userId: UserId) : LiveData<Operation.State> {
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to userId.id
-            ))
-            .build()
-
-        // TODO work is unique per user-id, make sure different inputdata => different unique work
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SYNC_ALARMS, ExistingWorkPolicy.REPLACE, work).state
-
+        return SyncAlarmsUseCase.scheduleWorker(workManager, userId, initialDelay = Duration.ofSeconds(10)).state
     }
 
     /**
