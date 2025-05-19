@@ -26,7 +26,7 @@ internal class ScheduleSyncAlarmsUseCaseTest {
     private val testsLogger = TestsLogger
 
     private val workName = UseCaseWorker.UniqueWorkNames.SYNC_ALARMS
-    private val workPolicy = ExistingWorkPolicy.REPLACE
+    private val workPolicy = ExistingWorkPolicy.APPEND_OR_REPLACE
 
     private fun getScheduleSyncAlarmsUseCase(): ScheduleSyncAlarmsUseCase {
         return ScheduleSyncAlarmsUseCase(

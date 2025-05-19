@@ -46,7 +46,7 @@ class ScheduleSyncAlarmsUseCase @Inject constructor(
         // TODO work is unique per user-id, make sure different inputdata => different unique work
         return workManager.enqueueUniqueWork(
             UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
             work
         )
     }
