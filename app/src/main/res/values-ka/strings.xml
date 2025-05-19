@@ -145,7 +145,7 @@
     <string name="event_hint_title">სათაურის დამატება</string>
     <string name="event_hint_location">მდებარეობის დამატება</string>
     <string name="event_text_add_participants">მონაწილეების დამატება</string>
-    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">დამსწრეები (%1$d/%2$d)</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">მონაწილეები (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">თქვენ</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ კიდევ %1$d</string>
     <string name="event_text_switch_all_day">მთელი დღე</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">%1$s-მდე ერთი დღით ადრე</string>
     <string name="event_alarm_all_day_3">%1$s-მდე კვირით დღით ადრე</string>
     <string name="event_alarm_all_day_4">3 კვირით ადრე %1$s-ზე</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00">%1$s - ზე</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">%1$s-ზე</string>
     <string name="event_alarm_action">გაგზავნა</string>
     <string name="event_alarm_action_notification">შეტყობინება</string>
     <string name="event_alarm_action_email">ელფოსტა</string>
@@ -222,7 +222,7 @@
     <string name="event_recurrence_custom_title">სიხშირის მითითება</string>
     <string name="event_recurrence_occurs_every">გამეორების ინტერვალი</string>
     <string name="event_recurrence_occurs_on">გამეორდება</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">დღე %1$d</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d რიცხვში</string>
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
     <string name="event_recurrence_ends_on">მთავრდება</string>
     <string name="event_recurrence_ends_never">არასოდეს</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">მოვლენა არ არსებობს</string>
     <string name="error_occurrence_does_not_exist">შემთხვევა არ არსებობს</string>
     <string name="update_timezone_dialog_title">დროის სარტყელი შეიცვალა</string>
-    <string name="update_timezone_dialog_message">თქვენი სისტემის დროის ზონა, როგორც ჩანს, შეიცვალა %1$s. გსურთ, განაახლოთ თქვენი დროის ზონის პარამეტრი?</string>
+    <string name="update_timezone_dialog_message">თქვენი სისტემის დროის სარტყელი, როგორც ჩანს, %1$s-ზე შეიცვალა. გსურთ, განაახლოთ თქვენი დროის სარტყელის პარამეტრი?</string>
     <string name="update_timezone_dialog_confirmation">განახლება</string>
     <string name="update_timezone_dialog_cancel">გაუქმება</string>
     <string name="contacts_permission_dialog_title">მისცემთ Proton Calendar-ს წვდომას თქვენს კონტაქტებზე?</string>
@@ -685,7 +685,7 @@
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
         <item quantity="one">კალენდარი</item>
-        <item quantity="other">კალენდრები</item>
+        <item quantity="other">კალენდარი</item>
     </plurals>
     <plurals name="import_assistant_import_button">
         <item quantity="one">%1$d კალენდრის შემოტანა</item>
@@ -720,7 +720,7 @@
         <item quantity="other">\u0020 ან\n • საჭირო იქნება, მინიმუმ, %1$d არსებულ კალენდართან შერწყმა.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">წამი</item>
+        <item quantity="one">მეორე</item>
         <item quantity="other">წამი</item>
     </plurals>
     <plurals name="plural_minute">
@@ -761,14 +761,14 @@
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">მონაწილე</item>
-        <item quantity="other">მონაწილე</item>
+        <item quantity="other">მონაწილეები</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">ყოველი %1$d %2$s</item>
+        <item quantity="one">ყოველი %1$d%2$s</item>
         <item quantity="other">ყოველი %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">ყოველი %1$d %2$s</item>
+        <item quantity="one">ყოველი %1$d%2$s</item>
         <item quantity="other">ყოველი %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">

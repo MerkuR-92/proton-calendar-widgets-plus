@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">正在載入活動…</string>
     <string name="agenda_loading_events_error">載入活動時發生錯誤</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ 另有 %1$d 等數量</string>
+    <string name="day_view_all_day_more">+ 另 %1$d 人</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">全日</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -78,11 +78,11 @@
     <string name="event_recurrence_weekly_on_all_days">全日</string>
     <string name="event_recurrence_until" comment="Event happens regularly until a date">直到 %1$s 為止</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">直到 %1$s (%2$s) 為止</string>
-    <string name="event_attendee_count" comment="Example: 5 participants">%1$d 個%2$s</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">已取消</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(已停用)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(預設)</string>
-    <string name="event_attendee_status_separator">%1$s，%2$s</string>
+    <string name="event_attendee_status_separator">%1$s、%2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d 人會出席</string>
     <string name="event_attendee_maybe" comment="How many attendees answered maybe">%1$d 人或會出席</string>
     <string name="event_attendee_no" comment="How many attendees answered no">%1$d 人不會出席</string>
@@ -269,7 +269,7 @@
     <string name="event_send_invite_dialog_confirm">傳送</string>
     <string name="event_send_invite_dialog_cancel">取消</string>
     <string name="event_add_participants_dialog_title">加入參與者</string>
-    <string name="event_add_participants_dialog_description">邀請將傳送以新增的參與者。</string>
+    <string name="event_add_participants_dialog_description">邀請將傳送給已加入參與者。</string>
     <string name="recurring_event_add_participants_dialog_description">邀請將傳給此系列中全部活動的參與者。</string>
     <string name="recurring_event_add_participants_overwrite_dialog_description">邀請將傳給此系列中全部活動的參與者。\n此系列中先前所作的修改將會消失。</string>
     <string name="event_add_participants_dialog_confirm">傳送</string>
@@ -756,7 +756,7 @@
         <item quantity="other">每 %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="other">%1$s 分鐘</item>
+        <item quantity="other">%1$s分鐘</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="other">%1$d/%2$d 個字元</item>

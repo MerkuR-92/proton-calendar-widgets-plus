@@ -63,7 +63,7 @@
     <string name="event_alarm_label_before">%1$s до події</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s до події електронним листом</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s, %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s о %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s електронним листом</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s до події – %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s до події – %2$s електронним листом</string>
@@ -138,7 +138,7 @@
     <string name="zoom_meeting_less_details">Менше деталей</string>
     <string name="zoom_meeting_host">Організатор зустрічі</string>
     <string name="zoom_meeting_link">Посилання на зустріч</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Інструкції приєднання</a></string>
+    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Інструкції для приєднання</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Нова подія</string>
     <string name="event_text_edit_event">Змінити подію</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">За 1 день до події – %1$s</string>
     <string name="event_alarm_all_day_3">За 1 тиждень до події – %1$s</string>
     <string name="event_alarm_all_day_4">За 3 тижні до події – %1$s</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00"> %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">о %1$s</string>
     <string name="event_alarm_action">Надіслати через</string>
     <string name="event_alarm_action_notification">сповіщення</string>
     <string name="event_alarm_action_email">електронний лист</string>
@@ -247,16 +247,16 @@
     <string name="event_allow_contacts_confirm">Дозволити</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Запрошення на подію – %1$s, %2$s %3$s</string>
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Запрошення на подію – %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Запрошення на подію – %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Запрошення на подію, що починається %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Запрошення на подію – %1$s, %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Запрошення на подію – %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрошення на подію – %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Запрошення на подію, що починається %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Оновлення для події, що починається %1$s %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Оновлення для події %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Оновлення для події, що починається %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Скасування події – %1$s, %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Скасування події – %1$s</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасування події – %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Скасування події, що починається %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Вас запрошено на %1$s\nКоли: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s було оновлено \nКоли: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (весь день)</string>
@@ -334,15 +334,15 @@
     <string name="snack_event_updated_recurring">Усі події оновлено</string>
     <string name="snack_event_updated_error_failed_mail">Не вдалося надіслати запрошення</string>
     <string name="snack_update_event_error_failed_mail">Не вдалося оновити</string>
-    <string name="snack_lost_zoom_access">З\'єднатися до Zoom щоб редагувати цю подію.</string>
-    <string name="snack_lost_zoom_access_acion">З\'єднатися</string>
-    <string name="snack_zoom_meeting_does_not_exist">Цей Zoom-сеанс скасовано. Вилучіть посилання для редагування цієї події.</string>
+    <string name="snack_lost_zoom_access">Під\'єднатися до Zoom, щоби редагувати цю подію.</string>
+    <string name="snack_lost_zoom_access_acion">Під\'єднатися</string>
+    <string name="snack_zoom_meeting_does_not_exist">Цей сеанс Zoom скасовано. Видаліть посилання для редагування цієї події.</string>
     <string name="snack_event_updated_error">Помилка оновлення події</string>
     <string name="snack_event_created">Подію створено</string>
     <string name="snack_event_created_failed_mail">Подію створено, але не вдалося надіслати запрошення</string>
     <string name="snack_event_created_error">Помилка створення події</string>
     <string name="snack_event_opening_edit_error">Помилка відкриття події для редагування</string>
-    <string name="snack_event_recurring_invitation_only_supported_on_web_message">This recurring event can only be deleted in the Calendar web app.</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Цю повторювану подію можна видалити лише у вебзастосунку Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">Редагування подій з учасниками ще не підтримується</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Не можна додавати учасників та змінювати календар одночасно</string>
     <string name="snack_event_init_error">Помилка ініціалізації нової події</string>
@@ -437,7 +437,7 @@
     <string name="notification_text_today_part_time">Сьогодні о %1$s</string>
     <string name="notification_text_tomorrow">Завтра</string>
     <string name="notification_text_tomorrow_part_time">Завтра о %1$s</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s, %2$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s о %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Тема</string>
     <string name="bug_report_hint_description">Опишіть проблему та додайте повідомлення про помилки.</string>
@@ -580,7 +580,7 @@
     <string name="calendar_widget_part_day_event_ends_at">Завершення %1$s</string>
     <!-- Spotlight Dialogs -->
     <string name="spotlight_dialog_header">Що нового</string>
-    <string name="spotlight_dialog_beta_header">Calendar Beta</string>
+    <string name="spotlight_dialog_beta_header">Calendar бета</string>
     <string name="spotlight_dialog_skip">Пропустити</string>
     <string name="spotlight_dialog_confirmation_button">OK</string>
     <string name="spotlight_dialog_month_view_title">Перегляд місяця</string>
@@ -687,7 +687,7 @@
         <item quantity="one">календар</item>
         <item quantity="few">календарі</item>
         <item quantity="many">календарів</item>
-        <item quantity="other">календарі</item>
+        <item quantity="other">календарів</item>
     </plurals>
     <plurals name="import_assistant_import_button">
         <item quantity="one">Імпортувати %1$d календар</item>
@@ -702,7 +702,7 @@
         <item quantity="other">%1$d поточних імпортів</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d з %2$d створений у %3$s</item>
+        <item quantity="one">%1$d з %2$d створено у %3$s</item>
         <item quantity="few">%1$d з %2$d створені у %3$s</item>
         <item quantity="many">%1$d з %2$d створені у %3$s</item>
         <item quantity="other">%1$d з %2$d створені у %3$s</item>
@@ -741,55 +741,55 @@
         <item quantity="one">секунда</item>
         <item quantity="few">секунди</item>
         <item quantity="many">секунд</item>
-        <item quantity="other">секунди</item>
+        <item quantity="other">секунд</item>
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">хвилина</item>
         <item quantity="few">хвилини</item>
         <item quantity="many">хвилин</item>
-        <item quantity="other">хвилини</item>
+        <item quantity="other">хвилин</item>
     </plurals>
     <plurals name="plural_hour">
         <item quantity="one">година</item>
         <item quantity="few">години</item>
         <item quantity="many">годин</item>
-        <item quantity="other">години</item>
+        <item quantity="other">годин</item>
     </plurals>
     <plurals name="plural_day">
         <item quantity="one">день</item>
         <item quantity="few">дні</item>
         <item quantity="many">днів</item>
-        <item quantity="other">дні</item>
+        <item quantity="other">днів</item>
     </plurals>
     <plurals name="plural_week">
         <item quantity="one">тиждень</item>
         <item quantity="few">тижні</item>
         <item quantity="many">тижнів</item>
-        <item quantity="other">тижні</item>
+        <item quantity="other">тижнів</item>
     </plurals>
     <plurals name="plural_month">
         <item quantity="one">місяць</item>
         <item quantity="few">місяці</item>
         <item quantity="many">місяців</item>
-        <item quantity="other">місяці</item>
+        <item quantity="other">місяців</item>
     </plurals>
     <plurals name="plural_year">
         <item quantity="one">рік</item>
         <item quantity="few">роки</item>
         <item quantity="many">років</item>
-        <item quantity="other">роки</item>
+        <item quantity="other">років</item>
     </plurals>
     <plurals name="plural_recurrence_count">
         <item quantity="one">одноразово</item>
         <item quantity="few">рази</item>
         <item quantity="many">разів</item>
-        <item quantity="other">рази</item>
+        <item quantity="other">разів</item>
     </plurals>
     <plurals name="plural_occurrence">
         <item quantity="one">повторення</item>
         <item quantity="few">повторення</item>
         <item quantity="many">повторень</item>
-        <item quantity="other">повторення</item>
+        <item quantity="other">повторень</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
         <item quantity="one">раз</item>
@@ -801,22 +801,22 @@
         <item quantity="one">учасник</item>
         <item quantity="few">учасники</item>
         <item quantity="many">учасників</item>
-        <item quantity="other">учасники</item>
+        <item quantity="other">учасників</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="one">Кожні %1$d %2$s</item>
         <item quantity="few">Кожні %1$d %2$s</item>
         <item quantity="many">Кожні %1$d %2$s</item>
         <item quantity="other">Кожні %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="one">Кожні %1$d %2$s</item>
         <item quantity="few">Кожні %1$d %2$s</item>
         <item quantity="many">Кожні %1$d %2$s</item>
         <item quantity="other">Кожні %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Кожен %1$d %2$s</item>
+        <item quantity="one">Кожні %1$d %2$s</item>
         <item quantity="few">Кожні %1$d %2$s</item>
         <item quantity="many">Кожні %1$d %2$s</item>
         <item quantity="other">Кожні %1$d %2$s</item>
@@ -831,7 +831,7 @@
         <item quantity="one">%1$s хвилина</item>
         <item quantity="few">%1$s хвилини</item>
         <item quantity="many">%1$s хвилин</item>
-        <item quantity="other">%1$s хвилини</item>
+        <item quantity="other">%1$s хвилин</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="one">%1$d/%2$d символ</item>

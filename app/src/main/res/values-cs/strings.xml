@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Načítání událostí…</string>
     <string name="agenda_loading_events_error">Chyba při načítání událostí</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d dalších</string>
+    <string name="day_view_all_day_more">+ %1$d další</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Celý den</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -63,7 +63,7 @@
     <string name="event_alarm_label_before">%1$s předem</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s předem e-mailem</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s v %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s v(e) %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s v %2$s e-mailem</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s předem v %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s předem v %2$s e-mailem</string>
@@ -145,9 +145,9 @@
     <string name="event_hint_title">Přidat titulek</string>
     <string name="event_hint_location">Přidat umístění</string>
     <string name="event_text_add_participants">Přidat účastníky</string>
-    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Účastníci (%1$d/%2$d)</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Úřastníci (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vy</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d dalších</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d další</string>
     <string name="event_text_switch_all_day">Celý den</string>
     <string name="event_text_date_start">Začátek</string>
     <string name="event_text_date_end">Konec</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">1 den předem v %1$s</string>
     <string name="event_alarm_all_day_3">1 týden předem v %1$s</string>
     <string name="event_alarm_all_day_4">3 týdny předem v %1$s</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00">v %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">v(e) %1$s</string>
     <string name="event_alarm_action">Odesílá</string>
     <string name="event_alarm_action_notification">upozornění</string>
     <string name="event_alarm_action_email">e-mail</string>
@@ -222,8 +222,8 @@
     <string name="event_recurrence_custom_title">Vlastní frekvence</string>
     <string name="event_recurrence_occurs_every">Opakuje se každý</string>
     <string name="event_recurrence_occurs_on">Opakuje se v</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">den %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">dne %1$d</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">v %1$s</string>
     <string name="event_recurrence_ends_on">Končí</string>
     <string name="event_recurrence_ends_never">nikdy</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">den</string>
@@ -246,17 +246,17 @@
     <string name="event_allow_contacts_cancel">Zamítnout</string>
     <string name="event_allow_contacts_confirm">Povolit</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Pozvánka na událost, která začíná v %1$s v %2$s%3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Pozvání na událost v $%1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Pozvánka na událost začínající v %1$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Pozvánka na událost v(ve) %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Pozvánka na událost začínající v(ve) %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Pozvánka na událost, která začíná v %1$s v%2$s%3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Pozvánka na událost v $%1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Pozvánka na událost, která začíná v %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Pozvánka na událost v(ve) %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Pozvánka na událost začínající v(e) %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Aktualizace události, která začíná v(e) %1$s %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aktualizace události v(e) %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aktualizace události začínající v(e) %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Zrušení události začínající %1$s v %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Zrušení události v %1$s</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Zrušení události začínající v %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Zrušení události v(ve) %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Zrušení události začínající v(ve) %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Jste pozvání na %1$s\nKdy: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Událost %1$s byla aktualizována\nKdy: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (celý den)</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">Událost neexistuje</string>
     <string name="error_occurrence_does_not_exist">Výskyt události neexistuje</string>
     <string name="update_timezone_dialog_title">Časové pásmo se změnilo</string>
-    <string name="update_timezone_dialog_message">Zdá se, že se vaše systémové časové pásmo změnilo na %1$s. Chcete aktualizovat nastavení časového pásma?</string>
+    <string name="update_timezone_dialog_message">Zdá se, že časové pásmo vašeho systému bylo změněno na %1$s. Chcete aktualizovat nastavení časového pásma?</string>
     <string name="update_timezone_dialog_confirmation">Aktualizovat</string>
     <string name="update_timezone_dialog_cancel">Zrušit</string>
     <string name="contacts_permission_dialog_title">Povolit aplikaci Proton Calendar přístup k vašim kontaktům?</string>
@@ -437,7 +437,7 @@
     <string name="notification_text_today_part_time">Dnes v %1$s</string>
     <string name="notification_text_tomorrow">Zítra</string>
     <string name="notification_text_tomorrow_part_time">Zítra v %1$s</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s v %2$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s v(e) %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Předmět</string>
     <string name="bug_report_hint_description">Popište prosím problém a přiložte všechny chybové zprávy.</string>
@@ -703,7 +703,7 @@
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
         <item quantity="one">%1$d z %2$d vytvořeno v %3$s</item>
-        <item quantity="few">%1$d z %2$d vytvořeno v %3$s</item>
+        <item quantity="few">%1$d ze %2$d vytvořeno v %3$s</item>
         <item quantity="many">%1$d z %2$d vytvořeno v %3$s</item>
         <item quantity="other">%1$d z %2$d vytvořeno v %3$s</item>
     </plurals>
@@ -834,14 +834,14 @@
         <item quantity="other">%1$s minut</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%1$d/%2$d znaku</item>
-        <item quantity="few">%1$d/%2$d znaků</item>
+        <item quantity="one">%1$d/%2$d znak</item>
+        <item quantity="few">%1$d/%2$d znaky</item>
         <item quantity="many">%1$d/%2$d znaků</item>
         <item quantity="other">%1$d/%2$d znaků</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%1$d/%2$d znaku</item>
-        <item quantity="few">%1$d/%2$d znaků</item>
+        <item quantity="one">%1$d/%2$d znak</item>
+        <item quantity="few">%1$d/%2$d znaky</item>
         <item quantity="many">%1$d/%2$d znaků</item>
         <item quantity="other">%1$d/%2$d znaků</item>
     </plurals>

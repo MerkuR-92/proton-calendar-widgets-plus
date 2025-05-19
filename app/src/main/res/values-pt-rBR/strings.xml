@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Adicionar participantes</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participantes (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Você</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d a mais</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d mais</string>
     <string name="event_text_switch_all_day">Todo o dia</string>
     <string name="event_text_date_start">Início</string>
     <string name="event_text_date_end">Fim</string>
@@ -223,7 +223,7 @@
     <string name="event_recurrence_occurs_every">Repetir a cada</string>
     <string name="event_recurrence_occurs_on">Repetir em</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">no dia %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">no(a) %1$s</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">no dia %1$s</string>
     <string name="event_recurrence_ends_on">Termina</string>
     <string name="event_recurrence_ends_never">nunca</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">no dia</string>
@@ -247,7 +247,7 @@
     <string name="event_allow_contacts_confirm">Permitir</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Convite para um evento começando em %1$s ás %2$s %3$s</string>
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Convite para um evento em %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Convite para um evento começando em %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Convite para um evento começando em %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Convite para um evento começando em %1$s ás %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Convite para um evento em %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Convite para um evento começando em %1$s</string>
@@ -696,7 +696,7 @@
         <item quantity="other">%1$d importações em andamento</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d de %2$d criado em %3$s</item>
+        <item quantity="one">%1$d de %2$d criados em %3$s</item>
         <item quantity="other">%1$d de %2$d criados em %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
@@ -780,7 +780,7 @@
         <item quantity="other">A cada %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%1$s minuto</item>
+        <item quantity="one">%1$s minutos</item>
         <item quantity="other">%1$s minutos</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">

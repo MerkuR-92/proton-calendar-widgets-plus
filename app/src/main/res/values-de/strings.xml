@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Termine werden geladen…</string>
     <string name="agenda_loading_events_error">Fehler beim Laden der Termine</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">und %1$d weitere</string>
+    <string name="day_view_all_day_more">+ %1$d weitere</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Ganztägig</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Teilnehmer hinzufügen</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Teilnehmer (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Du</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">und %1$d weitere</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d weitere</string>
     <string name="event_text_switch_all_day">Ganztägig</string>
     <string name="event_text_date_start">Beginn</string>
     <string name="event_text_date_end">Ende</string>
@@ -342,7 +342,7 @@
     <string name="snack_event_created_failed_mail">Termin erstellt, aber Einladung konnte nicht gesendet werden</string>
     <string name="snack_event_created_error">Fehler beim Erstellen des Termins</string>
     <string name="snack_event_opening_edit_error">Fehler beim Öffnen des Termins zur Bearbeitung</string>
-    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Dieser wiederkehrende Termin kann nur in der Kalender-Web--App gelöscht werden.</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Dieser wiederkehrende Termin kann nur in der Kalender-Web-App gelöscht werden.</string>
     <string name="snack_event_edit_with_attendees_error">Das Bearbeiten von Terminen mit Teilnehmern wird derzeit noch nicht unterstützt</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Teilnehmer hinzufügen und gleichzeitig den Kalender wechseln ist nicht möglich</string>
     <string name="snack_event_init_error">Fehler beim Initialisieren eines neuen Termins</string>
@@ -684,7 +684,7 @@
     <string name="undefined_color">Nicht definiert</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
-        <item quantity="one">Kalender</item>
+        <item quantity="one">kalender</item>
         <item quantity="other">Kalender</item>
     </plurals>
     <plurals name="import_assistant_import_button">
@@ -761,7 +761,7 @@
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">Teilnehmer</item>
-        <item quantity="other">Teilnehmer</item>
+        <item quantity="other">teilnehmer</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
         <item quantity="one">Alle %1$d %2$s</item>

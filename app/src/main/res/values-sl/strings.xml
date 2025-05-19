@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Nalaganje dogodkov …</string>
     <string name="agenda_loading_events_error">Napaka pri nalaganju dogodkov</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d več</string>
+    <string name="day_view_all_day_more">+ %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Cel dan</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -69,7 +69,7 @@
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s prej ob %2$s po e-pošti</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s v %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s na %2$d dan</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s na %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s v %2$s</string>
     <string name="event_recurrence_none">Se ne ponavlja</string>
     <string name="event_recurrence_daily">Dnevno</string>
     <string name="event_recurrence_weekly">Tedensko</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Dodaj udeležence</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Udeleženci (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vi</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d več</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d</string>
     <string name="event_text_switch_all_day">Ves dan</string>
     <string name="event_text_date_start">Začetek</string>
     <string name="event_text_date_end">Konec</string>
@@ -246,8 +246,8 @@
     <string name="event_allow_contacts_cancel">Zavrni</string>
     <string name="event_allow_contacts_confirm">Dovoli</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Povabilo na dogodek s pričetkom v %1$s ob %2$s %3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Povabilo na dogodek v %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Povabilo na dogodek s pričetkom v %1$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Povabilo na dogodek %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Povabilo na dogodek s pričetkom %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Povabilo na dogodek s pričetkom v %1$s ob %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Povabilo na dogodek v %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Povabilo na dogodek s pričetkom v %1$s</string>
@@ -342,7 +342,7 @@
     <string name="snack_event_created_failed_mail">Dogodek je bil ustvarjen, vendar povabila ni bilo mogoče poslati</string>
     <string name="snack_event_created_error">Napaka pri ustvarjanju dogodka</string>
     <string name="snack_event_opening_edit_error">Napaka pri odpiranju dogodka za urejanje</string>
-    <string name="snack_event_recurring_invitation_only_supported_on_web_message">This recurring event can only be deleted in the Calendar web app.</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Ta ponavljajoči se dogodek lahko izbrišete samo v spletni aplikaciji Calendar.</string>
     <string name="snack_event_edit_with_attendees_error">Urejanje dogodkov z udeleženci še ni podprto</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Ni mogoče hkrati dodati udeležence in spreminjati koledar</string>
     <string name="snack_event_init_error">Napaka pri inicializaciji novega dogodka</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">Dogodek ne obstaja</string>
     <string name="error_occurrence_does_not_exist">Ponovitev ne obstaja</string>
     <string name="update_timezone_dialog_title">Časovni pas je spremenjen</string>
-    <string name="update_timezone_dialog_message">Sistemski časovni pas se je spremenil v %1$s. Ali želite posodobiti nastavitve časovnega pasu?</string>
+    <string name="update_timezone_dialog_message">Vaš sistemski časovni pas se je spremenil v %1$s. Ali želite posodobiti nastavitve časovnega pasu?</string>
     <string name="update_timezone_dialog_confirmation">Posodobi</string>
     <string name="update_timezone_dialog_cancel">Prekliči</string>
     <string name="contacts_permission_dialog_title">Dovolite Proton Calendar dostop do stikov?</string>
@@ -702,7 +702,7 @@
         <item quantity="other">Poteka %1$d uvozov</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d od %2$d ustvarjenih v %3$s</item>
+        <item quantity="one">%1$d od %2$d ustvarjeni v %3$s</item>
         <item quantity="two">%1$d od %2$d ustvarjena v %3$s</item>
         <item quantity="few">%1$d od %2$d ustvarjeni v %3$s</item>
         <item quantity="other">%1$d od %2$d ustvarjenih v %3$s</item>
@@ -727,8 +727,8 @@
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="one">Zaradi omejitve koledarja ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarja</item>
-        <item quantity="two">Zaradi omejitve koledarjev ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarja</item>
-        <item quantity="few">Zaradi omejitve koledarjev ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarja</item>
+        <item quantity="two">Zaradi omejitve koledarjev ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarjev</item>
+        <item quantity="few">Zaradi omejitve koledarjev ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarjev</item>
         <item quantity="other">Zaradi omejitve koledarjev ni mogoče ustvariti novih koledarjev za vse uvožene koledarje.\n • Prekličite izbiro najmanj %1$d koledarjev</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
@@ -745,38 +745,38 @@
     </plurals>
     <plurals name="plural_minute">
         <item quantity="one">minuta</item>
-        <item quantity="two">minut</item>
-        <item quantity="few">minut</item>
+        <item quantity="two">minuti</item>
+        <item quantity="few">minute</item>
         <item quantity="other">minut</item>
     </plurals>
     <plurals name="plural_hour">
         <item quantity="one">ura</item>
-        <item quantity="two">ur</item>
-        <item quantity="few">ur</item>
+        <item quantity="two">uri</item>
+        <item quantity="few">ure</item>
         <item quantity="other">ur</item>
     </plurals>
     <plurals name="plural_day">
         <item quantity="one">dan</item>
-        <item quantity="two">dni</item>
-        <item quantity="few">dni</item>
+        <item quantity="two">dneva</item>
+        <item quantity="few">dnevi</item>
         <item quantity="other">dni</item>
     </plurals>
     <plurals name="plural_week">
         <item quantity="one">teden</item>
-        <item quantity="two">tednov</item>
-        <item quantity="few">tednov</item>
+        <item quantity="two">tedna</item>
+        <item quantity="few">tedni</item>
         <item quantity="other">tednov</item>
     </plurals>
     <plurals name="plural_month">
         <item quantity="one">mesec</item>
-        <item quantity="two">mesecev</item>
-        <item quantity="few">mesecev</item>
+        <item quantity="two">meseca</item>
+        <item quantity="few">meseci</item>
         <item quantity="other">mesecev</item>
     </plurals>
     <plurals name="plural_year">
         <item quantity="one">leto</item>
-        <item quantity="two">let</item>
-        <item quantity="few">let</item>
+        <item quantity="two">leti</item>
+        <item quantity="few">leta</item>
         <item quantity="other">let</item>
     </plurals>
     <plurals name="plural_recurrence_count">
@@ -787,9 +787,9 @@
     </plurals>
     <plurals name="plural_occurrence">
         <item quantity="one">ponovitev</item>
-        <item quantity="two">ponovitve</item>
+        <item quantity="two">ponovitvi</item>
         <item quantity="few">ponovitve</item>
-        <item quantity="other">ponovitve</item>
+        <item quantity="other">ponovitev</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
         <item quantity="one">krat</item>
@@ -822,15 +822,15 @@
         <item quantity="other">Vsakih %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Vsako %1$d %2$s</item>
-        <item quantity="two">Vsaki %1$d %2$s</item>
+        <item quantity="one">Vsak %1$d %2$s</item>
+        <item quantity="two">Vsaka %1$d %2$s</item>
         <item quantity="few">Vsake %1$d %2$s</item>
         <item quantity="other">Vsakih %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%1$s minuta</item>
-        <item quantity="two">%1$s minut</item>
-        <item quantity="few">%1$s minut</item>
+        <item quantity="two">%1$s minuti</item>
+        <item quantity="few">%1$s minute</item>
         <item quantity="other">%1$s minut</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">

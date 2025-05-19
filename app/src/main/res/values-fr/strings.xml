@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Chargement des événements…</string>
     <string name="agenda_loading_events_error">Une erreur s\'est produite pendant le chargement des événements.</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d de plus</string>
+    <string name="day_view_all_day_more">+  %1$d de plus</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Toute la journée</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -145,9 +145,9 @@
     <string name="event_hint_title">Ajouter un titre</string>
     <string name="event_hint_location">Ajouter un lieu</string>
     <string name="event_text_add_participants">Ajouter des participants</string>
-    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d/%2$d)</string>
+    <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d sur %2$d)</string>
     <string name="event_current_user_organizer">Vous</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d de plus</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+  %1$d de plus</string>
     <string name="event_text_switch_all_day">Toute la journée</string>
     <string name="event_text_date_start">Début</string>
     <string name="event_text_date_end">Fin</string>
@@ -227,7 +227,7 @@
     <string name="event_recurrence_ends_on">Se termine</string>
     <string name="event_recurrence_ends_never">jamais</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">le</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">le %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">les %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">après</string>
     <string name="event_recurring_edit_this">Cet événement</string>
     <string name="event_recurring_edit_this_and_future">Cet événement et les suivants</string>
@@ -246,17 +246,17 @@
     <string name="event_allow_contacts_cancel">Refuser</string>
     <string name="event_allow_contacts_confirm">Autoriser</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invitation à un événement %1$s à %2$s %3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invitation à un événement le %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re : Invitation à un événement commençant %1$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re : Invitation à un événement le %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re : Invitation à un événement commençant le %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation à un événement %1$s à %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation à un événement le %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation à un événement commençant %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation à un événement commençant le %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Mise à jour d\'un événement qui commence %1$s à %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Mise à jour d\'un événement prévu %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Mise à jour d\'un événement qui commence %1$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Mise à jour d\'un événement prévu le %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Mise à jour d\'un événement qui commence le %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annulation d’un événement %1$s à %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annulation d’un événement le %1$s</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulation d’un événement commençant %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annulation d\'un événement commençant le %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Vous êtes invité à %1$s.\nQuand : %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s a été mis à jour.\nQuand : %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (toute la journée)</string>
@@ -684,7 +684,7 @@
     <string name="undefined_color">Non définie</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
-        <item quantity="one">calendrier</item>
+        <item quantity="one">calendriers</item>
         <item quantity="other">calendriers</item>
     </plurals>
     <plurals name="import_assistant_import_button">
@@ -696,7 +696,7 @@
         <item quantity="other">%1$d importations en cours</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d sur %2$d créé dans %3$s</item>
+        <item quantity="one">%1$d sur %2$d créés dans %3$s</item>
         <item quantity="other">%1$d sur %2$d créés dans %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
@@ -764,24 +764,24 @@
         <item quantity="other">participants</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Tous les jours</item>
+        <item quantity="one">Tous les %1$d %2$s</item>
         <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Toutes les semaines</item>
-        <item quantity="other">Toutes les %1$d %2$s</item>
+        <item quantity="one">Tous les %1$d %2$s</item>
+        <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Tous les mois</item>
+        <item quantity="one">Tous les %1$d %2$s</item>
         <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Tous les ans</item>
+        <item quantity="one">Tous les %1$d %2$s</item>
         <item quantity="other">Tous les %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%1$s minute</item>
-        <item quantity="other">%1$s minutes</item>
+        <item quantity="other">%1$s minutes</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="one">Caractères : %1$d sur %2$d</item>

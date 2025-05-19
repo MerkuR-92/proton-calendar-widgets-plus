@@ -60,7 +60,7 @@
     <string name="event_alarm_label_at_event_time">La ora evenimentului</string>
     <string name="event_alarm_label_at_event_time_by_email">La momentul evenimentului după e-mail</string>
     <string name="event_alarm_label_on_the_same_day">În aceeași zi</string>
-    <string name="event_alarm_label_before">%1$s înainte</string>
+    <string name="event_alarm_label_before">%1$s în urmă</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s înainte prin e-mail</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s la %2$s</string>
@@ -227,7 +227,7 @@
     <string name="event_recurrence_ends_on">Se încheie</string>
     <string name="event_recurrence_ends_never">niciodată</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">în ziua</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">la %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">după</string>
     <string name="event_recurring_edit_this">Acest eveniment</string>
     <string name="event_recurring_edit_this_and_future">Acesta și viitoarele evenimente</string>
@@ -247,9 +247,9 @@
     <string name="event_allow_contacts_confirm">Permitere</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Rs: Invitație pentru un eveniment care începe %1$s %2$s la %3$s</string>
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Rs: Invitație la un eveniment %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Rs: Invitație pentru un eveniment care începe %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Rs: Invitație la un eveniment care începe %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitație pentru un eveniment care începe %1$s %2$s la %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitație la evenimentul de $%1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitație la evenimentul care are loc %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitație la un eveniment care începe %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualizare eveniment care începe %1$s la %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualizare eveniment ce are loc %1$s</string>
@@ -696,7 +696,7 @@
     <plurals name="import_assistant_ongoing_import" comment="Used as a caption to let the user know how many imports are currently ongoing">
         <item quantity="one">%1$d importare în desfășurare</item>
         <item quantity="few">%1$d importări în desfășurare</item>
-        <item quantity="other">%1$d importări în desfășurare</item>
+        <item quantity="other">%1$d de importări în desfășurare</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
         <item quantity="one">%1$d din %2$d creat în %3$s</item>
@@ -706,7 +706,7 @@
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
         <item quantity="one">Creare %1$d calendar în Proton Calendar.</item>
         <item quantity="few">Creare %1$d calendare în Proton Calendar.</item>
-        <item quantity="other">Creare %1$d calendare în Proton Calendar.</item>
+        <item quantity="other">Creare %1$d de calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
         <item quantity="one">Importare %1$d din %2$d calendar din</item>
@@ -719,12 +719,12 @@
         <item quantity="other">Îmbinare %1$d de calendare în Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Nu se pot crea calendare noi pentru toate calendarele importate din cauza limitei de calendare.\n - Deselectați cel puțin un calendar.</item>
+        <item quantity="one">Nu se pot crea calendare noi pentru toate calendarele importate din cauza limitei de calendare.\n - Deselectați cel puțin %1$d calendar.</item>
         <item quantity="few">Nu se pot crea calendare noi pentru toate calendarele importate din cauza limitei de calendare.\n - Deselectați cel puțin %1$d calendare.</item>
         <item quantity="other">Nu se pot crea calendare noi pentru toate calendarele importate din cauza limitei de calendare.\n - Deselectați cel puțin %1$d de calendare.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020sau\n • Îmbinați cel puțin un calendar cu calendarele Proton existente.</item>
+        <item quantity="one">\u0020sau\n • Îmbinați cel puțin %1$d calendar cu calendarele Proton existente.</item>
         <item quantity="few">\u0020sau\n • Îmbinați cel puțin %1$d calendare cu calendarele Proton existente.</item>
         <item quantity="other">\u0020sau\n • Îmbinați cel puțin %1$d de calendare cu calendarele Proton existente.</item>
     </plurals>
@@ -769,7 +769,7 @@
         <item quantity="other">de ori</item>
     </plurals>
     <plurals name="plural_occurrence">
-        <item quantity="one">apariţie</item>
+        <item quantity="one">apariție</item>
         <item quantity="few">apariții</item>
         <item quantity="other">de apariții</item>
     </plurals>
@@ -781,27 +781,27 @@
     <plurals name="plural_participant_uppercase">
         <item quantity="one">participant</item>
         <item quantity="few">participanți</item>
-        <item quantity="other">de participanţi</item>
+        <item quantity="other">participanți</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">La fiecare %1$d %2$s</item>
-        <item quantity="few">La fiecare %1$d %2$s</item>
-        <item quantity="other">La fiecare %1$d %2$s</item>
+        <item quantity="one">O dată la %1$d %2$s</item>
+        <item quantity="few">O dată la %1$d %2$s</item>
+        <item quantity="other">O dată la %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">La fiecare %1$d %2$s</item>
-        <item quantity="few">La fiecare %1$d %2$s</item>
-        <item quantity="other">La fiecare %1$d %2$s</item>
+        <item quantity="one">O dată la %1$d %2$s</item>
+        <item quantity="few">O dată la %1$d %2$s</item>
+        <item quantity="other">O dată la %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">La fiecare %1$d %2$s</item>
-        <item quantity="few">La fiecare %1$d %2$s</item>
-        <item quantity="other">La fiecare %1$d %2$s</item>
+        <item quantity="one">O dată la %1$d %2$s</item>
+        <item quantity="few">O dată la %1$d %2$s</item>
+        <item quantity="other">O dată la %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">La fiecare %1$d %2$s</item>
-        <item quantity="few">La fiecare %1$d %2$s</item>
-        <item quantity="other">La fiecare %1$d %2$s</item>
+        <item quantity="one">O dată la %1$d %2$s</item>
+        <item quantity="few">O dată la %1$d %2$s</item>
+        <item quantity="other">O dată la %1$d %2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%1$s minut</item>
@@ -809,13 +809,13 @@
         <item quantity="other">%1$s de minute</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%1$d/%2$d de caractere</item>
-        <item quantity="few">%1$d/%2$d de caractere</item>
+        <item quantity="one">%1$d/%2$d caracter</item>
+        <item quantity="few">%1$d/%2$d caractere</item>
         <item quantity="other">%1$d/%2$d de caractere</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%1$d/%2$d de caractere</item>
-        <item quantity="few">%1$d/%2$d de caractere</item>
+        <item quantity="one">%1$d/%2$d caracter</item>
+        <item quantity="few">%1$d/%2$d caractere</item>
         <item quantity="other">%1$d/%2$d de caractere</item>
     </plurals>
     <!--  STRING ARRAYS  -->

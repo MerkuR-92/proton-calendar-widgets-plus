@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="default_event_summary" comment="Event has no title">(제목 없음)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%2$s %1$s명</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
     <string name="default_user_email">(이메일 주소 없음)</string>
     <string name="default_user_display_name">(이름 없음)</string>
     <string name="toast_copied_to_clipboard">클립보드에 복사됨</string>
@@ -51,8 +51,8 @@
     <string name="agenda_no_events">이벤트 없음</string>
     <string name="agenda_loading_events">이벤트를 불러오는 중…</string>
     <string name="agenda_loading_events_error">이벤트 로딩 중 오류 발생</string>
-    <string name="agenda_header_date" comment="Tuesday 28">%1$s%2$d</string>
-    <string name="day_view_all_day_more">+ %1$d명 더</string>
+    <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
+    <string name="day_view_all_day_more">+ %1$d개 더</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">하루 종일</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -63,7 +63,7 @@
     <string name="event_alarm_label_before">%1$s 전에</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s 전에 이메일로</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s %2$s에</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s %2$s 에</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s %2$s에 이메일로</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s 전 %2$s에</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s 전 %2$s에 이메일로</string>
@@ -76,9 +76,9 @@
     <string name="event_recurrence_monthly">매월</string>
     <string name="event_recurrence_yearly">매년</string>
     <string name="event_recurrence_weekly_on_all_days">하루 종일</string>
-    <string name="event_recurrence_until" comment="Event happens regularly until a date">%1$s까지</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">%1$s 까지</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">%1$s까지 (%2$s)</string>
-    <string name="event_attendee_count" comment="Example: 5 participants">%2$s %1$d명</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">취소됨</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(비활성화됨)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(기본값)</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">참가자 추가</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">참가자 (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">나</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d명 더</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d개 더</string>
     <string name="event_text_switch_all_day">하루 종일</string>
     <string name="event_text_date_start">시작</string>
     <string name="event_text_date_end">끝</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">하루 전 %1$s에</string>
     <string name="event_alarm_all_day_3">1주 전 %1$s에</string>
     <string name="event_alarm_all_day_4">3주 전 %1$s에</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00">%1$s에</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">%1$s 에</string>
     <string name="event_alarm_action">전송됨</string>
     <string name="event_alarm_action_notification">알림</string>
     <string name="event_alarm_action_email">이메일</string>
@@ -222,8 +222,8 @@
     <string name="event_recurrence_custom_title">커스텀 빈도</string>
     <string name="event_recurrence_occurs_every">마다 반복</string>
     <string name="event_recurrence_occurs_on">반복하기</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d일마다</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s마다</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d일에</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s 에</string>
     <string name="event_recurrence_ends_on">종료</string>
     <string name="event_recurrence_ends_never">안 함</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">이 날에</string>
@@ -249,17 +249,17 @@
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: %1$s에 있는 이벤트에 초대합니다</string>
     <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: %1$s에 시작하는 이벤트에 초대합니다</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%1$s %2$s %3$s에 시작하는 이벤트에 초대합니다</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">%1$s에 있는 이벤트에 초대합니다</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">%1$s 에 있는 이벤트에 초대합니다</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">%1$s에 시작하는 이벤트에 초대합니다</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%1$s %2$s %3$s 에 시작하는 업데이트를 업데이트 합니다.</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">%1$s 의 이벤트를 업데이트 합니다</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">%1$s 에 시작하는 이벤트를 업데이트 합니다</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">%1$s에 있는 이벤트의 업데이트</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">%1$s에 시작하는 이벤트의 업데이트</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">%1$s %2$s %3$s에 시작하는 이벤트가 취소되었습니다</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">%1$s에 있는 이벤트가 취소되었습니다</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">%1$s에 시작하는 이벤트가 취소되었습니다</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s에 초대되었습니다\n시간: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s 이(가) 업데이트 되었습니다\n일시: %2$s</string>
-    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (하루 종일)</string>
+    <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (온종일)</string>
     <string name="event_send_invite_mail_body_all_day_multiple" comment="for full-day event, date of event start - date of event end">%1$s - %2$s</string>
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s %2$s %3$s - %4$s %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\n장소: %1$s</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">이벤트가 존재하지 않습니다</string>
     <string name="error_occurrence_does_not_exist">일정이 존재하지 않습니다</string>
     <string name="update_timezone_dialog_title">시간대 변경</string>
-    <string name="update_timezone_dialog_message">사용자의 시스템 시간대가 %1$s 로 변경되었습니다. 시간대를 업데이트하시겠습니까?</string>
+    <string name="update_timezone_dialog_message">시스템 시간대가 %1$s로 변경된 것 같습니다. 여기의 시간대도 변경하시겠습니까?</string>
     <string name="update_timezone_dialog_confirmation">업데이트</string>
     <string name="update_timezone_dialog_cancel">취소</string>
     <string name="contacts_permission_dialog_title">Proton Calendar의 사용자의 연락처에 접근하도록 허용하시겠어요?</string>
@@ -437,7 +437,7 @@
     <string name="notification_text_today_part_time">오늘 %1$s에</string>
     <string name="notification_text_tomorrow">내일</string>
     <string name="notification_text_tomorrow_part_time">내일 %1$s에</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s %2$s에</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s %2$s 에</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">제목</string>
     <string name="bug_report_hint_description">문제를 설명해 주시고 오류 메시지를 포함해 주십시오.</string>
@@ -745,19 +745,19 @@
         <item quantity="other">참가자</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="other">매 %1$d%2$s마다</item>
+        <item quantity="other">매 %1$d%2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="other">매 %1$d%2$s마다</item>
+        <item quantity="other">매 %1$d%2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="other">매 %1$d%2$s마다</item>
+        <item quantity="other">매 %1$d%2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="other">매 %1$d%2$s마다</item>
+        <item quantity="other">매 %1$d%2$s</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="other">%1$s 분</item>
+        <item quantity="other">%1$s분</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="other">%1$d/%2$d 글자</item>

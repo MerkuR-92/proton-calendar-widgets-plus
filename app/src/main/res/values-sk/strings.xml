@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Načítanie udalostí…</string>
     <string name="agenda_loading_events_error">Chyba pri načítaní udalostí</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ ešte %1$d</string>
+    <string name="day_view_all_day_more">+ %1$d ďalších</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Celý deň</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Pridať účastníkov</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Účastníci (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vy</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d ďalší</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d ďalších</string>
     <string name="event_text_switch_all_day">Celý deň</string>
     <string name="event_text_date_start">Začiatok</string>
     <string name="event_text_date_end">Koniec</string>
@@ -227,7 +227,7 @@
     <string name="event_recurrence_ends_on">Končí</string>
     <string name="event_recurrence_ends_never">nikdy</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">dňa</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">v %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">po</string>
     <string name="event_recurring_edit_this">Táto udalosť</string>
     <string name="event_recurring_edit_this_and_future">Táto a budúce udalosti</string>
@@ -246,11 +246,11 @@
     <string name="event_allow_contacts_cancel">Zamietnuť</string>
     <string name="event_allow_contacts_confirm">Povoliť</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Pozvanie na udalosť začínajúcu v %1$s o %2$s %3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Pozvanie na udalosť v %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Pozvanie na udalosť začínajúcu v %1$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Odp.: Pozvánka na udalosť dňa %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Odp.: Pozvánka na udalosť, ktorá sa začína %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Pozvanie na udalosť začínajúcu v %1$s o %2$s %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Pozvanie na udalosť v %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Pozvanie na udalosť začínajúcu v %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Pozvánka na udalosť dňa %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Pozvánka na udalosť, ktorá sa začína %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Aktualizácia udalosti začínajúcej v %1$s o %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aktualizácia udalosti v %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aktualizácia udalosti začínajúcej v %1$s</string>
@@ -687,7 +687,7 @@
         <item quantity="one">kalendár</item>
         <item quantity="few">kalendáre</item>
         <item quantity="many">kalendárov</item>
-        <item quantity="other">kalendáre</item>
+        <item quantity="other">kalendárov</item>
     </plurals>
     <plurals name="import_assistant_import_button">
         <item quantity="one">Importovať %1$d kalendár</item>
@@ -702,7 +702,7 @@
         <item quantity="other">%1$d prebiehajúcich importov</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d z %2$d vytvorený v %3$s</item>
+        <item quantity="one">%1$d z %2$d vytvorené v %3$s</item>
         <item quantity="few">%1$d z %2$d vytvorené v %3$s</item>
         <item quantity="many">%1$d z %2$d vytvorených v %3$s</item>
         <item quantity="other">%1$d z %2$d vytvorených v %3$s</item>
@@ -726,8 +726,8 @@
         <item quantity="other">Zlúčiť %1$d kalendárov v Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendára</item>
-        <item quantity="few">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendárov</item>
+        <item quantity="one">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendár</item>
+        <item quantity="few">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendáre</item>
         <item quantity="many">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendárov</item>
         <item quantity="other">Nie je možné vytvoriť nové kalendáre pre všetky importované kalendáre kvôli limitu kalendárov.\n • Zrušte výber najmenej %1$d kalendárov</item>
     </plurals>
@@ -747,7 +747,7 @@
         <item quantity="one">minúta</item>
         <item quantity="few">minúty</item>
         <item quantity="many">minút</item>
-        <item quantity="other">minúty</item>
+        <item quantity="other">minút</item>
     </plurals>
     <plurals name="plural_hour">
         <item quantity="one">hodina</item>
@@ -759,19 +759,19 @@
         <item quantity="one">deň</item>
         <item quantity="few">dni</item>
         <item quantity="many">dní</item>
-        <item quantity="other">dňa</item>
+        <item quantity="other">dní</item>
     </plurals>
     <plurals name="plural_week">
         <item quantity="one">týždeň</item>
         <item quantity="few">týždne</item>
         <item quantity="many">týždňov</item>
-        <item quantity="other">týždňa</item>
+        <item quantity="other">týždňov</item>
     </plurals>
     <plurals name="plural_month">
         <item quantity="one">mesiac</item>
         <item quantity="few">mesiace</item>
         <item quantity="many">mesiacov</item>
-        <item quantity="other">mesiaca</item>
+        <item quantity="other">mesiacov</item>
     </plurals>
     <plurals name="plural_year">
         <item quantity="one">rok</item>
@@ -834,14 +834,14 @@
         <item quantity="other">%1$s minút</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">%1$d/%2$d znaku</item>
-        <item quantity="few">%1$d/%2$d znakov</item>
+        <item quantity="one">%1$d/%2$d znak</item>
+        <item quantity="few">%1$d/%2$d znaky</item>
         <item quantity="many">%1$d/%2$d znakov</item>
         <item quantity="other">%1$d/%2$d znakov</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%1$d/%2$d znaku</item>
-        <item quantity="few">%1$d/%2$d znakov</item>
+        <item quantity="one">%1$d/%2$d znak</item>
+        <item quantity="few">%1$d/%2$d znaky</item>
         <item quantity="many">%1$d/%2$d znakov</item>
         <item quantity="other">%1$d/%2$d znakov</item>
     </plurals>

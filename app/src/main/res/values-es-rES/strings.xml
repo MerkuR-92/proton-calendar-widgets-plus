@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Cargando eventos…</string>
     <string name="agenda_loading_events_error">Error al cargar eventos</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">%1$d más</string>
+    <string name="day_view_all_day_more">+ %1$d más</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Todo el día</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -80,7 +80,7 @@
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">hasta el %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancelado</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s &lt;i&gt;(Desactivado)&lt;/i&gt;]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(Desactivado)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Por defecto)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d sí</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Añadir participantes</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participantes (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Tú</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+%1$d más</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d más</string>
     <string name="event_text_switch_all_day">Todo el día</string>
     <string name="event_text_date_start">Empieza</string>
     <string name="event_text_date_end">Termina</string>
@@ -223,7 +223,7 @@
     <string name="event_recurrence_occurs_every">Repetir cada</string>
     <string name="event_recurrence_occurs_on">Repetir el</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">el día %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">el %1$s</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">en el %1$s</string>
     <string name="event_recurrence_ends_on">Termina</string>
     <string name="event_recurrence_ends_never">nunca</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">el día</string>
@@ -252,7 +252,7 @@
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitación para un evento el %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitación para un evento que comienza el %1$s.</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualización para un evento que comienza el %1$s a las %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualización de un evento el %1$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualización de un evento para el %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Actualización para un evento que comienza el %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancelación de un evento que comienza el %1$s a las %2$s %3$s.</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancelación de un evento el %1$s</string>
@@ -276,25 +276,25 @@
     <string name="event_add_participants_dialog_cancel">Cancelar</string>
     <string name="event_remove_participants_dialog_title">Eliminar los participantes</string>
     <string name="event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes eliminados.</string>
-    <string name="recurring_event_remove_participants_dialog_description">Se enviará un correo electrónico de cancelación a los participantes eliminados para todos los eventos de esta serie.</string>
-    <string name="event_add_and_remove_participants_dialog_description">Se notificarán a los participantes añadidos y eliminados.</string>
+    <string name="recurring_event_remove_participants_dialog_description">Se enviará un correo de cancelación a los participantes eliminados para todos los eventos de esta serie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Se notificará a los participantes añadidos y eliminados.</string>
     <string name="recurring_event_add_and_remove_participants_dialog_description">Se notificará a los participantes añadidos y eliminados de todos los eventos de esta serie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s ha sido cancelado.</string>
     <string name="event_save_changes">Guardar los cambios</string>
-    <string name="event_update_add_participants_dialog_description">Se notificarán a los participantes existentes y añadidos.</string>
+    <string name="event_update_add_participants_dialog_description">Se notificará a los participantes existentes y añadidos.</string>
     <string name="recurring_event_update_add_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes existentes y añadidos.</string>
     <string name="event_update_remove_participants_dialog_description">Se notificará a los participantes existentes y eliminados.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Se notificarán a los participantes eliminados.</string>
-    <string name="recurring_event_update_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes existentes y eliminados.</string>
-    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificarán a los participantes eliminados.</string>
-    <string name="event_update_add_and_remove_participants_dialog_description">Se notificarán a los participantes existentes, añadidos y eliminados.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Se notificará a los participantes eliminados.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes existentes y eliminados.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes eliminados.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Se notificará a los participantes existentes, añadidos y eliminados.</string>
     <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualizarás todos los eventos de esta serie. Se notificará a los participantes existentes, añadidos y eliminados.</string>
     <string name="success_snack_email_update_recurring">Los participantes han sido notificados y todos los eventos han sido actualizados.</string>
     <string name="success_snack_email_update">Los participantes han sido notificados y el evento ha sido actualizado.</string>
     <string name="success_snack_add_attendees_recurring">La invitación ha sido enviada y los participantes han sido añadidos a todos los eventos.</string>
     <string name="success_snack_add_attendees">La invitación ha sido enviada y los participantes han sido añadidos.</string>
-    <string name="success_snack_remove_attendees_recurring">Se ha enviado la cancelación y se han eliminado los participantes de todos los eventos.</string>
-    <string name="success_snack_remove_attendees">Se ha enviado la cancelación y se han eliminado los participantes.</string>
+    <string name="success_snack_remove_attendees_recurring">Se ha enviado la cancelación y se ha eliminado a los participantes de todos los eventos.</string>
+    <string name="success_snack_remove_attendees">Se ha enviado la cancelación y se ha eliminado a los participantes.</string>
     <!-- NAVIGATION VIEW   -->
     <string name="nav_view_calendars">Mis calendarios</string>
     <string name="nav_view_subscribed_calendars">Calendarios suscritos</string>
@@ -609,7 +609,7 @@
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y fiable. Esto puede llevar unos segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nAñade los días festivos de cualquier país a tu calendario.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están libres u olvidarte de planificar una escapada de fin de semana largo.\n\nComo ya has llegado al límite de calendarios, para añadir un calendario de días festivos necesitarás eliminar un calendario existente primero.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Basta de programar reuniones cuando todos están fuera u olvidarte de planificar una escapada de fin de semana largo.\n\nComo ya has llegado al límite de calendarios, para añadir un calendario de días festivos necesitarás eliminar un calendario existente primero.</string>
     <string name="spotlight_dialog_color_per_event_title">Colores de eventos personalizados</string>
     <string name="spotlight_dialog_color_per_event_description">Personaliza el color de cada evento para:\n\n• Codificar por colores el calendario\n\n• Mejorar la organización diaria y la gestión del tiempo.\n\n• Definir prioridades y aumentar la eficiencia</string>
     <!-- Import -->
@@ -805,8 +805,8 @@
         <item>último</item>
         <item>penúltimo</item>
         <item>antepenúltimo</item>
-        <item>preantepenúltimo</item>
-        <item>quinto empezando por el final</item>
+        <item>cuarto al último</item>
+        <item>quinto al último</item>
     </string-array>
     <string-array name="app_themes">
         <item>Claro</item>

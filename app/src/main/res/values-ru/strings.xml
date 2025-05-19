@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Загрузка событий…</string>
     <string name="agenda_loading_events_error">Ошибка загрузки событий</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ ещё %1$d</string>
+    <string name="day_view_all_day_more">+ еще %1$d</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Весь день</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -299,7 +299,7 @@
     <string name="nav_view_calendars">Мои календари</string>
     <string name="nav_view_subscribed_calendars">Подписки на календари</string>
     <string name="nav_view_other_calendars">Другие календари</string>
-    <string name="nav_view_disabled_calendars">%1$s (Отключён)</string>
+    <string name="nav_view_disabled_calendars">%1$s (Отключен)</string>
     <string name="nav_view_not_synced_calendars">%1$s (Не синхронизирован)</string>
     <string name="nav_view_syncing_calendars">%1$s (Синхронизация)</string>
     <string name="nav_view_more">Больше</string>
@@ -735,12 +735,12 @@
         <item quantity="one">\u0020или\n • Объедините по крайней мере %1$d календарь с существующими в Proton календарями.</item>
         <item quantity="few">\u0020или\n • Объедините по крайней мере %1$d календаря с существующими в Proton календарями.</item>
         <item quantity="many">\u0020или\n • Объедините по крайней мере %1$d календарей с существующими в Proton календарями.</item>
-        <item quantity="other">\u0020или\n • Объедините по крайней мере %1$d календаря с существующими в Proton календарями.</item>
+        <item quantity="other">\u0020или\n • Объедините по крайней мере %1$d календарей с существующими в Proton календарями.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">секунда</item>
         <item quantity="few">секунды</item>
-        <item quantity="many">секунды</item>
+        <item quantity="many">секунд</item>
         <item quantity="other">секунд</item>
     </plurals>
     <plurals name="plural_minute">
@@ -810,7 +810,7 @@
         <item quantity="other">Каждые %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Каждая %1$d %2$s</item>
+        <item quantity="one">Каждый %1$d %2$s</item>
         <item quantity="few">Каждые %1$d %2$s</item>
         <item quantity="many">Каждые %1$d %2$s</item>
         <item quantity="other">Каждые %1$d %2$s</item>
@@ -840,8 +840,8 @@
         <item quantity="other">%1$d/%2$d символов</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">%1$d/%2$d символа</item>
-        <item quantity="few">%1$d/%2$d символов</item>
+        <item quantity="one">%1$d/%2$d символ</item>
+        <item quantity="few">%1$d/%2$d символа</item>
         <item quantity="many">%1$d/%2$d символов</item>
         <item quantity="other">%1$d/%2$d символов</item>
     </plurals>
