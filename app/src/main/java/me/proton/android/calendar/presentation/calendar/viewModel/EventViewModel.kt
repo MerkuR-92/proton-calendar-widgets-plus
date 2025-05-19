@@ -1283,17 +1283,6 @@ class EventViewModel @Inject constructor(
         return immutableOriginalEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
     }
 
-    private suspend fun isApiEventAnInvitation(): Boolean? {
-        // take the DB Event CalendarID, in case the calendar has just been edited
-        val dbEventCalendarId = dbEvent?.calendar?.id
-        return if (event.isSyncedWithApi() && dbEventCalendarId != null) {
-            val eventEntity = calendarsRepository.fetchEventById(userId, dbEventCalendarId, event.id).valueOrNullAndLogErrors(logger)?.event ?: return null
-            return eventEntity.attendees.isNotEmpty()
-        } else {
-            null
-        }
-    }
-
     suspend fun allowSendForCalendarAddress(): Boolean {
         val user =
             if (this::user.isInitialized) user

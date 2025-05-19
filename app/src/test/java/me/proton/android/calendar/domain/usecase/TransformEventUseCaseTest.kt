@@ -13,11 +13,11 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import me.proton.android.calendar.common.logger.TestsLogger
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -35,6 +35,8 @@ import me.proton.android.calendar.test.shared.mocks.calendarDisplay
 import me.proton.android.calendar.test.shared.mocks.userEmail
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.AddressId
 import me.proton.core.user.domain.entity.AddressType
@@ -54,6 +56,7 @@ internal class TransformEventUseCaseTest {
     private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase = mockk()
     private val cryptoContextMock: CryptoContext = mockk()
     private val userAddressManagerMock: UserAddressManager = mockk()
+    private val featureFlagManagerMock: FeatureFlagManager = mockk()
     private lateinit var database: AppDatabase
 
     @BeforeEach
@@ -88,6 +91,7 @@ internal class TransformEventUseCaseTest {
                 getMockedNonEncryptedCalendarEvents(),
                 getMockedNonEncryptedAttendeesEvents(),
                 getMockedAttendees(),
+                attendeesInfo = getMockedAttendees(),
                 null
             )
 
@@ -159,6 +163,20 @@ internal class TransformEventUseCaseTest {
                 )
             )
 
+            coEvery {
+                featureFlagManagerMock.getOrDefault(
+                    UserId("fkUserId"),
+                    CalendarFeatureFlag.RsvpCommentsAndroid.featureId,
+                    FeatureFlag.default(
+                        CalendarFeatureFlag.RsvpCommentsAndroid.featureId.id,
+                        CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+                    )
+                )
+            } returns FeatureFlag.default(
+                CalendarFeatureFlag.RsvpCommentsAndroid.featureId.id,
+                CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+            )
+
             val useCase = TransformEventUseCase(
                 json,
                 database,
@@ -168,11 +186,14 @@ internal class TransformEventUseCaseTest {
                 crypto,
                 iCal,
                 obtainPinnedKeysUseCase,
-                cryptoContextMock
+                cryptoContextMock,
+                featureFlagManagerMock
             )
             val event = useCase.execute(eventEntity)
             assertThat(event).isNotNull()
             assertThat(event?.iCalEvent).isNotNull()
+
+            // TODO after decrypton check if everything is the same for attendees info as well
             assertThat(event?.iCalEvent?.attendees.isNullOrEmpty()).isFalse()
             assertThat(event?.iCalEvent?.attendees?.size).isEqualTo(3)
 
@@ -186,6 +207,8 @@ internal class TransformEventUseCaseTest {
             assertThat(event.iCalEvent.attendees[1].participationStatus).isEqualTo(ParticipationStatus.DECLINED)
             assertThat(event.iCalEvent.attendees[2].email).isEqualTo("adamtst@protonmail.com")
             assertThat(event.iCalEvent.attendees[2].participationStatus).isEqualTo(ParticipationStatus.NEEDS_ACTION)
+
+            // TODO after decryption check if everything is the same for attendees info as well
 
             assertThat(event.verificationStatus).isEqualTo(Event.SignatureVerification.SIGNED_BUT_CANT_GET_KEYS)
 

@@ -496,7 +496,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 val organizer = event.iCalEvent.organizer
                 if (organizer != null) initOrganizerItem(organizer, organizerAttendee)
 
-                initAttendeeList(attendeeList, organizerAttendee)
+                initAttendeeList(attendeeList, organizerAttendee, event.attendeeComments, featureFlagViewModel.isRsvpCommentsEnabled())
 
                 lifecycleScope.launch {
                     val userAddresses = calendarViewModel.getUserAddresses() ?: return@launch
@@ -882,7 +882,6 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         resources.getString(R.string.event_attendee_organizer)
                 }
                 eventAttendeeOrganizerLayout.itemAttendeeInitials.text = getInitials(organizer.extractEmail() ?: "")
-
                 val organizerStatus = eventAttendeeOrganizerLayout.itemAttendeeStatus
                 if (organizerAttendee != null && organizerAttendee.participationStatus != null) {
                     initAttendeeStatus(organizerStatus, organizerAttendee.participationStatus, requireContext())
@@ -892,13 +891,18 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
     }
 
     private var attendeesListHeight: Int? = null
-    private fun initAttendeeList(attendeeList: MutableList<Attendee>, organizerAttendee: Attendee?) {
+    private fun initAttendeeList(
+        attendeeList: MutableList<Attendee>,
+        organizerAttendee: Attendee?,
+        attendeeComments: Map<String, Pair<Event.SignatureVerification, String?>>,
+        rsvpCommentsEnabled: Boolean
+    ) {
         lifecycleScope.launch {
             with(binding.sectionAttendees) {
                 val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
                 val attendeesLayoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
                 eventAttendeeList.layoutManager = attendeesLayoutManager
-                attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails)
+                attendeeListAdapter = AttendeeListAdapter(canonicalUserEmails, attendeeComments, rsvpCommentsEnabled)
                 (eventAttendeeList.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
                     false
                 eventAttendeeList.adapter = attendeeListAdapter

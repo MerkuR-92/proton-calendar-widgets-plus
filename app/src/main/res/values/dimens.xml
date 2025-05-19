@@ -56,6 +56,8 @@
     <dimen name="attendee_item_vertical_margin">14dp</dimen>
     <dimen name="attendee_item_vertical_margin_large">18dp</dimen>
 
+    <dimen name="attendee_comment_icon_margin_end">3dp</dimen>
+
     <dimen name="settings_calendar_badges_margin">6dp</dimen>
 
     <dimen name="material_dialog_inset_start">24dp</dimen>

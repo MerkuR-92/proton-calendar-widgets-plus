@@ -40,6 +40,7 @@ class FeatureFlagViewModel @Inject constructor(
     var splitViewVerticalScrollingFlag: LiveData<Boolean> = MutableLiveData()
     var zoomIntegrationAndroidFlag: LiveData<Boolean> = MutableLiveData()
     var fetchedEventsCacheAndroidFlag: LiveData<Boolean> = MutableLiveData()
+    var rsvpCommentsAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
@@ -95,6 +96,14 @@ class FeatureFlagViewModel @Inject constructor(
         ).map {
             it?.value ?: CalendarFeatureFlag.ZoomIntegrationAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
+
+        // RSVP comments feature flag, CALAND-2951
+        rsvpCommentsAndroidFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.RsvpCommentsAndroid.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+        }.asLiveData(Dispatchers.Default)
     }
 
     private suspend fun isFeatureEnabled(calendarFeatureFlag: CalendarFeatureFlag): Boolean {
@@ -146,6 +155,10 @@ class FeatureFlagViewModel @Inject constructor(
 
     fun isZoomIntegrationEnabled(): Boolean {
         return zoomIntegrationAndroidFlag.value ?: CalendarFeatureFlag.ZoomIntegrationAndroid.fallbackValue
+    }
+
+    fun isRsvpCommentsEnabled(): Boolean {
+        return rsvpCommentsAndroidFlag.value ?: CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
     }
 
     suspend fun isPlayStoreRatingEnabled(): Boolean {

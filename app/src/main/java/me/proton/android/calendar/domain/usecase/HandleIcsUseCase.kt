@@ -37,6 +37,8 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.util.kotlin.toBoolean
 import java.time.Instant
@@ -55,7 +57,8 @@ class HandleIcsUseCase @Inject constructor(
     private val handleDeleteUseCase: HandleDeleteUseCase,
     private val canonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val eventDecryptor: EventDecryptor,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val featureFlagManager: FeatureFlagManager,
 ) {
 
     suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
@@ -542,8 +545,23 @@ class HandleIcsUseCase @Inject constructor(
                 canonicalAttendeeEmail == existingEventCanonicalAttendeeEmails[it.extractEmail()]
             } == true) return IcsSurgeryUtils.HandleIcsResult.Error.ReplyPartyCrasher(existingEvent.id)
 
+
+        val isRsvpCommentsEnabled = featureFlagManager.getOrDefault(
+            userId,
+            CalendarFeatureFlag.RsvpCommentsAndroid.featureId,
+            FeatureFlag.default(
+                CalendarFeatureFlag.RsvpCommentsAndroid.featureId.id,
+                CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+            )
+        )
+
+        val eventAttendees = if (isRsvpCommentsEnabled.value && existingEventEntity.attendeesInfo?.isNotEmpty() == true) {
+            existingEventEntity.attendeesInfo
+        } else {
+            existingEventEntity.attendees
+        }
         // Get attendees part from existing event entity
-        val attendees = existingEventEntity.attendees.map {
+        val attendees = eventAttendees.map {
             json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
         }
 

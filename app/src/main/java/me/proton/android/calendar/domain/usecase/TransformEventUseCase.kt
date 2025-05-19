@@ -7,6 +7,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_TOKEN
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustIncomingAllDayEvent
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
@@ -24,6 +25,8 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.NotificationMigration
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.key.domain.decryptDataOrNull
 import me.proton.core.key.domain.decryptSessionKey
 import me.proton.core.key.domain.entity.key.PublicKey
@@ -46,7 +49,8 @@ class TransformEventUseCase @Inject constructor(
     private val crypto: Crypto,
     private val iCal: ICalUtilsImpl,
     private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase,
-    private val cryptoContext: CryptoContext
+    private val cryptoContext: CryptoContext,
+    private val featureFlagManager: FeatureFlagManager
 ) : UseCase { // TODO ADD TEST
 
     /**
@@ -191,11 +195,29 @@ class TransformEventUseCase @Inject constructor(
 
         // Cross reference unencrypted Attendees and encrypted AttendeesEvents data to update participation status
         var currentUserAttendeeId: String? = null
+        val attendeeComments = mutableMapOf<String, Pair<Event.SignatureVerification, String>>()
         if (!iCalendar.events.first().attendees.isNullOrEmpty()) {
             val canonicalUserEmails = userAddresses.map { canonicalizeProtonEmail(it.email, forceCanonicalization = true) }
-            val attendees = eventEntity.attendees.map {
+
+            val isRsvpCommentsEnabled = featureFlagManager.getOrDefault(
+                UserId(userId),
+                CalendarFeatureFlag.RsvpCommentsAndroid.featureId,
+                FeatureFlag.default(
+                    CalendarFeatureFlag.RsvpCommentsAndroid.featureId.id,
+                    CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+                )
+            )
+
+            val eventAttendees = if (isRsvpCommentsEnabled.value && eventEntity.attendeesInfo?.isNotEmpty() == true) {
+                eventEntity.attendeesInfo
+            } else {
+                eventEntity.attendees
+            }
+            // Get attendees part from existing event entity
+            val attendees = eventAttendees.map {
                 json.decodeFromJsonElement<Event.AttendeeStatusEvent>(it)
             }
+
             iCalendar.events.first().attendees.forEach { attendee ->
                 val attendeeToken = attendee.getParameter(X_PM_TOKEN) ?: generateXPmToken(
                     canonicalizeProtonEmail(attendee.extractEmail() ?: ""), // Do not force canonicalization here
@@ -207,6 +229,29 @@ class TransformEventUseCase @Inject constructor(
                     if (canonicalUserEmails.any { it == canonicalizeProtonEmail(attendee.extractEmail() ?: "", forceCanonicalization = true) }) currentUserAttendeeId =
                         attendeeStatusEvent.id
                     attendee.participationStatus = status
+                }
+                // decrypt and match comments to attendee emails
+                attendee.extractEmail()?.let { attendeeEmail ->
+                    val plaintextComment = attendeeStatusEvent?.comment?.let {
+                        decryptAttendeeComment(
+                            it,
+                            eventEntity,
+                            userId,
+                            attendeeEmail,
+                            userAddressForAddressKeyPacket,
+                            userAddresses,
+                            allowApiCall,
+                            calendarPrivateKeys,
+                            keyPassphrase
+                        )
+                    }
+                    plaintextComment?.takeIf { it.decryptionStatus == Event.DecryptionStatus.Success && it.plainText?.isNotBlank() == true }?.let {
+                        attendeeComments[attendeeEmail] = it.signatureVerification to (it.plainText ?: "")
+                    }
+
+                    Unit // prevent false positive error logs below
+                } ?: run {
+                    logger.e("TransformEventUseCase, attendee email is null when matching comments")
                 }
             }
         }
@@ -268,6 +313,7 @@ class TransformEventUseCase @Inject constructor(
             sharedEventId = eventEntity.sharedEventId,
             isProtonProtonInvite = eventEntity.isProtonProtonInvite?.toBoolean(),
             notifications = NotificationMigration(true, eventEntity.notifications?.mapNotNull { json.decodeFromJsonElement<NotificationEntity>(it).toNotification() }),
+            attendeeComments = attendeeComments,
             color = eventEntity.color
         )
 
@@ -398,6 +444,50 @@ class TransformEventUseCase @Inject constructor(
             ProcessResult(null, Event.DecryptionStatus.Failure.Generic, Event.SignatureVerification.FAILURE)
         }
 
+    }
+
+    private suspend fun decryptAttendeeComment(
+        comment: Event.AttendeeStatusEventComment,
+        eventEntity: EventEntity,
+        userId: String,
+        attendeeEmail: String,
+        userAddressForAddressKeyPacket: UserAddress?,
+        userAddresses: List<UserAddress>,
+        allowApiCall: Boolean,
+        calendarPrivateKeys: List<String>,
+        keyPassphrase: String
+    ): ProcessResult {
+
+        val attendeeEvent = Event.EventPart.Attendee(
+            comment.type,
+            comment.message,
+            null,
+            attendeeEmail
+        )
+
+        return if (eventEntity.addressKeyPacket != null) { // use Address Key with AddressKeyPacket
+            if (userAddressForAddressKeyPacket != null) {
+                getPlainText(
+                    eventEntity.addressKeyPacket,
+                    attendeeEvent,
+                    EncryptedWith.AddressKey(
+                        userAddressForAddressKeyPacket,
+                        cryptoContext,
+                        getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
+                    )
+                )
+            } else ProcessResult(null, Event.DecryptionStatus.Failure.NoAddressKey, Event.SignatureVerification.FAILURE)
+        } else { // use Calendar Key with SharedKeyPacket
+            getPlainText(
+                eventEntity.sharedKeyPacket,
+                attendeeEvent,
+                EncryptedWith.CalendarKey(
+                    calendarPrivateKeys,
+                    keyPassphrase,
+                    getPublicKeysForAuthor(UserId(userId), attendeeEvent, userAddresses, allowApiCall)
+                )
+            )
+        }
     }
 
 }

@@ -25,7 +25,8 @@ class SyncAlarmsUseCase @Inject constructor(
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val handleAlarmsUseCase: HandleAlarmsUseCase,
     private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
-    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase
+    private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase,
+    private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase,
 ): UseCase {
 
     companion object {
@@ -130,7 +131,7 @@ class SyncAlarmsUseCase @Inject constructor(
                         } else if (!calendarsRepository.hasEvent(alarmEntity.eventId, alarmEntity.calendarId)) {
                             logger.v("event ${alarmEntity.eventId} for alarm doesn't exist in DB")
                             // event doesn't exist locally, fetch and save it before inserting alarm
-                            when (val event = calendarsApi.getEvent(userId, alarmEntity.calendarId, alarmEntity.eventId)) {
+                            when (val event = fetchEventWithCommentsUseCase.execute(userId, alarmEntity.calendarId, alarmEntity.eventId)) {
                                 is ApiResponse.Success -> {
                                     logger.v("event ${alarmEntity.eventId} for alarm successfully fetched")
                                     calendarsRepository.persistEvents(event.data.event.toEventEntity())
