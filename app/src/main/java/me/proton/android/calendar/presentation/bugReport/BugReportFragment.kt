@@ -91,8 +91,9 @@ class BugReportFragment : BaseDialogFragment<FragmentBugReportBinding>(), KoinCo
                     val osVersion = "" + Build.VERSION.SDK_INT
                     val client = "AndroidCalendar"
                     val appVersionName = getString(
-                        R.string.nav_view_version_name,
-                        BuildConfig.VERSION_NAME
+                        R.string.nav_view_version_info,
+                        BuildConfig.VERSION_NAME,
+                        BuildConfig.VERSION_CODE
                     )
                     val title: String = binding.bugReportTitle.text.toString()
                     val description: String = binding.bugReportDescription.text.toString()

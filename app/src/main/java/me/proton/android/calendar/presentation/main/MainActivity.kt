@@ -452,8 +452,9 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         calendarViewModel.viewMode.value = mainViewModel.getLastViewMode()
 
         binding.navViewMainContent.navViewVersion.text = getString(
-            R.string.nav_view_version_name,
-            "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
+            R.string.nav_view_version_info,
+            BuildConfig.VERSION_NAME,
+            BuildConfig.VERSION_CODE
         )
 
         initDrawerHeader()
