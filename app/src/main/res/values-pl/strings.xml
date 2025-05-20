@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Ładowanie wydarzeń…</string>
     <string name="agenda_loading_events_error">Wystąpił błąd podczas ładowania wydarzeń</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+%1$d więcej</string>
+    <string name="day_view_all_day_more">+ %1$d więcej</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Cały dzień</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -69,7 +69,7 @@
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s wcześniej o godzinie %2$s przez wiadomość</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s w: %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s %2$d. dnia miesiąca</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s w %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s w: %2$s</string>
     <string name="event_recurrence_none">Nie powtarza się</string>
     <string name="event_recurrence_daily">Codziennie</string>
     <string name="event_recurrence_weekly">Co tydzień</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Dodaj uczestników</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Uczestnicy (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Ty</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+%1$d więcej</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d więcej</string>
     <string name="event_text_switch_all_day">Cały dzień</string>
     <string name="event_text_date_start">Data rozpoczęcia</string>
     <string name="event_text_date_end">Data zakończenia</string>
@@ -227,7 +227,7 @@
     <string name="event_recurrence_ends_on">Data zakończenia</string>
     <string name="event_recurrence_ends_never">nigdy</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">w dniu</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">do %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">w: %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">po</string>
     <string name="event_recurring_edit_this">To wydarzenie</string>
     <string name="event_recurring_edit_this_and_future">To i kolejne wydarzenia</string>
@@ -702,10 +702,10 @@
         <item quantity="other">%1$d trwających importów</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">Utworzone kalendarze na koncie %3$s: %1$d/%2$d</item>
-        <item quantity="few">Utworzone kalendarze na koncie %3$s: %1$d/%2$d</item>
-        <item quantity="many">Utworzone kalendarze na koncie %3$s: %1$d/%2$d</item>
-        <item quantity="other">Utworzone kalendarze na koncie %3$s: %1$d/%2$d</item>
+        <item quantity="one">Utworzone kalendarze na koncie %3$s: %1$d z %2$d</item>
+        <item quantity="few">Utworzone kalendarze na koncie %3$s: %1$d z %2$d</item>
+        <item quantity="many">Utworzone kalendarze na koncie %3$s: %1$d z %2$d</item>
+        <item quantity="other">Utworzone kalendarze na koncie %3$s: %1$d z %2$d</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
         <item quantity="one">Utwórz %1$d nowy kalendarz w Proton Calendar.</item>
@@ -726,10 +726,10 @@
         <item quantity="other">Scal %1$d kalendarzy w Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Z powodu limitu maksymalnej liczby kalendarzy, nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarz</item>
-        <item quantity="few">Z powodu limitu maksymalnej liczby kalendarzy, nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarze</item>
-        <item quantity="many">Z powodu limitu maksymalnej liczby kalendarzy, nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarzy</item>
-        <item quantity="other">Z powodu limitu maksymalnej liczby kalendarzy, nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarzy</item>
+        <item quantity="one">Z powodu limitu maksymalnej liczby kalendarzy nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarz</item>
+        <item quantity="few">Z powodu limitu maksymalnej liczby kalendarzy nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarze</item>
+        <item quantity="many">Z powodu limitu maksymalnej liczby kalendarzy nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarzy</item>
+        <item quantity="other">Z powodu limitu maksymalnej liczby kalendarzy nie możesz utworzyć nowych kalendarzy dla wszystkich zaimportowanych kalendarzy.\n • Odznacz co najmniej %1$d kalendarzy</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020lub\n • Scal co najmniej %1$d kalendarz z obecnymi kalendarzami Proton.</item>
@@ -747,13 +747,13 @@
         <item quantity="one">minuta</item>
         <item quantity="few">minuty</item>
         <item quantity="many">minut</item>
-        <item quantity="other">minuty</item>
+        <item quantity="other">minut</item>
     </plurals>
     <plurals name="plural_hour">
         <item quantity="one">godzina</item>
         <item quantity="few">godziny</item>
         <item quantity="many">godzin</item>
-        <item quantity="other">godziny</item>
+        <item quantity="other">godzin</item>
     </plurals>
     <plurals name="plural_day">
         <item quantity="one">dzień</item>
@@ -765,19 +765,19 @@
         <item quantity="one">tydzień</item>
         <item quantity="few">tygodnie</item>
         <item quantity="many">tygodni</item>
-        <item quantity="other">tygodnia</item>
+        <item quantity="other">tygodnie</item>
     </plurals>
     <plurals name="plural_month">
         <item quantity="one">miesiąc</item>
         <item quantity="few">miesiące</item>
         <item quantity="many">miesięcy</item>
-        <item quantity="other">miesiąca</item>
+        <item quantity="other">miesiące</item>
     </plurals>
     <plurals name="plural_year">
         <item quantity="one">rok</item>
         <item quantity="few">lata</item>
         <item quantity="many">lat</item>
-        <item quantity="other">roku</item>
+        <item quantity="other">lat</item>
     </plurals>
     <plurals name="plural_recurrence_count">
         <item quantity="one">1 raz</item>
@@ -786,14 +786,14 @@
         <item quantity="other">razy</item>
     </plurals>
     <plurals name="plural_occurrence">
-        <item quantity="one">powtórzeniu</item>
-        <item quantity="few">powtórzeniach</item>
-        <item quantity="many">powtórzeniach</item>
-        <item quantity="other">powtórzeniach</item>
+        <item quantity="one">powtórzenie</item>
+        <item quantity="few">powtórzenia</item>
+        <item quantity="many">powtórzeń</item>
+        <item quantity="other">powtórzeń</item>
     </plurals>
     <plurals name="plural_time" comment="Ex: Ends after 1 time. Ends after 2 times.">
         <item quantity="one">raz</item>
-        <item quantity="few"> razy</item>
+        <item quantity="few">razy</item>
         <item quantity="many">razy</item>
         <item quantity="other">razy</item>
     </plurals>
@@ -804,25 +804,25 @@
         <item quantity="other">uczestników</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Codziennie</item>
+        <item quantity="one">Co %1$d %2$s</item>
         <item quantity="few">Co %1$d %2$s</item>
         <item quantity="many">Co %1$d %2$s</item>
         <item quantity="other">Co %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Co %2$s</item>
+        <item quantity="one">Co %1$d %2$s</item>
         <item quantity="few">Co %1$d %2$s</item>
         <item quantity="many">Co %1$d %2$s</item>
         <item quantity="other">Co %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Co %2$s</item>
+        <item quantity="one">Co %1$d %2$s</item>
         <item quantity="few">Co %1$d %2$s</item>
         <item quantity="many">Co %1$d %2$s</item>
         <item quantity="other">Co %1$d %2$s</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Co %2$s</item>
+        <item quantity="one">Co %1$d %2$s</item>
         <item quantity="few">Co %1$d %2$s</item>
         <item quantity="many">Co %1$d %2$s</item>
         <item quantity="other">Co %1$d %2$s</item>
@@ -831,7 +831,7 @@
         <item quantity="one">%1$s minuta</item>
         <item quantity="few">%1$s minuty</item>
         <item quantity="many">%1$s minut</item>
-        <item quantity="other">%1$s minuty</item>
+        <item quantity="other">%1$s minut</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="one">%1$d/%2$d znak</item>

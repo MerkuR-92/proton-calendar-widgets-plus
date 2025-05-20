@@ -63,20 +63,20 @@
     <string name="event_alarm_label_before">%1$s abans</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s abans per correu</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s, %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a les %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s i per correu</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s abans, %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s i per correu</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s els %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el dia %2$d</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s el %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s els %2$s</string>
     <string name="event_recurrence_none">No es repeteix</string>
     <string name="event_recurrence_daily">Cada dia</string>
     <string name="event_recurrence_weekly">Cada setmana</string>
     <string name="event_recurrence_monthly">Cada mes</string>
     <string name="event_recurrence_yearly">Cada any</string>
     <string name="event_recurrence_weekly_on_all_days">tots els dies</string>
-    <string name="event_recurrence_until" comment="Event happens regularly until a date">fins el %1$s</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">fins al %1$s</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">fins el %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Cancel·lat</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Afegeix participants</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vós</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">i %1$d més</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d més</string>
     <string name="event_text_switch_all_day">Tot el dia</string>
     <string name="event_text_date_start">Inici</string>
     <string name="event_text_date_end">Final</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
     <string name="update_timezone_dialog_title">Fus horari canviat</string>
-    <string name="update_timezone_dialog_message">Sembla que el fus horari del vostre sistema ha canviat a $%1$s. Voleu actualitzar la vostra configuració de fus horari?</string>
+    <string name="update_timezone_dialog_message">Sembla que la zona horària del sistema ha canviat a %1$s. Voleu actualitzar la preferència de zona horària?</string>
     <string name="update_timezone_dialog_confirmation">Actualitza</string>
     <string name="update_timezone_dialog_cancel">Cancel·la</string>
     <string name="contacts_permission_dialog_title">Voleu permetre a Proton Calendar accedir als vostres contactes?</string>
@@ -437,7 +437,7 @@
     <string name="notification_text_today_part_time">Avui, %1$s</string>
     <string name="notification_text_tomorrow">Demà</string>
     <string name="notification_text_tomorrow_part_time">Demà, %1$s</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s, %2$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s a les %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Assumpte</string>
     <string name="bug_report_hint_description">Descriviu el problema i incloeu qualsevol missatge d\'error.</string>
@@ -700,24 +700,24 @@
         <item quantity="other">S\'han creat %1$d de %2$d a %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="one">Crea %1$d calendari a Proton Calendar.</item>
-        <item quantity="other">Crea %1$d calendaris a Proton Calendar.</item>
+        <item quantity="one">Crea %1$d calendari al Proton Calendar.</item>
+        <item quantity="other">Crea %1$d calendaris al Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
         <item quantity="one">Importa %1$d de %2$d calendari des de</item>
         <item quantity="other">Importa %1$d de %2$d calendaris des de</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="one">Combina %1$d calendari a Proton Calendar.</item>
-        <item quantity="other">Combina %1$d calendaris a Proton Calendar.</item>
+        <item quantity="one">Fusiona %1$d calendari al Proton Calendar.</item>
+        <item quantity="other">Combina %1$d calendaris al Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">No es poden crear calendaris nous per a tots els calendaris importats a causa del límit de calendaris.\n • Anul·leu la selecció d\'almenys %1$d calendari</item>
-        <item quantity="other">No es poden crear calendaris nous per a tots els calendaris importats a causa del límit de calendaris.\n • Anul·leu la selecció d\'almenys %1$d calendaris</item>
+        <item quantity="one">No es poden crear calendaris nous per a tots els calendaris importats a causa del límit de calendaris.\n • Desseleccioneu almenys %1$d calendari</item>
+        <item quantity="other">No es poden crear calendaris nous per a tots els calendaris importats a causa del límit de calendaris.\n • Desseleccioneu almenys %1$d calendaris</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="one">\u0020o\n • Combineu almenys %1$d calendari importat amb els vostres calendaris Proton existents.</item>
-        <item quantity="other">\u0020o\n • Combineu almenys %1$d calendaris importats amb els vostres calendaris Proton existents.</item>
+        <item quantity="one">\u0020o\n • Combineu almenys %1$d calendari importat amb els calendaris Proton existents.</item>
+        <item quantity="other">\u0020o\n • Combineu almenys %1$d calendaris importats amb els calendaris Proton existents.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="one">segon</item>
@@ -749,7 +749,7 @@
     </plurals>
     <plurals name="plural_recurrence_count">
         <item quantity="one">una vegada</item>
-        <item quantity="other">vegades</item>
+        <item quantity="other">varies vegades</item>
     </plurals>
     <plurals name="plural_occurrence">
         <item quantity="one">ocurrència</item>

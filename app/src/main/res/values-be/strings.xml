@@ -726,10 +726,10 @@
         <item quantity="other">Аб\'яднаць %1$d календароў у Proton Calendar.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календара</item>
-        <item quantity="few">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календароў</item>
-        <item quantity="many">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календароў</item>
-        <item quantity="other">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Здыміце выбар прынамсі з %1$d календароў</item>
+        <item quantity="one">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Зніміце выбар прынамсі з %1$d календара</item>
+        <item quantity="few">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Зніміце выбар прынамсі з %1$d календароў</item>
+        <item quantity="many">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Зніміце выбар прынамсі з %1$d календароў</item>
+        <item quantity="other">Немагчыма стварыць новыя календары для ўсіх імпартаваных календароў па прычыне абмежавання календара.\n • Зніміце выбар прынамсі з %1$d календароў</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020або\n • Аб\'яднайце прынамсі %1$d каляндар з існуючымі календарамі Proton.</item>

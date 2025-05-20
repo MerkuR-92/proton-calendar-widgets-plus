@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">A carregar os eventos…</string>
     <string name="agenda_loading_events_error">Erro ao carregar os eventos</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d outros</string>
+    <string name="day_view_all_day_more">+ %1$d mais</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Dia inteiro</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -63,7 +63,7 @@
     <string name="event_alarm_label_before">%1$s antes</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s antes por mensagem</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s ás %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s às %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s às %2$s por mensagem</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s antes às %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s antes às %2$s por mensagem</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Adicionar participantes</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participantes (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Você</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">mais %1$d outros</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d mais</string>
     <string name="event_text_switch_all_day">Dia inteiro</string>
     <string name="event_text_date_start">Início</string>
     <string name="event_text_date_end">Fim</string>
@@ -223,7 +223,7 @@
     <string name="event_recurrence_occurs_every">Repete a cada</string>
     <string name="event_recurrence_occurs_on">Repete a</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">no dia %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">, %1$s</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">no dia %1$s</string>
     <string name="event_recurrence_ends_on">Termina</string>
     <string name="event_recurrence_ends_never">nunca</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">no dia</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">O evento não existe</string>
     <string name="error_occurrence_does_not_exist">A ocorrência não existe</string>
     <string name="update_timezone_dialog_title">Fuso horário alterado</string>
-    <string name="update_timezone_dialog_message">O fuso horário do sistema parece ter mudado para %1$s. Deseja actualizar a preferência de fuso horário?</string>
+    <string name="update_timezone_dialog_message">O fuso horário do sistema parece ter mudado para %1$s. Deseja atualizar a preferência de fuso horário?</string>
     <string name="update_timezone_dialog_confirmation">Actualizar</string>
     <string name="update_timezone_dialog_cancel">Cancelar</string>
     <string name="contacts_permission_dialog_title">Permite que o Proton Calendar aceda aos seus contactos?</string>
@@ -437,7 +437,7 @@
     <string name="notification_text_today_part_time">Hoje às %1$s</string>
     <string name="notification_text_tomorrow">Amanhã</string>
     <string name="notification_text_tomorrow_part_time">Amanhã ás %1$s</string>
-    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s ás %2$s</string>
+    <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s às %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Assunto</string>
     <string name="bug_report_hint_description">Descreva o problema e inclua quaisquer mensagens de erro.</string>
@@ -785,11 +785,11 @@
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
         <item quantity="one">%1$d/%2$d caráter</item>
-        <item quantity="other">%1$d/%2$d carateres</item>
+        <item quantity="other">%1$d/%2$d caracteres</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
         <item quantity="one">%1$d/%2$d caráter</item>
-        <item quantity="other">%1$d/%2$d carateres</item>
+        <item quantity="other">%1$d/%2$d caracteres</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

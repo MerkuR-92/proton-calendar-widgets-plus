@@ -20,9 +20,9 @@
     <string name="dialog_button_update">Güncelle</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu etkinliği silmek ister misiniz?</string>
-    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanım dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
+    <string name="dialog_description_delete_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer">Etkinlik katılımcılarına bir iptal e-postası gönderilecek. Bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
-    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz kullanım dışı bırakılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
+    <string name="dialog_description_delete_recurring_event_as_organizer_disabled">Adresiniz kullanımdan kaldırılmış. Etkinlik katılımcılarına bir iptal e-postası gönderilemeyecek. Yine de bu dizideki tüm etkinlikleri silmek ister misiniz?</string>
     <!-- Delete as an attendee -->
     <string name="dialog_description_delete_single_event_as_attendee">Bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilecek. Bu etkinliği silmek ister misiniz?</string>
     <string name="dialog_description_delete_single_event_as_attendee_disabled">Davet edilen adresten e-posta gönderemeyeceğiniz için bu etkinliğin düzenleyicisine daveti reddettiğiniz bildirilemeyecek. Yine de bu etkinliği silmek ister misiniz?</string>
@@ -69,18 +69,18 @@
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s önce %2$s saatinde e-posta ile</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s her %2$s günü</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s her %2$d günü</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s %2$s zamanında</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s her %2$s günü</string>
     <string name="event_recurrence_none">Yinelenmiyor</string>
     <string name="event_recurrence_daily">Günlük</string>
     <string name="event_recurrence_weekly">Haftalık</string>
     <string name="event_recurrence_monthly">Aylık</string>
     <string name="event_recurrence_yearly">Yıllık</string>
     <string name="event_recurrence_weekly_on_all_days">tüm günler</string>
-    <string name="event_recurrence_until" comment="Event happens regularly until a date">%1$s zamanına kadar</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">%1$s tarihine kadar</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">%1$s (%2$s) zamanına kadar</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">İptal edildi</string>
-    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(kullanım dışı)</i>]]></string>
+    <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(kullanımdan kaldırılmış)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Varsayılan)</string>
     <string name="event_attendee_status_separator">%1$s, %2$s</string>
     <string name="event_attendee_yes" comment="How many attendees answered yes">%1$d evet</string>
@@ -222,12 +222,12 @@
     <string name="event_recurrence_custom_title">Özel yinelenme</string>
     <string name="event_recurrence_occurs_every">Yinelenme sıklığı</string>
     <string name="event_recurrence_occurs_on">Yinelenme tarihi</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d. gününde</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s tarihinde</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">%1$d. günde</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">%1$s gününde</string>
     <string name="event_recurrence_ends_on">Bitiş</string>
     <string name="event_recurrence_ends_never">yok</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">şu günde</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s tarihinde</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">%1$s günlerinde</string>
     <string name="event_recurrence_ends_after_count_prefix">şundan sonra</string>
     <string name="event_recurring_edit_this">Bu etkinlik</string>
     <string name="event_recurring_edit_this_and_future">Bu ve gelecekteki etkinlikler</string>
@@ -299,7 +299,7 @@
     <string name="nav_view_calendars">Takvimlerim</string>
     <string name="nav_view_subscribed_calendars">Abone olunmuş takvimler</string>
     <string name="nav_view_other_calendars">Diğer takvimler</string>
-    <string name="nav_view_disabled_calendars">%1$s (kullanım dışı)</string>
+    <string name="nav_view_disabled_calendars">%1$s (kullanımdan kaldırılmış)</string>
     <string name="nav_view_not_synced_calendars">%1$s (eşitlenmemiş)</string>
     <string name="nav_view_syncing_calendars">%1$s (eşitleniyor)</string>
     <string name="nav_view_more">Diğer</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">Etkinlik bulunamadı</string>
     <string name="error_occurrence_does_not_exist">Yinelenme bulunamadı</string>
     <string name="update_timezone_dialog_title">Saat dilimi değişti</string>
-    <string name="update_timezone_dialog_message">Sistem saat diliminiz $%1$s olarak değiştirilmiş gibi görünüyor. Saat diliminizi güncellemek ister misiniz?</string>
+    <string name="update_timezone_dialog_message">Sistem saat diliminiz %1$s olarak değiştirilmiş gibi görünüyor. Saat diliminizi güncellemek ister misiniz?</string>
     <string name="update_timezone_dialog_confirmation">Güncelle</string>
     <string name="update_timezone_dialog_cancel">İptal</string>
     <string name="contacts_permission_dialog_title">Proton Calendar kişilerinize erişebilsin mi?</string>
@@ -712,8 +712,8 @@
         <item quantity="other">Proton Calendar içindeki %1$d takvimi birleştir.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
-        <item quantity="one">Takvim sınırı nedeniyle içe aktarılan tüm takvimler için yeni takvimler eklenemiyor.\n • En az %1$d takvimin seçimini kaldırın</item>
-        <item quantity="other">Takvim sınırı nedeniyle içe aktarılan tüm takvimler için yeni takvimler eklenemiyor.\n • En az %1$d takvimin seçimini kaldırın</item>
+        <item quantity="one">Takvim sayısı sınırı nedeniyle içe aktarılan tüm takvimler için yeni takvimler eklenemiyor.\n • En az %1$d takvimin seçimini kaldırın</item>
+        <item quantity="other">Takvim sayısı sınırı nedeniyle içe aktarılan tüm takvimler için yeni takvimler eklenemiyor.\n • En az %1$d takvimin seçimini kaldırın</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
         <item quantity="one">\u0020ya da\n • En az %1$d takvimi var olan Proton takvimleriyle birleştirin.</item>
@@ -764,20 +764,20 @@
         <item quantity="other">katılımcı</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
-        <item quantity="one">Her %1$d %2$s</item>
-        <item quantity="other">Her %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s bir</item>
+        <item quantity="other">%1$d %2$s bir</item>
     </plurals>
     <plurals name="event_recurrence_every_some_week" comment="Example: Every 1 week / Every 2 weeks">
-        <item quantity="one">Her %1$d %2$s</item>
-        <item quantity="other">Her %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s bir</item>
+        <item quantity="other">%1$d %2$s bir</item>
     </plurals>
     <plurals name="event_recurrence_every_some_month" comment="Example: Every 1 month / Every 2 months">
-        <item quantity="one">Her %1$d %2$s</item>
-        <item quantity="other">Her %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s bir</item>
+        <item quantity="other">%1$d %2$s bir</item>
     </plurals>
     <plurals name="event_recurrence_every_some_year" comment="Example: Every 1 year / Every 2 years">
-        <item quantity="one">Her %1$d %2$s</item>
-        <item quantity="other">Her %1$d %2$s</item>
+        <item quantity="one">%1$d %2$s bir</item>
+        <item quantity="other">%1$d %2$s bir</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
         <item quantity="one">%1$s dakika</item>

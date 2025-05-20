@@ -222,12 +222,12 @@
     <string name="event_recurrence_custom_title">Aangepaste frequentie</string>
     <string name="event_recurrence_occurs_every">Herhaalt elke</string>
     <string name="event_recurrence_occurs_on">Herhaalt op</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">op de dag %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">op %1$s</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">op dag %1$d</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">op de %1$s</string>
     <string name="event_recurrence_ends_on">Eindigt</string>
     <string name="event_recurrence_ends_never">nooit</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">op de dag</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">van %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">op %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">na</string>
     <string name="event_recurring_edit_this">Deze afspraak</string>
     <string name="event_recurring_edit_this_and_future">Deze en toekomstige afspraken</string>
@@ -722,7 +722,7 @@ Deselecteer minstens %1$d agenda\'s</item>
         <item quantity="other">\u0020of\n • Tenminste %1$d agenda\'s samenvoegen met bestaande Proton agenda\'s.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">seconde</item>
+        <item quantity="one">tweede</item>
         <item quantity="other">seconden</item>
     </plurals>
     <plurals name="plural_minute">

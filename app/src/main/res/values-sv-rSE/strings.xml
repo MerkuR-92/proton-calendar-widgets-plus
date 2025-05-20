@@ -130,8 +130,8 @@
     <string name="event_send_prefs_public_keys_invalid">offentliga nycklar är ogiltiga</string>
     <string name="event_send_prefs_trusted_keys_signature_invalid">kontaktsignatur ogiltig</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
-    <string name="join_zoom_meeting_action">Gå med i Zoommöte</string>
-    <string name="zoom_meeting_title">Zoommöte</string>
+    <string name="join_zoom_meeting_action">Gå med i Zoom-möte</string>
+    <string name="zoom_meeting_title">Zoom-möte</string>
     <string name="zoom_meeting_id">ID: %1$s</string>
     <string name="zoom_meeting_password">Lösenord: %1$s</string>
     <string name="zoom_meeting_more_details">Mer detaljer</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Lägg till deltagare</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Deltagare (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Du</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d fler</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d till</string>
     <string name="event_text_switch_all_day">Heldag</string>
     <string name="event_text_date_start">Start</string>
     <string name="event_text_date_end">Slut</string>
@@ -227,7 +227,7 @@
     <string name="event_recurrence_ends_on">Slutar</string>
     <string name="event_recurrence_ends_never">aldrig</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">på dag</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">den %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">på %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">efter</string>
     <string name="event_recurring_edit_this">Denna händelse</string>
     <string name="event_recurring_edit_this_and_future">Denna och kommande händelser</string>
@@ -252,8 +252,8 @@
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Inbjudan till en händelse den %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Inbjudan för en händelse som börjar den %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Uppdatering för en händelse som börjar den %1$s kl. %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Uppdatering av en händelse på %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Uppdatering av en händelse som börjar på %1$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Uppdatering av en händelse den %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Uppdatering av en händelse som börjar den %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Avbokning av en händelse som börjar %1$s kl. %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Avbokning av en händelse den %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Avbokning av en händelse som börjar den %1$s</string>
@@ -336,7 +336,7 @@
     <string name="snack_update_event_error_failed_mail">Uppdatering misslyckades</string>
     <string name="snack_lost_zoom_access">Anslut till Zoom för att redigera denna händelse.</string>
     <string name="snack_lost_zoom_access_acion">Anslut</string>
-    <string name="snack_zoom_meeting_does_not_exist">Detta Zoommöte has kansellerats. Ta bort länken för att redigera denna händelse.</string>
+    <string name="snack_zoom_meeting_does_not_exist">Den här Zoom-sessionen har ställts in. Ta bort länken för att redigera detta evenemang.</string>
     <string name="snack_event_updated_error">Fel vid uppdatering av händelse</string>
     <string name="snack_event_created">Händelse skapad</string>
     <string name="snack_event_created_failed_mail">Händelse skapad men inbjudan misslyckades att skickas</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">Händelsen finns inte</string>
     <string name="error_occurrence_does_not_exist">Förekomsten finns inte</string>
     <string name="update_timezone_dialog_title">Tidszon ändrad</string>
-    <string name="update_timezone_dialog_message">Din systemtidszon verkar ha ändrats till %1$s. Vill du uppdatera din tidszons preferens?</string>
+    <string name="update_timezone_dialog_message">Din systemtidszon verkar ha ändrats till %1$s. Vill du uppdatera dina inställningar för tidszon?</string>
     <string name="update_timezone_dialog_confirmation">Uppdatera</string>
     <string name="update_timezone_dialog_cancel">Avbryt</string>
     <string name="contacts_permission_dialog_title">Tillåt Proton Calendar att komma åt dina kontakter?</string>

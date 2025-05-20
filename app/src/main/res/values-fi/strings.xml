@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="default_event_summary" comment="Event has no title">(ei nimeä)</string>
-    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s</string>
+    <string name="multiple_days_event_summary" comment="We display the start time of the event as prefix, example: 16:00 Summary">%1$s %2$s.</string>
     <string name="default_user_email">(ei sähköpostiosoitetta)</string>
     <string name="default_user_display_name">(ei nimeä)</string>
     <string name="toast_copied_to_clipboard">Kopioitu leikepöydälle</string>
@@ -17,7 +17,7 @@
     <string name="dialog_button_close">Sulje</string>
     <string name="dialog_button_remove">Poista</string>
     <string name="dialog_button_download">Lataa</string>
-    <string name="dialog_button_update">Muuta</string>
+    <string name="dialog_button_update">Päivitä</string>
     <!-- Delete as an organizer -->
     <string name="dialog_description_delete_event_as_organizer">Tapahtuman osallistujille lähetetään perumisilmoitus sähköpostitse. Haluatko poistaa tapahtuman?</string>
     <string name="dialog_description_delete_event_as_organizer_disabled">Osoitteesi on poistettu käytöstä, eikä osallistujille sen vuoksi voida lähettää peruutusviestiä. Haluatko silti poistaa tapahtuman?</string>
@@ -78,7 +78,7 @@
     <string name="event_recurrence_weekly_on_all_days">joka päivä</string>
     <string name="event_recurrence_until" comment="Event happens regularly until a date">päättyen %1$s</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">päättyen %1$s (%2$s)</string>
-    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
+    <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s.</string>
     <string name="event_status_canceled">Peruttu</string>
     <string name="event_calendar_disabled" comment="Example: My Calendar (Disabled)"><![CDATA[%1$s <i>(ei käytössä)</i>]]></string>
     <string name="event_default_color" comment="Label for the default color. Example: Blue (Default)">(Oletus)</string>
@@ -163,7 +163,7 @@
     <string name="change_calendar_recurring_disclaimer">Toistuvan tapahtuman kalenteria ei ole vielä mahdollista vaihtaa.</string>
     <string name="update_event">Päivitä tapahtuma</string>
     <string name="update_invite_send_email">Tapahtuman osallistujille lähetetään päivitetty kutsu.</string>
-    <string name="update_recurring_event">Muuta toistuvaa tapahtumaa</string>
+    <string name="update_recurring_event">Päivitä toistuva tapahtuma</string>
     <string name="update_recurring_all_events">Haluatko päivittää ketjun kaikki tapahtumat?</string>
     <string name="update_recurring_invite_send_email">Päivität ketjun kaikki tapahtumat. Kaikille osallistujille lähetetään päivitetty kutsu.</string>
     <!-- SEARCH -->
@@ -342,7 +342,7 @@
     <string name="snack_event_created_failed_mail">Tapahtuma luotiin, mutta kutsun lähetys epäonnistui</string>
     <string name="snack_event_created_error">Virhe luotaessa tapahtumaa</string>
     <string name="snack_event_opening_edit_error">Virhe avattaessa tapahtuman muokkausta</string>
-    <string name="snack_event_recurring_invitation_only_supported_on_web_message">This recurring event can only be deleted in the Calendar web app.</string>
+    <string name="snack_event_recurring_invitation_only_supported_on_web_message">Tämän toistuvan tapahtuman voi poistaa vain Kalenterin verkkosovelluksessa.</string>
     <string name="snack_event_edit_with_attendees_error">Osallistujia sisältävien tapahtumien muokkausta ei vielä tueta</string>
     <string name="snack_event_edit_calendar_with_attendees_error">Osallistujia ei ole mahdollista lisätä ja kalenteria vaihtaa samaan aikaan</string>
     <string name="snack_event_init_error">Virhe alustettaessa uutta tapahtumaa</string>
@@ -415,7 +415,7 @@
     <string name="update_timezone_dialog_message">Järjestelmäsi aikavyöhykkeeksi näyttää vaihtuneen %1$s. Haluatko päivittää aikavyöhykeasetuksesi?</string>
     <string name="update_timezone_dialog_confirmation">Päivitä</string>
     <string name="update_timezone_dialog_cancel">Peru</string>
-    <string name="contacts_permission_dialog_title">Saako Proton Calendar käyttää yhteystietoja?</string>
+    <string name="contacts_permission_dialog_title">Sallitaanko Proton Calendarin käyttää yhteystietoja?</string>
     <string name="contacts_permission_dialog_message">Proton Calendar tarvitsee laitteesi yhteystietojen käyttöoikeuden helpottaakseen niiden lisäämistä tapahtumiin.</string>
     <string name="contacts_permission_dialog_allow">Kyllä</string>
     <string name="contacts_permission_dialog_open_settings">Avaa Asetukset</string>
@@ -647,7 +647,7 @@
     <string name="import_assistant_new_import">Uusi tuonti</string>
     <string name="import_assistant_previous_import">Edelliset tuonnit</string>
     <string name="import_assistant_report_details" comment="Ex: 1010.73 KB • May 28, 2022 6:36 PM">%1$s • %2$s</string>
-    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s</string>
+    <string name="import_assistant_report_details_date_time" comment="Ex: May 28, 2022 6:36 PM">%1$s %2$s.</string>
     <string name="import_assistant_status_queued" comment="Context: The import has been started">Aloitettu</string>
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">Käynnissä</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Valmis</string>
@@ -720,7 +720,7 @@
         <item quantity="other">\u0020tai\n • Yhdistä ainakin %1$d kalenteria olemassa oleviin Proton-kalentereihin.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">sekunti</item>
+        <item quantity="one">toisena</item>
         <item quantity="other">sekuntia</item>
     </plurals>
     <plurals name="plural_minute">
@@ -732,15 +732,15 @@
         <item quantity="other">tuntia</item>
     </plurals>
     <plurals name="plural_day">
-        <item quantity="one">päivän</item>
+        <item quantity="one">päivä</item>
         <item quantity="other">päivän</item>
     </plurals>
     <plurals name="plural_week">
-        <item quantity="one">viikon</item>
+        <item quantity="one">viikko</item>
         <item quantity="other">viikon</item>
     </plurals>
     <plurals name="plural_month">
-        <item quantity="one">kuukauden</item>
+        <item quantity="one">kuukausi</item>
         <item quantity="other">kuukauden</item>
     </plurals>
     <plurals name="plural_year">
@@ -761,7 +761,7 @@
     </plurals>
     <plurals name="plural_participant_uppercase">
         <item quantity="one">osallistuja</item>
-        <item quantity="other">osallistujaa</item>
+        <item quantity="other">osallistujat</item>
     </plurals>
     <plurals name="event_recurrence_every_some_day" comment="Example: Every 1 day / Every 2 days">
         <item quantity="one">%1$d %2$s välein</item>
@@ -780,7 +780,7 @@
         <item quantity="other">%1$d %2$s välein</item>
     </plurals>
     <plurals name="calendar_form_default_event_duration_value" comment="Should always be greater than 1 as options are 30, 60, 90, 120">
-        <item quantity="one">%1$s minuutti</item>
+        <item quantity="one">%1$s minuuttia</item>
         <item quantity="other">%1$s minuuttia</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">

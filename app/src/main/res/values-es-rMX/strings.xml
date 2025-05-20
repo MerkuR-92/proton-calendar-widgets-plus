@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Cargando eventos…</string>
     <string name="agenda_loading_events_error">Error al cargar eventos</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">%1$d más</string>
+    <string name="day_view_all_day_more">+ %1$d más</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Todo el día</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -69,7 +69,7 @@
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s antes a las %2$s por correo</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s los %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el día %2$d</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s el %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s los %2$s</string>
     <string name="event_recurrence_none">No se repite</string>
     <string name="event_recurrence_daily">Cada día</string>
     <string name="event_recurrence_weekly">Cada semana</string>
@@ -223,11 +223,11 @@
     <string name="event_recurrence_occurs_every">Repetir cada</string>
     <string name="event_recurrence_occurs_on">Repite el</string>
     <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">el día %1$d</string>
-    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">el %1$s</string>
+    <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">en el %1$s</string>
     <string name="event_recurrence_ends_on">Termina</string>
     <string name="event_recurrence_ends_never">nunca</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">el día</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">en %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">el %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">después</string>
     <string name="event_recurring_edit_this">Este evento</string>
     <string name="event_recurring_edit_this_and_future">Este y eventos futuros</string>
@@ -249,14 +249,14 @@
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invitación para un evento el %1$s</string>
     <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invitación para un evento que comienza el %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitación para un evento que comienza el %1$s a las %2$s %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitación a un evento el %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitación para un evento que comienza el %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitación para un evento el %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitación para un evento que comienza el %1$s.</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualización para un evento que comienza el %1$s a las %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualización de un evento el %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Actualización para un evento que comienza el %1$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualización de un evento para el %1$s</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Actualización de un evento que comienza el %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancelación para un evento que comienza el %1$s a las %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancelación de un evento el %1$s</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancelación de un evento que comienza el %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancelación de un evento a que comienza el %1$s.</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Está invitado a %1$s\nCuándo: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s ha sido actualizado.\nCuándo: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (todo el día)</string>
@@ -609,7 +609,7 @@
     <string name="spotlight_dialog_wipe_search_description">Hemos eliminado la capacidad de búsqueda experimental de Proton Calendar Beta para que sea más útil y confiable. Esto puede tomar unos segundos.</string>
     <string name="spotlight_dialog_holiday_calendar_title">¡Los días festivos están aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nAgregue los días festivos de cualquier país a el calendario.</string>
-    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No más programar reuniones cuando todos están libres u olvidarse de planificar una escapada de fin de semana largo.\n\nComo actualmente está al límite del calendario, para agregar un calendario de días festivos, necesitará eliminar un calendario existente primero.</string>
+    <string name="spotlight_dialog_holiday_calendar_limit_reached_description">No más programar reuniones cuando todos están fuera u olvidarse de planificar una escapada de fin de semana largo.\n\nComo actualmente está al límite del calendario, para agregar un calendario de días festivos, necesitará eliminar un calendario existente primero.</string>
     <string name="spotlight_dialog_color_per_event_title">Colores de eventos personalizados</string>
     <string name="spotlight_dialog_color_per_event_description">Personalice el color de cada evento para:\n\n• Codificar el calendario con colores\n\n• Mejorar la organización diaria y la gestión del tiempo.\n\n• Definir prioridades y aumentar la eficiencia</string>
     <!-- Import -->

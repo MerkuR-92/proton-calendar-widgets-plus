@@ -163,7 +163,7 @@
     <string name="change_calendar_recurring_disclaimer">Ændring af kalender for tilbagevendende begivenheder er endnu ikke muligt.</string>
     <string name="update_event">Opdater begivenhed</string>
     <string name="update_invite_send_email">En invitationsopdatering vil blive sendt til begivenhedens deltagere.</string>
-    <string name="update_recurring_event">Opdater tilbagevendende begivenhed</string>
+    <string name="update_recurring_event">Opdatér tilbagevendende begivenhed</string>
     <string name="update_recurring_all_events">Vil du opdatere alle begivenheder i denne serie?</string>
     <string name="update_recurring_invite_send_email">Alle begivenheder i denne serie vil blive opdateret. En invitationsopdatering vil blive sendt til begivenhedens deltagere.</string>
     <!-- SEARCH -->
@@ -236,7 +236,7 @@
     <string name="event_discard_changes_description">Du vil miste alle ikke-gemte ændringer.</string>
     <string name="event_discard_changes_cancel">Fortsæt redigering</string>
     <string name="event_discard_changes_confirm">Kassér</string>
-    <string name="event_recurring_update_this_title">Opdater tilbagevendende begivenhed</string>
+    <string name="event_recurring_update_this_title">Opdatér tilbagevendende begivenhed</string>
     <string name="event_recurring_update_this_description">Hyppighedsændringer vil gå tabt</string>
     <string name="event_recurring_update_all_description">Tidligere ændringer på denne serie vil gå tabt</string>
     <string name="event_recurring_update_this_cancel">Annullér</string>
@@ -246,14 +246,14 @@
     <string name="event_allow_contacts_cancel">Afvis</string>
     <string name="event_allow_contacts_confirm">Tillad</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Sv: Invitation til en begivenhed med start %1$s kl. %2$s %3$s</string>
-    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Sv: Invitation til en begivenhed på %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Sv: Invitation til en begivenhed med start %1$s</string>
+    <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Re: Invitation til et event på %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Re: Invitation til en event, der starter den %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitation til en begivenhed med start den %1$s kl. %2$s %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation til en begivenhed den %1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation til en begivenhed med start den %1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitation til en begivenhed %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitation til en begivenhed med start %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Opdatering til en begivenhed med start den %1$s kl. %2$s %3$s</string>
-    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Opdatering til en begivenhed %1$s</string>
-    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Opdatering til en begivenhed med start %1$s</string>
+    <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Opdatering til en event den %1$s.</string>
+    <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Opdatering til en event, der begynder den %1$s.</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Annullering af en begivenhed med start %1$s kl. %2$s %3$s</string>
     <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Annullering af en begivenhed %1$s</string>
     <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Annullering af en begivenhed med start %1$s</string>
@@ -412,7 +412,7 @@
     <string name="error_event_does_not_exist">Begivenheden findes ikke</string>
     <string name="error_occurrence_does_not_exist">Forekomsten findes ikke</string>
     <string name="update_timezone_dialog_title">Tidszone ændret</string>
-    <string name="update_timezone_dialog_message">Din systemtidszone ser ud til at være ændret til %1$s. Ønsker du at opdatere din tidszone-indstilling?</string>
+    <string name="update_timezone_dialog_message">Dit systems tidszone ser ud til at være ændret til %1$s. Ønsker du at opdatere din tidszone-indstilling?</string>
     <string name="update_timezone_dialog_confirmation">Opdatér</string>
     <string name="update_timezone_dialog_cancel">Annullér</string>
     <string name="contacts_permission_dialog_title">Giv Proton Calendar adgang til dine kontakter?</string>
@@ -510,7 +510,7 @@
     <string name="add_calendar_text">Tilføj kalender</string>
     <string name="add_calendar_button" comment="Text for the button to add a new calendar">Tilføj</string>
     <string name="create_calendar_limit_reached">Du har nået det maksimale antal kalendere.</string>
-    <string name="create_calendar_limit_reached_title">Der kan ikke tilføjes flere kalendere</string>
+    <string name="create_calendar_limit_reached_title">Kan ikke tilføje flere kalendere</string>
     <string name="create_calendar_limit_reached_paid_description">Du har nået det maksimale antal på 25 kalendere i dit abonnement. \n\nFor at tilføje en ny kalender skal du fjerne en eksisterende.</string>
     <string name="create_mandatory_personal_calendar_limit_reached_paid_description">Du skal have mindst én personlig kalender, inden du når dit abonnements loft på 25 kalendere.</string>
     <string name="create_calendar_limit_reached_manage">Administrer kalendere</string>
@@ -600,7 +600,7 @@
     <string name="spotlight_dialog_search_title">Søg efter begivenheder</string>
     <string name="spotlight_dialog_search_description">Find nemt de begivenheder du leder efter, med vores nye søgefunktion. <a href="https://proton.me/support/calendar-search">Læs mere</a></string>
     <string name="spotlight_dialog_search_positive">Aktiver</string>
-    <string name="spotlight_dialog_search_negative">Glem det</string>
+    <string name="spotlight_dialog_search_negative">Spring over</string>
     <string name="spotlight_dialog_import_title">Flere måder at tilføje begivenheder</string>
     <string name="spotlight_dialog_import_description">• Importer begivenheder til din kalender fra filer på din telefon.\n\n• Tilføj rejsebookinger direkte fra Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Kalenderfunktioner</string>
@@ -720,7 +720,7 @@
         <item quantity="other">\u0020eller\n • Flet mindst %1$d kalendere med eksisterende Proton-kalendere.</item>
     </plurals>
     <plurals name="plural_seconds">
-        <item quantity="one">sekund</item>
+        <item quantity="one">anden</item>
         <item quantity="other">sekunder</item>
     </plurals>
     <plurals name="plural_minute">
@@ -852,19 +852,19 @@
         <item>Pink</item>
         <item>Gulerod</item>
         <item>Sahara</item>
-        <item>Klokkeblomst</item>
+        <item>Ensian</item>
         <item>Blomme</item>
-        <item>Kirsebær</item>
+        <item>Kirsebærrød</item>
         <item>Kobber</item>
-        <item>Jordbund</item>
+        <item>Jord</item>
         <item>Skiferblå</item>
         <item>Stillehavet</item>
         <item>Rev</item>
         <item>Bregne</item>
         <item>Oliven</item>
         <item>Kobolt</item>
-        <item>Havet</item>
-        <item>Fyrretræ</item>
+        <item>Hav</item>
+        <item>Fyr</item>
         <item>Skov</item>
         <item>Agurk</item>
     </string-array>

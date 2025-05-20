@@ -63,7 +63,7 @@
     <string name="event_alarm_label_before">%1$s sebelumnya</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s sebelumnya melalui email</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s pada %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s pada pukul %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s pada %2$s melalui email</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s sebelumnya pada %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s sebelumnya pada %2$s melalui email</string>
@@ -76,7 +76,7 @@
     <string name="event_recurrence_monthly">Bulanan</string>
     <string name="event_recurrence_yearly">Tahunan</string>
     <string name="event_recurrence_weekly_on_all_days">seluruh hari</string>
-    <string name="event_recurrence_until" comment="Event happens regularly until a date">hingga %1$s</string>
+    <string name="event_recurrence_until" comment="Event happens regularly until a date">sampai %1$s</string>
     <string name="event_recurrence_until_with_timezone" comment="Event happens regularly until a date with (timezone)">hingga %1$s (%2$s)</string>
     <string name="event_attendee_count" comment="Example: 5 participants">%1$d %2$s</string>
     <string name="event_status_canceled">Dibatalkan</string>
@@ -91,7 +91,7 @@
     <string name="event_attendee_organizer">Penyelenggara</string>
     <string name="event_attendee_optional">Opsional</string>
     <string name="event_attendee_is_current_user">Anda</string>
-    <string name="event_answer_attending">Hadir?</string>
+    <string name="event_answer_attending">Hadiri?</string>
     <string name="event_answer_yes">Ya</string>
     <string name="event_answer_no">Tidak</string>
     <string name="event_answer_maybe">Mungkin</string>
@@ -122,7 +122,7 @@
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Tidak ada peserta yang dapat diberi tahu mengenai perubahan Anda:\n\n• %1$s\n\nApakah Anda ingin tetap melanjutkan?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Peserta ini tidak dapat menerima pemberitahuan perubahan yang Anda lakukan:\n\n• %1$s\n\nApakah Anda ingin melanjutkan?</string>
     <string name="event_attendees_send_prefs_error_confirm">Lanjut</string>
-    <string name="event_attendees_send_prefs_error_cancel">Batalkan</string>
+    <string name="event_attendees_send_prefs_error_cancel">Batal</string>
     <string name="event_send_prefs_error_address_disabled">alamat ini tidak ada</string>
     <string name="event_send_prefs_error_getting_contact">tidak dapat memuat data kontak</string>
     <string name="event_send_prefs_error_network">masalah jaringan</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Tambah peserta</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Peserta (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Anda</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d lagi</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d lainnya</string>
     <string name="event_text_switch_all_day">Sepanjang hari</string>
     <string name="event_text_date_start">Mulai</string>
     <string name="event_text_date_end">Akhir</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">1 hari sebelumnya pukul %1$s</string>
     <string name="event_alarm_all_day_3">1 pekan sebelumnya pukul %1$s</string>
     <string name="event_alarm_all_day_4">3 pekan sebelumnya pukul %1$s</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00">pukul %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">pada pukul %1$s</string>
     <string name="event_alarm_action">Dikirim oleh</string>
     <string name="event_alarm_action_notification">pemberitahuan</string>
     <string name="event_alarm_action_email">email</string>
@@ -222,7 +222,7 @@
     <string name="event_recurrence_custom_title">Sesuaikan frekuensi</string>
     <string name="event_recurrence_occurs_every">Ulangi setiap</string>
     <string name="event_recurrence_occurs_on">Ulangi setiap</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">hari %1$d</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">tanggal %1$d</string>
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">pada %1$s</string>
     <string name="event_recurrence_ends_on">Berakhir</string>
     <string name="event_recurrence_ends_never">tidak pernah</string>
@@ -236,7 +236,7 @@
     <string name="event_discard_changes_description">Anda akan kehilangan seluruh perubahan yang belum disimpan.</string>
     <string name="event_discard_changes_cancel">Lanjut menyunting</string>
     <string name="event_discard_changes_confirm">Buang</string>
-    <string name="event_recurring_update_this_title">Sunting acara berulang</string>
+    <string name="event_recurring_update_this_title">Perbarui acara berulang</string>
     <string name="event_recurring_update_this_description">Perubahan frekuensi akan hilang</string>
     <string name="event_recurring_update_all_description">Perubahan sebelumnya pada rangkaian ini akan hilang</string>
     <string name="event_recurring_update_this_cancel">Batal</string>
@@ -247,10 +247,10 @@
     <string name="event_allow_contacts_confirm">Izinkan</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Ttg: Undangan untuk acara yang akan dimulai pada tanggal %1$s pukul %2$s %3$s</string>
     <string name="event_change_answer_mail_subject_all_day" comment="%1$s is starting date. Example: Re: Invitation for an event on Monday">Ttg: Undangan untuk acara pada hari %1$s</string>
-    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Ttg: Undangan untuk acara yang akan dimulai pada hari %1$s</string>
+    <string name="event_change_answer_mail_subject_multiple_day" comment="%1$s is starting date. Example: Re: Invitation for an event starting on Monday">Ttg: Undangan untuk acara yang akan dimulai pada %1$s</string>
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Undangan untuk acara yang dimulai pada tanggal $%1$s pukul %2$s %3$s</string>
-    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Undangan untuk acara pada hari $%1$s</string>
-    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Undangan untuk acara yang dimulai pada hari $%1$s</string>
+    <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Undangan untuk acara pada %1$s</string>
+    <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Undangan untuk acara yang dimulai pada %1$s</string>
     <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Pembaruan untuk acara yang akan dimulai pada tanggal %1$s pukul %2$s%3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Pembaruan untuk acara pada hari %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Pembaruan untuk acara yang akan dimulai pada hari %1$s</string>

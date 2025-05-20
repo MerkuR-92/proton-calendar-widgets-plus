@@ -52,7 +52,7 @@
     <string name="agenda_loading_events">Caricamento degli eventi in corso</string>
     <string name="agenda_loading_events_error">Errore nel caricamento degli eventi</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
-    <string name="day_view_all_day_more">+ %1$d</string>
+    <string name="day_view_all_day_more">+ %1$d in più</string>
     <!-- EVENT DETAILS   -->
     <string name="event_all_day">Tutto il giorno</string>
     <string name="event_time_period_spanning_single_day" comment="Example: 13:00 - 15:00">%1$s \u2013 %2$s</string>
@@ -63,13 +63,13 @@
     <string name="event_alarm_label_before">%1$s prima</string>
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s prima via email</string>
-    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s alle %2$s</string>
+    <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s alle %2$s via email</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s prima alle %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s prima alle %2$s via email</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s il %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s il giorno %2$d</string>
-    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s ogni %2$s</string>
+    <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s il %2$s</string>
     <string name="event_recurrence_none">Nessuna ripetizione</string>
     <string name="event_recurrence_daily">Giornaliera</string>
     <string name="event_recurrence_weekly">Settimanale</string>
@@ -147,7 +147,7 @@
     <string name="event_text_add_participants">Aggiungi partecipanti</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Partecipanti (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Tu</string>
-    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d</string>
+    <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d in più</string>
     <string name="event_text_switch_all_day">Tutto il giorno</string>
     <string name="event_text_date_start">Inizia</string>
     <string name="event_text_date_end">Finisce</string>
@@ -208,7 +208,7 @@
     <string name="event_alarm_all_day_2">1 giorno prima alle %1$s</string>
     <string name="event_alarm_all_day_3">1 settimana prima alle %1$s</string>
     <string name="event_alarm_all_day_4">3 settimane prima alle %1$s</string>
-    <string name="event_alarm_at_time" comment="Example: at 15:00">a %1$s</string>
+    <string name="event_alarm_at_time" comment="Example: at 15:00">alle %1$s</string>
     <string name="event_alarm_action">Invia tramite</string>
     <string name="event_alarm_action_notification">notifica</string>
     <string name="event_alarm_action_email">email</string>
@@ -222,12 +222,12 @@
     <string name="event_recurrence_custom_title">Frequenza personalizzata</string>
     <string name="event_recurrence_occurs_every">Ripeti ogni</string>
     <string name="event_recurrence_occurs_on">Ripeti il</string>
-    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">il giorno %1$d</string>
+    <string name="event_recurrence_occurs_monthly_on_day" comment="when repeating monthly always on day number X, Example: on day 15">il %1$d</string>
     <string name="event_recurrence_occurs_on_monthly_on_x_day_of_week" comment="when repeating weekly on specific day of week in a month, Example: on the last Friday">il %1$s</string>
     <string name="event_recurrence_ends_on">Termina</string>
     <string name="event_recurrence_ends_never">mai</string>
     <string name="event_recurrence_ends_on_date_empty" comment="Used when the end date has not been set yet. Once set it would display something along Event ends on Jul 14, 2022">il giorno</string>
-    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">su %1$s</string>
+    <string name="event_recurrence_ends_on_date" comment="repeats but ends on given date, Example: on January 21, 2020">il %1$s</string>
     <string name="event_recurrence_ends_after_count_prefix">dopo</string>
     <string name="event_recurring_edit_this">Questo evento</string>
     <string name="event_recurring_edit_this_and_future">Questo ed eventi futuri</string>
@@ -255,8 +255,8 @@
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Aggiornamento per un evento il %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Aggiornamento per un evento che inizia il %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancellazione di un evento che inizia il %1$s alle %2$s %3$s</string>
-    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancellazione di un evento il %1$s</string>
-    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancellazione di un evento che inizia il %1$s</string>
+    <string name="event_send_cancel_mail_subject_all_day" comment="%1$s is starting date. Example: Cancellation of an event on Monday">Cancellazione di un evento %1$s</string>
+    <string name="event_send_cancel_mail_subject_multiple_day" comment="%1$s is starting date. Example: Cancellation of an event starting on Monday">Cancellazione di un evento che inizia %1$s</string>
     <string name="event_send_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: You are invited to Dinner at John's. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">Sei invitato a %1$s\nQuando: %2$s</string>
     <string name="event_send_update_invite_mail_body" comment="%1$s is the event summary. %2$s is the event date. Example: Dinner at John's has been updated. When: Monday, August 21, 2023 - Tuesday, August 22, 2023">%1$s è stato aggiornato.\nQuando: %2$s</string>
     <string name="event_send_invite_mail_body_all_day_single" comment="Example: Super Cool Event (all day)">%1$s (tutto il giorno)</string>
@@ -696,7 +696,7 @@
         <item quantity="other">%1$d importazioni in corso</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="one">%1$d di %2$d creato in %3$s</item>
+        <item quantity="one">%1$d di %2$d creati in %3$s</item>
         <item quantity="other">%1$d di %2$d creati in %3$s</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
