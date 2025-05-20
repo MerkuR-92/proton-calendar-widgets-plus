@@ -13,6 +13,7 @@ import me.proton.android.calendar.data.entity.EventAlarmEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
+import me.proton.android.calendar.domain.usecase.ScheduleSyncAlarmsUseCase
 import me.proton.android.calendar.eventmanager.listeners.CalendarBaseEventListener
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.Action
@@ -27,7 +28,8 @@ class CalendarAlarmEventListener @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val safePersistEventAlarmUseCase: SafePersistEventAlarmUseCase,
     private val workManager: WorkManager,
-    private val logger: Logger
+    private val logger: Logger,
+    private val scheduleSyncAlarmsUseCase: ScheduleSyncAlarmsUseCase
 ): CalendarBaseEventListener<String, EventAlarmEntity>(db) {
     override val order: Int = 4
     override val type: Type = Type.Calendar
@@ -104,16 +106,7 @@ class CalendarAlarmEventListener @Inject constructor(
 
     override suspend fun onFailure(config: EventManagerConfig) {
         // Launch worker to force refresh and sync alarms
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_FORCE_SYNC_ALARMS to true // Force sync alarms
-            ),
-            UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        scheduleSyncAlarmsUseCase.execute(config.userId, force = true)
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
@@ -131,15 +124,6 @@ class CalendarAlarmEventListener @Inject constructor(
         calendarsRepository.deleteAllEventAlarmsByCalendar(calendarId)
 
         // Launch worker to force refresh and sync alarms
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SYNC_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_FORCE_SYNC_ALARMS to true // Force sync alarms
-            ),
-            UseCaseWorker.UniqueWorkNames.SYNC_ALARMS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        scheduleSyncAlarmsUseCase.execute(config.userId, force = true)
     }
 }

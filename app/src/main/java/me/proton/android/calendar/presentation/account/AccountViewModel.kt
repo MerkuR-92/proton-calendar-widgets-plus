@@ -146,16 +146,16 @@ class AccountViewModel @Inject constructor(
 
     private suspend fun disableUser(userId: UserId) {
         accountManager.disableAccount(userId)
-        valueStoreProvider.provideValueStore(userId.id).clearAll()
     }
 
-    private suspend fun cleanUser() {
+    private suspend fun cleanUser(userId: UserId) {
         workManager.cancelAllWork()
         calendarsRepository.clearSearchDatabase()
         // Calendar currently do not support multi user.
         calendarsRepository.deleteAllCalendars()
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
+        valueStoreProvider.provideValueStore(userId.id).clearAll()
         widgetRefresher.refreshEventList()
     }
 
@@ -180,8 +180,8 @@ class AccountViewModel @Inject constructor(
                 .onAccountDeviceSecretNeeded { startDeviceSecretWorkflow(it) }
                 .onAccountTwoPassModeFailed { disableUser(it.userId) }
                 .onAccountCreateAddressFailed { disableUser(it.userId) }
-                .onAccountDisabled(initialState = false) { cleanUser() }
-                .onAccountRemoved { cleanUser() }
+                .onAccountDisabled(initialState = false) { cleanUser(it.userId) }
+                .onAccountRemoved { cleanUser(it.userId) }
         }
 
         // Check if we already have Ready account.

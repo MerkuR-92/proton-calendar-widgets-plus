@@ -16,6 +16,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.SafePersistEventAlarmUseCase
+import me.proton.android.calendar.domain.usecase.ScheduleSyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.SyncAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarAlarmEventListener
@@ -41,6 +42,7 @@ class CalendarAlarmEventListenerTest {
     private val syncAlarmsUseCase: SyncAlarmsUseCase = mockk(relaxed = true)
     private val workManager: WorkManager = mockk(relaxed = true)
     private val logger: Logger = mockk(relaxed = true)
+    private val scheduleSyncAlarmsUseCase: ScheduleSyncAlarmsUseCase = mockk(relaxed = true)
 
     private lateinit var listener: CalendarAlarmEventListener
     private val config = EventManagerConfig.Calendar(userId, calendarId)
@@ -53,7 +55,8 @@ class CalendarAlarmEventListenerTest {
             calendarsRepository,
             safePersistEventAlarmUseCase,
             workManager,
-            logger
+            logger,
+            scheduleSyncAlarmsUseCase
         )
     }
 
@@ -94,6 +97,30 @@ class CalendarAlarmEventListenerTest {
             listener.onResetAll(config)
 
             coVerify { calendarsRepository.deleteAllEventAlarmsByCalendar(any()) }
+        }
+    }
+
+    @Test
+    fun `onResetAll schedules alarms sync with force=true`() {
+        runBlocking {
+            listener.onResetAll(config)
+
+            coVerify { scheduleSyncAlarmsUseCase.execute(
+                userId = userId,
+                force = true
+            ) }
+        }
+    }
+
+    @Test
+    fun `onFailure schedules alarms sync with force=true`() {
+        runBlocking {
+            listener.onFailure(config)
+
+            coVerify { scheduleSyncAlarmsUseCase.execute(
+                userId = userId,
+                force = true
+            ) }
         }
     }
 

@@ -9,10 +9,18 @@ import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.data.entity.toEventEntityMetadata
-import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.ValueSet
+import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.core.domain.entity.UserId
-import java.time.*
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
@@ -27,7 +35,7 @@ class SyncAlarmsUseCase @Inject constructor(
     private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
     private val deleteCalendarIfNeededUseCase: DeleteCalendarIfNeededUseCase,
     private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase,
-): UseCase {
+) : UseCase {
 
     companion object {
         const val SYNC_ALARMS = "SYNC_ALARMS"
