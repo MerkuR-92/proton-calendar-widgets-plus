@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import biweekly.parameter.ParticipationStatus
 import biweekly.util.ICalDate
 import biweekly.util.ICalDateFormat
 import biweekly.util.Recurrence
@@ -20,6 +21,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.iCalTimeZone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isDateTimeTheSame
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setEnd
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.data.entity.UserSettingsEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -88,6 +90,8 @@ class HandleSaveUseCase @Inject constructor(
         val originalDbEventStartDate = immutableOriginalDbEvent?.getStart(event.defaultTimeZone!!)
         val dbEventWithOccurrence = dbEvent?.let { Event.withOccurrence(it, occurrenceNumber, event.defaultTimeZone!!) }
         val dbEventWithOccurrenceStartDate = dbEventWithOccurrence?.getStart(event.defaultTimeZone!!)
+
+        val currentEventSequence = event.iCalEvent.sequence.value
 
         event.handleSequence(dbEvent, dbEventWithOccurrence, eventTimeZoneId)
 
@@ -194,16 +198,19 @@ class HandleSaveUseCase @Inject constructor(
             }
             // Update the event with attendee changes
             if (attendeesToNotify.isEmpty()) editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify)
-            else editEventWithAttendees(
-                userId,
-                newEvent,
-                isCreate = false,
-                attendeesToNotify,
-                addedAttendeesToNotify,
-                event.defaultTimeZone!!,
-                timeFormatIs24Hours,
-                sendEmailUpdate
-            )
+            else {
+                resetParticipationStatus(currentEventSequence, newEvent, attendeesToNotify)
+                editEventWithAttendees(
+                    userId,
+                    newEvent,
+                    isCreate = false,
+                    attendeesToNotify,
+                    addedAttendeesToNotify,
+                    event.defaultTimeZone!!,
+                    timeFormatIs24Hours,
+                    sendEmailUpdate
+                )
+            }
         } else if (!isCreate && sendEmailUpdate == false && (addedAttendees.isNotEmpty() || removedAttendees.isNotEmpty())) {
             // Just change attendees, no update for the existing event
             // Only keep attendees with valid send preferences
@@ -994,5 +1001,26 @@ class HandleSaveUseCase @Inject constructor(
             return editCreateEventUseCase.execute(userId, dbEvent)
         }
         return UseCase.Result.Success<Unit>()
+    }
+
+    private fun resetParticipationStatus(originalEventSequence: Int?, newEvent: Event, attendeesToNotify: Map<Email, SendPreferences>) {
+        val newEventSequence = newEvent.iCalEvent.sequence?.value
+
+        val isSequenceUpdated = originalEventSequence != null && newEventSequence != null && originalEventSequence < newEventSequence
+
+        if (isSequenceUpdated) {
+            newEvent.iCalEvent.attendees.forEach { attendee ->
+                val attendeeEmail = attendee.extractEmail()
+
+                val shouldUpdate = (attendeeEmail != null && attendeesToNotify.keys.any {
+                    canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
+                        .equals(canonicalizeProtonEmail(it, forceCanonicalization = true), ignoreCase = true)
+                })
+
+                if (shouldUpdate) {
+                    attendee.participationStatus = ParticipationStatus.NEEDS_ACTION
+                }
+            }
+        }
     }
 }
