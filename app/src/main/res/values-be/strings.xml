@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Падпіска</string>
     <string name="nav_view_more_logout">Выйсці</string>
     <string name="nav_view_more_login">Увайсці</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Гэта функцыя неўзабаве з\'явіцца</string>
     <string name="snack_event_deleted">Падзея выдалена</string>

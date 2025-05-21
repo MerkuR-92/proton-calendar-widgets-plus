@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">सदस्यता</string>
     <string name="nav_view_more_logout">साइन आउट</string>
     <string name="nav_view_more_login">साइन इन</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">ये सुविधा जल्द आ रही है</string>
     <string name="snack_event_deleted">इवेंट मिटाया गया</string>

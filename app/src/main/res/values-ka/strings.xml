@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">გამოწერა</string>
     <string name="nav_view_more_logout">გასვლა</string>
     <string name="nav_view_more_login">შესვლა</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">ეს ფუნქცია მალე ჩაირთვება</string>
     <string name="snack_event_deleted">მოვლენა წაიშალა</string>

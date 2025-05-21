@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Předplatné</string>
     <string name="nav_view_more_logout">Odhlásit se</string>
     <string name="nav_view_more_login">Přihlásit se</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Tato funkce bude brzy k dispozici</string>
     <string name="snack_event_deleted">Událost smazána</string>

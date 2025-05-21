@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Abonament</string>
     <string name="nav_view_more_logout">Deconectare</string>
     <string name="nav_view_more_login">Autentificare</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Această funcție va fi disponibilă în curând</string>
     <string name="snack_event_deleted">Eveniment șters</string>

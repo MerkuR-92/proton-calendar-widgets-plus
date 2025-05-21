@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Tilaus</string>
     <string name="nav_view_more_logout">Kirjaudu ulos</string>
     <string name="nav_view_more_login">Kirjaudu sisään</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Tämä ominaisuus on tulossa pian</string>
     <string name="snack_event_deleted">Tapahtuma poistettiin</string>

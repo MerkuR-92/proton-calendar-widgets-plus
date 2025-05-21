@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Abbonamento</string>
     <string name="nav_view_more_logout">Esci</string>
     <string name="nav_view_more_login">Accedi</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Questa funzionalità arriverà presto</string>
     <string name="snack_event_deleted">Evento eliminato</string>

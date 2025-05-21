@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">訂購授權</string>
     <string name="nav_view_more_logout">登出</string>
     <string name="nav_view_more_login">登入</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">此功能即將推出</string>
     <string name="snack_event_deleted">活動已刪除</string>

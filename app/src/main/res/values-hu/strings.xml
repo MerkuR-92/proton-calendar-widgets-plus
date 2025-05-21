@@ -317,7 +317,6 @@
     <string name="nav_view_more_subscription">Előfizetés</string>
     <string name="nav_view_more_logout">Kijelentkezés</string>
     <string name="nav_view_more_login">Bejelentkezés</string>
-    <string name="nav_view_version_name">Proton Calendar %1$s</string>
     <!-- SnackBar messages -->
     <string name="snack_feature_coming_soon">Ez a funkció hamarosan elérhető lesz</string>
     <string name="snack_event_deleted">Esemény törölve</string>
