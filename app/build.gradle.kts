@@ -246,6 +246,7 @@ dependencies {
     implementation(libs.core.notification)
     implementation(libs.core.network)
     implementation(libs.core.observability)
+    implementation(libs.core.passValidator)
     implementation(libs.core.payment)
     implementation(libs.core.paymentIap)
     implementation(libs.core.plan)
