@@ -57,7 +57,7 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
                     // this is a special case, when AddressKey is compromised, we should allow for decrypting
                     //  the CalendarPassphrase and ignore verification error (because verification will always fail),
                     //  but trust the signature verification only when key is not compromised
-                    if ((isKeyCompromised) || (!isKeyCompromised && isSignatureValid)) decryptedPassphrase else null
+                    if ((isKeyCompromised) || isSignatureValid) decryptedPassphrase else null
                 } else null
             }
         }
