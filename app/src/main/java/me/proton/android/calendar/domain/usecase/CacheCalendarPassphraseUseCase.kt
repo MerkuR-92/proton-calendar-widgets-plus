@@ -47,12 +47,21 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         // decrypt CalendarPassphrase -- actually a Passphrase for CalendarKey
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey
         val plaintextPassphrase = memberAddress.useKeys(cryptoContext) {
+
+            val publicKeysForVerification = this.publicKeyRing.keys.map { it.key }
+
             this.privateKeyRing.keys.firstNotNullOfOrNull { privateKey ->
                 val decryptedPassphrase = privateKey.unlockOrNull(cryptoContext)?.decryptTextOrNull(cryptoContext, memberPassphrase.passphrase)
 
                 if (decryptedPassphrase != null) {
                     val isKeyCompromised = !privateKey.canVerify
-                    val isSignatureValid = cryptoContext.pgpCrypto.verifyText(decryptedPassphrase, memberPassphrase.signature, cryptoContext.pgpCrypto.getPublicKey(privateKey.key))
+                    val isSignatureValid = publicKeysForVerification.any {
+                        cryptoContext.pgpCrypto.verifyText(
+                            decryptedPassphrase,
+                            memberPassphrase.signature,
+                            it
+                        )
+                    }
 
                     // this is a special case, when AddressKey is compromised, we should allow for decrypting
                     //  the CalendarPassphrase and ignore verification error (because verification will always fail),
