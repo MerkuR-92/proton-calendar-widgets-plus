@@ -48,7 +48,7 @@ class CacheCalendarPassphraseUseCase @Inject constructor( // TODO TEST
         // AddressKey used to d/encrypt Passphrase for this Member might not be the primary AddressKey
         val plaintextPassphrase = memberAddress.useKeys(cryptoContext) {
 
-            val publicKeysForVerification = this.publicKeyRing.keys.map { it.key }
+            val publicKeysForVerification = this.publicKeyRing.keys.filter { it.isActive }.map { it.key }
 
             this.privateKeyRing.keys.firstNotNullOfOrNull { privateKey ->
                 val decryptedPassphrase = privateKey.unlockOrNull(cryptoContext)?.decryptTextOrNull(cryptoContext, memberPassphrase.passphrase)
