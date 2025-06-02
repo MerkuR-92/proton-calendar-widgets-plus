@@ -488,7 +488,7 @@
     <string name="settings_calendar_subscribed_not_decrypted">Календарь невозможно было расшифровать</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
     <string name="settings_other_calendars_read_only" comment="Calendar is read only. Ex: View-only • owner@proton.me">Только просмотр</string>
-    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">от: %1$s</string>
+    <string name="settings_shared_calendars_owner" comment="Ex: from owner@proton.me">от %1$s</string>
     <!-- Calendar form -->
     <string name="calendar_form_create_title">Создать календарь</string>
     <string name="calendar_form_update_title">Редактировать календарь</string>
@@ -679,7 +679,7 @@
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">Импортировать как простое событие?</string>
     <string name="import_event_disclaimer_dialog_description">\nИмпортированные приглашения отображаются в Proton Calendar как простые события без информации об <b>организаторе</b> и <b>участниках</b>.\n\nЧтобы получать обновления и видеть участников, попросите организаторов пригласить вас, используя ваш адрес электронной почты Proton.</string>
-    <string name="import_event_disclaimer_dialog_positive">Импорт</string>
+    <string name="import_event_disclaimer_dialog_positive">Импортировать</string>
     <string name="undefined_color">Не задан</string>
     <!--  STRING PLURALS  -->
     <plurals name="calendar">
