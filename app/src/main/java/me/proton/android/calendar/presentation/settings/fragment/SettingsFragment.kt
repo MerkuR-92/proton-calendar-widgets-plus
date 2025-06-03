@@ -56,7 +56,6 @@ import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import me.proton.android.calendar.presentation.settings.adapter.SettingsCalendarListAdapter
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
 import me.proton.core.accountmanager.presentation.compose.AccountSettingsItem
-import me.proton.core.accountmanager.presentation.compose.SignOutDialogActivity
 import me.proton.core.compose.component.ProtonSettingsItem
 import me.proton.core.compose.theme.ProtonTheme
 import me.proton.core.devicemigration.presentation.settings.SignInToAnotherDeviceItem
@@ -123,8 +122,7 @@ class SettingsFragment : BaseDialogFragment<FragmentSettingsBinding>(), KoinComp
                                     name = label,
                                     onClick = onClick
                                 )
-                            },
-                            onLogOut = { SignOutDialogActivity.start(requireActivity(), userId = it) }
+                            }
                         )
                     }
                 }

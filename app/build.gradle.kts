@@ -246,6 +246,7 @@ dependencies {
     implementation(libs.core.notification)
     implementation(libs.core.network)
     implementation(libs.core.observability)
+    implementation(libs.core.passValidator)
     implementation(libs.core.payment)
     implementation(libs.core.paymentIap)
     implementation(libs.core.plan)
@@ -379,9 +380,9 @@ object Config {
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"
     const val targetSdk = 34
-    const val versionCode = 319
+    const val versionCode = 320
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
-    const val versionName = "2.24.0"
+    const val versionName = "2.24.1"
     const val archivesBaseName = "ProtonCalendar-$versionName($versionCode)"
     val resourceConfigurations
         get() = listOf(
