@@ -495,7 +495,9 @@ internal class CalendarWidgetRemoteViewsFactory(
 
                 val userId = accountManager.getPrimaryAccount().firstOrNull()?.userId
 
-                val userEmails = userAddressManager.getAddressesOrNull(userId ?: UserId(""))?.map { it.email } ?: emptyList()
+                val userEmails = userId?.let {
+                    userAddressManager.getAddressesOrNull(userId)?.map { it.email }
+                } ?: emptyList()
 
                 // show or hide "logged out" or "loading" info
                 if (userEmails.isEmpty()) { // user is logged out
