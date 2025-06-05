@@ -4,8 +4,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.runningFold
 import me.proton.android.calendar.domain.utils.KotlinUtils
 import kotlin.time.Duration
 
@@ -30,4 +30,19 @@ object KotlinUtilsImpl : KotlinUtils {
 
         return filtered
     }
+
+    @OptIn(FlowPreview::class)
+    override fun <T> Flow<T>.debounceExceptFirst(timeout: Duration): Flow<T> {
+        return this
+            .runningFold(0 to null as T?) { (index, _), item ->
+                (index + 1) to item
+            }
+            .drop(1) // drops initial dummy value
+            .debounce { (index, _) ->
+                // first legitimate item emitted has index == 1
+                if (index == 1) 0L else timeout.inWholeMilliseconds
+            }
+            .map { it.second!! }
+    }
+
 }
