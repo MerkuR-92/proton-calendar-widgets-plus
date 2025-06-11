@@ -7,7 +7,6 @@ import android.os.Build
 import android.text.Html
 import android.text.Spanned
 import android.text.format.DateFormat
-import android.text.format.DateFormat.getTimeFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.Lifecycle
@@ -17,13 +16,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import biweekly.parameter.ParticipationStatus
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -69,7 +63,16 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOutEventsBySe
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortForMonthView
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.BugReportWorker
+import me.proton.android.calendar.common.worker.FixCalendarsWorker
+import me.proton.android.calendar.common.worker.MigrateEventMetadataToOccurrencesWorker
+import me.proton.android.calendar.common.worker.UpdateAutoDetectPrimaryTimezoneWorker
+import me.proton.android.calendar.common.worker.UpdateAutoImportInviteWorker
+import me.proton.android.calendar.common.worker.UpdateCalendarListWorker
+import me.proton.android.calendar.common.worker.UpdateDisplayWeekNumberWorker
+import me.proton.android.calendar.common.worker.UpdatePrimaryTimezoneWorker
+import me.proton.android.calendar.common.worker.UpdateTimeFormatWorker
+import me.proton.android.calendar.common.worker.UpdateWeekStartWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
@@ -105,16 +108,12 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.nullIfBlank
 import me.proton.core.util.kotlin.toBoolean
-import timber.log.Timber
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.TimeZone
 import javax.inject.Inject
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.set
 
 @HiltViewModel
 class CalendarViewModel @Inject constructor(
@@ -591,79 +590,19 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun updatePrimaryTimezone(primaryTimezone: String) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PRIMARY_TIMEZONE,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return UpdatePrimaryTimezoneWorker.enqueue(workManager, currUserId(), primaryTimezone = primaryTimezone)
     }
 
     fun updateAutoDetectPrimaryTimezone(autoDetectPrimaryTimezone: Boolean) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_AUTO_DETECT_PRIMARY_TIMEZONE to autoDetectPrimaryTimezone
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_DETECT_PRIMARY_TIMEZONE, ExistingWorkPolicy.REPLACE, work).state
+        return UpdateAutoDetectPrimaryTimezoneWorker.enqueue(workManager, userId = currUserId(), autoDetectPrimaryTimezone)
     }
 
     fun updateDisplayWeekNumber(displayWeekNumber: Boolean) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_DISPLAY_WEEK_NUMBER,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_DISPLAY_WEEK_NUMBER to displayWeekNumber
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_DISPLAY_WEEK_NUMBER, ExistingWorkPolicy.REPLACE, work).state
+        return UpdateDisplayWeekNumberWorker.enqueue(workManager, userId = currUserId(), displayWeekNumber)
     }
 
     fun updateAutoImportInvite(autoImportInvite: Boolean) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_AUTO_IMPORT_INVITE,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_AUTO_IMPORT_INVITE to autoImportInvite
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_AUTO_IMPORT_INVITE, ExistingWorkPolicy.REPLACE, work).state
+        return UpdateAutoImportInviteWorker.enqueue(workManager, userId = currUserId(), autoImportInvite)
     }
 
     suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {
@@ -681,59 +620,21 @@ class CalendarViewModel @Inject constructor(
     }
 
     fun updateTimeFormat(timeFormat: Int) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_TIME_FORMAT,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_TIME_FORMAT to timeFormat
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_TIME_FORMAT, ExistingWorkPolicy.REPLACE, work).state
+        return UpdateTimeFormatWorker.enqueue(workManager, userId = currUserId(), timeFormat)
     }
 
     fun updateWeekStart(weekStart: Int) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_WEEK_START,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_WEEK_START to weekStart
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_WEEK_START, ExistingWorkPolicy.REPLACE, work).state
+        return UpdateWeekStartWorker.enqueue(workManager, userId = currUserId(), weekStart)
     }
 
     fun updateServerCalendarListDisplay() : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        return UpdateCalendarListWorker.enqueue(workManager, currUserId())
+    }
 
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_LIST,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.UPDATE_CALENDAR_LIST, ExistingWorkPolicy.REPLACE, work).state
+    private fun currUserId(): String {
+        val value = userId.value?.id
+        if (value == null) logger.e("User ID unexpectedly null")
+        return value.orEmpty()
     }
 
     fun sendBugReport(
@@ -746,29 +647,18 @@ class CalendarViewModel @Inject constructor(
         username: String,
         email: String
     ) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.SEND_BUG_REPORT,
-                    UseCaseWorker.INPUT_USER_ID to userId.value?.id,
-                    UseCaseWorker.INPUT_OS_NAME to osName,
-                    UseCaseWorker.INPUT_OS_VERSION to osVersion,
-                    UseCaseWorker.INPUT_CLIENT to client,
-                    UseCaseWorker.INPUT_APP_VERSION_NAME to appVersionName,
-                    UseCaseWorker.INPUT_TITLE to title,
-                    UseCaseWorker.INPUT_DESCRIPTION to description,
-                    UseCaseWorker.INPUT_USERNAME to username,
-                    UseCaseWorker.INPUT_EMAIL to email,
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.SEND_BUG_REPORT, ExistingWorkPolicy.REPLACE, work).state
+        return BugReportWorker.enqueue(
+            workManager,
+            userId = currUserId(),
+            osName = osName,
+            osVersion = osVersion,
+            client = client,
+            appVersionName = appVersionName,
+            title = title,
+            description = description,
+            username = username,
+            email = email,
+        )
     }
 
     suspend fun updateInactiveCalendarsPassphrase() {
@@ -1378,39 +1268,12 @@ class CalendarViewModel @Inject constructor(
 
     suspend fun fixCalendars(): LiveData<Operation.State> {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FIX_CALENDARS,
-                    UseCaseWorker.INPUT_USER_ID to userId?.id
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FIX_CALENDARS, ExistingWorkPolicy.REPLACE, work).state
+        return FixCalendarsWorker.enqueue(workManager, userId?.id.orEmpty())
     }
 
     suspend fun migrateEventMetadataToOccurrences(): LiveData<Operation.State> {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-        val constraints = Constraints.Builder()
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MIGRATE_EVENT_METADATA_TO_OCCURRENCES,
-                    UseCaseWorker.INPUT_USER_ID to userId?.id
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.MIGRATE_EVENT_METADATA_TO_OCCURRENCES, ExistingWorkPolicy.KEEP, work).state
+        return MigrateEventMetadataToOccurrencesWorker.enqueue(workManager, userId = userId?.id.orEmpty())
     }
 
     fun shouldDisplayServerDownBanner(): LiveData<Boolean> {

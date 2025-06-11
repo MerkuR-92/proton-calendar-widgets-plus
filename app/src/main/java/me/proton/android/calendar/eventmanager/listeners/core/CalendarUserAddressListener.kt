@@ -1,11 +1,7 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.RefreshMemberFlagsWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.key.data.api.response.AddressResponse
@@ -39,16 +35,7 @@ class CalendarUserAddressListener @Inject constructor(
 
         if (refreshMembersFlags) {
             // Launch worker to refresh members flags
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_MEMBERS_FLAGS,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id
-                ),
-                UseCaseWorker.UniqueWorkNames.REFRESH_MEMBERS_FLAGS,
-                ExistingWorkPolicy.REPLACE,
-                NetworkType.CONNECTED
-            )
-
+            RefreshMemberFlagsWorker.enqueue(workManager, config.userId.id)
             refreshMembersFlags = false
         }
     }

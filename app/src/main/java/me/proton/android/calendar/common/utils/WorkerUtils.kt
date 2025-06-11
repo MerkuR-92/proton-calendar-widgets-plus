@@ -1,32 +1,76 @@
 package me.proton.android.calendar.common.utils
 
-import androidx.lifecycle.LiveData
 import androidx.work.Constraints
+import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
+import androidx.work.ListenableWorker
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
+import me.proton.android.calendar.common.WORKER_MAX_RETRY_COUNT
 import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.UseCase
+import java.util.concurrent.TimeUnit
 
 object WorkerUtils {
 
-    fun WorkManager.enqueueWorkHelper(
+    fun WorkManager.enqueueAppending(
         workData: Data,
         uniqueWorkName: String,
-        workPolicy: ExistingWorkPolicy,
-        networkType: NetworkType
-    ): LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(networkType)
-            .build()
-
+        requireNetwork: Boolean = true,
+        initialDelayMs: Long? = null,
+    ): Operation {
         val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
+            .let {
+                if (requireNetwork) {
+                    it.setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                } else {
+                    it
+                }
+            }
+            .let {
+                if (initialDelayMs != null) {
+                  it.setInitialDelay(initialDelayMs, TimeUnit.MILLISECONDS)
+                } else {
+                    it
+                }
+            }
             .setInputData(workData)
             .build()
 
-        return this.enqueueUniqueWork(uniqueWorkName, workPolicy, work).state
+        return enqueueUniqueWork(uniqueWorkName, ExistingWorkPolicy.APPEND_OR_REPLACE, work)
+    }
+
+    suspend fun CoroutineWorker.executeUseCase(logger: Logger, block: suspend () -> UseCase.Result): ListenableWorker.Result {
+        val useCaseId = this.javaClass.simpleName
+
+        logger.v("inside UseCaseWorker doWork(), usecaseid: $useCaseId")
+
+        val useCaseResult = block()
+
+        return when (useCaseResult) {
+            is UseCase.Result.Success<*> -> {
+                logger.v("UseCaseId=$useCaseId success")
+                ListenableWorker.Result.success()
+            }
+            is UseCase.Result.InvalidParams -> {
+                logger.i("UseCaseId=$useCaseId failure, reason: ${useCaseResult.message}")
+                ListenableWorker.Result.failure()
+            }
+            is UseCase.Result.Error -> {
+                if (this.runAttemptCount >= WORKER_MAX_RETRY_COUNT) {
+                    logger.e("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, max retry exceeded")
+                    ListenableWorker.Result.failure()
+                } else {
+                    logger.i("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, retrying")
+                    ListenableWorker.Result.retry()
+                }
+            }
+        }
     }
 }

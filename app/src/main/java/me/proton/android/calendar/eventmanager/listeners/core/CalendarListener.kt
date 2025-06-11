@@ -1,11 +1,8 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.BootstrapAllCalendarsWorker
+import me.proton.android.calendar.common.worker.BootstrapCalendarsWorker
 import me.proton.android.calendar.data.api.CalendarsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarEntity
@@ -82,16 +79,7 @@ class CalendarListener @Inject constructor(
         super.onSuccess(config)
         if (calendarsToBootstrap.isNotEmpty()) {
             // Launch worker to bootstrap calendars
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_IDS to calendarsToBootstrap.toTypedArray()
-                ),
-                UseCaseWorker.UniqueWorkNames.BOOTSTRAP_CALENDARS,
-                ExistingWorkPolicy.APPEND,
-                NetworkType.CONNECTED
-            )
+            BootstrapCalendarsWorker.enqueue(workManager, config.userId.id, calendarsToBootstrap)
         }
     }
 
@@ -115,14 +103,6 @@ class CalendarListener @Inject constructor(
         calendarsRepository.deleteCalendars(config.userId.id)
 
         // Launch worker to bootstrap all calendars
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_ALL_CALENDARS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id
-            ),
-            UseCaseWorker.UniqueWorkNames.BOOTSTRAP_ALL_CALENDARS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        BootstrapAllCalendarsWorker.enqueue(workManager, config.userId.id)
     }
 }

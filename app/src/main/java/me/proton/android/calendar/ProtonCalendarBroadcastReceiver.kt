@@ -4,19 +4,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import me.proton.android.calendar.common.worker.HandleAlarmsWorker
 import me.proton.android.calendar.common.worker.PeriodicCalendarWorker
-import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.MigrateEventMetadataToOccurrencesUseCase
 import me.proton.core.accountmanager.domain.AccountManager
@@ -108,18 +105,7 @@ class ProtonCalendarBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun handleAlarms(userId: UserId, context: Context, alarmEpochSeconds: Long? = null): LiveData<Operation.State> {
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.HANDLE_ALARMS,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_ALARM_EPOCH_SECONDS to alarmEpochSeconds
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.HANDLE_ALARMS, ExistingWorkPolicy.REPLACE, work).state
+        return HandleAlarmsWorker.enqueue(workManager, userId = userId.id, alarmEpochSeconds)
     }
 
     companion object {

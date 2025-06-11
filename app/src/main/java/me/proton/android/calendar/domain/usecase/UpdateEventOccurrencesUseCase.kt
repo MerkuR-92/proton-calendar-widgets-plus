@@ -4,13 +4,11 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.overlaps
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import net.sqlcipher.database.SQLiteException
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset

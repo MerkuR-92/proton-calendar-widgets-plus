@@ -1,11 +1,8 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.RefreshCalendarKeysWorker
+import me.proton.android.calendar.common.worker.RefreshMemberFlagsWorker
 import me.proton.android.calendar.data.api.CalendarKeysEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarKeyEntity
@@ -63,16 +60,7 @@ class CalendarKeyEventListener @Inject constructor(
 
         if (refreshMembersFlags) {
             // Launch worker to refresh members flags
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_MEMBERS_FLAGS,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id
-                ),
-                UseCaseWorker.UniqueWorkNames.REFRESH_MEMBERS_FLAGS,
-                ExistingWorkPolicy.REPLACE,
-                NetworkType.CONNECTED
-            )
-
+            RefreshMemberFlagsWorker.enqueue(workManager, config.userId.id)
             refreshMembersFlags = false
         }
     }
@@ -88,15 +76,6 @@ class CalendarKeyEventListener @Inject constructor(
         calendarsRepository.deleteCalendarKeyByCalendarId(calendarId)
 
         // Launch worker to refresh calendar keys
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_KEYS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ),
-            UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_KEYS,
-            ExistingWorkPolicy.APPEND,
-            NetworkType.CONNECTED
-        )
+        RefreshCalendarKeysWorker.enqueue(workManager, userId = config.userId.id, calendarId)
     }
 }

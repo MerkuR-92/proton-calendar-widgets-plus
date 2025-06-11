@@ -1,17 +1,13 @@
 package me.proton.android.calendar.domain.usecase
 
-import android.content.Context
-import androidx.work.*
-import dagger.hilt.android.qualifiers.ApplicationContext
+import androidx.work.WorkManager
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.core.domain.entity.UserId
 import me.proton.core.key.domain.repository.PublicAddressRepository
-import me.proton.core.key.domain.repository.Source
 import me.proton.core.util.kotlin.mapAsync
 import javax.inject.Inject
 
@@ -52,28 +48,6 @@ class FetchPublicKeysUseCase @Inject constructor(
         }
 
         return UseCase.Result.Success<Unit>()
-    }
-
-    fun enqueueFetchPublicKeys(userId: UserId, eventEntities: List<EventEntity>) {
-        val chunkedEmails = getEmails(eventEntities).chunked(100)
-        chunkedEmails.forEach { emails ->
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
-
-            val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-                .setConstraints(constraints)
-                .setInputData(
-                    workDataOf(
-                        UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_PUBLIC_KEYS,
-                        UseCaseWorker.INPUT_USER_ID to userId.id,
-                        UseCaseWorker.INPUT_USER_EMAILS to emails.toTypedArray(),
-                    )
-                )
-                .build()
-
-            workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_PUBLIC_KEYS, ExistingWorkPolicy.APPEND, work)
-        }
     }
 
     private fun getEmails(eventEntities: List<EventEntity>): List<String> {

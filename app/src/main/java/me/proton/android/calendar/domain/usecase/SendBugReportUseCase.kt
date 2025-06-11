@@ -13,10 +13,6 @@ class SendBugReportUseCase @Inject constructor(
     private val bugReportsApi: BugReportsApi
 ) {
 
-    companion object {
-        const val WORKER_ID = "SEND_BUG_REPORT"
-    }
-
     suspend fun execute(
         userId: UserId,
         osName: String,

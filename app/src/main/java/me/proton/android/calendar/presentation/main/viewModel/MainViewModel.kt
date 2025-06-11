@@ -2,11 +2,15 @@ package me.proton.android.calendar.presentation.main.viewModel
 
 import android.app.Activity
 import android.app.Application
-import android.content.*
+import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.work.*
+import androidx.work.Operation
 import com.google.android.play.core.review.ReviewManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -17,17 +21,24 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import me.proton.android.calendar.common.*
+import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
+import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
+import me.proton.android.calendar.common.Navigation
+import me.proton.android.calendar.common.SharedPreferencesKeys
+import me.proton.android.calendar.common.ViewMode
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
-import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.logErrorIfNeeded
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.api.FeedbackApi
-import me.proton.android.calendar.domain.usecase.*
+import me.proton.android.calendar.domain.usecase.HandleIcsUseCase
+import me.proton.android.calendar.domain.usecase.RefreshCalendarUserSettingsUseCase
+import me.proton.android.calendar.domain.usecase.ResetLocalEventDatabaseUseCase
+import me.proton.android.calendar.domain.usecase.ScheduleSyncAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.core.account.domain.repository.AccountRepository
 import me.proton.core.contact.domain.entity.ContactEmail
@@ -36,7 +47,6 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import java.time.Duration
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel

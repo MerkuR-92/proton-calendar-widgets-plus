@@ -6,13 +6,8 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import biweekly.component.VAlarm
 import biweekly.parameter.ParticipationLevel
 import biweekly.parameter.ParticipationStatus
@@ -72,7 +67,7 @@ import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRRule
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.isShortDomainAddress
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.UpdateParticipationStatusSingleEditWorker
 import me.proton.android.calendar.data.api.valueOrNullAndLogErrors
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -124,7 +119,6 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import javax.inject.Inject
-import kotlin.collections.set
 
 @HiltViewModel
 class EventViewModel @Inject constructor(
@@ -3791,31 +3785,12 @@ class EventViewModel @Inject constructor(
         userEmails: List<String>,
         mainChainParticipationStatus: ParticipationStatus
     ): LiveData<Operation.State> {
-        val status = mainChainParticipationStatus.toInt()
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_EVENT_UID to eventUid,
-                    UseCaseWorker.INPUT_USER_EMAILS to userEmails.toTypedArray(),
-                    UseCaseWorker.INPUT_PARTICIPATION_STATUS to status
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(
-            UseCaseWorker.UniqueWorkNames.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
-            ExistingWorkPolicy.REPLACE,
-            work
-        ).state
+        return UpdateParticipationStatusSingleEditWorker.enqueue(workManager, userId = userId.id,
+            calendarId = calendarId,
+            eventUid = eventUid,
+            userEmails = userEmails,
+            mainChainParticipationStatus = mainChainParticipationStatus,
+        )
     }
 
     sealed class EventLinkResult {

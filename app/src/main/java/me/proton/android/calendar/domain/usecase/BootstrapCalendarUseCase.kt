@@ -1,15 +1,10 @@
 package me.proton.android.calendar.domain.usecase
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import me.proton.android.calendar.WidgetRefresher
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.GetMinimalCalendarEventsWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -20,9 +15,6 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.entity.UserAddress
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 
 /**
@@ -83,16 +75,7 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                         if (userMember.display == 1) {
 
                             // Launch worker to fetch minimal events for calendar
-                            workManager.enqueueWorkHelper(
-                                workDataOf(
-                                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
-                                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                                    UseCaseWorker.INPUT_CALENDAR_ID to calendarEntity.id
-                                ),
-                                UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
-                                ExistingWorkPolicy.APPEND,
-                                NetworkType.CONNECTED
-                            )
+                            GetMinimalCalendarEventsWorker.enqueue(workManager, userId = userId.id, calendarId = calendarEntity.id)
                         }
 
                         // for each bootstrapped calendar, get its latest Event ID

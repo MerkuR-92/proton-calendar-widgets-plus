@@ -14,11 +14,8 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ValueKey
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.domain.entity.UserId
-import java.time.Duration
 import java.time.Instant
-import java.time.ZoneId
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 class HandleAlarmsUseCase @Inject constructor(
     private val logger: Logger,
@@ -27,10 +24,6 @@ class HandleAlarmsUseCase @Inject constructor(
     private val showNotificationUseCase: ShowNotificationUseCase,
     private val valueStoreProvider: ValueStoreProvider
 ) {
-
-    companion object {
-        const val HANDLE_ALARMS = "HANDLE_ALARMS"
-    }
 
     suspend fun execute(userId: UserId, alarmEpochSeconds: Long? = null): UseCase.Result {
         val nowInstant = Instant.now()

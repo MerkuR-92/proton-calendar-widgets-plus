@@ -1,12 +1,8 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.MembersKeySetupWorker
 import me.proton.android.calendar.data.api.CalendarMembersEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.MemberEntity
@@ -98,16 +94,7 @@ class CalendarMemberEventListener @Inject constructor(
         }
 
         // Launch worker to do key setup for members with incomplete setup flag
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MEMBERS_KEY_SETUP,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_MEMBER_IDS to membersWithIncompleteKeySetup.toTypedArray()
-            ),
-            UseCaseWorker.UniqueWorkNames.MEMBERS_KEY_SETUP,
-            ExistingWorkPolicy.APPEND,
-            NetworkType.CONNECTED
-        )
+        MembersKeySetupWorker.enqueue(workManager, config.userId.id, membersWithIncompleteKeySetup)
     }
 
     override suspend fun onComplete(config: EventManagerConfig) {
