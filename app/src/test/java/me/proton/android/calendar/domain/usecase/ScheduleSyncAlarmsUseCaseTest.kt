@@ -13,7 +13,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.common.logger.TestsLogger
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.SyncAlarmsWorker
 import me.proton.android.calendar.test.shared.mocks.userId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,6 @@ internal class ScheduleSyncAlarmsUseCaseTest {
     private val workManagerMock: WorkManager = mockk()
     private val testsLogger = TestsLogger
 
-    private val workName = UseCaseWorker.UniqueWorkNames.SYNC_ALARMS
     private val workPolicy = ExistingWorkPolicy.APPEND_OR_REPLACE
 
     private fun getScheduleSyncAlarmsUseCase(): ScheduleSyncAlarmsUseCase {
@@ -34,6 +33,8 @@ internal class ScheduleSyncAlarmsUseCaseTest {
             workManagerMock
         )
     }
+
+    private fun workName(userId: String) = "SYNC_ALARMS_$userId"
 
     @BeforeEach
     fun `before each`() {
@@ -46,7 +47,6 @@ internal class ScheduleSyncAlarmsUseCaseTest {
     fun `ScheduleSyncAlarms with no params applies default values`() = runBlocking {
         val expectedDelay = Duration.ofSeconds(0)
         val expectedForce = false
-        val expectedUseCaseId = UseCaseWorker.UseCaseId.SYNC_ALARMS
         val expectedUserId = userId
 
         every {
@@ -64,20 +64,16 @@ internal class ScheduleSyncAlarmsUseCaseTest {
         val workRequestSlot = CapturingSlot<OneTimeWorkRequest>()
         coVerify(exactly = 1) {
             workManagerMock.enqueueUniqueWork(
-                workName,
+                any(),
                 workPolicy,
                 capture(workRequestSlot)
             )
         }
 
-        assertEquals(
-            expectedUseCaseId,
-            workRequestSlot.captured.workSpec.input.getString(UseCaseWorker.INPUT_USE_CASE_ID)
-        )
-        assertEquals(expectedUserId.id, workRequestSlot.captured.workSpec.input.getString(UseCaseWorker.INPUT_USER_ID))
+        assertEquals(expectedUserId.id, workRequestSlot.captured.workSpec.input.getString(SyncAlarmsWorker.INPUT_USER_ID))
         assertEquals(
             expectedForce,
-            workRequestSlot.captured.workSpec.input.getBoolean(UseCaseWorker.INPUT_FORCE_SYNC_ALARMS, !expectedForce)
+            workRequestSlot.captured.workSpec.input.getBoolean(SyncAlarmsWorker.INPUT_FORCE_SYNC_ALARMS, !expectedForce)
         )
         assertEquals(expectedDelay.toMillis(), workRequestSlot.captured.workSpec.initialDelay)
     }
@@ -86,7 +82,6 @@ internal class ScheduleSyncAlarmsUseCaseTest {
     fun `ScheduleSyncAlarms applies passed values`() = runBlocking {
         val expectedDelay = Duration.ofSeconds(10)
         val expectedForce = true
-        val expectedUseCaseId = UseCaseWorker.UseCaseId.SYNC_ALARMS
         val expectedUserId = userId
 
         every {
@@ -106,20 +101,16 @@ internal class ScheduleSyncAlarmsUseCaseTest {
         val workRequestSlot = CapturingSlot<OneTimeWorkRequest>()
         coVerify(exactly = 1) {
             workManagerMock.enqueueUniqueWork(
-                workName,
+                workName(userId.id),
                 workPolicy,
                 capture(workRequestSlot)
             )
         }
 
-        assertEquals(
-            expectedUseCaseId,
-            workRequestSlot.captured.workSpec.input.getString(UseCaseWorker.INPUT_USE_CASE_ID)
-        )
-        assertEquals(expectedUserId.id, workRequestSlot.captured.workSpec.input.getString(UseCaseWorker.INPUT_USER_ID))
+        assertEquals(expectedUserId.id, workRequestSlot.captured.workSpec.input.getString(SyncAlarmsWorker.INPUT_USER_ID))
         assertEquals(
             expectedForce,
-            workRequestSlot.captured.workSpec.input.getBoolean(UseCaseWorker.INPUT_FORCE_SYNC_ALARMS, !expectedForce)
+            workRequestSlot.captured.workSpec.input.getBoolean(SyncAlarmsWorker.INPUT_FORCE_SYNC_ALARMS, !expectedForce)
         )
         assertEquals(expectedDelay.toMillis(), workRequestSlot.captured.workSpec.initialDelay)
     }
