@@ -2,6 +2,7 @@ package me.proton.android.calendar.domain.usecase
 
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.FetchedEventsMetadataEntity
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
@@ -43,6 +44,22 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    suspend fun isWindowFullyFetched(
+        userId: String,
+        calendarId: String,
+        windowStart: Instant,
+        windowEnd: Instant,
+    ): Boolean {
+        return database.inTransaction {
+            database.fetchedEventsMetadataDao().hasWindowFullyOverlapping(
+                userId = userId,
+                calendarId = calendarId,
+                windowStart = windowStart.epochSecond,
+                windowEnd = windowEnd.epochSecond
+            )
         }
     }
 

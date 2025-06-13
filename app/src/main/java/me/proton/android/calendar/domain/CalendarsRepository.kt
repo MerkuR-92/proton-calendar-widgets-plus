@@ -173,7 +173,7 @@ interface CalendarsRepository {
 
     suspend fun eventExistsOnServer(userId: UserId, eventId: String, calendarId: String): Boolean?
 
-    suspend fun shouldFetchEvent(metadata: EventEntityMetadata): Boolean
+    suspend fun shouldFetchEvent(userId: UserId, metadata: EventEntityMetadata): Boolean
 
     suspend fun hasCalendar(calendarId: String, ): Boolean
 

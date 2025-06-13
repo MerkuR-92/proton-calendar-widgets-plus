@@ -63,7 +63,7 @@ class CalendarEventListener @Inject constructor(
                 // We check if event modifyTime to see if it is up to date
                 // We always assume we should fetch recurring events for simplicity
                 // If not recurring, we fetch if event happens soon or if it is withing requested FetchWindows
-                calendarsRepository.shouldFetchEvent(it)
+                calendarsRepository.shouldFetchEvent(config.userId, it)
             }.mapNotNullAsync { metadata ->
                 fetchEventEntity(config.userId, metadata)
             }.associateBy { event ->
