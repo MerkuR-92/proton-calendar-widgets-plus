@@ -5,8 +5,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarAlarmEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListener
+import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarEventListenerNew
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarKeyEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarPassphraseEventListener
 import me.proton.android.calendar.eventmanager.listeners.calendar.CalendarSettingsEventListener
@@ -18,6 +20,8 @@ import me.proton.android.calendar.eventmanager.listeners.core.CalendarUserSettin
 import me.proton.core.contact.data.ContactEmailEventListener
 import me.proton.core.contact.data.ContactEventListener
 import me.proton.core.eventmanager.domain.EventListener
+import me.proton.core.featureflag.domain.ExperimentalProtonFeatureFlag
+import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.notification.data.NotificationEventListener
 import me.proton.core.push.data.PushEventListener
 import me.proton.core.user.data.UserEventListener
@@ -27,6 +31,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object EventManagerModule {
+    @OptIn(ExperimentalProtonFeatureFlag::class)
     @Provides
     @Singleton
     @ElementsIntoSet
@@ -47,11 +52,14 @@ object EventManagerModule {
         calendarUserSettingsEventListener: CalendarUserSettingsEventListener,
         // Calendar only listeners in Calendar event loop
         calendarEventListener: CalendarEventListener,
+        calendarEventListenerNew: CalendarEventListenerNew,
         calendarAlarmEventListener: CalendarAlarmEventListener,
         calendarPassphraseEventListener: CalendarPassphraseEventListener,
         calendarKeyEventListener: CalendarKeyEventListener,
         calendarSubscriptionsEventListener: CalendarSubscriptionsEventListener,
         calendarSettingsEventListener: CalendarSettingsEventListener,
+        // Feature Flag Manager needed for dynamically switching listeners
+        featureFlagManager: FeatureFlagManager
     ): Set<EventListener<*, *>> = setOf(
         userEventListener,
         userSettingsEventListener,
@@ -63,7 +71,7 @@ object EventManagerModule {
         calendarListener,
         calendarMemberEventListener,
         calendarUserSettingsEventListener,
-        calendarEventListener,
+        if (featureFlagManager.getValue(null, CalendarFeatureFlag.NewCalendarEventListenerAndroid.featureId)) calendarEventListenerNew else calendarEventListener,
         calendarAlarmEventListener,
         calendarPassphraseEventListener,
         calendarKeyEventListener,
