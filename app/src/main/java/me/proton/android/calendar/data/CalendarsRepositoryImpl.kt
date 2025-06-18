@@ -720,8 +720,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun shouldFetchEvent(metadata: EventEntityMetadata): Boolean {
-
+    override suspend fun shouldFetchEvent(userId: UserId, metadata: EventEntityMetadata): Boolean {
         val dbEventEntity = database.eventsDao().selectById(metadata.id)
         val isDbEventUpToDate = dbEventEntity?.modifyTime == metadata.modifyTime
         if (isDbEventUpToDate) return false
@@ -731,6 +730,13 @@ class CalendarsRepositoryImpl @Inject constructor(
             val now = Instant.now()
             val startInstant = Instant.ofEpochSecond(metadata.startTime)
             val endInstant = Instant.ofEpochSecond(metadata.endTime)
+
+            val isInsideFetchedEventsMetadata = updateFetchedEventsMetadataUseCase.isWindowFullyFetched(
+                userId.id,
+                metadata.calendarId,
+                startInstant,
+                endInstant,
+            )
 
             val isEventRecent = when {
                 now.minus(60, ChronoUnit.DAYS).isAfter(endInstant) -> false
@@ -748,7 +754,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 else -> minWindowStart != null && maxWindowEnd != null
             }
 
-            return isEventRecent || isInsideRequestedFetchingWindows
+            return isEventRecent || isInsideRequestedFetchingWindows || isInsideFetchedEventsMetadata
         } else { // recurring event, we always assume "should fetch" for simplicity
             return true
         }

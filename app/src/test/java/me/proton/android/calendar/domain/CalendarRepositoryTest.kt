@@ -43,7 +43,6 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
@@ -285,7 +284,7 @@ internal class CalendarRepositoryTest {
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1)
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns createEventEntity(metadata.id, modifyTime = metadata.modifyTime)
 
-            assertThat(getCalendarRepository().shouldFetchEvent(metadata)).isFalse()
+            assertThat(getCalendarRepository().shouldFetchEvent(UserId("userid-1"), metadata)).isFalse()
         }
     }
 
@@ -298,6 +297,7 @@ internal class CalendarRepositoryTest {
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
             )
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns false
 
             val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
 
@@ -317,7 +317,7 @@ internal class CalendarRepositoryTest {
                 "UTC"
             )
 
-            assertThat(calendarsRepository.shouldFetchEvent(metadata)).isTrue()
+            assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
 
         }
     }
@@ -331,6 +331,7 @@ internal class CalendarRepositoryTest {
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
             )
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns false
 
             val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
 
@@ -350,7 +351,41 @@ internal class CalendarRepositoryTest {
                 "UTC"
             )
 
-            assertThat(calendarsRepository.shouldFetchEvent(metadata)).isFalse()
+            assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isFalse()
+
+        }
+    }
+
+    @Test
+    fun `should not fetch non-recurring events from metadata if they are inside of previously requested metadata windows`() {
+        runBlocking {
+
+            val metadata = createEventMetadata("id",
+                startTime = 1577890800, // 1. January 2020 15:00:00 UTC
+                endTime = 1577894400 // 1. January 2020 16:00:00 UTC
+            )
+            coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
+            coEvery { updateFetchedEventsMetadataUseCaseMock.isWindowFullyFetched(any(), any(), any(), any()) } returns true
+
+            val calendarsRepository = getCalendarRepository() as CalendarsRepositoryImpl
+
+            calendarsRepository.minRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 3, 1),
+                LocalDate.of(2020, 3, 31),
+                "UTC"
+            )
+
+            calendarsRepository.maxRequestedWindowToFetch = CalendarsRepositoryImpl.FetchWindow(
+                UserId("user ID"),
+                listOf("calendar 1 ID", "calendar 2 ID"),
+                LocalDate.of(2020, 3, 1),
+                LocalDate.of(2020, 3, 31),
+                "UTC"
+            )
+
+            assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
 
         }
     }
@@ -364,7 +399,7 @@ internal class CalendarRepositoryTest {
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1, rRule = "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR")
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
 
-            assertThat(getCalendarRepository().shouldFetchEvent(metadata)).isTrue()
+            assertThat(getCalendarRepository().shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
 
         }
     }
