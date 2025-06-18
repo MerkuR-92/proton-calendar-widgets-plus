@@ -1,11 +1,7 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.RefreshCalendarPassphraseWorker
 import me.proton.android.calendar.data.api.CalendarPassphrasesEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.PassphraseEntity
@@ -79,15 +75,6 @@ class CalendarPassphraseEventListener @Inject constructor(
         calendarsRepository.deleteCalendarPassphrases(calendarId)
 
         // Launch worker to refresh calendar passphrase
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_PASSPHRASE,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ),
-            UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_PASSPHRASE,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        RefreshCalendarPassphraseWorker.enqueue(workManager, userId = config.userId.id, calendarId)
     }
 }

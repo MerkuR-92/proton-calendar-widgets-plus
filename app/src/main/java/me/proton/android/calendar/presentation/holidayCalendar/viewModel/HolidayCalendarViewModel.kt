@@ -1,18 +1,12 @@
 package me.proton.android.calendar.presentation.holidayCalendar.viewModel
 
 import android.app.Application
-import android.graphics.Color
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import biweekly.component.VAlarm
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,8 +16,7 @@ import me.proton.android.calendar.R
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.getMatchingDefaultHolidayCalendar
-import me.proton.android.calendar.common.utils.toHexColor
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.FetchCachedViewsEventsWorker
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -640,23 +633,11 @@ class HolidayCalendarViewModel @Inject constructor(
         selectedDate: LocalDate,
         displayTimeZoneId: String
     ) : LiveData<Operation.State> {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
-            .setConstraints(constraints)
-            .setInputData(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_CACHED_VIEWS_EVENTS,
-                    UseCaseWorker.INPUT_USER_ID to userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_DATE to selectedDate.toEpochDay(),
-                    UseCaseWorker.INPUT_TIME_ZONE_ID to displayTimeZoneId
-                )
-            )
-            .build()
-
-        return workManager.enqueueUniqueWork(UseCaseWorker.UniqueWorkNames.FETCH_CACHED_VIEWS_EVENTS, ExistingWorkPolicy.APPEND, work).state
+        return FetchCachedViewsEventsWorker.enqueue(workManager,
+            userId = userId,
+            calendarId = calendarId,
+            selectedDate = selectedDate,
+            displayTimeZoneId = displayTimeZoneId
+        )
     }
 }

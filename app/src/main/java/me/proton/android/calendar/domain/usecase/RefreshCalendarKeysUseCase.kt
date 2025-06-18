@@ -1,11 +1,7 @@
 package me.proton.android.calendar.domain.usecase
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.GetMinimalCalendarEventsWorker
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -45,16 +41,7 @@ class RefreshCalendarKeysUseCase @Inject constructor(
         }
 
         // Launch worker to fetch minimal events for calendar
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
-                UseCaseWorker.INPUT_USER_ID to userId.id,
-                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ),
-            UseCaseWorker.UniqueWorkNames.GET_MINIMAL_CALENDAR_EVENTS,
-            ExistingWorkPolicy.APPEND,
-            NetworkType.CONNECTED
-        )
+        GetMinimalCalendarEventsWorker.enqueue(workManager, userId = userId.id, calendarId = calendarId)
 
         return UseCase.Result.Success(calendarKeys)
     }

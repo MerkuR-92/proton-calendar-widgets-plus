@@ -1,13 +1,10 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.RefreshCalendarSettingsWorker
+import me.proton.android.calendar.common.worker.UpdateAlarmsWorker
 import me.proton.android.calendar.data.api.CalendarSettingsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
@@ -79,17 +76,11 @@ class CalendarSettingsEventListener @Inject constructor(
         val calendarIds = updateAllDayEventsAlarms.plus(updatePartDayEventsAlarms)
         calendarIds.forEach { calendarId ->
             // Launch worker to update alarms of calendar
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_ALARMS,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId,
-                    UseCaseWorker.INPUT_UPDATE_ALL_DAY_ALARMS to updateAllDayEventsAlarms.contains(calendarId),
-                    UseCaseWorker.INPUT_UPDATE_PART_DAY_ALARMS to updatePartDayEventsAlarms.contains(calendarId)
-                ),
-                UseCaseWorker.UniqueWorkNames.UPDATE_ALARMS,
-                ExistingWorkPolicy.APPEND,
-                NetworkType.CONNECTED
+            UpdateAlarmsWorker.enqueue(workManager,
+                userId = config.userId.id,
+                calendarId = calendarId,
+                updateAllDayEventsAlarms = updateAllDayEventsAlarms,
+                updatePartDayEventsAlarms = updatePartDayEventsAlarms,
             )
         }
     }
@@ -111,15 +102,6 @@ class CalendarSettingsEventListener @Inject constructor(
         calendarsRepository.deleteCalendarSettingsByCalendarId(calendarId)
 
         // Launch worker to refresh calendar settings
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_SETTINGS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ),
-            UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_SETTINGS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        RefreshCalendarSettingsWorker.enqueue(workManager, userId = config.userId.id, calendarId)
     }
 }

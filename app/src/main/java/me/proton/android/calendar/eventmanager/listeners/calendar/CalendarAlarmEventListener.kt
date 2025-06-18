@@ -1,11 +1,8 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.HandleAlarmsWithMissingEventWorker
+import me.proton.android.calendar.common.worker.HandleAlarmsWorker
 import me.proton.android.calendar.data.api.CalendarAlarmsEvents
 import me.proton.android.calendar.data.api.ServerEvent
 import me.proton.android.calendar.data.db.AppDatabase
@@ -79,29 +76,12 @@ class CalendarAlarmEventListener @Inject constructor(
 
         missingEvents.forEach { eventId ->
             // Launch worker to handle alarms with missing events
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.HANDLE_ALARMS_WITH_MISSING_EVENT,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to config.asCalendar().calendarId,
-                    UseCaseWorker.INPUT_EVENT_ID to eventId
-                ),
-                UseCaseWorker.UniqueWorkNames.HANDLE_ALARMS_WITH_MISSING_EVENT,
-                ExistingWorkPolicy.APPEND,
-                NetworkType.CONNECTED
-            )
+            HandleAlarmsWithMissingEventWorker.enqueue(workManager, userId = config.userId.id,
+                calendarId = config.asCalendar().calendarId, eventId = eventId)
         }
 
         // Launch worker to handle alarms
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.HANDLE_ALARMS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id
-            ),
-            UseCaseWorker.UniqueWorkNames.HANDLE_ALARMS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        HandleAlarmsWorker.enqueue(workManager, userId = config.userId.id, alarmEpochSeconds = null)
     }
 
     override suspend fun onFailure(config: EventManagerConfig) {

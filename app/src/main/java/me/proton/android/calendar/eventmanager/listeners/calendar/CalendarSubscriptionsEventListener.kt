@@ -1,11 +1,7 @@
 package me.proton.android.calendar.eventmanager.listeners.calendar
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.RefreshCalendarSubscriptionWorker
 import me.proton.android.calendar.data.api.CalendarSubscriptionsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
@@ -59,16 +55,7 @@ class CalendarSubscriptionsEventListener @Inject constructor(
         // Make sure we only do this for subscribed calendars
         if (calendarsRepository.selectCalendar(calendarId)?.isSubscribed == true) {
             // Launch worker to refresh calendar subscriptions
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_SUBSCRIPTION,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id,
-                    UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-                ),
-                UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_SUBSCRIPTION,
-                ExistingWorkPolicy.REPLACE,
-                NetworkType.CONNECTED
-            )
+            RefreshCalendarSubscriptionWorker.enqueue(workManager, userId = config.userId.id, calendarId)
         }
     }
 }

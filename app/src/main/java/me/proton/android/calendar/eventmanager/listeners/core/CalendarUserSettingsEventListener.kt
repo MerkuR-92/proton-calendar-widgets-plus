@@ -1,11 +1,8 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.WorkManager
-import androidx.work.workDataOf
-import me.proton.android.calendar.common.utils.WorkerUtils.enqueueWorkHelper
-import me.proton.android.calendar.common.worker.UseCaseWorker
+import me.proton.android.calendar.common.worker.HandleTimeZoneChangedWorker
+import me.proton.android.calendar.common.worker.RefreshCalendarUserSettingsWorker
 import me.proton.android.calendar.data.api.CalendarUserSettingsEvents
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
@@ -47,16 +44,7 @@ class CalendarUserSettingsEventListener @Inject constructor(
 
         if (handlePrimaryTimezoneChange) {
             // Launch worker to handle time zone change
-            workManager.enqueueWorkHelper(
-                workDataOf(
-                    UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.HANDLE_TIME_ZONE_CHANGE,
-                    UseCaseWorker.INPUT_USER_ID to config.userId.id
-                ),
-                UseCaseWorker.UniqueWorkNames.HANDLE_TIME_ZONE_CHANGE,
-                ExistingWorkPolicy.REPLACE,
-                NetworkType.CONNECTED
-            )
-
+            HandleTimeZoneChangedWorker.enqueue(workManager, config.userId.id)
             handlePrimaryTimezoneChange = false
         }
     }
@@ -83,14 +71,6 @@ class CalendarUserSettingsEventListener @Inject constructor(
         calendarsRepository.deleteCalendarUserSettingsByUserId(config.userId.id)
 
         // Launch worker to handle calendar user settings refresh
-        workManager.enqueueWorkHelper(
-            workDataOf(
-                UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_USER_SETTINGS,
-                UseCaseWorker.INPUT_USER_ID to config.userId.id
-            ),
-            UseCaseWorker.UniqueWorkNames.REFRESH_CALENDAR_USER_SETTINGS,
-            ExistingWorkPolicy.REPLACE,
-            NetworkType.CONNECTED
-        )
+        RefreshCalendarUserSettingsWorker.enqueue(workManager, config.userId.id)
     }
 }
