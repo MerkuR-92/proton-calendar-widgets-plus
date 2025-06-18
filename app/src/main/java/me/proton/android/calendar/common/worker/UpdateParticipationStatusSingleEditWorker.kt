@@ -19,7 +19,7 @@ object UpdateParticipationStatusSingleEditWorker {
         mainChainParticipationStatus: ParticipationStatus
     ): LiveData<Operation.State> {
         val status = mainChainParticipationStatus.toInt()
-        return workManager.enqueueAppending(
+        return workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PARTICIPATION_STATUS_SINGLE_EDIT,
                 UseCaseWorker.INPUT_USER_ID to userId,

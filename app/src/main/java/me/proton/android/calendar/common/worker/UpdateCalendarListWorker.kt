@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object UpdateCalendarListWorker {
 
     fun enqueue(workManager: WorkManager, userId: String): LiveData<Operation.State> {
-        return workManager.enqueueAppending(
+        return workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_CALENDAR_LIST,
                 UseCaseWorker.INPUT_USER_ID to userId,

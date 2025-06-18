@@ -31,7 +31,7 @@ class SyncAlarmsWorker @AssistedInject constructor(
         const val INPUT_FORCE_SYNC_ALARMS = "INPUT_FORCE_SYNC_ALARMS"
 
         fun enqueue(workManager: WorkManager, userId: String, force: Boolean, initialDelayMs: Long): Operation {
-            return workManager.enqueueAppending(
+            return workManager.enqueueAppending<SyncAlarmsWorker>(
                 workDataOf(
                     INPUT_USER_ID to userId,
                     INPUT_FORCE_SYNC_ALARMS to force,

@@ -33,7 +33,7 @@ class HandleAlarmsWorker @AssistedInject constructor(
         const val INPUT_ALARM_EPOCH_SECONDS = "INPUT_ALARM_EPOCH_SECONDS"
 
         fun enqueue(workManager: WorkManager, userId: String, alarmEpochSeconds: Long?): LiveData<Operation.State> {
-            return workManager.enqueueAppending(
+            return workManager.enqueueAppending<HandleAlarmsWorker>(
                 workDataOf(
                     INPUT_USER_ID to userId,
                     INPUT_ALARM_EPOCH_SECONDS to alarmEpochSeconds

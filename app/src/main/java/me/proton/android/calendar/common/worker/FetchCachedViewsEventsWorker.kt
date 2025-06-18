@@ -17,7 +17,7 @@ object FetchCachedViewsEventsWorker {
         selectedDate: LocalDate,
         displayTimeZoneId: String
     ) : LiveData<Operation.State> {
-        return workManager.enqueueAppending(workDataOf(
+        return workManager.enqueueAppending<UseCaseWorker>(workDataOf(
             UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FETCH_CACHED_VIEWS_EVENTS,
             UseCaseWorker.INPUT_USER_ID to userId.id,
             UseCaseWorker.INPUT_CALENDAR_ID to calendarId,

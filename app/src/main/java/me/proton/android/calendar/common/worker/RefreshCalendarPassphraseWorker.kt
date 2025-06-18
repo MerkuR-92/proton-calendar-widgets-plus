@@ -7,7 +7,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object RefreshCalendarPassphraseWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, calendarId: String) {
-        workManager.enqueueAppending(
+        workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.REFRESH_CALENDAR_PASSPHRASE,
                 UseCaseWorker.INPUT_USER_ID to userId,

@@ -7,7 +7,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object UpdateAlarmsWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, calendarId: String, updateAllDayEventsAlarms: Set<String>, updatePartDayEventsAlarms: Set<String>) {
-        workManager.enqueueAppending(
+        workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_ALARMS,
                 UseCaseWorker.INPUT_USER_ID to userId,

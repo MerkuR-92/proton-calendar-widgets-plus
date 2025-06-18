@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object MigrateEventMetadataToOccurrencesWorker {
 
     fun enqueue(workManager: WorkManager, userId: String): LiveData<Operation.State> {
-        return workManager.enqueueAppending(
+        return workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MIGRATE_EVENT_METADATA_TO_OCCURRENCES,
                 UseCaseWorker.INPUT_USER_ID to userId

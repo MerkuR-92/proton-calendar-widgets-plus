@@ -40,7 +40,7 @@ class BugReportWorker @AssistedInject constructor(
                     appVersionName: String, title: String, description: String, username: String,
                     email: String,
         ): LiveData<Operation.State> {
-            return workManager.enqueueAppending(
+            return workManager.enqueueAppending<BugReportWorker>(
                 workDataOf(
                     INPUT_USER_ID to userId,
                     INPUT_OS_NAME to osName,
