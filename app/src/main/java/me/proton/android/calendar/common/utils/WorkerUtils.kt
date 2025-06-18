@@ -47,27 +47,26 @@ object WorkerUtils {
     }
 
     suspend fun CoroutineWorker.executeUseCase(logger: Logger, block: suspend () -> UseCase.Result): ListenableWorker.Result {
-        val useCaseId = this.javaClass.simpleName
-
-        logger.v("inside UseCaseWorker doWork(), usecaseid: $useCaseId")
+        val logTag = this.javaClass.simpleName
+        logger.v("inside $logTag doWork()")
 
         val useCaseResult = block()
 
         return when (useCaseResult) {
             is UseCase.Result.Success<*> -> {
-                logger.v("UseCaseId=$useCaseId success")
+                logger.v("Worker $logTag success")
                 ListenableWorker.Result.success()
             }
             is UseCase.Result.InvalidParams -> {
-                logger.i("UseCaseId=$useCaseId failure, reason: ${useCaseResult.message}")
+                logger.i("Worker $logTag failure, reason: ${useCaseResult.message}")
                 ListenableWorker.Result.failure()
             }
             is UseCase.Result.Error -> {
                 if (this.runAttemptCount >= WORKER_MAX_RETRY_COUNT) {
-                    logger.e("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, max retry exceeded")
+                    logger.e("Worker $logTag error, reason: ${useCaseResult.message}, max retry exceeded")
                     ListenableWorker.Result.failure()
                 } else {
-                    logger.i("UseCaseId=$useCaseId error, reason: ${useCaseResult.message}, retrying")
+                    logger.i("Worker $logTag error, reason: ${useCaseResult.message}, retrying")
                     ListenableWorker.Result.retry()
                 }
             }

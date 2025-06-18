@@ -64,7 +64,7 @@ internal class ScheduleSyncAlarmsUseCaseTest {
         val workRequestSlot = CapturingSlot<OneTimeWorkRequest>()
         coVerify(exactly = 1) {
             workManagerMock.enqueueUniqueWork(
-                any(),
+                "SYNC_ALARMS_${expectedUserId.id}",
                 workPolicy,
                 capture(workRequestSlot)
             )
