@@ -443,7 +443,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
                     "ru", // Russian
                     "uk", // Ukrainian
                     "ka", // Georgian
-                    "zh" // Chinese
+                    "zh", // Chinese
+                    "hi" // Hindi
                     -> locale
                     else -> {
                         null
