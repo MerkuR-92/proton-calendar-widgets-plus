@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object GetMinimalCalendarEventsWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, calendarId: String): LiveData<Operation.State> {
-        return workManager.enqueueAppending(
+        return workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
                 UseCaseWorker.INPUT_USER_ID to userId,

@@ -7,7 +7,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object BootstrapCalendarsWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, calendarsToBootstrap: Set<String>) {
-        workManager.enqueueAppending(
+        workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.BOOTSTRAP_CALENDARS,
                 UseCaseWorker.INPUT_USER_ID to userId,

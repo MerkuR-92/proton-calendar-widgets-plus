@@ -7,7 +7,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object MembersKeySetupWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, membersWithIncompleteKeySetup: Set<String>) {
-        workManager.enqueueAppending(
+        workManager.enqueueAppending<UseCaseWorker>(
             workDataOf(
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.MEMBERS_KEY_SETUP,
                 UseCaseWorker.INPUT_USER_ID to userId,

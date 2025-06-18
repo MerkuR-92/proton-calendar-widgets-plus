@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object UpdateDisplayWeekNumberWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, displayWeekNumber: Boolean) : LiveData<Operation.State> {
-        return workManager.enqueueAppending(workDataOf(
+        return workManager.enqueueAppending<UseCaseWorker>(workDataOf(
             UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_DISPLAY_WEEK_NUMBER,
             UseCaseWorker.INPUT_USER_ID to userId,
             UseCaseWorker.INPUT_DISPLAY_WEEK_NUMBER to displayWeekNumber

@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object FixCalendarsWorker {
 
     fun enqueue(workManager: WorkManager, userId: String): LiveData<Operation.State> {
-        return workManager.enqueueAppending(workDataOf(
+        return workManager.enqueueAppending<UseCaseWorker>(workDataOf(
             UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.FIX_CALENDARS,
             UseCaseWorker.INPUT_USER_ID to userId
         ), UseCaseWorker.UniqueWorkNames.FIX_CALENDARS).state

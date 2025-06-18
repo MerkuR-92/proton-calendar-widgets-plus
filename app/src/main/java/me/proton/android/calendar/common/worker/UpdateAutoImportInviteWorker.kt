@@ -9,7 +9,7 @@ import me.proton.android.calendar.common.utils.WorkerUtils.enqueueAppending
 object UpdateAutoImportInviteWorker {
 
     fun enqueue(workManager: WorkManager, userId: String, autoImportInvite: Boolean) : LiveData<Operation.State> {
-        return workManager.enqueueAppending(  workDataOf(
+        return workManager.enqueueAppending<UseCaseWorker>(workDataOf(
             UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_AUTO_IMPORT_INVITE,
             UseCaseWorker.INPUT_USER_ID to userId,
             UseCaseWorker.INPUT_AUTO_IMPORT_INVITE to autoImportInvite

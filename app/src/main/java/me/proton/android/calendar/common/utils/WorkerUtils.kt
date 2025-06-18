@@ -10,20 +10,19 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
 import me.proton.android.calendar.common.WORKER_MAX_RETRY_COUNT
-import me.proton.android.calendar.common.worker.UseCaseWorker
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.usecase.UseCase
 import java.util.concurrent.TimeUnit
 
 object WorkerUtils {
 
-    fun WorkManager.enqueueAppending(
+    inline fun <reified T: ListenableWorker> WorkManager.enqueueAppending(
         workData: Data,
         uniqueWorkName: String,
         requireNetwork: Boolean = true,
         initialDelayMs: Long? = null,
     ): Operation {
-        val work = OneTimeWorkRequestBuilder<UseCaseWorker>()
+        val work = OneTimeWorkRequestBuilder<T>()
             .let {
                 if (requireNetwork) {
                     it.setConstraints(Constraints.Builder()
