@@ -26,6 +26,7 @@
         <item>Українська</item>
         <item>ქართული ენა</item>
         <item>繁體中文</item>
+        <item>हिन्दी (भारत)</item>
     </array>
     <array name="custom_language_values" translatable="false">
         <item>en</item>
@@ -53,5 +54,6 @@
         <item>uk</item>
         <item>ka</item>
         <item>zh-TW</item>
+        <item>hi</item>
     </array>
 </resources>

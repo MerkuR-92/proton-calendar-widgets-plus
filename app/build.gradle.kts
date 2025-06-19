@@ -410,6 +410,7 @@ object Config {
             "ru", // Russian
             "uk", // Ukrainian
             "ka", // Georgian
+            "hi", // Hindi
             "zh-rTW", // Chinese Traditional (Taiwan)
         )
 }
