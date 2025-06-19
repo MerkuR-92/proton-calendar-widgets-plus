@@ -61,15 +61,6 @@ android {
         buildConfig = true
     }
 
-    signingConfigs {
-        create("default") {
-            storeFile = file(project.properties["keyStoreFilePath"] ?: "protonkey.jks")
-            storePassword = System.getenv("KEY_STORE_PASSWORD") ?: "\"Store password\""
-            keyAlias = System.getenv("KEY_STORE_KEY_ALIAS") ?: "proton"
-            keyPassword = System.getenv("KEY_STORE_KEY_PASSWORD") ?: "\"Store key password\""
-        }
-    }
-
     defaultConfig {
         applicationId = Config.applicationId
         minSdk = Config.minSdk
@@ -136,7 +127,7 @@ android {
                 getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("default")
+            signingConfig = signingConfigs.getByName("debug")
 
             val sentryDsn = System.getenv("SENTRY_DSN_NEW")
             buildConfigField("String", "SENTRY_DSN_NEW", sentryDsn.toBuildConfigValue())
@@ -150,7 +141,7 @@ android {
             isDebuggable = true
 
             if (isGitlabCI) {
-                signingConfig = signingConfigs.getByName("default")
+                signingConfig = signingConfigs.getByName("debug")
             }
         }
     }
