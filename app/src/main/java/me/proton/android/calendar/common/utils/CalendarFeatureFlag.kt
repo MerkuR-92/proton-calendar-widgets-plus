@@ -16,6 +16,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     FetchedEventsCacheAndroid(FeatureId("FetchedEventsCacheAndroid"), false, false),
     ZoomIntegrationAndroid(FeatureId("ZoomIntegrationAndroid"), false, false),
     RsvpCommentsAndroid(FeatureId("RsvpCommentsAndroid"), false, false),
+    NewCalendarEventListenerAndroid(FeatureId("NewCalendarEventListenerAndroid"), false, false),
 
     /** Local only flag (unknown to remote API) **/
     // Enabled

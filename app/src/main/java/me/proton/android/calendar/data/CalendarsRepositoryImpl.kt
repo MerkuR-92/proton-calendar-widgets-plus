@@ -978,6 +978,11 @@ class CalendarsRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun persistEventsMetadata(vararg eventsMetadata: EventEntityMetadata) {
+        database.eventsMetadataDao().updateOrInsert(*eventsMetadata)
+    }
+
     override suspend fun deleteEventsById(calendarId: String, ids: List<String>) {
         database.eventsDao().deleteByIds(ids)
 
