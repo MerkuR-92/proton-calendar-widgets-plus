@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -496,6 +497,21 @@ class CalendarViewModel @Inject constructor(
             getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
         }
     }
+
+    fun getUiEventsLookupFlow(
+        fromDate: LocalDate,
+        toDate: LocalDate,
+        timeZoneId: String,
+        lifecycle: Lifecycle
+    ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
+        val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
+        if (userId == null) {
+            logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
+            return@flow
+        }
+        emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED))
+    }.distinctUntilChanged()
+        .onStart { emit(CalendarsRepository.GetEventsResult.InProgress) }
 
     suspend fun getUiEventsLookupWithInProgressResult(
         fromDate: LocalDate,

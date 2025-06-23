@@ -15,10 +15,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.whenStarted
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
@@ -28,7 +28,6 @@ import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Operation
 import com.alamkanak.weekview.firstVisibleDateAsLocalDate
-import com.alamkanak.weekview.lastVisibleDateAsLocalDate
 import com.alamkanak.weekview.scrollToDate
 import com.alamkanak.weekview.scrollToDateTime
 import com.alamkanak.weekview.scrollToTime
@@ -38,6 +37,12 @@ import com.alamkanak.weekview.setDateTime
 import com.alamkanak.weekview.setWeekDayFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -87,7 +92,6 @@ import me.proton.android.calendar.presentation.calendar.pagerAdapter.AgendaPager
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MiniCalendarPagerAdapter
 import me.proton.android.calendar.presentation.calendar.pagerAdapter.MonthPagerAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
-import me.proton.android.calendar.presentation.calendar.viewModel.SearchViewModel
 import me.proton.android.calendar.presentation.main.fragment.BaseFragment
 import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
@@ -106,12 +110,12 @@ import javax.inject.Inject
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
-    private val searchViewModel: SearchViewModel by activityViewModels()
     private val featureFlagViewModel: FeatureFlagViewModel by activityViewModels()
 
     @Inject
@@ -149,11 +153,12 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private var currentFromDate: LocalDate? = null
     private var currentToDate: LocalDate? = null
     private var currentTimeZoneId: String? = null
-    private var loadedRangeStart: LocalDate? = null
-    private var loadedRangeEnd: LocalDate? = null
     private lateinit var weekViewAdapter: WeekViewAdapter
-    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
+
+    private data class EventsRange(val fromDate: LocalDate, val toDate: LocalDate, val timeZoneId: String)
+
+    private val currentRange = MutableStateFlow<EventsRange?>(null)
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonSearch = layoutInflater.inflate(R.layout.toolbar_action_button, fragmentToolbarContent, false)
@@ -673,6 +678,16 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             buttonSearch.visibleOrGone(eventSearchFeatureFlag)
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                currentRange.filterNotNull().flatMapLatest { range ->
+                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId, lifecycle)
+                }.collectLatest {
+                    updateUiEvents(it)
+                }
+            }
+        }
+
         weekViewAdapter = WeekViewAdapter(
             dragHandler = { _, _, _ ->
                 // TODO DRAG
@@ -767,9 +782,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             firstDayOfWeek?.let {
                 val fromDate = firstDayOfWeek.minusDays(WEEK_VIEW_PAST_DAYS_TO_LOAD)
                 val toDate = firstDayOfWeek.plusDays(WEEK_VIEW_FUTURE_DAYS_TO_LOAD)
-                val weekViewShown = currentViewMode == ViewMode.DAY || currentViewMode == ViewMode.THREE_DAY || currentViewMode == ViewMode.WEEK
-                val weekViewFlowInitialized = this@MonthFragment::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()
-                if ((!weekViewFlowInitialized && weekViewShown) || (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate)) {
+                val rangeChanged = (currentFromDate?.firstDayOfWeek(weekStart) != firstDayOfWeek && currentFromDate != fromDate && currentToDate != toDate)
+                if (rangeChanged) {
                     val timeZoneId = calendarViewModel.getTimeZoneId()?.id
                     getEvents(fromDate, toDate, timeZoneId ?: return@launch)
                 }
@@ -812,62 +826,35 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
     }
 
-    private suspend fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
-            binding.weekView.showLoadingEvents = false
-            if (fromDate == currentFromDate && toDate == currentToDate && timeZoneId == currentTimeZoneId) {
-                // Return early if we already have that flow running
-                return
-            }
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
+    private fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         // Get and display decrypted events
         currentFromDate = fromDate
         currentToDate = toDate
         currentTimeZoneId = timeZoneId
-        eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
+        currentRange.update { EventsRange(fromDate, toDate, timeZoneId) }
+    }
 
-        val visibleStart = binding.weekView.firstVisibleDateAsLocalDate
-        val visibleEnd = binding.weekView.lastVisibleDateAsLocalDate
-        val loadedStart = loadedRangeStart
-        val loadedEnd = loadedRangeEnd
+    private fun updateUiEvents(events: CalendarsRepository.GetEventsResult<UiEvent>) {
+        when (events) {
+            CalendarsRepository.GetEventsResult.InProgress -> {
+                binding.weekView.showLoadingEvents = true
+                binding.calendarProgress.isVisible = true
+            }
 
-        val hasEventsForView = loadedStart != null && loadedEnd != null &&  loadedStart < visibleEnd && visibleStart < loadedEnd
-        binding.calendarProgress.isVisible = !hasEventsForView
-
-        if (view == null) return // To prevent IllegalStateException: Can't access the Fragment View's LifecycleOwner when getView() is null
-        eventsLiveData.distinctUntilChanged().observe(viewLifecycleOwner) { eventsResult ->
-
-            eventsResult?.let {
-                when (it) {
-                    CalendarsRepository.GetEventsResult.InProgress -> {
-                        binding.weekView.showLoadingEvents = true
-                        binding.calendarProgress.isVisible = true
-                    }
-                    is CalendarsRepository.GetEventsResult.Success -> {
-                        lifecycleScope.launch {
-                            val weekViewCalendarEntities = it.events.flatMap { event ->
-                                event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
-                            }
-                            loadedRangeStart = it.events.minByOrNull { e ->
-                                e.dateStart
-                            }?.dateStart?.toLocalDate() ?: fromDate
-                            loadedRangeEnd = it.events.maxByOrNull { e ->
-                                e.dateStart
-                            }?.dateStart?.toLocalDate() ?: toDate
-
-                            weekViewAdapter.submitList(
-                                weekViewCalendarEntities
-                            )
-                            binding.weekView.showLoadingEvents = false
-                            binding.calendarProgress.isVisible = false
-                        }
-                    }
-                    is CalendarsRepository.GetEventsResult.Exception -> {
-                        binding.weekView.showLoadingEvents = false
-                        binding.calendarProgress.isVisible = false
-                    }
+            is CalendarsRepository.GetEventsResult.Success -> {
+                val weekViewCalendarEntities = events.events.flatMap { event ->
+                    event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
                 }
+                weekViewAdapter.submitList(
+                    weekViewCalendarEntities
+                )
+                binding.weekView.showLoadingEvents = false
+                binding.calendarProgress.isVisible = false
+            }
+
+            is CalendarsRepository.GetEventsResult.Exception -> {
+                binding.weekView.showLoadingEvents = false
+                binding.calendarProgress.isVisible = false
             }
         }
     }
@@ -1075,10 +1062,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
         }
 
-        if (viewMode != ViewMode.WEEK && viewMode != ViewMode.THREE_DAY && viewMode != ViewMode.DAY &&
-            this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
         if (binding.weekView.isVisible && (viewMode == ViewMode.DAY || viewMode == ViewMode.THREE_DAY || viewMode == ViewMode.WEEK)){
             miniCalendarChevron.clearAnimation()
             miniCalendarChevron.visibleOrGone(true)
