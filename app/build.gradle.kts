@@ -81,6 +81,12 @@ android {
 
         buildConfigField("String", "ACCOUNT_SENTRY_DSN", null.toBuildConfigValue())
 
+        // performance metrics
+        buildConfigField("String", "DYNAMIC_DOMAIN", "proton.black".toBuildConfigValue())
+        buildConfigField("String", "LOKI_ENDPOINT", localProperties.getProperty("LOKI_ENDPOINT").toBuildConfigValue())
+        buildConfigField("String", "LOKI_CERTIFICATE", localProperties.getProperty("LOKI_CERTIFICATE").toBuildConfigValue())
+        buildConfigField("String", "LOKI_PRIVATE_KEY", localProperties.getProperty("LOKI_PRIVATE_KEY").toBuildConfigValue())
+
         setAssetLinksResValue("proton.me")
 
         javaCompileOptions {
@@ -331,6 +337,7 @@ dependencies {
     androidTestImplementation(libs.test.espresso.core)
     androidTestImplementation(libs.core.userRecovery.test)
     androidTestImplementation(libs.core.test.android.test.rule)
+    androidTestImplementation(libs.core.test.android.test.performance)
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)
