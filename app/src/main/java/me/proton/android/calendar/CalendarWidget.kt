@@ -178,11 +178,11 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         // used for handling clicks on ListView elements
         remoteViews.setPendingIntentTemplate(R.id.lv_widget, createPendingIntentTemplate(context))
 
-        // force ListView to refresh
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.lv_widget)
-
         // trigger Remote Views update
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+
+        // force ListView to refresh
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.lv_widget)
     }
 
     private fun createOpenAppIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
