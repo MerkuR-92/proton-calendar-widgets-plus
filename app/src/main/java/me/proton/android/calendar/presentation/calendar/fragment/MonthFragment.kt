@@ -77,6 +77,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecry
 import me.proton.android.calendar.databinding.FragmentMonthBinding
 import me.proton.android.calendar.databinding.ItemMiniCalendarHeaderBinding
 import me.proton.android.calendar.domain.CalendarsRepository
+import me.proton.android.calendar.domain.CalendarsRepository.EventsWindow
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
@@ -156,9 +157,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private lateinit var weekViewAdapter: WeekViewAdapter
     private var initWeekView = false // Use it to ignore the first range change callback in week view mode (due to week view sticking to week start)
 
-    private data class EventsRange(val fromDate: LocalDate, val toDate: LocalDate, val timeZoneId: String)
-
-    private val currentRange = MutableStateFlow<EventsRange?>(null)
+    private val currentRange = MutableStateFlow<EventsWindow?>(null)
 
     override fun onToolbarCreated(toolbar: Toolbar) {
         buttonSearch = layoutInflater.inflate(R.layout.toolbar_action_button, fragmentToolbarContent, false)
@@ -831,7 +830,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         currentFromDate = fromDate
         currentToDate = toDate
         currentTimeZoneId = timeZoneId
-        currentRange.update { EventsRange(fromDate, toDate, timeZoneId) }
+        currentRange.update { EventsWindow(fromDate, toDate, timeZoneId) }
     }
 
     private fun updateUiEvents(events: CalendarsRepository.GetEventsResult<UiEvent>) {
