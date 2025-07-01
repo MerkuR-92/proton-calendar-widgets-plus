@@ -7,6 +7,7 @@ import configuration.util.getTokenFromCurl
 import studio.forface.easygradle.dsl.version
 import java.io.FileNotFoundException
 import java.util.Properties
+import groovy.json.StringEscapeUtils
 
 plugins {
     alias(libs.plugins.kotlin.serialization)
@@ -83,9 +84,9 @@ android {
 
         // performance metrics
         buildConfigField("String", "DYNAMIC_DOMAIN", "proton.black".toBuildConfigValue())
-        buildConfigField("String", "LOKI_ENDPOINT", localProperties.getProperty("LOKI_ENDPOINT").toBuildConfigValue())
-        buildConfigField("String", "LOKI_CERTIFICATE", localProperties.getProperty("LOKI_CERTIFICATE").toBuildConfigValue())
-        buildConfigField("String", "LOKI_PRIVATE_KEY", localProperties.getProperty("LOKI_PRIVATE_KEY").toBuildConfigValue())
+        buildConfigField("String", "LOKI_ENDPOINT", getEnvProperty("LOKI_ENDPOINT").toBuildConfigValue())
+        buildConfigField("String", "LOKI_CERTIFICATE", getEnvProperty("LOKI_CERTIFICATE").toBuildConfigValue())
+        buildConfigField("String", "LOKI_PRIVATE_KEY", getEnvProperty("LOKI_PRIVATE_KEY").toBuildConfigValue())
 
         setAssetLinksResValue("proton.me")
 
@@ -368,6 +369,16 @@ tasks.withType<Test> {
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
+    }
+}
+
+// Get env property first from Env, afterwards prioritize local.properties
+fun getEnvProperty(key: String, defaultValue: String? = null, escapeValue: Boolean = true): String? {
+    val value = System.getenv(key) ?: localProperties.getProperty(key, defaultValue)
+    return if (escapeValue && value != null) {
+        StringEscapeUtils.escapeJava(value)
+    } else {
+        value
     }
 }
 
