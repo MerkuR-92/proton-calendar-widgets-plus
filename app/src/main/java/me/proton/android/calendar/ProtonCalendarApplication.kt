@@ -43,6 +43,8 @@ class ProtonCalendarApplication : Application() {
         // Forward Core Logs to Timber, using TimberLogger.
         CoreLogger.set(TimberLogger)
 
+        System.loadLibrary("sqlcipher")
+
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }

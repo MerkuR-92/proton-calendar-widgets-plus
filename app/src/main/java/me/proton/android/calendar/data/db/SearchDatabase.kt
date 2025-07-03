@@ -12,7 +12,7 @@ import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.core.crypto.common.keystore.EncryptedByteArray
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import me.proton.core.crypto.common.keystore.PlainByteArray
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 @Database(
     entities = [
@@ -50,7 +50,7 @@ abstract class SearchDatabase : RoomDatabase() {
             } else persistedPassphrase
 
             return Room.databaseBuilder(context, SearchDatabase::class.java, name)
-                .openHelperFactory(SupportFactory(passphrase))
+                .openHelperFactory(SupportOpenHelperFactory(passphrase))
                 .build()
         }
 

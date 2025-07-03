@@ -18,6 +18,7 @@ app/build.env
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries/**
 .idea/misc.xml
+.idea/codeStyles/Project.xml
 # Do not exclude project Dictionary
 !.idea/**/dictionaries/project.xml
 .idea/**/shelf
