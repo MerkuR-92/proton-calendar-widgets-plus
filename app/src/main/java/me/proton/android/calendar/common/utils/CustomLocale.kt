@@ -2,6 +2,7 @@ package me.proton.android.calendar.common.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.preference.PreferenceManager
@@ -81,7 +82,18 @@ object CustomLocale {
         val languageToSet = localeCode.substringBefore("-")
         val countryToSet = localeCode.substringAfter("-", "")
         // Create custom Locale
-        return Locale(languageToSet, countryToSet)
+        return Locale(preAndroid15LanguageCode(languageToSet), preAndroid15LanguageCode(countryToSet))
+    }
+
+    fun preAndroid15LanguageCode(code: String): String  {
+        if (Build.VERSION.SDK_INT < 35) {
+            when (code) {
+                "he" -> return "iw"
+                "id" -> return "in"
+                "yi" -> return "ji"
+            }
+        }
+        return code
     }
 
     /** Gets either a custom selected Locale for the app or null. */

@@ -389,7 +389,7 @@ object Config {
             "fi", // Finnish
             "hu", // Hungarian
             "it", // Italian
-            "in", // Indonesian
+            "in", // Indonesian, not supported by Locale class starting from Android 15, replaced with "id"
             "nl", // Nederlands
             "pl", // Polish
             "pt-rBR", // Portuguese (Brazil)
