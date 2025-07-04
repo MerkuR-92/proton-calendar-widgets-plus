@@ -91,6 +91,7 @@ import me.proton.android.calendar.common.SERVER_DOWN_BANNER_DURATION_SECONDS
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -319,17 +320,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             return
         }
 
-        // edge-to-edge insets on Android 15+
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = insets.left
-                topMargin = insets.top
-                rightMargin = insets.right
-                bottomMargin = insets.bottom
-            }
-            WindowInsetsCompat.CONSUMED
-        }
+        AndroidUtils.applyAndroid15EdgeToEdge(view)
 
         // TODO bring it back after we contain performance issues or make it more async, maybe when leaving the app?
         // widgetRefresher.broadcastRefresh()
