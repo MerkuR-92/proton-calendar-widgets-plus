@@ -232,10 +232,10 @@
     <string name="event_recurring_edit_this">Гэта падзея</string>
     <string name="event_recurring_edit_this_and_future">Гэта і будучыя падзеі</string>
     <string name="event_recurring_edit_all_events">Усе падзеі</string>
-    <string name="event_discard_changes_title">Скасаваць змены?</string>
+    <string name="event_discard_changes_title">Адхіліць змены?</string>
     <string name="event_discard_changes_description">Вы страціце ўсе незахаваныя змены.</string>
     <string name="event_discard_changes_cancel">Працягнуць рэдагаванне</string>
-    <string name="event_discard_changes_confirm">Скасаваць</string>
+    <string name="event_discard_changes_confirm">Адхіліць</string>
     <string name="event_recurring_update_this_title">Абнавіць перыядычную падзею</string>
     <string name="event_recurring_update_this_description">Змяненні перыядычнасці будуць страчаны</string>
     <string name="event_recurring_update_all_description">Папярэднія змяненні ў гэтай серыі будуць страчаны.</string>
@@ -441,9 +441,9 @@
     <string name="bug_report_hint_title">Тэма</string>
     <string name="bug_report_hint_description">Апішыце праблему і далучыце ўсе паведамленні з памылкамі.</string>
     <string name="bug_report_discard_changes_title">Незахаваныя змены</string>
-    <string name="bug_report_discard_changes_description">У форме прысутнічаюць незахаваныя запісы. Вы сапраўды хочаце скасаваць іх?</string>
+    <string name="bug_report_discard_changes_description">У форме прысутнічаюць незахаваныя запісы. Вы сапраўды хочаце ідхіліць іх?</string>
     <string name="bug_report_discard_changes_cancel">Працягнуць пісаць</string>
-    <string name="bug_report_discard_changes_confirm">Скасаваць</string>
+    <string name="bug_report_discard_changes_confirm">Адхіліць</string>
     <!-- Settings -->
     <string name="settings_app_settings_title">Налады праграмы</string>
     <string name="settings_theme_title">Тэма</string>
@@ -669,7 +669,7 @@
     <string name="import_assistant_cancel_import_positive_button">Скасаваць імпартаванне</string>
     <string name="import_assistant_cancel_import_negative_button">Узнавіць імпартаванне</string>
     <string name="import_assistant_in_progress_snack">Выконваецца імпартаванне</string>
-    <string name="import_assistant_discard_import_title">Скасаваць імпартаванне?</string>
+    <string name="import_assistant_discard_import_title">Адхіліць імпартаванне?</string>
     <string name="import_assistant_discard_import_message">Імпартаванне незавершана і не можа быць узноўлена, калі вы яго скасуеце.</string>
     <string name="import_assistant_discard_import_positive">Скасаваць імпартаванне</string>
     <string name="import_assistant_discard_import_negative">Узнавіць імпартаванне</string>

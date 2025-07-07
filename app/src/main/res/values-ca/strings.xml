@@ -7,7 +7,7 @@
     <string name="toast_copied_to_clipboard">Copiat al porta-retalls</string>
     <!-- DELETE EVENT DIALOG -->
     <string name="dialog_title_delete_event">Elimina l\'esdeveniment</string>
-    <string name="dialog_title_delete_recurring_event">Suprimir esdeveniment recurrent</string>
+    <string name="dialog_title_delete_recurring_event">Suprimeix l\'esdeveniment recurrent</string>
     <string name="dialog_description_delete_event">Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_delete_recurring_event">Voleu suprimir tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="dialog_description_delete_non_standalone_single_edit_event">L\'organitzador ha actualitzat aquest esdeveniment. Voleu suprimir aquest esdeveniment?</string>
@@ -24,16 +24,16 @@
     <string name="dialog_description_delete_recurring_event_as_organizer">S\'enviarà un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="dialog_description_delete_recurring_event_as_organizer_disabled">La vostra adreça està desactivada. No es pot enviar un correu electrònic de cancel·lació als participants de l\'esdeveniment. Voleu suprimir tots els esdeveniments d\'aquesta sèrie igualment?</string>
     <!-- Delete as an attendee -->
-    <string name="dialog_description_delete_single_event_as_attendee">Es notificarà a l\'organitzador d\'aquest esdeveniment que rebutgeu la invitació. Voleu suprimir aquest esdeveniment?</string>
-    <string name="dialog_description_delete_single_event_as_attendee_disabled">No es notificarà a l\'organitzador d\'aquest esdeveniment que rebutgeu la invitació perquè no podeu enviar correus electrònics des de l\'adreça electrònica convidada. Voleu suprimir aquest esdeveniment de totes maneres?</string>
-    <string name="dialog_description_delete_recurring_event_as_attendee">L\'organitzador d\'aquesta sèrie d\'esdeveniments serà notificat que refuseu la invitació. Voleu suprimir tots els esdeveniments de la sèrie?</string>
-    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">No es notificarà a l\'organitzador d\'aquesta sèrie d\'esdeveniments que rebutgeu la invitació perquè no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir tots els esdeveniments d\'aquesta sèrie de totes maneres?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Aquest esdeveniment s\'ha actualitzat. Es notificarà a l\'organitzador que refuseu la invitació. Voleu suprimir aquest esdeveniment?</string>
-    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Aquest esdeveniment s\'ha actualitzat. No es notificarà a l\'organitzador d\'aquest esdeveniment que rebutgeu la invitació perquè no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir aquest esdeveniment?</string>
+    <string name="dialog_description_delete_single_event_as_attendee">L\'organitzador d\'aquest esdeveniment serà notificat que rebutgeu la invitació. Voleu suprimir aquest esdeveniment?</string>
+    <string name="dialog_description_delete_single_event_as_attendee_disabled">No es notificarà a l\'organitzador d\'aquest esdeveniment que rebutgeu la invitació, ja que no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir aquest esdeveniment?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee">L\'organitzador d\'aquesta sèrie d\'esdeveniments serà notificat que rebutgeu la invitació. Voleu suprimir tots els esdeveniments d\'aquesta sèrie?</string>
+    <string name="dialog_description_delete_recurring_event_as_attendee_disabled">No es notificarà a l\'organitzador d\'aquesta sèrie d\'esdeveniments que rebutgeu la invitació, ja que no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir tots els esdeveniments d\'aquesta sèrie?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee">Aquest esdeveniment s\'ha actualitzat. Es notificarà a l\'organitzador que rebutgeu la invitació. Voleu suprimir aquest esdeveniment?</string>
+    <string name="dialog_description_delete_non_standalone_single_edit_event_as_attendee_disabled">Aquest esdeveniment s\'ha actualitzat. No es notificarà a l\'organitzador que rebutgeu la invitació, ja que no podeu enviar correus electrònics des de l\'adreça convidada. Voleu suprimir aquest esdeveniment?</string>
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Les ocurrències actualitzades prèviament per l\'organitzador es conservaran, però es perdran les vostres respostes</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Es conservaran les ocurrències actualitzades prèviament per l’organitzador</string>
-    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar a l\'organitzador que refuseu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment de totes maneres?</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar l\'organitzador que refuseu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment de totes maneres?</string>
     <string name="dialog_button_set">Aplicar</string>
     <string name="dialog_button_ok">D\'acord</string>
     <string name="action_save">Desa</string>
@@ -50,7 +50,7 @@
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">Cap esdeveniment</string>
     <string name="agenda_loading_events">Carregant esdeveniments…</string>
-    <string name="agenda_loading_events_error">Error carregant esdeveniments</string>
+    <string name="agenda_loading_events_error">Error en carregar esdeveniments</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
     <string name="day_view_all_day_more">+ %1$d més</string>
     <!-- EVENT DETAILS   -->
@@ -62,11 +62,11 @@
     <string name="event_alarm_label_on_the_same_day">El mateix dia</string>
     <string name="event_alarm_label_before">%1$s abans</string>
     <string name="event_alarm_label">%1$s</string>
-    <string name="event_alarm_label_before_by_email">%1$s abans per correu</string>
+    <string name="event_alarm_label_before_by_email">%1$s abans per correu electrònic</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a les %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s i per correu</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s i per correu electrònic</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s abans, %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s i per correu</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s i per correu electrònic</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s els %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el dia %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s els %2$s</string>
@@ -102,7 +102,7 @@
     <string name="event_decryption_error_dialog_close">Tanca</string>
     <string name="event_signature_verification_failure">No s\'ha pogut verificar la signatura de l\'esdeveniment. <a href="https://proton.me/support/what-is-a-digital-signature">Més informació</a></string>
     <string name="event_signature_verification_in_progress">La verificació de la signatura de l\'esdeveniment està en curs.</string>
-    <string name="event_signature_verification_network_error">La verificació de la signatura de l\'esdeveniment s\'ha interromput per un error. <a href="">Proveu de nou</a></string>
+    <string name="event_signature_verification_network_error">La verificació de la signatura de l\'esdeveniment s\'ha interromput per un error. <a href="">Torna-ho a provar</a></string>
     <string name="event_change_answer_recurring_title">Actualitza l\'esdeveniment recurrent</string>
     <string name="event_change_answer_recurring_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?</string>
     <string name="event_change_answer_recurring_overwrite_description">Voleu canviar la vostra resposta per a tots els esdeveniments d\'aquesta sèrie?\nAlgunes de les vostres respostes a esdeveniments prèviament actualitzats per l\'organitzador es perdran.</string>
@@ -114,11 +114,11 @@
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s ha acceptat provisionalment la vostra invitació a %2$s.</string>
     <string name="event_organizer_send_prefs_error_title">No es pot notificar a l\'organitzador.</string>
     <string name="event_organizer_send_prefs_message_accepted_title">No es pot notificar a l\'organitzador que heu acceptat la invitació.</string>
-    <string name="event_organizer_send_prefs_message_declined_title">No es pot notificar a l\'organitzador que heu refusat la invitació.</string>
+    <string name="event_organizer_send_prefs_message_declined_title">No es pot notificar a l\'organitzador que heu rebutjat la invitació.</string>
     <string name="event_organizer_send_prefs_message_tentative_title">No es pot notificar a l\'organitzador que heu acceptat provisionalment la invitació.</string>
     <string name="event_organizer_send_prefs_message_default_title">No es pot notificar a l\'organitzador que heu respost a la invitació.</string>
     <string name="event_organizer_send_prefs_button_title">D\'acord</string>
-    <string name="event_attendees_send_prefs_error_title">No es pot notificar als participants</string>
+    <string name="event_attendees_send_prefs_error_title">No es pot notificar als assistents</string>
     <string name="event_attendees_send_prefs_error_none_message" comment="string placeholder is a list of failed emails">Cap dels participants pot rebre notificacions sobre els vostres canvis:\n\n• %1$s\n\nVoleu continuar de totes maneres?</string>
     <string name="event_attendees_send_prefs_error_some_message" comment="string placeholder is a list of failed emails">Els participants següents no poden rebre notificacions sobre els vostres canvis:\n\n• %1$s\n\nVoleu continuar de totes maneres?</string>
     <string name="event_attendees_send_prefs_error_confirm">Continua</string>
@@ -159,7 +159,7 @@
     <string name="event_text_timezone_start">Zona horària</string>
     <string name="invite_in_shared_calendar_disclaimer">L\'enviament d\'invitacions només està disponible en calendaris personals.</string>
     <string name="invite_change_calendar_disclaimer">No és possible modificar el calendari associat amb invitacions.</string>
-    <string name="invite_change_attendees_disclaimer">No és encara possible modificar els participants associats amb invitacions.</string>
+    <string name="invite_change_attendees_disclaimer">Encara no és possible modificar els participants associats a les invitacions.</string>
     <string name="change_calendar_recurring_disclaimer">El canvi de calendari per a un esdeveniment recurrent encara no està disponible.</string>
     <string name="update_event">Actualitza l\'esdeveniment</string>
     <string name="update_invite_send_email">S\'enviarà una actualització de la invitació als participants de l\'esdeveniment.</string>
@@ -199,7 +199,7 @@
     <string name="event_alarms_title">Notificacions</string>
     <string name="event_custom_alarms_field">Notificar</string>
     <string name="event_custom_alarms_title">Notificacions personalitzades</string>
-    <string name="event_alarm_partial_day_1">al moment de l\'esdeveniment</string>
+    <string name="event_alarm_partial_day_1">en el moment de l\'esdeveniment</string>
     <string name="event_alarm_partial_day_2">10 minuts</string>
     <string name="event_alarm_partial_day_3">30 minuts</string>
     <string name="event_alarm_partial_day_4">1 hora</string>
@@ -242,7 +242,7 @@
     <string name="event_recurring_update_this_cancel">Cancel·la</string>
     <string name="event_recurring_update_this_confirm">Actualitza</string>
     <string name="event_allow_contacts_title">Voleu permetre a Proton Calendar accedir als vostres contactes?</string>
-    <string name="event_allow_contacts_description">Proton Calendar necessita l\'accés als vostres contactes per utilitzar l\'emplenament automàtic</string>
+    <string name="event_allow_contacts_description">El Proton Calendar necessita accés als contactes per a proporcionar l\'emplenament automàtic</string>
     <string name="event_allow_contacts_cancel">Denega</string>
     <string name="event_allow_contacts_confirm">Permet</string>
     <string name="event_change_answer_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Re: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Re: Invitació a un esdeveniment que comença el %1$s a les %2$s %3$s</string>
@@ -251,7 +251,7 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitació a un esdeveniment que comença el %1$s a les %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitació a un esdeveniment el %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitació a un esdeveniment que comença el %1$s</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualització a un esdeveniment que comença el %1$s, %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualització a un esdeveniment que comença el %1$s, a les %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualització d\'un esdeveniment el %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Actualització d\'un esdeveniment que comença el %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancel·lació d\'un esdeveniment que comença el %1$s a les %2$s %3$s</string>
@@ -277,22 +277,22 @@
     <string name="event_remove_participants_dialog_title">Esborra els participants</string>
     <string name="event_remove_participants_dialog_description">S\'enviarà un correu electrònic de cancel·lació als participants esborrats.</string>
     <string name="recurring_event_remove_participants_dialog_description">S\'enviarà un correu de cancel·lació als participants esborrats per a tots els esdeveniments d\'aquesta sèrie.</string>
-    <string name="event_add_and_remove_participants_dialog_description">Els participants afegits i els esborrats seran notificats.</string>
-    <string name="recurring_event_add_and_remove_participants_dialog_description">Els participants afegits i els esborrats seran notificats de tots els esdeveniments d\'aquesta sèrie.</string>
+    <string name="event_add_and_remove_participants_dialog_description">Els participants afegits i eliminats seran notificats.</string>
+    <string name="recurring_event_add_and_remove_participants_dialog_description">Els participants afegits i eliminats seran notificats sobre tots els esdeveniments d\'aquesta sèrie.</string>
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s s\'ha cancel·lat.</string>
     <string name="event_save_changes">Desa els canvis</string>
-    <string name="event_update_add_participants_dialog_description">Els participants existents i els afegits seran notificats.</string>
-    <string name="recurring_event_update_add_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els afegits seran notificats.</string>
-    <string name="event_update_remove_participants_dialog_description">Els participants existents i els esborrats seran notificats.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Els participants esborrats seran notificats.</string>
-    <string name="recurring_event_update_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents i els esborrats seran notificats.</string>
-    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants esborrats seran notificats.</string>
-    <string name="event_update_add_and_remove_participants_dialog_description">Els participants existents, els afegits i els esborrats seran notificats.</string>
-    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Els participants existents, els afegits i els esborrats seran notificats.</string>
+    <string name="event_update_add_participants_dialog_description">Es notificarà als participants existents i als afegits.</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Es notificarà els participants existents i afegits.</string>
+    <string name="event_update_remove_participants_dialog_description">Es notificarà als participants existents i als eliminats.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Els participants eliminats seran notificats.</string>
+    <string name="recurring_event_update_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Es notificarà als participants existents i els esborrats.</string>
+    <string name="recurring_event_update_remove_all_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Es notificarà als participants esborrats.</string>
+    <string name="event_update_add_and_remove_participants_dialog_description">Es notificarà als participants existents, afegits i esborrats.</string>
+    <string name="recurring_event_update_add_and_remove_participants_dialog_description">Actualitzareu tots els esdeveniments d\'aquesta sèrie. Es notificarà als participants existents, afegits i eliminats.</string>
     <string name="success_snack_email_update_recurring">S\'ha notificat als participants i s\'han actualitzat tots els esdeveniments.</string>
-    <string name="success_snack_email_update">S\'ha notificat als participants i s\'ha actualitzat l\'esdeveniment.</string>
+    <string name="success_snack_email_update">Participants notificats i actualitzats</string>
     <string name="success_snack_add_attendees_recurring">S\'ha enviat la invitació i s\'han afegit els participants a tots els esdeveniments.</string>
-    <string name="success_snack_add_attendees">S\'ha enviat la invitació i s\'han afegit els participants.</string>
+    <string name="success_snack_add_attendees">S\'ha enviat la invitació i s\'ha afegit els participants.</string>
     <string name="success_snack_remove_attendees_recurring">S\'ha enviat la cancel·lació i s\'han esborrat els participants de tots els esdeveniments.</string>
     <string name="success_snack_remove_attendees">S\'ha enviat la cancel·lació i s\'han esborrat els participants.</string>
     <!-- NAVIGATION VIEW   -->
@@ -322,12 +322,12 @@
     <string name="snack_event_deleted">Esdeveniment eliminat</string>
     <string name="snack_event_deleted_as_organizer">Cancel·lació enviada i esdeveniment eliminat</string>
     <string name="snack_event_deleted_as_attendee">Resposta enviada i esdeveniment suprimit</string>
-    <string name="snack_event_deleted_error">Error eliminant l\'esdeveniment</string>
-    <string name="snack_event_deleted_as_organizer_error">El correu electrònic de cancel·lació no es pot enviar. Proveu de nou.</string>
-    <string name="snack_event_opening_error">Error obrint l\'esdeveniment</string>
-    <string name="snack_event_saving">Desant l\'esdeveniment</string>
-    <string name="snack_event_deleting">Eliminant l\'esdeveniment</string>
-    <string name="snack_event_changing_answer">Actualitzant la resposta</string>
+    <string name="snack_event_deleted_error">Error en eliminar l\'esdeveniment</string>
+    <string name="snack_event_deleted_as_organizer_error">No s\'ha pogut enviar el correu electrònic de cancel·lació. Torneu-ho a provar.</string>
+    <string name="snack_event_opening_error">Error en obrir l\'esdeveniment</string>
+    <string name="snack_event_saving">S\'està desant l\'esdeveniment</string>
+    <string name="snack_event_deleting">S\'està eliminant l\'esdeveniment</string>
+    <string name="snack_event_changing_answer">S\'està actualitzant la resposta</string>
     <string name="snack_event_part_stat_updated">S\'ha actualitzat l\'estat de participació.</string>
     <string name="snack_event_updated">Esdeveniment actualitzat</string>
     <string name="snack_event_updated_recurring">S\'han actualitzat tots els esdeveniments.</string>
@@ -336,27 +336,27 @@
     <string name="snack_lost_zoom_access">Connecteu-vos a Zoom per editar aquest esdeveniment.</string>
     <string name="snack_lost_zoom_access_acion">Connecta</string>
     <string name="snack_zoom_meeting_does_not_exist">S\'ha cancel·lat aquesta sessió de Zoom. Elimineu l\'enllaç per editar aquest esdeveniment.</string>
-    <string name="snack_event_updated_error">Error actualitzant l\'esdeveniment</string>
+    <string name="snack_event_updated_error">Error en actualitzar l\'esdeveniment</string>
     <string name="snack_event_created">Esdeveniment creat</string>
     <string name="snack_event_created_failed_mail">S\'ha creat l\'esdeveniment, però no s\'ha pogut enviar la invitació.</string>
-    <string name="snack_event_created_error">Error creant l\'esdeveniment</string>
-    <string name="snack_event_opening_edit_error">Error accedint a l\'edició de l\'esdeveniment</string>
+    <string name="snack_event_created_error">Error en crear l\'esdeveniment</string>
+    <string name="snack_event_opening_edit_error">Error en accedir a l\'edició de l\'esdeveniment</string>
     <string name="snack_event_recurring_invitation_only_supported_on_web_message">Aquest esdeveniment recurrent només es pot eliminar a l\'aplicació web Calendar.</string>
-    <string name="snack_event_edit_with_attendees_error">Encara no s\'admet l\'edició d\'esdeveniments amb participants</string>
-    <string name="snack_event_edit_calendar_with_attendees_error">No es poden afegir participants i canviar el calendari simultàniament</string>
-    <string name="snack_event_init_error">Error inicialitzant el nou esdeveniment</string>
-    <string name="snack_event_calendar_error">Error canviant de calendari</string>
+    <string name="snack_event_edit_with_attendees_error">Encara no s\'admet l\'edició d\'esdeveniments amb assistents.</string>
+    <string name="snack_event_edit_calendar_with_attendees_error">No es pot afegir participants i canviar el calendari simultàniament</string>
+    <string name="snack_event_init_error">Error en inicialitzar un esdeveniment nou</string>
+    <string name="snack_event_calendar_error">Error en canviar de calendari</string>
     <string name="snack_event_maximum_alarm_reached_error">S\'ha assolit el nombre màxim de notificacions</string>
     <string name="snack_send_bug_report_success">S\'ha enviat l\'informe. Gràcies pels vostres comentaris</string>
-    <string name="snack_send_bug_report_error">S\'ha produït un error en enviar l\'informe. Proveu de nou més tard</string>
+    <string name="snack_send_bug_report_error">S\'ha produït un error en enviar l\'informe. Torneu-ho a provar més tard.</string>
     <string name="snack_send_bug_report_description_empty">Proporcioneu una descripció del vostre informe</string>
     <string name="snack_create_event_no_active_personal_calendar">Necessiteu un calendari personal actiu per poder crear esdeveniments.</string>
     <string name="snack_create_event_no_active_calendar">Necessiteu un calendari actiu per poder crear esdeveniments</string>
     <string name="snack_add_self_as_participant">No es permet l\'autoinvitació</string>
     <string name="snack_maximum_participants_reached">S\'ha assolit el nombre màxim de participants.</string>
-    <string name="snack_add_participant_error">Error afegint el participant</string>
+    <string name="snack_add_participant_error">S\'ha produït un error en afegir el participant</string>
     <string name="snack_add_participant_invalid_email">Correu electrònic no vàlid</string>
-    <string name="snack_change_attendee_answer_error">S\'ha produït un error en enviar la resposta. Proveu de nou més tard</string>
+    <string name="snack_change_attendee_answer_error">S\'ha produït un error en enviar la resposta. Torneu-ho a provar més tard.</string>
     <string name="snack_network_error">S\'ha produït un error de xarxa. Proveu de nou més tard</string>
     <string name="snack_import_event_signed_out">Heu d\'iniciar la sessió per a importar esdeveniments</string>
     <string name="snack_app_link_signed_out">Heu d\'iniciar la sessió per a veure el vostre esdeveniment</string>
@@ -377,7 +377,7 @@
     <string name="snack_ics_event_not_found_error">No s\'ha trobat l\'esdeveniment</string>
     <string name="snack_ics_file_not_found_error">No s\'ha trobat el fitxer.</string>
     <string name="snack_ics_create_error">Error creant l\'esdeveniment</string>
-    <string name="snack_ics_parsing_error">Error llegint el calendari</string>
+    <string name="snack_ics_parsing_error">Error en llegir el calendari</string>
     <string name="snack_ics_unsupported_method_error">Aquest tipus d\'esdeveniment encara no està suportat</string>
     <string name="snack_ics_unsupported_add_error">Actualment encara no s’admet afegir ocurrències a un esdeveniment</string>
     <string name="snack_ics_unsupported_counter_error">Actualment encara no s\'admet la reprogramació d\'esdeveniments</string>
@@ -385,21 +385,21 @@
     <string name="snack_ics_unsupported_publish_error">Actualment encara no s\'admet la importació d\'esdeveniments</string>
     <string name="snack_ics_unsupported_single_edit_reply_error">Actualment encara només s\'admeten respostes a tots els esdeveniments d\'una sèrie</string>
     <string name="snack_ics_party_crasher_error">El vostre correu electrònic no es troba a la llista de participants</string>
-    <string name="snack_ics_reply_party_crasher_error">No es poden afegir participants que no han estat convidats per l\'organitzador</string>
+    <string name="snack_ics_reply_party_crasher_error">No es poden afegir els participants que no hagin estat convidats per l\'organitzador.</string>
     <string name="snack_ics_missing_uid_error">A l\'esdeveniment li manca UID</string>
     <string name="snack_ics_no_active_personal_calendar_error">No hi ha un calendari personal actiu associat amb aquest compte</string>
     <string name="snack_ics_no_active_calendar_error">No hi ha cap calendari actiu associat amb aquest compte</string>
     <string name="snack_ics_unsupported_duration_error">No s\'admet la propietat de durada</string>
     <string name="snack_ics_too_many_events_error">Encara no s\'admeten esdeveniments múltiples</string>
     <string name="snack_ics_no_events_error">Aquest calendari no conté cap esdeveniment</string>
-    <string name="snack_ics_invalid_error">Aquesta invitació és invàlida</string>
+    <string name="snack_ics_invalid_error">Aquesta invitació no és vàlida</string>
     <string name="snack_ics_disabled_calendar_error">Reactiveu l\'adreça enllaçada a aquest calendari per actualitzar aquest esdeveniment</string>
     <string name="snack_ics_event_deleted_error">Aquest esdeveniment ja no existeix al vostre calendari</string>
     <string name="snack_event_attendee_accepted_answer" comment="attendee who accepted">%1$s ha acceptat la vostra invitació</string>
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ha acceptat provisionalment la vostra invitació.</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ha declinat la vostra invitació</string>
     <string name="snack_app_link_invalid">L\'enllaç a l\'esdeveniment no és vàlid</string>
-    <string name="snack_app_link_error">Error obrint l\'esdeveniment</string>
+    <string name="snack_app_link_error">Error en obrir l\'esdeveniment</string>
     <string name="snack_app_link_import_error">S\'ha cancel·lat l\'autenticació</string>
     <string name="snack_notification_already_added">La notificació ja ha estat afegida.</string>
     <string name="snack_opening_ics">S\'està obrint l\'esdeveniment…</string>
@@ -410,7 +410,7 @@
     <!-- Dialogs -->
     <string name="error_event_does_not_exist">L\'esdeveniment no existeix.</string>
     <string name="error_occurrence_does_not_exist">L\'ocurrència no existeix.</string>
-    <string name="update_timezone_dialog_title">Fus horari canviat</string>
+    <string name="update_timezone_dialog_title">S\'ha canviat la zona horària.</string>
     <string name="update_timezone_dialog_message">Sembla que la zona horària del sistema ha canviat a %1$s. Voleu actualitzar la preferència de zona horària?</string>
     <string name="update_timezone_dialog_confirmation">Actualitza</string>
     <string name="update_timezone_dialog_cancel">Cancel·la</string>
@@ -423,23 +423,23 @@
     <string name="dialog_title_calendar_color_picker">Color del calendari</string>
     <string name="dialog_title_event_color_picker">Color de l\'esdeveniment</string>
     <string name="import_from_google_title">Importa des de Google</string>
-    <string name="notifications_permission_dialog_title">Voleu permetre a Proton Calendar mostrar notificacions?</string>
+    <string name="notifications_permission_dialog_title">Voleu permetre que el Proton Calendar mostri notificacions?</string>
     <string name="notifications_permission_dialog_message">Proton Calendar necessita permís per mostrar-vos les notificacions dels pròxims esdeveniments.</string>
     <string name="notifications_permission_dialog_open_settings">Obre les preferències</string>
     <string name="notifications_permission_dialog_cancel">Denega</string>
     <!-- NOTIFICATIONS -->
     <string name="notification_channel_alarms">Notificacions d\'esdeveniment</string>
     <string name="notification_channel_sync">Sincronització del calendari</string>
-    <string name="notification_channel_calendar_fetch">Obtenint els calendaris</string>
-    <string name="notification_sync">Sincronitzant calendaris…</string>
+    <string name="notification_channel_calendar_fetch">S\'estan obtenint els calendaris</string>
+    <string name="notification_sync">S\'estan sincronitzant els calendaris…</string>
     <string name="notification_text_today">Avui</string>
-    <string name="notification_text_today_part_time">Avui, %1$s</string>
+    <string name="notification_text_today_part_time">Avui, a les %1$s</string>
     <string name="notification_text_tomorrow">Demà</string>
-    <string name="notification_text_tomorrow_part_time">Demà, %1$s</string>
+    <string name="notification_text_tomorrow_part_time">Demà, a les %1$s</string>
     <string name="notification_text_part_time" comment="Example: January 12 2020 at 15:00">%1$s a les %2$s</string>
     <!-- Bug report -->
     <string name="bug_report_hint_title">Assumpte</string>
-    <string name="bug_report_hint_description">Descriviu el problema i incloeu qualsevol missatge d\'error.</string>
+    <string name="bug_report_hint_description">Descriviu el problema i incloeu-hi qualsevol missatge d\'error.</string>
     <string name="bug_report_discard_changes_title">Canvis no desats</string>
     <string name="bug_report_discard_changes_description">Hi ha entrades sense desar al formulari. Segur que voleu descartar-les?</string>
     <string name="bug_report_discard_changes_cancel">Continueu escrivint</string>
@@ -447,7 +447,7 @@
     <!-- Settings -->
     <string name="settings_app_settings_title">Preferències de l\'aplicació</string>
     <string name="settings_theme_title">Tema</string>
-    <string name="settings_theme_info">Aquesta configuració afecta només l\'aparença de l\'aplicació Proton Calendar a aquest dispositiu. L\'aplicació es reiniciarà després de canviar el tema.</string>
+    <string name="settings_theme_info">Aquesta configuració afecta només l\'aparença de l\'aplicació Proton Calendar en aquest dispositiu. L\'aplicació es reiniciarà després de canviar el tema.</string>
     <string name="settings_timezone_title">Zona horària</string>
     <string name="settings_language_title">Llengua de l\'aplicació</string>
     <string name="settings_language_default">Detecta automàticament</string>
@@ -479,11 +479,11 @@
     <string name="settings_calendar_default" comment="Default calendar">Per defecte</string>
     <string name="settings_calendar_disabled" comment="Disabled calendar">Desactivat</string>
     <string name="settings_calendar_not_synced" comment="Calendar not synced">No sincronitzat</string>
-    <string name="settings_calendar_syncing" comment="Calendar syncing">Sincronitzant</string>
+    <string name="settings_calendar_syncing" comment="Calendar syncing">S\'està sincronitzant</string>
     <string name="settings_calendar_subscribed_invalid_ics">Format de calendari no suportat</string>
     <string name="settings_calendar_subscribed_too_big">El calendari és massa gran</string>
-    <string name="settings_calendar_subscribed_not_accessible">L\'enllaç del calendari no és accessible</string>
-    <string name="settings_calendar_subscribed_tmp_not_accessible">L\'enllaç del calendari no és accessible temporalment</string>
+    <string name="settings_calendar_subscribed_not_accessible">L\'enllaç al calendari no és accessible</string>
+    <string name="settings_calendar_subscribed_tmp_not_accessible">L\'enllaç al calendari no és accessible temporalment</string>
     <string name="settings_calendar_subscribed_last_sync_old">Han passat més de 12 hores des de la darrera actualització</string>
     <string name="settings_calendar_subscribed_not_decrypted">El calendari no es pot desxifrar</string>
     <string name="settings_other_calendars_subtitle" comment="Ex: View-only • owner@proton.me">%1$s • %2$s</string>
@@ -499,7 +499,7 @@
     <string name="calendar_form_language">Idioma</string>
     <string name="calendar_form_default_event_duration">Duració de l\'esdeveniment</string>
     <string name="calendar_form_default_event_notifications">Notificacions d\'esdeveniment</string>
-    <string name="calendar_form_default_all_day_event_notifications">Notificacions esdeveniments dia sencer</string>
+    <string name="calendar_form_default_all_day_event_notifications">Notificacions d\'esdeveniments de tot el dia.</string>
     <string name="calendar_form_add_notification">Afegeix una notificació</string>
     <string name="calendar_form_default_email">Adreça de correu electrònic</string>
     <string name="calendar_form_default_email_value_error">No s\'ha pogut carregar l\'adreça de correu electrònic per defecte</string>
@@ -540,15 +540,15 @@
     <string name="add_holiday_calendar_country_search_hint">Cerca un país</string>
     <string name="holiday_calendar_form_picker_title">País</string>
     <string name="holiday_calendar_time_zone_based">En funció de la vostra zona horària</string>
-    <string name="holiday_calendar_already_exists">Aquest calendari de dies festius ja està afegit.</string>
+    <string name="holiday_calendar_already_exists">Aquest calendari de dies festius ja s\'ha afegit.</string>
     <string name="holiday_calendar_value_placeholder">Seleccioneu el país</string>
     <!-- Bootstrap errors -->
-    <string name="bootstrap_error_default_confirm">OK</string>
+    <string name="bootstrap_error_default_confirm">D\'acord</string>
     <string name="bootstrap_error_no_calendar_title">No hi ha calendaris associats amb aquest compte.</string>
     <string name="bootstrap_error_no_calendar_message">Per configurar-ne un ara, visiteu <a href="https://calendar.proton.me">calendar.proton.me</a></string>
-    <string name="bootstrap_error_some_calendars_failed_title">Error preparant els calendaris</string>
-    <string name="bootstrap_error_some_calendars_failed_message">Els calendaris següents no s\'han pogut configurar.</string>
-    <string name="bootstrap_error_no_active_calendar_title">No hi ha un calendari personal actiu associat amb aquest compte.</string>
+    <string name="bootstrap_error_some_calendars_failed_title">Error en preparar els calendaris</string>
+    <string name="bootstrap_error_some_calendars_failed_message">No s\'han pogut configurar els calendaris següents</string>
+    <string name="bootstrap_error_no_active_calendar_title">No hi ha cap calendari personal actiu associat amb aquest compte.</string>
     <string name="bootstrap_error_no_active_calendar_message">Per aprendre com activar un calendari, visiteu la nostra <a href="https://proton.me/support">base de coneixements</a></string>
     <string name="bootstrap_error_store_quota_reached_message">No hi ha més espai d\'emmagatzematge disponible.</string>
     <string name="bootstrap_error_store_quota_reached_learn_more">Més informació</string>
@@ -557,8 +557,8 @@
     <string name="bootstrap_error_update_passphrase_title">Reactiva les claus del calendari</string>
     <string name="bootstrap_error_update_passphrase_message">Heu reactivat les vostres claus i els esdeveniments enllaçats als següents calendaris ja es poden desxifrar.</string>
     <string name="bootstrap_error_continue_button">Continua</string>
-    <string name="splash_after_login_init">Preparant calendaris</string>
-    <string name="splash_init">Desxifrant esdeveniments</string>
+    <string name="splash_after_login_init">S\'estan preparant els calendaris.</string>
+    <string name="splash_init">S\'estan desxifrant els esdeveniments</string>
     <string name="default_calendar_name">El meu calendari</string>
     <!-- FEEDBACK DIALOG -->
     <string name="dialog_feedback_header">Doneu-nos la vostra opinió</string>
@@ -570,9 +570,9 @@
     <string name="dialog_feedback_submit_thank_you">Gràcies! Els vostres comentaris ens ajuden a millorar Proton.</string>
     <!-- Calendar Widget -->
     <string name="calendar_widget_description">Giny de Proton Calendar</string>
-    <string name="calendar_widget_no_upcoming_events_today">No hi ha esdeveniments pròxims avui.</string>
-    <string name="calendar_widget_loading_events">Carregant esdeveniments…</string>
-    <string name="calendar_widget_loading_events_error">No s\'han pogut carregar els esdeveniments.</string>
+    <string name="calendar_widget_no_upcoming_events_today">Avui no hi ha més esdeveniments.</string>
+    <string name="calendar_widget_loading_events">S\'estan carregant els esdeveniments...</string>
+    <string name="calendar_widget_loading_events_error">No s\'han pogut carregar els esdeveniments</string>
     <string name="calendar_widget_no_upcoming_events">No hi ha esdeveniments pròxims</string>
     <string name="calendar_widget_please_log_in">Inicieu sessió per veure els vostres esdeveniments</string>
     <string name="calendar_widget_part_day_event_starts_at">Comença a les %1$s</string>
@@ -583,17 +583,17 @@
     <string name="spotlight_dialog_skip">Omet</string>
     <string name="spotlight_dialog_confirmation_button">D\'acord</string>
     <string name="spotlight_dialog_month_view_title">Vista mensual</string>
-    <string name="spotlight_dialog_month_view_description">Obteniu una vista general dels vostres esdeveniments amb la nostra nova vista de mes. Canvieu entre les vistes mitjançant el menú.</string>
-    <string name="spotlight_dialog_easy_switch_description">Importar esdeveniments i altres dades de Google Calendar a Proton Calendar mai havia estat tan fàcil. El nostre Easy Switch et guiarà pas a pas.</string>
+    <string name="spotlight_dialog_month_view_description">Obtingueu una vista general dels vostres esdeveniments amb la nostra nova vista de mes. Canvieu entre les vistes mitjançant el menú.</string>
+    <string name="spotlight_dialog_easy_switch_description">Importar esdeveniments i altres dades de Google Calendar a Proton Calendar és més fàcil que mai. El nostre importador Easy Switch us guiarà pas a pas.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Comença la importació</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ara no</string>
     <string name="spotlight_dialog_auto_invites_title">Accepteu invitacions fàcilment</string>
-    <string name="spotlight_dialog_auto_invites_description">Ara les invitacions apareixen al vostre calendari en forma d\'esdeveniments pendents. Simplement, obre un esdeveniment Per respondre. \n\n Per gestionar-ho, ves a preferències.</string>
+    <string name="spotlight_dialog_auto_invites_description">Ara les invitacions apareixen al calendari com a esdeveniments pendents. Només cal obrir un esdeveniment per respondre.\n\n Per a gestionar això, aneu a preferències.</string>
     <string name="spotlight_dialog_auto_invites_positive_button">Següent</string>
     <string name="spotlight_v5_dialog_got_it_button">D\'acord</string>
     <string name="spotlight_v5_dialog_learn_more_button">Més informació</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Et presentem la nova estètica de Proton. Molts serveis, una missió. Benvingut a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Us presentem la nova estètica de Proton. Molts serveis, una missió. Benvinguts a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
     <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
     <string name="spotlight_dialog_week_view_description">• Presentem les vistes de calendari de <b>3 dies</b> i <b>setmanal</b>. Seleccioneu la vostra vista preferida al <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
     <string name="spotlight_dialog_search_title">Cerca esdeveniments</string>
@@ -601,11 +601,11 @@
     <string name="spotlight_dialog_search_positive">Activa</string>
     <string name="spotlight_dialog_search_negative">Omet</string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
-    <string name="spotlight_dialog_import_description">• Importeu esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu reserves de viatge directament des de Proton Mail.</string>
+    <string name="spotlight_dialog_import_description">• Importeu esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu-hi reserves de viatge directament des de Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments en calendaris que s\'han compartit amb vós.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 nous idiomes disponibles.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments a calendaris que us hagin estat compartits.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 nous idiomes disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">S\'ha esborrat la cerca per a millorar-la.</string>
-    <string name="spotlight_dialog_wipe_search_description">Estem suprimint la capacitat de cerca experimental de Proton Calendar Beta perquè volem fer-la més útil i confiable per a vós. Això pot trigar uns segons.</string>
+    <string name="spotlight_dialog_wipe_search_description">Estem suprimint la capacitat de cerca experimental del Proton Calendar Beta, ja que volem fer-la més útil i fiable. Això pot trigar uns segons.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Els dies festius són aquí!</string>
     <string name="spotlight_dialog_holiday_calendar_add_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nAfegiu els festius de qualsevol país al calendari.</string>
     <string name="spotlight_dialog_holiday_calendar_limit_reached_description">Ja n\'hi ha prou de programar reunions quan tothom té el dia lliure o oblidar-se de planejar una escapada d\'un cap de setmana llarg.\n\nCom que esteu al límit de calendaris, per afegir un calendari de festius necessiteu esborrar abans un calendari existent.</string>
@@ -615,19 +615,19 @@
     <string name="dialog_google_auth_title">Permet l\'accés</string>
     <string name="dialog_google_auth_description">Per començar a importar, inicieu sessió a Google Calendar i doneu permís a Proton per accedir a les vostres dades.</string>
     <string name="import_assistant_prepare_import_error">S\'ha produït un error en preparar la importació. Proveu de nou més tard.</string>
-    <string name="import_assistant_prepare_import">Prepara per importar</string>
-    <string name="import_assistant_gathering_data_loader_title">Obtenint les vostres dades</string>
+    <string name="import_assistant_prepare_import">S\'està preparant la importació</string>
+    <string name="import_assistant_gathering_data_loader_title">S\'estan obtenint les dades</string>
     <string name="import_assistant_summary_title">Resum de la importació</string>
     <string name="import_assistant_summary_customize_import">Personalitzar importació</string>
     <string name="import_assistant_error">Error aconseguint informació</string>
     <string name="import_assistant_data_gathering_error">No s\'han pogut recollir les dades.</string>
-    <string name="import_assistant_update_import_error">No s\'ha pogut actualitzar la importació. Proveu de nou més tard.</string>
+    <string name="import_assistant_update_import_error">No s\'ha pogut actualitzar la importació. Torneu-ho a provar més tard.</string>
     <string name="import_assistant_update_import_wrong_account_error">El compte no és correcte. Inicieu la sessió amb el compte que heu utilitzat per a la importació del calendari.</string>
-    <string name="import_assistant_start_import_error">No s\'ha pogut començar la importació. Proveu de nou més tard.</string>
+    <string name="import_assistant_start_import_error">No s\'ha pogut iniciar la importació. Torneu-ho a provar més tard.</string>
     <string name="import_assistant_delete_import_success">S\'ha suprimit el registre d\'importació</string>
-    <string name="import_assistant_delete_import_error">No s\'ha pogut eliminar la importació. Proveu de nou més tard.</string>
-    <string name="import_assistant_cancel_import_error">No s\'ha pogut cancel·lar la importació. Proveu de nou més tard.</string>
-    <string name="import_assistant_resume_import_error">No s\'ha pogut reprendre la importació. Proveu de nou més tard.</string>
+    <string name="import_assistant_delete_import_error">No s\'ha pogut suprimir la importació. Torneu-ho a provar més tard.</string>
+    <string name="import_assistant_cancel_import_error">No s\'ha pogut cancel·lar la importació. Torneu-ho a provar més tard.</string>
+    <string name="import_assistant_resume_import_error">No s\'ha pogut reprendre la importació. Torneu-ho a provar més tard.</string>
     <string name="import_assistant_create_calendar_error">No s\'han pogut crear un o més calendaris.</string>
     <string name="import_assistant_start_import_empty_error">No s\'ha pogut iniciar la importació. No hi ha calendaris per importar</string>
     <string name="import_assistant_import_as" comment="Use as a header for the calendar to import as. Import as the calendar called Holiday">Importa com a</string>
@@ -651,10 +651,10 @@
     <string name="import_assistant_status_in_progress" comment="Context: The import is in progress">En curs</string>
     <string name="import_assistant_status_completed" comment="Context: The import has been completed">Completat</string>
     <string name="import_assistant_status_canceled" comment="Context: The import has been canceled">Cancel·lat</string>
-    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">Cancel·lant</string>
+    <string name="import_assistant_status_canceling" comment="Context: The import is being canceled">S\'està cancel·lant</string>
     <string name="import_assistant_status_paused" comment="Context: The import has been paused">En pausa</string>
     <string name="import_assistant_status_failed" comment="Context: The import has failed">Error</string>
-    <string name="import_assistant_status_paused_lost_connection_title">Connexió amb Google perduda</string>
+    <string name="import_assistant_status_paused_lost_connection_title">S\'ha perdut la connexió amb Google.</string>
     <string name="import_assistant_status_paused_lost_connection_description">Per a continuar amb la importació, toqueu Reconnecta, inicieu la sessió a Google i doneu permís a Proton per a tornar a accedir a les dades de Google.</string>
     <string name="import_assistant_status_paused_lost_connection_button">Reconnecta</string>
     <string name="import_assistant_status_paused_storage_full_title">L\'emmagatzematge és ple.</string>
@@ -677,7 +677,7 @@
     <string name="import_assistant_sign_in_in_progress">Ja hi ha un procés d\'inici de sessió en curs</string>
     <string name="import_assistant_in_progress_error_snack">Encara hi ha una importació en curs.</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Voleu importar com a esdeveniment sense detalls?</string>
+    <string name="import_event_disclaimer_dialog_title">Voleu importar-lo com a esdeveniment sense detalls?</string>
     <string name="import_event_disclaimer_dialog_description">\nLes invitacions importades apareixen a Proton Calendar com a esdeveniments simples sense detalls de l\'<b>organitzador</b> i els <b>participants</b>.\n\n Per a rebre actualitzacions d\'esdeveniments i veure els participants, demaneu als organitzadors que us convidin mitjançant la vostra adreça electrònica de Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importa</string>
     <string name="undefined_color">Indefinit</string>
