@@ -41,6 +41,7 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
             tools:node="merge">
                 <!-- Remove default WorkManager initializer as we'll use our own -->
                 <meta-data
