@@ -11,10 +11,10 @@ kotlin {
 
 android {
     namespace = "me.proton.android.calendar.test.shared"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
-        compileSdk = 33
+        compileSdk = 35
         minSdk = 23
         multiDexEnabled = true
     }
