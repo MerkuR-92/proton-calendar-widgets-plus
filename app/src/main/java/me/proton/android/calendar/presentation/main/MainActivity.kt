@@ -21,6 +21,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.IdRes
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -1891,6 +1892,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
     /**
      * Checks if we have granted permissions to show notifications and displays appropriate dialogs if not.
      */
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private fun checkNotificationsPermissions(context: Context) {
 
         fun shouldShowNotificationsPermissionsDialog(context: Context) = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(
