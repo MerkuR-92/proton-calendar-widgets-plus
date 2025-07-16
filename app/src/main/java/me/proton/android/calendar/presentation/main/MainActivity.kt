@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -24,8 +25,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import androidx.drawerlayout.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import androidx.lifecycle.LiveData
@@ -87,6 +91,7 @@ import me.proton.android.calendar.common.SERVER_DOWN_BANNER_DURATION_SECONDS
 import me.proton.android.calendar.common.SYNC_CALENDARS_DELAY
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.ViewMode
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.displayCalendarListMaterialDialog
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
@@ -314,6 +319,8 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             finish()
             return
         }
+
+        AndroidUtils.applyAndroid15EdgeToEdge(view)
 
         // TODO bring it back after we contain performance issues or make it more async, maybe when leaving the app?
         // widgetRefresher.broadcastRefresh()

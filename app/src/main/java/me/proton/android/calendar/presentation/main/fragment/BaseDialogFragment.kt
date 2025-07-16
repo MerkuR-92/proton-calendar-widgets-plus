@@ -6,17 +6,16 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
+import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.databinding.FragmentBaseDialogBinding
 
 // TODO maybe remove DialogFragment whatsoever
@@ -117,6 +116,8 @@ abstract class BaseDialogFragment<VB: ViewBinding> : DialogFragment() {
             }
             onToolbarCreated(this)
         }
+
+        AndroidUtils.applyAndroid15EdgeToEdge(fragmentBaseDialogBinding.root)
 
         return fragmentBaseDialogBinding.root
     }

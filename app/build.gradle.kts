@@ -370,7 +370,7 @@ object Config {
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
     const val buildToolsVersion = "34.0.0"
-    const val targetSdk = 34
+    const val targetSdk = 35
     const val versionCode = 322
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
     const val versionName = "2.26.0"
@@ -389,7 +389,7 @@ object Config {
             "fi", // Finnish
             "hu", // Hungarian
             "it", // Italian
-            "in", // Indonesian
+            "in", // Indonesian, not supported by Locale class starting from Android 15, replaced with "id"
             "nl", // Nederlands
             "pl", // Polish
             "pt-rBR", // Portuguese (Brazil)
