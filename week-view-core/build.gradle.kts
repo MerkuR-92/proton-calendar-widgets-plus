@@ -3,6 +3,10 @@ plugins {
     id("kotlin-android")
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace = "com.alamkanak.weekview"
     defaultConfig {
@@ -10,6 +14,7 @@ android {
         minSdk = 23
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -17,12 +22,13 @@ android {
 
     testOptions {
         unitTests.all {
-            it.useTestNG()
+            it.useJUnit()
         }
     }
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.tools.desugar)
     implementation(libs.androidx.appcompat)
     implementation(libs.kotlin.stdlib)
     implementation(libs.androidx.appcompat)

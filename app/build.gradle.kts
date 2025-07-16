@@ -22,6 +22,10 @@ plugins {
     alias(libs.plugins.gradlePlugin.proton.environmentConfig)
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 sonarqube {
     properties {
         property("sonar.projectKey", "android_calendar_proton-calendar-android_AYGvp8U7f_vcScryKn5V")
@@ -35,7 +39,7 @@ sentry {
     }
 }
 
-jacoco { toolVersion = "0.8.8" }
+jacoco { toolVersion = "0.8.10" }
 kapt { correctErrorTypes = true }
 
 val localProperties = Properties().apply {

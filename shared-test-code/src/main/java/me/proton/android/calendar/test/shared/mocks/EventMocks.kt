@@ -24,7 +24,9 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 object EventMocks {
@@ -87,12 +89,17 @@ object EventMocks {
         if (hasExDate) {
             // Ex date on fourth occurrence
             val exceptionDates = ExceptionDates()
-            val newUntilDate = ZonedDateTime.of(
-                LocalDate.of(2021, 9, 17),
-                LocalTime.of(15, 30),
-                ZoneId.of(defaultTimezone)
-            ).toInstant()
-            exceptionDates.values.add(ICalDate(Date.from(newUntilDate), true))
+
+            // Create a Calendar instance for the desired date and time in the default timezone
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone(defaultTimezone))
+            calendar.set(2021, Calendar.SEPTEMBER, 17, 15, 30, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            // Create a Date object from the Calendar
+            val newUntilDate = calendar.time
+
+            // Add to exceptionDates
+            exceptionDates.values.add(ICalDate(newUntilDate, true))
             iCalendar.events.first().addExceptionDates(exceptionDates)
         }
 
