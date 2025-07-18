@@ -4,9 +4,9 @@ import android.os.Build
 import me.proton.android.calendar.BuildConfig
 import me.proton.android.calendar.common.API_APPLICATION_NAME
 import me.proton.android.calendar.common.API_DEBUG_APPLICATION_SUFFIX
-import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.USER_AGENT_NAME
+import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.network.domain.ApiClient
 import javax.inject.Inject
@@ -21,8 +21,10 @@ class CalendarApiClient @Inject constructor(
 
     override val appVersionHeader = "${API_APPLICATION_NAME}@${BuildConfig.VERSION_NAME}${if (BuildConfig.DEBUG) API_DEBUG_APPLICATION_SUFFIX else ""}"
     override val enableDebugLogging = BuildConfig.DEBUG
-    override val shouldUseDoh get() = defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
+
+    override suspend fun shouldUseDoh(): Boolean = defaultSharedPreferencesProvider.sharedPreferences.getBoolean(
         SharedPreferencesKeys.ALTERNATIVE_ROUTING, true)
+
     override val userAgent: String
         get() = "${USER_AGENT_NAME}/${BuildConfig.VERSION_NAME} (Android ${Build.VERSION.RELEASE}; ${Build.BRAND} ${Build.MODEL})"
 
