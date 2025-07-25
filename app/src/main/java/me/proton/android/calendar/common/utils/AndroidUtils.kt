@@ -61,6 +61,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.BindingAdapter
 import biweekly.component.VAlarm
@@ -1448,15 +1449,17 @@ object AndroidUtils {
     }
 
     fun applyAndroid15EdgeToEdge(view: View) {
-        ViewCompat.setOnApplyWindowInsetsListener(view) { v, windowInsets ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                leftMargin = insets.left
-                topMargin = insets.top
-                rightMargin = insets.right
-                bottomMargin = insets.bottom
+        ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
+            val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                leftMargin = systemInsets.left
+                topMargin = systemInsets.top
+                rightMargin = systemInsets.right
+                bottomMargin = systemInsets.bottom
             }
-            WindowInsetsCompat.CONSUMED
+            view.updatePadding(bottom = imeInsets.bottom)
+            insets
         }
     }
 }
