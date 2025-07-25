@@ -24,8 +24,12 @@ import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.uitest.robot.Robot
+import me.proton.android.calendar.uitest.rule.NotificationPermissionRule
 import me.proton.android.calendar.uitest.rule.SharedPreferencesRule
 import me.proton.android.calendar.uitest.rule.TimeZoneRule
+import me.proton.android.calendar.BuildConfig
+import me.proton.core.test.performance.MeasurementConfig
+import me.proton.core.test.performance.MeasurementRule
 import me.proton.core.test.quark.Quark
 import me.proton.core.test.quark.data.User.Users
 import me.proton.core.test.rule.extension.protonActivityScenarioRule
@@ -38,6 +42,16 @@ import java.util.TimeZone
 @HiltAndroidTest
 open class BaseTest {
 
+    val measurementConfig = MeasurementConfig
+        .setEnvironment(BuildConfig.DYNAMIC_DOMAIN)
+        .setLokiEndpoint(BuildConfig.LOKI_ENDPOINT)
+        .setLokiPrivateKey(BuildConfig.LOKI_PRIVATE_KEY)
+        .setLokiCertificate(BuildConfig.LOKI_CERTIFICATE)
+
+    private val measurementRule = MeasurementRule()
+
+    val measurementContext = measurementRule.measurementContext(measurementConfig)
+
     @get:Rule
     open val protonRule = protonActivityScenarioRule<MainActivity>(
         afterHilt = {
@@ -45,7 +59,9 @@ open class BaseTest {
         },
         additionalRules = linkedSetOf(
             TimeZoneRule(timeZone),
-            SharedPreferencesRule(sharedPreferences)
+            SharedPreferencesRule(sharedPreferences),
+            NotificationPermissionRule(),
+            measurementRule
         ),
         logoutBefore = true
     )
