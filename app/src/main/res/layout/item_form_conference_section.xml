@@ -22,7 +22,7 @@
         android:id="@+id/join_meeting_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/join_zoom_meeting_action"
+        tools:text="@string/join_proton_meeting_action"
         style="@style/Text.Default"
         android:textColor="@color/white"
         android:clickable="true"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             style="@style/Text.Default"
             android:layout_marginStart="@dimen/default_margin_text_start"
-            android:text="@string/zoom_meeting_more_details" />
+            android:text="@string/generic_meeting_more_details" />
 
         <ImageView
             android:id="@+id/text_conference_more_details_button"
@@ -131,7 +131,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:text="@string/zoom_meeting_host" />
+            android:text="@string/generic_meeting_host" />
 
         <TextView
             android:id="@+id/text_conference_meeting_host_value"
@@ -156,7 +156,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_conference_meeting_host_value"
-            android:text="@string/zoom_meeting_link" />
+            android:text="@string/generic_meeting_link" />
 
         <TextView
             android:id="@+id/text_conference_meeting_link_value"
@@ -179,7 +179,7 @@
             app:layout_constraintStart_toStartOf="@+id/text_conference_meeting_link_value"
             app:layout_constraintEnd_toEndOf="@+id/text_conference_meeting_link_value"
             app:layout_constraintTop_toBottomOf="@+id/text_conference_meeting_link_value"
-            android:text="@string/zoom_meeting_joining_instructions" />
+            android:text="@string/generic_meeting_joining_instructions" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

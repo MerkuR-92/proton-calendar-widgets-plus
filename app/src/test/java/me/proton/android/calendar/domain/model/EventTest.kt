@@ -21,6 +21,9 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendar
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
+import me.proton.core.test.kotlin.assertEquals
+import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import java.sql.Date
 import java.time.LocalDate
@@ -556,11 +559,32 @@ internal class EventTest {
 
     @Test
     fun `correctly fallback to legacy Zoom properties`() {
+        val event = Event.from("id",
+            Calendar(
+                id = "id",
+                name = "name",
+                email = "email",
+                ownerEmail = "ownerEmail",
+                description = "description",
+                color = "color",
+                priority = 0,
+                addressId = "addressId",
+                memberId = "memberId",
+                flags = 1,
+                display = true,
+                type = 0,
+                permissions = 127,
+                defaultEventDuration = 30,
+                defaultPartDayNotifications = emptyList(),
+                defaultFullDayNotifications = emptyList()
+            ),
+            iCalendar = calendarWithLegacyZoomProperties!!,
+            modifyTime = 0
+        )!!
 
-        val event = Event.from("id", Calendar("id", "name", "email", "ownerEmail", "description", "color", 0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()), calendarWithLegacyZoomProperties!!, 0)!!
-
-        assertThat(event.zoomConferencePassword).isEqualTo("976610")
-        assertThat(event.zoomMeetingHost).isEqualTo("proton662@urey.proton.black")
+        Assertions.assertEquals(MeetIntegrationType.Zoom, event.meetType)
+        assertThat(event.meetConferencePassword).isEqualTo("976610")
+        assertThat(event.meetMeetingHost).isEqualTo("proton662@urey.proton.black")
     }
 
 

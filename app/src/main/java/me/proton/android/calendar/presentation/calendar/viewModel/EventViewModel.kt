@@ -81,6 +81,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
@@ -177,7 +178,7 @@ class EventViewModel @Inject constructor(
     var eventEdited = false
     private var editMode = false
     private var isCreate = false
-    private var zoomIntegrationEnabled = false
+    private var meetIntegrations = emptySet<MeetIntegrationType>()
 
     private lateinit var event: Event
 
@@ -305,7 +306,7 @@ class EventViewModel @Inject constructor(
     suspend fun initialise(
         userId: UserId,
         editMode: Boolean,
-        zoomIntegrationEnabled: Boolean,
+        meetIntegrations: Set<MeetIntegrationType>,
         eventId: String?,
         occurrenceNumber: Int?,
         initStartDate: String?,
@@ -325,7 +326,7 @@ class EventViewModel @Inject constructor(
         this.editMode = editMode
         this.userId = userId
         this.isCreate = eventId == null
-        this.zoomIntegrationEnabled = zoomIntegrationEnabled
+        this.meetIntegrations = meetIntegrations
 
         // Default calendar and its settings is only needed in create mode
         val defaultCalendar: Calendar? =
@@ -554,7 +555,7 @@ class EventViewModel @Inject constructor(
 
         if (dbEvent == null) return InitResult.EventDoesNotExist
 
-        if (zoomIntegrationEnabled) {
+        if (meetIntegrations.isNotEmpty()) {
             dbEvent?.removeConferenceDescription()
         }
 
@@ -2208,9 +2209,13 @@ class EventViewModel @Inject constructor(
         // Post saving event value to true to trigger loading state
         eventFormState.value = EventState.Processing.Saving
 
-        // Add back the Zoom description
-        if (zoomIntegrationEnabled && !event.zoomUrl.isNullOrBlank() && !event.containsZoomDescription()) {
-            event.addZoomDescription()
+        // Add back the Meet/Zoom description
+        if (meetIntegrations.isNotEmpty()
+            && !event.meetUrl.isNullOrBlank()
+            && !event.containsMeetDescription()
+            && meetIntegrations.contains(event.meetType)
+        ) {
+            event.addMeetDescription()
         }
 
         val eventCopy = Event.from(event)
@@ -2232,7 +2237,7 @@ class EventViewModel @Inject constructor(
 
         handleSaveResult.ifSuccessAndLogErrors(logger) {}
 
-        if (handleSaveResult !is UseCase.Result.Success<*> && zoomIntegrationEnabled) {
+        if (handleSaveResult !is UseCase.Result.Success<*> && meetIntegrations.isNotEmpty()) {
             event.removeConferenceDescription()
         }
 

@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Csatlakozás Zoom találkozóhoz</string>
     <string name="zoom_meeting_title">Zoom találkozó</string>
-    <string name="zoom_meeting_id">AZONOSÍTÓ: %1$s</string>
-    <string name="zoom_meeting_password">Jelszó: %1$s</string>
-    <string name="zoom_meeting_more_details">További részletek</string>
-    <string name="zoom_meeting_less_details">Kevesebb részlet</string>
-    <string name="zoom_meeting_host">Találkozó házigazdája</string>
-    <string name="zoom_meeting_link">Találkozó linkje</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Csatlakozási utasítások</a></string>
+    <string name="generic_meeting_id">AZONOSÍTÓ: %1$s</string>
+    <string name="generic_meeting_password">Jelszó: %1$s</string>
+    <string name="generic_meeting_more_details">További részletek</string>
+    <string name="generic_meeting_less_details">Kevesebb részlet</string>
+    <string name="generic_meeting_host">Találkozó házigazdája</string>
+    <string name="generic_meeting_link">Találkozó linkje</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Csatlakozási utasítások</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Új esemény</string>
     <string name="event_text_edit_event">Esemény szerkesztése</string>

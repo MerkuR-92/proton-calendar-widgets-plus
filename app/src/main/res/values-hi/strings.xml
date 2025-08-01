@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">ज़ूम मीटिंग में शामिल हों</string>
     <string name="zoom_meeting_title">ज़ूम मीटिंग</string>
-    <string name="zoom_meeting_id">आईडी: %1$s</string>
-    <string name="zoom_meeting_password">पासवर्ड: %1$s</string>
-    <string name="zoom_meeting_more_details">अधिक जानकारी</string>
-    <string name="zoom_meeting_less_details">कम जानकारी</string>
-    <string name="zoom_meeting_host">मीटिंग आयोजक</string>
-    <string name="zoom_meeting_link">मीटिंग लिंक</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">शामिल होने के निर्देश</a></string>
+    <string name="generic_meeting_id">आईडी: %1$s</string>
+    <string name="generic_meeting_password">पासवर्ड: %1$s</string>
+    <string name="generic_meeting_more_details">अधिक जानकारी</string>
+    <string name="generic_meeting_less_details">कम जानकारी</string>
+    <string name="generic_meeting_host">मीटिंग आयोजक</string>
+    <string name="generic_meeting_link">मीटिंग लिंक</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">शामिल होने के निर्देश</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">नया इवेंट</string>
     <string name="event_text_edit_event">इवेंट बदलें</string>

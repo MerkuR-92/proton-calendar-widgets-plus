@@ -72,6 +72,7 @@ import me.proton.android.calendar.databinding.ItemAttendeeChipBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
@@ -142,7 +143,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 else eventViewModel.initialise(
                     userId,
                     editMode = false,
-                    zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
+                    meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
                     navigationArguments.eventId,
                     if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                     null,
@@ -331,7 +332,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
-                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
+                        meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
                         null,
                         null,
                         startZonedDateTime.toLocalDate().toString(),
@@ -349,7 +350,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
-                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
+                        meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         navigationArguments.initStartDate,
@@ -465,9 +466,14 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
             binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
 
-            binding.eventFormConferenceLayout.visibleOrGone(
-                featureFlagViewModel.isZoomIntegrationEnabled() && !event.zoomUrl.isNullOrBlank()
-            )
+            val hasMeetConference = featureFlagViewModel.enabledMeetIntegrations().contains(event.meetType) && !event.meetUrl.isNullOrBlank()
+            binding.eventFormConferenceLayout.visibleOrGone(hasMeetConference)
+            if (hasMeetConference) {
+                binding.eventFormConference.setText(when (event.meetType) {
+                    MeetIntegrationType.ProtonMeet, null -> R.string.proton_meeting_title
+                    MeetIntegrationType.Zoom -> R.string.zoom_meeting_title
+                })
+            }
 
             ImageViewCompat.setImageTintList(
                 binding.eventFormLocationIcon,

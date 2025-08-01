@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Συνδεθείτε στη σύσκεψη Zoom</string>
     <string name="zoom_meeting_title">Σύσκεψη Zoom</string>
-    <string name="zoom_meeting_id">Αναγνωριστικό: %1$s</string>
-    <string name="zoom_meeting_password">Κωδικός πρόσβασης: %1$s</string>
-    <string name="zoom_meeting_more_details">Περισσότερες λεπτομέρειες</string>
-    <string name="zoom_meeting_less_details">Λιγότερες λεπτομέρειες</string>
-    <string name="zoom_meeting_host">Διοργανωτής σύσκεψης</string>
-    <string name="zoom_meeting_link">Σύνδεσμος σύσκεψης</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Οδηγίες συμμετοχής</a></string>
+    <string name="generic_meeting_id">Αναγνωριστικό: %1$s</string>
+    <string name="generic_meeting_password">Κωδικός πρόσβασης: %1$s</string>
+    <string name="generic_meeting_more_details">Περισσότερες λεπτομέρειες</string>
+    <string name="generic_meeting_less_details">Λιγότερες λεπτομέρειες</string>
+    <string name="generic_meeting_host">Διοργανωτής σύσκεψης</string>
+    <string name="generic_meeting_link">Σύνδεσμος σύσκεψης</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Οδηγίες συμμετοχής</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Νέο γεγονός</string>
     <string name="event_text_edit_event">Επεξεργασία γεγονότος</string>
