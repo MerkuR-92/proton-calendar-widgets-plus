@@ -560,7 +560,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 event.meetUrl?.nullIfBlank()?.let { meetUrl ->
                     with(binding.sectionZoom) {
                         val isProtonMeet = event.meetType != MeetIntegrationType.Zoom
-                        joinMeetingButton.setText(if (isProtonMeet) R.string.join_proton_meeting_action else R.string.join_zoom_meeting_action)
+                        joinMeetingButton.setText(if (isProtonMeet) R.string.join_with_proton_meet else R.string.join_zoom_meeting_action)
 
                         joinMeetingButton.setOnSingleClickListener {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(meetUrl))
