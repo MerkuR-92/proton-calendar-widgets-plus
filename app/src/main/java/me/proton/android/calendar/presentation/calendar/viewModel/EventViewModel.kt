@@ -2215,7 +2215,7 @@ class EventViewModel @Inject constructor(
             && !event.containsMeetDescription()
             && meetIntegrations.contains(event.meetType)
         ) {
-            event.addMeetDescription()
+            event.addMeetDescription(resourceProvider)
         }
 
         val eventCopy = Event.from(event)

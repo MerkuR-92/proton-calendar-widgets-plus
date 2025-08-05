@@ -40,7 +40,7 @@ class FeatureFlagViewModel @Inject constructor(
     var eventSearchFeatureFlag: LiveData<Boolean> = MutableLiveData()
     var splitViewVerticalScrollingFlag: LiveData<Boolean> = MutableLiveData()
     var zoomIntegrationAndroidFlag: LiveData<Boolean> = MutableLiveData()
-    var protonMeetIntegationFlag: LiveData<Boolean> = MutableLiveData()
+    var protonMeetIntegrationFlag: LiveData<Boolean> = MutableLiveData()
     var fetchedEventsCacheAndroidFlag: LiveData<Boolean> = MutableLiveData()
     var rsvpCommentsAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
@@ -100,7 +100,7 @@ class FeatureFlagViewModel @Inject constructor(
         }.asLiveData(Dispatchers.Default)
 
         // Proton meet integration feature flag
-        protonMeetIntegationFlag = featureFlagManager.observe(
+        protonMeetIntegrationFlag = featureFlagManager.observe(
             userId,
             CalendarFeatureFlag.ProtonMeet.featureId
         ).map {
@@ -168,7 +168,7 @@ class FeatureFlagViewModel @Inject constructor(
     }
 
     private fun isProtonMeetIntegrationEnabled(): Boolean {
-        return protonMeetIntegationFlag.value ?: CalendarFeatureFlag.ProtonMeet.fallbackValue
+        return protonMeetIntegrationFlag.value ?: CalendarFeatureFlag.ProtonMeet.fallbackValue
     }
 
     fun enabledMeetIntegrations(): Set<MeetIntegrationType> = setOfNotNull(
