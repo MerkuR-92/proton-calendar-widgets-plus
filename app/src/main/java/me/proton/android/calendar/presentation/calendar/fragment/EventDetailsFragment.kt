@@ -556,11 +556,14 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             }
 
             val enabledMeetIntegrations = featureFlagViewModel.enabledMeetIntegrations()
-            if (enabledMeetIntegrations.contains(event.meetType)) {
+            val meetType = event.meetType
+            if (meetType != null && enabledMeetIntegrations.contains(event.meetType)) {
                 event.meetUrl?.nullIfBlank()?.let { meetUrl ->
                     with(binding.sectionZoom) {
-                        val isProtonMeet = event.meetType != MeetIntegrationType.Zoom
-                        joinMeetingButton.setText(if (isProtonMeet) R.string.join_with_proton_meet else R.string.join_zoom_meeting_action)
+                        joinMeetingButton.setText(when (meetType) {
+                            MeetIntegrationType.ProtonMeet -> R.string.join_with_proton_meet
+                            MeetIntegrationType.Zoom -> R.string.join_zoom_meeting_action
+                        })
 
                         joinMeetingButton.setOnSingleClickListener {
                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(meetUrl))

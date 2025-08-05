@@ -328,28 +328,21 @@ data class Event private constructor(
         ) == true
     }
 
-    fun addMeetDescription() {
-        fun formatHeader(): String {
-            // We do not translate this
-            val prompt = when (meetType) {
-                MeetIntegrationType.ProtonMeet -> "Join Proton Meeting"
-                MeetIntegrationType.Zoom, null -> "Join Zoom Meeting"
-            }
-            return "\n$CONFERENCE_DESCRIPTION_HEADER\n$prompt: $meetUrl (ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $meetConferencePassword" }})\n\nMeeting host: $meetMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
+    fun addMeetDescription(resourceProvider: ResourceProvider) {
+        val prompt = when (meetType ?: return) {
+            MeetIntegrationType.ProtonMeet -> resourceProvider.provideString(R.string.join_proton_meet_ical_description)
+            MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
         }
-        val description = this.iCalEvent.description?.value?.takeIfNotBlank() ?: ""
-        this.iCalEvent.setDescription(
-            description.plus(
-                /*
-                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
-                Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
+        val header = "\n$CONFERENCE_DESCRIPTION_HEADER\n$prompt: $meetUrl (ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $meetConferencePassword" }})\n\nMeeting host: $meetMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
 
-                Meeting host: john.doe@proton.ch
-                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
-                 */
-                formatHeader()
-            )
-        )
+        /*
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+            Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
+
+            Meeting host: john.doe@proton.ch
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+             */
+        this.iCalEvent.setDescription(description.plus(header))
     }
 
     fun removeConference() {
