@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s（%2$s）</string>
     <string name="join_zoom_meeting_action">加入 Zoom 会议</string>
     <string name="zoom_meeting_title">Zoom 会议</string>
-    <string name="zoom_meeting_id">ID：%1$s</string>
-    <string name="zoom_meeting_password">密码：%1$s</string>
-    <string name="zoom_meeting_more_details">更多详情</string>
-    <string name="zoom_meeting_less_details">收起详情</string>
-    <string name="zoom_meeting_host">会议主持人</string>
-    <string name="zoom_meeting_link">会议链接</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">加入说明</a></string>
+    <string name="generic_meeting_id">ID：%1$s</string>
+    <string name="generic_meeting_password">密码：%1$s</string>
+    <string name="generic_meeting_more_details">更多详情</string>
+    <string name="generic_meeting_less_details">收起详情</string>
+    <string name="generic_meeting_host">会议主持人</string>
+    <string name="generic_meeting_link">会议链接</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">加入说明</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">新活动</string>
     <string name="event_text_edit_event">编辑活动</string>

@@ -26,6 +26,7 @@ import me.proton.android.calendar.data.entity.toEventEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
@@ -159,7 +160,7 @@ open class EventViewModelTestCommon: KoinComponent {
         eventViewModel.initialise(
             userId,
             editMode,
-            true,
+            setOf(MeetIntegrationType.Zoom, MeetIntegrationType.ProtonMeet),
             eventId,
             occurrenceNumber,
             initStartDate,

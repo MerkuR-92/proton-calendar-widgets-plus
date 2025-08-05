@@ -131,14 +131,18 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">contact signature invalid</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Join Zoom meeting</string>
+    <string name="join_proton_meet_ical_description" translatable="false">Join Proton Meeting</string>
+    <string name="join_zoom_meet_ical_description" translatable="false">Join Zoom Meeting</string>
+    <string name="join_with_proton_meet">Join with Proton Meet</string>
     <string name="zoom_meeting_title">Zoom meeting</string>
-    <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Password: %1$s</string>
-    <string name="zoom_meeting_more_details">More details</string>
-    <string name="zoom_meeting_less_details">Less details</string>
-    <string name="zoom_meeting_host">Meeting host</string>
-    <string name="zoom_meeting_link">Meeting link</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="proton_meeting_title">Proton Meet</string>
+    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_password">Password: %1$s</string>
+    <string name="generic_meeting_more_details">More details</string>
+    <string name="generic_meeting_less_details">Less details</string>
+    <string name="generic_meeting_host">Meeting host</string>
+    <string name="generic_meeting_link">Meeting link</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     More details
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">New event</string>

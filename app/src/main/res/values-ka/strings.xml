@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Zoom-ის შეხვედრასთან მიერთება</string>
     <string name="zoom_meeting_title">Zoom-ის შეხვედრა</string>
-    <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">პაროლი: %1$s</string>
-    <string name="zoom_meeting_more_details">მეტი დეტალი</string>
-    <string name="zoom_meeting_less_details">ნაკლები დეტალი</string>
-    <string name="zoom_meeting_host">შეხვედრის მასპინძელი</string>
-    <string name="zoom_meeting_link">შეხვედრის ბმული</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">მიერთების ინსტრუქციები</a></string>
+    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_password">პაროლი: %1$s</string>
+    <string name="generic_meeting_more_details">მეტი დეტალი</string>
+    <string name="generic_meeting_less_details">ნაკლები დეტალი</string>
+    <string name="generic_meeting_host">შეხვედრის მასპინძელი</string>
+    <string name="generic_meeting_link">შეხვედრის ბმული</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">მიერთების ინსტრუქციები</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">ახალი მოვლენა</string>
     <string name="event_text_edit_event">მოვლენის ჩასწორება</string>

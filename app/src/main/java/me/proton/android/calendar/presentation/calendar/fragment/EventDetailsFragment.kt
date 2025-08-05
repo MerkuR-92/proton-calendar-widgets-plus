@@ -71,6 +71,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.matchAttendeesWit
 import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.AttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.adapter.initAttendeeStatus
@@ -279,7 +280,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                     eventViewModel.initialise(
                         userId,
                         editMode = false,
-                        zoomIntegrationEnabled = featureFlagViewModel.isZoomIntegrationEnabled(),
+                        meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
                         navigationArguments.eventId,
                         if (navigationArguments.occurrenceNumber == 0) null else navigationArguments.occurrenceNumber,
                         null,
@@ -359,8 +360,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
 //            }
 //        }
         binding.sectionLocation.imageButtonAction.setOnSingleClickListener {
-            eventViewModel.eventLiveData.value?.location?.let {
-                if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.location as String /*TODO after get()*/)) {
+            eventViewModel.eventLiveData.value?.location?.let { location ->
+                if (mainViewModel.handleCopyToClipboard(location /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
                 } else {
                     logger.i("could not copy location to clipboard")
@@ -369,8 +370,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
         }
 
         binding.sectionZoom.imageButtonAction.setOnSingleClickListener {
-            eventViewModel.eventLiveData.value?.zoomUrl?.let {
-                if (mainViewModel.handleCopyToClipboard(eventViewModel.eventLiveData.value?.zoomUrl as String /*TODO after get()*/)) {
+            eventViewModel.eventLiveData.value?.meetUrl?.let { meetUrl ->
+                if (mainViewModel.handleCopyToClipboard(meetUrl /*TODO after get()*/)) {
                     view?.displaySnackBar(requireContext().getString(R.string.toast_copied_to_clipboard))
                 } else {
                     logger.i("could not copy zoom URL to clipboard")
@@ -554,55 +555,61 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 }
             }
 
-            if (featureFlagViewModel.isZoomIntegrationEnabled()) {
-                event.zoomUrl?.nullIfBlank()?.let { zoomUrl ->
+            val enabledMeetIntegrations = featureFlagViewModel.enabledMeetIntegrations()
+            val meetType = event.meetType
+            if (meetType != null && enabledMeetIntegrations.contains(event.meetType)) {
+                event.meetUrl?.nullIfBlank()?.let { meetUrl ->
                     with(binding.sectionZoom) {
+                        joinMeetingButton.setText(when (meetType) {
+                            MeetIntegrationType.ProtonMeet -> R.string.join_with_proton_meet
+                            MeetIntegrationType.Zoom -> R.string.join_zoom_meeting_action
+                        })
 
                         joinMeetingButton.setOnSingleClickListener {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(zoomUrl))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(meetUrl))
                             startActivity(intent)
                         }
 
                         imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
                         imageButtonAction.visibleOrInvisible(true)
 
-                        event.zoomConferenceId?.let { zoomConferenceId ->
+                        event.meetConferenceId?.let { meetConferenceId ->
                             val spannableConferenceId: Spannable = SpannableString(
-                                getString(R.string.zoom_meeting_id, zoomConferenceId)
+                                getString(R.string.generic_meeting_id, meetConferenceId)
                             )
                             spannableConferenceId.setSpan(
                                 ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                                spannableConferenceId.indexOf(zoomConferenceId),
-                                spannableConferenceId.indexOf(zoomConferenceId).plus(zoomConferenceId.length),
+                                spannableConferenceId.indexOf(meetConferenceId),
+                                spannableConferenceId.indexOf(meetConferenceId).plus(meetConferenceId.length),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
                             textConferenceId.text = spannableConferenceId
                             textConferenceId.visibleOrGone(true)
                         }
 
-                        event.zoomConferencePassword?.let { zoomConferencePassword ->
+                        event.meetConferencePassword?.let { meetConferencePassword ->
                             val spannableConferencePassword: Spannable = SpannableString(
-                                getString(R.string.zoom_meeting_password, zoomConferencePassword)
+                                getString(R.string.generic_meeting_password, meetConferencePassword)
                             )
                             spannableConferencePassword.setSpan(
                                 ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                                spannableConferencePassword.indexOf(zoomConferencePassword),
-                                spannableConferencePassword.indexOf(zoomConferencePassword)
-                                    .plus(zoomConferencePassword.length),
+                                spannableConferencePassword.indexOf(meetConferencePassword),
+                                spannableConferencePassword.indexOf(meetConferencePassword)
+                                    .plus(meetConferencePassword.length),
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
                             textConferencePassword.text = spannableConferencePassword
                             textConferencePassword.visibleOrGone(true)
                         }
 
-                        event.zoomMeetingHost?.let { zoomMeetingHost ->
-                            textConferenceMeetingHostValue.text = linkifyAndParseHtml(zoomMeetingHost)
+                        event.meetMeetingHost?.let { meetingHost ->
+                            textConferenceMeetingHostValue.text = linkifyAndParseHtml(meetingHost)
                             textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
                             textConferenceMeetingHost.visibleOrGone(true)
                             textConferenceMeetingHostValue.visibleOrGone(true)
                         }
 
-                        textConferenceMeetingLinkValue.text = linkifyAndParseHtml(zoomUrl)
+                        textConferenceMeetingLinkValue.text = linkifyAndParseHtml(meetUrl)
                         textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
 
                         textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented

@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Zoom 회의 참여</string>
     <string name="zoom_meeting_title">Zoom 회의</string>
-    <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">비밀번호: %1$s</string>
-    <string name="zoom_meeting_more_details">자세히</string>
-    <string name="zoom_meeting_less_details">간략하게</string>
-    <string name="zoom_meeting_host">회의 주최자</string>
-    <string name="zoom_meeting_link">회의 주소</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">참여 절차</a></string>
+    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_password">비밀번호: %1$s</string>
+    <string name="generic_meeting_more_details">자세히</string>
+    <string name="generic_meeting_less_details">간략하게</string>
+    <string name="generic_meeting_host">회의 주최자</string>
+    <string name="generic_meeting_link">회의 주소</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">참여 절차</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">새 이벤트</string>
     <string name="event_text_edit_event">이벤트 편집</string>

@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Připojit se ke schůzce na Zoomu</string>
     <string name="zoom_meeting_title">Schůzka na Zoomu</string>
-    <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Heslo: %1$s</string>
-    <string name="zoom_meeting_more_details">Více detailů</string>
-    <string name="zoom_meeting_less_details">Méně detailů</string>
-    <string name="zoom_meeting_host">Hostitel schůzky</string>
-    <string name="zoom_meeting_link">Odkaz na schůzku</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Pokyny k připojení</a></string>
+    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_password">Heslo: %1$s</string>
+    <string name="generic_meeting_more_details">Více detailů</string>
+    <string name="generic_meeting_less_details">Méně detailů</string>
+    <string name="generic_meeting_host">Hostitel schůzky</string>
+    <string name="generic_meeting_link">Odkaz na schůzku</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Pokyny k připojení</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nová událost</string>
     <string name="event_text_edit_event">Upravit událost</string>

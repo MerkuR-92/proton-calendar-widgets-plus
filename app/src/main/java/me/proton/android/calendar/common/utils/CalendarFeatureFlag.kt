@@ -15,6 +15,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     SplitViewVerticalScrollingAndroid(FeatureId("SplitViewVerticalScrollingAndroid"), false, false),
     FetchedEventsCacheAndroid(FeatureId("FetchedEventsCacheAndroid"), false, false),
     ZoomIntegrationAndroid(FeatureId("ZoomIntegrationAndroid"), false, false),
+    ProtonMeet(FeatureId("NewScheduleOption"), false, false),
     RsvpCommentsAndroid(FeatureId("RsvpCommentsAndroid"), false, false),
     NewCalendarEventListenerAndroid(FeatureId("NewCalendarEventListenerAndroid"), false, false),
 

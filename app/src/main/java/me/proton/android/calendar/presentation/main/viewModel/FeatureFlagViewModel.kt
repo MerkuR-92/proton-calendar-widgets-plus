@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.mapLatest
 import me.proton.android.calendar.common.FETCH_FEATURE_FLAG_INTERVAL_SECONDS
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
@@ -39,6 +40,7 @@ class FeatureFlagViewModel @Inject constructor(
     var eventSearchFeatureFlag: LiveData<Boolean> = MutableLiveData()
     var splitViewVerticalScrollingFlag: LiveData<Boolean> = MutableLiveData()
     var zoomIntegrationAndroidFlag: LiveData<Boolean> = MutableLiveData()
+    var protonMeetIntegrationFlag: LiveData<Boolean> = MutableLiveData()
     var fetchedEventsCacheAndroidFlag: LiveData<Boolean> = MutableLiveData()
     var rsvpCommentsAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
@@ -97,6 +99,14 @@ class FeatureFlagViewModel @Inject constructor(
             it?.value ?: CalendarFeatureFlag.ZoomIntegrationAndroid.fallbackValue
         }.asLiveData(Dispatchers.Default)
 
+        // Proton meet integration feature flag
+        protonMeetIntegrationFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.ProtonMeet.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.ProtonMeet.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+
         // RSVP comments feature flag, CALAND-2951
         rsvpCommentsAndroidFlag = featureFlagManager.observe(
             userId,
@@ -153,9 +163,18 @@ class FeatureFlagViewModel @Inject constructor(
         return fetchedEventsCacheAndroidFlag.value ?: CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
     }
 
-    fun isZoomIntegrationEnabled(): Boolean {
+    private fun isZoomIntegrationEnabled(): Boolean {
         return zoomIntegrationAndroidFlag.value ?: CalendarFeatureFlag.ZoomIntegrationAndroid.fallbackValue
     }
+
+    private fun isProtonMeetIntegrationEnabled(): Boolean {
+        return protonMeetIntegrationFlag.value ?: CalendarFeatureFlag.ProtonMeet.fallbackValue
+    }
+
+    fun enabledMeetIntegrations(): Set<MeetIntegrationType> = setOfNotNull(
+        MeetIntegrationType.Zoom.takeIf { isZoomIntegrationEnabled() },
+        MeetIntegrationType.ProtonMeet.takeIf { isProtonMeetIntegrationEnabled() }
+    )
 
     fun isRsvpCommentsEnabled(): Boolean {
         return rsvpCommentsAndroidFlag.value ?: CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue

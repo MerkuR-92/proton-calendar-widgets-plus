@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Gabung ke pertemuan Zoom</string>
     <string name="zoom_meeting_title">Pertemuan Zoom</string>
-    <string name="zoom_meeting_id">ID: %1$s</string>
-    <string name="zoom_meeting_password">Kata sandi: %1$s</string>
-    <string name="zoom_meeting_more_details">Lebih banyak rincian</string>
-    <string name="zoom_meeting_less_details">Lebih sedikit rincian</string>
-    <string name="zoom_meeting_host">Host pertemuan</string>
-    <string name="zoom_meeting_link">Tautan undangan</string>
-    <string name="zoom_meeting_joining_instructions"><a href="https://proton.me/support">Petunjuk untuk bergabung</a></string>
+    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_password">Kata sandi: %1$s</string>
+    <string name="generic_meeting_more_details">Lebih banyak rincian</string>
+    <string name="generic_meeting_less_details">Lebih sedikit rincian</string>
+    <string name="generic_meeting_host">Host pertemuan</string>
+    <string name="generic_meeting_link">Tautan undangan</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Petunjuk untuk bergabung</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Acara baru</string>
     <string name="event_text_edit_event">Edit acara</string>

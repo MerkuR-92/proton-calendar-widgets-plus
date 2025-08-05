@@ -16,6 +16,8 @@ import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_C
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_HOST_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD
 import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PASSWORD_READONLY
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER
+import me.proton.android.calendar.common.CustomICalPropertyParameter.PARAMETER_CONFERENCE_PROVIDER_READONLY
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_ID
 import me.proton.android.calendar.common.CustomICalPropertyParameter.X_PM_CONFERENCE_URL
 import me.proton.android.calendar.common.OFFLINE_EVENT_ID_PREFIX
@@ -43,6 +45,7 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.core.util.kotlin.takeIfNotBlank
+import me.proton.core.util.kotlin.takeIfNotEmpty
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -211,12 +214,26 @@ data class Event private constructor(
     val summary: String? get() = iCalEvent.summary?.value
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
-    val zoomConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
-    val zoomUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
-    val zoomConferencePassword: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+
+    val meetType: MeetIntegrationType? by lazy {
+        iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.let {
+            val providerValue = (it.parameters.get(PARAMETER_CONFERENCE_PROVIDER)?.takeIfNotEmpty()
+                ?: it.parameters.get(PARAMETER_CONFERENCE_PROVIDER_READONLY)?.takeIfNotEmpty())
+                ?.firstOrNull()
+            when (providerValue) {
+                "1" -> MeetIntegrationType.Zoom
+                "2" -> MeetIntegrationType.ProtonMeet
+                else -> null
+            }
+        }
+    }
+
+    val meetConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
+    val meetUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
+    val meetConferencePassword: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
         it.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_PASSWORD_READONLY)?.takeIfNotBlank()
     }
-    val zoomMeetingHost: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+    val meetMeetingHost: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
         it.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_HOST_READONLY)?.takeIfNotBlank()
     }
 
@@ -305,28 +322,27 @@ data class Event private constructor(
         notifications = notifications.copy(notifications = notificationsWithAlarmRemoved)
     }
 
-    fun containsZoomDescription(): Boolean {
+    fun containsMeetDescription(): Boolean {
         return this.iCalEvent.description?.value?.contains(
             Regex(CONFERENCE_DESCRIPTION_REGEX_STRING)
         ) == true
     }
 
-    fun addZoomDescription() {
-        val description = this.iCalEvent.description?.value?.takeIfNotBlank() ?: ""
-        this.iCalEvent.setDescription(
-            description.plus(
-                /*
-                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
-                Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
+    fun addMeetDescription(resourceProvider: ResourceProvider) {
+        val prompt = when (meetType ?: return) {
+            MeetIntegrationType.ProtonMeet -> resourceProvider.provideString(R.string.join_proton_meet_ical_description)
+            MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
+        }
+        val header = "\n$CONFERENCE_DESCRIPTION_HEADER\n$prompt: $meetUrl (ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $meetConferencePassword" }})\n\nMeeting host: $meetMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
 
-                Meeting host: john.doe@proton.ch
-                ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
-                 */
+        /*
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+            Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
 
-                // We do not translate this
-                "\n$CONFERENCE_DESCRIPTION_HEADER\nJoin Zoom Meeting: $zoomUrl (ID: $zoomConferenceId${zoomConferencePassword?.let { ", passcode: $zoomConferencePassword" }})\n\nMeeting host: $zoomMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
-            )
-        )
+            Meeting host: john.doe@proton.ch
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+             */
+        this.iCalEvent.setDescription(description.plus(header))
     }
 
     fun removeConference() {
@@ -336,7 +352,7 @@ data class Event private constructor(
     }
 
     fun removeConferenceDescription() {
-        if (this.containsZoomDescription() && !this.zoomUrl.isNullOrBlank()) {
+        if (this.containsMeetDescription() && !this.meetUrl.isNullOrBlank()) {
             this.iCalEvent.description.value = this.iCalEvent.description.value.replace(
                 Regex(CONFERENCE_DESCRIPTION_REGEX_STRING),
                 ""
