@@ -22,7 +22,7 @@
         android:id="@+id/join_meeting_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="@string/join_with_proton_meet"
+        tools:text="Join with []"
         style="@style/Text.Default"
         android:textColor="@color/white"
         android:clickable="true"

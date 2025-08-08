@@ -616,7 +616,7 @@
             <TextView
                 android:id="@+id/event_form_conference"
                 style="@style/Text.Default.Form"
-                tools:text="@string/proton_meeting_title"
+                tools:text="Meeting Conference"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>

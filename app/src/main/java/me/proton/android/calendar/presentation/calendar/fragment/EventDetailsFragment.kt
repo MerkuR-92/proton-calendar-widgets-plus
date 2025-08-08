@@ -561,8 +561,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                 event.meetUrl?.nullIfBlank()?.let { meetUrl ->
                     with(binding.sectionZoom) {
                         joinMeetingButton.setText(when (meetType) {
-                            MeetIntegrationType.ProtonMeet -> R.string.join_with_proton_meet
-                            MeetIntegrationType.Zoom -> R.string.join_zoom_meeting_action
+                            MeetIntegrationType.ProtonMeet -> "Join with Proton Meet" // TODO: Localize
+                            MeetIntegrationType.Zoom -> getString(R.string.join_zoom_meeting_action)
                         })
 
                         joinMeetingButton.setOnSingleClickListener {
