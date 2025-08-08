@@ -1451,14 +1451,17 @@ object AndroidUtils {
     fun applyAndroid15EdgeToEdge(view: View) {
         ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
             val systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                 leftMargin = systemInsets.left
                 topMargin = systemInsets.top
                 rightMargin = systemInsets.right
                 bottomMargin = systemInsets.bottom
             }
-            view.updatePadding(bottom = imeInsets.bottom)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                // Below 11 the system does adjustResize already
+                val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+                view.updatePadding(bottom = imeInsets.bottom)
+            }
             insets
         }
     }
