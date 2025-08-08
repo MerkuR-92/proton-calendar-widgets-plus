@@ -46,7 +46,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.adjustToWeekStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.createNewVEvent
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.eventStartZonedDateTimeToDate
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeEventDayByDay
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.filterOccurencesByRecurrenceId
@@ -242,7 +241,7 @@ internal class ICalUtilsTest {
 
         /* Windows Time Zones */
 
-        assertThat(fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kiev")
+        assertThat(fallbackTimeZone("FLE Standard Time")).isEqualTo("Europe/Kyiv")
 
         assertThat(fallbackTimeZone("Taipei Standard Time")).isEqualTo("Asia/Taipei")
 

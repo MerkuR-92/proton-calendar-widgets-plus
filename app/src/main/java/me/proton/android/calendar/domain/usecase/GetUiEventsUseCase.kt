@@ -79,7 +79,7 @@ class GetUiEventsUseCase @Inject constructor(
 
                     withContext(Dispatchers.Default) {
 
-                        // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
+                        // potential optimization: we have rule, we can generate occurrences quickly without decrypting the event
                         // to filter out even more events here, before decryption takes place
 
                         // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
