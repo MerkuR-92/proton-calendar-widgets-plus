@@ -470,8 +470,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormConferenceLayout.visibleOrGone(hasMeetConference)
             if (hasMeetConference) {
                 binding.eventFormConference.setText(when (event.meetType) {
-                    MeetIntegrationType.ProtonMeet, null -> R.string.proton_meeting_title
-                    MeetIntegrationType.Zoom -> R.string.zoom_meeting_title
+                    MeetIntegrationType.ProtonMeet, null -> "Proton Meet" // TODO: Localize
+                    MeetIntegrationType.Zoom -> getString(R.string.zoom_meeting_title)
                 })
             }
 
