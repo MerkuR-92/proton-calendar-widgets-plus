@@ -330,7 +330,7 @@ data class Event private constructor(
 
     fun addMeetDescription(resourceProvider: ResourceProvider) {
         val prompt = when (meetType ?: return) {
-            MeetIntegrationType.ProtonMeet -> resourceProvider.provideString(R.string.join_proton_meet_ical_description)
+            MeetIntegrationType.ProtonMeet -> "Join Proton Meeting"
             MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
         }
         val header = "\n$CONFERENCE_DESCRIPTION_HEADER\n$prompt: $meetUrl (ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $meetConferencePassword" }})\n\nMeeting host: $meetMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
