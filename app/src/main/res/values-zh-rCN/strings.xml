@@ -134,8 +134,8 @@
     <string name="zoom_meeting_title">Zoom 会议</string>
     <string name="generic_meeting_id">ID：%1$s</string>
     <string name="generic_meeting_password">密码：%1$s</string>
-    <string name="generic_meeting_more_details">更多详情</string>
-    <string name="generic_meeting_less_details">收起详情</string>
+    <string name="generic_meeting_more_details">更多详细信息</string>
+    <string name="generic_meeting_less_details">更少细节</string>
     <string name="generic_meeting_host">会议主持人</string>
     <string name="generic_meeting_link">会议链接</string>
     <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">加入说明</a></string>

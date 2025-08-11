@@ -33,7 +33,7 @@
     <string name="dialog_description_warning_delete_recurring_with_single_edit_as_attendee" comment="Order of those two arguments will always be the same. It is a message followed by a warning on a new line.">%1$s\n%2$s</string>
     <string name="dialog_description_warning_delete_recurring_with_answered_single_edit_as_attendee">Les ocurrències actualitzades prèviament per l\'organitzador es conservaran, però es perdran les vostres respostes</string>
     <string name="dialog_description_warning_delete_recurring_with_unanswered_single_edit_as_attendee">Es conservaran les ocurrències actualitzades prèviament per l’organitzador</string>
-    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar l\'organitzador que refuseu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment de totes maneres?</string>
+    <string name="event_delete_as_attendee_send_prefs_error_message" comment="string placeholder is a list of failed emails">No es pot notificar l\'organitzador que rebutgeu la invitació:\n\n• %1$s\n\nVoleu eliminar l\'esdeveniment igualment?</string>
     <string name="dialog_button_set">Aplicar</string>
     <string name="dialog_button_ok">D\'acord</string>
     <string name="action_save">Desa</string>
@@ -66,7 +66,7 @@
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a les %2$s</string>
     <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s i per correu electrònic</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s abans, %2$s</string>
-    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s i per correu electrònic</string>
+    <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s per correu electrònic</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s els %2$s</string>
     <string name="event_recurrence_occurs_on_day_of_month" comment="Example: monthly on day 15">%1$s el dia %2$d</string>
     <string name="event_recurrence_occurs_on_day_of_week_full_words" comment="Example: monthly on first Friday">%1$s els %2$s</string>
@@ -137,8 +137,8 @@
     <string name="generic_meeting_more_details">Més detalls</string>
     <string name="generic_meeting_less_details">Menys detalls</string>
     <string name="generic_meeting_host">Organitzador de la reunió</string>
-    <string name="generic_meeting_link">Enllaç de la reunió</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruccions per unir-se</a></string>
+    <string name="generic_meeting_link">Enllaç de la sessió</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruccions per unir-vos-hi</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nou esdeveniment</string>
     <string name="event_text_edit_event">Edita l\'esdeveniment</string>
@@ -251,7 +251,7 @@
     <string name="event_send_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Invitation for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Invitació a un esdeveniment que comença el %1$s a les %2$s %3$s</string>
     <string name="event_send_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Invitation for an event on Monday">Invitació a un esdeveniment el %1$s</string>
     <string name="event_send_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Invitation for an event starting on Monday">Invitació a un esdeveniment que comença el %1$s</string>
-    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualització a un esdeveniment que comença el %1$s, a les %2$s %3$s</string>
+    <string name="event_send_update_invite_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Update for an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Actualització d\'un esdeveniment que comença el %1$s, a les %2$s %3$s</string>
     <string name="event_send_update_invite_mail_subject_all_day" comment="%1$s is starting date. Example: Update for an event on Monday">Actualització d\'un esdeveniment el %1$s</string>
     <string name="event_send_update_invite_mail_subject_multiple_day" comment="%1$s is starting date. Example: Update for an event starting on Monday">Actualització d\'un esdeveniment que comença el %1$s</string>
     <string name="event_send_cancel_mail_subject_part_day" comment="%1$s is starting date. %2$s is starting time. %3$s is timezone. Example: Cancellation of an event on Monday, June 7, 2021 at 18:00 (GMT+2)">Cancel·lació d\'un esdeveniment que comença el %1$s a les %2$s %3$s</string>
@@ -447,7 +447,7 @@
     <!-- Settings -->
     <string name="settings_app_settings_title">Preferències de l\'aplicació</string>
     <string name="settings_theme_title">Tema</string>
-    <string name="settings_theme_info">Aquesta configuració afecta només l\'aparença de l\'aplicació Proton Calendar en aquest dispositiu. L\'aplicació es reiniciarà després de canviar el tema.</string>
+    <string name="settings_theme_info">Aquesta preferència només afecta l\'aparença de l\'aplicació del Proton Calendar en aquest dispositiu. L\'aplicació es reiniciarà després de canviar el tema.</string>
     <string name="settings_timezone_title">Zona horària</string>
     <string name="settings_language_title">Llengua de l\'aplicació</string>
     <string name="settings_language_default">Detecta automàticament</string>
@@ -583,7 +583,7 @@
     <string name="spotlight_dialog_skip">Omet</string>
     <string name="spotlight_dialog_confirmation_button">D\'acord</string>
     <string name="spotlight_dialog_month_view_title">Vista mensual</string>
-    <string name="spotlight_dialog_month_view_description">Obtingueu una vista general dels vostres esdeveniments amb la nostra nova vista de mes. Canvieu entre les vistes mitjançant el menú.</string>
+    <string name="spotlight_dialog_month_view_description">Obtingueu una vista general dels esdeveniments amb la nostra nova vista mensual. Canvieu entre les vistes utilitzant el menú.</string>
     <string name="spotlight_dialog_easy_switch_description">Importar esdeveniments i altres dades de Google Calendar a Proton Calendar és més fàcil que mai. El nostre importador Easy Switch us guiarà pas a pas.</string>
     <string name="spotlight_dialog_easy_switch_positive_button">Comença la importació</string>
     <string name="spotlight_dialog_easy_switch_negative_button">Ara no</string>
@@ -593,7 +593,7 @@
     <string name="spotlight_v5_dialog_got_it_button">D\'acord</string>
     <string name="spotlight_v5_dialog_learn_more_button">Més informació</string>
     <string name="spotlight_v5_dialog_rebranding_title">Proton actualitzat, protecció unificada</string>
-    <string name="spotlight_v5_dialog_rebranding_description">Us presentem la nova estètica de Proton. Molts serveis, una missió. Benvinguts a l\'internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Saber-ne més</a></string>
+    <string name="spotlight_v5_dialog_rebranding_description">Us presentem la nova estètica del Proton. Molts serveis, una missió. Us donem la benvinguda a una internet on la privacitat és la norma. <a href="https://proton.me/news/updated-proton">Més informació</a></string>
     <string name="spotlight_dialog_week_view_title">Més opcions de visualització</string>
     <string name="spotlight_dialog_week_view_description">• Presentem les vistes de calendari de <b>3 dies</b> i <b>setmanal</b>. Seleccioneu la vostra vista preferida al <b>menú</b>.\n\n• Ajusteu l\'alçada de les files a la graella diària pessigant amb dos dits per fer zoom.</string>
     <string name="spotlight_dialog_search_title">Cerca esdeveniments</string>
@@ -601,7 +601,7 @@
     <string name="spotlight_dialog_search_positive">Activa</string>
     <string name="spotlight_dialog_search_negative">Omet</string>
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
-    <string name="spotlight_dialog_import_description">• Importeu esdeveniments al vostre calendari des dels fitxers del vostre telèfon.\n\n• Afegiu-hi reserves de viatge directament des de Proton Mail.</string>
+    <string name="spotlight_dialog_import_description">• Importeu esdeveniments al calendari des dels fitxers del telèfon.\n\n• Afegiu reserves de viatges directament des del Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
     <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments a calendaris que us hagin estat compartits.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 nous idiomes disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">S\'ha esborrat la cerca per a millorar-la.</string>
@@ -677,7 +677,7 @@
     <string name="import_assistant_sign_in_in_progress">Ja hi ha un procés d\'inici de sessió en curs</string>
     <string name="import_assistant_in_progress_error_snack">Encara hi ha una importació en curs.</string>
     <!-- Import events -->
-    <string name="import_event_disclaimer_dialog_title">Voleu importar-lo com a esdeveniment sense detalls?</string>
+    <string name="import_event_disclaimer_dialog_title">Voleu importar-ho com a un esdeveniment sense detalls?</string>
     <string name="import_event_disclaimer_dialog_description">\nLes invitacions importades apareixen a Proton Calendar com a esdeveniments simples sense detalls de l\'<b>organitzador</b> i els <b>participants</b>.\n\n Per a rebre actualitzacions d\'esdeveniments i veure els participants, demaneu als organitzadors que us convidin mitjançant la vostra adreça electrònica de Proton.</string>
     <string name="import_event_disclaimer_dialog_positive">Importa</string>
     <string name="undefined_color">Indefinit</string>

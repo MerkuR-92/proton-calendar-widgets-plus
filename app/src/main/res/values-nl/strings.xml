@@ -136,9 +136,9 @@
     <string name="generic_meeting_password">Wachtwoord: %1$s</string>
     <string name="generic_meeting_more_details">Meer details</string>
     <string name="generic_meeting_less_details">Minder details</string>
-    <string name="generic_meeting_host">Gastheer van de bijeenkomst</string>
-    <string name="generic_meeting_link">Meeting link</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support"> Instructies om deel te nemen </a></string>
+    <string name="generic_meeting_host">Gastheer van de vergadering</string>
+    <string name="generic_meeting_link">Link naar de vergadering</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instructies om deel te nemen</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nieuwe afspraak</string>
     <string name="event_text_edit_event">Afspraak bewerken</string>
