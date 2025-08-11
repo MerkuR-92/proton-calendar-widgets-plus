@@ -34,6 +34,7 @@ import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.FormValidation
 import me.proton.android.calendar.common.getUserOrNull
 import me.proton.android.calendar.common.getUserSettingsEntity
+import me.proton.android.calendar.common.timezoneApiOverrides
 import me.proton.android.calendar.common.utils.AndroidUtils.formatSendPreferencesError
 import me.proton.android.calendar.common.utils.AndroidUtils.toInt
 import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
@@ -861,7 +862,8 @@ class EventViewModel @Inject constructor(
         _event.postValue(event)
     }
 
-    fun handleTimeZone(timeZoneId: String) {
+    fun handleTimeZone(orgTimeZoneId: String) {
+        val timeZoneId = timezoneApiOverrides[orgTimeZoneId] ?: orgTimeZoneId
         markEventAsEdited()
         val old = event.getStart(eventTimeZoneId)
         event.iCalendar.setDefaultTimeZone(timeZoneId)
