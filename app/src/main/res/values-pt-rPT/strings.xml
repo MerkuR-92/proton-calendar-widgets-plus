@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">Participar na reunião Zoom</string>
     <string name="zoom_meeting_title">Reunião Zoom</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">Palavra-passe: %1$s</string>
-    <string name="generic_meeting_more_details">Mais detalhes</string>
-    <string name="generic_meeting_less_details">Menos detalhes</string>
-    <string name="generic_meeting_host">Organizador da reunião</string>
-    <string name="generic_meeting_link">Ligação da reunião</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruções para entrar</a></string>
+    <string name="generic_meeting_password">Password: %1$s</string>
+    <string name="generic_meeting_more_details">More details</string>
+    <string name="generic_meeting_less_details">Less details</string>
+    <string name="generic_meeting_host">Meeting host</string>
+    <string name="generic_meeting_link">Meeting link</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Novo evento</string>
     <string name="event_text_edit_event">Editar evento</string>

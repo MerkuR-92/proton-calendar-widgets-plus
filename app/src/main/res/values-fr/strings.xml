@@ -132,13 +132,13 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Rejoindre la réunion Zoom</string>
     <string name="zoom_meeting_title">Réunion Zoom</string>
-    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_id">ID : %1$s</string>
     <string name="generic_meeting_password">Mot de passe : %1$s</string>
-    <string name="generic_meeting_more_details">Plus d\'informations</string>
-    <string name="generic_meeting_less_details">Moins d’informations</string>
+    <string name="generic_meeting_more_details">Plus d\'infos</string>
+    <string name="generic_meeting_less_details">Moins d’infos</string>
     <string name="generic_meeting_host">Hôte de la réunion </string>
     <string name="generic_meeting_link">Lien de la réunion </string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instructions pour participer</a></string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instructions pour rejoindre</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nouvel événement</string>
     <string name="event_text_edit_event">Modifier l’événement</string>
@@ -783,12 +783,12 @@
         <item quantity="other">%1$s minutes</item>
     </plurals>
     <plurals name="calendar_form_name_character_limit" comment="Should always be greater than 1. Currently set to 100 chars">
-        <item quantity="one">Caractères : %1$d sur %2$d</item>
-        <item quantity="other">Caractères : %1$d sur %2$d</item>
+        <item quantity="one">%1$d/%2$d caractère</item>
+        <item quantity="other">%1$d/%2$d caractères</item>
     </plurals>
     <plurals name="calendar_form_description_character_limit" comment="Can range from 0 to 255 chars.">
-        <item quantity="one">Caractères : %1$d sur %2$d</item>
-        <item quantity="other">Caractères : %1$d sur %2$d</item>
+        <item quantity="one">%1$d/%2$d caractère</item>
+        <item quantity="other">%1$d/%2$d caractères</item>
     </plurals>
     <!--  STRING ARRAYS  -->
     <string-array name="ordinals_as_words">

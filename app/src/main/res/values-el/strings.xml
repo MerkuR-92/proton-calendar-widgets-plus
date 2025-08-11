@@ -136,8 +136,8 @@
     <string name="generic_meeting_password">Κωδικός πρόσβασης: %1$s</string>
     <string name="generic_meeting_more_details">Περισσότερες λεπτομέρειες</string>
     <string name="generic_meeting_less_details">Λιγότερες λεπτομέρειες</string>
-    <string name="generic_meeting_host">Διοργανωτής σύσκεψης</string>
-    <string name="generic_meeting_link">Σύνδεσμος σύσκεψης</string>
+    <string name="generic_meeting_host">Διοργανωτής συνάντησης</string>
+    <string name="generic_meeting_link">Σύνδεσμος συνάντησης</string>
     <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Οδηγίες συμμετοχής</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Νέο γεγονός</string>

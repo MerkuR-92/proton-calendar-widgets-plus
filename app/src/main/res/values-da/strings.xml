@@ -137,8 +137,8 @@
     <string name="generic_meeting_more_details">Flere detaljer</string>
     <string name="generic_meeting_less_details">Færre detaljer</string>
     <string name="generic_meeting_host">Mødevært</string>
-    <string name="generic_meeting_link">Møde-link</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruktioner om tilslutning</a></string>
+    <string name="generic_meeting_link">Mødelink</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Vejledning til deltagelse</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Ny begivenhed</string>
     <string name="event_text_edit_event">Redigér begivenhed</string>

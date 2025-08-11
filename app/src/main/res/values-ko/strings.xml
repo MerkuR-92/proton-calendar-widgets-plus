@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">Zoom 회의 참여</string>
     <string name="zoom_meeting_title">Zoom 회의</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">비밀번호: %1$s</string>
-    <string name="generic_meeting_more_details">자세히</string>
-    <string name="generic_meeting_less_details">간략하게</string>
-    <string name="generic_meeting_host">회의 주최자</string>
-    <string name="generic_meeting_link">회의 주소</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">참여 절차</a></string>
+    <string name="generic_meeting_password">Password: %1$s</string>
+    <string name="generic_meeting_more_details">More details</string>
+    <string name="generic_meeting_less_details">Less details</string>
+    <string name="generic_meeting_host">Meeting host</string>
+    <string name="generic_meeting_link">Meeting link</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">새 이벤트</string>
     <string name="event_text_edit_event">이벤트 편집</string>
@@ -693,22 +693,22 @@
         <item quantity="other">%1$d 불러오기 진행중</item>
     </plurals>
     <plurals name="import_assistant_creating_calendars_count" comment="Number of calendar(s) created. ex: 1 of 3 created in test@proton.me">
-        <item quantity="other">%1$d 개 중 %2$d 개 가 %3$s 에 생성됨</item>
+        <item quantity="other">%1$d개 중 %2$d개가 %3$s에 생성됨</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_create_details" comment="ex: Create 2 new calendars in Proton Calendar. / Create 1 new calendar in Proton Calendar.">
-        <item quantity="other">Proton Calendar에서 %1$d 개 새 캘린더 만들기.</item>
+        <item quantity="other">Proton Calendar에서 %1$d개 새 캘린더 만들기.</item>
     </plurals>
     <plurals name="import_assistant_summary_count" comment="ex: Import 1 of 1 calendar from / Import 1 of 2 calendars from">
         <item quantity="other">%1$d 중 %2$d 캘린더 불러오기</item>
     </plurals>
     <plurals name="fragment_import_assistant_summary_merge_details" comment="ex: Merge 2 calendars in Proton Calendar. / Merge 1 calendar in Proton Calendar.">
-        <item quantity="other">Proton Calendar에 %1$d 개 캘린더를 병합하기.</item>
+        <item quantity="other">Proton Calendar에 %1$d개 캘린더를 병합하기.</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error" comment="%1$d is replaced by number of calendars">
         <item quantity="other">캘린더 제한으로 인해 모든 불러온 캘린더에 대해서 새 캘린더를 생성할 수 없습니다.\n • 최소 %1$d개의 캘린더를 삭제해주세요</item>
     </plurals>
     <plurals name="import_assistant_import_summary_error_merge" comment="This is appended at the end of the string import_assistant_import_summary_error in some cases. Make sure to translate the or that is between the \u0020 and the \n. %1$d is replaced by number of calendars. \u0020 is a unicode char to add a space at the start of the sentence.">
-        <item quantity="other">\u0020중\n • 존재하는 Proton calendar에 최소한 %1$d 개의 캘린더를 병합하십시오.</item>
+        <item quantity="other">\u0020중\n • 존재하는 Proton 캘린더에 최소한 %1$d 개의 캘린더를 병합하십시오.</item>
     </plurals>
     <plurals name="plural_seconds">
         <item quantity="other">초</item>
