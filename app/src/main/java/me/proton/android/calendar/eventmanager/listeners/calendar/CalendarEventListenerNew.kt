@@ -43,7 +43,7 @@ class CalendarEventListenerNew @Inject constructor(
             logger.i("action CREATE for calendarEvent in deleted calendar")
             return
         }
-
+        logger.i("CalendarEventListener2 onCreate with ${entities.size} new events [${config.asCalendar().calendarId}]")
         calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
     }
 
@@ -52,7 +52,7 @@ class CalendarEventListenerNew @Inject constructor(
             logger.i("action UPDATE for calendarEvent in deleted calendar")
             return
         }
-
+        logger.i("CalendarEventListener2 onUpdate with ${entities.size} changed events [${config.asCalendar().calendarId}]")
         calendarsRepository.persistEventsMetadata(*entities.toTypedArray())
     }
 
@@ -69,8 +69,7 @@ class CalendarEventListenerNew @Inject constructor(
 
     override suspend fun onResetAll(config: EventManagerConfig) {
         super.onResetAll(config)
-
-        logger.e("CalendarEventListener2 onResetAll [${config.asCalendar().calendarId}]")
+        logger.i("CalendarEventListener2 onResetAll [${config.asCalendar().calendarId}]")
 
         val userId = config.userId
         val calendarId = config.asCalendar().calendarId

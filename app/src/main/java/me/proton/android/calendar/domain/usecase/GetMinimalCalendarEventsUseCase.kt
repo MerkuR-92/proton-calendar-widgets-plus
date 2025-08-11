@@ -25,9 +25,6 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
         const val GET_MINIMAL_CALENDAR_EVENTS = "GET_MINIMAL_CALENDAR_EVENTS"
     }
 
-    /**
-     * @return success or failure
-     */
     suspend fun execute(userId: UserId, calendarId: String): UseCase.Result {
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
             ?: ZoneId.systemDefault().id
@@ -38,28 +35,26 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
         val fromDate = timeWindow.first
         val toDate = timeWindow.second
 
-        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
-        fetchEventsResult.first.ifSuccessAndLogErrors(logger) { }
+        val (result, entitiesAndMetadatas) = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
+        result.ifSuccessAndLogErrors(logger) { }
 
-        if (fetchEventsResult.first is UseCase.Result.Success<*>) {
-            if (fetchEventsResult.second == null) {
+        if (result is UseCase.Result.Success<*>) {
+            if (entitiesAndMetadatas == null) {
                 logger.e("GetMinimalCalendarEventsUseCase: null event list when Success")
                 return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: null event list when Success")
             }
 
-            fetchEventsResult.second?.let {
-                logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${it.size}")
-                val eventEntities = it.map { it.first }
-                calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
-                it.map { it.second }.forEach {
-                    updateEventOccurrencesUseCase.execute(userId.id, it)
-                }
-                updateAlarmsUseCase.execute(userId.id, eventEntities)
-                return UseCase.Result.Success<Unit>()
+            logger.v("GetMinimalCalendarEventsUseCase fetchEventsResult success: ${entitiesAndMetadatas.size}")
+            val eventEntities = entitiesAndMetadatas.map { it.first }
+            calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
+            entitiesAndMetadatas.map { it.second }.forEach {
+                updateEventOccurrencesUseCase.execute(userId.id, it)
             }
+            updateAlarmsUseCase.execute(userId.id, eventEntities)
+            return UseCase.Result.Success<Unit>()
+        } else {
+            logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents: $result")
+            return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
         }
-
-        logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
-        return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
     }
 }

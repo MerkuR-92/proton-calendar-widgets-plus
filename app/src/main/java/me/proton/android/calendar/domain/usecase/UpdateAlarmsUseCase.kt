@@ -1,6 +1,5 @@
 package me.proton.android.calendar.domain.usecase
 
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.formatUidForICal

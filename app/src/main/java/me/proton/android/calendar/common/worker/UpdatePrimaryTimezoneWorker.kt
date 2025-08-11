@@ -13,6 +13,8 @@ object UpdatePrimaryTimezoneWorker {
             UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.UPDATE_PRIMARY_TIMEZONE,
             UseCaseWorker.INPUT_USER_ID to userId,
             UseCaseWorker.INPUT_PRIMARY_TIMEZONE to primaryTimezone
-        ), UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE).state
+        ),
+            uniqueWorkName = UseCaseWorker.UniqueWorkNames.UPDATE_PRIMARY_TIMEZONE + "_$userId"
+        ).state
     }
 }

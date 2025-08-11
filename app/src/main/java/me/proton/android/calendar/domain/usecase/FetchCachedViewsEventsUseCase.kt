@@ -36,7 +36,7 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
         val timeWindow = ProtonUtilsImpl.getCachedMonthViewsTimeWindow(selectedDate, weekStart)
         val fromDate = timeWindow.first
         val toDate = timeWindow.second
-        val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
+        val (fetchEventsResult, events) = fetchEventsUseCase.splitFetchEvents(
             userId,
             listOf(calendarId),
             fromDate,
@@ -44,12 +44,11 @@ class FetchCachedViewsEventsUseCase @Inject constructor(
             displayTimeZoneId
         )
 
-        val events = fetchEventsResult.second
-        return if (fetchEventsResult.first is UseCase.Result.Success<*> && events != null) {
+        return if (fetchEventsResult is UseCase.Result.Success<*> && events != null) {
             val eventEntities = events.map { it.first }
             calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
-            events.forEach {
-                updateEventOccurrencesUseCase.execute(userId.id, it.second)
+            events.forEach { (_, eventMetadata) ->
+                updateEventOccurrencesUseCase.execute(userId.id, eventMetadata)
             }
             updateAlarmsUseCase.execute(userId.id, eventEntities)
             widgetRefresher.refreshEventList()
