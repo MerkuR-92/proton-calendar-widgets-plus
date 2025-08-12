@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import me.proton.android.calendar.common.timezoneApiOverrides
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarUserSettingsEntity
@@ -25,24 +26,24 @@ class UpdateCalendarUserSettingsUseCase @Inject constructor(
         const val WORKER_ID_DEFAULT_CALENDAR_ID = "WORKER_ID_DEFAULT_CALENDAR_ID"
     }
 
-    suspend fun executePrimaryTimezone(userId: UserId, primaryTimezone: String): UseCase.Result {
-        return when (val updateCalendarUserPrimaryTimezoneResponse =
-            settingsApi.updateCalendarUserPrimaryTimezone(userId, primaryTimezone)
-        ) {
+    suspend fun executePrimaryTimezone(userId: UserId, primaryTimezoneId: String): UseCase.Result {
+        val primaryTimezone = timezoneApiOverrides[primaryTimezoneId] ?: primaryTimezoneId
+        val response = settingsApi.updateCalendarUserPrimaryTimezone(userId, primaryTimezone)
+        return when (response) {
             is ApiResponse.Success -> {
                 calendarsRepository.persistCalendarUserSettings(
                     userId.id,
-                    updateCalendarUserPrimaryTimezoneResponse.data.calendarUserSettings
+                    response.data.calendarUserSettings
                 )
                 calendarUserSettingsChangedUseCase.handlePrimaryTimezoneChange(userId.id)
             }
             is ApiResponse.Error -> {
-                logger.e("api error updating calendar user primary timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                UseCase.Result.Error(updateCalendarUserPrimaryTimezoneResponse.error)
+                logger.e("api error updating calendar user primary timezone: $response")
+                UseCase.Result.Error(response.error)
             }
             is ApiResponse.Exception -> {
-                logger.e("api error updating calendar user primary timezone: $updateCalendarUserPrimaryTimezoneResponse")
-                UseCase.Result.Error(updateCalendarUserPrimaryTimezoneResponse.exception.message ?: "(no exception message)")
+                logger.e("api error updating calendar user primary timezone: $response")
+                UseCase.Result.Error(response.exception.message ?: "(no exception message)")
             }
         }
     }

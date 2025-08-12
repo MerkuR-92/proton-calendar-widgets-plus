@@ -8,6 +8,7 @@ import me.proton.android.calendar.common.CalendarSettings.DAYS_IN_A_WEEK
 import me.proton.android.calendar.common.aliasesTimezonesMap
 import me.proton.android.calendar.common.allowedTimezoneIds
 import me.proton.android.calendar.common.logger.TimberLogger
+import me.proton.android.calendar.common.timezoneDisplayOverrides
 import me.proton.android.calendar.common.windowsTimeZoneMap
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.utils.DateTimeUtils
@@ -192,7 +193,8 @@ object DateTimeUtilsImpl : DateTimeUtils {
 
         val offset = "${offsetLocalTime.hour}${if (offsetLocalTime.minute > 0) ":${offsetLocalTime.minute}" else ""}"
 
-        return "${if (displayId) "$timeZoneId " else ""}(GMT${if (rawOffset < 0) "-" else "+"}${offset})"
+        val tzDisplay = timezoneDisplayOverrides[timeZoneId] ?: timeZoneId
+        return "${if (displayId) "$tzDisplay " else ""}(GMT${if (rawOffset < 0) "-" else "+"}${offset})"
     }
 
     override fun getTimezoneOffsetDifferenceSeconds(instantA: Instant, instantB: Instant, timeZoneId: String): Int {
@@ -291,7 +293,6 @@ object DateTimeUtilsImpl : DateTimeUtils {
      * If supplied TimeZone is not supported, fallback retaining UTC offset.
      */
     override fun fallbackTimeZone(timeZone: String, fallbackToDefault: Boolean): String? {
-
         return if (allowedTimezoneIds.contains(timeZone)) {
             timeZone
         } else {

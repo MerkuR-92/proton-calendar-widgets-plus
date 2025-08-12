@@ -19,7 +19,6 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
         toDate: LocalDate,
         timeZoneId: String
     ) {
-
         val windowStart = fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
         val windowEnd = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
 

@@ -366,6 +366,17 @@ object MessageDigestHashType {
     const val SHA1 = "SHA-1"
 }
 
+private val EuropeKyiv = "Europe/Kyiv"
+private val EuropeKyivApiSupported = "Europe/Kiev"
+
+val timezoneApiOverrides = mapOf(
+    EuropeKyiv to EuropeKyivApiSupported,
+)
+
+val timezoneDisplayOverrides = mapOf(
+    EuropeKyivApiSupported to EuropeKyiv,
+)
+
 val allowedTimezoneIds = listOf(
     "Africa/Abidjan",
     "Africa/Accra",
@@ -638,7 +649,7 @@ val allowedTimezoneIds = listOf(
     "Europe/Helsinki",
     "Europe/Istanbul",
     "Europe/Kaliningrad",
-    "Europe/Kyiv",
+    EuropeKyiv,
     "Europe/Kirov",
     "Europe/Lisbon",
     "Europe/London",

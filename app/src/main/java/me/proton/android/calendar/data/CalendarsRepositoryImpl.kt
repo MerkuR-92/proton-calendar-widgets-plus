@@ -17,17 +17,13 @@ import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -84,7 +80,6 @@ import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
-import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
@@ -100,12 +95,10 @@ import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.user.domain.UserManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -209,7 +202,7 @@ class CalendarsRepositoryImpl @Inject constructor(
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
             // fetch from API
-            val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
+            val (fetchEventsResult, eventsAndMetadatas) = fetchEventsUseCase.splitFetchEvents(
                 fetchWindow.userId,
                 calendarIdsToFetch,
                 fetchWindow.fromDate,
@@ -217,20 +210,20 @@ class CalendarsRepositoryImpl @Inject constructor(
                 fetchWindow.timeZoneId
             )
 
-            if (fetchEventsResult.first is UseCase.Result.Success<*>) {
-                if (fetchEventsResult.second == null) {
+            if (fetchEventsResult is UseCase.Result.Success<*>) {
+                if (eventsAndMetadatas == null) {
                     logger.e("fetchEventsResult: null event list when Success")
                 }
 
-                fetchEventsResult.second?.let { fetchingResult ->
-                    logger.v("fetchEventsResult success: ${fetchingResult.size}")
+                eventsAndMetadatas?.let { eventsAndMetadatas ->
+                    logger.v("fetchEventsResult success: ${eventsAndMetadatas.size}")
 
                     // TODO persist events where we download fresh ones, not here
 
-                    val eventEntities = fetchingResult.map { it.first }
+                    val eventEntities = eventsAndMetadatas.map { it.first }
                     persistEvents(*(eventEntities).toTypedArray())
-                    fetchingResult.forEach {
-                        updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, it.second)
+                    eventsAndMetadatas.forEach { (_, eventMetadata) ->
+                        updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, eventMetadata)
                     }
                     fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
@@ -726,7 +719,6 @@ class CalendarsRepositoryImpl @Inject constructor(
         if (isDbEventUpToDate) return false
 
         if (metadata.rRule == null) { // non-recurring event
-
             val now = Instant.now()
             val startInstant = Instant.ofEpochSecond(metadata.startTime)
             val endInstant = Instant.ofEpochSecond(metadata.endTime)
@@ -951,11 +943,11 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun persistEvents(vararg events: EventEntity) {
         val eventsByCalendar = events.groupBy { it.calendarId }
         database.inTransaction {
-            eventsByCalendar.forEach {
-                val calendarUserId = database.calendarsDao().selectCalendarUserId(it.key)
+            eventsByCalendar.forEach { (calendarId, eventsForCalendar) ->
+                val calendarUserId = database.calendarsDao().selectCalendarUserId(calendarId)
                 if (calendarUserId != null /* Calendar exists */) {
                     try {
-                        it.value.forEach {
+                        eventsForCalendar.forEach {
                             // don't overwrite Event it we already have the same or newer one in DB
                             if (!database.eventsDao().hasEventWithHigherOrEqualModifyTime(it.id, it.calendarId, it.modifyTime)) {
                                 database.eventsDao().updateOrInsert(it)
@@ -969,11 +961,11 @@ class CalendarsRepositoryImpl @Inject constructor(
                             && e.message?.contains("constraint", ignoreCase = true) == true
                         ) {
                             // ignore, it means this Event's Calendar doesn't exist
-                            logger.e("persistEvents couldn't insert because ${e.message}", e)
+                            logger.e("persistEvents couldn't insert because ${e.message}, calendar ID: $calendarId", e)
                         } else throw e
                     }
                 } else {
-                    logger.i("persistEvents couldn't insert because calendar doesn't exist")
+                    logger.e("persistEvents couldn't insert because calendar $calendarId doesn't exist")
                 }
             }
         }

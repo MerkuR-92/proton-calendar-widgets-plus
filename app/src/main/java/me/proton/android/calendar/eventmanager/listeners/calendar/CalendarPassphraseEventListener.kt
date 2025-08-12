@@ -67,7 +67,7 @@ class CalendarPassphraseEventListener @Inject constructor(
     override suspend fun onResetAll(config: EventManagerConfig) {
         super.onResetAll(config)
 
-        logger.e("CalendarPassphraseEventListener onResetAll [${config.asCalendar().calendarId}]")
+        logger.i("CalendarPassphraseEventListener onResetAll [${config.asCalendar().calendarId}]")
 
         val calendarId = config.asCalendar().calendarId
 

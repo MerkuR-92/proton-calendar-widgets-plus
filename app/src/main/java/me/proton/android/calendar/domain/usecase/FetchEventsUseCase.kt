@@ -37,14 +37,18 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
     private val fetchEventWithCommentsUseCase: GetEventWithCommentsUseCase,
 ) : UseCase {
 
+    data class ResultData(
+        val result: UseCase.Result,
+        val eventsAndMetadata: List<Pair<EventEntity, EventEntityMetadata>>?,
+    )
+
     suspend fun splitFetchEvents(
         userId: UserId,
         calendarIds: List<String>,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String
-    ): Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?> { // TODO introduce new type of result with payload
-
+    ): ResultData {
         val daysInTimeWindow = ChronoUnit.DAYS.between(fromDate, toDate)
         val timeWindows = arrayListOf<Pair<LocalDate, LocalDate>>()
 
@@ -63,39 +67,32 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                 timeWindowsCount++
             }
         } else {
-            timeWindows.add(
-                Pair(fromDate, toDate)
-            )
+            timeWindows.add(Pair(fromDate, toDate))
         }
-
-        var results: List<Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?>> = emptyList()
-
-        try {
-            coroutineScope {
-                launch {
-                    results = timeWindows.map { timeWindow ->
-                        async {
-                            fetchEventEntitiesLocalOrRemote(userId, calendarIds, timeWindow.first, timeWindow.second, timeZoneId, this)
-                        }
-                    }.awaitAll()
-                }
+        return try {
+            val results = coroutineScope {
+                timeWindows.map { (from, to) ->
+                    async {
+                        fetchEventEntitiesLocalOrRemote(userId, calendarIds, fromDate = from, toDate = to, timeZoneId, this)
+                    }
+                }.awaitAll()
+            }
+            val firstError = results.firstOrNull { it.first !is UseCase.Result.Success<*> }?.first
+            if (firstError != null) {
+                logger.e("Error in splitFetchEvents: failed to fetch event entities: $firstError")
+                ResultData(firstError, null)
+            } else {
+                updateFetchedEventsMetadataUseCase.execute(userId.id, calendarIds = calendarIds, fromDate = fromDate, toDate = toDate, timeZoneId = timeZoneId)
+                logger.i("Fetched ${results.size} events and their metadatas")
+                ResultData(
+                    UseCase.Result.Success<Unit>(),
+                    results.flatMap { it.second ?: arrayListOf() }
+                )
             }
         } catch (e: Exception) {
             logger.e("Exception in splitFetchEvents", e)
-            results = emptyList()
-        }
-
-        return if (results.isNotEmpty() && results.all { it.first is UseCase.Result.Success<*> }) {
-
-            updateFetchedEventsMetadataUseCase.execute(userId.id, calendarIds, fromDate, toDate, timeZoneId)
-
-            Pair(
-                UseCase.Result.Success<Unit>(),
-                results.flatMap { it.second ?: arrayListOf() }
-            )
-        } else {
-            Pair(
-                UseCase.Result.Error("error fetching events"),
+            ResultData(
+                UseCase.Result.Error("error fetching events: ${e.message}", userErrorMessage = e.message),
                 null
             )
         }
@@ -225,9 +222,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         var result: Pair<UseCase.Result, List<Pair<EventEntity, EventEntityMetadata>>?>
 
         try {
-
             coroutineScope {
-
                 val eventEntitiesChannel = fetchMetadataOnly(
                     userId,
                     calendarIds,
@@ -250,9 +245,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                 } catch (e: Exception) {
                     Pair(UseCase.Result.Error("Error in fetchEventEntitiesLocalOrRemote ${e.message}"), null)
                 }
-
             }
-
         } catch (e: Exception) {
             return Pair(UseCase.Result.Error("Error in fetchEventEntitiesLocalOrRemote ${e.message}"), null)
         }

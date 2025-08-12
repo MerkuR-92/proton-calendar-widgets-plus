@@ -51,7 +51,7 @@ class ResetLocalEventDatabaseUseCase @Inject constructor(
 
         // Fetch and persist events
         calendarIds.mapAsync { calendarEntity ->
-            val fetchEventsResult = fetchEventsUseCase.splitFetchEvents(
+            val (fetchEventsResult, eventsAndMetadatas) = fetchEventsUseCase.splitFetchEvents(
                 userId,
                 listOf(calendarEntity.id),
                 fromDate,
@@ -59,20 +59,18 @@ class ResetLocalEventDatabaseUseCase @Inject constructor(
                 timeZoneId
             )
 
-            fetchEventsResult.first.ifSuccessAndLogErrors(logger) {
-                if (fetchEventsResult.second == null) {
+            fetchEventsResult.ifSuccessAndLogErrors(logger) {
+                if (eventsAndMetadatas == null) {
                     logger.e("fetchEventsResult: null event list when Success")
                 } else {
-                    fetchEventsResult.second?.let {
-                        logger.v("persisting events in bootstrap: ${it.size}")
-                        val eventEntities = it.map { it.first }
-                        calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
-                        it.map { it.second }.forEach {
-                            updateEventOccurrencesUseCase.execute(userId.id, it)
-                        }
-                        updateAlarmsUseCase.execute(userId.id, eventEntities)
-                        widgetRefresher.refreshEventList()
+                    logger.v("persisting events in bootstrap: ${eventsAndMetadatas.size}")
+                    val eventEntities = eventsAndMetadatas.map { it.first }
+                    calendarsRepository.persistEvents(*(eventEntities).toTypedArray())
+                    eventsAndMetadatas.forEach { (_, eventMetadata) ->
+                        updateEventOccurrencesUseCase.execute(userId.id, eventMetadata)
                     }
+                    updateAlarmsUseCase.execute(userId.id, eventEntities)
+                    widgetRefresher.refreshEventList()
                 }
             }
         }

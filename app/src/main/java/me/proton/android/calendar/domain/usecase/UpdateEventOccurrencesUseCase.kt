@@ -29,7 +29,6 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
         userId: String,
         eventEntityMetadata: EventEntityMetadata
     ) {
-
         // early return if there is no need to update the Occurrences
         if (database.inTransaction {
             database.eventOccurrencesDao().hasOccurrenceWithEqualOrHigherModifyTime(
@@ -41,7 +40,6 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
         }) return
 
         val eventOccurrenceEntities = if (eventEntityMetadata.rRule == null) { // normal event or single edit
-
             listOf(
                 EventOccurrenceEntity(
                     userId = userId,
@@ -57,9 +55,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                     firstOccurrenceStartTime = eventEntityMetadata.startTime
                 )
             )
-
         } else { // recurring event
-
             val startUtc = LocalDateTime.ofEpochSecond(eventEntityMetadata.startTime, 0, ZoneOffset.UTC)
             val endUtc = LocalDateTime.ofEpochSecond(eventEntityMetadata.endTime, 0, ZoneOffset.UTC)
 
@@ -82,13 +78,12 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
             }
 
             val lastOccurrenceEndTime = if (firstOccurrenceAfterWindows == null) {
-                occurrences?.lastOrNull()?.endDateTime?.toEpochSecond()
+                occurrences.lastOrNull()?.endDateTime?.toEpochSecond()
             } else null
 
             val eventOccurrenceEntities = mutableListOf<EventOccurrenceEntity>()
 
             for (i in 0..generatedWindowsCount) {
-
                 val windowStart = startOfEventsFirstMonth.plusMonths(i).atStartOfDay(ZoneId.of("UTC"))
                 val windowEnd = windowStart.toLocalDate().plusMonths(1).atStartOfDay(ZoneId.of("UTC")).minusSeconds(1)
 
@@ -125,12 +120,9 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                         )
                     )
                 }
-
             }
-
             eventOccurrenceEntities
         }
-
         kotlin.runCatching {
             database.inTransaction {
                 database.eventOccurrencesDao()
@@ -138,9 +130,8 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
             }
         }.onFailure {
-            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId}", it)
+            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} (event likely does not exist)", it)
         }
-
     }
 
     private fun generateDummyEventForOccurrences(
@@ -164,5 +155,4 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
 
         return Event.dummyFrom(ICalUtilsImpl.parseICalString(iCalString)!!)!!
     }
-
 }

@@ -29,47 +29,41 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
     private val calendarsRepository: CalendarsRepository
 ) {
 
-    companion object {
-        const val WORKER_ID = "POST_PROCESS_EVENTS_METADATA"
-    }
-
     suspend fun execute(): UseCase.Result {
-
         val userId =
             accountManager.getPrimaryUserId().firstOrNull() ?: return UseCase.Result.Error("Could not obtain UserId")
 
-        val selectedMetadata = database.eventsMetadataDao().selectEventsMetadata()
+        val selectedMetadatas = database.eventsMetadataDao().selectEventsMetadata()
         val eventEntitiesForAlarms = mutableListOf<EventEntity>()
 
-        selectedMetadata.forEach {
-
-            if (calendarsRepository.shouldFetchEvent(userId, it)) {
+        selectedMetadatas.forEach { metadata ->
+            if (calendarsRepository.shouldFetchEvent(userId, metadata)) {
                 val fetchedEventEntity = runCatching {
-                    fetchEventEntity(userId, it)
+                    fetchEventEntity(userId, metadata)
                 }.getOrElse {
                     return UseCase.Result.Error(
                         "PostProcessEventsMetadataUseCase fetching error",
                         userErrorMessage = it.message
                     )
                 }
-
-                fetchedEventEntity?.let {
-                    eventEntitiesForAlarms.add(it)
-                    calendarsRepository.persistEvents(it)
+                fetchedEventEntity?.let { entity ->
+                    eventEntitiesForAlarms.add(entity)
+                    calendarsRepository.persistEvents(entity)
                 }
+            } else {
+                logger.i("Ignoring fetch for event ${metadata.id}")
             }
-
             try {
-                updateEventOccurrencesUseCase.execute(userId.id, it)
+                updateEventOccurrencesUseCase.execute(userId.id, metadata)
             } catch (e: SQLException) {
                 // should not happen and if it does then the Event doesn't exist in DB so we can't recover from that anyway
                 logger.e("PostProcessEventsMetadataUseCase: Error updating event occurrences", e)
             }
         }
 
-        database.eventsMetadataDao().delete(*selectedMetadata.toTypedArray())
+        database.eventsMetadataDao().delete(*selectedMetadatas.toTypedArray())
 
-        updateAlarmsUseCase.execute(userId.id, eventEntitiesForAlarms)
+        updateAlarmsUseCase.execute(userId.id, eventEntitiesForAlarms).ifSuccessAndLogErrors(logger) {}
         widgetRefresher.refreshEventList()
 
         return UseCase.Result.Success<Unit>()
@@ -80,12 +74,14 @@ class PostProcessEventsMetadataUseCase @Inject constructor(
             is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
                 // If event was not found just omit it, otherwise we'll retry this indefinitely
-                if (result.isNotFound()) return null
+                if (result.isNotFound()) {
+                    logger.i("Event ${response.id} (cal ID: ${response.calendarId}) not found on API: $result")
+                    return null
+                }
                 else throw IllegalStateException(result.error)
             }
 
             is ApiResponse.Exception -> throw result.exception
         }
     }
-
 }

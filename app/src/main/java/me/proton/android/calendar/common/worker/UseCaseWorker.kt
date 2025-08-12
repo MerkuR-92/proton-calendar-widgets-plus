@@ -17,7 +17,6 @@ import me.proton.android.calendar.domain.usecase.GetMinimalCalendarEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsWithMissingEventUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.MigrateEventMetadataToOccurrencesUseCase
-import me.proton.android.calendar.domain.usecase.PostProcessEventsMetadataUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarKeysUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarPassphraseUseCase
 import me.proton.android.calendar.domain.usecase.RefreshCalendarSettingsUseCase
@@ -57,7 +56,6 @@ class UseCaseWorker @AssistedInject constructor(
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
     private val handleAlarmsWithMissingEventUseCase: HandleAlarmsWithMissingEventUseCase,
     private val migrateEventMetadataToOccurrencesUseCase: MigrateEventMetadataToOccurrencesUseCase,
-    private val postProcessEventsMetadataUseCase: PostProcessEventsMetadataUseCase
 ) : CoroutineWorker(context, workerParameters) {
     /**
      * Used to inject and execute different usecases from this Worker
@@ -89,7 +87,6 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_ALARMS = UpdateAlarmsUseCase.UPDATE_ALARMS
             const val HANDLE_ALARMS_WITH_MISSING_EVENT = HandleAlarmsWithMissingEventUseCase.HANDLE_ALARMS_WITH_MISSING_EVENT
             const val MIGRATE_EVENT_METADATA_TO_OCCURRENCES = MigrateEventMetadataToOccurrencesUseCase.WORKER_ID
-            const val POST_PROCESS_EVENTS_METADATA = PostProcessEventsMetadataUseCase.WORKER_ID
         }
     }
 
@@ -148,12 +145,10 @@ class UseCaseWorker @AssistedInject constructor(
             const val UPDATE_ALARMS = "UPDATE_ALARMS"
             const val HANDLE_ALARMS_WITH_MISSING_EVENT = "HANDLE_ALARMS_WITH_MISSING_EVENT"
             const val MIGRATE_EVENT_METADATA_TO_OCCURRENCES = "MIGRATE_EVENT_METADATA_TO_OCCURRENCES"
-            const val POST_PROCESS_EVENTS_METADATA = "POST_PROCESS_EVENTS_METADATA"
         }
     }
 
     override suspend fun doWork(): Result {
-
         logger.v("inside UseCaseWorker doWork(), usecaseid: ${inputData.getString(INPUT_USE_CASE_ID)}")
 
         val userId = inputData.getString(INPUT_USER_ID)?.let { UserId(it) } ?: return Result.failure()
@@ -283,9 +278,6 @@ class UseCaseWorker @AssistedInject constructor(
             }
             UseCaseId.MIGRATE_EVENT_METADATA_TO_OCCURRENCES -> {
                 migrateEventMetadataToOccurrencesUseCase.execute()
-            }
-            UseCaseId.POST_PROCESS_EVENTS_METADATA -> {
-                postProcessEventsMetadataUseCase.execute()
             }
             else -> {
                 TODO("unsupported or empty UseCaseId: $useCaseId")
