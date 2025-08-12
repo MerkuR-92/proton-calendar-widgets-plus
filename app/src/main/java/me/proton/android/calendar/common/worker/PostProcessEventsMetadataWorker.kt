@@ -19,7 +19,7 @@ class PostProcessEventsMetadataWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParameters) {
 
     override suspend fun doWork(): Result = executeUseCase(logger) {
-        logger.d("inside UseCaseWorker doWork, POST_PROCESS")
+        logger.v("inside PostProcessEventsMetadataWorker doWork")
         postProcessEventsMetadataUseCase.execute()
     }
 }
