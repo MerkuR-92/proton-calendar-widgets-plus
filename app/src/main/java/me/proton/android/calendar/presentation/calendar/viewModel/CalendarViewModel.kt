@@ -23,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
@@ -85,7 +84,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
-import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
@@ -137,22 +135,12 @@ class CalendarViewModel @Inject constructor(
     private val database: AppDatabase,
     private val getUiEventsUseCase: GetUiEventsUseCase,
     private val workManager: WorkManager,
-    private val fixCalendarsUseCase: FixCalendarsUseCase
 ) : AndroidViewModel(application) {
-
-    private var viewModelJob = Job() // TODO extract this to superclass
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     val initialised = MutableLiveData(false)
 
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
 
     var updateSelectedLocalDate: LocalDate? = null
 
@@ -180,13 +168,6 @@ class CalendarViewModel @Inject constructor(
     var monthView: MutableLiveData<Boolean> = MutableLiveData(false)
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    // Pair with position of the resumed fragment and loading status for the view
-    //  so that we know when to load and display the events for a fragment without having multiple process running
-    val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
-
-    // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
-    val resumedMonthViewPosition = MutableLiveData<Int>()
 
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
