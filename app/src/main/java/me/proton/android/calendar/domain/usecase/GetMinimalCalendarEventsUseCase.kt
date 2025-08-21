@@ -18,7 +18,8 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
     private val fetchEventsUseCase: FetchEventsUseCase,
     private val logger: Logger,
     private val updateAlarmsUseCase: UpdateAlarmsUseCase,
-    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase
+    private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
+    private val loadingStateUseCase: LoadingStateUseCase,
 ) {
 
     companion object {
@@ -28,6 +29,9 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
     suspend fun execute(userId: UserId, calendarId: String): UseCase.Result {
         val timezone = calendarsRepository.selectCalendarUserSettings(userId.id)?.primaryTimezone
             ?: ZoneId.systemDefault().id
+
+        loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = true)
+
         val zoneId = if (timezone.isBlank()) ZoneId.systemDefault() else ZoneId.of(timezone)
         val now = LocalDate.now(zoneId)
         val weekStart = userSettingsRepository.getWeekStart(userId, database)
@@ -51,8 +55,10 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
                 updateEventOccurrencesUseCase.execute(userId.id, it)
             }
             updateAlarmsUseCase.execute(userId.id, eventEntities)
+            loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = false)
             return UseCase.Result.Success<Unit>()
         } else {
+            loadingStateUseCase.markMinimalCalendarFetching(calendarId, inProgress = false)
             logger.e("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents: $result")
             return UseCase.Result.Error("GetMinimalCalendarEventsUseCase: failed to splitFetchEvents")
         }

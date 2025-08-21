@@ -142,7 +142,7 @@ interface CalendarsRepository {
 
     sealed class GetEventsResult<out T> {
         object InProgress: GetEventsResult<Nothing>()
-        data class Success<T>(val events: List<T>): GetEventsResult<T>()
+        data class Success<T>(val events: List<T>, val fullyLoaded: Boolean): GetEventsResult<T>()
         data class Exception(val throwable: Throwable): GetEventsResult<Nothing>()
     }
 
