@@ -169,6 +169,13 @@ class CalendarViewModel @Inject constructor(
 
     var loading: MutableLiveData<Boolean> = MutableLiveData(false)
 
+    // Pair with position of the resumed fragment and loading status for the view
+    //  so that we know when to load and display the events for a fragment without having multiple process running
+    val monthViewLoading = MutableLiveData<Pair<Int, Boolean>>()
+
+    // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
+    val resumedMonthViewPosition = MutableLiveData<Int>()
+
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
 
