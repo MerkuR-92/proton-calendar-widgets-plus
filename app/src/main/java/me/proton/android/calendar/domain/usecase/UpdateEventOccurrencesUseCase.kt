@@ -99,9 +99,7 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                     lastOccurrenceEndTime != null && windowStart.toEpochSecond() > lastOccurrenceEndTime
 
                 if (occurrenceInThisWindow != null || isWindowAfterLastOccurrence.not()) {
-
                     eventOccurrenceEntities.add(
-
                         // if there is no occurrence in this window, startTime and endTime will be null -- this is a useful information for lookup
                         EventOccurrenceEntity(
                             userId = userId,

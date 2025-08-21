@@ -112,7 +112,6 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         lastKnownEventId: String?,
         coroutineScope: CoroutineScope
     ): ReceiveChannel<List<EventResponse>> {
-
         // eventIdsRequestPageSize has to be evenly divisible by (workerCount * workerBatchSize)!
         val workerCount = 5
         val workerBatchSize = 5
@@ -122,16 +121,12 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         val eventResponsesChannel = Channel<List<EventResponse>>(5)
 
         coroutineScope.launch {
-
             var afterId = lastKnownEventId
-
             // Event IDs downloaded in one call
             var batchOfIds = emptyList<String>()
 
             launch { // PRODUCE Event IDs
-
                 do {
-
                     when (val response = calendarsApi.getEventIdsForExport(userId, calendarId, eventIdsRequestPageSize, afterId)) {
                         is ApiResponse.Error -> {
                             response.logErrorIfNeeded("[FetchEventsUseCase] error in getEventIdsForExport", logger)
@@ -155,17 +150,13 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                 } while (batchOfIds.isNotEmpty())
 
                 eventIdsChannel.close()
-
             }
-
         }
 
         coroutineScope.launch {
             for (eventIds in eventIdsChannel) { // CONSUME Event IDs
-
                 // we have to fetch EventEntites somewhat synchronously, because we need to maintain order
                 // of Event IDs in downloaded Event batches we publish to consumer
-
                 eventIds.chunked(workerCount * workerBatchSize).map { chunkForAllWorkers ->
 
                     val fetchedEntities = chunkForAllWorkers.chunked(workerBatchSize).map { eventIds ->
@@ -195,16 +186,11 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                     if (!eventResponsesChannel.isClosedForSend) {
                         eventResponsesChannel.send(fetchedEntities) // PRODUCE Event Entities
                     }
-
                 }
-
             }
-
             eventResponsesChannel.close()
         }
-
         return eventResponsesChannel
-
     }
 
     /**
@@ -276,12 +262,10 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                 async {
                     (0..3).map { type -> // we need to fire off 4 requests with different types
-
                         async {
                             var page = 0
 
                             do {
-
                                 val eventsResponse = calendarsApi.getEventsMetadata(
                                     userId,
                                     calendarId,
@@ -353,7 +337,6 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
                 val eventEntities = eventMetadatas.map { metaData ->
                     async {
-
                         val dbEventEntity = database.eventsDao().selectEvent(metaData.id, metaData.calendarId)
 
                         // return EventEnity from DB if it's up to date, otherwise call API
@@ -393,5 +376,4 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
 
         return eventEntitiesChannel
     }
-
 }

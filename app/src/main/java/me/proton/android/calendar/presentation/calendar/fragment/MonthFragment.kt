@@ -290,9 +290,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
     private fun updateMiniCalendarHeight(
         startWeekOn: DayOfWeek,
         isMonthView: Boolean,
-        animateChange: Boolean
     ) {
-
         val firstDayOfMonth = calendarViewModel.selectedDateTime.value?.first?.withDayOfMonth(1) ?: return // We will retry this once calendarViewModel.selectedDate has been set
 
         // Calculate current month's desired height for both mini calendar mode (month / week)
@@ -314,8 +312,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
 
         if (!isResumed) return // TODO ViewBinding NPE
-
-        if (animateChange) {
             binding.viewPagerTopGuideline.animateGuidelineHeightChange(
                 desiredHeight,
                 calendarViewModel.currentPosDesiredMonthHeight
@@ -326,17 +322,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                     R.dimen.calendar_slider_height
                 ), calendarViewModel.currentPosDesiredMonthHeight
             ) { }
-        } else {
-            (binding.viewPagerTopGuideline.layoutParams as? ConstraintLayout.LayoutParams)?.let { layoutParams ->
-                layoutParams.guideBegin = desiredHeight
-                binding.viewPagerTopGuideline.layoutParams = layoutParams
-            }
-
-            (binding.viewPagerSliderGuideline.layoutParams as? ConstraintLayout.LayoutParams)?.let { sliderLayoutParams ->
-                sliderLayoutParams.guideBegin = desiredHeight - requireContext().resources.getDimensionPixelSize(R.dimen.calendar_slider_height)
-                binding.viewPagerSliderGuideline.layoutParams = sliderLayoutParams
-            }
-        }
     }
 
     override fun onStart() {
@@ -964,7 +949,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                         updateMiniCalendarHeight(
                             startWeekOn,
                             isMonthView = true,
-                            animateChange = true
                         )
                         timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                     } else {
@@ -991,7 +975,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                         updateMiniCalendarHeight(
                             startWeekOn,
                             isMonthView = false,
-                            animateChange = true
                         )
                         timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                     } else {
@@ -1315,7 +1298,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         updateMiniCalendarHeight(
             startWeekOn,
             isMonthView = true,
-            animateChange = true
         )
         timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
         if (currentViewMode != ViewMode.MONTH) AndroidUtils.rotateArrowUpward(miniCalendarChevron)
@@ -1351,7 +1333,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             updateMiniCalendarHeight(
                 startWeekOn,
                 isMonthView = false,
-                animateChange = true
             )
             timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
         } else {
@@ -1370,7 +1351,6 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                         updateMiniCalendarHeight(
                             startWeekOn,
                             isMonthView = false,
-                            animateChange = true
                         )
                         timeZoneId?.let { setHeaderDaysContent(startWeekOn, it) }
                     }

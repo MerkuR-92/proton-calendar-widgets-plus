@@ -437,7 +437,6 @@ class CalendarViewModel @Inject constructor(
             }
 
         }.flowOn(Dispatchers.IO).cancellable()
-
     }
 
     suspend fun calendarIndicators(
@@ -502,7 +501,7 @@ class CalendarViewModel @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        lifecycle: Lifecycle
+        lifecycle: Lifecycle,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {

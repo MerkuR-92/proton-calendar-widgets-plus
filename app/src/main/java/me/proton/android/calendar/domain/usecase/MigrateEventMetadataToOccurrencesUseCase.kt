@@ -19,7 +19,6 @@ class MigrateEventMetadataToOccurrencesUseCase @Inject constructor(
     }
 
     suspend fun execute(): UseCase.Result {
-
         val userId =
             accountManager.getPrimaryUserId().firstOrNull() ?: return UseCase.Result.Error("Could not obtain UserId")
 
