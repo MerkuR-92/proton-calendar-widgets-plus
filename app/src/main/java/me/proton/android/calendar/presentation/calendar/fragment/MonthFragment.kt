@@ -832,7 +832,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
                 weekViewAdapter.submitList(
                     weekViewCalendarEntities
                 )
-                binding.weekView.showLoadingEvents = events.fullyLoaded.not()
+                binding.weekView.showLoadingEvents = events.events.isEmpty() && events.fullyLoaded.not()
                 binding.calendarProgress.isVisible = events.fullyLoaded.not()
             }
 
