@@ -342,7 +342,7 @@ data class Event private constructor(
             Meeting host: john.doe@proton.ch
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
              */
-        this.iCalEvent.setDescription(description.plus(header))
+        this.iCalEvent.setDescription(description.orEmpty() + header)
     }
 
     fun removeConference() {
