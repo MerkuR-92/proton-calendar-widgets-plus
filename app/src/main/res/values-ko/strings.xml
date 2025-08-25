@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">Zoom 회의 참여</string>
     <string name="zoom_meeting_title">Zoom 회의</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">Password: %1$s</string>
-    <string name="generic_meeting_more_details">More details</string>
-    <string name="generic_meeting_less_details">Less details</string>
-    <string name="generic_meeting_host">Meeting host</string>
-    <string name="generic_meeting_link">Meeting link</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="generic_meeting_password">비밀번호: %1$s</string>
+    <string name="generic_meeting_more_details">자세히</string>
+    <string name="generic_meeting_less_details">간략하게</string>
+    <string name="generic_meeting_host">회의 주최자</string>
+    <string name="generic_meeting_link">회의 링크</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">참여하는 방법</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">새 이벤트</string>
     <string name="event_text_edit_event">이벤트 편집</string>

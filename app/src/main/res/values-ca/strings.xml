@@ -64,7 +64,7 @@
     <string name="event_alarm_label">%1$s</string>
     <string name="event_alarm_label_before_by_email">%1$s abans per correu electrònic</string>
     <string name="event_alarm_label_not_before_with_time" comment="Example: On the same day at 15:00">%1$s a les %2$s</string>
-    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s, %2$s i per correu electrònic</string>
+    <string name="event_alarm_label_not_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s a les %2$s per correu electrònic</string>
     <string name="event_alarm_label_before_with_time" comment="Example: 1 day before at 9:00">%1$s abans, %2$s</string>
     <string name="event_alarm_label_before_with_time_by_email" comment="Example: 1 day before at 9:00 by email">%1$s abans, %2$s per correu electrònic</string>
     <string name="event_recurrence_occurs_on_day_of_week" comment="Example: weekly on Friday">%1$s els %2$s</string>
@@ -138,7 +138,7 @@
     <string name="generic_meeting_less_details">Menys detalls</string>
     <string name="generic_meeting_host">Organitzador de la reunió</string>
     <string name="generic_meeting_link">Enllaç de la sessió</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruccions per unir-vos-hi</a></string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instruccions per a unir-vos-hi</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nou esdeveniment</string>
     <string name="event_text_edit_event">Edita l\'esdeveniment</string>
@@ -603,7 +603,7 @@
     <string name="spotlight_dialog_import_title">Més maneres d\'afegir esdeveniments</string>
     <string name="spotlight_dialog_import_description">• Importeu esdeveniments al calendari des dels fitxers del telèfon.\n\n• Afegiu reserves de viatges directament des del Proton Mail.</string>
     <string name="spotlight_dialog_calendar_provider_title">Característiques del calendari</string>
-    <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament a Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments a calendaris que us hagin estat compartits.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 nous idiomes disponibles.</string>
+    <string name="spotlight_dialog_calendar_provider_description">• Afegiu esdeveniments directament al Proton Calendar des d\'altres aplicacions.\n\n• Creeu i gestioneu esdeveniments a calendaris que us hagin estat compartits.\n\n• Establiu la pantalla per defecte que voleu veure en obrir l\'aplicació.\n\n• 13 idiomes nous disponibles.</string>
     <string name="spotlight_dialog_wipe_search_title">S\'ha esborrat la cerca per a millorar-la.</string>
     <string name="spotlight_dialog_wipe_search_description">Estem suprimint la capacitat de cerca experimental del Proton Calendar Beta, ja que volem fer-la més útil i fiable. Això pot trigar uns segons.</string>
     <string name="spotlight_dialog_holiday_calendar_title">Els dies festius són aquí!</string>
