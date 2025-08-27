@@ -210,27 +210,6 @@ class CalendarsApiImpl @Inject constructor(private val apiProvider: ApiProvider)
             getCalendar(calendarId)
         }.toApiResponse()
 
-    override suspend fun getEvents(
-        userId: UserId,
-        calendarId: String,
-        startTimestamp: Long,
-        endTimestamp: Long,
-        timezone: String,
-        type: Int,
-        page: Int,
-        pageSize: Int
-    ): ApiResponse<EventsApiResponse> = apiProvider.get<CalendarsApiService>(userId).invoke {
-        getEvents(
-            calendarId,
-            startTimestamp,
-            endTimestamp,
-            timezone,
-            type,
-            page,
-            pageSize
-        )
-    }.toApiResponse()
-
     override suspend fun getEventsMetadata(
         userId: UserId,
         calendarId: String,

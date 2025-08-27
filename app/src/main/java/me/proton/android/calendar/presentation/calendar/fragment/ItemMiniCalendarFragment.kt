@@ -54,8 +54,6 @@ import kotlin.math.ceil
 class ItemMiniCalendarFragment : Fragment() {
 
     private var _binding: ItemMiniCalendarFragmentBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     private var position: Int? = null
@@ -252,7 +250,6 @@ class ItemMiniCalendarFragment : Fragment() {
         setMiniCalendarSkeletonList(skeletonList, forDate, firstDayOfTheMonth, firstMiniCalendarDay, startWeekOn, timeZoneId)
 
         viewLifecycleOwner.lifecycleScope.launch {
-
             calendarViewModel.calendarIndicators(
                 fromDate,
                 toDate,

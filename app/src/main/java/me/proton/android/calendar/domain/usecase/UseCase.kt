@@ -41,3 +41,5 @@ suspend fun UseCase.Result.ifSuccessAndLogErrors(logger: Logger, onSuccess: susp
         is UseCase.Result.Error -> logger.i("UseCase Error: ${this.message}")
     }
 }
+
+suspend fun UseCase.Result.logErrors(logger: Logger) = ifSuccessAndLogErrors(logger) {}

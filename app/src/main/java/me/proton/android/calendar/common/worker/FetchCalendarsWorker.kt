@@ -72,7 +72,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
     )
 
     override suspend fun doWork(): Result {
-
         setForeground(
             createForegroundInfo(
                 applicationContext.getString(
@@ -83,7 +82,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
         )
 
         val userId = accountManager.getPrimaryUserId().filterNotNull().firstOrNull()
-
         var result: Result = Result.failure()
 
         if (userId != null) {
@@ -143,7 +141,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
         calendarMetadata: Metadata,
         coroutineScope: CoroutineScope
     ): Result {
-
         // will be empty the very first time, or will contain the Event ID we should start fetching from this time
 
         // how many events were downloaded, including the ones from previous runs
@@ -183,14 +180,11 @@ class FetchCalendarsWorker @AssistedInject constructor(
                     reportProgress(calendarMetadata.calendarId, allEventCount.toInt())
                 }
             }
-
         }
-
         return Result.success()
     }
 
     private suspend fun reportProgress(calendarId: String, downloaded: Int) {
-
         calendarProgress[calendarId] = downloaded
 
         val elapsedMillis = Instant.now().toEpochMilli() - startInstant.toEpochMilli()
@@ -274,7 +268,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
         totalDownloadedCount: Long,
         events: List<EventResponse>
     ): Boolean {
-
         val eventEntities = events.map { it.toEventEntity() }
         calendarsRepository.persistEvents(*eventEntities.toTypedArray())
         events.map { it.toEventEntityMetadata() }.forEach {
@@ -292,7 +285,6 @@ class FetchCalendarsWorker @AssistedInject constructor(
                 totalDownloadedCount
             )
         }
-
         return true
     }
 

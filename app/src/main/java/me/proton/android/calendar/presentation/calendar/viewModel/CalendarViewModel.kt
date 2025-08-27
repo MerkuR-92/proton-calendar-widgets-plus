@@ -23,7 +23,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
@@ -85,7 +84,6 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.SkeletonEvent
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.DeleteCalendarUseCase
-import me.proton.android.calendar.domain.usecase.FixCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
 import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
@@ -137,22 +135,12 @@ class CalendarViewModel @Inject constructor(
     private val database: AppDatabase,
     private val getUiEventsUseCase: GetUiEventsUseCase,
     private val workManager: WorkManager,
-    private val fixCalendarsUseCase: FixCalendarsUseCase
 ) : AndroidViewModel(application) {
-
-    private var viewModelJob = Job() // TODO extract this to superclass
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
-    val ioScope = CoroutineScope(Dispatchers.IO + viewModelJob)
 
     val initialised = MutableLiveData(false)
 
     private val _userId: MutableLiveData<UserId> = MutableLiveData()
     val userId: LiveData<UserId> = _userId
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelJob.cancel()
-    }
 
     var updateSelectedLocalDate: LocalDate? = null
 
@@ -437,7 +425,6 @@ class CalendarViewModel @Inject constructor(
             }
 
         }.flowOn(Dispatchers.IO).cancellable()
-
     }
 
     suspend fun calendarIndicators(
@@ -502,7 +489,7 @@ class CalendarViewModel @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        lifecycle: Lifecycle
+        lifecycle: Lifecycle,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {

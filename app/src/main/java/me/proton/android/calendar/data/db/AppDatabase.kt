@@ -311,24 +311,28 @@ abstract class AppDatabase :
  */
 class DatabaseTypeConverters {
 
+    private val defaultJson by lazy {
+        Json { ignoreUnknownKeys = true }
+    }
+
     @TypeConverter
     fun toListOfJsonElements(value: String?): List<JsonElement>? {
-        return value?.run { Json { ignoreUnknownKeys = true }.decodeFromString<List<JsonElement>>(value) }
+        return value?.run { defaultJson.decodeFromString<List<JsonElement>>(value) }
     }
 
     @TypeConverter
     fun fromListOfJsonElement(json: List<JsonElement>?): String? {
-        return json?.run { Json { ignoreUnknownKeys = true }.encodeToString(json) }
+        return json?.run { defaultJson.encodeToString(json) }
     }
 
     @TypeConverter
     fun toJsonObject(value: String?): JsonObject? {
-        return value?.run { Json { ignoreUnknownKeys = true }.decodeFromString<JsonObject>(value) }
+        return value?.run { defaultJson.decodeFromString<JsonObject>(value) }
     }
 
     @TypeConverter
     fun fromJsonObject(json: JsonObject?): String? {
-        return json?.run { Json { ignoreUnknownKeys = true }.encodeToString(json) }
+        return json?.run { defaultJson.encodeToString(json) }
     }
 
     @TypeConverter
@@ -340,5 +344,4 @@ class DatabaseTypeConverters {
     fun fromListOfLong(value: List<Long>?): List<String>? {
         return value?.map { it.toString() }
     }
-
 }

@@ -24,7 +24,6 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
 
         database.inTransaction {
             calendarIds.forEach {
-
                 val shouldAddNewEntry = database.fetchedEventsMetadataDao().hasWindowFullyOverlapping(
                     userId,
                     it,

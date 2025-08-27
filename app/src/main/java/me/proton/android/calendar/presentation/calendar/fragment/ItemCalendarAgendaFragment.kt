@@ -47,8 +47,6 @@ class ItemCalendarAgendaFragment: Fragment() {
     lateinit var logger: Logger
 
     private var _binding: ItemCalendarAgendaFragmentBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()

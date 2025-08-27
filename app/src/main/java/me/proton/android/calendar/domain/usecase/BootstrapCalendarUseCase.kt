@@ -73,7 +73,6 @@ class BootstrapCalendarUseCase @Inject constructor( // TODO TEST
                             )
                         } ?: calendarMembers.first()
                         if (userMember.display == 1) {
-
                             // Launch worker to fetch minimal events for calendar
                             GetMinimalCalendarEventsWorker.enqueue(workManager, userId = userId.id, calendarId = calendarEntity.id)
                         }

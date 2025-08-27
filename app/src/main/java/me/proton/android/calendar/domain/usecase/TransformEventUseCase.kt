@@ -339,7 +339,7 @@ class TransformEventUseCase @Inject constructor(
                 canonicalizeProtonEmail(it.email, forceCanonicalization = true).equalsNoCase(canonicalizedAuthorEmail)
             }?.let {
                 // current User is the Author of this EventPart
-                return it.publicKeyRing(cryptoContext).keys
+                return it.publicKeyRing(cryptoContext).keys.filter { key -> key.isActive }
             }
 
             if (allowApiCall) {

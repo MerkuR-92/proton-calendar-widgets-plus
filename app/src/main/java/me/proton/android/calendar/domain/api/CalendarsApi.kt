@@ -16,20 +16,6 @@ interface CalendarsApi {
     suspend fun getCalendar(userId: UserId, calendarId: String): ApiResponse<CalendarApiResponse>
 
     /**
-     * Gets all events for given calendar, happening between timestamps in given timezone.
-     */
-    suspend fun getEvents(
-        userId: UserId,
-        calendarId: String,
-        startTimestamp: Long,
-        endTimestamp: Long,
-        timezone: String,
-        type: Int,
-        page: Int,
-        pageSize: Int
-    ): ApiResponse<EventsApiResponse>
-
-    /**
      * Gets all events Metadata for given calendar, happening between timestamps in given timezone.
      */
     suspend fun getEventsMetadata(

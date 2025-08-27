@@ -36,7 +36,7 @@ class GetMinimalCalendarEventsUseCase @Inject constructor(
         val toDate = timeWindow.second
 
         val (result, entitiesAndMetadatas) = fetchEventsUseCase.splitFetchEvents(userId, listOf(calendarId), fromDate, toDate, zoneId.id)
-        result.ifSuccessAndLogErrors(logger) { }
+        result.logErrors(logger)
 
         if (result is UseCase.Result.Success<*>) {
             if (entitiesAndMetadatas == null) {
