@@ -1,6 +1,5 @@
 package me.proton.android.calendar.test.presentation.calendarFormViewModel
 
-import android.graphics.Color
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import biweekly.component.VAlarm
@@ -14,8 +13,13 @@ import kotlinx.coroutines.runBlocking
 import me.proton.android.calendar.R
 import me.proton.android.calendar.common.CalendarForm
 import me.proton.android.calendar.domain.usecase.UseCase
-import me.proton.android.calendar.test.shared.mocks.*
 import me.proton.android.calendar.presentation.settings.viewModel.CalendarFormViewModel
+import me.proton.android.calendar.test.shared.mocks.CalendarMocks
+import me.proton.android.calendar.test.shared.mocks.calendarColor
+import me.proton.android.calendar.test.shared.mocks.calendarId
+import me.proton.android.calendar.test.shared.mocks.calendarName
+import me.proton.android.calendar.test.shared.mocks.userEmail
+import me.proton.android.calendar.test.shared.mocks.userId
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
