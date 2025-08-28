@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">Pripojte sa k stretnutiu na Zoome</string>
     <string name="zoom_meeting_title">Zoom stretnutie</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">Password: %1$s</string>
-    <string name="generic_meeting_more_details">More details</string>
-    <string name="generic_meeting_less_details">Less details</string>
-    <string name="generic_meeting_host">Meeting host</string>
-    <string name="generic_meeting_link">Meeting link</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="generic_meeting_password">Heslo: %1$s</string>
+    <string name="generic_meeting_more_details">Ďalšie podrobnosti</string>
+    <string name="generic_meeting_less_details">Menej podrobností</string>
+    <string name="generic_meeting_host">Poskytovateľ schôdzky</string>
+    <string name="generic_meeting_link">Odkaz na schôdzku</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Pokyny na pripojenie</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nová udalosť</string>
     <string name="event_text_edit_event">Upraviť udalosť</string>
