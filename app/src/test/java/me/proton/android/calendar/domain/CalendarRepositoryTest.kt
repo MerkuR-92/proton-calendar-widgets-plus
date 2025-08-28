@@ -31,6 +31,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
+import me.proton.android.calendar.domain.usecase.GetFetchedEventWindowsValidity
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
@@ -71,7 +72,7 @@ internal class CalendarRepositoryTest {
     private val networkManagerMock: NetworkManager = mockk()
     private val updateEventOccurrencesUseCaseMock: UpdateEventOccurrencesUseCase = mockk()
     private val updateFetchedEventsMetadataUseCaseMock: UpdateFetchedEventsMetadataUseCase = mockk()
-    private val featureFlagManagerMock: FeatureFlagManager = mockk()
+    private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -424,7 +425,7 @@ internal class CalendarRepositoryTest {
             networkManagerMock,
             updateEventOccurrencesUseCaseMock,
             updateFetchedEventsMetadataUseCaseMock,
-            featureFlagManagerMock
+            getFetchedEventWindowsValidity
         )
     }
 

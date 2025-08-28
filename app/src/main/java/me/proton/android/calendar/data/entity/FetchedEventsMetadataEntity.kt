@@ -23,6 +23,7 @@ data class FetchedEventsMetadataEntity(
     val calendarId: String,
     val windowStartTime: Long,
     val windowEndTime: Long,
+    val validUntilMs: Long,
 
     @PrimaryKey(autoGenerate = true)
     var _id: Int = 0

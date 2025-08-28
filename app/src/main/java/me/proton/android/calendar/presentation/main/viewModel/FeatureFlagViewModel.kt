@@ -159,10 +159,6 @@ class FeatureFlagViewModel @Inject constructor(
         return splitViewVerticalScrollingFlag.value ?: CalendarFeatureFlag.SplitViewVerticalScrollingAndroid.fallbackValue
     }
 
-    fun isFetchedEventsCacheEnabled(): Boolean {
-        return fetchedEventsCacheAndroidFlag.value ?: CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
-    }
-
     private fun isZoomIntegrationEnabled(): Boolean {
         return zoomIntegrationAndroidFlag.value ?: CalendarFeatureFlag.ZoomIntegrationAndroid.fallbackValue
     }
