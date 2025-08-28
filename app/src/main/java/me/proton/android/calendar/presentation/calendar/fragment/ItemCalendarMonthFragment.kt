@@ -8,6 +8,7 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
@@ -355,14 +356,14 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
                         loading = false
                         // Hide progress bar
-                        binding.monthFragmentLoader.visibleOrGone(false)
+                        binding.monthFragmentLoader.isVisible = it.events.isEmpty() && it.fullyLoaded.not()
                         // Clear monthViewLoading value so that we can load the adjacent fragments content
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
                     }
                     is CalendarsRepository.GetEventsResult.Exception -> {
                         loading = false
                         calendarViewModel.monthViewLoading.value = Pair(position, false)
-
+                        binding.monthFragmentLoader.isVisible = false
                         // TODO Show the error somewhere ?
                     }
                 }

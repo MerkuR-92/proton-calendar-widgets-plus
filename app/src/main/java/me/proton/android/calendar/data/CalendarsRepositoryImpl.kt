@@ -680,7 +680,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 database.eventsDao().selectEvent(searchEventEntity.eventId, searchEventEntity.calendarId)?.let { eventDecryptor.decrypt(it) }
             }.filterOutDuplicatesInSubscribedCalendars().first
 
-            emit(CalendarsRepository.GetEventsResult.Success(deduplicated))
+            emit(CalendarsRepository.GetEventsResult.Success(deduplicated, fullyLoaded = true))
         }.onStart {
             emit(CalendarsRepository.GetEventsResult.InProgress)
         }.catch {

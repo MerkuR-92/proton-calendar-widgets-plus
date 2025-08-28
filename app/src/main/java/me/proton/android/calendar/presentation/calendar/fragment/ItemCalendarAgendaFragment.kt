@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
@@ -266,10 +267,11 @@ class ItemCalendarAgendaFragment: Fragment() {
                             } else null
 
                         if (sortedEvents.isEmpty()) {
-                            binding.listViewStatus.visibleOrInvisible(true)
-                            binding.listViewStatus.text = resources.getString(R.string.agenda_no_events)
+                            val isLoading = it.fullyLoaded.not()
+                            binding.listViewStatus.isVisible = true
+                            binding.listViewStatus.text = resources.getString(if (isLoading) R.string.agenda_loading_events else R.string.agenda_no_events)
                         } else {
-                            binding.listViewStatus.visibleOrInvisible(false)
+                            binding.listViewStatus.isVisible = false
                         }
 
                         lifecycleScope.launch {
