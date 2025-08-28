@@ -1,7 +1,6 @@
 package me.proton.android.calendar.presentation.settings.viewModel
 
 import android.app.Application
-import android.graphics.Color
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -11,24 +10,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
 import me.proton.android.calendar.R
-import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_ALL_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_ALARM
 import me.proton.android.calendar.common.CalendarForm.DEFAULT_PART_DAY_EMAIL_ALARM
 import me.proton.android.calendar.common.CalendarForm.EVENT_DEFAULT_DURATION_MINUTES
+import me.proton.android.calendar.common.utils.AndroidUtils.tryCast
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.isTheSameAs
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.entity.CalendarSettingsEntity
-import me.proton.android.calendar.data.entity.MemberEntity
-import me.proton.android.calendar.data.entity.NotificationEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.ResourceProvider
@@ -44,12 +36,12 @@ import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.isExternal
 import javax.inject.Inject
 
 @HiltViewModel
 class CalendarFormViewModel @Inject constructor(
     application: Application,
-    private val json: Json,
     private val resourceProvider: ResourceProvider,
     private val logger: Logger,
     private val calendarsRepository: CalendarsRepository,
@@ -233,9 +225,8 @@ class CalendarFormViewModel @Inject constructor(
         _userId.value = userId
 
         // Save user emails for calendar email picker dialog
-        // TODO empty Addresses should not happen but it's better than crashing
-        val userAddresses = userAddressManager.getAddressesOrNull(userId) ?: emptyList()
-        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive }.sortedBy { it.order }.map { it.email }
+        val userAddresses = userAddressManager.getAddressesOrNull(userId).orEmpty()
+        userEmails = userAddresses.filter { it.enabled && it.canSend && it.canReceive && it.isExternal().not() }.sortedBy { it.order }.map { it.email }
 
         val defaultUserEmail = userManager.getUser(userId).email
         val defaultUserAddress =
