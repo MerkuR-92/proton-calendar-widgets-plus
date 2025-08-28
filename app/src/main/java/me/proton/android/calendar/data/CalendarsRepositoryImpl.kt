@@ -82,6 +82,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
+import me.proton.android.calendar.domain.usecase.GetFetchedEventWindowsValidity
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
@@ -99,11 +100,13 @@ import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -128,13 +131,13 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val networkManager: NetworkManager,
     private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
-    private val featureFlagManager: FeatureFlagManager
+    private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity,
 ) : CalendarsRepository {
 
     override val fetchingState =
         MutableStateFlow<CalendarsRepository.FetchingState>(CalendarsRepository.FetchingState.NotNeeded)
 
-    private var fetchedWindows = mutableSetOf<FetchWindow>()
+    private val fetchedWindowTimes = ConcurrentHashMap<FetchWindow, Instant>()
     private var fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     /**
@@ -151,24 +154,27 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val displayServerDownBannerFlow = MutableStateFlow(false)
     private var lastPingMs: Long = 0L
 
-    override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
+    private suspend fun FetchWindow.needsRefresh() = fetchedWindowTimes[this]
+        ?.let { getFetchedEventWindowsValidity.isWindowFetchValid(this, it).not() }
+        ?: true
 
+    override suspend fun initForUser(userId: String, timeZoneId: ZoneId): Flow<CalendarsRepository.InitingState> {
         val flow = MutableStateFlow<CalendarsRepository.InitingState>(CalendarsRepository.InitingState.Initing)
 
         // TODO make sure we also migrate the calendar fetching for new event decryption
         scopeEventFetching.launch {
-            fetchEventsChannel.consumeEach {
+            fetchEventsChannel.consumeEach { fetchWindow ->
 
                 minRequestedWindowToFetch = if (minRequestedWindowToFetch != null) {
-                    listOf(it, minRequestedWindowToFetch).minByOrNull { it!!.fromDate }
-                } else it
+                    listOf(fetchWindow, minRequestedWindowToFetch).minByOrNull { it!!.fromDate }
+                } else fetchWindow
 
                 maxRequestedWindowToFetch = if (maxRequestedWindowToFetch != null) {
-                    listOf(it, maxRequestedWindowToFetch).maxByOrNull { it!!.toDate }
-                } else it
+                    listOf(fetchWindow, maxRequestedWindowToFetch).maxByOrNull { it!!.toDate }
+                } else fetchWindow
 
-                logger.v("consuming: $it")
-                fetchEventsInWindow(it)
+                logger.v("consuming: $fetchWindow")
+                fetchEventsInWindow(fetchWindow)
             }
         }
 
@@ -177,15 +183,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
-
-        val shouldUseFetchedEventsMetadata = featureFlagManager.getOrDefault(
-            fetchWindow.userId,
-            CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId,
-            FeatureFlag.default(
-                CalendarFeatureFlag.FetchedEventsCacheAndroid.featureId.id,
-                CalendarFeatureFlag.FetchedEventsCacheAndroid.fallbackValue
-            )
-        ).value
+        val shouldUseFetchedEventsMetadata = getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(fetchWindow)
 
         // only fetch calendars that have not been fetched before
         val calendarIdsToFetch = if (shouldUseFetchedEventsMetadata) fetchWindow.calendarIds.filter {
@@ -196,7 +194,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 fetchWindow.timeZoneId)
         } else fetchWindow.calendarIds
 
-        if (!fetchedWindows.contains(fetchWindow)) {
+        if (fetchWindow.needsRefresh()) {
             logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
             fetchingState.value = CalendarsRepository.FetchingState.Fetching
@@ -228,7 +226,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                     fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
                     updateAlarmsUseCase.execute(fetchWindow.userId.id, eventEntities)
-                    fetchedWindows.add(fetchWindow)
+                    fetchedWindowTimes[fetchWindow] = Instant.now()
                 }
             } else {
                 // If this failed, we make sure servers are up with a ping
@@ -252,7 +250,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         minRequestedWindowToFetch = null
         maxRequestedWindowToFetch = null
 
-        fetchedWindows.clear()
+        fetchedWindowTimes.clear()
         fetchEventsChannel = Channel<FetchWindow>(capacity = 3, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
         fetchingState.value = CalendarsRepository.FetchingState.Finished
@@ -654,7 +652,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         val calendarIds: List<String>,
         val fromDate: LocalDate,
         val toDate: LocalDate,
-        val timeZoneId: String
+        val timeZoneId: String,
     )
 
     override suspend fun fetchEvents(

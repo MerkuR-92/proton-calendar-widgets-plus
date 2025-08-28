@@ -178,7 +178,7 @@ val useCaseModule = module {
     factory<GetUserInfoUseCase> { GetUserInfoUseCase(get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<GetUiEventsUseCase> { GetUiEventsUseCase(get(), get(), get(), get(), get()) }
-    factory<UpdateFetchedEventsMetadataUseCase> { UpdateFetchedEventsMetadataUseCase(get()) }
+    factory<UpdateFetchedEventsMetadataUseCase> { UpdateFetchedEventsMetadataUseCase(get(), get()) }
 }
 
 fun coreModule(

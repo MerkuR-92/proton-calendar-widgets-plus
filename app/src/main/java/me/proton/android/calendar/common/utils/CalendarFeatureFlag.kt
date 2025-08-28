@@ -46,3 +46,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ClearCalendar(FeatureId("ClearCalendar"), false, true),
     Payments(FeatureId("Subscription"), false, true)
 }
+
+object CalendarUnleashVariants {
+    val FetchedEventsValidityMin = FeatureId("CalendarAndroidFetchedWindowValidityMin")
+}

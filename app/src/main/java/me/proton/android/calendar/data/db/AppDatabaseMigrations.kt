@@ -636,4 +636,16 @@ object AppDatabaseMigrations {
             db.addTableColumn(TABLE_EVENTS, "attendeesInfo", "TEXT")
         }
     }
+
+    val MIGRATION_78_79 = object : Migration(78, 79) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.addTableColumn(
+                table = TABLE_FETCHED_EVENTS_METADATA,
+                column = "validUntilMs",
+                type = "INTEGER NOT NULL",
+                defaultValue = "0",
+            )
+            FeatureFlagDatabase.MIGRATION_4.migrate(db)
+        }
+    }
 }

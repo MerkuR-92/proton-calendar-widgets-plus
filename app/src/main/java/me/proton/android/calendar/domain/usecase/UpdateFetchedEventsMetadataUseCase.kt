@@ -7,9 +7,9 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 
-
 class UpdateFetchedEventsMetadataUseCase @Inject constructor(
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity,
 ) {
 
     suspend fun execute(
@@ -22,22 +22,25 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
         val windowStart = fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
         val windowEnd = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
 
-        database.inTransaction {
-            calendarIds.forEach {
-                val shouldAddNewEntry = database.fetchedEventsMetadataDao().hasWindowFullyOverlapping(
-                    userId,
-                    it,
-                    windowStart,
-                    windowEnd
-                ).not() && database.calendarsDao().hasCalendar(it)
+        val validityDuration = getFetchedEventWindowsValidity.getValidityDuration(userId)
 
+        database.inTransaction {
+            calendarIds.forEach { calId ->
+                val shouldAddNewEntry = database.calendarsDao().hasCalendar(calId)
                 if (shouldAddNewEntry) {
+                    database.fetchedEventsMetadataDao().deleteWindowsWithin(
+                        userId = userId,
+                        calendarId = calId,
+                        start = windowStart,
+                        end = windowEnd,
+                    )
                     database.fetchedEventsMetadataDao().insert(
                         FetchedEventsMetadataEntity(
-                            userId,
-                            it,
-                            windowStart,
-                            windowEnd
+                            userId = userId,
+                            calId,
+                            windowStartTime = windowStart,
+                            windowEndTime = windowEnd,
+                            validUntilMs = (Instant.now() + validityDuration).toEpochMilli(),
                         )
                     )
                 }
@@ -50,16 +53,12 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
         calendarId: String,
         windowStart: Instant,
         windowEnd: Instant,
-    ): Boolean {
-        return database.inTransaction {
-            database.fetchedEventsMetadataDao().hasWindowFullyOverlapping(
-                userId = userId,
-                calendarId = calendarId,
-                windowStart = windowStart.epochSecond,
-                windowEnd = windowEnd.epochSecond
-            )
-        }
-    }
+    ): Boolean = hasValidFetchedWindowWithin(
+        userId = userId,
+        calendarId = calendarId,
+        windowStart = windowStart,
+        windowEnd = windowEnd,
+    )
 
     suspend fun shouldFetch(
         userId: String,
@@ -68,18 +67,28 @@ class UpdateFetchedEventsMetadataUseCase @Inject constructor(
         toDate: LocalDate,
         timeZoneId: String
     ): Boolean {
-
-        val windowStart = fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
-        val windowEnd = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toEpochSecond()
-
-        return database.inTransaction {
-            database.fetchedEventsMetadataDao().hasWindowFullyOverlapping(
-                userId,
-                calendarId,
-                windowStart,
-                windowEnd
-            )
-        }.not()
+        return hasValidFetchedWindowWithin(
+            userId = userId,
+            calendarId = calendarId,
+            windowStart = fromDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant(),
+            windowEnd = toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toInstant(),
+        ).not()
     }
 
+    private suspend fun hasValidFetchedWindowWithin(
+        userId: String,
+        calendarId: String,
+        windowStart: Instant,
+        windowEnd: Instant,
+    ): Boolean {
+        return database.inTransaction {
+            database.fetchedEventsMetadataDao().hasWindowFullyOverlappingAt(
+                userId = userId,
+                calendarId = calendarId,
+                windowStart = windowStart.epochSecond,
+                windowEnd = windowEnd.epochSecond,
+                nowMs = Instant.now().toEpochMilli(),
+            )
+        }
+    }
 }

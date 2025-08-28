@@ -255,16 +255,13 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
         val notFoundErrors = ConcurrentHashMap<String, Int>()
 
         coroutineScope.launch {
-
             calendarIds.map { calendarId ->
-
                 notFoundErrors[calendarId] = 0
 
                 async {
                     (0..3).map { type -> // we need to fire off 4 requests with different types
                         async {
                             var page = 0
-
                             do {
                                 val eventsResponse = calendarsApi.getEventsMetadata(
                                     userId,
