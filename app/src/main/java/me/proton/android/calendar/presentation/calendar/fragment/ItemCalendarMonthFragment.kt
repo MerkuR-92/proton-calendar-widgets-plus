@@ -11,12 +11,19 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -32,8 +39,7 @@ import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.weekNumber
 import me.proton.android.calendar.databinding.ItemCalendarMonthFragmentBinding
 import me.proton.android.calendar.databinding.ItemMonthViewGridBinding
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.model.SkeletonEvent
+import me.proton.android.calendar.domain.CalendarsRepository.EventsWindow
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
@@ -42,23 +48,19 @@ import me.proton.android.calendar.presentation.calendar.customView.MonthView.Mon
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
 import org.koin.core.KoinComponent
-import org.koin.core.inject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Collections
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     private var _binding: ItemCalendarMonthFragmentBinding? = null
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
-
-    private val logger: Logger by inject()
 
     private val fetchingEventsScope = CoroutineScope(Dispatchers.IO)
 
@@ -71,12 +73,8 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     private var skeletonList: List<LocalDate> = listOf()
 
-    private var loading = true
-
     private lateinit var monthView: MonthView
     private var monthViewMaxEventCount = 0
-
-    private lateinit var eventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
 
     private var events: List<UiEvent>? = null
 
@@ -103,8 +101,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
 
     override fun onResume() {
         super.onResume()
-        calendarViewModel.resumedMonthViewPosition.value = position
-        position?.let { calendarViewModel.monthViewLoading.value = Pair(it, loading) }
         timeZoneId?.let {
             // Set the grid selectable items
             setMonthGridClickableItems(skeletonList, it)
@@ -130,9 +126,7 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         val firstDayMonthView = immutableDate.plusMonths((immutablePosition - immutableStartingPosition).toLong())
 
         calendarViewModel.displayWeekNumber.observe(viewLifecycleOwner) { displayWeekNumber ->
-
             binding.monthFragmentWeekNumberLayout.visibleOrGone(displayWeekNumber)
-
             monthView.setShowWeekNumbers(displayWeekNumber)
         }
 
@@ -159,10 +153,22 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
                 setupMonthViewGrid(firstDayMonthView, it.first, it.second, immutablePosition)
             }
         }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                currentRange.filterNotNull().flatMapLatest { range ->
+                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId, lifecycle).map {
+                        range to it
+                    }
+                }.collectLatest { (range, events) ->
+                    updateUiEvents(events, range)
+                }
+            }
+        }
     }
 
     private fun setWeekDaysHeader(weekStart: DayOfWeek, timeZoneId: String, firstDayMonthView: LocalDate) {
-        val weekDays = DayOfWeek.values().toList()
+        val weekDays = DayOfWeek.entries.toMutableList()
         Collections.rotate(
             weekDays,
             CalendarSettings.DAYS_IN_A_WEEK - (weekStart.value - 1)
@@ -219,38 +225,12 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         monthView.prepareMonthGrid(skeletonList, forDate.month)
         monthViewMaxEventCount = monthView.calculateMaxEventCount()
 
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
-        if (calendarViewModel.monthViewLoading.hasActiveObservers()) {
-            calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
-        }
+        requestEvents(fromDate!!, toDate!!, timeZoneId)
 
         // Check if we load the events now or if we need to wait
         if (this.isResumed) {
             // Set the grid selectable items
             setMonthGridClickableItems(skeletonList, timeZoneId)
-            // We first load and display the events for the selected month
-            calendarViewModel.monthViewLoading.value = Pair(position, true)
-            getSkeletonEvents(fromDate!!, toDate!!, timeZoneId, position)
-        } else {
-            loading = false
-            calendarViewModel.monthViewLoading.observe(viewLifecycleOwner) { monthViewLoading ->
-                if (this::eventsLiveData.isInitialized && eventsLiveData.hasObservers()) {
-                    // Remove the monthViewLoading observers if we started loading the events for that fragment as it won't be needed anymore
-                    calendarViewModel.monthViewLoading.removeObservers(viewLifecycleOwner)
-                    return@observe
-                }
-
-                // Load the events for that fragment if no other fragment is currently doing the same process
-                val resumedMonthViewPosition = calendarViewModel.resumedMonthViewPosition.value
-                if ((this.isResumed || (resumedMonthViewPosition != null && (position == resumedMonthViewPosition + 1 || position == resumedMonthViewPosition - 1))) &&
-                    !loading && (monthViewLoading.first == position || !monthViewLoading.second)) {
-                    loading = true
-                    calendarViewModel.monthViewLoading.value = Pair(position, true)
-                    getSkeletonEvents(fromDate, toDate, timeZoneId, position)
-                }
-            }
         }
     }
 
@@ -318,77 +298,41 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         }
     }
 
-    private fun getSkeletonEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
-        // Show progress bar
-        binding.monthFragmentLoader.visibleOrGone(true)
-
+    private fun requestEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String) {
         lifecycleScope.launch {
             calendarViewModel.fetchEvents(fromDate, toDate, timeZoneId, coroutineScope = fetchingEventsScope)
-
-            // TODO Skeleton events have been discarded for now
-            // Get and display skeleton events
-            //  val skeletonEvents = calendarViewModel.getSkeletonEvents(fromDate, toDate, timeZoneId)
-            // Display the skeleton events in the month view
-            //  displayMonthViewSkeletonEvents(skeletonEvents, fromDate, timeZoneId)
-
-            getEvents(fromDate, toDate, timeZoneId, position)
+            currentRange.value = EventsWindow(
+                fromDate = fromDate,
+                toDate = toDate,
+                timeZoneId = timeZoneId,
+            )
         }
     }
 
-    private suspend fun getEvents(fromDate: LocalDate, toDate: LocalDate, timeZoneId: String, position: Int) {
-        if (this::eventsLiveData.isInitialized && eventsLiveData.hasActiveObservers()) {
-            eventsLiveData.removeObservers(viewLifecycleOwner)
-        }
-        // Get and display decrypted events
-        eventsLiveData = calendarViewModel.getUiEventsLookup(fromDate, toDate, timeZoneId, this.lifecycle)
-        eventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
-            eventsResult?.let {
-                when (it) {
-                    CalendarsRepository.GetEventsResult.InProgress -> {
-                        // Progress is shown through the skeleton events
-                    }
-                    is CalendarsRepository.GetEventsResult.Success -> {
-                        val alphabeticallySortedEvents = it.events.sortedBy { event -> event?.summary }
-                        events = alphabeticallySortedEvents
+    private val currentRange = MutableStateFlow<EventsWindow?>(null)
 
-                        // Display the UI events in the month view
-                        displayMonthViewUiEvents(alphabeticallySortedEvents, fromDate, timeZoneId)
+    private fun updateUiEvents(newEvents: CalendarsRepository.GetEventsResult<UiEvent>, range: EventsWindow) {
+        when (newEvents) {
+            CalendarsRepository.GetEventsResult.InProgress -> {
+                // Progress is shown through the skeleton events
+                binding.monthFragmentLoader.isVisible = true
+            }
+            is CalendarsRepository.GetEventsResult.Success -> {
+                val alphabeticallySortedEvents = newEvents.events.sortedBy { event -> event?.summary }
+                events = alphabeticallySortedEvents
 
-                        loading = false
-                        // Hide progress bar
-                        binding.monthFragmentLoader.isVisible = it.events.isEmpty() && it.fullyLoaded.not()
-                        // Clear monthViewLoading value so that we can load the adjacent fragments content
-                        calendarViewModel.monthViewLoading.value = Pair(position, false)
-                    }
-                    is CalendarsRepository.GetEventsResult.Exception -> {
-                        loading = false
-                        calendarViewModel.monthViewLoading.value = Pair(position, false)
-                        binding.monthFragmentLoader.isVisible = false
-                        // TODO Show the error somewhere ?
-                    }
-                }
+                // Display the UI events in the month view
+                displayMonthViewUiEvents(alphabeticallySortedEvents, range.fromDate)
+
+                binding.monthFragmentLoader.isVisible = false
+            }
+            is CalendarsRepository.GetEventsResult.Exception -> {
+                binding.monthFragmentLoader.isVisible = false
             }
         }
     }
 
-    private fun displayMonthViewSkeletonEvents(events: List<SkeletonEvent>, fromDate:LocalDate, timeZoneId: String) {
-        val newMaxEventCount = monthView.calculateMaxEventCount()
-        if (newMaxEventCount > monthViewMaxEventCount) monthViewMaxEventCount = newMaxEventCount
-
-        lifecycleScope.launch {
-
-            // Get the map of MonthViewEvent indexed by day
-            val monthViewEventsMap = calendarViewModel.getMonthViewSkeletonEventsMap(events, fromDate, monthViewMaxEventCount, timeZoneId)
-
-            // Set the month view events so that they can be drawn
-            monthView.setMonthViewEvents(monthViewEventsMap, calendarViewModel.displayWeekNumber.value ?: false, monthViewMaxEventCount)
-
-            // Hide progress bar
-            binding.monthFragmentLoader.visibleOrGone(false)
-        }
-    }
-
-    private fun displayMonthViewUiEvents(events: List<UiEvent>, fromDate:LocalDate, timeZoneId: String) {
+    private fun displayMonthViewUiEvents(events: List<UiEvent>, fromDate:LocalDate) {
         val newMaxEventCount = monthView.calculateMaxEventCount()
         if (newMaxEventCount > monthViewMaxEventCount) monthViewMaxEventCount = newMaxEventCount
 
@@ -417,9 +361,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
     override fun onDestroyView() {
         super.onDestroyView()
         if (fetchingEventsScope.isActive) fetchingEventsScope.cancel()
-        if (loading) {
-            position?.let { calendarViewModel.monthViewLoading.value = Pair(it, false) }
-        }
         _binding = null
     }
 }

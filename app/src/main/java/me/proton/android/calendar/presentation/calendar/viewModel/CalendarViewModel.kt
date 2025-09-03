@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
@@ -499,28 +498,6 @@ class CalendarViewModel @Inject constructor(
         emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED))
     }.distinctUntilChanged()
         .onStart { emit(CalendarsRepository.GetEventsResult.InProgress) }
-
-    suspend fun getUiEventsLookupWithInProgressResult(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        lifecycle: Lifecycle
-    ): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
-        return withContext(Dispatchers.IO) {
-            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-            if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getUiEventsLookupWithInProgressResult")
-                return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
-            }
-
-            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onStart {
-                emit(CalendarsRepository.GetEventsResult.InProgress)
-            }.catch {
-                logger.e("Exception in getUiEventsLookup", it)
-                emit(CalendarsRepository.GetEventsResult.Exception(it))
-            }.asLiveData()
-        }
-    }
 
     suspend fun handleDeleteEvent(eventId: String,
                                   calendarId: String,
