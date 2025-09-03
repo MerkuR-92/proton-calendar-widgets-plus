@@ -926,6 +926,11 @@ class CalendarsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun selectEventsByUidIn(uids: Set<String>): Map<String, List<Event>> =
+        database.eventsDao().selectByUidIn(uids).groupBy { it.id }.mapValues { (_, rows) ->
+            rows.mapNotNull { row -> eventDecryptor.getFromCache(row.id, row.calendarId, row.modifyTime) }
+        }
+
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
         return getEventWithCommentsUseCase.execute(userId, calendarId, eventId)
     }

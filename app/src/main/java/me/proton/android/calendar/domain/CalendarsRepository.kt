@@ -213,6 +213,8 @@ interface CalendarsRepository {
 
     suspend fun selectEventsByUid(eventUid: String): List<Event>
 
+    suspend fun selectEventsByUidIn(uids: Set<String>): Map<String, List<Event>>
+
     suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse>
 
     // calendar keys

@@ -63,6 +63,7 @@ sentry-gradle-plugin = "4.14.1"
 gradlePlugin-proton-config = "1.3.1"
 review = "2.0.1"
 espresso-core="3.5.1"
+cash-turbine = "1.0.0"
 
 [libraries]
 jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
@@ -196,6 +197,7 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security" }
 core-test-android-test-rule = { module = "me.proton.core:test-rule", version.ref = "core" }
 core-test-android-test-performance = { module = "me.proton.core:test-performance", version.ref = "core" }
+cash-turbine = { module = "app.cash.turbine:turbine", version.ref = "cash-turbine" }
 
 # Hilt
 androidx-hilt-lifecycleViewmodel = { module = "androidx.hilt:hilt-lifecycle-viewmodel", version.ref = "hilt-androidx" }

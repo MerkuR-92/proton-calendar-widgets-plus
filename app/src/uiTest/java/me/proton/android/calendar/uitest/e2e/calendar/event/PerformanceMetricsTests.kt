@@ -18,7 +18,6 @@ class PerformanceMetricsTests : AuthenticatedTest() {
     @Measure
     @PrepareUser(loginBefore = true, userData = TestUserData(name = "pro", password = "pro"))
     fun performanceMetricsTest() {
-
         val profile = measurementContext
             .setWorkflow("android_calendar")
             .setServiceLevelIndicator("test_of_performance_metrics")
@@ -39,10 +38,9 @@ class PerformanceMetricsTests : AuthenticatedTest() {
                 .clickHamburgerButton()
                 .clickAgenda()
                 .verify {
-                    eventIsDisplayed(eventName, 1)
+                    eventIsDisplayed(eventName, null)
                     robotDisplayed()
                 }
         }
-
     }
 }
