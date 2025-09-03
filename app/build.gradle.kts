@@ -8,6 +8,7 @@ import studio.forface.easygradle.dsl.version
 import java.io.FileNotFoundException
 import java.util.Properties
 import groovy.json.StringEscapeUtils
+import studio.forface.easygradle.dsl.testImplementation
 
 plugins {
     alias(libs.plugins.kotlin.serialization)
@@ -320,6 +321,7 @@ dependencies {
     testImplementation(libs.test.assertk.jvm)
     testImplementation(libs.core.test.kotlin)
     testImplementation(project(":shared-test-code"))
+    testImplementation(libs.cash.turbine)
 
     androidTestImplementation(libs.test.mockk.android)
     androidTestImplementation(libs.test.androidx.core)
@@ -342,6 +344,7 @@ dependencies {
 
     androidTestUtil(libs.test.androidx.orchestrator)
     androidTestUtil(libs.test.androidx.services)
+    testImplementation(kotlin("test"))
 }
 
 tasks.register("createBuildEnv") {
