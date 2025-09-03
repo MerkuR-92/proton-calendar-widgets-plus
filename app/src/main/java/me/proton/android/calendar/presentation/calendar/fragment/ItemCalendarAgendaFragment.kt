@@ -7,21 +7,14 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.R
@@ -36,7 +29,6 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.sortUiEventsForAgen
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.displayEventDecryptionErrorDialog
 import me.proton.android.calendar.databinding.ItemCalendarAgendaFragmentBinding
 import me.proton.android.calendar.domain.CalendarsRepository
-import me.proton.android.calendar.domain.CalendarsRepository.EventsWindow
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
@@ -49,7 +41,6 @@ import java.time.ZoneId
 import java.util.Collections
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @AndroidEntryPoint
 class ItemCalendarAgendaFragment: Fragment() {
 
@@ -69,7 +60,7 @@ class ItemCalendarAgendaFragment: Fragment() {
     private var timeZoneId: String? = null
     private var timeFormatIs24Hour: Boolean? = null
 
-    private val currentRange = MutableStateFlow<EventsWindow?>(null)
+    private lateinit var uiEventsLiveData: LiveData<CalendarsRepository.GetEventsResult<UiEvent>>
     private var selectedDate: LocalDate? = null
 
     private lateinit var eventsListLayoutAdapter: EventAdapter
@@ -176,18 +167,6 @@ class ItemCalendarAgendaFragment: Fragment() {
                 setupItemMiniCalendarContent(it.first, it.second)
             }
         }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId, lifecycle).map {
-                        range to it
-                    }
-                }.collectLatest { (range, events) ->
-                    updateEvents(events, range.fromDate, range.timeZoneId)
-                }
-            }
-        }
     }
 
     private fun setupItemMiniCalendarContent(timeZoneId: String, timeFormatIs24Hour: Boolean) {
@@ -220,81 +199,99 @@ class ItemCalendarAgendaFragment: Fragment() {
                 // Set the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
                 calendarViewModel.firstEventOfTheDayTime = firstEventOfTheDayTime
             }
-
-            if ((immutableDate == selectedDate ||
+            if (this::uiEventsLiveData.isInitialized && uiEventsLiveData.hasActiveObservers() &&
+                immutableDate != selectedDate &&
+                immutableDate != selectedDate.minusDays(1) &&
+                immutableDate != selectedDate.plusDays(1)) {
+                logger.v("events flow: remove observer for $immutableDate. Selected date is $selectedDate")
+                calendarViewModel.setLoading(false, position)
+                uiEventsLiveData.removeObservers(viewLifecycleOwner)
+            } else if (this::uiEventsLiveData.isInitialized && !uiEventsLiveData.hasActiveObservers() &&
+                (immutableDate == selectedDate ||
                         immutableDate == selectedDate.minusDays(1) ||
                         immutableDate == selectedDate.plusDays(1))) {
                 logger.v("events flow: recreate getEvents flow $immutableDate. Selected date is $selectedDate")
-                getEvents(immutableDate, timeZoneId)
+                lifecycleScope.launch {
+                    getEvents(immutableDate, timeZoneId)
+                }
             }
         }
     }
 
-    private fun getEvents(date: LocalDate, timeZoneId: String) {
-        currentRange.value = EventsWindow(fromDate = date, toDate = date, timeZoneId)
-    }
+    private suspend fun getEvents(immutableDate: LocalDate, timeZoneId: String) {
+        if (this::uiEventsLiveData.isInitialized && uiEventsLiveData.hasActiveObservers()) {
+            logger.v("events flow: remove already existing observer for $immutableDate")
+            calendarViewModel.setLoading(false, position)
+            uiEventsLiveData.removeObservers(viewLifecycleOwner)
+        }
 
-    private fun updateEvents(eventsResult: CalendarsRepository.GetEventsResult<UiEvent>, immutableDate: LocalDate, timeZoneId: String) {
-        when (eventsResult) {
-            CalendarsRepository.GetEventsResult.InProgress -> {
-                val currentList = eventsListLayoutAdapter.currentList
-                if (currentList.size <= 1 && this.isResumed) {
-                    calendarViewModel.setLoading(true, position)
-                    binding.listViewStatus.isVisible = true
-                    binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
-                }
-            }
-            is CalendarsRepository.GetEventsResult.Success -> {
-                // Sort the events
-                val sortedEvents = eventsResult.events.filter {
-                    // filter all-day events that are technically happening until Midnight the next day,
-                    //  but we're not presenting them like this in UI
-                    DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
-                        it.dateStart,
-                        it.dateEnd,
-                        immutableDate,
-                        immutableDate,
-                        timeZoneId
-                    )
-                }.sortUiEventsForAgendaView(timeZoneId)
+        uiEventsLiveData = calendarViewModel.getUiEventsLookupWithInProgressResult(immutableDate, immutableDate, timeZoneId, this.lifecycle)
+        uiEventsLiveData.observe(viewLifecycleOwner) { eventsResult ->
 
-                val partDayEvents = eventsResult.events.filter {
-                    !it.isAllDay && it.spansSingleDay(true) // Multi day events are displayed in the day view header
-                }
-                // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
-                firstEventOfTheDayTime =
-                    if (partDayEvents.isNotEmpty()) {
-                        Collections.min(
-                            partDayEvents.map {
-                                it.dateStart.withZoneSameLocal(ZoneId.of(timeZoneId)).toLocalTime()
-                            }
+        eventsResult?.let {
+                when (it) {
+                    CalendarsRepository.GetEventsResult.InProgress -> {
+                        val currentList = eventsListLayoutAdapter.currentList
+                        if (currentList.size <= 1 && this.isResumed) {
+                            calendarViewModel.setLoading(true, position)
+                            binding.listViewStatus.visibleOrInvisible(true)
+                            binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
+                        }
+                    }
+                    is CalendarsRepository.GetEventsResult.Success -> {
+
+                        // Sort the events
+                        val sortedEvents = it.events.filter {
+                            // filter all-day events that are technically happening until Midnight the next day,
+                            //  but we're not presenting them like this in UI
+                            DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
+                                it.dateStart,
+                                it.dateEnd,
+                                immutableDate,
+                                immutableDate,
+                                timeZoneId
+                            )
+                        }.sortUiEventsForAgendaView(timeZoneId)
+
+                        val partDayEvents = it.events.filter {
+                            !it.isAllDay && it.spansSingleDay(true) // Multi day events are displayed in the day view header
+                        }
+                        // Save the time of the first event of the day so that we can easily adjust the day view scroll position if view mode changes
+                        firstEventOfTheDayTime =
+                            if (partDayEvents.isNotEmpty()) {
+                                Collections.min(
+                                    partDayEvents.map {
+                                        it.dateStart.withZoneSameLocal(ZoneId.of(timeZoneId)).toLocalTime()
+                                    }
+                                )
+                            } else null
+
+                        if (sortedEvents.isEmpty()) {
+                            val isLoading = it.fullyLoaded.not()
+                            binding.listViewStatus.isVisible = true
+                            binding.listViewStatus.text = resources.getString(if (isLoading) R.string.agenda_loading_events else R.string.agenda_no_events)
+                        } else {
+                            binding.listViewStatus.isVisible = false
+                        }
+
+                        lifecycleScope.launch {
+                            eventsListLayoutAdapter.submitList(
+                                listOf(fakeHeaderEvent).plus(sortedEvents)
+                            )
+                            calendarViewModel.setLoading(false, position)
+                        }
+                    }
+                    is CalendarsRepository.GetEventsResult.Exception -> {
+                        binding.listViewStatus.visibleOrInvisible(true)
+                        binding.listViewStatus.text =
+                            resources.getString(R.string.agenda_loading_events_error)
+
+                        eventsListLayoutAdapter.submitList(
+                            listOf(fakeHeaderEvent)
                         )
-                    } else null
-
-                if (sortedEvents.isEmpty()) {
-                    val isLoading = eventsResult.fullyLoaded.not()
-                    binding.listViewStatus.isVisible = true
-                    binding.listViewStatus.text = resources.getString(if (isLoading) R.string.agenda_loading_events else R.string.agenda_no_events)
-                } else {
-                    binding.listViewStatus.isVisible = false
+                        calendarViewModel.setLoading(false, position)
+                    }
                 }
-
-                lifecycleScope.launch {
-                    eventsListLayoutAdapter.submitList(
-                        listOf(fakeHeaderEvent).plus(sortedEvents)
-                    )
-                    calendarViewModel.setLoading(false, position)
-                }
-            }
-            is CalendarsRepository.GetEventsResult.Exception -> {
-                binding.listViewStatus.visibleOrInvisible(true)
-                binding.listViewStatus.text =
-                    resources.getString(R.string.agenda_loading_events_error)
-
-                eventsListLayoutAdapter.submitList(
-                    listOf(fakeHeaderEvent)
-                )
-                calendarViewModel.setLoading(false, position)
             }
         }
     }
