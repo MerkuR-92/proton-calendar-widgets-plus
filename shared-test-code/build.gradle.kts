@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.tools.desugar)
+
     implementation(project(":app"))
     implementation(libs.dagger.hilt.android)
     implementation(libs.core.utilKotlin)
