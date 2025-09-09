@@ -29,6 +29,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
+import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.GetFetchedEventWindowsValidity
@@ -41,7 +42,6 @@ import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.domain.UserAddressManager
 import org.junit.jupiter.api.BeforeEach
@@ -281,7 +281,6 @@ internal class CalendarRepositoryTest {
     @Test
     fun `should not fetch events from metadata if they are up-to-date`() {
         runBlocking {
-
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1)
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns createEventEntity(metadata.id, modifyTime = metadata.modifyTime)
 
@@ -292,7 +291,6 @@ internal class CalendarRepositoryTest {
     @Test
     fun `should fetch non-recurring events from metadata if they are inside of previously requested windows`() {
         runBlocking {
-
             val metadata = createEventMetadata("id",
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
@@ -319,14 +317,12 @@ internal class CalendarRepositoryTest {
             )
 
             assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
-
         }
     }
 
     @Test
     fun `should not fetch non-recurring events from metadata if they are outside of previously requested windows`() {
         runBlocking {
-
             val metadata = createEventMetadata("id",
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
@@ -353,14 +349,12 @@ internal class CalendarRepositoryTest {
             )
 
             assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isFalse()
-
         }
     }
 
     @Test
     fun `should not fetch non-recurring events from metadata if they are inside of previously requested metadata windows`() {
         runBlocking {
-
             val metadata = createEventMetadata("id",
                 startTime = 1577890800, // 1. January 2020 15:00:00 UTC
                 endTime = 1577894400 // 1. January 2020 16:00:00 UTC
@@ -387,23 +381,201 @@ internal class CalendarRepositoryTest {
             )
 
             assertThat(calendarsRepository.shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
-
         }
     }
 
     @Test
     fun `should fetch recurring events from metadata regardless of previously requested windows`() {
         runBlocking {
-
             // here the FetchWindows are empty
-
             val metadata = createEventMetadata("id modified at 1", modifyTime = 1, rRule = "FREQ=WEEKLY;BYDAY=TU,WE,TH,FR")
             coEvery { appDatabaseMock.eventsDao().selectById(metadata.id) } returns null
 
             assertThat(getCalendarRepository().shouldFetchEvent(UserId("userid-1"), metadata)).isTrue()
-
         }
     }
+
+    @Test
+    fun `expandOccurrencesWithSingleEditsAndExDatesToUiEvents keeps series occurrences, drops exdates, and adds single edits`() = runBlocking {
+        // Given DAILY x3 series (Sep 23–25) with EXDATE on Sep 24 and a single edit on Sep 24
+        val uid = "series-uid-1"
+        val tz = "UTC"
+        val fromDate = LocalDate.of(2025, 9, 22)
+        val toDate = LocalDate.of(2025, 9, 26)
+
+        val original = buildRecurringAllDayEvent(
+            id = "root-id",
+            uid = uid,
+            startDate = LocalDate.of(2025, 9, 23),
+            count = 3,
+            exDates = listOf(LocalDate.of(2025, 9, 24))
+        )
+        val singleEdit = buildSingleEditAllDayEvent(
+            id = "se-24",
+            uid = uid,
+            recurrenceDate = LocalDate.of(2025, 9, 24)
+        )
+
+        // When
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original,
+            eventsSharingUid = listOf(singleEdit),
+            fromDate = fromDate,
+            toDate = toDate,
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false
+        )!!
+
+        // Then
+        assertThat(uiEvents.size).isEqualTo(3)
+
+        val dates = uiEvents.map { it.dateStart.toLocalDate() }.sorted()
+        assertThat(dates).isEqualTo(listOf(
+            LocalDate.of(2025, 9, 23),
+            LocalDate.of(2025, 9, 24),
+            LocalDate.of(2025, 9, 25)
+        ))
+
+        // two series occurrences (23 & 25) must be recurring (occurrenceNumber > 0)
+        val recurringDates = uiEvents.filter { it.isRecurring }.map { it.dateStart.toLocalDate() }.sorted()
+        assertThat(recurringDates).isEqualTo(listOf(
+            LocalDate.of(2025, 9, 23),
+            LocalDate.of(2025, 9, 25)
+        ))
+
+        // single edit (24) must have occurrenceNumber == 0
+        val singleEditDates = uiEvents.filter { !it.isRecurring }.map { it.dateStart.toLocalDate() }
+        assertThat(singleEditDates).isEqualTo(listOf(LocalDate.of(2025, 9, 24)))
+    }
+
+    @Test
+    fun `expandOccurrencesWithSingleEditsAndExDatesToUiEvents filters by window`() = runBlocking {
+        // Given DAILY x3 series (Sep 23–25) + single edit on Sep 24
+        val uid = "series-uid-2"
+        val tz = "UTC"
+
+        val original = buildRecurringAllDayEvent(
+            id = "root-id-2",
+            uid = uid,
+            startDate = LocalDate.of(2025, 9, 23),
+            count = 3
+        )
+        val singleEdit = buildSingleEditAllDayEvent(
+            id = "se-24-b",
+            uid = uid,
+            recurrenceDate = LocalDate.of(2025, 9, 24)
+        )
+
+        // When window to only Sep 25
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original,
+            eventsSharingUid = listOf(singleEdit),
+            fromDate = LocalDate.of(2025, 9, 25),
+            toDate = LocalDate.of(2025, 9, 25),
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false
+        )!!
+
+        // Then only Sep 25 should remain
+        assertThat(uiEvents.size).isEqualTo(1)
+        assertThat(uiEvents.first().dateStart.toLocalDate()).isEqualTo(LocalDate.of(2025, 9, 25))
+        // regular series occurrence should be marked recurring
+        assertThat(uiEvents.first().isRecurring).isTrue()
+    }
+
+    @Test
+    fun `expandOccurrences returns only series occurrences when no exdates or single edits`() = runBlocking {
+        // Given a clean DAILY x3 series (Sep 23–25), no exdates, no single edits
+        val uid = "series-uid-3"
+        val tz = "UTC"
+
+        val original = buildRecurringAllDayEvent(
+            id = "root-id-3",
+            uid = uid,
+            startDate = LocalDate.of(2025, 9, 23),
+            count = 3
+        )
+
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original,
+            eventsSharingUid = emptyList(),
+            fromDate = LocalDate.of(2025, 9, 22),
+            toDate = LocalDate.of(2025, 9, 26),
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false
+        )!!
+
+        assertThat(uiEvents.size).isEqualTo(3)
+        assertThat(uiEvents.all { it.isRecurring }).isTrue()
+
+        val dates = uiEvents.map { it.dateStart.toLocalDate() }.sorted()
+        assertThat(dates).isEqualTo(listOf(
+            LocalDate.of(2025, 9, 23),
+            LocalDate.of(2025, 9, 24),
+            LocalDate.of(2025, 9, 25)
+        ))
+    }
+
+    private fun buildRecurringAllDayEvent(
+        id: String,
+        uid: String,
+        startDate: LocalDate,
+        count: Int,
+        exDates: List<LocalDate> = emptyList(),
+    ): Event {
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            appendLine("DTSTART;VALUE=DATE:${toIcsDate(startDate)}")
+            appendLine("DTEND;VALUE=DATE:${toIcsDate(startDate.plusDays(1))}")
+            appendLine("RRULE:FREQ=DAILY;COUNT=$count")
+            exDates.forEach { ex ->
+                appendLine("EXDATE;VALUE=DATE:${toIcsDate(ex)}")
+            }
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
+    }
+
+    private fun buildSingleEditAllDayEvent(
+        id: String,
+        uid: String,
+        recurrenceDate: LocalDate
+    ): Event {
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            appendLine("DTSTART;VALUE=DATE:${toIcsDate(recurrenceDate)}")
+            appendLine("DTEND;VALUE=DATE:${toIcsDate(recurrenceDate.plusDays(1))}")
+            appendLine("RECURRENCE-ID;VALUE=DATE:${toIcsDate(recurrenceDate)}")
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
+    }
+
+    private fun toIcsDate(d: LocalDate) = String.format("%04d%02d%02d", d.year, d.monthValue, d.dayOfMonth)
 
     private fun getCalendarRepository(): CalendarsRepository {
         return CalendarsRepositoryImpl(
