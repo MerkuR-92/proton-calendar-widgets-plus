@@ -47,6 +47,8 @@ import me.proton.core.user.domain.UserAddressManager
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.TimeZone
 
 @ExperimentalCoroutinesApi
@@ -518,8 +520,151 @@ internal class CalendarRepositoryTest {
         assertThat(dates).isEqualTo(listOf(
             LocalDate.of(2025, 9, 23),
             LocalDate.of(2025, 9, 24),
-            LocalDate.of(2025, 9, 25)
+            LocalDate.of(2025, 9, 25),
         ))
+    }
+
+    @Test
+    fun `timed event ending exactly at fromStart is excluded`() = runBlocking {
+        // Given the event ends exactly on fromStart 00:00 on 25th
+        val tz = "Europe/Ljubljana"
+        val from = LocalDate.of(2025, 9, 25)
+        val to = LocalDate.of(2025, 9, 25)
+
+        val original = buildTimedRecurringEvent(
+            id = "root",
+            uid = "u1",
+            start = "2025-09-24T23:00",
+            durationMinutes = 60,
+            count = 1,
+            tz = tz,
+        )
+        // When + then
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            original, emptyList(), from, to, tz, emptyList(), false
+        )!!
+        assert(uiEvents.isEmpty())
+    }
+
+    @Test
+    fun `single edit moved out of window leaves gap`() = runBlocking {
+        // Given base with 3 occurrences from 23–25 and window == 24 only
+        val uid = "u2"; val tz = "UTC"
+        val base = buildRecurringAllDayEvent("root", uid, LocalDate.of(2025,9,23), count = 3)
+        // moved to 26 - outside the window
+        val se = buildSingleEditAllDayEventMoved(
+            id = "se",
+            uid = uid,
+            recurrenceDate = LocalDate.of(2025,9,24),
+            movedTo = LocalDate.of(2025,9,26),
+        )
+        // When
+        val repo = getCalendarRepository()
+        val ui = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            originalEvent = base,
+            eventsSharingUid = listOf(se),
+            fromDate = LocalDate.of(2025,9,24),
+            toDate = LocalDate.of(2025,9,24),
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false,
+        )!!
+        // Then: nothing on the 24th
+        assert(ui.isEmpty())
+    }
+
+    @Test
+    fun `single edit moved into window appears even if RECURRENCE-ID outside window (no base at moved time)`() = runBlocking {
+        val uid = "u3"; val tz = "UTC"
+        // Given base on 2025-09-20
+        val base = buildRecurringAllDayEvent("root", uid, LocalDate.of(2025, 9, 20), count = 1)
+        // and a single edit moved event from 20th into the window day (21st), but RECURRENCE-ID (20) is outside the window
+        val se = buildSingleEditAllDayEventMoved(
+            id = "se",
+            uid = uid,
+            recurrenceDate = LocalDate.of(2025, 9, 20),
+            movedTo = LocalDate.of(2025, 9, 21),
+        )
+
+        val repo = getCalendarRepository()
+        val uiEvents = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            originalEvent = base,
+            eventsSharingUid = listOf(se),
+            fromDate = LocalDate.of(2025, 9, 21),
+            toDate = LocalDate.of(2025, 9, 21),
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false,
+        )!!
+
+        assertThat(uiEvents.size).isEqualTo(1)
+        assertThat(uiEvents.first().isRecurring).isFalse() // single edit
+        assertThat(uiEvents.first().dateStart.toLocalDate()).isEqualTo(LocalDate.of(2025, 9, 21))
+    }
+
+    private fun toIcsLocal(dt: LocalDateTime): String =
+        String.format("%04d%02d%02dT%02d%02d%02d",
+            dt.year, dt.monthValue, dt.dayOfMonth, dt.hour, dt.minute, dt.second)
+
+    private fun parseIsoLocal(dt: String) = LocalDateTime.parse(dt) // "yyyy-MM-dd'T'HH:mm"
+
+    fun buildTimedRecurringEvent(
+        id: String,
+        uid: String,
+        start: String, // "2025-09-25T07:00"
+        durationMinutes: Int,
+        count: Int,
+        tz: String,
+    ): Event {
+        val startLdt = parseIsoLocal(start)
+        val endLdt = startLdt.plusMinutes(durationMinutes.toLong())
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            appendLine("DTSTART;TZID=$tz:${toIcsLocal(startLdt)}")
+            appendLine("DTEND;TZID=$tz:${toIcsLocal(endLdt)}")
+            appendLine("RRULE:FREQ=DAILY;COUNT=$count")
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
+    }
+
+    fun buildSingleEditAllDayEventMoved(
+        id: String,
+        uid: String,
+        recurrenceDate: LocalDate,
+        movedTo: LocalDate,
+        tz: String = "UTC",
+    ): Event {
+        val recMidnight = LocalDateTime.of(recurrenceDate, LocalTime.MIDNIGHT)
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            // moved all-day instance
+            appendLine("DTSTART;VALUE=DATE:${toIcsDate(movedTo)}")
+            appendLine("DTEND;VALUE=DATE:${toIcsDate(movedTo.plusDays(1))}")
+            // explicit date-time at midnight with TZ to match the base occurrence instant
+            appendLine("RECURRENCE-ID;TZID=$tz:${toIcsLocal(recMidnight)}")
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
     }
 
     private fun buildRecurringAllDayEvent(
