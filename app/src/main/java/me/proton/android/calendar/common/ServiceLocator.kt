@@ -62,6 +62,7 @@ import me.proton.android.calendar.domain.usecase.JoinCalendarUseCase
 import me.proton.android.calendar.domain.usecase.KeySetupUseCase
 import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.LoadingStateUseCase
 import me.proton.android.calendar.domain.usecase.ObtainPinnedKeysUseCase
 import me.proton.android.calendar.domain.usecase.ObtainSendPreferencesUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
@@ -111,6 +112,7 @@ val commonModule = module {
 
     single<WidgetRefresher> { CalendarWidgetRefresher(androidApplication()) }
 
+    single<LoadingStateUseCase> { LoadingStateUseCase() }
 //    factory { new instance every time }
 //    single(named("special logger")) { TimberLogger } -> single { SpecialRepository(get("special logger")) }
 }
