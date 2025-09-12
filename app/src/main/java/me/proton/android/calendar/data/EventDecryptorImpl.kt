@@ -9,6 +9,7 @@ import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 class EventDecryptorImpl @Inject constructor(
@@ -20,80 +21,47 @@ class EventDecryptorImpl @Inject constructor(
     private data class CacheKey(
         val eventId: String,
         val calendarId: String,
-        val modifyTime: Long
+        val modifyTime: Long,
     )
 
-    private data class CacheValue(
-        val event: Event
-    )
-
-    private val cache = mutableMapOf<CacheKey, CacheValue>()
+    private val cache = ConcurrentHashMap<CacheKey, Event>()
     private val eventsMutex = Mutex()
-    private val calendarsMutex = Mutex()
 
-    private var allCalendars = listOf<Calendar>()
+    private val cachedCalendars = ConcurrentHashMap<String, Calendar>()
 
     override suspend fun setCalendars(calendars: List<Calendar>) {
-        calendarsMutex.withLock {
-            allCalendars = calendars
-        }
+        cachedCalendars.putAll(calendars.associateBy { it.id })
     }
 
+    private suspend fun findCalendar(id: String): Calendar? =
+        cachedCalendars[id] ?: database.calendarsDao()
+            .selectById(id)?.joinToCalendar(database, json)?.also {
+                cachedCalendars.putIfAbsent(id, it)
+            }
+
     override suspend fun decrypt(eventEntity: EventEntity): Event? {
+        val cal = findCalendar(eventEntity.calendarId) ?: return null
+        val key = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
 
-        // TODO we don't need Calendar anymore, because color is inside Member
-        // check if Calendar hasn't changed since we put the Event into cache
-        val calendar = allCalendars.find { it.id == eventEntity.calendarId }
-            ?: database.calendarsDao().selectById(eventEntity.calendarId)?.joinToCalendar(database, json)
-            ?: return null // Calendar is not in local cache or in DB, hard fail
+        cache.computeIfPresent(key) { _, ev ->
+            if (ev.calendar == cal) ev else Event.from(ev, calendar = cal)
+        }?.let { return it }
 
-        val cacheKey = CacheKey(eventEntity.id, calendar.id, eventEntity.modifyTime)
-        val cacheValue = cache[cacheKey]
-
-        return if (cacheValue != null && cacheValue.event.isTheSameAs(eventEntity)) {
-
-            val cachedValue = cacheValue.event
-
-            if (calendar != cachedValue.calendar) { // Calendar changed since last decryption
-                val eventCopy = Event.from(cachedValue, calendar = calendar)
-                eventsMutex.withLock {
-                    cache[cacheKey] = CacheValue(eventCopy)
-                }
-                eventCopy
-            } else {
-                cachedValue
-            }
-
-        } else {
-
-            eventsMutex.withLock {
-                cache.remove(cacheKey)
-            }
-
-            val decryptedEvent = transformEventUseCase.execute(eventEntity)
-            if (decryptedEvent != null) {
-                eventsMutex.withLock {
-                    cache[cacheKey] = CacheValue(decryptedEvent)
-                }
-            }
-
-            cache[cacheKey]?.event
-        }
+        val dec = transformEventUseCase.execute(eventEntity) ?: return null
+        return cache.putIfAbsent(key, dec) ?: dec
     }
 
     override suspend fun decryptAllowingApiCall(eventEntity: EventEntity): Event? {
-
         // we don't care about cache value and force decrypting again
         val decryptedEvent = transformEventUseCase.execute(eventEntity, allowApiCall = true)
 
         eventsMutex.withLock {
             return if (decryptedEvent != null) {
                 val cacheKey = CacheKey(eventEntity.id, eventEntity.calendarId, eventEntity.modifyTime)
-                cache[cacheKey] = CacheValue(decryptedEvent)
+                cache[cacheKey] = decryptedEvent
                 decryptedEvent
             } else null
         }
-
     }
 
     override suspend fun clearCache() = eventsMutex.withLock {
@@ -101,33 +69,11 @@ class EventDecryptorImpl @Inject constructor(
     }
 
     override suspend fun getFromCache(eventId: String, calendarId: String, modifyTime: Long): Event? {
-
-        // TODO we don't need Calendar anymore, because color is inside Member
-        // check if Calendar hasn't changed since we put the Event into cache
-        val calendar = allCalendars.find { it.id == calendarId }
-            ?: database.calendarsDao().selectById(calendarId)?.joinToCalendar(database, json)
-            ?: return null // Calendar is not in local cache or in DB, hard fail
-
-        val cacheKey = CacheKey(eventId, calendarId, modifyTime)
-        val cacheValue = cache[cacheKey]
-
-        return if (cacheValue != null) {
-            if (calendar != cacheValue.event.calendar) { // Calendar changed since last decryption
-                val eventCopy = Event.from(cacheValue.event, calendar = calendar)
-                eventsMutex.withLock {
-                    cache[cacheKey] = CacheValue(eventCopy)
-                }
-                eventCopy
-            } else cacheValue.event
-        } else null
+        val cal = findCalendar(calendarId) ?: return null
+        val key = CacheKey(eventId, calendarId, modifyTime)
+        return cache.compute(key) { _, cur ->
+            cur ?: return@compute null
+            if (cur.calendar == cal) cur else Event.from(cur, calendar = cal)
+        }
     }
-
-    private fun Event.isTheSameAs(other: EventEntity): Boolean {
-
-        return this.id == other.id &&
-                this.calendar.id == other.calendarId &&
-                this.modifyTime == other.modifyTime
-
-    }
-
 }
