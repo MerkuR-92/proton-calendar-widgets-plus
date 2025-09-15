@@ -21,6 +21,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.clone
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils
 import me.proton.android.calendar.common.utils.IcsSurgeryUtils.cleanRecurrenceId
+import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmails
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -86,7 +87,6 @@ class HandleIcsUseCase @Inject constructor(
     }
 
     private suspend fun handleImportIcs(iCalendar: ICalendar, userId: UserId, isOpeningFromProtonMail: Boolean): IcsSurgeryUtils.HandleIcsResult {
-
         // Get default calendar
         val defaultCalendar = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = true)?.let { defaultCalendarId ->
             calendarsRepository.selectCalendar(defaultCalendarId)
@@ -186,8 +186,8 @@ class HandleIcsUseCase @Inject constructor(
     }
 
     private suspend fun handleInviteIcs(iCalendar: ICalendar, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
-
-        val canonicalUserEmails = userAddressManager.getAddressesOrNull(userId)?.map { address ->
+        val allAddresses = userAddressManager.getAddressesOrNull(userId)
+        val canonicalUserEmails = allAddresses?.map { address ->
             canonicalizeProtonEmail(address.email, forceCanonicalization = true)
         } ?: return IcsSurgeryUtils.HandleIcsResult.Error.DefaultError
 
@@ -256,7 +256,7 @@ class HandleIcsUseCase @Inject constructor(
             return IcsSurgeryUtils.HandleIcsResult.Error.Unsupported.SingleEditReply
 
         // Try to extract the current user from the attendee list if it exists
-        val userAttendee = iCalendar.events.first().attendees.find { attendee ->
+        var userAttendee = iCalendar.events.first().attendees.find { attendee ->
             canonicalUserEmails.firstOrNull { canonicalUserEmail ->
                 val attendeeEmail = attendee.extractEmail()
                 attendeeEmail != null && canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true).equals(canonicalUserEmail, ignoreCase = true)
@@ -274,8 +274,38 @@ class HandleIcsUseCase @Inject constructor(
             }
         }
 
-        // If current user is not in the attendee list and is not the organizer then it is a party crasher
-        if (!isOrganizerMode && userAttendee == null) return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+        if (!isOrganizerMode && userAttendee == null) {
+            // Check for supported party crasher case
+            val isUserRecipient = allAddresses.any { it.email.equals(recipientEmail, ignoreCase = true) }
+            if (isUserRecipient) {
+                val protonReplyEmail = allAddresses.firstOrNull { ProtonUtilsImpl.isProtonDomain(it.email) }?.email
+                    ?: run {
+                        val defCalId = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = false)
+                            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
+                        calendarsRepository.selectCalendar(defCalId)?.email
+                            ?: return IcsSurgeryUtils.HandleIcsResult.Error.NoDefaultPersonalCalendarFound
+                    }
+                val ev = iCalendar.events.first()
+                val replyCanon = canonicalizeProtonEmail(protonReplyEmail, true)
+                val alreadyPresent = ev.attendees.any {
+                    val email = it.extractEmail().orEmpty()
+                    canonicalizeProtonEmail(email, true).equals(replyCanon, ignoreCase = true)
+                }
+                // Add the user to the attendees
+                if (!alreadyPresent) {
+                    ev.attendees.add(Attendee("", protonReplyEmail).apply {
+                        uri = "mailto:$protonReplyEmail"
+                        participationStatus = ParticipationStatus.NEEDS_ACTION
+                        rsvp = true
+                    })
+                    userAttendee = iCalendar.events.first().attendees
+                        .find { it.extractEmail()?.equals(protonReplyEmail, true) == true }
+                }
+            } else {
+                // If current user is not in the attendee list and is not the organizer then it is a party crasher
+                return IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher
+            }
+        }
 
         // Use the default calendar to create the event
         // Calendar needs to be active and user needs to be owner (we don't allow members to add invites in shared cals even with write permissions)
@@ -471,7 +501,9 @@ class HandleIcsUseCase @Inject constructor(
         val eventUid = this.events.first().uid?.value
         if (missingToken && eventUid != null) {
             val canonicalEmails = canonicalEmailsUseCase.invoke(userId, this.events.first().attendees.mapNotNull { it.extractEmail() })
-            if (canonicalEmails.values.any { it.isNullOrEmpty() }) return false
+            
+            if (isOrganizerMode && canonicalEmails.values.any { it.isNullOrEmpty() }) return false
+
             this.events.first().attendees.forEach { attendee ->
                 val attendeeCanonicalEmail =
                     if (attendee.extractEmail() != null) canonicalEmails[attendee.extractEmail()]
