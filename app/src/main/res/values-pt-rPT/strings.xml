@@ -108,7 +108,7 @@
     <string name="event_change_answer_recurring_overwrite_description">Deseja alterar a resposta a todos os eventos desta série?\nAlgumas respostas a ocorrências previamente actualizadas pelo organizador serão perdidas.</string>
     <string name="event_change_answer_recurring_single_edit_description">Este evento foi actualizado pelo organizador. Deseja alterar a sua resposta só para esta ocorrência da série?</string>
     <string name="event_change_answer_recurring_cancel">Cancelar</string>
-    <string name="event_change_answer_recurring_confirm">Actualizar</string>
+    <string name="event_change_answer_recurring_confirm">Atualizar</string>
     <string name="event_change_answer_mail_body_accepted" comment="Example: Mary Jane has accepted your invitation to Super Cool Event">%1$s aceitou o seu convite para %2$s</string>
     <string name="event_change_answer_mail_body_declined" comment="Example: Mary Jane has declined your invitation to Super Cool Event">%1$s recusou o seu convite para %2$s</string>
     <string name="event_change_answer_mail_body_tentative" comment="Example: Mary Jane has tentatively accepted your invitation to Super Cool Event">%1$s aceitou provisoriamente o seu convite para %2$s</string>

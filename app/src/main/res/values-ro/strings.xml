@@ -441,7 +441,7 @@
     <string name="bug_report_hint_title">Subiect</string>
     <string name="bug_report_hint_description">Descrieți problema incluzând și mesajele de eroare care apar.</string>
     <string name="bug_report_discard_changes_title">Modificări nesalvate</string>
-    <string name="bug_report_discard_changes_description">Există date nesalvate în acest formular. Sigur doriți să renunțați la ele?</string>
+    <string name="bug_report_discard_changes_description">Există date nesalvate în acest formular. Renunțați la ele?</string>
     <string name="bug_report_discard_changes_cancel">Continuare</string>
     <string name="bug_report_discard_changes_confirm">Renunțare</string>
     <!-- Settings -->
@@ -519,10 +519,10 @@
     <string name="delete_calendar_dialog_title">Ștergere calendar</string>
     <string name="delete_calendar_dialog_message">Sigur doriți să ștergeți acest calendar?</string>
     <string name="remove_calendar_dialog_title">Eliminare calendar</string>
-    <string name="remove_calendar_dialog_message">Sigur doriți să eliminați acest calendar?</string>
+    <string name="remove_calendar_dialog_message">Eliminați acest calendar?</string>
     <string name="leave_calendar_dialog_title">Părăsire calendar</string>
     <string name="leave_calendar_dialog_message">Dacă părăsiți acest calendar, va trebui să solicitați proprietarului să vă alăturați din nou.</string>
-    <string name="delete_default_calendar_dialog_message">Sigur doriți ștergerea acestui calendar? „%1$s” va fi setat ca și calendar implicit.</string>
+    <string name="delete_default_calendar_dialog_message">Ștergeți acest calendar? Calendarul „%1$s” va fi setat ca implicit.</string>
     <string name="delete_calendar_snack_deleted">Calendarul a fost șters</string>
     <string name="remove_calendar_snack_removed">Calendar a fost eliminat.</string>
     <string name="delete_calendar_snack_error">Eroare la ștergerea calendarului</string>
@@ -530,7 +530,7 @@
     <string name="leave_calendar_snack_error">Eroare la părăsirea calendarului.</string>
     <string name="delete_calendar_snack_error_password_confirmation">Confirmarea parolei a eșuat</string>
     <string name="recreate_calendar_dialog_title">Golire calendar</string>
-    <string name="recreate_calendar_dialog_message">Această acțiune va elimina toate evenimentele și utilizatorii invitați.\n\nSigur doriți să ștergeți acest calendar?</string>
+    <string name="recreate_calendar_dialog_message">Această acțiune va elimina toate evenimentele și utilizatorii invitați.\n\nȘtergeți acest calendar?</string>
     <string name="recreate_calendar_snack_error">Eroare golire calendar</string>
     <string name="recreate_calendar_snack_deleted">Calendarul a fost golit</string>
     <string name="recreate_calendar_snack_clearing">Se golește calendarul…</string>

@@ -132,7 +132,7 @@
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Далучыцца да сустрэчы ў Zoom</string>
     <string name="zoom_meeting_title">Сустрэча па Zoom</string>
-    <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_id">Ідэнт.: %1$s</string>
     <string name="generic_meeting_password">Пароль: %1$s</string>
     <string name="generic_meeting_more_details">Больш падрабязна</string>
     <string name="generic_meeting_less_details">Менш падрабязна</string>
