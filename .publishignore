@@ -1,4 +1,5 @@
 .idea
+.gitlab-ci.yml
 CODEOWNERS
 renovate.json
 
