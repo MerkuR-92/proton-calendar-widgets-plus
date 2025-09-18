@@ -1,0 +1,8 @@
+.idea
+CODEOWNERS
+renovate.json
+
+app/src/uiTest/assets
+docs/
+scripts/
+keystore/
