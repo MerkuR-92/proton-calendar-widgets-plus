@@ -40,3 +40,7 @@ An adaptation of https://github.com/alamkanak/Android-Week-View used for week vi
 ## Contributing notice
 
 This project does not accept external contributions.
+
+## License
+
+The code and data files in this distribution are licensed under the terms of the GPLv3 as published by the Free Software Foundation. See https://www.gnu.org/licenses/ for a copy of this license.
