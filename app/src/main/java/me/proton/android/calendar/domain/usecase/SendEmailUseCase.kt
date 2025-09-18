@@ -273,7 +273,7 @@ class SendEmailUseCase @Inject constructor(
         val calendarPassphraseList = calendarsRepository.selectCalendarPassphrases(calendarId)
         if (calendarPassphraseList.isEmpty()) return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: there are no passphrase for calendar")
         val calendarPassphrase = calendarPassphraseList.map { it.toPassphrase(json) }.first { it.isActive }
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase")
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId.id).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) ?: return UseCase.Result.InvalidParams("SendEmailUseCase sendInviteToAttendees: there is no valid cached Calendar Passphrase") // gitleaks:allow
 
         if (eventEntity.sharedKeyPacket == null) {
             return UseCase.Result.InvalidParams("SendEmailUseCase getSharedProperties: EventEntity is not upgraded")

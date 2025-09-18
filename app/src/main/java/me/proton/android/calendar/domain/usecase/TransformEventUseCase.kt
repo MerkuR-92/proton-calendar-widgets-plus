@@ -74,7 +74,7 @@ class TransformEventUseCase @Inject constructor(
             return null
         }
 
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id)
+        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) // gitleaks:allow
         if (keyPassphrase == null) {
             logger.e("TransformEventUseCase, keyPassphrase is null")
             return null
