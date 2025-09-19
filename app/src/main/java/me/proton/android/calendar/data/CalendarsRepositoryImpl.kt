@@ -194,6 +194,8 @@ class CalendarsRepositoryImpl @Inject constructor(
                 fetchWindow.timeZoneId)
         } else fetchWindow.calendarIds
 
+        if (calendarIdsToFetch.isEmpty()) return
+
         if (fetchWindow.needsRefresh()) {
             logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
@@ -238,11 +240,9 @@ class CalendarsRepositoryImpl @Inject constructor(
         } else {
             logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
         }
-
     }
 
     override suspend fun shutdown() {
-
         // cancel any ongoing Event fetching
         scopeEventFetching.cancel()
         scopeEventFetching = CoroutineScope(Dispatchers.Default)
@@ -549,101 +549,90 @@ class CalendarsRepositoryImpl @Inject constructor(
         userEmails: List<String>,
         isFreeUser: Boolean
     ): List<UiEvent>? {
-        val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
-            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
-        } else {
-            toDate
+        val tz = ZoneId.of(timeZoneId)
+
+        val fromStartInstant = fromDate.atStartOfDay(tz).toInstant()
+        val toEndInstant = toDate.plusDays(1).atStartOfDay(tz).toInstant()
+
+        val dtStart = originalEvent.getStart(timeZoneId)
+        val untilInstant = originalEvent.iCalEvent.recurrenceRule.value.until?.toInstant()
+
+        val potentialOccurrences = when {
+            dtStart.toInstant() >= toEndInstant -> emptyList()
+            untilInstant != null && untilInstant.isBefore(fromStartInstant) -> emptyList()
+            else -> originalEvent.generateOccurrencesUntil(toDate, timeZoneId) ?: return null
         }
 
-        val potentialOccurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
-
-        // Extract EXDATEs from the original event
-        val exZonedDateTimes = originalEvent.iCalEvent.exceptionDates.flatMap { exDates ->
-            exDates.values.map { exDate ->
-                exDate.toZonedDateTime(timeZoneId)
-            }
-        }.toSet()
-
-        // Get start times of all single edits (events with RECURRENCE-ID valued) separately
-        val singleEditRecurrenceIds = eventsSharingUid
-            .filter { it.isSingleEdit() }
-            .mapNotNull { it.getRecurrenceId(timeZoneId) }
+        val exInstants = originalEvent.iCalEvent.exceptionDates
+            .flatMap { it.values }
+            .map { it.toZonedDateTime(timeZoneId).toInstant() }
             .toSet()
 
-        // Process all occurrences and filter out EXDATEs + times replaced by single edits
-        val originalUiEvents = potentialOccurrences.mapNotNull { occurrence ->
-            // If this occurrence time is excluded by exdate, do not process it
-            if (occurrence.startDateTime in exZonedDateTimes) {
-                null
+        val singleEditRecurrenceInstants = eventsSharingUid
+            .filter { it.isSingleEdit() }
+            .mapNotNull { it.getRecurrenceId(timeZoneId)?.toInstant() }
+            .toSet()
 
-            // If this occurrence time is replaced by a single edit, do not process it (otherwise it duplicates)
-            } else if (occurrence.startDateTime in singleEditRecurrenceIds) {
-                null
+        val displayColor = originalEvent.getDisplayColor(isFreeUser)
+        val decryptStatus = originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic
+        val participation = originalEvent.getParticipationStatus(userEmails)
+        val status = originalEvent.status ?: Status.confirmed()
 
-            // Ensure it's within range
-            } else if (!DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
-                    occurrence.startDateTime,
-                    occurrence.endDateTime,
-                    fromDate,
-                    toDate,
-                    timeZoneId
-                )) {
-                null
-            } else {
-                UiEvent(
-                    originalEvent.id,
-                    originalEvent.calendar.id,
-                    originalEvent.uid,
-                    originalEvent.summary,
-                    originalEvent.location,
-                    originalEvent.description,
-                    occurrence.startDateTime,
-                    occurrence.endDateTime,
-                    originalEvent.isAllDay(),
-                    occurrence.occurrenceNumber,
-                    originalEvent.getDisplayColor(isFreeUser),
-                    originalEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
-                    originalEvent.getParticipationStatus(userEmails),
-                    originalEvent.status ?: Status.confirmed()
-                )
-            }
+        val originalUiEvents = potentialOccurrences.mapNotNull { occ ->
+            val sInst = occ.startDateTime.toInstant()
+            if (sInst in exInstants || sInst in singleEditRecurrenceInstants) return@mapNotNull null
+
+            val eInst = occ.endDateTime.toInstant()
+            val overlaps = eInst.isAfter(fromStartInstant) && sInst.isBefore(toEndInstant)
+            if (!overlaps) return@mapNotNull null
+
+            UiEvent(
+                id = originalEvent.id,
+                calendarId = originalEvent.calendar.id,
+                uid = originalEvent.uid,
+                summary = originalEvent.summary,
+                location = originalEvent.location,
+                description = originalEvent.description,
+                dateStart = occ.startDateTime,
+                dateEnd = occ.endDateTime,
+                isAllDay = originalEvent.isAllDay(),
+                occurrenceNumber = occ.occurrenceNumber,
+                displayColor = displayColor,
+                decryptionStatus = decryptStatus,
+                participationStatus = participation,
+                status = status,
+            )
         }
 
-        // Handle single edit events separately
-        val singleEditUiEvents = eventsSharingUid
-            .filter { it.isSingleEdit() }
-            .mapNotNull { singleEditEvent ->
-                // Ensure it's in the active date range
-                if (DateTimeUtilsImpl.startEndOverlapsWithFullDayRange(
-                        singleEditEvent.getStart(timeZoneId),
-                        singleEditEvent.getEnd(timeZoneId),
-                        fromDate,
-                        toDate,
-                        timeZoneId
-                    )) {
-                    UiEvent(
-                        singleEditEvent.id,
-                        singleEditEvent.calendar.id,
-                        singleEditEvent.uid,
-                        singleEditEvent.summary,
-                        singleEditEvent.location,
-                        singleEditEvent.description,
-                        singleEditEvent.getStart(timeZoneId),
-                        singleEditEvent.getEnd(timeZoneId),
-                        singleEditEvent.isAllDay(),
-                        0, // N/A, fallback to 0 as it's a single edit
-                        singleEditEvent.getDisplayColor(isFreeUser),
-                        singleEditEvent.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
-                        singleEditEvent.getParticipationStatus(userEmails),
-                        singleEditEvent.status ?: Status.confirmed()
-                    )
-                } else {
-                    null
-                }
-            }
-
-        return (originalUiEvents + singleEditUiEvents)
+        val singleEditUiEvents = eventsSharingUid.mapNotNull { se ->
+            if (!se.isSingleEdit()) return@mapNotNull null
+            val s = se.getStart(timeZoneId)
+            val e = se.getEnd(timeZoneId)
+            val sInst = s.toInstant()
+            val eInst = e.toInstant()
+            if (eInst <= fromStartInstant || sInst >= toEndInstant) return@mapNotNull null
+            UiEvent(
+                id = se.id,
+                calendarId = se.calendar.id,
+                uid = se.uid,
+                summary = se.summary,
+                location = se.location,
+                description = se.description,
+                dateStart = s,
+                dateEnd = e,
+                isAllDay = se.isAllDay(),
+                occurrenceNumber = 0,
+                displayColor = se.getDisplayColor(isFreeUser),
+                decryptionStatus = se.decryptionStatus ?: Event.DecryptionStatus.Failure.Generic,
+                participationStatus = se.getParticipationStatus(userEmails),
+                status = se.status ?: Status.confirmed(),
+            )
+        }
+        return if (singleEditUiEvents.isEmpty()) {
+            originalUiEvents
+        } else {
+            originalUiEvents + singleEditUiEvents
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

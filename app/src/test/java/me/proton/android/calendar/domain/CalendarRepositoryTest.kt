@@ -603,11 +603,76 @@ internal class CalendarRepositoryTest {
         assertThat(uiEvents.first().dateStart.toLocalDate()).isEqualTo(LocalDate.of(2025, 9, 21))
     }
 
+    @Test
+    fun `single edit moved into window still shown when series UNTIL before window`() = runBlocking {
+        // Given base DAILY series 18–20 Sep (via RRULE;UNTIL=20th)
+        val tz = "UTC"
+        val uid = "u4"
+        val windowFrom = LocalDate.of(2025, 9, 22)
+        val windowTo = windowFrom
+        val base = buildRecurringAllDayEventUntil(
+            id = "root-u4",
+            uid = uid,
+            startDate = LocalDate.of(2025, 9, 18),
+            untilDate = LocalDate.of(2025, 9, 20)
+        )
+        // Single edit moves the 19th occurrence to the 22nd (inside the window)
+        val se = buildSingleEditAllDayEventMoved(
+            id = "se-u4",
+            uid = uid,
+            recurrenceDate = LocalDate.of(2025, 9, 19),
+            movedTo = LocalDate.of(2025, 9, 22),
+            tz = tz
+        )
+        // When
+        val repo = getCalendarRepository()
+        val ui = repo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+            originalEvent = base,
+            eventsSharingUid = listOf(se),
+            fromDate = windowFrom,
+            toDate = windowTo,
+            timeZoneId = tz,
+            userEmails = emptyList(),
+            isFreeUser = false
+        )!!
+        // Then: the moved single-edit appears on the 22nd (non-recurring)
+        assertThat(ui.size).isEqualTo(1)
+        assertThat(ui.first().isRecurring).isFalse()
+        assertThat(ui.first().dateStart.toLocalDate()).isEqualTo(LocalDate.of(2025, 9, 22))
+    }
+
+
     private fun toIcsLocal(dt: LocalDateTime): String =
         String.format("%04d%02d%02dT%02d%02d%02d",
             dt.year, dt.monthValue, dt.dayOfMonth, dt.hour, dt.minute, dt.second)
 
     private fun parseIsoLocal(dt: String) = LocalDateTime.parse(dt) // "yyyy-MM-dd'T'HH:mm"
+
+    fun buildRecurringAllDayEventUntil(
+        id: String,
+        uid: String,
+        startDate: LocalDate,
+        untilDate: LocalDate
+    ): Event {
+        val untilUtc = toIcsLocal(LocalDateTime.of(untilDate, LocalTime.MIDNIGHT)) + "Z"
+        val ics = buildString {
+            appendLine("BEGIN:VCALENDAR")
+            appendLine("VERSION:2.0")
+            appendLine("BEGIN:VEVENT")
+            appendLine("UID:$uid")
+            appendLine("DTSTAMP:20210101T000000Z")
+            appendLine("DTSTART;VALUE=DATE:${toIcsDate(startDate)}")
+            appendLine("DTEND;VALUE=DATE:${toIcsDate(startDate.plusDays(1))}")
+            appendLine("RRULE:FREQ=DAILY;UNTIL=$untilUtc")
+            appendLine("SEQUENCE:0")
+            appendLine("STATUS:CONFIRMED")
+            appendLine("END:VEVENT")
+            appendLine("END:VCALENDAR")
+        }
+        val iCal = me.proton.android.calendar.common.utils.ICalUtilsImpl.parseICalString(ics)!!
+        val base = Event.dummyFrom(iCal)!!
+        return Event.from(base, id = id)
+    }
 
     fun buildTimedRecurringEvent(
         id: String,
