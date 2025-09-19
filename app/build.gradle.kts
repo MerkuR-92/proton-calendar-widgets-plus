@@ -13,7 +13,6 @@ import studio.forface.easygradle.dsl.testImplementation
 plugins {
     alias(libs.plugins.kotlin.serialization)
     id("io.sentry.android.gradle") version libs.versions.sentry.gradle.plugin
-    id("org.sonarqube") version "3.3"
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-kapt")
@@ -26,13 +25,6 @@ plugins {
 
 kotlin {
     jvmToolchain(17)
-}
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "android_calendar_proton-calendar-android_AYGvp8U7f_vcScryKn5V")
-        property("sonar.qualitygate.wait", true)
-    }
 }
 
 sentry {
