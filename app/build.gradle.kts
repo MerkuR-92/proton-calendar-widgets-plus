@@ -125,7 +125,7 @@ android {
     buildTypes {
         release {
             isDebuggable = false
-            isMinifyEnabled = false // TODO turn off for initial beta release
+            isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android.txt"),
