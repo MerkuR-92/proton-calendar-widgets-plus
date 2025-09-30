@@ -180,7 +180,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId, lifecycle).map {
+                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId).map {
                         range to it
                     }
                 }.collectLatest { (range, events) ->

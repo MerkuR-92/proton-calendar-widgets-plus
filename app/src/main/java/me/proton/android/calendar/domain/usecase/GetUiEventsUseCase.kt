@@ -27,7 +27,6 @@ import me.proton.core.domain.entity.UserId
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
-import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -125,7 +124,6 @@ class GetUiEventsUseCase @Inject constructor(
                                 .toSet()
 
                         val byUidMap = calendarsRepository.selectEventsByUidIn(neededUids)
-                        val seenRecurringUids = ConcurrentHashMap.newKeySet<String>()
 
                         suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? =
                             (eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
@@ -143,9 +141,7 @@ class GetUiEventsUseCase @Inject constructor(
                                 }
 
                             val transformedFiniteRecurring =
-                                finiteRecurring.filter { occ ->
-                                    seenRecurringUids.add(occ.eventUid)
-                                }.parallelMap { occ ->
+                                finiteRecurring.parallelMap { occ ->
                                     fetchEventFor(occ)?.let { decr ->
                                         calendarsRepository
                                             .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
@@ -161,10 +157,7 @@ class GetUiEventsUseCase @Inject constructor(
                                 }.flatten()
 
                             val transformedInfiniteRecurring =
-                                filteredInfiniteRecurring
-                                    .filter { occ ->
-                                        seenRecurringUids.add(occ.eventUid)
-                                    }.parallelMap { occ ->
+                                filteredInfiniteRecurring.parallelMap { occ ->
                                         fetchEventFor(occ)?.let { decr ->
                                             calendarsRepository
                                                 .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(

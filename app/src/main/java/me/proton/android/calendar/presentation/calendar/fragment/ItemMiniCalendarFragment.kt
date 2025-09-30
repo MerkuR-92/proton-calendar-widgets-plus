@@ -15,13 +15,16 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -250,15 +253,16 @@ class ItemMiniCalendarFragment : Fragment() {
         setMiniCalendarSkeletonList(skeletonList, forDate, firstDayOfTheMonth, firstMiniCalendarDay, startWeekOn, timeZoneId)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            calendarViewModel.calendarIndicators(
-                fromDate,
-                toDate,
-                timeZoneId,
-                lifecycle
-            ).observe(viewLifecycleOwner) { indicators ->
-                view?.run {
-                    this@ItemMiniCalendarFragment.indicators = indicators
-                    applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                calendarViewModel.calendarIndicators(
+                    fromDate,
+                    toDate,
+                    timeZoneId,
+                ).collectLatest { indicators ->
+                    view?.run {
+                        this@ItemMiniCalendarFragment.indicators = indicators
+                        applyMiniCalendarIndicators(indicators, firstMiniCalendarDay)
+                    }
                 }
             }
 
