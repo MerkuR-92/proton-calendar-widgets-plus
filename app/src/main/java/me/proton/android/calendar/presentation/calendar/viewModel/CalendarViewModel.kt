@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -426,14 +427,13 @@ class CalendarViewModel @Inject constructor(
         }.flowOn(Dispatchers.IO).cancellable()
     }
 
-    suspend fun calendarIndicators(
+    fun calendarIndicators(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        lifecycle: Lifecycle
-    ): LiveData<Map<LocalDate, List<String>>> {
+    ): Flow<Map<LocalDate, List<String>>> {
         // TODO we could optimize this by operating on EventOccurrenceEntity only, not full UiEvents
-        return getUiEventsLookup(fromDate, toDate, timeZoneId, lifecycle).map { eventsResult ->
+        return getUiEventsLookupFlow(fromDate, toDate, timeZoneId).map { eventsResult ->
             when (eventsResult) {
                 CalendarsRepository.GetEventsResult.InProgress -> {
                     emptyMap()
@@ -467,35 +467,17 @@ class CalendarViewModel @Inject constructor(
         }
     }
 
-    suspend fun getUiEventsLookup(
-        fromDate: LocalDate,
-        toDate: LocalDate,
-        timeZoneId: String,
-        lifecycle: Lifecycle
-    ): LiveData<CalendarsRepository.GetEventsResult<UiEvent>> {
-        return withContext(Dispatchers.IO) {
-            val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
-            if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
-                return@withContext MutableLiveData<CalendarsRepository.GetEventsResult<UiEvent>>()
-            }
-
-            getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).asLiveData()
-        }
-    }
-
     fun getUiEventsLookupFlow(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        lifecycle: Lifecycle,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
             return@flow
         }
-        emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId).flowWithLifecycle(lifecycle, Lifecycle.State.STARTED))
+        emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId))
     }.distinctUntilChanged()
         .onStart { emit(CalendarsRepository.GetEventsResult.InProgress) }
 

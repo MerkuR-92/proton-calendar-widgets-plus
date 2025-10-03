@@ -40,8 +40,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -663,11 +665,18 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId, lifecycle)
+                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId)
                 }.collectLatest {
                     updateUiEvents(it)
+                }
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                weekViewEvents.collectLatest { weekViewCalendarEntities ->
+                    weekViewAdapter.submitList(weekViewCalendarEntities)
                 }
             }
         }
@@ -759,6 +768,13 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         }
     }
 
+    private val rawUiEvents = MutableStateFlow<List<UiEvent>?>(null)
+    private val weekViewEvents = rawUiEvents.filterNotNull().map { events ->
+        events.flatMap { event ->
+            event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
+        }
+    }.distinctUntilChanged()
+
     private fun updateWeekView(selectedDate: LocalDate, selectedTime: LocalTime? = null, animate: Boolean = true) {
         lifecycleScope.launch {
             val weekStart = calendarViewModel.getWeekStart()
@@ -826,12 +842,8 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
 
             is CalendarsRepository.GetEventsResult.Success -> {
-                val weekViewCalendarEntities = events.events.flatMap { event ->
-                    event.toWeekViewCalendarEntityEvent(getString(R.string.default_event_summary))
-                }
-                weekViewAdapter.submitList(
-                    weekViewCalendarEntities
-                )
+                rawUiEvents.value = events.events
+
                 binding.weekView.showLoadingEvents = events.events.isEmpty() && events.fullyLoaded.not()
                 binding.calendarProgress.isVisible = events.fullyLoaded.not()
             }
