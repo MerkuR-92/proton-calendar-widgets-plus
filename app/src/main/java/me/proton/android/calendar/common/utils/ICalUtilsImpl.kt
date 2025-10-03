@@ -77,14 +77,18 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     override fun normaliseICalendar(calendar: ICalendar) {
-
         // TODO replace this with global validation of all properties from biweekly
+        fun String.sanitizeICalParam(): String =
+            this.replace("\r", "").replace("\n", "").replace("\"", "")
+
         calendar.events?.forEach { vEvent ->
-            vEvent?.attendees?.forEach {
-                it.commonName = it.commonName?.replace("\"", "")
+            vEvent?.attendees?.forEach { att ->
+                att.commonName = att.commonName?.sanitizeICalParam()
+            }
+            vEvent?.organizer?.let { org ->
+                org.commonName = org.commonName?.sanitizeICalParam()
             }
         }
-
     }
 
     /**
@@ -852,7 +856,12 @@ object ICalUtilsImpl : ICalUtils {
     }
 
     // TODO we strip out "global timezone forward slash" manually, because for some requests server refuses to accept it
-    override fun ICalendar.printToString() : String {
+    override fun ICalendar.printToString(): String {
+        fun String.sanitizeICalParam() = replace("\r", "").replace("\n", "").replace("\"", "")
+        this.events?.forEach { e ->
+            e.attendees?.forEach { a -> a.commonName = a.commonName?.sanitizeICalParam() }
+            e.organizer?.let { o -> o.commonName = o.commonName?.sanitizeICalParam() }
+        }
         return Biweekly.write(this).go().replace("TZID=/", "TZID=")
     }
 
