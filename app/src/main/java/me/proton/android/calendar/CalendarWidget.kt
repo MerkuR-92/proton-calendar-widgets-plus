@@ -11,43 +11,19 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.net.Uri
 import android.os.Build
-import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
-import biweekly.parameter.ParticipationStatus
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import me.proton.android.calendar.CalendarWidget.Companion.WIDGET_DAYS_AHEAD
 import me.proton.android.calendar.common.Navigation
-import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeekMedium
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatTime
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
-import me.proton.android.calendar.common.utils.EventUtilsImpl.calculateFullDayCounter
-import me.proton.android.calendar.common.utils.EventUtilsImpl.formatFullDayCounter
-import me.proton.android.calendar.common.utils.ICalUtilsImpl.explodeDayByDay
-import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
-import me.proton.android.calendar.domain.ResourceProvider
-import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.UiEvent
-import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.android.calendar.presentation.main.MainActivity
 import me.proton.android.calendar.presentation.main.viewModel.MainViewModel
-import me.proton.core.accountmanager.domain.AccountManager
-import me.proton.core.accountmanager.domain.getPrimaryAccount
-import me.proton.core.domain.entity.UserId
-import me.proton.core.user.domain.UserAddressManager
-import me.proton.core.usersettings.domain.repository.UserSettingsRepository
-import me.proton.core.util.kotlin.takeIfNotBlank
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 import java.time.LocalDate
@@ -85,6 +61,8 @@ class CalendarWidgetRefresher @Inject constructor(@ApplicationContext private va
  * App Widget showing upcoming Events
  */
 class CalendarWidget : AppWidgetProvider(), KoinComponent {
+
+    private val updater: CalendarWidgetUpdater by inject()
 
     override fun onReceive(context: Context, intent: Intent?) {
         intent?.let {
@@ -170,7 +148,9 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
         // we need to pass the AppWidgetID to RemoteViewsService
         remoteViewsServiceIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
         // without "data" property, extras are ignored when comparing intents
-        remoteViewsServiceIntent.data = Uri.parse(remoteViewsServiceIntent.toUri(Intent.URI_INTENT_SCHEME))
+
+        remoteViewsServiceIntent.data =
+            remoteViewsServiceIntent.toUri(Intent.URI_INTENT_SCHEME).toUri()
         remoteViews.setRemoteAdapter(
             R.id.lv_widget,
             remoteViewsServiceIntent
@@ -183,6 +163,8 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         // force ListView to refresh
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.lv_widget)
+
+        updater.rebuildSnapshot(context)
     }
 
     private fun createOpenAppIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
@@ -235,20 +217,12 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
             // TODO https://developer.android.com/guide/topics/appwidgets/advanced#broadcastreceiver-priority
             context.sendBroadcast(createWidgetRefreshIntent(context))
         }
-
     }
-
 }
 
 internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComponent {
 
-    private val resourceProvider: ResourceProvider by inject()
-    private val accountManager: AccountManager by inject()
-    private val userAddressManager: UserAddressManager by inject()
-    private val userSettingsRepository: UserSettingsRepository by inject()
     private val logger: Logger by inject()
-    private val database: AppDatabase by inject()
-    private val getUiEventsUseCase: GetUiEventsUseCase by inject()
 
     override fun onGetViewFactory(intent: Intent?): RemoteViewsFactory {
 
@@ -266,14 +240,8 @@ internal class CalendarWidgetRemoteViewsService : RemoteViewsService(), KoinComp
 
         return CalendarWidgetRemoteViewsFactory(
             widgetId ?: AppWidgetManager.INVALID_APPWIDGET_ID,
-            resourceProvider,
-            accountManager,
-            userAddressManager,
-            userSettingsRepository,
             applicationContext,
             logger,
-            database,
-            getUiEventsUseCase
         )
     }
 }
@@ -297,84 +265,12 @@ internal data class WidgetEvent(
 
 internal class CalendarWidgetRemoteViewsFactory(
     private val appWidgetId: Int,
-    private val resourceProvider: ResourceProvider,
-    private val accountManager: AccountManager,
-    private val userAddressManager: UserAddressManager,
-    private val userSettingsRepository: UserSettingsRepository,
     private val applicationContext: Context,
     private val logger: Logger,
-    private val database: AppDatabase,
-    private val getUiEventsUseCase: GetUiEventsUseCase
-) : RemoteViewsService.RemoteViewsFactory {
+) : RemoteViewsService.RemoteViewsFactory, KoinComponent {
 
+    private val updater: CalendarWidgetUpdater by inject()
     private var adapterData = emptyList<WidgetEvent>()
-
-    private fun UiEvent.toWidgetEvent(
-        happensOn: LocalDate,
-        timeZoneId: String,
-        showDateColumn: Boolean,
-        showBottomSpacing: Boolean,
-        showNoEventsToday: Boolean,
-        is24Hour: Boolean,
-    ): WidgetEvent {
-
-        val fullDayCounter = this.calculateFullDayCounter(happensOn)
-
-        val fullDayCounterString = if (fullDayCounter.second > 1) {
-            this.formatFullDayCounter(happensOn)
-        } else null
-
-        val dateText = if (this.isAllDay) {
-            resourceProvider.provideString(R.string.event_all_day)
-        } else {
-            if (fullDayCounter.second > 1) { // multi-day part-day
-                when (fullDayCounter.first) {
-                    1 -> { // first day
-                        resourceProvider.provideString(
-                            R.string.calendar_widget_part_day_event_starts_at,
-                            this.dateStart.formatTime(timeZoneId, is24Hour)
-                        )
-                    }
-                    fullDayCounter.second -> { // last day
-                        resourceProvider.provideString(
-                            R.string.calendar_widget_part_day_event_ends_at,
-                            this.dateEnd.formatTime(timeZoneId, is24Hour)
-                        )
-                    }
-                    else -> { // day in the middle
-                        resourceProvider.provideString(R.string.event_all_day)
-                    }
-                }
-            } else { // single-day part-day
-                "${
-                    dateStart.formatTime(
-                        timeZoneId,
-                        is24Hour
-                    )
-                } ‐ ${dateEnd.formatTime(timeZoneId, is24Hour)}"
-            }
-        }
-
-        val locationText = this.location?.takeIfNotBlank()?.let { " • $it" }
-
-        val subheaderContent = "${dateText}${locationText ?: ""}"
-
-        return WidgetEvent(
-            id = this.id,
-            summary = this.summary?.takeIfNotBlank() ?: resourceProvider.provideString(R.string.default_event_summary),
-            subheaderContent = subheaderContent,
-            happensOn = happensOn,
-            showDateColumn = showDateColumn,
-            showBottomSpacing = showBottomSpacing,
-            showNoEventsToday = showNoEventsToday,
-            fullDayCounter = fullDayCounterString,
-            occurrenceNumber = this.occurrenceNumber,
-            color = this.displayColor,
-            isCancelledOrDeclined = this.decryptionStatus == Event.DecryptionStatus.Success && (this.isCancelled() || participationStatus == ParticipationStatus.DECLINED),
-            needsAction = !this.isCancelled() && participationStatus == ParticipationStatus.NEEDS_ACTION,
-            failedToDecrypt = this.decryptionStatus is Event.DecryptionStatus.Failure
-        )
-    }
 
     override fun getViewAt(position: Int): RemoteViews? {
 
@@ -485,126 +381,14 @@ internal class CalendarWidgetRemoteViewsFactory(
     }
 
     override fun onDataSetChanged() {
-
-        // val identityToken = Binder.clearCallingIdentity() // TODO use this as last resort
-
-        // this method has to get the data synchronously
-        runBlocking {
-
-            val widgetEvents = withTimeoutOrNull(java.time.Duration.ofSeconds(30).toMillis()) {
-
-                val userId = accountManager.getPrimaryAccount().firstOrNull()?.userId
-
-                val userEmails = userId?.let {
-                    userAddressManager.getAddressesOrNull(userId)?.map { it.email }
-                } ?: emptyList()
-
-                // show or hide "logged out" or "loading" info
-                if (userEmails.isEmpty()) { // user is logged out
-                    displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_please_log_in))
-                    displayActionButtons(display = false)
-                    // there is no need to query the Events
-                    return@withTimeoutOrNull emptyList<WidgetEvent>()
-                } else {
-                    displayMainInfoText(if (adapterData.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_loading_events) else null)
-                    displayActionButtons(display = true)
-                }
-
-                val is24Hour = if (userId != null) {
-                    userSettingsRepository.getUserSettingsEntity(userId, database).timeFormatIs24Hour(DateFormat.is24HourFormat(applicationContext))
-                } else true
-
-                val zoneId = ZoneId.systemDefault()
-
-                val fromDate = LocalDate.now(zoneId)
-                val toDate = LocalDate.now(zoneId).plusDays(WIDGET_DAYS_AHEAD.toLong())
-
-                val events = withContext(this.coroutineContext) {
-                    if (userId != null) {
-                        val events = getUiEventsUseCase.execute(
-                            userId,
-                            fromDate,
-                            toDate,
-                            zoneId.id
-                        ).firstOrNull()
-
-                        when (events) {
-                            is CalendarsRepository.GetEventsResult.Success<UiEvent> -> events.events
-                            else -> emptyList()
-                        }
-                    } else emptyList()
-                }
-
-                // create a list of Events with correct time labels to display on Widget list
-                val widgetEvents = mutableListOf<WidgetEvent>()
-                events.explodeDayByDay(fromDate, toDate, zoneId.id).toSortedMap().forEach { entry ->
-
-                    val upcomingEvents = entry.value.filter { !it.isInThePast() }
-                        .distinctBy { Pair(it.id, it.occurrenceNumber) } // TODO hack for duplicated events
-
-                    val sortedEvents = upcomingEvents.sortedBy {
-                        "${!it.isAllDay}${
-                            it.dateStart.toEpochSecond()
-                        }${it.summary}"
-                    }
-
-                    sortedEvents.forEachIndexed { index, event ->
-                        // show date column only in the first Event on a given day
-                        // show bottom spacing below last Event on a given day
-                        val widgetEvent = event.toWidgetEvent(
-                            entry.key,
-                            zoneId.id,
-                            index == 0,
-                            index == sortedEvents.size - 1,
-                            false,
-                            is24Hour
-                        )
-                        widgetEvents.add(widgetEvent)
-                    }
-                }
-
-                // show or hide "no upcoming events" only if user is logged in
-                if (userEmails.isNotEmpty()) {
-                    displayMainInfoText(if (widgetEvents.isEmpty()) resourceProvider.provideString(R.string.calendar_widget_no_upcoming_events) else null)
-                }
-
-                // add special dummy WidgetEvent if there are no Events to show for today
-                if (widgetEvents.isNotEmpty() && widgetEvents.first().happensOn != fromDate) {
-                    widgetEvents.add(
-                        0, widgetEvents.first().copy(
-                            happensOn = LocalDate.now(),
-                            showDateColumn = true,
-                            showBottomSpacing = true,
-                            showNoEventsToday = true,
-                            color = resourceProvider.provideString(R.color.separator_norm)
-                        )
-                    )
-                }
-
-                // hide spacing below the very last WidgetEvent on list
-                widgetEvents.removeLastOrNull()?.let {
-                    widgetEvents.add(it.copy(showBottomSpacing = false))
-                }
-
-                widgetEvents
-            }
-
-            if (widgetEvents == null) {
-                logger.e("widgetEvents == null in onDataSetChanged")
-                displayMainInfoText(resourceProvider.provideString(R.string.calendar_widget_loading_events_error))
-            } else {
-                adapterData = widgetEvents
-            }
-        }
-
-        //Binder.restoreCallingIdentity(identityToken) // TODO use this as last resort
-
+        updater.ensureSnapshotAvailable(applicationContext)
+        adapterData = updater.snapshot
+        displayMainInfoText(updater.statusText)
+        displayActionButtons(updater.showButtons)
     }
 
     private fun displayMainInfoText(text: String?) {
-
         val widgetManager = AppWidgetManager.getInstance(applicationContext)
-
         val remoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.calendar_widget)
         if (text != null) {
             remoteViews.setTextViewText(R.id.tv_widget_main_info_text, text)
@@ -612,21 +396,16 @@ internal class CalendarWidgetRemoteViewsFactory(
         } else {
             remoteViews.setViewVisibility(R.id.tv_widget_main_info_text, View.INVISIBLE)
         }
-
         widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
 
     }
 
     private fun displayActionButtons(display: Boolean) {
-
         val widgetManager = AppWidgetManager.getInstance(applicationContext)
-
         val remoteViews = RemoteViews(BuildConfig.APPLICATION_ID, R.layout.calendar_widget)
         remoteViews.setViewVisibility(R.id.ib_plus, if (display) View.VISIBLE else View.INVISIBLE)
         remoteViews.setViewVisibility(R.id.ib_refresh, if (display) View.VISIBLE else View.INVISIBLE)
-
         widgetManager.partiallyUpdateAppWidget(appWidgetId, remoteViews)
-
     }
 
     override fun onCreate() {}
