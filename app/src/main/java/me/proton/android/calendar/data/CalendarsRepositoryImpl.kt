@@ -34,7 +34,6 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.PING_INTERVAL_SECONDS
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
-import me.proton.android.calendar.common.utils.DateTimeUtilsImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toZonedDateTime
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateFirstRealOccurrenceSince
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
@@ -91,8 +90,6 @@ import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseC
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.domain.entity.UserId
-import me.proton.core.featureflag.domain.FeatureFlagManager
-import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.network.domain.NetworkManager
 import me.proton.core.user.data.entity.AddressEntity
 import me.proton.core.user.domain.UserAddressManager
@@ -100,7 +97,6 @@ import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
 import me.proton.core.util.kotlin.toInt
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -909,16 +905,14 @@ class CalendarsRepositoryImpl @Inject constructor(
         return calendarsApi.getEventsByUid(userId, eventUid, 0, 100)
     }
 
-    override suspend fun selectEventsByUid(eventUid: String): List<Event> {
-        return database.eventsDao().selectByUid(formatUidForICal(eventUid)).mapNotNull {
-            eventDecryptor.decrypt(it)
+    override suspend fun selectEventEntitiesByUids(
+        uids: Collection<String>,
+    ): Map<String, List<EventEntity>> {
+        if (uids.isEmpty()) return emptyMap()
+        return uids.associateWith {
+            eventUid -> database.eventsDao().selectByUid(formatUidForICal(eventUid))
         }
     }
-
-    override suspend fun selectEventsByUidIn(uids: Set<String>): Map<String, List<Event>> =
-        database.eventsDao().selectByUidIn(uids).groupBy { it.id }.mapValues { (_, rows) ->
-            rows.mapNotNull { row -> eventDecryptor.getFromCache(row.id, row.calendarId, row.modifyTime) }
-        }
 
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
         return getEventWithCommentsUseCase.execute(userId, calendarId, eventId)
