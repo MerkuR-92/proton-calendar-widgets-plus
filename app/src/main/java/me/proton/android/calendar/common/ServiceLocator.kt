@@ -4,6 +4,7 @@ package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
+import me.proton.android.calendar.CalendarWidgetUpdater
 import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
@@ -133,6 +134,20 @@ val networkModule = module {
 val repositoryModule = module {
 //    single { FlightRepository(get(), get()) }
 //    single { EventRepository(get(), get()) }
+}
+
+val widgetModule = module {
+    single {
+        CalendarWidgetUpdater(
+            resourceProvider = get(),
+            accountManager = get(),
+            userAddressManager = get(),
+            userSettingsRepository = get(),
+            logger = get(),
+            database = get(),
+            getUiEventsUseCase = get(),
+        )
+    }
 }
 
 val useCaseModule = module {

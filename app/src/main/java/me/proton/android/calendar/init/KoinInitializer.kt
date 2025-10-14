@@ -41,6 +41,7 @@ class KoinInitializer : Initializer<Unit> {
                 repositoryModule,
                 networkModule,
                 useCaseModule,
+                widgetModule,
                 coreModule(
                     entryPoint.appDatabase(),
                     entryPoint.apiProvider(),
