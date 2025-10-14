@@ -124,7 +124,7 @@
     <string name="event_attendees_send_prefs_error_confirm">Jatka</string>
     <string name="event_attendees_send_prefs_error_cancel">Peru</string>
     <string name="event_send_prefs_error_address_disabled">osoitetta ei ole olemassa</string>
-    <string name="event_send_prefs_error_getting_contact">yhteystietojen nouto ei onnistunut</string>
+    <string name="event_send_prefs_error_getting_contact">Yhteystietoja ei voitu hakea</string>
     <string name="event_send_prefs_error_network">verkkovirhe</string>
     <string name="event_send_prefs_trusted_keys_invalid">luotetut avaimet ovat virheellisiä</string>
     <string name="event_send_prefs_public_keys_invalid">julkiset avaimet ovat virheellisiä</string>

@@ -133,12 +133,12 @@
     <string name="join_zoom_meeting_action">Gabung ke pertemuan Zoom</string>
     <string name="zoom_meeting_title">Pertemuan Zoom</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">Password: %1$s</string>
-    <string name="generic_meeting_more_details">More details</string>
-    <string name="generic_meeting_less_details">Less details</string>
-    <string name="generic_meeting_host">Meeting host</string>
-    <string name="generic_meeting_link">Meeting link</string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Joining instructions</a></string>
+    <string name="generic_meeting_password">Kata sandi: %1$s</string>
+    <string name="generic_meeting_more_details">Tambah rincian</string>
+    <string name="generic_meeting_less_details">Kurangi rincian</string>
+    <string name="generic_meeting_host">Tuan rumah pertemuan</string>
+    <string name="generic_meeting_link">Tautan pertemuan</string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Panduan untuk bergabung</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Acara baru</string>
     <string name="event_text_edit_event">Edit acara</string>
