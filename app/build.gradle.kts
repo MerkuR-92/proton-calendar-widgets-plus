@@ -45,7 +45,6 @@ val localProperties = Properties().apply {
 }
 
 android {
-    buildToolsVersion = Config.buildToolsVersion
     ndkVersion = Config.ndkVersion
     compileSdk = Config.compileSdk
     namespace = Config.applicationId
@@ -383,10 +382,9 @@ val isGitlabCI: Boolean get() = !System.getenv("CI_SERVER_NAME").isNullOrEmpty()
 
 object Config {
     const val applicationId = "me.proton.android.calendar"
-    const val compileSdk = 35
+    const val compileSdk = 36
     const val minSdk = 23
     const val ndkVersion = "21.3.6528147"
-    const val buildToolsVersion = "34.0.0"
     const val targetSdk = 35
     const val versionCode = 333
     const val testInstrumentationRunner = "me.proton.android.calendar.uitest.extension.HiltTestRunner"
