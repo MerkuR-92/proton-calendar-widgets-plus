@@ -123,7 +123,7 @@ class GetUiEventsUseCase @Inject constructor(
                                 .distinct()
                                 .toSet()
 
-                        val byUidMap = calendarsRepository.selectEventsByUidIn(neededUids)
+                        val byUidMap = calendarsRepository.selectEventEntitiesByUids(neededUids)
 
                         suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? =
                             (eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
@@ -143,10 +143,14 @@ class GetUiEventsUseCase @Inject constructor(
                             val transformedFiniteRecurring =
                                 finiteRecurring.parallelMap { occ ->
                                     fetchEventFor(occ)?.let { decr ->
+                                        val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
+                                            eventDecryptor.decrypt(it)
+                                        }.orEmpty()
+
                                         calendarsRepository
                                             .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
                                                 originalEvent = decr,
-                                                eventsSharingUid = byUidMap[occ.eventUid].orEmpty(),
+                                                eventsSharingUid = eventsSharingUid,
                                                 fromDate = eventsWindow.fromDate,
                                                 toDate = eventsWindow.toDate,
                                                 timeZoneId = eventsWindow.timeZoneId,
@@ -159,10 +163,14 @@ class GetUiEventsUseCase @Inject constructor(
                             val transformedInfiniteRecurring =
                                 filteredInfiniteRecurring.parallelMap { occ ->
                                         fetchEventFor(occ)?.let { decr ->
+                                            val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
+                                                eventDecryptor.decrypt(it)
+                                            }.orEmpty()
+
                                             calendarsRepository
                                                 .expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
                                                     originalEvent = decr,
-                                                    eventsSharingUid = byUidMap[occ.eventUid].orEmpty(),
+                                                    eventsSharingUid = eventsSharingUid,
                                                     fromDate = eventsWindow.fromDate,
                                                     toDate = eventsWindow.toDate,
                                                     timeZoneId = eventsWindow.timeZoneId,

@@ -12,6 +12,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.EventOccurrencesDao
 import me.proton.android.calendar.data.db.EventsDao
+import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
@@ -108,25 +109,7 @@ class GetUiEventsUseCaseTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(finite)
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(infinite)
 
-        coEvery { calendarsRepo.selectEventsByUid(match { it.startsWith("uid-") }) } answers {
-            val uid: String = arg(0)
-            listOf(createEvent(
-                id = "$uid-se",
-                uid = uid,
-                tz = tz,
-                start = from.atStartOfDay(zone).plusHours(1),
-                end = from.atStartOfDay(zone).plusHours(2),
-                isSingleEdit = true,
-            ))
-        }
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } answers {
-            val uids: Set<String> = arg(0)
-            cachedEvents.values.groupBy { it.uid }.mapNotNull { (uid, events) ->
-                events.filter { it.uid in uids }.takeIf { it.isNotEmpty() }?.let {
-                    uid to it
-                }
-            }.toMap()
-        }
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -175,7 +158,7 @@ class GetUiEventsUseCaseTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(emptyList())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
 
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -218,7 +201,7 @@ class GetUiEventsUseCaseTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(emptyList())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
 
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -247,22 +230,34 @@ class GetUiEventsUseCaseTest {
         )
 
         coEvery { decryptor.getFromCache("eR", calendarId, any()) } returns base
-        coEvery { calendarsRepo.selectEventsByUid("uidR") } returns listOf(
-            createEvent(
-                id = "eR-se",
-                uid = "uidR",
-                tz = tz,
-                start = start.plusHours(2),
-                end = start.plusHours(3),
-                isSingleEdit = true
+        val ee1 = mockk<EventEntity>(relaxed = true)
+        val ee2 = mockk<EventEntity>(relaxed = true)
+        coEvery { calendarsRepo.selectEventEntitiesByUids(setOf("uidR")) } returns mapOf("uidR" to listOf(ee1, ee2))
+        coEvery { decryptor.decrypt(ee1) } returns createEvent("eR-edit1", "uidR", tz, start.plusDays(1), end.plusDays(1), isSingleEdit = true)
+        coEvery { decryptor.decrypt(ee2) } returns createEvent("eR-edit2", "uidR", tz, start.plusDays(2), end.plusDays(2), isSingleEdit = true)
+        coEvery {
+            calendarsRepo.expandOccurrencesWithSingleEditsAndExDatesToUiEvents(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
             )
-        )
+        } answers {
+            val original: Event = arg(0)
+            val edits: List<Event> = arg(1)
+            val tzArg: String = arg(4)
+            val emails: List<String> = arg(5)
+            val isFree: Boolean = arg(6)
+            assertEquals(2, edits.size, "should pass decrypted single-edits to expansion")
+            listOf(buildUiEventFrom(original, tzArg, emails, isFree))
+        }
 
         every { occurrencesDao.selectNonRecurringBetweenInclusive(any(), any(), any(), any()) } returns flowOf(emptyList())
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(listOf(occ))
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
-
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -272,6 +267,8 @@ class GetUiEventsUseCaseTest {
                     base, any(), from, to, tz, any(), any()
                 )
             }
+            coVerify { decryptor.decrypt(ee1) }
+            coVerify { decryptor.decrypt(ee2) }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -295,7 +292,7 @@ class GetUiEventsUseCaseTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(emptyList())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(listOf(occ))
 
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -335,7 +332,6 @@ class GetUiEventsUseCaseTest {
         )
 
         coEvery { decryptor.getFromCache("dup", calendarId, any()) } returns sameEvent
-        coEvery { calendarsRepo.selectEventsByUid("uidD") } returns emptyList()
 
         every {
             occurrencesDao.selectNonRecurringBetweenInclusive(any(), any(), any(), any())
@@ -345,7 +341,7 @@ class GetUiEventsUseCaseTest {
         } returns flowOf(listOf(finOcc))
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
 
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
@@ -382,7 +378,7 @@ class GetUiEventsUseCaseTest {
         every { occurrencesDao.selectFiniteRecurring(any(), any(), any(), any()) } returns flowOf(emptyList())
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns flowOf(emptyList())
 
-        coEvery { calendarsRepo.selectEventsByUidIn(any()) } returns emptyMap()
+        coEvery { calendarsRepo.selectEventEntitiesByUids(any()) } returns emptyMap()
 
         execute(from, to).test {
             // When / Then
