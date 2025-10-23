@@ -53,7 +53,6 @@ sentry = "7.21.0"
 ez-vcard = "0.11.2"
 appcompat-alpha = "1.6.0-alpha05"
 tink = "1.5.0"
-retrofit-serialization-converter = "1.0.0"
 logging-interceptor = "4.8.0"
 sql-cipher = "4.9.0"
 guava = "31.0.1-android"
@@ -229,7 +228,6 @@ jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "j
 
 # Retrofit
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit-serialization-converter" }
 
 # Google play review
 google-play-review = { module = "com.google.android.play:review", version.ref = "review" }
