@@ -21,6 +21,7 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("jacoco")
     alias(libs.plugins.gradlePlugin.proton.environmentConfig)
+    id("com.google.devtools.ksp")
 }
 
 kotlin {
@@ -42,6 +43,10 @@ val localProperties = Properties().apply {
     } catch (e: FileNotFoundException) {
         logger.warn("No local.properties found")
     }
+}
+
+ksp {
+    arg("room.generateKotlin", "false")
 }
 
 android {
@@ -199,7 +204,6 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
-    implementation(libs.retrofit.serialization.converter)
 
     // Shared preferences
     implementation(libs.androidx.preference)
@@ -291,7 +295,7 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

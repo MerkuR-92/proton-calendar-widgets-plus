@@ -32,4 +32,6 @@ tasks.register("clean", Delete::class) {
 
 plugins {
     alias(libs.plugins.proton.detekt)
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
 }
+
