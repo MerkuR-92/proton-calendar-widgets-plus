@@ -14,6 +14,7 @@ import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.utils.ProtonUtils
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
+import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.contact.domain.entity.ContactEmail
 import me.proton.core.presentation.utils.InputValidationResult
 import me.proton.core.util.kotlin.equalsNoCase
@@ -49,7 +50,7 @@ object ProtonUtilsImpl : ProtonUtils {
     }
 
     override fun isProtonDomain(email: String): Boolean {
-        return PROTON_MAIL_DOMAINS.any {
+        return (PROTON_MAIL_DOMAINS + listOf(EnvironmentConfigurationDefaults.host)).any {
             email.endsWith("@$it", true)
         }
     }
