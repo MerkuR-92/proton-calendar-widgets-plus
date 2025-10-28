@@ -129,6 +129,105 @@ class HandleIcsUseCaseTest {
     }
 
     @Test
+    fun `party-crasher when proton organizer sends to non-user BYOE recipient`() = runTest {
+        // Given: user has a Proton address
+        mockAddresses(protonAddress)
+        stubDefaultCalendar()
+        stubNoExistingEvents()
+        stubCanonicalEmailsUseCaseUsingRealCanonicalization()
+        val externalOrganizer = "organizer@proton.me"
+
+        // When: Proton organizer sends an invite
+        val res = sut.execute(
+            iCalString = icsRequest(organizer = externalOrganizer),
+            userId = userId,
+            senderEmail = senderAddress,
+            recipientEmail = gmailAddress,
+        )
+
+        // Then: party crasher
+        assertTrue(res is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher)
+        coVerify(exactly = 0) {
+            editCreateEventUseCase.execute(any(), any(), any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `party-crasher when proton organizer sends to user's BYOE recipient`() = runTest {
+        // Given: user has a Proton + BYOE address
+        mockAddresses(protonAddress, gmailAddress)
+        stubDefaultCalendar()
+        stubNoExistingEvents()
+        stubCanonicalEmailsUseCaseUsingRealCanonicalization()
+        val protonOrganizer = "organizer@proton.me"
+
+        // When: Proton organizer sends an invite
+        val res = sut.execute(
+            iCalString = icsRequest(organizer = protonOrganizer),
+            userId = userId,
+            senderEmail = protonOrganizer,
+            recipientEmail = gmailAddress,
+        )
+
+        // Then: party crasher
+        assertTrue(res is IcsSurgeryUtils.HandleIcsResult.Error.PartyCrasher)
+        coVerify(exactly = 0) {
+            editCreateEventUseCase.execute(any(), any(), any(), any(), any(), any())
+        }
+    }
+
+    @Test
+    fun `no party-crasher when external organizer sends to user's BYOE recipient`() = runTest {
+        // Given: user has a Proton + BYOE address
+        mockAddresses(protonAddress, gmailAddress)
+        stubDefaultCalendar()
+        stubNoExistingEvents()
+        stubCanonicalEmailsUseCaseUsingRealCanonicalization()
+        val externalOrganizer = "organizer@external.org"
+
+        // When: Proton organizer sends an invite
+        val eventSlot = slot<Event>()
+        coEvery {
+            editCreateEventUseCase.execute(
+                userId = userId,
+                newEvent = capture(eventSlot),
+                oldCalendarId = any(),
+                createLinkedEventAsAttendee = any(),
+                sendPreferences = any(),
+                isImport = any()
+            )
+        } returns UseCase.Result.Success(listOf("evt-1"))
+
+        val res = sut.execute(
+            iCalString = icsRequest(organizer = externalOrganizer),
+            userId = userId,
+            senderEmail = externalOrganizer,
+            recipientEmail = gmailAddress,
+        )
+
+        // Then: party crasher
+        assertIs<IcsSurgeryUtils.HandleIcsResult.Success>(res)
+        assertTrue(res.action == IcsSurgeryUtils.HandleIcsAction.CREATE_EVENT)
+
+        val ev = eventSlot.captured.iCalendar.events.first()
+
+        val attendeeCanon = ev.attendees.mapNotNull { it.extractEmail() }
+            .map { ProtonUtilsImpl.canonicalizeProtonEmail(it, true).lowercase() }
+
+        val expectedCanon = ProtonUtilsImpl
+            .canonicalizeProtonEmail(protonAddress, true)
+            .lowercase()
+
+        assertTrue(expectedCanon in attendeeCanon, "attendees=$attendeeCanon")
+
+        val protonAttendee = ev.attendees.first {
+            ProtonUtilsImpl.canonicalizeProtonEmail(it.extractEmail().orEmpty(), true)
+                .equals(expectedCanon, true)
+        }
+        assertEquals(ParticipationStatus.NEEDS_ACTION, protonAttendee.participationStatus)
+    }
+
+    @Test
     fun `injects protonEmail when invite was forwarded to BYOE and creates event`() = runTest {
         // Given: user's gmail received the invite
         mockAddresses(protonAddress, gmailAddress)

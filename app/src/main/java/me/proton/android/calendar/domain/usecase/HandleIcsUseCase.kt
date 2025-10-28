@@ -63,7 +63,6 @@ class HandleIcsUseCase @Inject constructor(
 ) {
 
     suspend fun execute(iCalString: String, userId: UserId, senderEmail: String?, recipientEmail: String?): IcsSurgeryUtils.HandleIcsResult {
-
         val isOpeningFromProtonMail = senderEmail != null || recipientEmail != null
 
         val timeZoneId = calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
@@ -275,9 +274,10 @@ class HandleIcsUseCase @Inject constructor(
         }
 
         if (!isOrganizerMode && userAttendee == null) {
-            // Check for supported party crasher case
+            // Check for supported party crasher case - only when organizer is not a Proton domain
+            val isProtonOrganizer = ProtonUtilsImpl.isProtonDomain(organizerEmail)
             val isUserRecipient = allAddresses.any { it.email.equals(recipientEmail, ignoreCase = true) }
-            if (isUserRecipient) {
+            if (isUserRecipient && !isProtonOrganizer) {
                 val protonReplyEmail = allAddresses.firstOrNull { ProtonUtilsImpl.isProtonDomain(it.email) }?.email
                     ?: run {
                         val defCalId = calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared = false)
