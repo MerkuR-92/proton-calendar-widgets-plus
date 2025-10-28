@@ -3562,31 +3562,31 @@ class EventViewModel @Inject constructor(
 
             // Finish change answer flow for proton to proton invite
             handleChangeAnswerProtonToProton(
-                sendPreferences,
-                eventCopy,
-                eventEntity,
-                userAttendee,
-                participationStatus,
-                status,
-                personalPartICalString,
-                notifications,
-                timeFormatIs24Hours,
-                attendeeId,
-                userEmails
+                sendPreferences = sendPreferences,
+                eventCopy = eventCopy,
+                eventEntity = eventEntity,
+                userAttendee = userAttendee,
+                participationStatus = participationStatus,
+                status = status,
+                personalPartICalString = personalPartICalString,
+                notifications = notifications,
+                timeFormatIs24Hours = timeFormatIs24Hours,
+                attendeeId = attendeeId,
+                userEmails = userEmails
             )
         } else {
             // Finish change answer flow for external invite
             handleChangeAnswerExternal(
-                sendPreferences,
-                eventCopy,
-                userAttendee,
-                participationStatus,
-                status,
-                personalPartICalString,
-                notifications,
-                timeFormatIs24Hours,
-                attendeeId,
-                userEmails
+                sendPreferences = sendPreferences,
+                eventCopy = eventCopy,
+                userAttendee = userAttendee,
+                participationStatus = participationStatus,
+                status = status,
+                personalPartICalString = personalPartICalString,
+                notifications = notifications,
+                timeFormatIs24Hours = timeFormatIs24Hours,
+                attendeeId = attendeeId,
+                userEmails = userEmails
             )
         }
     }
@@ -3615,19 +3615,33 @@ class EventViewModel @Inject constructor(
                 handleChangeAnswerError()
                 return
             }
+
+            val preferredReplyEmail =
+                userEmails.firstOrNull { ProtonUtilsImpl.isProtonDomain(it) } ?: userEmails.first()
+
+            val protonAttendeeForReply = eventCopy.iCalEvent.attendees.firstOrNull { a ->
+                val attendeeEmail = a.extractEmail()
+                attendeeEmail != null && ProtonUtilsImpl.canonicalizeProtonEmail(attendeeEmail, forceCanonicalization = true)
+                    .equals(
+                        ProtonUtilsImpl.canonicalizeProtonEmail(preferredReplyEmail, forceCanonicalization = true),
+                        ignoreCase = true
+                    )
+            }
+            val attendeeForReply = protonAttendeeForReply ?: userAttendee
+
             sendEmailUseCase.sendReplyToOrganizer(
-                userId,
-                eventCopy,
-                dbEvent?.iCalendar?.timezoneInfo,
-                userAttendee.copy(),
-                organizerEmail,
-                participationStatus,
-                sendPreferences,
-                Date.from(updateTime),
-                null,
-                false,
-                event.defaultTimeZone!!,
-                timeFormatIs24Hours
+                userId = userId,
+                event = eventCopy,
+                originalTimeZoneInfo = dbEvent?.iCalendar?.timezoneInfo,
+                userAttendee = attendeeForReply.copy(),
+                organizerEmail = organizerEmail,
+                participationStatus = participationStatus,
+                sendPreferences = sendPreferences,
+                dtStamp = Date.from(updateTime),
+                eventEntity = null,
+                isProtonProtonInvite = false,
+                defaultTimeZone = event.defaultTimeZone!!,
+                timeFormatIs24Hours = timeFormatIs24Hours
             )
         } else UseCase.Result.Success<Unit>()
         sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
