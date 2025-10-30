@@ -8,10 +8,14 @@ import assertk.assertions.isTrue
 import biweekly.property.RecurrenceId
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -27,6 +31,7 @@ import me.proton.android.calendar.data.api.EventResponse
 import me.proton.android.calendar.data.api.EventsByUidApiResponse
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
+import me.proton.android.calendar.data.entity.CalendarEntity
 import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.TestsApi
 import me.proton.android.calendar.domain.model.Event
@@ -38,6 +43,7 @@ import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
 import me.proton.android.calendar.domain.usecase.UpdateFetchedEventsMetadataUseCase
+import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.createEventEntity
 import me.proton.android.calendar.eventmanager.createEventMetadata
 import me.proton.core.accountmanager.domain.AccountManager
@@ -49,6 +55,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneId
 import java.util.TimeZone
 
 @ExperimentalCoroutinesApi
@@ -86,7 +93,11 @@ internal class CalendarRepositoryTest {
         clearAllMocks()
         mockkStatic(Log::class)
         coEvery { Log.isLoggable(any(), any()) } returns true
-        appDatabaseMock = mockk()
+        appDatabaseMock = mockk(relaxed = true)
+        coEvery { appDatabaseMock.inTransaction(any<suspend () -> Any?>()) } coAnswers {
+            val block = firstArg<suspend () -> Any?>()
+            block()
+        }
 
         coEvery { appDatabaseMock.calendarsDao().flowCalendars() } returns flowOf(listOf())
         coEvery { appDatabaseMock.eventsDao().selectSkeletonEventsFlow() } returns flowOf(listOf())
@@ -641,6 +652,104 @@ internal class CalendarRepositoryTest {
         assertThat(ui.first().dateStart.toLocalDate()).isEqualTo(LocalDate.of(2025, 9, 22))
     }
 
+    @Test
+    fun `force refresh =true bypasses metadata gating and validity, then no refetch when window still valid`() = runBlocking {
+        // Given
+        val repo = getCalendarRepository() as CalendarsRepositoryImpl
+        val tz = "UTC"
+        val from = LocalDate.of(2025, 1, 1)
+        val to = LocalDate.of(2025, 1, 31)
+
+        coEvery { appDatabaseMock.calendarsDao().selectCalendars(userId.id) } returns listOf(
+            mockk<CalendarEntity> {
+                every { this@mockk.id } returns "cal-1"
+            },
+            mockk<CalendarEntity> {
+                every { this@mockk.id } returns "cal-2"
+            }
+        )
+
+        coEvery { getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(any()) } returns true
+        coEvery { updateFetchedEventsMetadataUseCaseMock.shouldFetch(any(), any(), any(), any(), any()) } returns false
+        coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success(Unit)
+        coEvery { updateEventOccurrencesUseCaseMock.execute(any(), any()) } returns Unit
+        coEvery {
+            fetchEventsUseCaseMock.splitFetchEvents(
+                userId, listOf("cal-1", "cal-2"), from, to, tz
+            )
+        } returns FetchEventsUseCase.ResultData(UseCase.Result.Success(Unit), emptyList())
+
+        // When+then: force, regular, force
+        repo.initForUser(userId.id, ZoneId.of(tz)).first()
+        repo.fetchEvents(userId, from, to, tz, force = true)
+
+        // fetched once with all calendars
+        coVerify(exactly = 1) {
+            fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+        // ignore when force refreshing
+        coVerify(exactly = 0) {
+            updateFetchedEventsMetadataUseCaseMock.shouldFetch(any(), any(), any(), any(), any())
+        }
+
+        coEvery { getFetchedEventWindowsValidity.isWindowFetchValid(any(), any()) } returns true
+
+        // regular refresh
+        repo.fetchEvents(userId, from, to, tz, force = false)
+        // should not fetch again
+        coVerify(exactly = 1) {
+            fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+        // force again
+        repo.fetchEvents(userId, from, to, tz, force = true)
+        delay(50) // give time to the collector - we could avoid it by injecting a test dispatcher, but for now this is simpler
+        // fetches again
+        coVerify(exactly = 2) {
+            fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+    }
+
+    @Test
+    fun `non-forced fetch refetches when window validity fails`() = runBlocking {
+        // Given
+        val repo = getCalendarRepository() as CalendarsRepositoryImpl
+        val tz = "UTC"
+        val from = LocalDate.of(2025, 2, 1)
+        val to = LocalDate.of(2025, 2, 28)
+
+        coEvery { appDatabaseMock.calendarsDao().selectCalendars(userId.id) } returns listOf(
+            mockk<CalendarEntity> {
+                every { this@mockk.id } returns "cal-1"
+            },
+            mockk<CalendarEntity> {
+                every { this@mockk.id } returns "cal-2"
+            }
+        )
+
+        coEvery { getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(any()) } returns false
+        coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success(Unit)
+        coEvery { updateEventOccurrencesUseCaseMock.execute(any(), any()) } returns Unit
+
+        coEvery {
+            fetchEventsUseCaseMock.splitFetchEvents(
+                userId, listOf("cal-1", "cal-2"), from, to, tz
+            )
+        } returns FetchEventsUseCase.ResultData(UseCase.Result.Success(Unit), emptyList())
+
+        repo.initForUser(userId.id, ZoneId.of(tz)).first()
+
+        // When+then: force first
+        repo.fetchEvents(userId, from, to, tz, force = true)
+        // make window no longer valid
+        coEvery { getFetchedEventWindowsValidity.isWindowFetchValid(any(), any()) } returns false
+
+        // non-forced should refetch
+        repo.fetchEvents(userId, from, to, tz, force = false)
+
+        coVerify(exactly = 2) {
+            fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+    }
 
     private fun toIcsLocal(dt: LocalDateTime): String =
         String.format("%04d%02d%02dT%02d%02d%02d",

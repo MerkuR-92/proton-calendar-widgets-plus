@@ -1190,6 +1190,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             binding.drawerLayout.close()
         }
 
+        binding.navViewMainContent.navRefreshButtonPress.setOnSingleClickListener {
+            calendarViewModel.refreshNow()
+            binding.drawerLayout.close()
+        }
+
         binding.navViewMainContent.navViewMoreFeedbackLayout.visibleOrGone(CalendarFeatureFlag.Feedback.fallbackValue)
         binding.navViewMainContent.navViewMoreFeedbackPress.setOnSingleClickListener {
             showFeedbackDialog()
@@ -1230,6 +1235,14 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                 else if (currentViewMode == ViewMode.THREE_DAY && viewMode == ViewMode.DAY) ViewMode.THREE_DAY
                 else null
             currentViewMode = viewMode
+        })
+        calendarViewModel.loading.observe(this@MainActivity, Observer { isLoading ->
+            with(binding.navViewMainContent) {
+                navRefreshButtonPress.isEnabled = !isLoading
+                val alpha = if (isLoading) 0.5f else 1.0f
+                navRefreshButtonTitle.alpha = alpha
+                navRefreshButtonIcon.alpha = alpha
+            }
         })
 
         binding.navViewMainContent.navViewSwitcherDayPress.setOnSingleClickListener {
