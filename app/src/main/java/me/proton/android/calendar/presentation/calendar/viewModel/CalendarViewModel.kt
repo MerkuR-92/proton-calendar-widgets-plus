@@ -89,6 +89,7 @@ import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.LeaveManagedCalendarUseCase
 import me.proton.android.calendar.domain.usecase.LeaveSharedCalendarUseCase
+import me.proton.android.calendar.domain.usecase.ManualRefreshUseCase
 import me.proton.android.calendar.domain.usecase.ReactivateCalendarKeyUseCase
 import me.proton.android.calendar.domain.usecase.RecreateCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UpdateCalendarUserSettingsUseCase
@@ -135,6 +136,7 @@ class CalendarViewModel @Inject constructor(
     private val database: AppDatabase,
     private val getUiEventsUseCase: GetUiEventsUseCase,
     private val workManager: WorkManager,
+    private val manualRefreshUseCase: ManualRefreshUseCase,
 ) : AndroidViewModel(application) {
 
     val initialised = MutableLiveData(false)
@@ -226,6 +228,17 @@ class CalendarViewModel @Inject constructor(
             return null
         }
         return userManager.getUserOrNull(userId, logger)
+    }
+
+    fun refreshNow() = viewModelScope.launch {
+        setLoading(true)
+        val result = manualRefreshUseCase.execute()
+        if (result !is UseCase.Result.Success<*>) {
+            logger.e("Manual refresh failed: $result")
+        }
+        calendarsRepository.fetchingState
+            .firstOrNull { it == CalendarsRepository.FetchingState.Finished }
+        setLoading(false)
     }
 
     // TODO go back to UserId as String

@@ -137,7 +137,8 @@ interface CalendarsRepository {
         userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
-        timeZoneId: String
+        timeZoneId: String,
+        force: Boolean = false,
     )
 
     sealed class GetEventsResult<out T> {

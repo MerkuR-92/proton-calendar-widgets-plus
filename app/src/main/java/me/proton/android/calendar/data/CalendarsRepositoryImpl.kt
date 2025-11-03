@@ -179,7 +179,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     }
 
     private suspend fun fetchEventsInWindow(fetchWindow: FetchWindow) {
-        val shouldUseFetchedEventsMetadata = getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(fetchWindow)
+        val shouldUseFetchedEventsMetadata = getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(fetchWindow) && !fetchWindow.force
 
         // only fetch calendars that have not been fetched before
         val calendarIdsToFetch = if (shouldUseFetchedEventsMetadata) fetchWindow.calendarIds.filter {
@@ -192,50 +192,51 @@ class CalendarsRepositoryImpl @Inject constructor(
 
         if (calendarIdsToFetch.isEmpty()) return
 
-        if (fetchWindow.needsRefresh()) {
-            logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+        val needsToFetch = fetchWindow.force || fetchWindow.needsRefresh()
+        if (!needsToFetch) {
+            logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+            return
+        }
 
-            fetchingState.value = CalendarsRepository.FetchingState.Fetching
+        logger.d("fetching events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
 
-            // fetch from API
-            val (fetchEventsResult, eventsAndMetadatas) = fetchEventsUseCase.splitFetchEvents(
-                fetchWindow.userId,
-                calendarIdsToFetch,
-                fetchWindow.fromDate,
-                fetchWindow.toDate,
-                fetchWindow.timeZoneId
-            )
+        fetchingState.value = CalendarsRepository.FetchingState.Fetching
 
-            if (fetchEventsResult is UseCase.Result.Success<*>) {
-                if (eventsAndMetadatas == null) {
-                    logger.e("fetchEventsResult: null event list when Success")
-                }
+        // fetch from API
+        val (fetchEventsResult, eventsAndMetadatas) = fetchEventsUseCase.splitFetchEvents(
+            fetchWindow.userId,
+            calendarIdsToFetch,
+            fetchWindow.fromDate,
+            fetchWindow.toDate,
+            fetchWindow.timeZoneId
+        )
 
-                eventsAndMetadatas?.let { eventsAndMetadatas ->
-                    logger.v("fetchEventsResult success: ${eventsAndMetadatas.size}")
-
-                    // TODO persist events where we download fresh ones, not here
-
-                    val eventEntities = eventsAndMetadatas.map { it.first }
-                    persistEvents(*(eventEntities).toTypedArray())
-                    eventsAndMetadatas.forEach { (_, eventMetadata) ->
-                        updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, eventMetadata)
-                    }
-                    fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
-
-                    updateAlarmsUseCase.execute(fetchWindow.userId.id, eventEntities)
-                    fetchedWindowTimes[fetchWindow] = Instant.now()
-                }
-            } else {
-                // If this failed, we make sure servers are up with a ping
-                pingServer(fetchWindow.userId)
+        if (fetchEventsResult is UseCase.Result.Success<*>) {
+            if (eventsAndMetadatas == null) {
+                logger.e("fetchEventsResult: null event list when Success")
             }
 
-            fetchingState.value = CalendarsRepository.FetchingState.Finished
+            eventsAndMetadatas?.let { eventsAndMetadatas ->
+                logger.v("fetchEventsResult success: ${eventsAndMetadatas.size}")
 
+                // TODO persist events where we download fresh ones, not here
+
+                val eventEntities = eventsAndMetadatas.map { it.first }
+                persistEvents(*(eventEntities).toTypedArray())
+                eventsAndMetadatas.forEach { (_, eventMetadata) ->
+                    updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, eventMetadata)
+                }
+                fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
+
+                updateAlarmsUseCase.execute(fetchWindow.userId.id, eventEntities)
+                fetchedWindowTimes[fetchWindow] = Instant.now()
+            }
         } else {
-            logger.v("no need to fetch events: ${fetchWindow.fromDate} = ${fetchWindow.toDate}")
+            // If this failed, we make sure servers are up with a ping
+            pingServer(fetchWindow.userId)
         }
+
+        fetchingState.value = CalendarsRepository.FetchingState.Finished
     }
 
     override suspend fun shutdown() {
@@ -638,17 +639,18 @@ class CalendarsRepositoryImpl @Inject constructor(
         val fromDate: LocalDate,
         val toDate: LocalDate,
         val timeZoneId: String,
+        val force: Boolean = false,
     )
 
     override suspend fun fetchEvents(
         userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
-        timeZoneId: String
+        timeZoneId: String,
+        force: Boolean,
     ) {
         val calendarIds = database.calendarsDao().selectCalendars(userId.id).map { it.id }
-
-        fetchEventsChannel.send(FetchWindow(userId, calendarIds, fromDate, toDate, timeZoneId))
+        fetchEventsChannel.send(FetchWindow(userId, calendarIds, fromDate, toDate, timeZoneId, force))
     }
 
     override suspend fun transformAllowingApiCall(eventId: String, calendarId: String): Event? {
