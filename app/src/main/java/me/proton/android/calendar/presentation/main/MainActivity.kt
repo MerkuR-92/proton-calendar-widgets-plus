@@ -1826,6 +1826,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             rsvpCommentsAndroidFlag ?: return@Observer
         })
 
+        featureFlagViewModel.refreshButtonAndroidFlag.observe(this@MainActivity, Observer { isEnabled ->
+            isEnabled ?: return@Observer
+            binding.navViewMainContent.navRefreshButtonLayout.isVisible = isEnabled
+        })
+
         lifecycleScope.launch {
             calendarViewModel.fixCalendars()
         }

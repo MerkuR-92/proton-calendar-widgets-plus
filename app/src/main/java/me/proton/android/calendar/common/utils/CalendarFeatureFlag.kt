@@ -18,6 +18,7 @@ enum class CalendarFeatureFlag(val featureId: FeatureId, val fallbackValue: Bool
     ProtonMeet(FeatureId("MeetIntegrationAndroid"), false, false),
     RsvpCommentsAndroid(FeatureId("RsvpCommentsAndroid"), false, false),
     NewCalendarEventListenerAndroid(FeatureId("NewCalendarEventListenerAndroid"), false, false),
+    RefreshButton(FeatureId("CalendarAndroidRefreshButton"), false, false),
 
     /** Local only flag (unknown to remote API) **/
     // Enabled

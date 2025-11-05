@@ -43,6 +43,7 @@ class FeatureFlagViewModel @Inject constructor(
     var protonMeetIntegrationFlag: LiveData<Boolean> = MutableLiveData()
     var fetchedEventsCacheAndroidFlag: LiveData<Boolean> = MutableLiveData()
     var rsvpCommentsAndroidFlag: LiveData<Boolean> = MutableLiveData()
+    var refreshButtonAndroidFlag: LiveData<Boolean> = MutableLiveData()
 
     private var lastFetchMs = 0L
 
@@ -113,6 +114,14 @@ class FeatureFlagViewModel @Inject constructor(
             CalendarFeatureFlag.RsvpCommentsAndroid.featureId
         ).map {
             it?.value ?: CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
+        }.asLiveData(Dispatchers.Default)
+
+        // Sidebar refresh button
+        refreshButtonAndroidFlag = featureFlagManager.observe(
+            userId,
+            CalendarFeatureFlag.RefreshButton.featureId
+        ).map {
+            it?.value ?: CalendarFeatureFlag.RefreshButton.fallbackValue
         }.asLiveData(Dispatchers.Default)
     }
 
