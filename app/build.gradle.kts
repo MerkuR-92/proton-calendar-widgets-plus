@@ -342,6 +342,24 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+
+dependencies {
+    // fix for missing `beginTransactionReadOnly()` method in Room due to sqlite version mismatch
+    val sqliteVersion = "2.6.1"
+    implementation("androidx.sqlite:sqlite:${sqliteVersion}") {
+        exclude(group = "io.sentry", module = "sentry-android-sqlite")
+    }
+    implementation("androidx.sqlite:sqlite-ktx:${sqliteVersion}") {
+        exclude(group = "io.sentry", module = "sentry-android-sqlite")
+    }
+    configurations.configureEach {
+        resolutionStrategy {
+            force("androidx.sqlite:sqlite:${sqliteVersion}")
+            force("androidx.sqlite:sqlite-ktx:${sqliteVersion}")
+        }
+    }
+}
+
 tasks.register("createBuildEnv") {
     fun String.toEnvVar() = replace("-", "_").toUpperCase()
 
