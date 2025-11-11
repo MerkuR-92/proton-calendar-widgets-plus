@@ -10,8 +10,6 @@ import android.text.SpannableString
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
-import android.text.style.URLSpan
-import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +17,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
-import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -72,6 +68,7 @@ import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MeetIntegrationType
+import me.proton.android.calendar.domain.usecase.LinkifyAndParseHTMLUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.AttendeeListAdapter
 import me.proton.android.calendar.presentation.calendar.adapter.initAttendeeStatus
@@ -112,6 +109,8 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
     @Inject
     lateinit var logger: Logger
 
+    @Inject
+    lateinit var linkifyAndParseHTMLUseCase: LinkifyAndParseHTMLUseCase
     private val calendarViewModel: CalendarViewModel by activityViewModels()
     private val eventViewModel: EventViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
@@ -546,7 +545,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
 
             event.location?.nullIfBlank()?.let {
                 with(binding.sectionLocation) {
-                    textHeader.text = linkifyAndParseHtml(event.location ?: "")
+                    textHeader.text = linkifyAndParseHTMLUseCase.execute(event.location ?: "")
                     textHeader.movementMethod = LinkMovementMethod.getInstance()
                     imageIcon.setImageResource(R.drawable.ic_proton_map_pin)
                     imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
@@ -603,13 +602,13 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
                         }
 
                         event.meetMeetingHost?.let { meetingHost ->
-                            textConferenceMeetingHostValue.text = linkifyAndParseHtml(meetingHost)
+                            textConferenceMeetingHostValue.text = linkifyAndParseHTMLUseCase.execute(meetingHost)
                             textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
                             textConferenceMeetingHost.visibleOrGone(true)
                             textConferenceMeetingHostValue.visibleOrGone(true)
                         }
 
-                        textConferenceMeetingLinkValue.text = linkifyAndParseHtml(meetUrl)
+                        textConferenceMeetingLinkValue.text = linkifyAndParseHTMLUseCase.execute(meetUrl)
                         textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
 
                         textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
@@ -675,7 +674,7 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
 
             event.description?.nullIfBlank()?.let {
                 with(binding.sectionDescription) {
-                    textHeader.text = linkifyAndParseHtml(event.description ?: "")
+                    textHeader.text = linkifyAndParseHTMLUseCase.execute(event.description ?: "")
                     textHeader.movementMethod = LinkMovementMethod.getInstance()
                     imageIcon.setImageResource(R.drawable.ic_proton_text_align_left)
                     root.visibleOrGone(true)
@@ -703,22 +702,6 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             }
 
         })
-    }
-
-    private fun linkifyAndParseHtml(html: String): Spannable {
-        val text = HtmlCompat.fromHtml(
-            html.replace("\n", "<br>"),
-            FROM_HTML_MODE_COMPACT
-        )
-        val currentSpans = text.getSpans(0, text.length, URLSpan::class.java)
-        val buffer = SpannableString(text)
-        Linkify.addLinks(buffer, Linkify.WEB_URLS or Linkify.PHONE_NUMBERS or Linkify.EMAIL_ADDRESSES)
-        for (span in currentSpans) {
-            val end = text.getSpanEnd(span)
-            val start = text.getSpanStart(span)
-            buffer.setSpan(span, start, end, 0)
-        }
-        return buffer
     }
 
     private fun onVerificationBadgeClicked(event: Event) {
