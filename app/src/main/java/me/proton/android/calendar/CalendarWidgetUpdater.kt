@@ -50,7 +50,7 @@ internal class CalendarWidgetUpdater(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Volatile
-    var snapshot: List<WidgetEvent> = emptyList()
+    var snapshot: List<WidgetEvent>? = null
         private set
 
     @Volatile
@@ -71,13 +71,14 @@ internal class CalendarWidgetUpdater(
     }
 
     fun ensureSnapshotAvailable(context: Context) {
-        val isNotStale = snapshot.isNotEmpty() && lastConfigKey == currentConfigKey(context)
+        val current = currentConfigKey(context)
+        val isNotStale = snapshot != null && lastConfigKey == current
         if (isNotStale) return
         rebuildSnapshot(context)
     }
 
     fun rebuildSnapshot(context: Context) {
-        if (snapshot.isEmpty()) {
+        if (snapshot == null) {
             statusText = resourceProvider.provideString(R.string.calendar_widget_loading_events)
             showButtons = false
             updateHeader(context)
