@@ -238,7 +238,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                 val eventEntities = eventsAndMetadatas.map { it.first }
                 persistEvents(*(eventEntities).toTypedArray())
                 eventsAndMetadatas.forEach { (_, eventMetadata) ->
-                    updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, eventMetadata)
+                    updateEventOccurrencesUseCase.execute(fetchWindow.userId.id, eventMetadata, forceReload = fetchWindow.force)
                 }
                 fetchingState.value = CalendarsRepository.FetchingState.Finished // Events have been fetched and persisted in DB
 
