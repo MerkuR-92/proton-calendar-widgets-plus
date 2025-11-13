@@ -382,7 +382,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
     override fun onDataSetChanged() {
         updater.ensureSnapshotAvailable(applicationContext)
-        adapterData = updater.snapshot
+        adapterData = updater.snapshot.orEmpty()
         displayMainInfoText(updater.statusText)
         displayActionButtons(updater.showButtons)
     }

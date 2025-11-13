@@ -265,14 +265,18 @@ class ItemMiniCalendarFragment : Fragment() {
                     }
                 }
             }
+        }
 
-            calendarViewModel.selectedDateTime.observe(viewLifecycleOwner) { selectedDateTime ->
-                applySelectedDate(
-                    selectedDateTime.first,
-                    firstMiniCalendarDay,
-                    firstDayOfTheMonth,
-                    this@ItemMiniCalendarFragment.timeZoneId ?: timeZoneId
-                )
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                calendarViewModel.selectedDateTime.observe(viewLifecycleOwner) { selectedDateTime ->
+                    applySelectedDate(
+                        selectedDateTime.first,
+                        firstMiniCalendarDay,
+                        firstDayOfTheMonth,
+                        this@ItemMiniCalendarFragment.timeZoneId ?: timeZoneId
+                    )
+                }
             }
         }
     }
