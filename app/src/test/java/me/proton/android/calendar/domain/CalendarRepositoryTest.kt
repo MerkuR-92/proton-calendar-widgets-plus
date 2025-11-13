@@ -39,6 +39,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.GetFetchedEventWindowsValidity
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
+import me.proton.android.calendar.domain.usecase.RefreshDeletedEventsUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
@@ -82,6 +83,7 @@ internal class CalendarRepositoryTest {
     private val updateEventOccurrencesUseCaseMock: UpdateEventOccurrencesUseCase = mockk()
     private val updateFetchedEventsMetadataUseCaseMock: UpdateFetchedEventsMetadataUseCase = mockk()
     private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity = mockk()
+    private val refreshDeletedEventsUseCase: RefreshDeletedEventsUseCase = mockk()
 
     private val testsLogger = TestsLogger
     private val json = Json { this.ignoreUnknownKeys = true }
@@ -669,6 +671,7 @@ internal class CalendarRepositoryTest {
             }
         )
 
+        coEvery { refreshDeletedEventsUseCase.execute(any(), any(), any(), any(), any(), any()) } returns UseCase.Result.Success(Unit)
         coEvery { getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(any()) } returns true
         coEvery { updateFetchedEventsMetadataUseCaseMock.shouldFetch(any(), any(), any(), any(), any()) } returns false
         coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success(Unit)
@@ -700,12 +703,18 @@ internal class CalendarRepositoryTest {
         coVerify(exactly = 1) {
             fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
         }
+        coVerify(exactly = 1) {
+            refreshDeletedEventsUseCase.execute(userId, listOf("cal-1", "cal-2"), from, to, tz, any())
+        }
         // force again
         repo.fetchEvents(userId, from, to, tz, force = true)
         delay(50) // give time to the collector - we could avoid it by injecting a test dispatcher, but for now this is simpler
         // fetches again
         coVerify(exactly = 2) {
             fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+        coVerify(exactly = 2) {
+            refreshDeletedEventsUseCase.execute(userId, listOf("cal-1", "cal-2"), from, to, tz, any())
         }
     }
 
@@ -726,6 +735,7 @@ internal class CalendarRepositoryTest {
             }
         )
 
+        coEvery { refreshDeletedEventsUseCase.execute(any(), any(), any(), any(), any(), any()) } returns UseCase.Result.Success(Unit)
         coEvery { getFetchedEventWindowsValidity.shouldUseFetchedEventsMetadata(any()) } returns false
         coEvery { updateAlarmsUseCaseMock.execute(any(), any()) } returns UseCase.Result.Success(Unit)
         coEvery { updateEventOccurrencesUseCaseMock.execute(any(), any()) } returns Unit
@@ -748,6 +758,9 @@ internal class CalendarRepositoryTest {
 
         coVerify(exactly = 2) {
             fetchEventsUseCaseMock.splitFetchEvents(userId, listOf("cal-1", "cal-2"), from, to, tz)
+        }
+        coVerify(exactly = 1) {
+            refreshDeletedEventsUseCase.execute(userId, listOf("cal-1", "cal-2"), from, to, tz, any())
         }
     }
 
@@ -898,25 +911,26 @@ internal class CalendarRepositoryTest {
 
     private fun getCalendarRepository(): CalendarsRepository {
         return CalendarsRepositoryImpl(
-            appDatabaseMock,
-            transformEventUseCaseMock,
-            testsLogger,
-            fetchEventsUseCaseMock,
-            getEventWithCommentsUseCaseMock,
-            updateAlarmsUseCaseMock,
-            calendarsApiMock,
-            testsApiMock,
-            json,
-            calendarWidgetRefresherMock,
-            eventDecryptorMock,
-            searchDatabaseMock,
-            indexEventForSearchUseCaseMock,
-            userAddressManagerMock,
-            accountManagerMock,
-            networkManagerMock,
-            updateEventOccurrencesUseCaseMock,
-            updateFetchedEventsMetadataUseCaseMock,
-            getFetchedEventWindowsValidity
+            database = appDatabaseMock,
+            transformEventUseCase = transformEventUseCaseMock,
+            logger = testsLogger,
+            fetchEventsUseCase = fetchEventsUseCaseMock,
+            getEventWithCommentsUseCase = getEventWithCommentsUseCaseMock,
+            updateAlarmsUseCase = updateAlarmsUseCaseMock,
+            calendarsApi = calendarsApiMock,
+            testsApi = testsApiMock,
+            json = json,
+            widgetRefresher = calendarWidgetRefresherMock,
+            eventDecryptor = eventDecryptorMock,
+            searchDatabase = searchDatabaseMock,
+            indexEventForSearchUseCase = indexEventForSearchUseCaseMock,
+            userAddressManager = userAddressManagerMock,
+            accountManager = accountManagerMock,
+            networkManager = networkManagerMock,
+            updateEventOccurrencesUseCase = updateEventOccurrencesUseCaseMock,
+            updateFetchedEventsMetadataUseCase = updateFetchedEventsMetadataUseCaseMock,
+            getFetchedEventWindowsValidity = getFetchedEventWindowsValidity,
+            refreshDeletedEventsUseCase = refreshDeletedEventsUseCase,
         )
     }
 

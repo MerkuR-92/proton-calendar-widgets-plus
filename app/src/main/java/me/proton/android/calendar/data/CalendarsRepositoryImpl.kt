@@ -83,6 +83,7 @@ import me.proton.android.calendar.domain.usecase.FetchEventsUseCase
 import me.proton.android.calendar.domain.usecase.GetEventWithCommentsUseCase
 import me.proton.android.calendar.domain.usecase.GetFetchedEventWindowsValidity
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
+import me.proton.android.calendar.domain.usecase.RefreshDeletedEventsUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
 import me.proton.android.calendar.domain.usecase.UpdateAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.UpdateEventOccurrencesUseCase
@@ -128,6 +129,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     private val updateEventOccurrencesUseCase: UpdateEventOccurrencesUseCase,
     private val updateFetchedEventsMetadataUseCase: UpdateFetchedEventsMetadataUseCase,
     private val getFetchedEventWindowsValidity: GetFetchedEventWindowsValidity,
+    private val refreshDeletedEventsUseCase: RefreshDeletedEventsUseCase,
 ) : CalendarsRepository {
 
     override val fetchingState =
@@ -210,6 +212,18 @@ class CalendarsRepositoryImpl @Inject constructor(
             fetchWindow.toDate,
             fetchWindow.timeZoneId
         )
+        
+        // delete any events missed by the event loop
+        if (fetchWindow.force && eventsAndMetadatas != null) {
+            refreshDeletedEventsUseCase.execute(
+                userId = fetchWindow.userId,
+                calendarIdsToFetch = calendarIdsToFetch,
+                fromDate = fetchWindow.fromDate,
+                toDate = fetchWindow.toDate,
+                timeZoneId = fetchWindow.timeZoneId,
+                eventsAndMetadatas = eventsAndMetadatas,
+            )
+        }
 
         if (fetchEventsResult is UseCase.Result.Success<*>) {
             if (eventsAndMetadatas == null) {
