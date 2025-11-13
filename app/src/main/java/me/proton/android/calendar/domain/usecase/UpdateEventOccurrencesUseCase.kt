@@ -9,6 +9,7 @@ import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -20,26 +21,22 @@ import javax.inject.Inject
  */
 class UpdateEventOccurrencesUseCase @Inject constructor(
     private val logger: Logger,
-    private val database: AppDatabase
+    private val insertEventOccurrencesUseCase: InsertEventOccurrencesUseCase,
 ) : UseCase {
 
     private val generatedWindowsCount = 24L
 
     suspend fun execute(
         userId: String,
-        eventEntityMetadata: EventEntityMetadata
+        eventEntityMetadata: EventEntityMetadata,
+        forceReload: Boolean = false,
     ) {
+        val isNonRecurring = eventEntityMetadata.rRule == null
+        val forceReloadRecurring = !isNonRecurring && forceReload
         // early return if there is no need to update the Occurrences
-        if (database.inTransaction {
-            database.eventOccurrencesDao().hasOccurrenceWithEqualOrHigherModifyTime(
-                userId,
-                eventEntityMetadata.calendarId,
-                eventEntityMetadata.id,
-                eventEntityMetadata.modifyTime
-            )
-        }) return
+        if (!forceReloadRecurring && insertEventOccurrencesUseCase.needsRefresh(userId, eventEntityMetadata)) return
 
-        val eventOccurrenceEntities = if (eventEntityMetadata.rRule == null) { // normal event or single edit
+        val eventOccurrenceEntities = if (isNonRecurring) { // normal event or single edit
             listOf(
                 EventOccurrenceEntity(
                     userId = userId,
@@ -56,20 +53,34 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                 )
             )
         } else { // recurring event
-            val startUtc = LocalDateTime.ofEpochSecond(eventEntityMetadata.startTime, 0, ZoneOffset.UTC)
-            val endUtc = LocalDateTime.ofEpochSecond(eventEntityMetadata.endTime, 0, ZoneOffset.UTC)
+            val zoneId = ZoneId.of(eventEntityMetadata.startTimeZone)
+            val startLocal = Instant.ofEpochSecond(eventEntityMetadata.startTime).atZone(zoneId)
+                .toLocalDateTime()
+            val endLocalRaw =
+                Instant.ofEpochSecond(eventEntityMetadata.endTime).atZone(zoneId).toLocalDateTime()
+            // handle overnight ranges (end <= start -> next day)
+            val endLocal =
+                if (eventEntityMetadata.fullDay == 0 && !endLocalRaw.isAfter(startLocal)) {
+                    endLocalRaw.plusDays(1)
+                } else endLocalRaw
 
-            val dummyEventForOccurrences = generateDummyEventForOccurrences(startUtc, endUtc, eventEntityMetadata)
+            val dummyEventForOccurrences =
+                generateDummyEventForOccurrences(
+                    startLocal = startLocal,
+                    endLocal = endLocal,
+                    rrule = eventEntityMetadata.rRule,
+                    zoneId = zoneId,
+                )
 
-            val startOfEventsFirstMonth = startUtc.withDayOfMonth(1).toLocalDate()
+            val startOfEventsFirstMonth = startLocal.withDayOfMonth(1).toLocalDate()
 
             val occurrences = dummyEventForOccurrences.generateOccurrencesUntil(
                 startOfEventsFirstMonth.plusMonths(generatedWindowsCount + 1).minusDays(1),
-                "UTC"
+                zoneId.id
             )
 
             val firstOccurrenceAfterWindows = dummyEventForOccurrences.generateFirstOccurrenceSince(
-                startOfEventsFirstMonth.plusMonths(generatedWindowsCount + 1).atStartOfDay(ZoneId.of("UTC"))
+                startOfEventsFirstMonth.plusMonths(generatedWindowsCount + 1).atStartOfDay(zoneId)
             )
 
             val firstOccurrenceStartTime = occurrences?.firstOrNull()?.startDateTime?.toEpochSecond() ?: run {
@@ -84,8 +95,8 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
             val eventOccurrenceEntities = mutableListOf<EventOccurrenceEntity>()
 
             for (i in 0..generatedWindowsCount) {
-                val windowStart = startOfEventsFirstMonth.plusMonths(i).atStartOfDay(ZoneId.of("UTC"))
-                val windowEnd = windowStart.toLocalDate().plusMonths(1).atStartOfDay(ZoneId.of("UTC")).minusSeconds(1)
+                val windowStart = startOfEventsFirstMonth.plusMonths(i).atStartOfDay(zoneId)
+                val windowEnd = windowStart.toLocalDate().plusMonths(1).atStartOfDay(zoneId).minusSeconds(1)
 
                 // first generated occurrence should be happening in the first window for sure
 
@@ -121,35 +132,28 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
             }
             eventOccurrenceEntities
         }
-        kotlin.runCatching {
-            database.inTransaction {
-                database.eventOccurrencesDao()
-                    .deleteAllForEvent(userId, eventEntityMetadata.calendarId, eventEntityMetadata.id)
-                database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
-            }
-        }.onFailure {
-            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} (event likely does not exist)", it)
-        }
+        insertEventOccurrencesUseCase.execute(userId, eventEntityMetadata, eventOccurrenceEntities)
     }
 
     private fun generateDummyEventForOccurrences(
-        startUtc: LocalDateTime,
-        endUtc: LocalDateTime,
-        eventEntityMetadata: EventEntityMetadata
+        startLocal: LocalDateTime,
+        endLocal: LocalDateTime,
+        rrule: String,
+        zoneId: ZoneId,
     ): Event {
         val formatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss")
 
         val iCalString = """
-                    BEGIN:VCALENDAR
-                    PRODID:0
-                    VERSION:2.0
-                    BEGIN:VEVENT
-                    DTSTART;TZID=UTC:${startUtc.format(formatter)}
-                    DTEND;TZID=UTC:${endUtc.format(formatter)}
-                    RRULE:${eventEntityMetadata.rRule}
-                    END:VEVENT
-                    END:VCALENDAR
-                    """.trimIndent()
+            BEGIN:VCALENDAR
+            PRODID:0
+            VERSION:2.0
+            BEGIN:VEVENT
+            DTSTART;TZID=${zoneId.id}:${startLocal.format(formatter)}
+            DTEND;TZID=${zoneId.id}:${endLocal.format(formatter)}
+            RRULE:$rrule
+            END:VEVENT
+            END:VCALENDAR
+        """.trimIndent()
 
         return Event.dummyFrom(ICalUtilsImpl.parseICalString(iCalString)!!)!!
     }
