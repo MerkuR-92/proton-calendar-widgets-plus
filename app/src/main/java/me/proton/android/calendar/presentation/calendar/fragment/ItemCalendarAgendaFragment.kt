@@ -178,7 +178,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         }
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 currentRange.filterNotNull().flatMapLatest { range ->
                     calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId).map {
                         range to it
@@ -238,7 +238,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         when (eventsResult) {
             CalendarsRepository.GetEventsResult.InProgress -> {
                 val currentList = eventsListLayoutAdapter.currentList
-                if (currentList.size <= 1 && this.isResumed) {
+                if (currentList.size <= 1) {
                     calendarViewModel.setLoading(true, position)
                     binding.listViewStatus.isVisible = true
                     binding.listViewStatus.text = resources.getString(R.string.agenda_loading_events)
