@@ -19,6 +19,7 @@ import me.proton.android.calendar.data.api.CalendarsApiImpl
 import me.proton.android.calendar.data.api.FeedbackApiImpl
 import me.proton.android.calendar.data.api.ImporterApiImpl
 import me.proton.android.calendar.data.api.MailSettingsApiImpl
+import me.proton.android.calendar.data.api.ProtonMeetApiImpl
 import me.proton.android.calendar.data.api.ServerEventsApiImpl
 import me.proton.android.calendar.data.api.SettingsApiImpl
 import me.proton.android.calendar.data.api.TestsApiImpl
@@ -37,6 +38,7 @@ import me.proton.android.calendar.domain.api.CalendarsApi
 import me.proton.android.calendar.domain.api.FeedbackApi
 import me.proton.android.calendar.domain.api.ImporterApi
 import me.proton.android.calendar.domain.api.MailSettingsApi
+import me.proton.android.calendar.domain.api.ProtonMeetApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.android.calendar.domain.api.TestsApi
@@ -86,6 +88,7 @@ import me.proton.android.calendar.domain.usecase.UpdateParticipationStatusUseCas
 import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpdateUserSettingsUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
+import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
@@ -120,6 +123,8 @@ val commonModule = module {
 
 val networkModule = module {
     single<CalendarsApi> { CalendarsApiImpl(get()) }
+    single<ProtonMeetApi> { ProtonMeetApiImpl(get()) }
+    single<ProtonMeetCrypto> { ProtonMeetCrypto.fromCrypto(get()) }
     single<AddressesApi> { AddressesApiImpl(get()) }
     single<AuthenticationApi> { AuthenticationApiImpl(get()) }
     single<ServerEventsApi> { ServerEventsApiImpl(get()) }

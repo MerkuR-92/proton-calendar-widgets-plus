@@ -677,6 +677,8 @@ data class SyncEvent(
     val calendarEventContent: List<Event.EventPart.Calendar>? = null,
     @SerialName("SharedKeyPacket")
     val sharedKeyPacket: String? = null,
+    @SerialName("VideoConferencingData")
+    val videoConferencingData: Event.VideoConferencingData? = null,
     @SerialName("SharedEventContent")
     val sharedEventContent: List<Event.EventPart.Shared>? = null,
     @SerialName("AttendeesEventContent")

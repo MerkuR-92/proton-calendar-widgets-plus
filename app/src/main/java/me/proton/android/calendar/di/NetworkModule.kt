@@ -28,6 +28,12 @@ object NetworkModule {
     @BaseProtonApiUrl
     fun provideProtonApiUrl(envConfiguration: EnvironmentConfiguration): HttpUrl = envConfiguration.baseUrl.toHttpUrl()
 
+    @Provides
+    @BaseProtonMeetApiUrl
+    fun provideProtonMeetBaseUrl(envConfiguration: EnvironmentConfiguration): HttpUrl {
+        return "https://meet.${envConfiguration.host}".toHttpUrl()
+    }
+
     @DohProviderUrls
     @Provides
     fun provideDohProviderUrls(): Array<String> = Constants.DOH_PROVIDERS_URLS

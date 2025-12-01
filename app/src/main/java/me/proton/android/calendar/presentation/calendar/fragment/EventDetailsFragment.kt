@@ -1,15 +1,10 @@
 package me.proton.android.calendar.presentation.calendar.fragment
 
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
 import android.text.format.DateFormat
 import android.text.method.LinkMovementMethod
-import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,7 +42,6 @@ import me.proton.android.calendar.common.utils.AndroidUtils
 import me.proton.android.calendar.common.utils.AndroidUtils.collapse
 import me.proton.android.calendar.common.utils.AndroidUtils.displaySnackBar
 import me.proton.android.calendar.common.utils.AndroidUtils.expand
-import me.proton.android.calendar.common.utils.AndroidUtils.getColorFromAttr
 import me.proton.android.calendar.common.utils.AndroidUtils.getDeviceContacts
 import me.proton.android.calendar.common.utils.AndroidUtils.getInitials
 import me.proton.android.calendar.common.utils.AndroidUtils.getParticipationStatusPriorityValue
@@ -67,7 +61,6 @@ import me.proton.android.calendar.common.utils.ProtonUtilsImpl.matchAttendeesWit
 import me.proton.android.calendar.databinding.FragmentEventDetailsBinding
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
-import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.usecase.LinkifyAndParseHTMLUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.AttendeeListAdapter
@@ -100,9 +93,6 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
     private lateinit var buttonDelete: View
     private lateinit var loadingAction: View
     private lateinit var attendeeListAdapter: AttendeeListAdapter
-
-    private var isConferenceDetailsVisible = false
-    private var conferenceDetailsHeight: Int? = null
 
     private val navigationArguments: EventDetailsFragmentArgs by navArgs()
 
@@ -557,85 +547,13 @@ class EventDetailsFragment : BaseDialogFragment<FragmentEventDetailsBinding>(), 
             val enabledMeetIntegrations = featureFlagViewModel.enabledMeetIntegrations()
             val meetType = event.meetType
             if (meetType != null && enabledMeetIntegrations.contains(event.meetType)) {
-                event.meetUrl?.nullIfBlank()?.let { meetUrl ->
-                    with(binding.sectionZoom) {
-                        joinMeetingButton.setText(when (meetType) {
-                            MeetIntegrationType.ProtonMeet -> "Join with Proton Meet" // TODO: Localize
-                            MeetIntegrationType.Zoom -> getString(R.string.join_zoom_meeting_action)
-                        })
-
-                        joinMeetingButton.setOnSingleClickListener {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(meetUrl))
-                            startActivity(intent)
-                        }
-
-                        imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
-                        imageButtonAction.visibleOrInvisible(true)
-
-                        event.meetConferenceId?.let { meetConferenceId ->
-                            val spannableConferenceId: Spannable = SpannableString(
-                                getString(R.string.generic_meeting_id, meetConferenceId)
-                            )
-                            spannableConferenceId.setSpan(
-                                ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                                spannableConferenceId.indexOf(meetConferenceId),
-                                spannableConferenceId.indexOf(meetConferenceId).plus(meetConferenceId.length),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                            )
-                            textConferenceId.text = spannableConferenceId
-                            textConferenceId.visibleOrGone(true)
-                        }
-
-                        event.meetConferencePassword?.let { meetConferencePassword ->
-                            val spannableConferencePassword: Spannable = SpannableString(
-                                getString(R.string.generic_meeting_password, meetConferencePassword)
-                            )
-                            spannableConferencePassword.setSpan(
-                                ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                                spannableConferencePassword.indexOf(meetConferencePassword),
-                                spannableConferencePassword.indexOf(meetConferencePassword)
-                                    .plus(meetConferencePassword.length),
-                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                            )
-                            textConferencePassword.text = spannableConferencePassword
-                            textConferencePassword.visibleOrGone(true)
-                        }
-
-                        event.meetMeetingHost?.let { meetingHost ->
-                            textConferenceMeetingHostValue.text = linkifyAndParseHTMLUseCase.execute(meetingHost)
-                            textConferenceMeetingHostValue.movementMethod = LinkMovementMethod.getInstance()
-                            textConferenceMeetingHost.visibleOrGone(true)
-                            textConferenceMeetingHostValue.visibleOrGone(true)
-                        }
-
-                        textConferenceMeetingLinkValue.text = linkifyAndParseHTMLUseCase.execute(meetUrl)
-                        textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
-
-                        textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
-                        textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
-
-                        conferenceMoreDetailsTitleLayout.setOnClickListener {
-                            if (isConferenceDetailsVisible) {
-                                // Save expanded view height once so we can animate it
-                                val height = collapse(conferenceMoreDetailsContentLayout).first
-                                if (conferenceDetailsHeight == null) conferenceDetailsHeight = height
-                                rotateArrowDownward(textConferenceMoreDetailsButton)
-                                isConferenceDetailsVisible = false
-                            } else {
-                                conferenceDetailsHeight?.let {
-                                    if (it > 0) expand(conferenceMoreDetailsContentLayout, height = it)
-                                    else conferenceMoreDetailsContentLayout.visibleOrGone(true)
-                                } ?: run {
-                                    conferenceMoreDetailsContentLayout.visibleOrGone(true)
-                                }
-                                rotateArrowUpward(textConferenceMoreDetailsButton)
-                                isConferenceDetailsVisible = true
-                            }
-                        }
-
-                        root.visibleOrGone(true)
-                    }
-                }
+                EventDetailsUtils.setupConferenceDetailsSection(
+                    fragment = this,
+                    meetType = meetType,
+                    event = event,
+                    binding = binding.sectionZoom,
+                    linkifyAndParseHTMLUseCase = linkifyAndParseHTMLUseCase,
+                )
             }
 
             with(binding.sectionCalendar) {

@@ -145,7 +145,10 @@ open class EventViewModelTestCommon: KoinComponent {
             database = appDatabaseMock,
             upgradeEventUseCase = upgradeEventUseCaseMock,
             workManager = workManagerMock,
-            updatePersonalPartUseCase = updatePersonalPartUseCase
+            updatePersonalPartUseCase = updatePersonalPartUseCase,
+            generateProtonMeetUrlUseCase = mockk(),
+            protonMeetCrypto = mockk(),
+            gerProtonMeetDetailsUseCase = mockk(),
         )
     }
 

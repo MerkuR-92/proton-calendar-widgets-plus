@@ -110,6 +110,7 @@ android {
             protonEnvironment {
                 proxyToken = getProxyToken()
                 host = atlasHost
+                apiPrefix = "calendar-api"
             }
             setAssetLinksResValue(atlasHost)
         }

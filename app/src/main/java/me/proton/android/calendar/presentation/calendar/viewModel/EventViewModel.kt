@@ -6,6 +6,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.work.Operation
 import androidx.work.WorkManager
 import biweekly.component.VAlarm
@@ -85,7 +86,9 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.model.Notification
 import me.proton.android.calendar.domain.model.SendPreferences
+import me.proton.android.calendar.domain.usecase.GenerateProtonMeetUrlUseCase
 import me.proton.android.calendar.domain.usecase.GetCanonicalEmailsUseCase
+import me.proton.android.calendar.domain.usecase.GetProtonMeetDetailsUseCase
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
 import me.proton.android.calendar.domain.usecase.HandleDeleteUseCase
 import me.proton.android.calendar.domain.usecase.HandleSaveUseCase
@@ -98,8 +101,10 @@ import me.proton.android.calendar.domain.usecase.UpdatePersonalPartUseCase
 import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
+import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.configuration.EnvironmentConfigurationDefaults
+import me.proton.core.crypto.common.pgp.SessionKey
 import me.proton.core.domain.entity.UserId
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
@@ -146,7 +151,10 @@ class EventViewModel @Inject constructor(
     private val database: AppDatabase,
     private val upgradeEventUseCase: UpgradeEventUseCase,
     private val workManager: WorkManager,
-    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase
+    private val updatePersonalPartUseCase: UpdatePersonalPartUseCase,
+    private val generateProtonMeetUrlUseCase: GenerateProtonMeetUrlUseCase,
+    private val protonMeetCrypto: ProtonMeetCrypto,
+    private val gerProtonMeetDetailsUseCase: GetProtonMeetDetailsUseCase,
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -159,6 +167,14 @@ class EventViewModel @Inject constructor(
             class Default(val errorMessage: String) : Error(errorMessage)
             class InitDefaultCalendarError(val errorMessage: String) : Error(errorMessage)
         }
+    }
+
+    sealed interface ProtonMeetState {
+        data object Hidden : ProtonMeetState
+        data object ClickableForMeet : ProtonMeetState
+        data object Creating : ProtonMeetState
+        data class Success(val url: String) : ProtonMeetState
+        data object Error : ProtonMeetState
     }
 
     sealed class EventDetailsActionType {
@@ -217,6 +233,45 @@ class EventViewModel @Inject constructor(
     val eventFormSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
 
     val attendeeAnswerState: MutableStateFlow<Pair<ParticipationStatus, Boolean>?> = MutableStateFlow(null)
+
+    val protonMeetState = MutableStateFlow<ProtonMeetState?>(null)
+    private var meetSessionKey: SessionKey? = null
+
+    private fun initialMeetState() = when {
+        meetIntegrations.isEmpty() -> ProtonMeetState.Hidden
+        meetIntegrations.contains(MeetIntegrationType.ProtonMeet) -> ProtonMeetState.ClickableForMeet
+        else -> null
+    }
+
+    fun requestProtonMeetUrl() {
+        if (event.meetUrl?.isNotBlank() == true) return
+        val hasMeetConference = meetIntegrations.contains(event.meetType) && !event.meetUrl.isNullOrBlank()
+        val protonMeetEnabled = meetIntegrations.contains(MeetIntegrationType.ProtonMeet)
+        if (hasMeetConference || !protonMeetEnabled) return // sanity
+        viewModelScope.launch {
+            protonMeetState.value = ProtonMeetState.Creating
+            meetSessionKey = null
+            when (val res = generateProtonMeetUrlUseCase.execute(
+                userId = userId,
+                meetingName = event.summary,
+            )) {
+                is GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error ->
+                    protonMeetState.value = ProtonMeetState.Error
+                is GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success -> {
+                    markEventAsEdited()
+                    event.addMeetUrl(
+                        newUrl = res.url,
+                        newConferenceId = res.meetingLinkNameConfId,
+                        encryptedTitle = res.encryptedTitle,
+                        host = res.hostAddress,
+                    )
+                    meetSessionKey = res.sessionKey
+                    _event.postValue(event)
+                    protonMeetState.value = ProtonMeetState.Success(res.url)
+                }
+            }
+        }
+    }
 
     private var currentParticipationStatus: ParticipationStatus = ParticipationStatus.NEEDS_ACTION
 
@@ -281,7 +336,7 @@ class EventViewModel @Inject constructor(
             eventDetailsState.value = EventState.Idle
             eventDetailsSnackState.value = null
         }
-
+        meetSessionKey = null
         attendeeAnswerState.value = null
 
         // reset backup values
@@ -328,6 +383,7 @@ class EventViewModel @Inject constructor(
         this.userId = userId
         this.isCreate = eventId == null
         this.meetIntegrations = meetIntegrations
+        protonMeetState.value = initialMeetState()
 
         // Default calendar and its settings is only needed in create mode
         val defaultCalendar: Calendar? =
@@ -397,6 +453,18 @@ class EventViewModel @Inject constructor(
         if (editMode && !isCreate) saveUserEditedAlarms()
 
         _event.postValue(event)
+
+        event.meetingLinkName?.let { meetingLinkName ->
+            val result = gerProtonMeetDetailsUseCase.execute(meetingLinkName = meetingLinkName, userId)
+            when (result) {
+                GetProtonMeetDetailsUseCase.MeetingDetailsResult.Error -> {
+                    logger.e("Failed to retrieve Proton Meet session key: $result")
+                }
+                is GetProtonMeetDetailsUseCase.MeetingDetailsResult.Success -> {
+                    meetSessionKey = result.sessionKey
+                }
+            }
+        }
 
         return InitResult.Success
     }
@@ -1307,6 +1375,7 @@ class EventViewModel @Inject constructor(
     fun handleAttendee(attendee: Attendee, canonicalEmail: String = "", addAttendee: Boolean = true) {
         markEventAsEdited()
         if (addAttendee) {
+            val prevAttendeesCount = event.iCalEvent.attendees.size
             attendee.commonName = ""
             attendee.rsvp = true
             attendee.participationLevel = ParticipationLevel.REQUIRED
@@ -1319,6 +1388,10 @@ class EventViewModel @Inject constructor(
             if (event.iCalEvent.organizer == null) {
                 val organizerEmail = event.calendar.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
+            }
+
+            if (prevAttendeesCount == 0 && !event.hasValidVideoConferenceInData()) {
+                requestProtonMeetUrl()
             }
         } else {
             event.iCalEvent.attendees.removeFirst { it.extractEmail()?.equalsNoCase(attendee.extractEmail()) == true }
@@ -2220,6 +2293,15 @@ class EventViewModel @Inject constructor(
             event.addMeetDescription(resourceProvider)
         }
 
+        val sessionKey = meetSessionKey
+        if (event.hasProtonMeetUrl && sessionKey != null) {
+            val encryptedEventName = protonMeetCrypto.encryptEventName(
+                event.summary.orEmpty(),
+                sessionKey = sessionKey
+            )
+            event.newMeetEncryptedTitle = encryptedEventName
+        }
+
         val eventCopy = Event.from(event)
 
         val handleSaveResult = handleSaveUseCase.handleSave(
@@ -2607,7 +2689,6 @@ class EventViewModel @Inject constructor(
                 return true
             }
         }
-
         return false
     }
 
@@ -2682,11 +2763,8 @@ class EventViewModel @Inject constructor(
                     dbEvent?.isSingleOccurrenceRecurring(displayTimeZoneId) == false
 
             if (disabledCalendarRecurringEvent) {
-
                 deleteDisabledCalendarRecurringEvent(displayDialog)
-            }
-            else {
-
+            } else {
                 deleteEvent(displayDialog, originalOccurrenceNumber)
             }
         }

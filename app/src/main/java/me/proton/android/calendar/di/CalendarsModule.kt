@@ -16,12 +16,13 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.CalendarsRepositoryImpl
 import me.proton.android.calendar.data.EventDecryptorImpl
 import me.proton.android.calendar.data.api.*
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.SearchDatabase
 import me.proton.android.calendar.domain.*
 import me.proton.android.calendar.domain.api.*
 import me.proton.android.calendar.domain.usecase.IndexEventForSearchUseCase
 import me.proton.android.calendar.domain.usecase.TransformEventUseCase
+import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
+import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.crypto.common.keystore.KeyStoreCrypto
 import javax.inject.Singleton
 
@@ -49,6 +50,12 @@ object CalendarsModule {
         searchDatabase: SearchDatabase,
         transformEventUseCase: TransformEventUseCase
     ): IndexEventForSearchUseCase = IndexEventForSearchUseCase(valueStoreProvider, searchDatabase, transformEventUseCase)
+
+    @Provides
+    @Singleton
+    fun provideProtonMeetCrypto(
+        cryptoContext: CryptoContext,
+    ): ProtonMeetCrypto = ProtonMeetCrypto.fromCrypto(cryptoContext)
 }
 
 @Module
@@ -62,6 +69,10 @@ abstract class CalendarsBindModule {
     @Binds
     @Singleton
     abstract fun bindCalendarApi(calendarsApiImpl: CalendarsApiImpl): CalendarsApi
+
+    @Binds
+    @Singleton
+    abstract fun bindProtonMeetApi(impl: ProtonMeetApiImpl): ProtonMeetApi
 
     @Binds
     @Singleton

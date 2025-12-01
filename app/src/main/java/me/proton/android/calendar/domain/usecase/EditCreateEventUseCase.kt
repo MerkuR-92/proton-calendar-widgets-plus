@@ -286,6 +286,10 @@ class EditCreateEventUseCase @Inject constructor(
             }
         }
 
+        val videoConferencingData = newEvent.newMeetEncryptedTitle?.let {
+            Event.VideoConferencingData(it)
+        }
+
         val organizerEmail = sanitizedNewEvent.iCalEvent.organizer?.extractEmail()
         val isOrganizer =
             if (organizerEmail != null) {
@@ -309,6 +313,7 @@ class EditCreateEventUseCase @Inject constructor(
                                 calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
                                 calendarEventContent = calendarEventContent,
                                 sharedEventId = sanitizedNewEvent.sharedEventId,
+                                videoConferencingData = videoConferencingData,
                                 uid = sanitizedNewEvent.uid,
                                 sourceCalendarId = oldCalendarId,
                                 notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
@@ -328,6 +333,7 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedKeyPacket = null, // this is already present in existing event
                                 sharedEventContent = sharedEventContent,
                                 calendarKeyPacket = if (oldSessionKeys?.calendar == null) encryptedCalendarPartCiphertext?.encodedKeyPacket else null, // only attach newly generated Calendar KeyPacket when updating
+                                videoConferencingData = videoConferencingData,
                                 calendarEventContent = calendarEventContent,
                                 attendeesEventContent = attendeesEventContent,
                                 attendees = attendees.takeIfNotEmpty(), // TODO to remove all attendees from event, send null value
@@ -353,6 +359,7 @@ class EditCreateEventUseCase @Inject constructor(
                             event = SyncEvent(
                                 isOrganizer = isOrganizer,
                                 sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
+                                videoConferencingData = videoConferencingData,
                                 attendees = attendees,
                                 sharedEventId = sharedEventId,
                                 uid = sanitizedNewEvent.uid,
@@ -372,6 +379,7 @@ class EditCreateEventUseCase @Inject constructor(
                                 sharedKeyPacket = encryptedSharedPartCiphertext.encodedKeyPacket,
                                 sharedEventContent = sharedEventContent,
                                 calendarKeyPacket = encryptedCalendarPartCiphertext?.encodedKeyPacket,
+                                videoConferencingData = videoConferencingData,
                                 calendarEventContent = calendarEventContent,
                                 attendeesEventContent =
                                 if (sanitizedNewEvent.iCalendar.method?.isRequest == true) attendeesEventContent // If we create an event from an invitation we provide attendees
