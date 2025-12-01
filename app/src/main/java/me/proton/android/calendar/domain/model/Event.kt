@@ -5,6 +5,7 @@ import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.Action
+import biweekly.property.RawProperty
 import biweekly.property.Status
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -43,6 +44,7 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStartTimeZone
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl
 import me.proton.android.calendar.domain.ResourceProvider
+import me.proton.android.calendar.domain.utils.VideoConferenceParser
 import me.proton.android.calendar.presentation.calendar.adapter.TimelineEventAdapter
 import me.proton.core.util.kotlin.takeIfNotBlank
 import me.proton.core.util.kotlin.takeIfNotEmpty
@@ -65,7 +67,8 @@ data class Event private constructor(
     val isProtonProtonInvite: Boolean? = null,
     var notifications: NotificationMigration = NotificationMigration(false, null),
     val attendeeComments: Map<String, Pair<SignatureVerification, String?>> = emptyMap(),
-    val color: String? = null
+    val color: String? = null,
+    var newMeetEncryptedTitle: String? = null, // Used for event creation/edit
 ) : BaseModel() {
 
     companion object {
@@ -82,7 +85,7 @@ data class Event private constructor(
             isProtonProtonInvite: Boolean? = null,
             notifications: NotificationMigration? = null,
             attendeeComments: Map<String, Pair<SignatureVerification, String?>> = emptyMap(),
-            color: String? = null
+            color: String? = null,
         ): Event? {
 
             val vEvent = iCalendar.events.firstOrNull()
@@ -100,7 +103,7 @@ data class Event private constructor(
                     isProtonProtonInvite,
                     notifications ?: NotificationMigration(false, null),
                     attendeeComments,
-                    color
+                    color,
                 )
             } else null
 
@@ -117,7 +120,7 @@ data class Event private constructor(
             calendar: Calendar? = null,
             iCalendar: ICalendar? = null,
             notifications: NotificationMigration? = null,
-            color: String? = null
+            color: String? = null,
         ): Event {
             val defaultTimezoneId = event.iCalendar.timezoneInfo?.defaultTimezone?.timeZone?.id
             val startTimezoneId = event.iCalendar.timezoneInfo?.getTimezone(event.iCalEvent.dateStart)?.timeZone?.id
@@ -151,7 +154,8 @@ data class Event private constructor(
                     setDefaultTimeZone(defaultTimezoneId)
                 },
                 notifications = notifications ?: event.notifications,
-                color = color ?: event.color
+                color = color ?: event.color,
+                newMeetEncryptedTitle = event.newMeetEncryptedTitle,
             )
         }
 
@@ -202,8 +206,6 @@ data class Event private constructor(
                 this.occurrence = occurrence
             }
         }
-
-
     }
 
     var occurrence: Occurrence? = null
@@ -215,26 +217,34 @@ data class Event private constructor(
     val location: String? get() = iCalEvent.location?.value
     val description: String? get() = iCalEvent.description?.value
 
-    val meetType: MeetIntegrationType? by lazy {
-        iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.let {
+    val meetType: MeetIntegrationType? get() {
+        return iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.let {
             val providerValue = (it.parameters.get(PARAMETER_CONFERENCE_PROVIDER)?.takeIfNotEmpty()
                 ?: it.parameters.get(PARAMETER_CONFERENCE_PROVIDER_READONLY)?.takeIfNotEmpty())
                 ?.firstOrNull()
-            when (providerValue) {
-                "1" -> MeetIntegrationType.Zoom
-                "2" -> MeetIntegrationType.ProtonMeet
-                else -> null
-            }
+            MeetIntegrationType.entries.firstOrNull { type -> type.providerValue == providerValue }
         }
     }
 
-    val meetConferenceId = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
-    val meetUrl: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.value
-    val meetConferencePassword: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+    val meetConferenceId get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_ID)?.value
+
+    private val meetUrlProperty: RawProperty? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)
+
+    val meetUrl: String? get() = meetUrlProperty?.value
+    val meetConferencePassword: String? get() = meetUrlProperty?.let {
         it.getParameter(PARAMETER_CONFERENCE_PASSWORD)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_PASSWORD_READONLY)?.takeIfNotBlank()
     }
-    val meetMeetingHost: String? get() = iCalEvent.getExperimentalProperty(X_PM_CONFERENCE_URL)?.let {
+    val meetMeetingHost: String? get() = meetUrlProperty?.let {
         it.getParameter(PARAMETER_CONFERENCE_HOST)?.takeIfNotBlank() ?: it.getParameter(PARAMETER_CONFERENCE_HOST_READONLY)?.takeIfNotBlank()
+    }
+
+    val hasProtonMeetUrl get() = meetUrl != null && meetType == MeetIntegrationType.ProtonMeet
+
+    val meetingLinkName: String? get() {
+        val protonMeetUrl = meetUrl?.takeIf { hasProtonMeetUrl } ?: return null
+        return protonMeetUrl
+            .substringAfter("id-")
+            .substringBefore("#pwd-")
     }
 
     val status: Status? get() = iCalEvent.status
@@ -343,6 +353,25 @@ data class Event private constructor(
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
              */
         this.iCalEvent.setDescription(description.orEmpty() + header)
+    }
+
+    fun hasValidVideoConferenceInData(): Boolean {
+        if (!meetUrl.isNullOrBlank()) return true
+        return VideoConferenceParser.hasValidVideoConference(
+            description = description,
+            location = location,
+        )
+    }
+
+    fun addMeetUrl(newUrl: String, newConferenceId: String, encryptedTitle: String, host: String?) {
+        removeConference()
+        val urlProp = iCalEvent.setExperimentalProperty(X_PM_CONFERENCE_URL, newUrl)
+        if (host != null) {
+            urlProp.setParameter(PARAMETER_CONFERENCE_HOST, host)
+        }
+        val confIdProp = iCalEvent.setExperimentalProperty(X_PM_CONFERENCE_ID, newConferenceId)
+        confIdProp.setParameter(PARAMETER_CONFERENCE_PROVIDER, MeetIntegrationType.ProtonMeet.providerValue)
+        this.newMeetEncryptedTitle = encryptedTitle
     }
 
     fun removeConference() {
@@ -602,6 +631,12 @@ data class Event private constructor(
     }
 
     @Serializable
+    data class VideoConferencingData(
+        @SerialName("MeetEncryptedTitle")
+        val meetEncryptedTitle: String,
+    )
+
+    @Serializable
     data class AttendeeStatusEvent(
         @SerialName("ID")
         val id: String? = null,
@@ -753,6 +788,7 @@ data class Event private constructor(
     )
 }
 
-
-
-
+private val MeetIntegrationType.providerValue: String get() = when (this) {
+    MeetIntegrationType.Zoom -> "1"
+    MeetIntegrationType.ProtonMeet -> "2"
+}

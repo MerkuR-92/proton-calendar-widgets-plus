@@ -18,12 +18,15 @@ import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.withStarted
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -31,6 +34,7 @@ import androidx.preference.PreferenceManager
 import biweekly.property.Action
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -73,6 +77,7 @@ import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MeetIntegrationType
+import me.proton.android.calendar.domain.usecase.LinkifyAndParseHTMLUseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
 import me.proton.android.calendar.presentation.calendar.viewModel.EventViewModel
@@ -107,6 +112,10 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
     override val navigateUp = false
 
     private val logger: Logger by inject()
+
+    private val linkifyAndParseHTMLUseCase by lazy {
+        LinkifyAndParseHTMLUseCase()
+    }
 
     private lateinit var loadingAction: View
     private lateinit var buttonSave: View
@@ -369,6 +378,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 }
                 observeEventLiveData()
                 observeEventSnackState(coroutineContext)
+                observeProtonMeetState()
                 attachActionHandlers()
             } else {
                 when (viewModeInitStatus) {
@@ -425,7 +435,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormColorPress.root.isEnabled = !processingEvent
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
-                binding.eventFormConferenceRemove.isEnabled = !processingEvent
+                binding.eventFormConferenceLayout.imageButtonAction.isEnabled = !processingEvent
 
                 for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
@@ -466,14 +476,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             binding.eventFormLocation.doAfterTextChanged { if (binding.eventFormLocation.hasFocus()) persistFormData() }
             binding.eventFormDescription.doAfterTextChanged { if (binding.eventFormDescription.hasFocus()) persistFormData() }
 
-            val hasMeetConference = featureFlagViewModel.enabledMeetIntegrations().contains(event.meetType) && !event.meetUrl.isNullOrBlank()
-            binding.eventFormConferenceLayout.visibleOrGone(hasMeetConference)
-            if (hasMeetConference) {
-                binding.eventFormConference.setText(when (event.meetType) {
-                    MeetIntegrationType.ProtonMeet, null -> "Proton Meet" // TODO: Localize
-                    MeetIntegrationType.Zoom -> getString(R.string.zoom_meeting_title)
-                })
-            }
+            updateConferenceSection(event)
 
             ImageViewCompat.setImageTintList(
                 binding.eventFormLocationIcon,
@@ -674,6 +677,90 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         })
     }
 
+    private fun observeProtonMeetState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                eventViewModel.protonMeetState.collectLatest { state ->
+                    buttonSave.isEnabled = true
+                    eventViewModel.eventLiveData.value?.let {
+                        updateConferenceSection(it)
+                    } ?: updateMeetState(state)
+                    if (state is EventViewModel.ProtonMeetState.Error) {
+                        view?.displaySnackBar(getString(R.string.event_creating_proton_meet_error))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateConferenceSection(event: Event) {
+        val enabledMeetIntegrations = featureFlagViewModel.enabledMeetIntegrations()
+        val meetType = event.meetType
+        val hasMeetConference =
+            enabledMeetIntegrations.contains(event.meetType) && !event.meetUrl.isNullOrBlank()
+        val protonMeetEnabled = enabledMeetIntegrations.contains(MeetIntegrationType.ProtonMeet)
+
+        when {
+            hasMeetConference -> {
+                binding.eventFormConferenceLayoutAdd.root.isVisible = false
+                val container = binding.eventFormConferenceLayout
+                container.root.isVisible = true
+                EventDetailsUtils.setupConferenceDetailsSection(
+                    fragment = this,
+                    meetType = meetType,
+                    event = event,
+                    binding = binding.eventFormConferenceLayout,
+                    linkifyAndParseHTMLUseCase = linkifyAndParseHTMLUseCase,
+                )
+                container.imageButtonAction.setImageResource(R.drawable.ic_proton_cross)
+                binding.eventFormConferenceLayout.imageButtonAction.setOnSingleClickListener {
+                    requireActivity().clearFocusAndHideKeyboard(view)
+                    eventViewModel.removeConferenceLink()
+                }
+            }
+
+            protonMeetEnabled -> {
+                binding.eventFormConferenceLayoutAdd.root.isVisible = true
+                binding.eventFormConferenceLayout.root.isVisible = false
+                updateMeetState(eventViewModel.protonMeetState.value)
+            }
+
+            else -> binding.eventFormConferenceLayout.root.isVisible = false
+        }
+    }
+
+    private fun updateMeetState(state: EventViewModel.ProtonMeetState?) {
+        val container = binding.eventFormConferenceLayoutAdd
+        container.eventFormConferenceProgress.isVisible = false
+        when (state) {
+            EventViewModel.ProtonMeetState.ClickableForMeet,
+            is EventViewModel.ProtonMeetState.Success,
+            is EventViewModel.ProtonMeetState.Error -> {
+                binding.eventFormConferenceLayout.root.isVisible = false
+                container.root.isVisible = true
+                container.urlStatus.isVisible = true
+                container.urlStatus.text =
+                    getString(R.string.event_add_proton_meet)
+                container.eventFormConferencePress.root.isEnabled = true
+            }
+            EventViewModel.ProtonMeetState.Creating -> {
+                container.root.isVisible = true
+                binding.eventFormConferenceLayout.root.isVisible = false
+                container.root.isVisible = true
+                container.urlStatus.isVisible = true
+                container.urlStatus.text =
+                    getString(R.string.event_creating_proton_meet)
+                container.eventFormConferenceProgress.isVisible = true
+                container.eventFormConferencePress.root.isEnabled = false
+                buttonSave.isEnabled = false
+            }
+            EventViewModel.ProtonMeetState.Hidden -> {
+                container.root.isVisible = false
+            }
+            null -> Unit
+        }
+    }
+
     private fun observeEventSnackState(coroutineContext: CoroutineContext) {
         eventViewModel.eventFormSnackState.asLiveData(coroutineContext).observe(viewLifecycleOwner) { eventSnackState ->
             eventSnackState?.let {
@@ -787,6 +874,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 else ->
                     ImageViewCompat.setImageTintList(binding.eventFormDescriptionIcon, ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.icon_hint)))
             }
+        }
+
+        binding.eventFormConferenceLayoutAdd.eventFormConferencePress.root.setOnSingleClickListener {
+            requireActivity().clearFocusAndHideKeyboard(view)
+            eventViewModel.requestProtonMeetUrl()
         }
 
         binding.eventFormAllDayPress.root.setOnClickListener {
@@ -913,11 +1005,6 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             if (eventViewModel.eventLiveData.value?.calendar?.isOwner == true) {
                 checkNavigationToAttendees()
             }
-        }
-
-        binding.eventFormConferenceRemove.setOnSingleClickListener {
-            requireActivity().clearFocusAndHideKeyboard(view)
-            eventViewModel.removeConferenceLink()
         }
     }
 

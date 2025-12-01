@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <include
+        android:id="@+id/event_form_conference_press"
+        layout="@layout/view_press_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/image_icon"
+        style="@style/Icon"
+        app:layout_constraintBottom_toBottomOf="@id/url_status"
+        app:layout_constraintEnd_toStartOf="@id/url_status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/url_status"
+        app:srcCompat="@drawable/ic_video_camera"
+        app:tint="@color/icon_norm" />
+
+    <TextView
+        android:id="@+id/url_status"
+        style="@style/Text.Default.Form"
+        android:layout_width="0dp"
+        android:layout_marginStart="@dimen/default_margin_text_start"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:paddingVertical="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Add Proton Meet conference"
+        tools:visibility="visible" />
+
+    <ProgressBar
+        android:id="@+id/event_form_conference_progress"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spacing_page"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/image_icon"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
