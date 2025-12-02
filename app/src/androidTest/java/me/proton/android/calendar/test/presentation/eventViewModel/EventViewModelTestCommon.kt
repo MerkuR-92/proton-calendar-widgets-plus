@@ -15,7 +15,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.just
 import io.mockk.mockk
-import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetRefresher
 import me.proton.android.calendar.common.getUserSettingsEntity
 import me.proton.android.calendar.common.getUserSettingsEntityFlow
@@ -84,7 +83,6 @@ open class EventViewModelTestCommon: KoinComponent {
     val updatePersonalPartUseCase: UpdatePersonalPartUseCase = mockk()
 
     private val testsLogger = TestsLogger
-    private val json = Json { this.ignoreUnknownKeys = true }
 
     val resourceProviderMock: ResourceProvider = mockk()
 
@@ -132,7 +130,6 @@ open class EventViewModelTestCommon: KoinComponent {
             updateParticipationStatusUseCase = updateParticipationStatusUseCaseMock,
             sendEmailUseCase = sendEmailUseCaseMock,
             logger = testsLogger,
-            json = json,
             getCanonicalEmailsUseCase = getCanonicalEmailsUseCaseMock,
             obtainSendPreferencesUseCase = obtainSendPreferencesUseCaseMock,
             handleSaveUseCase = handleSaveUseCaseMock,
@@ -149,6 +146,7 @@ open class EventViewModelTestCommon: KoinComponent {
             generateProtonMeetUrlUseCase = mockk(),
             protonMeetCrypto = mockk(),
             gerProtonMeetDetailsUseCase = mockk(),
+            featureFlagManager = mockk(),
         )
     }
 

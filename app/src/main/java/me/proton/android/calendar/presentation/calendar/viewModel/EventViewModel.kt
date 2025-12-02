@@ -103,9 +103,12 @@ import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
+import me.proton.android.calendar.presentation.main.viewModel.FeatureFlagViewModel
 import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.crypto.common.pgp.SessionKey
 import me.proton.core.domain.entity.UserId
+import me.proton.core.featureflag.domain.FeatureFlagManager
+import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
@@ -139,7 +142,6 @@ class EventViewModel @Inject constructor(
     private val updateParticipationStatusUseCase: UpdateParticipationStatusUseCase,
     private val sendEmailUseCase: SendEmailUseCase,
     private val logger: Logger,
-    private val json: Json,
     private val getCanonicalEmailsUseCase: GetCanonicalEmailsUseCase,
     private val obtainSendPreferencesUseCase: ObtainSendPreferencesUseCase,
     private val handleSaveUseCase: HandleSaveUseCase,
@@ -155,6 +157,7 @@ class EventViewModel @Inject constructor(
     private val generateProtonMeetUrlUseCase: GenerateProtonMeetUrlUseCase,
     private val protonMeetCrypto: ProtonMeetCrypto,
     private val gerProtonMeetDetailsUseCase: GetProtonMeetDetailsUseCase,
+    private val featureFlagManager: FeatureFlagManager,
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -249,6 +252,8 @@ class EventViewModel @Inject constructor(
         val protonMeetEnabled = meetIntegrations.contains(MeetIntegrationType.ProtonMeet)
         if (hasMeetConference || !protonMeetEnabled) return // sanity
         viewModelScope.launch {
+            if (!isProtonMeetAddEnabled()) return@launch
+
             protonMeetState.value = ProtonMeetState.Creating
             meetSessionKey = null
             when (val res = generateProtonMeetUrlUseCase.execute(
@@ -455,6 +460,7 @@ class EventViewModel @Inject constructor(
         _event.postValue(event)
 
         event.meetingLinkName?.let { meetingLinkName ->
+            if (!isProtonMeetAddEnabled()) return@let
             val result = gerProtonMeetDetailsUseCase.execute(meetingLinkName = meetingLinkName, userId)
             when (result) {
                 GetProtonMeetDetailsUseCase.MeetingDetailsResult.Error -> {
@@ -3928,4 +3934,15 @@ class EventViewModel @Inject constructor(
             else EventLinkResult.Success(occurrences.lastIndex + 1)
         } else EventLinkResult.Success(0)
     }
+
+    private suspend fun isProtonMeetAddEnabled() = with(CalendarFeatureFlag.ProtonMeetAdd) {
+        featureFlagManager.getOrDefault(
+            userId,
+            featureId,
+            FeatureFlag.default(
+                featureId.id,
+                fallbackValue
+            )
+        )
+    }.value
 }
