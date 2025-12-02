@@ -223,7 +223,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         result as GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success
 
         val expectedUrl =
-            meetBaseUrl.toString() + "guest/join/id-$meetingLinkName#pwd-${payload.urlPasswordBase}"
+            meetBaseUrl.toString() + "join/id-$meetingLinkName#pwd-${payload.urlPasswordBase}"
 
         assertThat(result.url).isEqualTo(expectedUrl)
         assertThat(result.meetingLinkNameConfId).isEqualTo(meetingLinkName)
@@ -234,6 +234,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
     private fun address(): UserAddress =
         mockk {
             every { addressId } returns AddressId("address-id")
+            every { email } returns "test@email.com"
         }
 
     private fun preparedPayload(sessionKey: SessionKey = mockk()): PreparedMeeting =
