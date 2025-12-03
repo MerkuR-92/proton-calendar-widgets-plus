@@ -15,10 +15,7 @@ spec:
     claim:
       inherits:
         - backend
-        - patch-affinity
-        - patch-namespace
-        - patch-sync-waves
-        - patch-labels
+        - default-patches
       charts:
         docs-rts-api:
           enabled: 'false'
