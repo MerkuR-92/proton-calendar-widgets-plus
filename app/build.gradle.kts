@@ -192,7 +192,6 @@ dependencies {
 
     // Local
     implementation(project(":week-view-core"))
-    implementation(files("../../proton-libs/gopenpgp/gopenpgp.aar"))
 
     // Hilt Android.
     implementation(libs.dagger.hilt.android)
@@ -205,6 +204,9 @@ dependencies {
 
     // Retrofit
     implementation(libs.retrofit)
+
+    // Golang crypto lib
+    implementation(libs.android.golib)
 
     // Shared preferences
     implementation(libs.androidx.preference)
