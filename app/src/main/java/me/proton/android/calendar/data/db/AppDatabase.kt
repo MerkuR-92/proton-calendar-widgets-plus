@@ -92,6 +92,8 @@ import me.proton.core.usersettings.data.db.UserSettingsConverters
 import me.proton.core.usersettings.data.db.UserSettingsDatabase
 import me.proton.core.usersettings.data.entity.OrganizationEntity
 import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
+import me.proton.core.util.kotlin.deserialize
+import me.proton.core.util.kotlin.serialize
 
 @Database(
     entities = [
@@ -167,7 +169,8 @@ import me.proton.core.usersettings.data.entity.OrganizationKeysEntity
     PushConverters::class,
     AuthConverters::class,
     // Calendar
-    DatabaseTypeConverters::class
+    DatabaseTypeConverters::class,
+    CalendarUserSettingsConverters::class,
 )
 abstract class AppDatabase :
     BaseDatabase(),
@@ -230,7 +233,7 @@ abstract class AppDatabase :
         const val TABLE_MANAGED_HOLIDAY_CALENDARS = "managed_holiday_calendars"
 
         const val name = "proton.calendar.db"
-        const val version = 80
+        const val version = 81
 
         // Migrations before version 29.
         private val oldMigrations = listOf(
@@ -293,6 +296,7 @@ abstract class AppDatabase :
             AppDatabaseMigrations.MIGRATION_77_78,
             AppDatabaseMigrations.MIGRATION_78_79,
             AppDatabaseMigrations.MIGRATION_79_80,
+            AppDatabaseMigrations.MIGRATION_80_81,
         )
 
         fun buildDatabase(context: Context): AppDatabase =
@@ -346,4 +350,15 @@ class DatabaseTypeConverters {
     fun fromListOfLong(value: List<Long>?): List<String>? {
         return value?.map { it.toString() }
     }
+}
+
+class CalendarUserSettingsConverters {
+
+    @TypeConverter
+    fun fromAutoAddConferenceLink(value: CalendarUserSettingsEntity.AutoAddConferenceLink?): String? =
+        value?.serialize()
+
+    @TypeConverter
+    fun toAutoAddConferenceLink(value: String?): CalendarUserSettingsEntity.AutoAddConferenceLink? =
+        value?.deserialize()
 }

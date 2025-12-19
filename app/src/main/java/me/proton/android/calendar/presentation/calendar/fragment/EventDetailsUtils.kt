@@ -6,6 +6,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ForegroundColorSpan
+import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import me.proton.android.calendar.R
@@ -16,7 +17,6 @@ import me.proton.android.calendar.common.utils.AndroidUtils.rotateArrowDownward
 import me.proton.android.calendar.common.utils.AndroidUtils.rotateArrowUpward
 import me.proton.android.calendar.common.utils.AndroidUtils.setOnSingleClickListener
 import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrGone
-import me.proton.android.calendar.common.utils.AndroidUtils.visibleOrInvisible
 import me.proton.android.calendar.databinding.ItemFormConferenceSectionBinding
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MeetIntegrationType
@@ -31,8 +31,6 @@ object EventDetailsUtils {
                                       binding: ItemFormConferenceSectionBinding,
                                       linkifyAndParseHTMLUseCase: LinkifyAndParseHTMLUseCase,
     ) {
-        var isConferenceDetailsVisible = false
-        var conferenceDetailsHeight: Int? = null
         val meetUrl = event.meetUrl?.nullIfBlank() ?: return
         with(fragment) {
             binding.joinMeetingButton.text = when (meetType) {
@@ -46,23 +44,7 @@ object EventDetailsUtils {
             }
 
             binding.imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
-            binding.imageButtonAction.visibleOrInvisible(true)
-
-            event.meetConferenceId?.let { meetConferenceId ->
-                val spannableConferenceId: Spannable = SpannableString(
-                    getString(R.string.generic_meeting_id, meetConferenceId)
-                )
-                spannableConferenceId.setSpan(
-                    ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                    spannableConferenceId.indexOf(meetConferenceId),
-                    spannableConferenceId.indexOf(meetConferenceId).plus(meetConferenceId.length),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-                binding.textConferenceId.text = spannableConferenceId
-                binding.textConferenceId.visibleOrGone(true)
-            } ?: run {
-                binding.textConferenceId.isVisible = false
-            }
+            binding.imageButtonAction.isVisible = true
 
             event.meetConferencePassword?.let { meetConferencePassword ->
                 val spannableConferencePassword: Spannable = SpannableString(
@@ -96,30 +78,38 @@ object EventDetailsUtils {
             }
 
             binding.textConferenceMeetingLinkValue.text = linkifyAndParseHTMLUseCase.execute(meetUrl)
+
             binding.textConferenceMeetingLinkValue.movementMethod = LinkMovementMethod.getInstance()
 
-            binding.textConferenceJoiningInstructions.visibleOrGone(false) // TODO Handle joining instructions once implemented
-            binding.textConferenceJoiningInstructions.movementMethod = LinkMovementMethod.getInstance()
+            val expandedContent = binding.conferenceMoreDetailsContentLayout
+            if (expandedContent.isVisible) {
+                rotateArrowUpward(binding.textConferenceMoreDetailsButton)
+            } else {
+                rotateArrowDownward(binding.textConferenceMoreDetailsButton)
+            }
+
+            var conferenceDetailsHeight: Int? = null
 
             binding.conferenceMoreDetailsTitleLayout.setOnClickListener {
-                if (isConferenceDetailsVisible) {
-                    // Save expanded view height once so we can animate it
-                    val height = collapse(binding.conferenceMoreDetailsContentLayout).first
-                    if (conferenceDetailsHeight == null) conferenceDetailsHeight = height
+                if (expandedContent.isVisible) {
+                    collapse(expandedContent)
                     rotateArrowDownward(binding.textConferenceMoreDetailsButton)
-                    isConferenceDetailsVisible = false
                 } else {
-                    conferenceDetailsHeight?.let {
-                        if (it > 0) expand(binding.conferenceMoreDetailsContentLayout, height = it)
-                        else binding.conferenceMoreDetailsContentLayout.visibleOrGone(true)
-                    } ?: run {
-                        binding.conferenceMoreDetailsContentLayout.visibleOrGone(true)
+                    if (conferenceDetailsHeight == null) { // first time expansion, or section was re-created
+                        expandedContent.clearAnimation()
+                        expandedContent.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        expandedContent.requestLayout()
+                        expandedContent.isVisible = true
+                        expandedContent.post {
+                            conferenceDetailsHeight = expandedContent.measuredHeight
+                        }
+                    } else {
+                        expand(expandedContent, height = conferenceDetailsHeight)
                     }
                     rotateArrowUpward(binding.textConferenceMoreDetailsButton)
-                    isConferenceDetailsVisible = true
                 }
             }
-            binding.root.visibleOrGone(true)
+            binding.root.isVisible = true
         }
     }
 }

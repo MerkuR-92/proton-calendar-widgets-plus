@@ -23,6 +23,7 @@ import me.proton.core.user.domain.entity.UserAddress
 import okhttp3.HttpUrl
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 internal class GenerateProtonMeetUrlUseCaseTest {
 
@@ -61,7 +62,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         val result = sut.execute(meetingName = "Whatever", userId = userId)
 
         // then
-        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error::class)
+        assertEquals(result, GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.GenericError)
     }
 
     @Test
@@ -79,7 +80,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         val result = sut.execute(meetingName = "Meeting name", userId = userId)
 
         // then
-        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error::class)
+        assertEquals(result, GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.GenericError)
     }
 
     @Test
@@ -127,7 +128,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         val result = sut.execute(meetingName = "Name", userId = userId)
 
         // then
-        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error::class)
+        assertEquals(result, GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.ApiError("api error"))
     }
 
     @Test
@@ -152,7 +153,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         val result = sut.execute(meetingName = "Name", userId = userId)
 
         // then
-        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error::class)
+        assertEquals(result, GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.GenericError)
     }
 
     @Test
@@ -182,7 +183,7 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         val result = sut.execute(meetingName = "Name", userId = userId)
 
         // then
-        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Error::class)
+        assertEquals(result, GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.GenericError)
     }
 
     @Test

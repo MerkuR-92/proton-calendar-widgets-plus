@@ -654,4 +654,14 @@ object AppDatabaseMigrations {
             AccountDatabase.MIGRATION_11.migrate(db)
         }
     }
+
+    val MIGRATION_80_81 = object : Migration(80, 81) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.addTableColumn(
+                table = AppDatabase.TABLE_CALENDAR_USER_SETTINGS,
+                column = "autoAddConferenceLink",
+                type = "TEXT"
+            )
+        }
+    }
 }

@@ -3,18 +3,9 @@ package me.proton.android.calendar.domain.usecase
 import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
 import me.proton.core.account.domain.repository.AccountRepository
 import me.proton.core.auth.domain.repository.AuthRepository
-import me.proton.core.crypto.common.context.CryptoContext
-import me.proton.core.crypto.common.pgp.PGPCrypto
 import me.proton.core.crypto.common.pgp.SessionKey
-import me.proton.core.crypto.common.pgp.SignatureContext
-import me.proton.core.crypto.common.srp.SrpCrypto
 import me.proton.core.domain.entity.UserId
-import me.proton.core.key.domain.encryptAndSignText
-import me.proton.core.key.domain.entity.keyholder.KeyHolder
-import me.proton.core.key.domain.useKeys
 import me.proton.core.user.domain.UserManager
-import me.proton.core.user.domain.entity.User
-import java.security.SecureRandom
 import javax.inject.Inject
 
 data class PreparedMeeting(

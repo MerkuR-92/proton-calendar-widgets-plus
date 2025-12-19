@@ -686,7 +686,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         updateConferenceSection(it)
                     } ?: updateMeetState(state)
                     if (state is EventViewModel.ProtonMeetState.Error) {
-                        view?.displaySnackBar(getString(R.string.event_creating_proton_meet_error))
+                        view?.displaySnackBar(state.localizedMessage ?: getString(R.string.event_creating_proton_meet_error))
                     }
                 }
             }
@@ -729,7 +729,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         }
     }
 
-    private fun updateMeetState(state: EventViewModel.ProtonMeetState?) {
+    private fun updateMeetState(state: EventViewModel.ProtonMeetState) {
         val container = binding.eventFormConferenceLayoutAdd
         container.eventFormConferenceProgress.isVisible = false
         when (state) {
@@ -742,6 +742,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 container.urlStatus.text =
                     getString(R.string.event_add_proton_meet)
                 container.eventFormConferencePress.root.isEnabled = true
+                binding.eventFormConferenceLayout.conferenceMoreDetailsContentLayout.isVisible = false
             }
             EventViewModel.ProtonMeetState.Creating -> {
                 container.root.isVisible = true
@@ -757,7 +758,6 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             EventViewModel.ProtonMeetState.Hidden -> {
                 container.root.isVisible = false
             }
-            null -> Unit
         }
     }
 
@@ -878,7 +878,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
 
         binding.eventFormConferenceLayoutAdd.eventFormConferencePress.root.setOnSingleClickListener {
             requireActivity().clearFocusAndHideKeyboard(view)
-            eventViewModel.requestProtonMeetUrl()
+            eventViewModel.requestProtonMeetUrl(isAuto = false)
         }
 
         binding.eventFormAllDayPress.root.setOnClickListener {

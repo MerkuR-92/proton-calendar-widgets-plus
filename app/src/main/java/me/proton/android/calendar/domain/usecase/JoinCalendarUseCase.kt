@@ -5,7 +5,6 @@ import com.google.crypto.tink.subtle.Base64
 import com.proton.gopenpgp.crypto.SessionKey
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.common.utils.toHexColor
 import me.proton.android.calendar.data.api.ApiResponse
 import me.proton.android.calendar.data.api.JoinCalendarApiRequest
 import me.proton.android.calendar.data.entity.ManagedHolidayCalendarEntity
