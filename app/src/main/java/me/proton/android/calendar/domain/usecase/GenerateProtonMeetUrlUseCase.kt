@@ -30,13 +30,25 @@ class GenerateProtonMeetUrlUseCase @Inject constructor(
             val hostAddress: String,
             val sessionKey: SessionKey,
         ) : GenerateMeetUrlResult
-        data object Error: GenerateMeetUrlResult
+        data object GenericError: GenerateMeetUrlResult
+        data class ApiError(val message: String): GenerateMeetUrlResult
+    }
+
+    private var cachedSuccessResult: GenerateMeetUrlResult? = null
+
+    fun onMeetUrlSynced() {
+        cachedSuccessResult = null
     }
 
     suspend fun execute(meetingName: String?, userId: UserId): GenerateMeetUrlResult {
         val address = userAddressManager.getAddresses(userId).firstOrNull() ?: run {
             logger.e("No address found for meet payload creation")
-            return GenerateMeetUrlResult.Error
+            return GenerateMeetUrlResult.GenericError
+        }
+
+        // Reuse previously retrieved successful result. The use-case is viewmodel-scoped so this is a valid instance for this user.
+        (cachedSuccessResult as? GenerateMeetUrlResult.Success)?.let {
+            return it
         }
 
         val prepared = when (val preparedResult = prepareMeetPayloadUseCase.execute(
@@ -45,7 +57,7 @@ class GenerateProtonMeetUrlUseCase @Inject constructor(
         )) {
             PreparedMeetPayloadResult.NoAccountError -> {
                 logger.e("Failed preparing meet payload: $preparedResult")
-                return GenerateMeetUrlResult.Error
+                return GenerateMeetUrlResult.GenericError
             }
             is PreparedMeetPayloadResult.Success -> preparedResult.payload
         }
@@ -72,15 +84,15 @@ class GenerateProtonMeetUrlUseCase @Inject constructor(
         val meeting = when (val resp = meetApi.getProtonMeetUrl(userId, body)) {
             is ApiResponse.Error -> {
                 logger.e("Get proton meet url error: ${resp.error}")
-                return GenerateMeetUrlResult.Error
+                return GenerateMeetUrlResult.ApiError(resp.error)
             }
             is ApiResponse.Exception -> {
                 logger.e("Get proton meet url exception: ${resp.exception.message}")
-                return GenerateMeetUrlResult.Error
+                return GenerateMeetUrlResult.GenericError
             }
             is ApiResponse.Success<CreateMeetingApiResponse> -> resp.data.meeting ?: run {
                 logger.e("No meeting returned, code: ${resp.data.code}")
-                return GenerateMeetUrlResult.Error
+                return GenerateMeetUrlResult.GenericError
             }
         }
         val url  = meetBaseUrl.toString() + "join/id-${meeting.meetingLinkName}#pwd-${prepared.urlPasswordBase}"
@@ -92,6 +104,6 @@ class GenerateProtonMeetUrlUseCase @Inject constructor(
             encryptedTitle = prepared.encryptedMeetingNameB64,
             sessionKey = prepared.sessionKey,
             hostAddress = address.email,
-        )
+        ).also { cachedSuccessResult = it }
     }
 }

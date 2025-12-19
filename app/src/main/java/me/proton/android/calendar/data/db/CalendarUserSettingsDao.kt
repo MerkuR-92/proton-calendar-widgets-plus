@@ -60,4 +60,8 @@ abstract class CalendarUserSettingsDao : BaseDao<CalendarUserSettingsEntity> {
     @Query("UPDATE calendar_user_settings SET autoImportInvite = :autoImportInvite WHERE fkUserId = :userId")
     abstract suspend fun updateAutoImportInvite(userId: String, autoImportInvite: Int)
 
+    @Query("SELECT autoAddConferenceLink FROM calendar_user_settings WHERE fkUserId = :userId")
+    abstract fun flowCalendarUserSettingsAutoAddConferenceLink(
+        userId: String
+    ): Flow<CalendarUserSettingsEntity.AutoAddConferenceLink?>
 }

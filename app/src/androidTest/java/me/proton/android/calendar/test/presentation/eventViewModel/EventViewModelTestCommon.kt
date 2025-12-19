@@ -146,7 +146,7 @@ open class EventViewModelTestCommon: KoinComponent {
             generateProtonMeetUrlUseCase = mockk(),
             protonMeetCrypto = mockk(),
             gerProtonMeetDetailsUseCase = mockk(),
-            featureFlagManager = mockk(),
+            isProtonMeetAddEnabled = mockk(),
         )
     }
 

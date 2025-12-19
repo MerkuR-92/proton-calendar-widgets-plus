@@ -45,9 +45,20 @@ data class CalendarUserSettingsEntity(
     val defaultCalendarId: String?, // TODO we still get null for old accounts (even when web says there is default calendar)
     @SerialName("AutoImportInvite")
     val autoImportInvite: Int, // 0 off, 1 on
-
+    @SerialName("AutoAddConferenceLink")
+    val autoAddConferenceLink: AutoAddConferenceLink? = null, // 0 off, 1 on
 ) {
+    @Serializable
+    data class AutoAddConferenceLink(
+        @SerialName("Provider")
+        val provider: Int?,
+    ) {
+        fun isMeetAutoAddOn() = provider?.let { it == ProviderMeetAutoAddOn }
 
+        companion object {
+            private const val ProviderMeetAutoAddOn = 2
+        }
+    }
 //    @PrimaryKey(autoGenerate = true)
 //    var _id: Int = 0
 }

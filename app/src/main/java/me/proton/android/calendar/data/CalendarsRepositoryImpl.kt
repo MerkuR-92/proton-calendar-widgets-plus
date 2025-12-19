@@ -1131,6 +1131,12 @@ class CalendarsRepositoryImpl @Inject constructor(
         return database.calendarUserSettingsDao().flowCalendarUserSettingsDisplayWeekNumber(userId).distinctUntilChanged()
     }
 
+    override fun flowIsAutoAddConferenceLinkOn(userId: String): Flow<Boolean?> {
+        return database.calendarUserSettingsDao().flowCalendarUserSettingsAutoAddConferenceLink(userId).map {
+            it?.isMeetAutoAddOn()
+        }.distinctUntilChanged()
+    }
+
     override fun flowCalendarUserSettingsAutoImportInvite(userId: String): Flow<Int?> {
         return database.calendarUserSettingsDao().flowCalendarUserSettingsAutoImportInvite(userId).distinctUntilChanged()
     }
