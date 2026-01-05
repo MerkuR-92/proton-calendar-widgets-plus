@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">neplatný podpis kontaktu</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Pripojte sa k stretnutiu na Zoome</string>
+    <string name="join_proton_meet_action">Pripojiť sa s Proton Meet</string>
     <string name="zoom_meeting_title">Zoom stretnutie</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Heslo: %1$s</string>
     <string name="generic_meeting_more_details">Ďalšie podrobnosti</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Pridať názov</string>
     <string name="event_hint_location">Pridať polohu</string>
     <string name="event_text_add_participants">Pridať účastníkov</string>
+    <string name="event_add_proton_meet">Pridať konferencie Proton Meet</string>
+    <string name="event_creating_proton_meet">Vytváranie Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Nepodarilo sa vytvoriť konferenciu Proton Meet. Skúste to znovu, prosím.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Účastníci (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vy</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d ďalších</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Mesiac</string>
     <string name="nav_view_timezone">Časové pásmo</string>
     <string name="nav_view_settings">Nastavenia</string>
+    <string name="nav_view_refresh">Obnoviť</string>
     <string name="nav_view_feedback">Dajte nám spätnú väzbu</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Všeobecné</string>
     <string name="nav_view_more_bug">Nahlásiť problém</string>

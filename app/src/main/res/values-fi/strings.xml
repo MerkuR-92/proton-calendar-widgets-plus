@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">yhteystiedon allekirjoitus on virheellinen</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Liity Zoom-kokoukseen</string>
+    <string name="join_proton_meet_action">Liity Proton Meetillä</string>
     <string name="zoom_meeting_title">Zoom-kokous</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Salasana: %1$s</string>
     <string name="generic_meeting_more_details">Enemmän tietoja</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Lisää nimi</string>
     <string name="event_hint_location">Lisää sijainti</string>
     <string name="event_text_add_participants">Lisää osallistujia</string>
+    <string name="event_add_proton_meet">Lisää Proton Meet -neuvottelu</string>
+    <string name="event_creating_proton_meet">Luodaan Proton Meetiä...</string>
+    <string name="event_creating_proton_meet_error">Proton Meet -kokouksen luominen epäonnistui. Yritä uudelleen.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Osallistujat (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Sinä</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d lisää</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Kuukausi</string>
     <string name="nav_view_timezone">Aikavyöhyke</string>
     <string name="nav_view_settings">Asetukset</string>
+    <string name="nav_view_refresh">Päivitä</string>
     <string name="nav_view_feedback">Anna palautetta</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Yleiset</string>
     <string name="nav_view_more_bug">Ilmoita ongelmasta</string>

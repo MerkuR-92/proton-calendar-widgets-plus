@@ -131,20 +131,25 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">la signature de contact n\'est pas valide.</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Rejoindre la réunion Zoom</string>
+    <string name="join_proton_meet_action">Rejoindre avec Proton Meet</string>
     <string name="zoom_meeting_title">Réunion Zoom</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID : %1$s</string>
     <string name="generic_meeting_password">Mot de passe : %1$s</string>
-    <string name="generic_meeting_more_details">Plus d\'infos</string>
-    <string name="generic_meeting_less_details">Moins d’infos</string>
+    <string name="generic_meeting_more_details">Plus d\'informations</string>
+    <string name="generic_meeting_less_details">Moins d’informations</string>
     <string name="generic_meeting_host">Hôte de la réunion </string>
     <string name="generic_meeting_link">Lien de la réunion </string>
-    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instructions pour rejoindre</a></string>
+    <string name="generic_meeting_joining_instructions"><a href="https://proton.me/support">Instructions pour rejoindre la réunion</a></string>
     <!-- CREATE / EDIT EVENT   -->
     <string name="title_create_event">Nouvel événement</string>
     <string name="event_text_edit_event">Modifier l’événement</string>
     <string name="event_hint_title">Ajouter un titre</string>
     <string name="event_hint_location">Ajouter un lieu</string>
     <string name="event_text_add_participants">Ajouter des participants</string>
+    <string name="event_add_proton_meet">Ajouter une conférence Proton Meet</string>
+    <string name="event_creating_proton_meet">Création d\'un Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">La création d\'une conférence Proton Meet n\'a pas abouti. Veuillez réessayer.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d sur %2$d)</string>
     <string name="event_current_user_organizer">Vous</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+  %1$d de plus</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Mois</string>
     <string name="nav_view_timezone">Fuseau horaire</string>
     <string name="nav_view_settings">Paramètres</string>
+    <string name="nav_view_refresh">Actualiser</string>
     <string name="nav_view_feedback">Donnez-nous votre avis</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Général</string>
     <string name="nav_view_more_bug">Signaler un bug</string>

@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">підпис контакту недійсний</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Приєднатися до зустрічі в Zoom</string>
+    <string name="join_proton_meet_action">Приєднатися до Proton Meet</string>
     <string name="zoom_meeting_title">Zoom-зустріч</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Пароль: %1$s</string>
     <string name="generic_meeting_more_details">Докладніше</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Додати заголовок</string>
     <string name="event_hint_location">Додати розташування</string>
     <string name="event_text_add_participants">Додати учасників</string>
+    <string name="event_add_proton_meet">Додати конференцію Proton Meet</string>
+    <string name="event_creating_proton_meet">Створення Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Не вдалося створити конференцію Proton Meet. Повторіть спробу.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Учасники (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Ви</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ ще %1$d</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Місяць</string>
     <string name="nav_view_timezone">Часовий пояс</string>
     <string name="nav_view_settings">Налаштування</string>
+    <string name="nav_view_refresh">Оновити</string>
     <string name="nav_view_feedback">Напишіть нам відгук</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Загальні</string>
     <string name="nav_view_more_bug">Повідомити про проблему</string>

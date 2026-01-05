@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">kontaktsignaturen er ugyldig</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Bli med på Zoom-møte</string>
+    <string name="join_proton_meet_action">Bli med på Proton Meet</string>
     <string name="zoom_meeting_title">Zoom-møte</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Passord: %1$s</string>
     <string name="generic_meeting_more_details">Flere detaljer</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Legg til tittel</string>
     <string name="event_hint_location">Legg til sted</string>
     <string name="event_text_add_participants">Legg til deltakere</string>
+    <string name="event_add_proton_meet">Legg til Proton Meet-konferanse</string>
+    <string name="event_creating_proton_meet">Oppretter Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Kunne ikke opprette en Proton Meet-konferanse. Prøv på nytt.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Deltakere (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Deg</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d til</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Måned</string>
     <string name="nav_view_timezone">Tidssone</string>
     <string name="nav_view_settings">Innstillinger</string>
+    <string name="nav_view_refresh">Oppdater</string>
     <string name="nav_view_feedback">Gi oss tilbakemelding</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generelt</string>
     <string name="nav_view_more_bug">Rapporter et problem</string>

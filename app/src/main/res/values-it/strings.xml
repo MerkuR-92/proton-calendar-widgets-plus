@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">firma contatto non valida</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Partecipa alla riunione su Zoom</string>
+    <string name="join_proton_meet_action">Unisciti a Proton Meet</string>
     <string name="zoom_meeting_title">Meeting Zoom</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Password: %1$s</string>
     <string name="generic_meeting_more_details">Maggiori dettagli</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Aggiungi titolo</string>
     <string name="event_hint_location">Aggiungi posizione</string>
     <string name="event_text_add_participants">Aggiungi partecipanti</string>
+    <string name="event_add_proton_meet">Aggiungi conferenza Proton Meet</string>
+    <string name="event_creating_proton_meet">Creazione di Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Impossibile creare una conferenza Proton Meet. Riprova.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Partecipanti (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Tu</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d in più</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Mese</string>
     <string name="nav_view_timezone">Fuso orario</string>
     <string name="nav_view_settings">Impostazioni</string>
+    <string name="nav_view_refresh">Aggiorna</string>
     <string name="nav_view_feedback">Dateci il vostro feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
     <string name="nav_view_more_bug">Segnala un problema</string>

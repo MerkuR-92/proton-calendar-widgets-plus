@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">kişi imzası geçersiz</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Zoom görüşmesine katıl</string>
+    <string name="join_proton_meet_action">Proton Meet ile katılın</string>
     <string name="zoom_meeting_title">Zoom görüşmesi</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">Kimlik: %1$s</string>
     <string name="generic_meeting_password">Parola: %1$s</string>
     <string name="generic_meeting_more_details">Ayrıntıları görüntüle</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Başlık ekleyin</string>
     <string name="event_hint_location">Konum ekle</string>
     <string name="event_text_add_participants">Katılımcı ekle</string>
+    <string name="event_add_proton_meet">Proton Meet görüşmesi ekle</string>
+    <string name="event_creating_proton_meet">Proton Meet oluşturuluyor…</string>
+    <string name="event_creating_proton_meet_error">Proton Meet görüşmesi oluşturulamadı. Lütfen yeniden deneyin.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Katılımcılar (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Siz</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d diğer</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Aylık</string>
     <string name="nav_view_timezone">Saat dilimi</string>
     <string name="nav_view_settings">Ayarlar</string>
+    <string name="nav_view_refresh">Yenile</string>
     <string name="nav_view_feedback">Geri bildirimde bulunun</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Genel</string>
     <string name="nav_view_more_bug">Sorun bildirin</string>
@@ -462,8 +468,8 @@
     <string name="settings_auto_invites_title">Davetler takvime eklensin ve bekliyor olarak işaretlensin</string>
     <string name="settings_search_title">Takvimlerde arama</string>
     <string name="settings_search_subtitle">Arama yapmak için takvim içeriğini aygıtınıza indirir ve depolar. Bu özelliği kapatmak, indirilen içeriği kaldırır.\n\nArama, deneysel bir özelliktir. Açılması, uygulamayı kararsız hale getirebilir.</string>
-    <string name="settings_alternative_routing_title">Alternatif yöneltme kullanılabilsin</string>
-    <string name="settings_alternative_routing_subtitle">Proton sitelerine erişimin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yöneltmesi kullanmayı dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
+    <string name="settings_alternative_routing_title">Alternatif yönlendirme kullanılabilsin</string>
+    <string name="settings_alternative_routing_subtitle">Proton sitelerine erişimin engellenmiş olması durumunda, uygulama Proton ağına ulaşmak için alternatif ağ yönlendirmesi kullanmayı dener. Güvenlik duvarlarını veya ağ sorunlarını aşmakta yararlı olabilir. Bağlantı güvenilirliğini artırmak için bu seçeneği açık tutmanız önerilir.</string>
     <string name="settings_value_placeholder">Seçmek için dokunun</string>
     <string name="settings_general_title">Genel</string>
     <string name="settings_general_info" comment="ex: Theme, language, time zone, calendar layout, etc.">%1$s vb.</string>

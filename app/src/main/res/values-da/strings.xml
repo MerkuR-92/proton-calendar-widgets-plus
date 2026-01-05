@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">kontaktsignatur ugyldig</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Deltag i Zoom-møde</string>
+    <string name="join_proton_meet_action">Deltag med Proton Meet</string>
     <string name="zoom_meeting_title">Zoom-møde</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Adgangskode: %1$s</string>
     <string name="generic_meeting_more_details">Flere detaljer</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Tilføj titel</string>
     <string name="event_hint_location">Tilføj placering</string>
     <string name="event_text_add_participants">Tilføj deltagere</string>
+    <string name="event_add_proton_meet">Tilføj Proton Meet-konference</string>
+    <string name="event_creating_proton_meet">Opretter Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Kunne ikke oprette en Proton Meet-konference. Prøv igen.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Deltagere (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Dig</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+%1$d mere</string>
@@ -274,7 +279,7 @@
     <string name="recurring_event_add_participants_overwrite_dialog_description">Der sendes en invitation til tilføjede deltagere til alle arrangementer i denne serie.\nTidligere ændringer i denne serie vil gå tabt.</string>
     <string name="event_add_participants_dialog_confirm">Send</string>
     <string name="event_add_participants_dialog_cancel">Annullér</string>
-    <string name="event_remove_participants_dialog_title">Afvis deltagere</string>
+    <string name="event_remove_participants_dialog_title">Fjern deltagere</string>
     <string name="event_remove_participants_dialog_description">Afviste deltagere vil få tilsendt en aflysningsmail.</string>
     <string name="recurring_event_remove_participants_dialog_description">En aflysningsmail vil blive sendt til fjernede deltagere for alle begivenheder i denne serie.</string>
     <string name="event_add_and_remove_participants_dialog_description">Tilføjet og afviste deltagere vil blive underrettet.</string>
@@ -282,9 +287,9 @@
     <string name="event_send_cancel_mail_body" comment="Example: Event X has been canceled">%1$s er blevet aflyst.</string>
     <string name="event_save_changes">Gem ændringer</string>
     <string name="event_update_add_participants_dialog_description">Eksisterende og nye deltagere vil få besked.</string>
-    <string name="recurring_event_update_add_participants_dialog_description">Du vil opdatere alle arrangementer i denne serie. Eksisterende og nye deltagere vil få besked.</string>
-    <string name="event_update_remove_participants_dialog_description">Eksisterende og afviste deltagere vil få besked.</string>
-    <string name="event_update_remove_all_participants_dialog_description">Afviste deltagere vil få besked</string>
+    <string name="recurring_event_update_add_participants_dialog_description">Du vil opdatere alle arrangementer i denne serie. Eksisterende og tilføjede deltagere vil få besked.</string>
+    <string name="event_update_remove_participants_dialog_description">Eksisterende og fjernede deltagere vil få besked.</string>
+    <string name="event_update_remove_all_participants_dialog_description">Fjernede deltagere vil få besked</string>
     <string name="recurring_event_update_remove_participants_dialog_description">Du vil opdatere alle arrangementer i denne serie. Eksisterende og afviste deltagere vil få besked.</string>
     <string name="recurring_event_update_remove_all_participants_dialog_description">Du vil opdatere alle arrangementer i denne serie. Afviste deltagere vil få besked.</string>
     <string name="event_update_add_and_remove_participants_dialog_description">Eksisterende, tilføjet og afviste deltagere vil få besked.</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Måned</string>
     <string name="nav_view_timezone">Tidszone</string>
     <string name="nav_view_settings">Indstillinger</string>
+    <string name="nav_view_refresh">Opdater</string>
     <string name="nav_view_feedback">Giv os feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generelt</string>
     <string name="nav_view_more_bug">Anmeld et problem</string>
@@ -318,7 +324,7 @@
     <string name="nav_view_more_logout">Log ud</string>
     <string name="nav_view_more_login">Log ind</string>
     <!-- SnackBar messages -->
-    <string name="snack_feature_coming_soon">Denne feature kommer snart</string>
+    <string name="snack_feature_coming_soon">Denne funktion kommer snart</string>
     <string name="snack_event_deleted">Begivenhed slettet</string>
     <string name="snack_event_deleted_as_organizer">Aflysning sendt og begivenhed slettet</string>
     <string name="snack_event_deleted_as_attendee">Svar sendt og begivenhed slettet</string>
@@ -339,7 +345,7 @@
     <string name="snack_event_updated_error">Fejl ved opdatering af begivenhed</string>
     <string name="snack_event_created">Begivenhed oprettet</string>
     <string name="snack_event_created_failed_mail">Begivenhed oprettet, men invitation blev ikke sendt</string>
-    <string name="snack_event_created_error">Fejl ved opretning af begivenhed</string>
+    <string name="snack_event_created_error">Fejl under oprettelse af begivenhed</string>
     <string name="snack_event_opening_edit_error">Fejl under åbning af begivenhed for redigering</string>
     <string name="snack_event_recurring_invitation_only_supported_on_web_message">Denne tilbagevendende begivenhed kan kun slettes i Calendar-webappen.</string>
     <string name="snack_event_edit_with_attendees_error">Redigering af begivenheder med deltagere understøttes endnu ikke</string>

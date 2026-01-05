@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">la signatura del contacte no és vàlida</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Uniu-vos a la reunió de Zoom</string>
+    <string name="join_proton_meet_action">Uniu-vos-hi amb el Proton Meet</string>
     <string name="zoom_meeting_title">Reunió de Zoom</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Contrasenya: %1$s</string>
     <string name="generic_meeting_more_details">Més detalls</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Afegeix un títol</string>
     <string name="event_hint_location">Afegeix una ubicació</string>
     <string name="event_text_add_participants">Afegeix participants</string>
+    <string name="event_add_proton_meet">Afegeix una conferència del Proton Meet</string>
+    <string name="event_creating_proton_meet">S\'està creant el Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">No s\'ha pogut crear la conferència del Proton Meet. Torneu-ho a provar.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participants (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vós</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d més</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Mes</string>
     <string name="nav_view_timezone">Zona horària</string>
     <string name="nav_view_settings">Preferències</string>
+    <string name="nav_view_refresh">Actualitza</string>
     <string name="nav_view_feedback">Doneu-nos la vostra opinió</string>
     <string name="nav_view_more_general_settings" comment="General Settings">General</string>
     <string name="nav_view_more_bug">Notifica un problema</string>

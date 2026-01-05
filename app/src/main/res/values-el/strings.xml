@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">η υπογραφή επαφής είναι άκυρη</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Συνδεθείτε στη σύσκεψη Zoom</string>
+    <string name="join_proton_meet_action">Συμμετοχή με Proton Meet</string>
     <string name="zoom_meeting_title">Σύσκεψη Zoom</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">Αναγνωριστικό: %1$s</string>
     <string name="generic_meeting_password">Κωδικός πρόσβασης: %1$s</string>
     <string name="generic_meeting_more_details">Περισσότερες λεπτομέρειες</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Προσθέστε τίτλο</string>
     <string name="event_hint_location">Προσθήκη τοποθεσίας</string>
     <string name="event_text_add_participants">Προσθήκη συμμετεχόντων</string>
+    <string name="event_add_proton_meet">Προσθήκη τηλεδιάσκεψης Proton Meet</string>
+    <string name="event_creating_proton_meet">Δημιουργείται το Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Αποτυχία δημιουργίας μιας τηλεδιάσκεψης Proton Meet. Παρακαλούμε δοκιμάστε ξανά.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Συμμετέχοντες (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Εσείς</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d παραπάνω</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">Μήνας</string>
     <string name="nav_view_timezone">Ζώνη ώρας</string>
     <string name="nav_view_settings">Ρυθμίσεις</string>
+    <string name="nav_view_refresh">Ανανέωση</string>
     <string name="nav_view_feedback">Αφήστε την κριτική σας</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Γενικά</string>
     <string name="nav_view_more_bug">Αναφορά προβλήματος</string>
