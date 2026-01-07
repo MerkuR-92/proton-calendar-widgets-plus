@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">semnătura contactului nu este validă</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Accesare conferință Zoom</string>
+    <string name="join_proton_meet_action">Alăturați-vă cu Proton Meet</string>
     <string name="zoom_meeting_title">Conferință pe Zoom</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Parola: %1$s</string>
     <string name="generic_meeting_more_details">Mai multe detalii</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">Adăugare titlu</string>
     <string name="event_hint_location">Adăugare loc</string>
     <string name="event_text_add_participants">Adăugare participanți</string>
+    <string name="event_add_proton_meet">Adăugați conferință Proton Meet</string>
+    <string name="event_creating_proton_meet">Se creează Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Eșuare creare conferință Proton Meet. Mai încercați.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Participanți (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Dvs.</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ încă %1$d</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">lună</string>
     <string name="nav_view_timezone">Fus orar</string>
     <string name="nav_view_settings">Setări</string>
+    <string name="nav_view_refresh">Împrospătare</string>
     <string name="nav_view_feedback">Oferiți-ne feedback</string>
     <string name="nav_view_more_general_settings" comment="General Settings">Generale</string>
     <string name="nav_view_more_bug">Raportare problemă</string>

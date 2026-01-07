@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">संपर्क हस्ताक्षर अमान्य है</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">ज़ूम मीटिंग में शामिल हों</string>
+    <string name="join_proton_meet_action">Join with Proton Meet</string>
     <string name="zoom_meeting_title">ज़ूम मीटिंग</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">Password: %1$s</string>
     <string name="generic_meeting_more_details">More details</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">शीर्षक जोड़ें</string>
     <string name="event_hint_location">स्थान जोड़ें</string>
     <string name="event_text_add_participants">प्रतिभागी जोड़ें</string>
+    <string name="event_add_proton_meet">Add Proton Meet conferencing</string>
+    <string name="event_creating_proton_meet">Creating Proton Meet…</string>
+    <string name="event_creating_proton_meet_error">Failed to create a Proton Meet conference. Please try again.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">प्रतिभागी (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">आप</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d और</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">महीना</string>
     <string name="nav_view_timezone">समय क्षेत्र</string>
     <string name="nav_view_settings">सेटिंग्स</string>
+    <string name="nav_view_refresh">Refresh</string>
     <string name="nav_view_feedback">हमें प्रतिक्रिया दें</string>
     <string name="nav_view_more_general_settings" comment="General Settings">सामान्य</string>
     <string name="nav_view_more_bug">समस्या रिपोर्ट करें</string>

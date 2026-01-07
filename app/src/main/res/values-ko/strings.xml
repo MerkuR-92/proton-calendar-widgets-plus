@@ -131,7 +131,9 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">연락처 서명이 유효하지 않습니다</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Zoom 회의 참여</string>
+    <string name="join_proton_meet_action">Proton Meet으로 참여</string>
     <string name="zoom_meeting_title">Zoom 회의</string>
+    <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
     <string name="generic_meeting_password">비밀번호: %1$s</string>
     <string name="generic_meeting_more_details">자세히</string>
@@ -145,6 +147,9 @@
     <string name="event_hint_title">제목 추가</string>
     <string name="event_hint_location">위치 추가</string>
     <string name="event_text_add_participants">참가자 추가</string>
+    <string name="event_add_proton_meet">Proton Meet 화상 회의 추가</string>
+    <string name="event_creating_proton_meet">Proton Meet 생성하는 중…</string>
+    <string name="event_creating_proton_meet_error">Proton Meet 회의를 생성하지 못했습니다. 다시 시도해주세요.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">참가자 (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">나</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d개 더</string>
@@ -311,6 +316,7 @@
     <string name="nav_view_switcher_month">월</string>
     <string name="nav_view_timezone">시간대</string>
     <string name="nav_view_settings">설정</string>
+    <string name="nav_view_refresh">새로고침</string>
     <string name="nav_view_feedback">피드백 제공하기</string>
     <string name="nav_view_more_general_settings" comment="General Settings">일반</string>
     <string name="nav_view_more_bug">문제 보고</string>
