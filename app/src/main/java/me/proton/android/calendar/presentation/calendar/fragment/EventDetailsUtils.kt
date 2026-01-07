@@ -84,8 +84,10 @@ object EventDetailsUtils {
             val expandedContent = binding.conferenceMoreDetailsContentLayout
             if (expandedContent.isVisible) {
                 rotateArrowUpward(binding.textConferenceMoreDetailsButton)
+                binding.textConferenceMoreDetails.setText(R.string.generic_meeting_less_details)
             } else {
                 rotateArrowDownward(binding.textConferenceMoreDetailsButton)
+                binding.textConferenceMoreDetails.setText(R.string.generic_meeting_more_details)
             }
 
             var conferenceDetailsHeight: Int? = null
@@ -94,6 +96,7 @@ object EventDetailsUtils {
                 if (expandedContent.isVisible) {
                     collapse(expandedContent)
                     rotateArrowDownward(binding.textConferenceMoreDetailsButton)
+                    binding.textConferenceMoreDetails.setText(R.string.generic_meeting_more_details)
                 } else {
                     if (conferenceDetailsHeight == null) { // first time expansion, or section was re-created
                         expandedContent.clearAnimation()
@@ -107,6 +110,7 @@ object EventDetailsUtils {
                         expand(expandedContent, height = conferenceDetailsHeight)
                     }
                     rotateArrowUpward(binding.textConferenceMoreDetailsButton)
+                    binding.textConferenceMoreDetails.setText(R.string.generic_meeting_less_details)
                 }
             }
             binding.root.isVisible = true
