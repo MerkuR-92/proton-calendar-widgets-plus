@@ -468,6 +468,17 @@ class EventViewModel @Inject constructor(
                 }
                 is GetProtonMeetDetailsUseCase.MeetingDetailsResult.Success -> {
                     meetSessionKey = result.sessionKey
+                    event.meetUrl?.let { url ->
+                        generateProtonMeetUrlUseCase.cacheExistingMeetUrl(
+                            GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
+                                url = url,
+                                meetingLinkNameConfId = meetingLinkName,
+                                encryptedTitle = "", // not needed, we re-encrypt during saving
+                                sessionKey = result.sessionKey,
+                                hostAddress = event.meetMeetingHost ?: event.calendar.email,
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -1564,6 +1575,7 @@ class EventViewModel @Inject constructor(
                 || dbEvent?.location != event.location
                 || dateChanged
                 || dbEvent?.iCalEvent?.recurrenceRule != event.iCalEvent.recurrenceRule
+                || dbEvent?.meetUrl != event.meetUrl
     }
 
     /**

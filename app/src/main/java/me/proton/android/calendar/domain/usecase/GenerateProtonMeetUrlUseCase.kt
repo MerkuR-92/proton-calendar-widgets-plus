@@ -40,6 +40,10 @@ class GenerateProtonMeetUrlUseCase @Inject constructor(
         cachedSuccessResult = null
     }
 
+    fun cacheExistingMeetUrl(result: GenerateMeetUrlResult.Success) {
+        cachedSuccessResult = result
+    }
+
     suspend fun execute(meetingName: String?, userId: UserId): GenerateMeetUrlResult {
         val address = userAddressManager.getAddresses(userId).firstOrNull() ?: run {
             logger.e("No address found for meet payload creation")

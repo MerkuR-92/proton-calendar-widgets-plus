@@ -232,6 +232,89 @@ internal class GenerateProtonMeetUrlUseCaseTest {
         assertThat(result.sessionKey).isEqualTo(sessionKey)
     }
 
+    @Test
+    fun `cacheExistingMeetUrl returns cached result on execute`() = runTest {
+        // given
+        val sessionKey: SessionKey = mockk()
+        val cachedResult = GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
+            url = "https://meet.test/join/id-existing-123#pwd-existingPwd",
+            meetingLinkNameConfId = "existing-123",
+            encryptedTitle = "encrypted-title",
+            sessionKey = sessionKey,
+            hostAddress = "host@test.com",
+        )
+        sut.cacheExistingMeetUrl(cachedResult)
+
+        coEvery { userAddressManager.getAddresses(userId) } returns listOf(address())
+
+        // when
+        val result = sut.execute(meetingName = "New meeting", userId = userId)
+
+        // then
+        assertThat(result).isEqualTo(cachedResult)
+        coVerify(exactly = 0) { prepareMeetPayloadUseCase.execute(any(), any()) }
+        coVerify(exactly = 0) { meetApi.getProtonMeetUrl(any(), any()) }
+    }
+
+    @Test
+    fun `onMeetUrlSynced clears cached existing url`() = runTest {
+        // given
+        val sessionKey: SessionKey = mockk()
+        val cachedResult = GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
+            url = "https://meet.test/join/id-existing-123#pwd-existingPwd",
+            meetingLinkNameConfId = "existing-123",
+            encryptedTitle = "encrypted-title",
+            sessionKey = sessionKey,
+            hostAddress = "host@test.com",
+        )
+        sut.cacheExistingMeetUrl(cachedResult)
+
+        // when
+        sut.onMeetUrlSynced()
+
+        // then - execute should now call API since cache is cleared
+        coEvery { userAddressManager.getAddresses(userId) } returns listOf(address())
+        coEvery {
+            prepareMeetPayloadUseCase.execute(userId = userId, meetingName = any())
+        } returns PreparedMeetPayloadResult.NoAccountError
+
+        val result = sut.execute(meetingName = "New meeting", userId = userId)
+
+        assertThat(result).isInstanceOf(GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.GenericError::class)
+        coVerify(exactly = 1) { prepareMeetPayloadUseCase.execute(any(), any()) }
+    }
+
+    @Test
+    fun `cached existing url is returned instead of generating new one`() = runTest {
+        // given - cache an existing URL (simulating editing an event with existing Meet URL)
+        val existingSessionKey: SessionKey = mockk()
+        val existingUrl = "https://meet.test/join/id-original-456#pwd-originalPwd"
+        val cachedResult = GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
+            url = existingUrl,
+            meetingLinkNameConfId = "original-456",
+            encryptedTitle = "original-encrypted-title",
+            sessionKey = existingSessionKey,
+            hostAddress = "organizer@test.com",
+        )
+        sut.cacheExistingMeetUrl(cachedResult)
+
+        coEvery { userAddressManager.getAddresses(userId) } returns listOf(address())
+
+        // when - user removed the URL and re-adds it (calls execute)
+        val result = sut.execute(meetingName = "Event Title", userId = userId)
+
+        // then - original URL restored without a new one generated
+        result as GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success
+        assertThat(result.url).isEqualTo(existingUrl)
+        assertThat(result.meetingLinkNameConfId).isEqualTo("original-456")
+        assertThat(result.sessionKey).isEqualTo(existingSessionKey)
+        assertThat(result.hostAddress).isEqualTo("organizer@test.com")
+
+        // no API calls were made
+        coVerify(exactly = 0) { prepareMeetPayloadUseCase.execute(any(), any()) }
+        coVerify(exactly = 0) { meetApi.getProtonMeetUrl(any(), any()) }
+    }
+
     private fun address(): UserAddress =
         mockk {
             every { addressId } returns AddressId("address-id")
