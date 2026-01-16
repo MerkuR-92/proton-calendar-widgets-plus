@@ -304,7 +304,9 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
                 binding.eventFormAttendeesListHeader.visibleOrGone(attendeeList.isNotEmpty())
                 val attendeeCount = if (attendeeList.size > 0) attendeeList.size - 1 else 0 // Subtract organizer that was added to bottom of list
                 binding.eventFormAttendeesListHeader.text = getString(R.string.event_text_participants, attendeeCount, ATTENDEE_MAX_ALLOWED)
-                binding.eventFormAttendeesListLayout.visibleOrGone(attendeeList.isNotEmpty())
+                // show attendees list if there's no active search query to prevent overlap with search results
+                val query = binding.eventFormAttendeesSearchInput.text
+                binding.eventFormAttendeesListLayout.isVisible = attendeeList.isNotEmpty() && query.isEmpty()
             }
         })
 

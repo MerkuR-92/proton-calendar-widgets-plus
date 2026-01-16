@@ -789,6 +789,47 @@ internal class EventTest {
     END:VCALENDAR
     """.trimIndent())
 
+    @Test
+    fun `meetUrl is null for event without video conference`() {
+        val event = provideEvent()
+        assertNull(event.meetUrl)
+        assertFalse(event.hasProtonMeetUrl)
+    }
+
+    @Test
+    fun `meetUrl is set after adding Proton Meet link`() {
+        val event = provideEvent()
+        val meetUrl = "https://meet.proton.me/test-meeting-id"
+        val conferenceId = "test-conference-id"
+        val encryptedTitle = "encrypted-title"
+        val host = "organizer@proton.me"
+
+        event.addMeetUrl(meetUrl, conferenceId, encryptedTitle, host)
+
+        assertThat(event.meetUrl).isEqualTo(meetUrl)
+        assertThat(event.meetConferenceId).isEqualTo(conferenceId)
+        assertThat(event.meetMeetingHost).isEqualTo(host)
+        assertTrue(event.hasProtonMeetUrl)
+    }
+
+    @Test
+    fun `meetUrl comparison detects added Proton Meet link`() {
+        val eventWithoutMeet = provideEvent()
+        val eventWithMeet = provideEvent()
+
+        eventWithMeet.addMeetUrl(
+            "https://meet.proton.me/test-meeting-id",
+            "test-conference-id",
+            "encrypted-title",
+            "organizer@proton.me"
+        )
+
+        // this comparison is used in needSendAnEmailUpdate to detect meet URL changes
+        assertThat(eventWithoutMeet.meetUrl).isEqualTo(null)
+        assertThat(eventWithMeet.meetUrl).isEqualTo("https://meet.proton.me/test-meeting-id")
+        assertThat(eventWithoutMeet.meetUrl != eventWithMeet.meetUrl).isTrue()
+    }
+
     val calendarWithLegacyZoomProperties = ICalUtilsImpl.parseICalString("""
     BEGIN:VCALENDAR
     VERSION:2.0
