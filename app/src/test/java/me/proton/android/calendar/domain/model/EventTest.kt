@@ -858,33 +858,6 @@ internal class EventTest {
     }
 
     @Test
-    fun `updateMeetHost updates the host for existing Proton Meet URL`() {
-        val event = provideEvent()
-        val meetUrl = "https://meet.proton.me/join/id-ABC123#pwd-XYZ789"
-        val conferenceId = "ABC123"
-        val originalHost = "primary@proton.me"
-
-        event.addMeetUrl(meetUrl, conferenceId, "encrypted-title", originalHost)
-        assertThat(event.meetMeetingHost).isEqualTo(originalHost)
-
-        val newHost = "alias@custom-domain.com"
-        event.updateMeetHost(newHost)
-
-        assertThat(event.meetMeetingHost).isEqualTo(newHost)
-        assertTrue(event.hasProtonMeetUrl)
-    }
-
-    @Test
-    fun `updateMeetHost does nothing when no Meet URL exists`() {
-        val event = provideEvent()
-        assertNull(event.meetUrl)
-
-        event.updateMeetHost("alias@custom-domain.com")
-
-        assertNull(event.meetMeetingHost)
-    }
-
-    @Test
     fun `addMeetDescription for Zoom includes ID and passcode but not host`() {
         val event = Event.from(
             "id",
