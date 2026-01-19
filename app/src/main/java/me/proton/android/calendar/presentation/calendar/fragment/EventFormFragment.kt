@@ -436,6 +436,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 binding.eventFormRecurrencePress.root.isEnabled = !processingEvent
                 binding.eventFormAlarmPress.root.isEnabled = !processingEvent
                 binding.eventFormConferenceLayout.imageButtonAction.isEnabled = !processingEvent
+                binding.eventFormConferenceLayoutAdd.eventFormConferencePress.root.isEnabled = !processingEvent
 
                 for (i in 0 until binding.eventFormAlarmList.childCount) {
                     // Disable the delete buttons from inside alarm items views
