@@ -267,7 +267,7 @@ class EventViewModel @Inject constructor(
                         newUrl = res.url,
                         newConferenceId = res.meetingLinkNameConfId,
                         encryptedTitle = res.encryptedTitle,
-                        host = res.hostAddress,
+                        host = event.calendar.email,
                     )
                     meetSessionKey = res.sessionKey
                     _event.postValue(event)
@@ -902,6 +902,9 @@ class EventViewModel @Inject constructor(
             if (event.iCalEvent.organizer != null) {
                 val organizerEmail = calendar.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
+            }
+            if (isCalendarBeingChanged && event.hasProtonMeetUrl) {
+                event.updateMeetHost(calendar.email)
             }
             event = Event.from(
                 event,
