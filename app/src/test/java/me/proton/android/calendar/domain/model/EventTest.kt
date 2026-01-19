@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.model
 
 import assertk.assertThat
+import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
@@ -19,6 +21,9 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.printToString
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.setStart
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.wrapInICalendar
+import io.mockk.every
+import io.mockk.mockk
+import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks.provideCalendar
 import me.proton.android.calendar.test.shared.mocks.EventMocks.provideEvent
 import me.proton.core.test.kotlin.assertEquals
@@ -828,6 +833,67 @@ internal class EventTest {
         assertThat(eventWithoutMeet.meetUrl).isEqualTo(null)
         assertThat(eventWithMeet.meetUrl).isEqualTo("https://meet.proton.me/test-meeting-id")
         assertThat(eventWithoutMeet.meetUrl != eventWithMeet.meetUrl).isTrue()
+    }
+
+    @Test
+    fun `addMeetDescription for Proton Meet only includes URL without ID or host`() {
+        val event = provideEvent()
+        val meetUrl = "https://meet.proton.me/join/id-ABC123#pwd-XYZ789"
+        val conferenceId = "ABC123"
+        val host = "user@pm.me"
+
+        event.addMeetUrl(meetUrl, conferenceId, "encrypted-title", host)
+
+        val resourceProvider = mockk<ResourceProvider>()
+        event.addMeetDescription(resourceProvider)
+
+        val description = event.description!!
+        assertThat(description).doesNotContain("ID:")
+        assertThat(description).doesNotContain("Meeting host:")
+        assertThat(description).doesNotContain(host)
+        
+        val header = "~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~"
+        val expectedBlock = "\n$header\nJoin Proton Meeting: $meetUrl\n$header"
+        assertThat(description).isEqualTo(expectedBlock)
+    }
+
+    @Test
+    fun `addMeetDescription for Zoom includes ID and passcode but not host`() {
+        val event = Event.from(
+            "id",
+            Calendar(
+                id = "id",
+                name = "name",
+                email = "email",
+                ownerEmail = "ownerEmail",
+                description = "description",
+                color = "color",
+                priority = 0,
+                addressId = "addressId",
+                memberId = "memberId",
+                flags = 1,
+                display = true,
+                type = 0,
+                permissions = 127,
+                defaultEventDuration = 30,
+                defaultPartDayNotifications = emptyList(),
+                defaultFullDayNotifications = emptyList()
+            ),
+            iCalendar = calendarWithLegacyZoomProperties!!,
+            modifyTime = 0
+        )!!
+
+        val resourceProvider = mockk<ResourceProvider>()
+        every { resourceProvider.provideString(any(), *anyVararg()) } returns "Join Zoom Meeting"
+
+        event.addMeetDescription(resourceProvider)
+
+        val description = event.description!!
+        assertThat(description).contains("Join Zoom Meeting:")
+        assertThat(description).contains("ID: 81286437055")
+        assertThat(description).contains("passcode: 976610")
+        assertThat(description).doesNotContain("Meeting host:")
+        assertThat(description).doesNotContain("proton662@urey.proton.black")
     }
 
     val calendarWithLegacyZoomProperties = ICalUtilsImpl.parseICalString("""

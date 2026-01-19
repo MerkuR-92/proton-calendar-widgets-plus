@@ -343,13 +343,25 @@ data class Event private constructor(
             MeetIntegrationType.ProtonMeet -> "Join Proton Meeting"
             MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
         }
-        val header = "\n$CONFERENCE_DESCRIPTION_HEADER\n$prompt: $meetUrl (ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $meetConferencePassword" }})\n\nMeeting host: $meetMeetingHost\n$CONFERENCE_DESCRIPTION_HEADER"
+        val details = when (meetType) {
+            MeetIntegrationType.ProtonMeet -> "$prompt: $meetUrl"
+            MeetIntegrationType.Zoom -> {
+                val idAndPasscode = "(ID: $meetConferenceId${meetConferencePassword?.let { ", passcode: $it" } ?: ""})"
+                "$prompt: $meetUrl $idAndPasscode"
+            }
+            null -> return
+        }
+        val header = "\n$CONFERENCE_DESCRIPTION_HEADER\n$details\n$CONFERENCE_DESCRIPTION_HEADER"
 
         /*
+            Proton Meet:
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+            Join Proton Meeting: https://meet.proton.me/join/id-XXX#pwd-XXX
+            ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
+
+            Zoom:
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
             Join Zoom Meeting: https://zoom.us/j/XXX?pwd=XXX (ID: XXX, passcode: XXX)
-
-            Meeting host: john.doe@proton.ch
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
              */
         this.iCalEvent.setDescription(description.orEmpty() + header)
