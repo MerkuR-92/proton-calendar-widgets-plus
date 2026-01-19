@@ -267,7 +267,7 @@ class EventViewModel @Inject constructor(
                         newUrl = res.url,
                         newConferenceId = res.meetingLinkNameConfId,
                         encryptedTitle = res.encryptedTitle,
-                        host = res.hostAddress,
+                        host = event.calendar.email,
                     )
                     meetSessionKey = res.sessionKey
                     _event.postValue(event)
@@ -893,6 +893,7 @@ class EventViewModel @Inject constructor(
 
     suspend fun handleCalendar(calendar: Calendar): Boolean {
         val isCalendarBeingChanged = dbEvent?.calendar?.id != null && dbEvent?.calendar?.id != calendar.id
+        val isCalendarDifferentFromCurrent = event.calendar.id != calendar.id
 
         // If user choice has been saved then we don't set calendar's default alarms
         val alarmsEdited = (event.isAllDay() && eventCustomAllDayAlarmsSave != null) ||
@@ -903,6 +904,7 @@ class EventViewModel @Inject constructor(
                 val organizerEmail = calendar.email
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
+            val shouldUpdateMeetHost = isCalendarDifferentFromCurrent && event.hasProtonMeetUrl
             event = Event.from(
                 event,
                 calendar = Calendar(
@@ -926,6 +928,9 @@ class EventViewModel @Inject constructor(
                 color = if (event.color == event.calendar.color) calendar.color
                 else event.color
             )
+            if (shouldUpdateMeetHost) {
+                event.updateMeetHost(calendar.email)
+            }
 
             // when changing calendar, don't apply its default alarms
             if (!alarmsEdited && (!isCalendarBeingChanged || dbEvent?.isAllDay() != event.isAllDay())) {

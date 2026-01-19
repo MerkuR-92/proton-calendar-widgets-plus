@@ -386,6 +386,13 @@ data class Event private constructor(
         this.newMeetEncryptedTitle = encryptedTitle
     }
 
+    fun updateMeetHost(newHost: String) {
+        meetUrlProperty?.let { urlProp ->
+            urlProp.removeParameter(PARAMETER_CONFERENCE_HOST)
+            urlProp.setParameter(PARAMETER_CONFERENCE_HOST, newHost)
+        }
+    }
+
     fun removeConference() {
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_ID)
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_URL)
