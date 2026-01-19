@@ -566,7 +566,7 @@ class CalendarsRepositoryImpl @Inject constructor(
         val toEndInstant = toDate.plusDays(1).atStartOfDay(tz).toInstant()
 
         val dtStart = originalEvent.getStart(timeZoneId)
-        val untilInstant = originalEvent.iCalEvent.recurrenceRule.value.until?.toInstant()
+        val untilInstant = originalEvent.iCalEvent.recurrenceRule?.value?.until?.toInstant()
 
         val potentialOccurrences = when {
             dtStart.toInstant() >= toEndInstant -> emptyList()
