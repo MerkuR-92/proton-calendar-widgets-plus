@@ -341,6 +341,7 @@ class EventViewModel @Inject constructor(
             eventDetailsSnackState.value = null
         }
         meetSessionKey = null
+        generateProtonMeetUrlUseCase.onMeetUrlSynced() // clear any cached Meet URL
         attendeeAnswerState.value = null
 
         // reset backup values
