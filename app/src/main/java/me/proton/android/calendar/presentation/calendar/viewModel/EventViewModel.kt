@@ -1413,7 +1413,7 @@ class EventViewModel @Inject constructor(
                 event.iCalEvent.organizer = Organizer(organizerEmail, organizerEmail)
             }
 
-            if (prevAttendeesCount == 0 && !event.hasValidVideoConferenceInData()) {
+            if (prevAttendeesCount == 0 && !event.hasValidVideoConferenceInData() && event.location.isNullOrBlank()) {
                 requestProtonMeetUrl(isAuto = true)
             }
         } else {
