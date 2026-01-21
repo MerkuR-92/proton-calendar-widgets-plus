@@ -959,7 +959,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 val calendars = getSelectableCalendars()
 
                 // TODO Save active calendars in calendar VM to avoid triggering click effect when not needed
-                if (calendars == null || calendars.size <= 1) return@launch
+                if (calendars == null || calendars.size <= 1 || !eventViewModel.isCalendarChangeAllowed()) return@launch
 
                 val selectedIndex = calendars.indexOfFirst { it.id == eventViewModel.eventLiveData.value!!.calendar.id }
 
