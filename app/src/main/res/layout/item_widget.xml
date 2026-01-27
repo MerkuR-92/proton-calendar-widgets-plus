@@ -133,6 +133,7 @@
         android:layout_alignStart="@id/rl_event_container"
         android:layout_alignTop="@id/rl_event_container"
         android:layout_alignEnd="@id/rl_event_container"
+        android:layout_alignBottom="@id/rl_event_container"
         android:ellipsize="end"
         android:gravity="center|start"
         android:maxLines="1"

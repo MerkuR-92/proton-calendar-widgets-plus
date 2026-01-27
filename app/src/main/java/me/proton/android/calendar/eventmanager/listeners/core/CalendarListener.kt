@@ -1,6 +1,7 @@
 package me.proton.android.calendar.eventmanager.listeners.core
 
 import androidx.work.WorkManager
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.android.calendar.common.worker.BootstrapAllCalendarsWorker
 import me.proton.android.calendar.common.worker.BootstrapCalendarsWorker
 import me.proton.android.calendar.data.api.CalendarsEvents
@@ -21,8 +22,9 @@ class CalendarListener @Inject constructor(
     database: AppDatabase,
     private val calendarsRepository: CalendarsRepository,
     private val workManager: WorkManager,
-    private val logger: Logger
-    ): CalendarBaseEventListener<String, CalendarEntity>(database) {
+    private val logger: Logger,
+    private val widgetRefresher: WidgetRefresher,
+): CalendarBaseEventListener<String, CalendarEntity>(database) {
     override val order: Int = 1
     override val type: Type = Type.Core
 
@@ -73,6 +75,8 @@ class CalendarListener @Inject constructor(
                 calendarsRepository.deleteCalendarById(it)
             }
         }
+
+        widgetRefresher.broadcastRefresh()
     }
 
     override suspend fun onSuccess(config: EventManagerConfig) {
@@ -101,6 +105,8 @@ class CalendarListener @Inject constructor(
         //  - Members
         // CalendarUserSettings and UserSettings will not be deleted
         calendarsRepository.deleteCalendars(config.userId.id)
+
+        widgetRefresher.broadcastRefresh()
 
         // Launch worker to bootstrap all calendars
         BootstrapAllCalendarsWorker.enqueue(workManager, config.userId.id)

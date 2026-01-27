@@ -23,6 +23,7 @@ import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.eventmanager.listeners.core.CalendarListener
+import me.proton.android.calendar.WidgetRefresher
 import me.proton.core.domain.entity.UserId
 import me.proton.core.eventmanager.domain.EventManagerConfig
 import me.proton.core.eventmanager.domain.entity.EventsResponse
@@ -38,6 +39,7 @@ class CalendarListenerTest {
     private val logger: Logger = mockk(relaxed = true)
     private val json: Json = mockk()
     private val workManager: WorkManager = mockk(relaxed = true)
+    private val widgetRefresher: WidgetRefresher = mockk(relaxed = true)
 
     private lateinit var listener: CalendarListener
     private val config = EventManagerConfig.Core(UserId("user_id"))
@@ -46,7 +48,7 @@ class CalendarListenerTest {
     fun setup() {
         clearAllMocks()
 
-        listener = CalendarListener(db, calendarsRepository, workManager, logger)
+        listener = CalendarListener(db, calendarsRepository, workManager, logger, widgetRefresher)
 
         coEvery { calendarsRepository.selectCalendarUserSettings(any()) } returns null
         coEvery { calendarsRepository.persistCalendar(any(), any()) } returns Unit

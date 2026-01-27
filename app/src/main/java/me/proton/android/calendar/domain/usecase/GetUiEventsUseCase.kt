@@ -28,9 +28,11 @@ import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@Singleton
 class GetUiEventsUseCase @Inject constructor(
     private val database: AppDatabase,
     private val eventDecryptor: EventDecryptor,

@@ -14,6 +14,7 @@ import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.Logger
+import me.proton.android.calendar.domain.usecase.GetUiEventsUseCase
 import me.proton.core.accountmanager.domain.AccountManager
 import me.proton.core.contact.domain.repository.ContactRepository
 import me.proton.core.crypto.common.context.CryptoContext
@@ -57,7 +58,8 @@ class KoinInitializer : Initializer<Unit> {
                     entryPoint.contactEmailsRepository(),
                     entryPoint.userSettingsRepository(),
                     entryPoint.getRecipientPublicAddresses(),
-                    entryPoint.defaultSharedPreferencesProvider()
+                    entryPoint.defaultSharedPreferencesProvider(),
+                    entryPoint.getUiEventsUseCase(), // reuse the same instance to utilize the same decryption mutex
                 )
             )
         }
@@ -85,5 +87,6 @@ class KoinInitializer : Initializer<Unit> {
         fun userSettingsRepository(): UserSettingsRepository
         fun defaultSharedPreferencesProvider(): DefaultSharedPreferencesProvider
         fun getRecipientPublicAddresses(): GetRecipientPublicAddresses
+        fun getUiEventsUseCase(): GetUiEventsUseCase
     }
 }

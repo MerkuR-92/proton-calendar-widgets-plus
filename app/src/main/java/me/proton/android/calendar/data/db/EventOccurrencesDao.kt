@@ -23,6 +23,10 @@ abstract class EventOccurrencesDao : BaseDao<EventOccurrenceEntity> {
     @Query("SELECT EXISTS(SELECT * FROM events_occurrences WHERE userId = :userId AND eventId = :eventId AND calendarId = :calendarId AND modifyTime >= :modifyTime)")
     abstract fun hasOccurrenceWithEqualOrHigherModifyTime(userId: String, calendarId: String, eventId: String, modifyTime: Long): Boolean
 
+    // cheap count for widget to respond to post-login insertions
+    @Query("SELECT COUNT(*) FROM events_occurrences WHERE userId = :userId")
+    abstract fun countForUser(userId: String): Flow<Int>
+
     @Query("""
         SELECT DISTINCT eventId, calendarId
         FROM events_occurrences
