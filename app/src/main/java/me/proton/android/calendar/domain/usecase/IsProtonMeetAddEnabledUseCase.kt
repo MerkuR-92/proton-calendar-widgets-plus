@@ -32,12 +32,14 @@ class IsProtonMeetAddEnabledUseCase @Inject constructor(
     private val orgSettingsCache = mutableMapOf<UserId, OrgSettingsEntry>()
 
     suspend operator fun invoke(userId: UserId, isAuto: Boolean): Boolean {
+        val isManualEnabled = CalendarFeatureFlag.ProtonMeetAddManual.isEnabled(userId)
         return if (isAuto) {
-            CalendarFeatureFlag.ProtonMeetAddAuto.isEnabled(userId)
+            isManualEnabled
+                    && CalendarFeatureFlag.ProtonMeetAddAuto.isEnabled(userId)
                     && isAutoAddUserSettingEnabled(userId)
                     && isAutoAddOrgSettingEnabled(userId)
         } else {
-            CalendarFeatureFlag.ProtonMeetAddManual.isEnabled(userId)
+            isManualEnabled
         }
     }
 
