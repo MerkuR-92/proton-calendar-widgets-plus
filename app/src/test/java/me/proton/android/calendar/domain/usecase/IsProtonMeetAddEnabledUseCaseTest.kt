@@ -81,7 +81,22 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
     }
 
     @Test
+    fun `auto add - returns false if manual flag disabled`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, false)
+        // auto flag enabled, but manual flag disabled should short-circuit
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
+        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+
+        val result = createUseCase().invoke(userId = userId, isAuto = true)
+
+        assert(!result)
+        coVerify(exactly = 0) { userManager.getUser(any()) }
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    @Test
     fun `auto add - returns false if auto flag disabled`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, false)
         // even if settings would be true, flag should short-circuit
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
@@ -95,6 +110,7 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
 
     @Test
     fun `auto add - non org user ignores org gating`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
 
@@ -111,6 +127,7 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
 
     @Test
     fun `auto add - org user allowedProducts contains Meet enables and caches`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
 
@@ -146,6 +163,7 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
 
     @Test
     fun `auto add - org settings fetch throws returns false`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
 

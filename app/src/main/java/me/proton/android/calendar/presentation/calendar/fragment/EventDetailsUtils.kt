@@ -46,7 +46,9 @@ object EventDetailsUtils {
             binding.imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
             binding.imageButtonAction.isVisible = true
 
-            event.meetConferencePassword?.let { meetConferencePassword ->
+            val showPassword = meetType != MeetIntegrationType.ProtonMeet
+            if (showPassword && event.meetConferencePassword != null) {
+                val meetConferencePassword = event.meetConferencePassword!!
                 val spannableConferencePassword: Spannable = SpannableString(
                     getString(R.string.generic_meeting_password, meetConferencePassword)
                 )
@@ -59,7 +61,7 @@ object EventDetailsUtils {
                 )
                 binding.textConferencePassword.text = spannableConferencePassword
                 binding.textConferencePassword.visibleOrGone(true)
-            } ?: run {
+            } else {
                 binding.textConferencePassword.isVisible = false
             }
 
