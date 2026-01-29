@@ -66,30 +66,120 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
         }
     }
 
+    private fun stubNonOrgUser() {
+        val user: User = mockk(relaxed = true)
+        coEvery { userManager.getUser(userId) } returns user
+        every { user.role } returns Role.NoOrganization
+    }
+
+    private fun stubOrgAdmin() {
+        val user: User = mockk(relaxed = true)
+        coEvery { userManager.getUser(userId) } returns user
+        every { user.role } returns Role.OrganizationAdmin
+    }
+
+    private fun stubOrgMember() {
+        val user: User = mockk(relaxed = true)
+        coEvery { userManager.getUser(userId) } returns user
+        every { user.role } returns Role.OrganizationMember
+    }
+
+    private fun stubOrgSettingsWithMeet() {
+        coEvery {
+            organizationRepository.getOrganizationSettings(
+                sessionUserId = userId,
+                refresh = false
+            )
+        } returns OrganizationSettings(
+            allowedProducts = listOf("Mail", "Meet"),
+            logoId = null,
+        )
+    }
+
+    private fun stubOrgSettingsWithoutMeet() {
+        coEvery {
+            organizationRepository.getOrganizationSettings(
+                sessionUserId = userId,
+                refresh = false
+            )
+        } returns OrganizationSettings(
+            allowedProducts = listOf("Mail"),
+            logoId = null,
+        )
+    }
+
+    // manual add
+
     @Test
-    fun `manual add - returns flag value`() = runBlocking {
+    fun `manual add - non-org user returns flag value`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubNonOrgUser()
 
         val result = createUseCase().invoke(userId = userId, isAuto = false)
 
         assert(result)
-
-        // should not touch auto-gated dependencies when isAuto=false
         coVerify(exactly = 0) { calendarsRepository.flowIsAutoAddConferenceLinkOn(any()) }
-        coVerify(exactly = 0) { userManager.getUser(any()) }
         coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
     }
 
     @Test
+    fun `manual add - org admin ignores org access control`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubOrgAdmin()
+        stubOrgSettingsWithoutMeet()
+
+        val result = createUseCase().invoke(userId = userId, isAuto = false)
+
+        assert(result)
+        // should not even check org settings
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    @Test
+    fun `manual add - org non-admin with Meet allowed returns true`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubOrgMember()
+        stubOrgSettingsWithMeet()
+
+        val result = createUseCase().invoke(userId = userId, isAuto = false)
+
+        assert(result)
+    }
+
+    @Test
+    fun `manual add - org non-admin without Meet returns false`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubOrgMember()
+        stubOrgSettingsWithoutMeet()
+
+        val result = createUseCase().invoke(userId = userId, isAuto = false)
+
+        assert(!result)
+    }
+
+    @Test
+    fun `manual add - returns false if flag disabled`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, false)
+
+        val result = createUseCase().invoke(userId = userId, isAuto = false)
+
+        assert(!result)
+        // Should short-circuit before org check
+        coVerify(exactly = 0) { userManager.getUser(any()) }
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    // auto-add
+
+    @Test
     fun `auto add - returns false if manual flag disabled`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, false)
-        // auto flag enabled, but manual flag disabled should short-circuit
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
-        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
 
         val result = createUseCase().invoke(userId = userId, isAuto = true)
 
         assert(!result)
+        //short-circuit before other checks
         coVerify(exactly = 0) { userManager.getUser(any()) }
         coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
     }
@@ -98,26 +188,19 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
     fun `auto add - returns false if auto flag disabled`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, false)
-        // even if settings would be true, flag should short-circuit
-        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubNonOrgUser()
 
         val result = createUseCase().invoke(userId = userId, isAuto = true)
 
         assert(!result)
-        coVerify(exactly = 0) { userManager.getUser(any()) }
-        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
     }
 
     @Test
-    fun `auto add - non org user ignores org gating`() = runBlocking {
+    fun `auto add - non-org user with all flags enabled returns true`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
-
-        // user is NOT org user -> org gating returns true without repo call
-        val user: User = mockk(relaxed = true)
-        coEvery { userManager.getUser(userId) } returns user
-        every { user.role } returns Role.NoOrganization
+        stubNonOrgUser()
 
         val result = createUseCase().invoke(userId = userId, isAuto = true)
 
@@ -126,54 +209,66 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
     }
 
     @Test
-    fun `auto add - org user allowedProducts contains Meet enables and caches`() = runBlocking {
+    fun `auto add - org admin ignores org access control`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubOrgAdmin()
+        stubOrgSettingsWithoutMeet()
 
-        val user: User = mockk(relaxed = true)
-        coEvery { userManager.getUser(userId) } returns user
-        every { user.role } returns Role.OrganizationAdmin
+        val result = createUseCase().invoke(userId = userId, isAuto = true)
 
-        val orgSettings = OrganizationSettings(
-            // only field we care about in use case
-            allowedProducts = listOf("Mail", "Meet"),
-            logoId = null,
-        )
-        coEvery {
-            organizationRepository.getOrganizationSettings(
-                sessionUserId = userId,
-                refresh = false
-            )
-        } returns orgSettings
-
-        val useCase = createUseCase()
-
-        val first = useCase.invoke(userId = userId, isAuto = true)
-        val second = useCase.invoke(userId = userId, isAuto = true)
-
-        assert(first)
-        assert(second)
-
-        // should fetch only once because it caches for ~5 minutes
-        coVerify(exactly = 1) {
-            organizationRepository.getOrganizationSettings(sessionUserId = userId, refresh = false)
-        }
+        assert(result)
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
     }
 
     @Test
-    fun `auto add - org settings fetch throws returns false`() = runBlocking {
+    fun `auto add - org non-admin with Meet allowed returns true`() = runBlocking {
         stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
         stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
         coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubOrgMember()
+        stubOrgSettingsWithMeet()
 
-        val user: User = mockk(relaxed = true)
-        coEvery { userManager.getUser(userId) } returns user
-        every { user.role } returns Role.OrganizationAdmin
+        val result = createUseCase().invoke(userId = userId, isAuto = true)
 
+        assert(result)
+    }
+
+    @Test
+    fun `auto add - org non-admin without Meet returns false`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
+        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubOrgMember()
+        stubOrgSettingsWithoutMeet()
+
+        val result = createUseCase().invoke(userId = userId, isAuto = true)
+
+        assert(!result)
+    }
+
+    @Test
+    fun `auto add - org non-admin settings fetch throws returns false`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
+        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubOrgMember()
         coEvery {
             organizationRepository.getOrganizationSettings(sessionUserId = userId, refresh = false)
         } throws RuntimeException("error")
+
+        val result = createUseCase().invoke(userId = userId, isAuto = true)
+
+        assert(!result)
+    }
+
+    @Test
+    fun `auto add - returns false if user setting disabled`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
+        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(false)
+        stubNonOrgUser()
 
         val result = createUseCase().invoke(userId = userId, isAuto = true)
 
