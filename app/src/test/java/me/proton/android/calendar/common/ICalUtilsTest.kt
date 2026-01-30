@@ -5703,4 +5703,138 @@ internal class ICalUtilsTest {
 
         return Event.from("", Calendar("", "", "", "", "", "",0, "addressId", "memberId", 1, true, 0, 127, 30, emptyList(), emptyList()), iCalendar, 0)!!
     }
+
+    // https://protonag.atlassian.net/browse/CALAND-3213
+    @Test
+    fun `generate first occurrence SINCE for yearly all-day event with non-midnight time should return same-day occurrence`() {
+        // birthday all-day yearly-recurring event: Jan 28, 2025
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar//EN
+    BEGIN:VEVENT
+    RRULE:FREQ=YEARLY
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    DTSTAMP:20250101T000000Z
+    UID:birthday-test-caland-3189@proton.me
+    DTSTART;VALUE=DATE:20250128
+    DTEND;VALUE=DATE:20250129
+    SUMMARY:John's Birthday
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Athens" // non-UTC
+        val event = Event.from(
+            "id", Calendar(
+                "id",
+                "calendar",
+                "email",
+                "ownerEmail",
+                "description",
+                "",
+                0,
+                "addressId",
+                "memberId",
+                1,
+                true,
+                0,
+                127,
+                30,
+                emptyList(),
+                emptyList()
+            ), iCal, 0, null
+        )!!
+
+        // ShowNotificationUseCase does:
+        // alarm fires Jan 27, 2026 at 10:09 AM for a day before reminder
+        // occurrenceStartEpoch = alarm time + 1 day = Jan 28, 2026 10:09 AM
+        val fromDateTime = ZonedDateTime.of(
+            LocalDate.of(2026, 1, 28),
+            LocalTime.of(10, 9, 0), // non-midnight
+            ZoneId.of(displayTimeZoneId)
+        )
+
+        val firstOccurrence = event.generateFirstOccurrenceSince(fromDateTime)!!
+
+        // occurrence #2 (Jan 28, 2026) - the current year's birthday
+        assertThat(firstOccurrence.occurrenceNumber).isEqualTo(2)
+        assertThat(firstOccurrence.startDateTime).isEqualTo(
+            ZonedDateTime.of(
+                LocalDate.of(2026, 1, 28),
+                LocalTime.MIDNIGHT,
+                ZoneId.of(displayTimeZoneId)
+            )
+        )
+        assertThat(firstOccurrence.endDateTime).isEqualTo(
+            ZonedDateTime.of(
+                LocalDate.of(2026, 1, 29),
+                LocalTime.MIDNIGHT,
+                ZoneId.of(displayTimeZoneId)
+            )
+        )
+    }
+
+    @Test
+    fun `generate first occurrence SINCE for yearly all-day event with midnight time returns correct occurrence`() {
+
+        val iCalString = """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Proton AG//AndroidCalendar//EN
+    BEGIN:VEVENT
+    RRULE:FREQ=YEARLY
+    SEQUENCE:0
+    STATUS:CONFIRMED
+    DTSTAMP:20250101T000000Z
+    UID:birthday-test-control@proton.me
+    DTSTART;VALUE=DATE:20250128
+    DTEND;VALUE=DATE:20250129
+    SUMMARY:Control Test Birthday
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent()
+
+        val iCal = parseICalString(iCalString)!!
+        val displayTimeZoneId = "Europe/Athens"
+        val event = Event.from(
+            "id", Calendar(
+                "id",
+                "calendar",
+                "email",
+                "ownerEmail",
+                "description",
+                "",
+                0,
+                "addressId",
+                "memberId",
+                1,
+                true,
+                0,
+                127,
+                30,
+                emptyList(),
+                emptyList()
+            ), iCal, 0, null
+        )!!
+
+        val fromDateTime = ZonedDateTime.of(
+            LocalDate.of(2026, 1, 28),
+            LocalTime.MIDNIGHT,
+            ZoneId.of(displayTimeZoneId)
+        )
+
+        val firstOccurrence = event.generateFirstOccurrenceSince(fromDateTime)!!
+
+        assertThat(firstOccurrence.occurrenceNumber).isEqualTo(2)
+        assertThat(firstOccurrence.startDateTime).isEqualTo(
+            ZonedDateTime.of(
+                LocalDate.of(2026, 1, 28),
+                LocalTime.MIDNIGHT,
+                ZoneId.of(displayTimeZoneId)
+            )
+        )
+    }
 }
