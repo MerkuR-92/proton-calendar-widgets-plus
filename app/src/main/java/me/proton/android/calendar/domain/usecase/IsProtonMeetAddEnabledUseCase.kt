@@ -9,11 +9,10 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.user.domain.UserManager
+import me.proton.core.user.domain.entity.Role
 import me.proton.core.user.domain.extension.isOrganizationUser
 import me.proton.core.usersettings.domain.entity.OrganizationSettings
 import me.proton.core.usersettings.domain.repository.OrganizationRepository
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 class IsProtonMeetAddEnabledUseCase @Inject constructor(
@@ -23,44 +22,31 @@ class IsProtonMeetAddEnabledUseCase @Inject constructor(
     private val userManager: UserManager,
     private val logger: Logger,
 ) {
-    private data class OrgSettingsEntry(
-        val settings: OrganizationSettings,
-        val expiresAt: Instant = Instant.now().plus(5, ChronoUnit.MINUTES),
-    ) {
-        fun valueIfValid() = settings.takeIf { expiresAt > Instant.now() }
-    }
-    private val orgSettingsCache = mutableMapOf<UserId, OrgSettingsEntry>()
 
     suspend operator fun invoke(userId: UserId, isAuto: Boolean): Boolean {
-        val isManualEnabled = CalendarFeatureFlag.ProtonMeetAddManual.isEnabled(userId)
+        if (!CalendarFeatureFlag.ProtonMeetAddManual.isEnabled(userId)) return false
+        if (!isOrgAccessControlAllowed(userId)) return false
         return if (isAuto) {
-            isManualEnabled
-                    && CalendarFeatureFlag.ProtonMeetAddAuto.isEnabled(userId)
+            CalendarFeatureFlag.ProtonMeetAddAuto.isEnabled(userId)
                     && isAutoAddUserSettingEnabled(userId)
-                    && isAutoAddOrgSettingEnabled(userId)
         } else {
-            isManualEnabled
+            true
         }
     }
 
     private suspend fun isAutoAddUserSettingEnabled(userId: UserId) = calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id).firstOrNull() ?: false
 
-    private suspend fun isAutoAddOrgSettingEnabled(userId: UserId): Boolean {
+    private suspend fun isOrgAccessControlAllowed(userId: UserId): Boolean {
         val user = userManager.getUserOrNull(userId, logger)
-        // Ignore this gating for non-org users
+        // non-org: not applicable
         if (user?.isOrganizationUser() != true) return true
+        // admins: not applicable
+        if (user.role == Role.OrganizationAdmin) return true
         return try {
-            val cached = orgSettingsCache[userId]?.valueIfValid()
-            if (cached != null) {
-                cached.isProtonMeetEnabled()
-            } else {
-                val settings = organizationRepository.getOrganizationSettings(
-                    sessionUserId = userId,
-                    refresh = false
-                )
-                orgSettingsCache[userId] = OrgSettingsEntry(settings)
-                settings.isProtonMeetEnabled()
-            }
+            organizationRepository.getOrganizationSettings(
+                sessionUserId = userId,
+                refresh = false
+            ).isProtonMeetEnabled()
         } catch (e: Throwable) {
             logger.e("Failed to fetch org settings", e)
             false
