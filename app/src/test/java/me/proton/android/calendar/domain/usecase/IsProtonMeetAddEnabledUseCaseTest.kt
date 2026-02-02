@@ -274,4 +274,62 @@ internal class IsProtonMeetAddEnabledUseCaseTest {
 
         assert(!result)
     }
+
+    @Test
+    fun `org settings are cached - multiple calls only fetch once`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddAuto, true)
+        coEvery { calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id) } returns flowOf(true)
+        stubOrgMember()
+        stubOrgSettingsWithMeet()
+
+        val useCase = createUseCase()
+        useCase.invoke(userId = userId, isAuto = false)
+        useCase.invoke(userId = userId, isAuto = true)
+        useCase.invoke(userId = userId, isAuto = false)
+
+        coVerify(exactly = 1) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    @Test
+    fun `org settings cache is cleared when clearCache is called`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubOrgMember()
+        stubOrgSettingsWithMeet()
+
+        val useCase = createUseCase()
+        useCase.invoke(userId = userId, isAuto = false)
+        useCase.clearCache()
+        useCase.invoke(userId = userId, isAuto = false)
+
+        coVerify(exactly = 2) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    @Test
+    fun `org settings cache works for non-org user`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubNonOrgUser()
+
+        val useCase = createUseCase()
+        useCase.invoke(userId = userId, isAuto = false)
+        useCase.invoke(userId = userId, isAuto = false)
+
+        // Non-org user: first call caches the result, second call uses cache
+        coVerify(exactly = 1) { userManager.getUser(userId) }
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
+
+    @Test
+    fun `org settings cache works for org admin`() = runBlocking {
+        stubFlag(CalendarFeatureFlag.ProtonMeetAddManual, true)
+        stubOrgAdmin()
+
+        val useCase = createUseCase()
+        useCase.invoke(userId = userId, isAuto = false)
+        useCase.invoke(userId = userId, isAuto = false)
+
+        // Org admin: first call caches the result, second call uses cache
+        coVerify(exactly = 1) { userManager.getUser(userId) }
+        coVerify(exactly = 0) { organizationRepository.getOrganizationSettings(any(), any()) }
+    }
 }
