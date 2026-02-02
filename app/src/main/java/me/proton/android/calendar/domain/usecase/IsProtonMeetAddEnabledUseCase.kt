@@ -22,12 +22,6 @@ class IsProtonMeetAddEnabledUseCase @Inject constructor(
     private val userManager: UserManager,
     private val logger: Logger,
 ) {
-    // cached per-user, per-session
-    private var cachedOrgAccessControlResult: Pair<UserId, Boolean>? = null
-
-    fun clearCache() {
-        cachedOrgAccessControlResult = null
-    }
 
     suspend operator fun invoke(userId: UserId, isAuto: Boolean): Boolean {
         if (!CalendarFeatureFlag.ProtonMeetAddManual.isEnabled(userId)) return false
@@ -43,28 +37,20 @@ class IsProtonMeetAddEnabledUseCase @Inject constructor(
     private suspend fun isAutoAddUserSettingEnabled(userId: UserId) = calendarsRepository.flowIsAutoAddConferenceLinkOn(userId.id).firstOrNull() ?: false
 
     private suspend fun isOrgAccessControlAllowed(userId: UserId): Boolean {
-        cachedOrgAccessControlResult?.let { (cachedUserId, result) ->
-            if (cachedUserId == userId) return result
-        }
-
         val user = userManager.getUserOrNull(userId, logger)
-        val result = when {
-            // non-org: not applicable
-            user?.isOrganizationUser() != true -> true
-            // admins: not applicable
-            user.role == Role.OrganizationAdmin -> true
-            else -> try {
-                organizationRepository.getOrganizationSettings(
-                    sessionUserId = userId,
-                    refresh = false
-                ).isProtonMeetEnabled()
-            } catch (e: Throwable) {
-                logger.e("Failed to fetch org settings", e)
-                false
-            }
+        // non-org: not applicable
+        if (user?.isOrganizationUser() != true) return true
+        // admins: not applicable
+        if (user.role == Role.OrganizationAdmin) return true
+        return try {
+            organizationRepository.getOrganizationSettings(
+                sessionUserId = userId,
+                refresh = false
+            ).isProtonMeetEnabled()
+        } catch (e: Throwable) {
+            logger.e("Failed to fetch org settings", e)
+            false
         }
-        cachedOrgAccessControlResult = userId to result
-        return result
     }
 
     private fun OrganizationSettings.isProtonMeetEnabled() = allowedProducts?.any { it.equals("Meet", ignoreCase = true) } ?: false

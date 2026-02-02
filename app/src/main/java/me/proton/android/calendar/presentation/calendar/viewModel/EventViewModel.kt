@@ -342,7 +342,6 @@ class EventViewModel @Inject constructor(
         }
         meetSessionKey = null
         generateProtonMeetUrlUseCase.onMeetUrlSynced() // clear any cached Meet URL
-        isProtonMeetAddEnabled.clearCache() // clear cached org access control result
         attendeeAnswerState.value = null
 
         // reset backup values
