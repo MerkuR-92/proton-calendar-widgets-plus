@@ -369,10 +369,8 @@ data class Event private constructor(
 
     fun hasValidVideoConferenceInData(): Boolean {
         if (!meetUrl.isNullOrBlank()) return true
-        return VideoConferenceParser.hasValidVideoConference(
-            description = description,
-            location = location,
-        )
+        return VideoConferenceParser.containsVideoConferenceUrl(description)
+            || VideoConferenceParser.containsVideoConferenceUrl(location)
     }
 
     fun addMeetUrl(newUrl: String, newConferenceId: String, encryptedTitle: String, host: String?) {

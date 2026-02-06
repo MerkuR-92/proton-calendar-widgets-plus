@@ -2,6 +2,8 @@ package me.proton.android.calendar.domain.utils
 
 object VideoConferenceParser {
 
+    // schemes optional when detecting
+
     private val googleMeet =
         Regex("(https://)?meet\\.google\\.com/([a-z]{3}-[a-z]{4}-[a-z]{3})")
 
@@ -26,17 +28,6 @@ object VideoConferenceParser {
         teams,
     )
 
-    fun hasValidVideoConference(description: String?, location: String?): Boolean =
-        listOfNotNull(description, location)
-            .any { containsVideoConferenceUrl(it) }
-
-    private fun containsVideoConferenceUrl(text: String): Boolean =
-        allRegexes.any { regex -> findUrlWithOptionalScheme(text, regex) != null }
-
-    private fun findUrlWithOptionalScheme(text: String, regex: Regex): String? {
-        val match = regex.find(text) ?: return null
-        val schemePart = match.groupValues.getOrNull(1).orEmpty()
-        val value = match.value
-        return if (schemePart.isNotEmpty()) value else "https://$value"
-    }
+    fun containsVideoConferenceUrl(text: String?): Boolean =
+        text != null && allRegexes.any { it.containsMatchIn(text) }
 }
