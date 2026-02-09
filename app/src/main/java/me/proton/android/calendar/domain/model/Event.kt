@@ -340,7 +340,7 @@ data class Event private constructor(
 
     fun addMeetDescription(resourceProvider: ResourceProvider) {
         val prompt = when (meetType ?: return) {
-            MeetIntegrationType.ProtonMeet -> "Join Proton Meeting"
+            MeetIntegrationType.ProtonMeet -> "Join Proton Meet"
             MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
         }
         val details = when (meetType) {
@@ -356,7 +356,7 @@ data class Event private constructor(
         /*
             Proton Meet:
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
-            Join Proton Meeting: https://meet.proton.me/join/id-XXX#pwd-XXX
+            Join Proton Meet: https://meet.proton.me/join/id-XXX#pwd-XXX
             ~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~
 
             Zoom:

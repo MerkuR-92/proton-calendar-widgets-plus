@@ -46,23 +46,40 @@ object EventDetailsUtils {
             binding.imageButtonAction.setImageResource(R.drawable.ic_proton_squares)
             binding.imageButtonAction.isVisible = true
 
-            val showPassword = meetType != MeetIntegrationType.ProtonMeet
-            if (showPassword && event.meetConferencePassword != null) {
-                val meetConferencePassword = event.meetConferencePassword!!
-                val spannableConferencePassword: Spannable = SpannableString(
-                    getString(R.string.generic_meeting_password, meetConferencePassword)
+            val showIdAndPasscode = meetType != MeetIntegrationType.ProtonMeet
+            if (showIdAndPasscode && event.meetConferenceId != null) {
+                val meetConferenceId = event.meetConferenceId!!
+                val spannableConferenceId = SpannableString(
+                    getString(R.string.generic_meeting_id, meetConferenceId)
                 )
-                spannableConferencePassword.setSpan(
+                spannableConferenceId.setSpan(
                     ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
-                    spannableConferencePassword.indexOf(meetConferencePassword),
-                    spannableConferencePassword.indexOf(meetConferencePassword)
-                        .plus(meetConferencePassword.length),
+                    spannableConferenceId.indexOf(meetConferenceId),
+                    spannableConferenceId.indexOf(meetConferenceId).plus(meetConferenceId.length),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-                binding.textConferencePassword.text = spannableConferencePassword
-                binding.textConferencePassword.visibleOrGone(true)
+                binding.textConferenceId.text = spannableConferenceId
+                binding.textConferenceId.visibleOrGone(true)
             } else {
-                binding.textConferencePassword.isVisible = false
+                binding.textConferenceId.isVisible = false
+            }
+
+            if (showIdAndPasscode && event.meetConferencePassword != null) {
+                val meetConferencePasscode = event.meetConferencePassword!!
+                val spannableConferencePasscode = SpannableString(
+                    getString(R.string.generic_meeting_passcode, meetConferencePasscode)
+                )
+                spannableConferencePasscode.setSpan(
+                    ForegroundColorSpan(requireContext().getColorFromAttr(R.attr.proton_text_weak)),
+                    spannableConferencePasscode.indexOf(meetConferencePasscode),
+                    spannableConferencePasscode.indexOf(meetConferencePasscode)
+                        .plus(meetConferencePasscode.length),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                binding.textConferencePasscode.text = spannableConferencePasscode
+                binding.textConferencePasscode.visibleOrGone(true)
+            } else {
+                binding.textConferencePasscode.isVisible = false
             }
 
             if (event.meetMeetingHost != null) {

@@ -853,7 +853,7 @@ internal class EventTest {
         assertThat(description).doesNotContain(host)
         
         val header = "~-~-~-~-~-~-~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~%~!~-~-~-~-~-~-~"
-        val expectedBlock = "\n$header\nJoin Proton Meeting: $meetUrl\n$header"
+        val expectedBlock = "\n$header\nJoin Proton Meet: $meetUrl\n$header"
         assertThat(description).isEqualTo(expectedBlock)
     }
 
