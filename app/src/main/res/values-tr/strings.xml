@@ -135,7 +135,6 @@
     <string name="zoom_meeting_title">Zoom görüşmesi</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">Kimlik: %1$s</string>
-    <string name="generic_meeting_password">Parola: %1$s</string>
     <string name="generic_meeting_more_details">Ayrıntıları görüntüle</string>
     <string name="generic_meeting_less_details">Ayrıntıları gizle</string>
     <string name="generic_meeting_host">Görüşme sahibi</string>
