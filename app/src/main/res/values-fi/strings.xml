@@ -135,7 +135,6 @@
     <string name="zoom_meeting_title">Zoom-kokous</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_password">Salasana: %1$s</string>
     <string name="generic_meeting_more_details">Enemmän tietoja</string>
     <string name="generic_meeting_less_details">Vähemmän tietoja</string>
     <string name="generic_meeting_host">Kokouksen järjestäjä</string>
