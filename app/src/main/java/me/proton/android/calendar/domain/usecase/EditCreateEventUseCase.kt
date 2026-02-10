@@ -73,7 +73,8 @@ class EditCreateEventUseCase @Inject constructor(
         oldCalendarId: String = newEvent.calendar.id,
         createLinkedEventAsAttendee: Boolean = false,
         sendPreferences: Map<Email, SendPreferences> = emptyMap(),
-        isImport: Boolean = false
+        isImport: Boolean = false,
+        removedAttendeeAddresses: List<String> = emptyList()
     ) : UseCase.Result {
 
         val sanitizedNewEvent = Event.from(newEvent)
@@ -343,7 +344,8 @@ class EditCreateEventUseCase @Inject constructor(
                                 // If we sent the SharedSessionKey already before, the attendee has the event auto-created in their calendar already, so we are done.
                                 addedProtonAttendees = addedProtonAttendees,
                                 notifications = sanitizedNewEvent.notifications.notifications?.map { NotificationEntity.fromNotification(it) },
-                                color = sanitizedNewEvent.color
+                                color = sanitizedNewEvent.color,
+                                removedAttendeeAddresses = removedAttendeeAddresses.takeIfNotEmpty()
                             )
                         )
                     )

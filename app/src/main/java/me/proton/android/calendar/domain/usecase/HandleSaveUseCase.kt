@@ -151,6 +151,7 @@ class HandleSaveUseCase @Inject constructor(
         val removedAttendees = immutableOriginalDbEvent?.iCalEvent?.attendees?.filter { dbEventAttendee ->
             !event.iCalEvent.attendees.map { it.extractEmail() }.contains(dbEventAttendee.extractEmail())
         } ?: emptyList()
+        val removedAttendeeEmails = removedAttendees.mapNotNull { it.extractEmail() }
 
         return if (!isCreate && (!newEvent.iCalEvent.attendees.isNullOrEmpty() || !immutableOriginalDbEvent?.iCalEvent?.attendees.isNullOrEmpty()) && (sendEmailUpdate == null || sendEmailUpdate == true)) {
             // Update event and change attendees
@@ -197,7 +198,7 @@ class HandleSaveUseCase @Inject constructor(
                 existingAttendees.any { sendPrefs.key == it.extractEmail() }
             }
             // Update the event with attendee changes
-            if (attendeesToNotify.isEmpty()) editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify)
+            if (attendeesToNotify.isEmpty()) editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify, removedAttendeeAddresses = removedAttendeeEmails)
             else {
                 resetParticipationStatus(currentEventSequence, newEvent, attendeesToNotify)
                 editEventWithAttendees(
@@ -208,7 +209,8 @@ class HandleSaveUseCase @Inject constructor(
                     addedAttendeesToNotify,
                     event.defaultTimeZone!!,
                     timeFormatIs24Hours,
-                    sendEmailUpdate
+                    sendEmailUpdate,
+                    removedAttendeeAddresses = removedAttendeeEmails
                 )
             }
         } else if (!isCreate && sendEmailUpdate == false && (addedAttendees.isNotEmpty() || removedAttendees.isNotEmpty())) {
@@ -248,7 +250,7 @@ class HandleSaveUseCase @Inject constructor(
                 }
             }
             // Update the event with attendee changes
-            return editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify)
+            return editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify, removedAttendeeAddresses = removedAttendeeEmails)
         } else if (isCreate && !newEvent.iCalEvent.attendees.isNullOrEmpty()) {
             // Create event with attendees
             val attendeesToNotify = sendPreferences.filter { sendPrefs ->
@@ -744,7 +746,8 @@ class HandleSaveUseCase @Inject constructor(
         addedAttendeesToNotify: Map<Email, SendPreferences>,
         defaultTimeZone: String,
         timeFormatIs24Hours: Boolean,
-        sendEmailUpdate: Boolean?
+        sendEmailUpdate: Boolean?,
+        removedAttendeeAddresses: List<String> = emptyList()
     ): UseCase.Result {
         val sendEmailResult =
             if (sendEmailUpdate == true && attendeesToNotify.isEmpty()) {
@@ -783,7 +786,7 @@ class HandleSaveUseCase @Inject constructor(
             )
         }
 
-        return editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify)
+        return editCreateEvent(userId, newEvent, sendPreferences = addedAttendeesToNotify, removedAttendeeAddresses = removedAttendeeAddresses)
     }
 
     private suspend fun notifyAddedAttendees(
@@ -936,14 +939,16 @@ class HandleSaveUseCase @Inject constructor(
         userId: UserId,
         newEvent: Event,
         oldCalendarId: String? = null,
-        sendPreferences: Map<Email, SendPreferences> = emptyMap()
+        sendPreferences: Map<Email, SendPreferences> = emptyMap(),
+        removedAttendeeAddresses: List<String> = emptyList()
     ): UseCase.Result {
 
         val createEventResult = editCreateEventUseCase.execute(
             userId,
             newEvent,
             oldCalendarId = oldCalendarId ?: newEvent.calendar.id,
-            sendPreferences = sendPreferences
+            sendPreferences = sendPreferences,
+            removedAttendeeAddresses = removedAttendeeAddresses
         )
 
         return when (createEventResult) {

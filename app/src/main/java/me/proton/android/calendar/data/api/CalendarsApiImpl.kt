@@ -696,7 +696,9 @@ data class SyncEvent(
     @SerialName("Notifications") // notifications that used to be in the PersonalEventContent
     val notifications: List<NotificationEntity>? = null,
     @SerialName("Color")
-    val color: String? = null
+    val color: String? = null,
+    @SerialName("RemovedAttendeeAddresses")
+    val removedAttendeeAddresses: List<String>? = null
 )
 
 @Serializable
