@@ -166,7 +166,7 @@
     <string name="invite_change_attendees_disclaimer">Пока невозможно изменить участников, связанных с приглашениями.</string>
     <string name="change_calendar_recurring_disclaimer">Изменение календаря для повторяющегося события пока невозможно.</string>
     <string name="update_event">Обновить событие</string>
-    <string name="update_invite_send_email">An invitation update will be sent to the event participants.</string>
+    <string name="update_invite_send_email">Участникам события будет отправлено обновление приглашения.</string>
     <string name="update_recurring_event">Обновить повторяющееся событие</string>
     <string name="update_recurring_all_events">Вы хотите обновить все события в этой серии?</string>
     <string name="update_recurring_invite_send_email">Вы обновите все события в этой серии. Участникам события будет отправлено обновленное приглашение.</string>
