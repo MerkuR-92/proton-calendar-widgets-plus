@@ -682,7 +682,9 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 eventViewModel.protonMeetState.collectLatest { state ->
-                    buttonSave.isEnabled = true
+                    val isLoadingSessionKey = state is EventViewModel.ProtonMeetState.LoadingSessionKey
+                    buttonSave.isEnabled = !isLoadingSessionKey
+                    binding.eventFormConferenceLayout.imageButtonAction.isEnabled = !isLoadingSessionKey
                     eventViewModel.eventLiveData.value?.let {
                         updateConferenceSection(it)
                     } ?: updateMeetState(state)
@@ -756,7 +758,8 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                 container.eventFormConferencePress.root.isEnabled = false
                 buttonSave.isEnabled = false
             }
-            EventViewModel.ProtonMeetState.Hidden -> {
+            EventViewModel.ProtonMeetState.Hidden,
+            EventViewModel.ProtonMeetState.LoadingSessionKey -> {
                 container.root.isVisible = false
             }
         }

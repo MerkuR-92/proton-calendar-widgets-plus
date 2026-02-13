@@ -153,7 +153,7 @@ class EventViewModel @Inject constructor(
     private val updatePersonalPartUseCase: UpdatePersonalPartUseCase,
     private val generateProtonMeetUrlUseCase: GenerateProtonMeetUrlUseCase,
     private val protonMeetCrypto: ProtonMeetCrypto,
-    private val gerProtonMeetDetailsUseCase: GetProtonMeetDetailsUseCase,
+    private val getProtonMeetDetailsUseCase: GetProtonMeetDetailsUseCase,
     private val isProtonMeetAddEnabled: IsProtonMeetAddEnabledUseCase,
 ) : AndroidViewModel(application) {
 
@@ -173,6 +173,7 @@ class EventViewModel @Inject constructor(
         data object Hidden : ProtonMeetState
         data object ClickableForMeet : ProtonMeetState
         data object Creating : ProtonMeetState
+        data object LoadingSessionKey : ProtonMeetState
         data class Success(val url: String) : ProtonMeetState
         data class Error(val localizedMessage: String?) : ProtonMeetState
     }
@@ -461,26 +462,33 @@ class EventViewModel @Inject constructor(
         _event.postValue(event)
 
         event.meetingLinkName?.let { meetingLinkName ->
-            val addEnabled = isProtonMeetAddEnabled(userId, true) || isProtonMeetAddEnabled(userId, false)
-            if (!addEnabled) return@let
-            val result = gerProtonMeetDetailsUseCase.execute(meetingLinkName = meetingLinkName, userId)
-            when (result) {
-                GetProtonMeetDetailsUseCase.MeetingDetailsResult.Error -> {
-                    logger.e("Failed to retrieve Proton Meet session key: $result")
-                }
-                is GetProtonMeetDetailsUseCase.MeetingDetailsResult.Success -> {
-                    meetSessionKey = result.sessionKey
-                    event.meetUrl?.let { url ->
-                        generateProtonMeetUrlUseCase.cacheExistingMeetUrl(
-                            GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
-                                url = url,
-                                meetingLinkNameConfId = meetingLinkName,
-                                encryptedTitle = "", // not needed, we re-encrypt during saving
-                                sessionKey = result.sessionKey,
-                                hostAddress = event.meetMeetingHost ?: event.calendar.email,
-                            )
-                        )
+            protonMeetState.value = ProtonMeetState.LoadingSessionKey
+            coroutineScope.launch {
+                try {
+                    val addEnabled = isProtonMeetAddEnabled(userId, true) || isProtonMeetAddEnabled(userId, false)
+                    if (!addEnabled) return@launch
+                    val result = getProtonMeetDetailsUseCase.execute(meetingLinkName = meetingLinkName, userId)
+                    when (result) {
+                        GetProtonMeetDetailsUseCase.MeetingDetailsResult.Error -> {
+                            logger.e("Failed to retrieve Proton Meet session key: $result")
+                        }
+                        is GetProtonMeetDetailsUseCase.MeetingDetailsResult.Success -> {
+                            meetSessionKey = result.sessionKey
+                            event.meetUrl?.let { url ->
+                                generateProtonMeetUrlUseCase.cacheExistingMeetUrl(
+                                    GenerateProtonMeetUrlUseCase.GenerateMeetUrlResult.Success(
+                                        url = url,
+                                        meetingLinkNameConfId = meetingLinkName,
+                                        encryptedTitle = "", // not needed, we re-encrypt during saving
+                                        sessionKey = result.sessionKey,
+                                        hostAddress = event.meetMeetingHost ?: event.calendar.email,
+                                    )
+                                )
+                            }
+                        }
                     }
+                } finally {
+                    protonMeetState.value = initialMeetState()
                 }
             }
         }
