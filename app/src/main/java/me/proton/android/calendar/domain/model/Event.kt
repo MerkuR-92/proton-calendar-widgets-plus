@@ -402,7 +402,7 @@ data class Event private constructor(
             this.iCalEvent.description.value = this.iCalEvent.description.value.replace(
                 Regex(CONFERENCE_DESCRIPTION_REGEX_STRING),
                 ""
-            ).trim()
+            ).trim().ifEmpty { null }
         }
     }
 

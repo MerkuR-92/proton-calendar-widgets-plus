@@ -1316,6 +1316,10 @@ object ICalUtilsImpl : ICalUtils {
         // TODO: Provide complete VTIMEZONE in the ics. In the meantime, we remove it from the ICS
         inviteICalendar.timezoneInfo.timezones.clear()
 
+        // Refresh DTSTAMP so that calendar clients (e.g. Google Calendar) recognize this as a newer version,
+        // even when SEQUENCE hasn't changed (e.g. description-only or meet-link-only updates).
+        inviteICalendar.events.first().setDateTimeStamp(Date.from(Instant.now()))
+
         return inviteICalendar.printToString()
     }
 
