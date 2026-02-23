@@ -135,6 +135,7 @@
     <string name="zoom_meeting_title">Zoom 会议</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID：%1$s</string>
+    <string name="generic_meeting_passcode">密码：%1$s</string>
     <string name="generic_meeting_more_details">更多详细信息</string>
     <string name="generic_meeting_less_details">更少细节</string>
     <string name="generic_meeting_host">会议主持人</string>
@@ -680,7 +681,7 @@
     <string name="import_assistant_discard_import_positive">取消导入</string>
     <string name="import_assistant_discard_import_negative">恢复导入</string>
     <string name="import_assistant_authentication_canceled">验证已取消</string>
-    <string name="import_assistant_sign_in_in_progress">已在登入中</string>
+    <string name="import_assistant_sign_in_in_progress">正在登录...</string>
     <string name="import_assistant_in_progress_error_snack">仍在进行导入</string>
     <!-- Import events -->
     <string name="import_event_disclaimer_dialog_title">导入为简单活动？</string>

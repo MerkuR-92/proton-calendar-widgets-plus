@@ -135,6 +135,7 @@
     <string name="zoom_meeting_title">Réunion Zoom</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID : %1$s</string>
+    <string name="generic_meeting_passcode">Code d’accès : %1$s</string>
     <string name="generic_meeting_more_details">Plus d\'informations</string>
     <string name="generic_meeting_less_details">Moins d’informations</string>
     <string name="generic_meeting_host">Hôte de la réunion </string>
