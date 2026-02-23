@@ -135,6 +135,7 @@
     <string name="zoom_meeting_title">Pertemuan Zoom</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
+    <string name="generic_meeting_passcode">Passcode: %1$s</string>
     <string name="generic_meeting_more_details">Tambah rincian</string>
     <string name="generic_meeting_less_details">Kurangi rincian</string>
     <string name="generic_meeting_host">Tuan rumah pertemuan</string>
