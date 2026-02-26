@@ -462,6 +462,11 @@ class EventViewModel @Inject constructor(
         _event.postValue(event)
 
         event.meetingLinkName?.let { meetingLinkName ->
+            val isCurrentUserMeetingHost = event.meetMeetingHost.let { host ->
+                host == null || host == event.calendar.email
+            }
+            // non-host (shared calendars): do not fetch session key
+            if (!isCurrentUserMeetingHost) return@let
             protonMeetState.value = ProtonMeetState.LoadingSessionKey
             coroutineScope.launch {
                 try {
