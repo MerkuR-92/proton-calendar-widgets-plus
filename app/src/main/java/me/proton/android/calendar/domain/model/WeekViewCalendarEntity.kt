@@ -45,15 +45,18 @@ sealed class WeekViewCalendarEntity {
 }
 
 const val OCCURRENCE_NUMBER_SUFFIX = "&occurrenceNumber="
+const val CALENDAR_ID_SUFFIX = "&calendarId="
 const val BIS_SUFFIX = "&bis"
 const val CUSTOM_FONT = "sans-serif-medium"
 
 fun WeekViewCalendarEntity.Event.getActualEventId(): String {
-    val occurrenceNumberIndex = id.indexOf(OCCURRENCE_NUMBER_SUFFIX)
     val bisIndex = id.indexOf(BIS_SUFFIX)
+    val calendarIdIndex = id.indexOf(CALENDAR_ID_SUFFIX)
+    val occurrenceNumberIndex = id.indexOf(OCCURRENCE_NUMBER_SUFFIX)
     return id.substring(
         0,
         if (bisIndex >= 0) bisIndex
+        else if (calendarIdIndex >= 0) calendarIdIndex
         else if (occurrenceNumberIndex >= 0) occurrenceNumberIndex
         else id.length
     )
@@ -61,8 +64,9 @@ fun WeekViewCalendarEntity.Event.getActualEventId(): String {
 
 fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekViewCalendarEntity.Event> {
     // We add the occurrence number as a suffix to the event id so that week view doesn't recycle events with the same id, and so that we easily find the event occurrence on click
+    val calendarIdSuffix = CALENDAR_ID_SUFFIX + this.calendarId
     val occurrenceNumberSuffix = if (!this.isRecurring) "" else OCCURRENCE_NUMBER_SUFFIX + this.occurrenceNumber
-    val weekViewEventId = this.id + occurrenceNumberSuffix
+    val weekViewEventId = this.id + calendarIdSuffix + occurrenceNumberSuffix
     val sameDay = this.dateEnd.toLocalDate().isEqual(this.dateStart.toLocalDate())
     val lastAtLeast24Hours = this.dateEnd.toInstant().toEpochMilli() - this.dateStart.toInstant().toEpochMilli() >= TimeUnit.HOURS.toMillis(24)
     return if (sameDay || lastAtLeast24Hours) {
@@ -104,7 +108,7 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
             isRecurring = this.isRecurring,
             occurrenceNumber = if (this.occurrenceNumber == 0) null else this.occurrenceNumber
         )
-        val weekViewEventBisId = this.id + BIS_SUFFIX + occurrenceNumberSuffix
+        val weekViewEventBisId = this.id + BIS_SUFFIX + calendarIdSuffix + occurrenceNumberSuffix
         val endEvent = startEvent.copy(
             id = weekViewEventBisId,
             startTime = this.dateEnd.with(LocalTime.MIN).toLocalDateTime(),
