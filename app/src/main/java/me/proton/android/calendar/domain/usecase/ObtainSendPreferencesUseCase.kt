@@ -23,6 +23,8 @@ import me.proton.core.key.domain.entity.key.Recipient
 import me.proton.core.mailmessage.domain.entity.Email
 import me.proton.core.mailmessage.domain.usecase.GetRecipientPublicAddresses
 import me.proton.core.user.domain.UserManager
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.filterNullValues
 import javax.inject.Inject
@@ -55,7 +57,8 @@ class ObtainSendPreferencesUseCase @Inject constructor(
 
     suspend fun execute(
         userId: UserId,
-        canonicalEmails: Map<Email, Email>
+        canonicalEmails: Map<Email, Email>,
+        refresh: Boolean = true
     ): Map<Email, Result> {
 
         val user = userManager.getUserOrNull(userId, logger)
@@ -64,27 +67,31 @@ class ObtainSendPreferencesUseCase @Inject constructor(
             logger.i("ObtainSendPreferencesUseCase User is null")
         }
 
-        // 1. get User's Mail Settings
-        val mailSettings = mailSettingsApi.getMailSettings(userId).valueOrNullAndLogErrors(
-            logger,
-            "ObtainSendPreferencesUseCase, get Mail Settings"
-        )?.mailSettings?.toMailSettings()
-
-        // 2. get all User's contacts
-        val contactEmails =
-            kotlin.runCatching { contactEmailsRepository.getAllContactEmails(userId, refresh = true) }.getOrElse {
-                logger.i("ObtainSendPreferencesUseCase error getting all contact emails", it)
-                null
+        // Fetch mail settings, contacts, and public addresses in parallel — they have no data dependencies
+        val (mailSettings, contactEmails, publicAddresses) = coroutineScope {
+            val mailSettingsDeferred = async {
+                mailSettingsApi.getMailSettings(userId).valueOrNullAndLogErrors(
+                    logger,
+                    "ObtainSendPreferencesUseCase, get Mail Settings"
+                )?.mailSettings?.toMailSettings()
             }
+            val contactEmailsDeferred = async {
+                kotlin.runCatching { contactEmailsRepository.getAllContactEmails(userId, refresh = refresh) }.getOrElse {
+                    logger.i("ObtainSendPreferencesUseCase error getting all contact emails", it)
+                    null
+                }
+            }
+            val publicAddressesDeferred = async {
+                getRecipientPublicAddresses.invoke(userId, canonicalEmails.keys.toList())
+            }
+            Triple(mailSettingsDeferred.await(), contactEmailsDeferred.await(), publicAddressesDeferred.await())
+        }
 
         if (mailSettings == null || contactEmails == null || user == null) {
             return canonicalEmails.mapValues { Result.Error.NetworkError }
         }
 
         val result = HashMap<Email, Result>()
-
-        // 3. get public addresses for recipients
-        val publicAddresses = getRecipientPublicAddresses.invoke(userId, canonicalEmails.keys.toList())
         publicAddresses.forEach {
             if (it.value == null && canonicalEmails.keys.contains(it.key) && !result.containsKey(it.key)) result[it.key] = Result.Error.AddressDisabled
         }
@@ -96,7 +103,7 @@ class ObtainSendPreferencesUseCase @Inject constructor(
 
         // 5. fetch full Contact info for those contacts
         val fullContactsWithCustomPreferences = contactEmailsWithCustomPreferences.mapValues { entry ->
-            kotlin.runCatching { contactEmailsRepository.getContactWithCards(userId, entry.value.contactId, refresh = true) }.getOrElse {
+            kotlin.runCatching { contactEmailsRepository.getContactWithCards(userId, entry.value.contactId, refresh = refresh) }.getOrElse {
                 logger.i("ObtainSendPreferencesUseCase error getting full contacts", it)
                 null
             }
