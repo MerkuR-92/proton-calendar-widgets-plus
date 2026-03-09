@@ -303,17 +303,33 @@ object EventUtilsImpl : EventUtils {
             if (toDate != null && occurrenceStart.isAfter(formatToZonedDateTime)) break
 
             // ignore occurrences before the [firstOccurrenceFromDateTime]
-            if (firstOccurrenceFromDateTime != null && firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
-                continue
+            // all-day events: compare dates only to avoid skipping same-day occurrences
+            // when firstOccurrenceFromDateTime has a non-midnight time.
+            // If the time is within 60 seconds of midnight, use datetime comparison
+            // to support the plusSeconds(1) skip in generateFirstRealOccurrenceSince.
+            if (firstOccurrenceFromDateTime != null) {
+                val useAllDayDateComparison = isAllDay() &&
+                    firstOccurrenceFromDateTime.toLocalTime().toSecondOfDay() >= 60
+                val shouldSkip = if (useAllDayDateComparison) {
+                    firstOccurrenceFromDateTime.toLocalDate().isAfter(occurrenceStart.toLocalDate())
+                } else {
+                    firstOccurrenceFromDateTime.isAfter(occurrenceStart)
+                }
+                if (shouldSkip) continue
             }
 
             occurrences.add(Event.Occurrence(occurrenceStart, occurrenceEnd, count))
 
             // if there was [firstOccurrenceFromDateTime], take the first matching occurrence and break
             if (firstOccurrenceFromDateTime != null) {
-                if (!firstOccurrenceFromDateTime.isAfter(occurrenceStart)) {
-                    break
+                val useAllDayDateComparison = isAllDay() &&
+                    firstOccurrenceFromDateTime.toLocalTime().toSecondOfDay() >= 60
+                val shouldBreak = if (useAllDayDateComparison) {
+                    !firstOccurrenceFromDateTime.toLocalDate().isAfter(occurrenceStart.toLocalDate())
+                } else {
+                    !firstOccurrenceFromDateTime.isAfter(occurrenceStart)
                 }
+                if (shouldBreak) break
             }
         }
 
