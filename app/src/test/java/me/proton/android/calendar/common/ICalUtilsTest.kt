@@ -2480,7 +2480,7 @@ internal class ICalUtilsTest {
         val filteredByExdatesmappedSingleEditBeforeFirstOccurrence = mappedSingleEditBeforeFirstOccurrence.filterOutOccurrencesByExdates(events.first(), displayTimeZoneId)
 
         assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence.size).isEqualTo(1)
-        assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence[0].occurrence!!.occurrenceNumber == 1)
+        assertThat(filteredByExdatesmappedSingleEditBeforeFirstOccurrence[0].occurrence!!.occurrenceNumber).isEqualTo(1)
 
     }
 
@@ -2529,7 +2529,7 @@ internal class ICalUtilsTest {
         LOCATION:
         SEQUENCE:1
         STATUS:CONFIRMED
-        SUMMARY:SE: Invite from google make SE 
+        SUMMARY:SE: Invite from google make SE
         TRANSP:TRANSPARENT
         END:VEVENT
         END:VCALENDAR
@@ -2561,9 +2561,75 @@ internal class ICalUtilsTest {
         }
 
         val occurrencesWithSingleEdits = ICalUtilsImpl.expandOccurrencesWithSingleEdits(events.first(), events, LocalDate.of(2021, 9, 15), displayRangeTo, displayTimeZoneId)!!
-        assertThat(occurrencesWithSingleEdits.size == 1)
-        assertThat(occurrencesWithSingleEdits.first().isSingleEdit())
-        assertThat(occurrencesWithSingleEdits.first().summary == "SE: Invite from google make SE")
+        assertThat(occurrencesWithSingleEdits.size).isEqualTo(1)
+        assertThat(occurrencesWithSingleEdits.first().isSingleEdit()).isTrue()
+        assertThat(occurrencesWithSingleEdits.first().summary).isEqualTo("SE: Invite from google make SE")
+    }
+
+    @Test
+    fun `expandOccurrencesWithSingleEdits all-day single edit found regardless of system timezone`() {
+        // if system TZ is far from the display TZ, the recurrence-id date can shift by a day
+        // if extracted via epoch millis instead of rawComponents.
+        // This would prevent maxToDate from extending far enough, so the single edit's occurrence is never generated.
+        val originalTz = TimeZone.getDefault()
+        try {
+            TimeZone.setDefault(TimeZone.getTimeZone("GMT+7"))
+
+            val iCals = listOf(
+                """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210906
+    DTEND;VALUE=DATE:20210907
+    RRULE:FREQ=WEEKLY;BYDAY=MO
+    UID:tz-regression-test@test
+    SUMMARY:Weekly Monday
+    END:VEVENT
+    END:VCALENDAR
+                """.trimIndent(),
+                """
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20210912
+    DTEND;VALUE=DATE:20210913
+    RECURRENCE-ID;VALUE=DATE:20210913
+    UID:tz-regression-test@test
+    SUMMARY:Moved to Sunday
+    END:VEVENT
+    END:VCALENDAR
+                """.trimIndent(),
+            )
+
+            val calendar = Calendar(
+                "id", "calendar", "email", "ownerEmail", "description", "",
+                0, "addressId", "memberId", 1, true, 0, 127, 30,
+                emptyList(), emptyList()
+            )
+            val events = iCals.mapIndexed { index, iCal ->
+                Event.from(
+                    "eventId-$index",
+                    calendar,
+                    parseICalString(iCal)!!,
+                    0,
+                    null
+                )!!
+            }
+
+            // window ends before the recurrence-id (Sept 13) so maxToDate must extend
+            val occurrences = ICalUtilsImpl.expandOccurrencesWithSingleEdits(
+                events.first(), events,
+                LocalDate.of(2021, 9, 6), LocalDate.of(2021, 9, 12),
+                "Europe/Paris"
+            )!!
+
+            val singleEdit = occurrences.find { it.isSingleEdit() }
+            assertThat(singleEdit).isNotNull()
+            assertThat(singleEdit!!.summary).isEqualTo("Moved to Sunday")
+        } finally {
+            TimeZone.setDefault(originalTz)
+        }
     }
 
     @Test

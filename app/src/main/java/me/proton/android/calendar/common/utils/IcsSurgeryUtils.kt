@@ -914,7 +914,6 @@ object IcsSurgeryUtils {
             event.recurrenceId.value =
                 if (rawComponents != null) {
                     ICalDate(
-                        event.recurrenceId.value,
                         rawComponents,
                         false
                     )
@@ -975,8 +974,9 @@ object IcsSurgeryUtils {
                     }
                     exceptionDates.values[exceptionDates.values.indexOf(exceptionDateValue)] =
                         if (rawComponents != null) {
+                            // use date components, not from the original datetime
+                            // - truncating a datetime to midnight in system TZ can land on the wrong day
                             ICalDate(
-                                exceptionDateValue,
                                 rawComponents,
                                 false
                             )
