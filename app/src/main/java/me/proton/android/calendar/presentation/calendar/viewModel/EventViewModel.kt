@@ -25,6 +25,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import me.proton.android.calendar.R
@@ -114,6 +116,7 @@ import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
 import me.proton.core.util.kotlin.equalsNoCase
+import me.proton.core.util.kotlin.CoroutineScopeProvider
 import me.proton.core.util.kotlin.filterNullValues
 import me.proton.core.util.kotlin.removeFirst
 import me.proton.core.util.kotlin.toBoolean
@@ -155,6 +158,7 @@ class EventViewModel @Inject constructor(
     private val protonMeetCrypto: ProtonMeetCrypto,
     private val getProtonMeetDetailsUseCase: GetProtonMeetDetailsUseCase,
     private val isProtonMeetAddEnabled: IsProtonMeetAddEnabledUseCase,
+    private val scopeProvider: CoroutineScopeProvider,
 ) : AndroidViewModel(application) {
 
     sealed class InitResult {
@@ -234,6 +238,9 @@ class EventViewModel @Inject constructor(
     val eventFormSnackState: MutableStateFlow<EventSnackState?> = MutableStateFlow(null)
 
     val attendeeAnswerState: MutableStateFlow<Pair<ParticipationStatus, Boolean>?> = MutableStateFlow(null)
+
+    @Volatile
+    private var cachedOrganizerSendPreferences: SendPreferencesResults? = null
 
     val protonMeetState = MutableStateFlow<ProtonMeetState>(ProtonMeetState.Hidden)
     private var meetSessionKey: SessionKey? = null
@@ -460,6 +467,19 @@ class EventViewModel @Inject constructor(
         if (editMode && !isCreate) saveUserEditedAlarms()
 
         _event.postValue(event)
+
+        if (!editMode && event.isAnInvitation) {
+            val organizerEmail = event.iCalEvent.organizer?.extractEmail()
+            if (organizerEmail != null) {
+                coroutineScope.launch {
+                    try {
+                        cachedOrganizerSendPreferences = getSendPreferences(listOf(organizerEmail))
+                    } catch (e: Exception) {
+                        logger.i("Pre-fetch organizer send preferences failed", e)
+                    }
+                }
+            }
+        }
 
         event.meetingLinkName?.let { meetingLinkName ->
             val isCurrentUserMeetingHost = event.meetMeetingHost.let { host ->
@@ -1441,11 +1461,10 @@ class EventViewModel @Inject constructor(
         val emailErrors: Map<String, ObtainSendPreferencesUseCase.Result.Error>
     )
 
-    private suspend fun getSendPreferences(emails: List<String>): SendPreferencesResults {
-        // get send preferences and check if attendees have disabled email addresses
+    private suspend fun getSendPreferences(emails: List<String>, refresh: Boolean = true): SendPreferencesResults {
         val canonicalEmails = getCanonicalEmailsUseCase.invoke(userId, emails)
 
-        val sendPreferencesResults = obtainSendPreferencesUseCase.execute(userId, canonicalEmails.filterNullValues())
+        val sendPreferencesResults = obtainSendPreferencesUseCase.execute(userId, canonicalEmails.filterNullValues(), refresh = refresh)
 
         val emailErrors = hashMapOf<String, ObtainSendPreferencesUseCase.Result.Error>()
         val sendPreferences = sendPreferencesResults.mapValues {
@@ -3553,7 +3572,27 @@ class EventViewModel @Inject constructor(
             return
         }
 
-        val sendPreferencesResults = getSendPreferences(listOf(organizerEmail))
+        val needsEventFetch = event.isProtonProtonInvite == null || event.isProtonProtonInvite == true
+
+        // Fetch send preferences and event entity in parallel — they have no data dependencies
+        val (sendPreferencesResults, prefetchedEventEntity) = coroutineScope {
+            val sendPrefsDeferred = async {
+                val result = cachedOrganizerSendPreferences
+                    ?: getSendPreferences(listOf(organizerEmail), refresh = false)
+                result
+            }
+            val eventEntityDeferred = if (needsEventFetch) {
+                async {
+                    val result = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id)
+                        .valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
+                    result
+                }
+            } else null
+
+            Pair(sendPrefsDeferred.await(), eventEntityDeferred?.await())
+        }
+        cachedOrganizerSendPreferences = null
+
         if (sendPreferencesResults.emailErrors.isNotEmpty()) {
 
             val emailError = sendPreferencesResults.emailErrors.values.first()
@@ -3596,7 +3635,8 @@ class EventViewModel @Inject constructor(
             changeAnswer(
                 newParticipationStatus,
                 sendPreferencesResults.sendPreferences,
-                timeFormatIs24Hours
+                timeFormatIs24Hours,
+                prefetchedEventEntity
             )
         }
     }
@@ -3607,7 +3647,8 @@ class EventViewModel @Inject constructor(
     private suspend fun changeAnswer(
         participationStatus: ParticipationStatus,
         sendPreferences: Map<Email, SendPreferences>,
-        timeFormatIs24Hours: Boolean
+        timeFormatIs24Hours: Boolean,
+        prefetchedEventEntity: EventEntity? = null
     ) {
         val status = participationStatus.toInt()
 
@@ -3658,12 +3699,12 @@ class EventViewModel @Inject constructor(
             }
 
         val eventEntity = if (event.isProtonProtonInvite == null || event.isProtonProtonInvite == true) {
-            val event = calendarsRepository.fetchEventById(userId, event.calendar.id, event.id).valueOrNullAndLogErrors(logger)?.event?.toEventEntity()
-            if (event == null) {
+            val entity = prefetchedEventEntity
+            if (entity == null) {
                 handleChangeAnswerError()
                 return
             }
-            event
+            entity
         } else null
 
         val isProtonProtonInvite = event.isProtonProtonInvite ?: eventEntity?.isProtonProtonInvite?.toBoolean()
@@ -3842,25 +3883,33 @@ class EventViewModel @Inject constructor(
         } else UseCase.Result.Error("handleChangeAnswerProtonToProton could not upgrade Event: ${upgradedEventEntity}")
         updateParticipationStatusUseCaseResult.ifSuccessAndLogErrors(logger) { }
 
+        // Send reply email in background — it's optional for P2P and shouldn't block the UI
         val organizerEmail = event.iCalEvent.organizer.extractEmail()
         if (updateParticipationStatusUseCaseResult is UseCase.Result.Success<*> && sendPreferences.isNotEmpty() && organizerEmail != null) {
-            // If we updated the participation status on BE, we send the reply to the organizer. We consider sending the reply to be optional.
-            val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
-                userId,
-                eventCopy,
-                dbEvent?.iCalendar?.timezoneInfo,
-                userAttendee.copy(),
-                organizerEmail,
-                participationStatus,
-                sendPreferences,
-                Date.from(updateTime), // Use same updateTime as for Update part stat BE call
-                eventEntity,
-                true,
-                event.defaultTimeZone!!,
-                timeFormatIs24Hours
-            )
-            sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
-            // Do not return use case result. Sending the email is optional for proton to proton so we don't care if it failed
+            val timezoneInfo = dbEvent?.iCalendar?.timezoneInfo
+            val defaultTimeZone = event.defaultTimeZone!!
+            val userAttendeeCopy = userAttendee.copy()
+            scopeProvider.GlobalDefaultSupervisedScope.launch {
+                try {
+                    val sendEmailUseCaseResult = sendEmailUseCase.sendReplyToOrganizer(
+                        userId,
+                        eventCopy,
+                        timezoneInfo,
+                        userAttendeeCopy,
+                        organizerEmail,
+                        participationStatus,
+                        sendPreferences,
+                        Date.from(updateTime),
+                        eventEntity,
+                        true,
+                        defaultTimeZone,
+                        timeFormatIs24Hours
+                    )
+                    sendEmailUseCaseResult.ifSuccessAndLogErrors(logger) { }
+                } catch (e: Exception) {
+                    logger.i("P2P reply email send failed", e)
+                }
+            }
         }
 
         handleChangeAnswerResult(
