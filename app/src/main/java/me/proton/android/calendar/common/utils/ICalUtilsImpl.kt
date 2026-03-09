@@ -534,24 +534,20 @@ object ICalUtilsImpl : ICalUtils {
 
         val maxRecurrenceIdEvent = events.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
 
-        // take either maximum RecurrenceId from single edits or the requested "toDate"
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.plusDays(1).atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
-            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
-        } else {
-            toDate
-        }
+        val isAllDay = originalEvent.isAllDay()
+        val maxRecIdDate = maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toLocalDate(timeZoneId, isAllDay)
+        val maxToDate = if (maxRecIdDate?.isAfter(toDate) == true) maxRecIdDate else toDate
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
         return occurrences.map { occurrence ->
             val event = Event.from(
                 events.find {
-                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, originalEvent.isAllDay())
+                    it.iCalEvent.recurrenceId?.value == eventStartZonedDateTimeToDate(occurrence.startDateTime, isAllDay)
                 } ?: originalEvent
             )
             event.occurrence = occurrence
             event
         }
-
     }
 
     /**
@@ -566,11 +562,9 @@ object ICalUtilsImpl : ICalUtils {
     ): List<Event>? {
 
         val maxRecurrenceIdEvent = eventsSharingUid.maxByOrNull { it.iCalEvent.recurrenceId?.value?.time ?: Long.MIN_VALUE }
-        val maxToDate = if (maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toInstant()?.isAfter(toDate.atStartOfDay(ZoneId.of(timeZoneId)).toInstant()) == true) {
-            ZonedDateTime.ofInstant(maxRecurrenceIdEvent.iCalEvent.recurrenceId?.value?.toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
-        } else {
-            toDate
-        }
+        val isAllDay = originalEvent.isAllDay()
+        val maxRecIdDate = maxRecurrenceIdEvent?.iCalEvent?.recurrenceId?.value?.toLocalDate(timeZoneId, isAllDay)
+        val maxToDate = if (maxRecIdDate?.isAfter(toDate) == true) maxRecIdDate else toDate
 
         val occurrences = originalEvent.generateOccurrencesUntil(maxToDate, timeZoneId) ?: return null
 
@@ -976,6 +970,17 @@ object ICalUtilsImpl : ICalUtils {
 
     override fun Organizer.extractEmail(): String? {
         return extractEmail(this.uri, this.email, this.commonName)
+    }
+
+    private fun ICalDate.toLocalDate(timeZoneId: String, isAllDay: Boolean): LocalDate {
+        return if (isAllDay) {
+            // extract date directly from rawComponents to avoid
+            // timezone-dependent epoch millis conversions that shift across day boundaries
+            rawComponents?.let { LocalDate.of(it.year, it.month, it.date) }
+                ?: toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        } else {
+            ZonedDateTime.ofInstant(toInstant(), ZoneId.of(timeZoneId)).toLocalDate()
+        }
     }
 
     private fun extractEmail(uri: String?, email: String?, commonName: String?): String? {
