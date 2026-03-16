@@ -135,7 +135,7 @@
     <string name="zoom_meeting_title">Sestanek prek Zooma</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_passcode">Passcode: %1$s</string>
+    <string name="generic_meeting_passcode">Koda za dostop: %1$s</string>
     <string name="generic_meeting_more_details">Več podrobnosti</string>
     <string name="generic_meeting_less_details">Manj podrobnosti</string>
     <string name="generic_meeting_host">Gostitelj sestanka</string>
@@ -147,9 +147,9 @@
     <string name="event_hint_title">Dodaj naslov</string>
     <string name="event_hint_location">Dodaj lokacijo</string>
     <string name="event_text_add_participants">Dodaj udeležence</string>
-    <string name="event_add_proton_meet">Add Proton Meet conferencing</string>
-    <string name="event_creating_proton_meet">Creating Proton Meet…</string>
-    <string name="event_creating_proton_meet_error">Failed to create a Proton Meet conference. Please try again.</string>
+    <string name="event_add_proton_meet">Dodaj konferenčni klic Proton Meet</string>
+    <string name="event_creating_proton_meet">Ustvarjanje Proton Meet …</string>
+    <string name="event_creating_proton_meet_error">Ustvarjanje videokonference Proton Meet ni uspelo. Poskusite znova.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Udeleženci (%1$d/%2$d)</string>
     <string name="event_current_user_organizer">Vi</string>
     <string name="event_max_attendee_chip" comment="How many more participants didn't fit into view and we've hidden their names">+ %1$d</string>
