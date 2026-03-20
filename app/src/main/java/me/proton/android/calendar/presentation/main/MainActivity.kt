@@ -138,6 +138,7 @@ import me.proton.core.util.kotlin.toBooleanOrFalse
 import org.koin.core.KoinComponent
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
@@ -590,6 +591,20 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.fallbackValue) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
+                        } else if (actionViewIntent != null && actionViewIntent.data?.isCalendarTimeUri() == true) {
+                            val epochMillis = actionViewIntent.data?.lastPathSegment?.toLongOrNull()
+                            if (epochMillis != null && epochMillis > 0) {
+                                val localDate = Instant.ofEpochMilli(epochMillis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                                safeNavigateToMonth(localDate)
+                            } else {
+                                safeNavigateToMonth()
+                            }
+                        } else if (actionViewIntent != null && actionViewIntent.data?.isCalendarEventItemUri() == true) {
+                            safeNavigateToMonth()
+                        } else if (actionViewIntent != null && actionViewIntent.data?.isGoogleCalendarUrl() == true) {
+                            safeNavigateToMonth()
                         } else if (actionViewIntent != null &&
                             CalendarFeatureFlag.AppLinks.fallbackValue) {
                             // Handle app link
@@ -796,6 +811,18 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
             handleOpenIcsIntent(uri, senderEmail, recipientEmail)
         } else safeNavigateToMonth()
+    }
+
+    private fun Uri.isCalendarTimeUri(): Boolean =
+        scheme == "content" && authority == CalendarContract.AUTHORITY && path?.startsWith("/time/") == true
+
+    private fun Uri.isCalendarEventItemUri(): Boolean =
+        scheme == "content" && authority == CalendarContract.AUTHORITY && path?.startsWith("/events/") == true
+
+    private fun Uri.isGoogleCalendarUrl(): Boolean {
+        val h = host ?: return false
+        return (h == "www.google.com" || h == "calendar.google.com") &&
+            path?.startsWith("/calendar/") == true
     }
 
     private fun handleEventDetailsAppLink(eventId: String, calendarId: String, recurrenceId: String) {

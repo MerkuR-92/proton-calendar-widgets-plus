@@ -109,7 +109,16 @@
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALENDAR" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="time/epoch" />
+                <data android:host="com.android.calendar" />
+                <data android:scheme="content" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -142,10 +151,37 @@
                     android:path="/easy_switch" />
             </intent-filter>
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/event" />
+            </intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
                 <action android:name="android.intent.action.INSERT" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="vnd.android.cursor.item/event" />
+                <data android:mimeType="vnd.android.cursor.dir/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+                <data android:scheme="https" android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+                <data android:scheme="http" android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+                <data android:scheme="https" android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+                <data android:scheme="http" android:host="calendar.google.com"
+                    android:pathPrefix="/calendar/event" />
+                <data android:scheme="https" android:host="calendar.google.com"
+                    android:pathPrefix="/calendar/event" />
+                <data android:scheme="http" android:host="calendar.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+                <data android:scheme="https" android:host="calendar.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
             </intent-filter>
             <nav-graph android:value="@navigation/graph_main" />
         </activity>
