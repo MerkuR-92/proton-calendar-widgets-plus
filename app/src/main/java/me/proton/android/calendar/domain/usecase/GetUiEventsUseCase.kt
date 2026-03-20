@@ -87,8 +87,11 @@ class GetUiEventsUseCase @Inject constructor(
                         userId.id,
                         calendarIds,
                         toEpochSec
-                    ).debounceExceptFirst(1.seconds).distinctUntilChanged()
-                ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring ->
+                    ).debounceExceptFirst(1.seconds).distinctUntilChanged(),
+                    // signal to retry decryption when passphrases change (e.g. after onResetAll restores them)
+                    database.passphrasesDao().flowCountByCalendarIds(calendarIds)
+                        .debounceExceptFirst(1.seconds)
+                ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring, _ ->
                     Timber.d("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
                     withContext(Dispatchers.Default) {
                         // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
