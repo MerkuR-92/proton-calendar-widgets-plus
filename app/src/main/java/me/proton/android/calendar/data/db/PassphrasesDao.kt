@@ -18,4 +18,6 @@ abstract class PassphrasesDao : BaseDao<PassphraseEntity> {
     @Query("DELETE FROM passphrases WHERE calendarId = :calendarId")
     abstract suspend fun deleteByCalendarId(calendarId: String)
 
+    @Query("SELECT COUNT(*) FROM passphrases WHERE calendarId IN (:calendarIds)")
+    abstract fun flowCountByCalendarIds(calendarIds: List<String>): Flow<Int>
 }
