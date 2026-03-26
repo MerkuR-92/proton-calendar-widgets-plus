@@ -31,6 +31,7 @@ import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.ValueSet
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Event
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.model.SendPreferences
 import me.proton.core.crypto.common.context.CryptoContext
 import me.proton.core.domain.entity.UserId
@@ -447,6 +448,19 @@ class SendEmailUseCase @Inject constructor(
             R.string.event_send_invite_mail_body_description,
             event.description
         )
+        val meetUrl = event.meetUrl
+        if (!meetUrl.isNullOrBlank() && !body.contains(meetUrl)) {
+            val joinPrompt = when (event.meetType) {
+                MeetIntegrationType.ProtonMeet -> "Join Proton Meet"
+                MeetIntegrationType.Zoom -> resourceProvider.provideString(R.string.join_zoom_meet_ical_description)
+                null -> "Join meeting"
+            }
+            body += resourceProvider.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                joinPrompt,
+                meetUrl
+            )
+        }
         return body
     }
 

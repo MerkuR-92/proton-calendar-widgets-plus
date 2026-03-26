@@ -271,6 +271,7 @@
     <string name="event_send_invite_mail_body_part_day" comment="Example: Monday, June 7, 2021 at 19:00 (GMT+2) - Monday, June 7, 2021 at 19:30 (GMT+2)">%1$s at %2$s %3$s - %4$s at %5$s %6$s</string>
     <string name="event_send_invite_mail_body_where" comment="if there is location provided in the event, this will be put inside body of email with invitation">\nWhere: %1$s</string>
     <string name="event_send_invite_mail_body_description" comment="if there is description provided in the event, this will be put inside body of email with invitation">\nDescription: %1$s</string>
+    <string name="event_send_invite_mail_body_conference" translatable="false">\n%1$s: %2$s</string>
     <string name="event_send_invite_dialog_title">Send invitation</string>
     <string name="event_send_invite_dialog_description">An invitation will be sent to added participants.</string>
     <string name="event_send_invite_dialog_confirm">Send</string>
