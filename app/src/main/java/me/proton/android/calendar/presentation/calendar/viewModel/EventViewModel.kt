@@ -2345,7 +2345,6 @@ class EventViewModel @Inject constructor(
         if (meetIntegrations.isNotEmpty()
             && !event.meetUrl.isNullOrBlank()
             && !event.containsMeetDescription()
-            && meetIntegrations.contains(event.meetType)
         ) {
             event.addMeetDescription(resourceProvider)
         }

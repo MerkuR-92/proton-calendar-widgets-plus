@@ -17,6 +17,7 @@ import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.ResourceProvider
 import me.proton.android.calendar.domain.ValueStoreProvider
 import me.proton.android.calendar.domain.model.Calendar
+import me.proton.android.calendar.domain.model.MeetIntegrationType
 import me.proton.android.calendar.domain.usecase.EditCreateEventUseCase
 import me.proton.android.calendar.domain.usecase.SendEmailDirect
 import me.proton.android.calendar.domain.usecase.SendEmailUseCase
@@ -249,4 +250,280 @@ class SendEmailUseCaseTest {
     END:VEVENT
     END:VCALENDAR
     """.trimIndent())
+
+    private val testCalendar = Calendar(
+        id = "id",
+        name = "name",
+        email = "email",
+        ownerEmail = "ownerEmail",
+        description = "description",
+        color = "color",
+        priority = 0,
+        addressId = "addressId",
+        memberId = "memberId",
+        flags = 1,
+        display = true,
+        type = 0,
+        permissions = 127,
+        defaultEventDuration = 30,
+        emptyList(),
+        emptyList()
+    )
+
+    private val protonMeetUrl = "https://meet.proton.me/join/test-id#pwd-test"
+
+    private val calendarWithProtonMeet = ICalUtilsImpl.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200402
+    DTEND;VALUE=DATE:20200403
+    SUMMARY:Meeting with Proton Meet
+    UID:proton-calendar-meet-001
+    DTSTAMP:20200330T155327Z
+    X-PM-CONFERENCE-ID;X-PM-PROVIDER=2:meet-test-id
+    X-PM-CONFERENCE-URL:$protonMeetUrl
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    private val zoomUrl = "https://zoom.us/j/123456?pwd=abc"
+
+    private val calendarWithZoom = ICalUtilsImpl.parseICalString("""
+    BEGIN:VCALENDAR
+    VERSION:2.0
+    PRODID:-//Michael Angstadt//biweekly 0.6.3//EN
+    BEGIN:VEVENT
+    DTSTART;VALUE=DATE:20200402
+    DTEND;VALUE=DATE:20200403
+    SUMMARY:Meeting with Zoom
+    UID:proton-calendar-zoom-001
+    DTSTAMP:20200330T155327Z
+    X-PM-CONFERENCE-ID;X-PM-PROVIDER=1:zoom-test-id
+    X-PM-CONFERENCE-URL:$zoomUrl
+    END:VEVENT
+    END:VCALENDAR
+    """.trimIndent())
+
+    @Test
+    fun test_getInviteMailBody_with_proton_meet_url_includes_conference_line() {
+        val event = Event.from(
+            id = "id",
+            calendar = testCalendar,
+            iCalendar = calendarWithProtonMeet!!,
+            modifyTime = 0
+        )!!
+
+        val timezone = "Europe/Zurich"
+        val timeFormatIs24Hours = true
+        val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
+
+        assert(event.meetUrl == protonMeetUrl)
+        assert(event.meetType == MeetIntegrationType.ProtonMeet)
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_all_day_single,
+                formattedDateStart.first
+            )
+        } returns "All day event"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body,
+                event.summary,
+                "All day event"
+            )
+        } returns "Base body"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                "Join Proton Meet",
+                protonMeetUrl
+            )
+        } returns "\nJoin Proton Meet: $protonMeetUrl"
+
+        val result = sendEmailUseCase.getInviteMailBody(
+            event = event,
+            timezone = timezone,
+            timeFormatIs24Hours = timeFormatIs24Hours,
+            sendEmailUpdate = false
+        )
+
+        assert(result.contains(protonMeetUrl))
+
+        verify {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                "Join Proton Meet",
+                protonMeetUrl
+            )
+        }
+    }
+
+    @Test
+    fun test_getInviteMailBody_with_zoom_url_includes_conference_line() {
+        val event = Event.from(
+            id = "id",
+            calendar = testCalendar,
+            iCalendar = calendarWithZoom!!,
+            modifyTime = 0
+        )!!
+
+        val timezone = "Europe/Zurich"
+        val timeFormatIs24Hours = true
+        val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
+
+        assert(event.meetUrl == zoomUrl)
+        assert(event.meetType == MeetIntegrationType.Zoom)
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_all_day_single,
+                formattedDateStart.first
+            )
+        } returns "All day event"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body,
+                event.summary,
+                "All day event"
+            )
+        } returns "Base body"
+
+        every {
+            resourceProviderMock.provideString(R.string.join_zoom_meet_ical_description)
+        } returns "Join Zoom Meeting"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                "Join Zoom Meeting",
+                zoomUrl
+            )
+        } returns "\nJoin Zoom Meeting: $zoomUrl"
+
+        val result = sendEmailUseCase.getInviteMailBody(
+            event = event,
+            timezone = timezone,
+            timeFormatIs24Hours = timeFormatIs24Hours,
+            sendEmailUpdate = false
+        )
+
+        assert(result.contains(zoomUrl))
+
+        verify {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                "Join Zoom Meeting",
+                zoomUrl
+            )
+        }
+    }
+
+    @Test
+    fun test_getInviteMailBody_with_meet_url_already_in_description_does_not_duplicate() {
+        val event = Event.from(
+            id = "id",
+            calendar = testCalendar,
+            iCalendar = calendarWithProtonMeet!!,
+            modifyTime = 0
+        )!!
+
+        val timezone = "Europe/Zurich"
+        val timeFormatIs24Hours = true
+        val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_all_day_single,
+                formattedDateStart.first
+            )
+        } returns "All day event"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body,
+                event.summary,
+                "All day event"
+            )
+        } returns "Base body"
+
+        // Simulate description already containing the meet URL (via marker block)
+        event.iCalEvent.setDescription("Join Proton Meet: $protonMeetUrl")
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_description,
+                event.description
+            )
+        } returns "\nDescription: Join Proton Meet: $protonMeetUrl"
+
+        val result = sendEmailUseCase.getInviteMailBody(
+            event = event,
+            timezone = timezone,
+            timeFormatIs24Hours = timeFormatIs24Hours,
+            sendEmailUpdate = false
+        )
+
+        // body already contains the URL via description, so conference line should NOT be added
+        verify(exactly = 0) {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                any(),
+                any()
+            )
+        }
+    }
+
+    @Test
+    fun test_getInviteMailBody_without_conference_url_has_no_conference_line() {
+        val event = Event.from(
+            id = "id",
+            calendar = testCalendar,
+            iCalendar = calendarAllDaySingleDay!!,
+            modifyTime = 0
+        )!!
+
+        val timezone = "Europe/Zurich"
+        val timeFormatIs24Hours = true
+        val formattedDateStart = event.formatStart(timezone, timeFormatIs24Hours)
+
+        assert(event.meetUrl == null)
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_all_day_single,
+                formattedDateStart.first
+            )
+        } returns "All day event"
+
+        every {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body,
+                event.summary,
+                "All day event"
+            )
+        } returns "Base body"
+
+        val result = sendEmailUseCase.getInviteMailBody(
+            event = event,
+            timezone = timezone,
+            timeFormatIs24Hours = timeFormatIs24Hours,
+            sendEmailUpdate = false
+        )
+
+        assert(result == "Base body")
+
+        verify(exactly = 0) {
+            resourceProviderMock.provideString(
+                R.string.event_send_invite_mail_body_conference,
+                any(),
+                any()
+            )
+        }
+    }
 }
