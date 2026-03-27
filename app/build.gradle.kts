@@ -81,9 +81,6 @@ android {
 
         // performance metrics
         buildConfigField("String", "DYNAMIC_DOMAIN", "proton.black".toBuildConfigValue())
-        buildConfigField("String", "LOKI_ENDPOINT", getEnvProperty("LOKI_ENDPOINT").toBuildConfigValue())
-        buildConfigField("String", "LOKI_CERTIFICATE", getEnvProperty("LOKI_CERTIFICATE").toBuildConfigValue())
-        buildConfigField("String", "LOKI_PRIVATE_KEY", getEnvProperty("LOKI_PRIVATE_KEY").toBuildConfigValue())
 
         setAssetLinksResValue("proton.me")
 
@@ -113,10 +110,18 @@ android {
                 apiPrefix = "calendar-api"
             }
             setAssetLinksResValue(atlasHost)
+
+            buildConfigField("String", "LOKI_ENDPOINT", getEnvProperty("LOKI_ENDPOINT").toBuildConfigValue())
+            buildConfigField("String", "LOKI_CERTIFICATE", getEnvProperty("LOKI_CERTIFICATE").toBuildConfigValue())
+            buildConfigField("String", "LOKI_PRIVATE_KEY", getEnvProperty("LOKI_PRIVATE_KEY").toBuildConfigValue())
         }
         create("prod") {
             dimension = "env"
             resValue("string", "app_name", "Proton Calendar")
+
+            buildConfigField("String", "LOKI_ENDPOINT", null.toBuildConfigValue())
+            buildConfigField("String", "LOKI_CERTIFICATE", null.toBuildConfigValue())
+            buildConfigField("String", "LOKI_PRIVATE_KEY", null.toBuildConfigValue())
 
             protonEnvironment {
                 // If we are creating a custom build (prod build that points to scientist env)
