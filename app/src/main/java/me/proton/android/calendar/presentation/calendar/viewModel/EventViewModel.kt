@@ -104,6 +104,7 @@ import me.proton.android.calendar.domain.usecase.UpgradeEventUseCase
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.domain.usecase.ifSuccessAndLogErrors
 import me.proton.android.calendar.domain.utils.ProtonMeetCrypto
+import me.proton.android.calendar.domain.utils.VideoConferenceParser
 import me.proton.android.calendar.presentation.main.fragment.BaseDialogFragment
 import me.proton.core.configuration.EnvironmentConfigurationDefaults
 import me.proton.core.crypto.common.pgp.SessionKey
@@ -651,7 +652,12 @@ class EventViewModel @Inject constructor(
 
         // Prefill
         title?.let { newEvent.iCalEvent.setSummary(title) }
-        description?.let { newEvent.iCalEvent.setDescription(description) }
+        description?.let { desc ->
+            newEvent.iCalEvent.setDescription(desc)
+            VideoConferenceParser.extractProtonMeetUrl(desc)?.let { meetUrl ->
+                newEvent.setMeetUrlFromExternal(meetUrl)
+            }
+        }
         location?.let { newEvent.iCalEvent.setLocation(location) }
 
         return InitResult.InitEventSuccess(newEvent)

@@ -30,4 +30,11 @@ object VideoConferenceParser {
 
     fun containsVideoConferenceUrl(text: String?): Boolean =
         text != null && allRegexes.any { it.containsMatchIn(text) }
+
+    fun extractProtonMeetUrl(text: String?): String? {
+        if (text == null) return null
+        val match = protonMeet.find(text) ?: return null
+        val matched = match.value
+        return if (matched.startsWith("https://")) matched else "https://$matched"
+    }
 }

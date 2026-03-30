@@ -25,6 +25,7 @@ object Navigation {
             initStartTime: LocalTime? = null
         ) = Uri.parse("proton-calendar://protonmail.com/event/create?initStartDate=${initStartDate}${if (initStartTime != null) "&initStartTime=${initStartTime}" else ""}")
         fun toEventCreatePrefill(
+            userId: String,
             startMillis: Long,
             endMillis: Long,
             timeZoneId: String,
@@ -33,7 +34,7 @@ object Navigation {
             description: String,
             location: String,
             rRule: String
-        ) = Uri.parse("proton-calendar://protonmail.com/event/create?prefill=true&startMillis=$startMillis&endMillis=$endMillis&timeZoneId=$timeZoneId&allDay=$allDay&title=$title&description=$description&location=$location&rRule=$rRule")
+        ) = Uri.parse("proton-calendar://protonmail.com/event/create?prefill=true&userId=$userId&startMillis=$startMillis&endMillis=$endMillis&timeZoneId=$timeZoneId&allDay=$allDay&title=$title&description=$description&location=$location&rRule=$rRule")
         fun toImportAssistant(code: String) = Uri.parse("proton-calendar://protonmail.com/import?code=$code")
     }
 

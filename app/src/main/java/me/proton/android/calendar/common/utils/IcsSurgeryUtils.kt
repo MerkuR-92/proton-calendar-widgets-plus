@@ -523,7 +523,7 @@ object IcsSurgeryUtils {
             }
 
             // A trigger for partial-day event cannot contain more than one-time component
-            if (this.dateStart.value.hasTime() && alarm?.trigger?.duration != null) {
+            if (this.dateStart?.value?.hasTime() == true && alarm?.trigger?.duration != null) {
                 val hasWeeks = alarm.trigger.duration.weeks?.let { 1 } ?: 0
                 val hasDays = alarm.trigger.duration.days?.let { 1 } ?: 0
                 val hasHours = alarm.trigger.duration.hours?.let { 1 } ?: 0
