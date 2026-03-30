@@ -610,17 +610,21 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             // Handle app link
                             val appLinkData: Uri? = actionViewIntent.data
 
-                            // Handle open event details link
-                            val eventId = appLinkData?.getQueryParameter(EVENT_ID)
-                            val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
-                            val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
-                            val action = appLinkData?.getQueryParameter(ACTION)
-
-                            if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
-                                handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
+                            if (appLinkData?.scheme == "proton-calendar") {
+                                safeNavigateToDialogFragment(appLinkData)
                             } else {
-                                this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
-                                safeNavigateToMonth()
+                                // Handle open event details link
+                                val eventId = appLinkData?.getQueryParameter(EVENT_ID)
+                                val calendarId = appLinkData?.getQueryParameter(CALENDAR_ID)
+                                val recurrenceId = appLinkData?.getQueryParameter(RECURRENCE_ID)
+                                val action = appLinkData?.getQueryParameter(ACTION)
+
+                                if (eventId != null && calendarId != null && recurrenceId != null && action == VIEW) {
+                                    handleEventDetailsAppLink(eventId, calendarId, recurrenceId)
+                                } else {
+                                    this@MainActivity.displaySnackBar(getString(R.string.snack_app_link_invalid))
+                                    safeNavigateToMonth()
+                                }
                             }
                         } else if (actionEditOrInsertIntent != null) {
                             // Handle extras
@@ -665,6 +669,7 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                                     } ?: ""
                                     safeNavigateToDialogFragment(
                                         Navigation.Deeplink.toEventCreatePrefill(
+                                            userId = "",
                                             startMillis,
                                             endMillis,
                                             Uri.encode(timeZoneId),

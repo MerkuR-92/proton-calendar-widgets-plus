@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.utils
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -59,5 +61,47 @@ internal class VideoConferenceParserTest {
     @Test
     fun `returns false for null`() {
         assertFalse(VideoConferenceParser.containsVideoConferenceUrl(null))
+    }
+
+    @Test
+    fun `extractProtonMeetUrl returns URL from Meet deeplink description`() {
+        val description = "https://meet.proton.me/join/id-1K5WVSNMFW#pwd-P93Elc6xkUZL"
+        assertEquals(
+            "https://meet.proton.me/join/id-1K5WVSNMFW#pwd-P93Elc6xkUZL",
+            VideoConferenceParser.extractProtonMeetUrl(description)
+        )
+    }
+
+    @Test
+    fun `extractProtonMeetUrl returns URL when embedded in text`() {
+        val description = "Join at https://meet.proton.me/join/id-abc123#pwd-xyz789 for the meeting"
+        assertEquals(
+            "https://meet.proton.me/join/id-abc123#pwd-xyz789",
+            VideoConferenceParser.extractProtonMeetUrl(description)
+        )
+    }
+
+    @Test
+    fun `extractProtonMeetUrl prepends scheme when missing`() {
+        val description = "meet.proton.me/join/id-abc123#pwd-xyz789"
+        assertEquals(
+            "https://meet.proton.me/join/id-abc123#pwd-xyz789",
+            VideoConferenceParser.extractProtonMeetUrl(description)
+        )
+    }
+
+    @Test
+    fun `extractProtonMeetUrl returns null for non-meet URL`() {
+        assertNull(VideoConferenceParser.extractProtonMeetUrl("https://example.com/meeting"))
+    }
+
+    @Test
+    fun `extractProtonMeetUrl returns null for null`() {
+        assertNull(VideoConferenceParser.extractProtonMeetUrl(null))
+    }
+
+    @Test
+    fun `extractProtonMeetUrl returns null for Zoom URL`() {
+        assertNull(VideoConferenceParser.extractProtonMeetUrl("https://zoom.us/j/123456789?pwd=abc"))
     }
 }

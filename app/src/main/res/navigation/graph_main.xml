@@ -223,7 +223,7 @@
         <deepLink
             android:id="@+id/deepLink4"
             android:autoVerify="true"
-            app:uri="proton-calendar://protonmail.com/event/create?prefill={prefill}&amp;startMillis={startMillis}&amp;endMillis={endMillis}&amp;timeZoneId={timeZoneId}&amp;allDay={allDay}&amp;title={title}&amp;description={description}&amp;location={location}&amp;rRule={rRule}" />
+            app:uri="proton-calendar://protonmail.com/event/create?prefill={prefill}&amp;userId={userId}&amp;startMillis={startMillis}&amp;endMillis={endMillis}&amp;timeZoneId={timeZoneId}&amp;allDay={allDay}&amp;title={title}&amp;description={description}&amp;location={location}&amp;rRule={rRule}" />
         <argument
             android:name="eventId"
             app:argType="string"
@@ -277,6 +277,10 @@
             android:defaultValue="" />
         <argument
             android:name="rRule"
+            app:argType="string"
+            android:defaultValue="" />
+        <argument
+            android:name="userId"
             app:argType="string"
             android:defaultValue="" />
         <action

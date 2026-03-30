@@ -391,6 +391,18 @@ data class Event private constructor(
         }
     }
 
+    fun setMeetUrlFromExternal(url: String) {
+        val meetingLinkName = url
+            .substringAfter("id-", "")
+            .substringBefore("#pwd-")
+        if (meetingLinkName.isBlank()) return
+
+        removeConference()
+        iCalEvent.setExperimentalProperty(X_PM_CONFERENCE_URL, url)
+        val confIdProp = iCalEvent.setExperimentalProperty(X_PM_CONFERENCE_ID, meetingLinkName)
+        confIdProp.setParameter(PARAMETER_CONFERENCE_PROVIDER, MeetIntegrationType.ProtonMeet.providerValue)
+    }
+
     fun removeConference() {
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_ID)
         this.iCalEvent.removeExperimentalProperties(X_PM_CONFERENCE_URL)

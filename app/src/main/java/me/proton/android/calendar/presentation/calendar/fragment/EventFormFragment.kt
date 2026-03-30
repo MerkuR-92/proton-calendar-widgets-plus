@@ -136,10 +136,10 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                if (navigationArguments.eventId == null) jumpToMonthView()
+                if (navigationArguments.eventId == null) navigateAwayFromForm()
                 else navigateBackToDetails()
             }
-        } else if (navigationArguments.eventId == null) jumpToMonthView()
+        } else if (navigationArguments.eventId == null) navigateAwayFromForm()
         else navigateBackToDetails()
     }
 
@@ -194,12 +194,20 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
         }
         if (eventViewModel.hasEventBeenEdited()) {
             displayDiscardChangesConfirmationDialog { _, _ ->
-                jumpToMonthView()
+                navigateAwayFromForm()
             }
+        } else {
+            navigateAwayFromForm()
+        }
+        return true
+    }
+
+    private fun navigateAwayFromForm() {
+        if (navigationArguments.prefill) {
+            requireActivity().finish()
         } else {
             jumpToMonthView()
         }
-        return true
     }
 
     private fun jumpToMonthView() {
@@ -313,6 +321,16 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             val prefill: Boolean = navigationArguments.prefill
 
             val userId = accountViewModel.getPrimaryUserId()
+
+            if (prefill) {
+                val deeplinkUserId = navigationArguments.userId.takeIf { it.isNotBlank() }
+                if (deeplinkUserId != null && userId?.id != deeplinkUserId) {
+                    view?.displaySnackBar(getString(R.string.error_deeplink_user_mismatch))
+                    findNavController().navigateUp()
+                    return@launch
+                }
+            }
+
             val viewModeInitStatus = withContext(Dispatchers.Main) {
                 if (userId == null) EventViewModel.InitResult.Error.Default("user ID is null in EventDetailsFragment onViewCreated")
                 else if (prefill) {
@@ -408,7 +426,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     }
                     else -> Unit // TODO refactor and use one `when` expression
                 }
-                if (navigationArguments.eventId == null) jumpToMonthView()
+                if (navigationArguments.eventId == null) navigateAwayFromForm()
                 else onBackPressedCustom()
             }
 
@@ -789,44 +807,48 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     is EventViewModel.EventSnackState.DisplaySnackReturnToMonth -> {
                         requireActivity().displaySnackBar(it.message)
 
-                        lifecycleScope.launch {
-                            val newSelectedDate = it.newSelectedDate
-                            val newSelectedTime = it.newSelectedTime
-                            val selectedDateTime = calendarViewModel.selectedDateTime.value
-                            val selectedDate = selectedDateTime?.first
-                            val selectedTime = selectedDateTime?.second
-                            val isDifferentSelectedDate = newSelectedDate != null && selectedDate != newSelectedDate
-                            val isDifferentSelectedTime = newSelectedTime != null && selectedTime != newSelectedTime
-                            val isDayVisible =
-                                when (calendarViewModel.viewMode.value) {
-                                    ViewMode.AGENDA,
-                                    ViewMode.DAY -> newSelectedDate == selectedDate
-                                    ViewMode.MONTH -> {
-                                        newSelectedDate?.year == selectedDate?.year && newSelectedDate?.month == selectedDate?.month
+                        if (navigationArguments.prefill) {
+                            requireActivity().finish()
+                        } else {
+                            lifecycleScope.launch {
+                                val newSelectedDate = it.newSelectedDate
+                                val newSelectedTime = it.newSelectedTime
+                                val selectedDateTime = calendarViewModel.selectedDateTime.value
+                                val selectedDate = selectedDateTime?.first
+                                val selectedTime = selectedDateTime?.second
+                                val isDifferentSelectedDate = newSelectedDate != null && selectedDate != newSelectedDate
+                                val isDifferentSelectedTime = newSelectedTime != null && selectedTime != newSelectedTime
+                                val isDayVisible =
+                                    when (calendarViewModel.viewMode.value) {
+                                        ViewMode.AGENDA,
+                                        ViewMode.DAY -> newSelectedDate == selectedDate
+                                        ViewMode.MONTH -> {
+                                            newSelectedDate?.year == selectedDate?.year && newSelectedDate?.month == selectedDate?.month
+                                        }
+                                        ViewMode.THREE_DAY -> {
+                                            selectedDate?.let {
+                                                newSelectedDate?.isBetween(selectedDate, selectedDate.plusDays(2))
+                                            } ?: false
+                                        }
+                                        ViewMode.WEEK -> {
+                                            val weekStart = calendarViewModel.getWeekStart()
+                                            val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
+                                            if (selectedDate != null && newSelectedDate != null && firstDayOfWeek != null) {
+                                                newSelectedDate.isBetween(firstDayOfWeek, firstDayOfWeek.plusDays(7))
+                                            } else false
+                                        }
+                                        else -> false
                                     }
-                                    ViewMode.THREE_DAY -> {
-                                        selectedDate?.let {
-                                            newSelectedDate?.isBetween(selectedDate, selectedDate.plusDays(2))
-                                        } ?: false
-                                    }
-                                    ViewMode.WEEK -> {
-                                        val weekStart = calendarViewModel.getWeekStart()
-                                        val firstDayOfWeek = selectedDate?.firstDayOfWeek(weekStart)
-                                        if (selectedDate != null && newSelectedDate != null && firstDayOfWeek != null) {
-                                            newSelectedDate.isBetween(firstDayOfWeek, firstDayOfWeek.plusDays(7))
-                                        } else false
-                                    }
-                                    else -> false
+                                if (newSelectedDate != null && isDifferentSelectedDate && !isDayVisible) {
+                                    calendarViewModel.handleDaySelected(newSelectedDate, newSelectedTime?.getTimeWithPadding())
+                                } else if (selectedDate != null && isDayVisible && isDifferentSelectedTime) {
+                                    // Use currently selected date and new selected time
+                                    calendarViewModel.handleDaySelected(selectedDate, newSelectedTime?.getTimeWithPadding())
                                 }
-                            if (newSelectedDate != null && isDifferentSelectedDate && !isDayVisible) {
-                                calendarViewModel.handleDaySelected(newSelectedDate, newSelectedTime?.getTimeWithPadding())
-                            } else if (selectedDate != null && isDayVisible && isDifferentSelectedTime) {
-                                // Use currently selected date and new selected time
-                                calendarViewModel.handleDaySelected(selectedDate, newSelectedTime?.getTimeWithPadding())
-                            }
 
-                            // Use jumpToMonthView to handle navigation when opening details from notification
-                            jumpToMonthView()
+                                // Use jumpToMonthView to handle navigation when opening details from notification
+                                jumpToMonthView()
+                            }
                         }
                     }
                 }
