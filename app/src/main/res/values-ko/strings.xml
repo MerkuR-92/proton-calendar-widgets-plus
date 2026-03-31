@@ -50,7 +50,7 @@
     <!-- MONTH VIEW -->
     <string name="agenda_no_events">이벤트 없음</string>
     <string name="agenda_loading_events">이벤트를 불러오는 중…</string>
-    <string name="agenda_loading_events_error">이벤트 로딩 중 오류 발생</string>
+    <string name="agenda_loading_events_error">이벤트를 불러오던 중 오류 발생</string>
     <string name="agenda_header_date" comment="Tuesday 28">%1$s %2$d</string>
     <string name="day_view_all_day_more">+ %1$d개 더</string>
     <!-- EVENT DETAILS   -->
@@ -135,7 +135,7 @@
     <string name="zoom_meeting_title">Zoom 회의</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_passcode">Passcode: %1$s</string>
+    <string name="generic_meeting_passcode">패스코드: %1$s</string>
     <string name="generic_meeting_more_details">자세히</string>
     <string name="generic_meeting_less_details">간략하게</string>
     <string name="generic_meeting_host">회의 주최자</string>
@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s가 당신의 초대를 잠정적으로 수락했습니다</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s가 당신의 초대를 거부했습니다</string>
     <string name="snack_app_link_invalid">유효하지 않은 이벤트 링크</string>
+    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
     <string name="snack_app_link_error">이벤트 열기 실패</string>
     <string name="snack_app_link_import_error">인증이 취소되었습니다</string>
     <string name="snack_notification_already_added">알림이 이미 추가되었습니다</string>

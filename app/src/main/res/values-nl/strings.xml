@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s heeft voorzichtig een uitnodiging geaccepteerd</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s heeft uw uitnodiging geweigerd</string>
     <string name="snack_app_link_invalid">Ongeldige link naar de afspraak</string>
+    <string name="error_deeplink_user_mismatch">Deze koppeling is voor een ander account</string>
     <string name="snack_app_link_error">Fout bij openen afspraak</string>
     <string name="snack_app_link_import_error">Authenticatie geannuleerd</string>
     <string name="snack_notification_already_added">De melding is al toegevoegd</string>

@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s predbežne prijal(-a) vašu pozvánku</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s odmietol(-a) vašu pozvánku</string>
     <string name="snack_app_link_invalid">Neplatný odkaz na udalosť</string>
+    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
     <string name="snack_app_link_error">Chyba pri otváraní udalosti</string>
     <string name="snack_app_link_import_error">Overovanie zrušené</string>
     <string name="snack_notification_already_added">Notifikácia už bola pridaná</string>

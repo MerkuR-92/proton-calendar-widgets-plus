@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s hyväksyi kutsusi alustavasti</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s kieltäytyi kutsustasi</string>
     <string name="snack_app_link_invalid">Virheellinen tapahtumalinkki</string>
+    <string name="error_deeplink_user_mismatch">Tämä linkki on eri tilille</string>
     <string name="snack_app_link_error">Virhe avattaessa tapahtumaa</string>
     <string name="snack_app_link_import_error">Tunnistautuminen peruttiin</string>
     <string name="snack_notification_already_added">Ilmoitus on jo lisätty</string>
