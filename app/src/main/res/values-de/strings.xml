@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s hat deine Einladung unter Vorbehalt bestätigt</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s hat deine Einladung abgelehnt</string>
     <string name="snack_app_link_invalid">Link zum Termin ungültig</string>
+    <string name="error_deeplink_user_mismatch">Dieser Link gilt für ein anderes Konto</string>
     <string name="snack_app_link_error">Fehler beim Öffnen des Termins</string>
     <string name="snack_app_link_import_error">Authentifizierung abgebrochen</string>
     <string name="snack_notification_already_added">Die Benachrichtigung wurde bereits hinzugefügt</string>

@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s mungkin menerima undangan Anda</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s menolak undangan Anda</string>
     <string name="snack_app_link_invalid">Tautan ke acara tidak vallid</string>
+    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
     <string name="snack_app_link_error">Terjadi kesalahan saat membuka acara</string>
     <string name="snack_app_link_import_error">Autentikasi dibatalkan</string>
     <string name="snack_notification_already_added">Pemberitahuan sudah ditambahkan</string>

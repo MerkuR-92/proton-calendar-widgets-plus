@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s 已暫訂接受您的邀請</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s 已婉拒您的邀請</string>
     <string name="snack_app_link_invalid">活動的連結無效</string>
+    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
     <string name="snack_app_link_error">開啟活動時發生錯誤</string>
     <string name="snack_app_link_import_error">驗證已取消</string>
     <string name="snack_notification_already_added">通知已加入</string>

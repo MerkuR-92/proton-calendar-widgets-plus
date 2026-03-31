@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ha acceptat provisionalment la vostra invitació.</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ha declinat la vostra invitació</string>
     <string name="snack_app_link_invalid">L\'enllaç a l\'esdeveniment no és vàlid</string>
+    <string name="error_deeplink_user_mismatch">Aquest enllaç és per a un compte diferent</string>
     <string name="snack_app_link_error">Error en obrir l\'esdeveniment</string>
     <string name="snack_app_link_import_error">S\'ha cancel·lat l\'autenticació</string>
     <string name="snack_notification_already_added">La notificació ja ha estat afegida.</string>

@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ने आपका निमंत्रण अस्थायी रूप से स्वीकार किया है</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ने आपका निमंत्रण अस्वीकार कर दिया है</string>
     <string name="snack_app_link_invalid">कार्यक्रम की लिंक अमान्य है</string>
+    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
     <string name="snack_app_link_error">कार्यक्रम खोलने में त्रुटि हुई</string>
     <string name="snack_app_link_import_error">प्रमाणीकरण रद्द कर दिया गया</string>
     <string name="snack_notification_already_added">सूचना पहले से ही जोड़ी जा चुकी है</string>

@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">Ο/Η %1$s αποδέχθηκε με επιφύλαξη την πρόσκλησή σας</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">Ο/Η %1$s απέρριψε την πρόσκλησή σας</string>
     <string name="snack_app_link_invalid">Μη έγκυρος σύνδεσμος για την εκδήλωση</string>
+    <string name="error_deeplink_user_mismatch">Αυτός ο σύνδεσμος είναι για διαφορετικό λογαριασμό</string>
     <string name="snack_app_link_error">Σφάλμα κατά το άνοιγμα της εκδήλωσης</string>
     <string name="snack_app_link_import_error">Η ταυτοποίηση ακυρώθηκε</string>
     <string name="snack_notification_already_added">Η ειδοποίηση έχει ήδη προστεθεί</string>

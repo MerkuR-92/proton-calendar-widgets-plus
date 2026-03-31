@@ -405,6 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s accepterade preliminärt din inbjudan</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s avböjde din inbjudan</string>
     <string name="snack_app_link_invalid">Ogiltig länk till händelsen</string>
+    <string name="error_deeplink_user_mismatch">Denna länk är för ett annat konto</string>
     <string name="snack_app_link_error">Det gick inte att öppna händelse</string>
     <string name="snack_app_link_import_error">Autentisering avbröts</string>
     <string name="snack_notification_already_added">Aviseringen har redan lagts till</string>
