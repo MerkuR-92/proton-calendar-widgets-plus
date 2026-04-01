@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
@@ -340,9 +341,10 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     val endMillis: Long = navigationArguments.endMillis
                     val timeZoneId: String = Uri.decode(navigationArguments.timeZoneId)
                     val allDay: Boolean = navigationArguments.allDay
-                    val title: String = Uri.decode(navigationArguments.title)
-                    val description: String = Uri.decode(navigationArguments.description)
-                    val location: String = Uri.decode(navigationArguments.location)
+                    fun String.decodeQueryParam(): String = Uri.decode(this).replace("+", " ")
+                    val title: String = navigationArguments.title.decodeQueryParam()
+                    val description: String = navigationArguments.description.decodeQueryParam()
+                    val location: String = navigationArguments.location.decodeQueryParam()
                     val rRule: String = Uri.decode(navigationArguments.rRule)
 
                     val startZonedDateTime =
@@ -425,7 +427,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     }
                     is EventViewModel.InitResult.Error -> {
                         logger.e(viewModeInitStatus.message)
-                        requireActivity().displaySnackBar(
+                        val errorMessage =
                             if (navigationArguments.eventId != null) getString(R.string.snack_event_opening_edit_error)
                             else {
                                 when (viewModeInitStatus) {
@@ -433,7 +435,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                                     is EventViewModel.InitResult.Error.Default -> getString(R.string.snack_event_init_error)
                                 }
                             }
-                        )
+                        if (prefill) {
+                            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
+                        } else {
+                            requireActivity().displaySnackBar(errorMessage)
+                        }
                     }
                     else -> Unit // TODO refactor and use one `when` expression
                 }

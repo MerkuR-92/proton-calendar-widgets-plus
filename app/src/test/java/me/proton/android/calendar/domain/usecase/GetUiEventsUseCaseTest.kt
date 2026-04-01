@@ -12,6 +12,7 @@ import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationSt
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.EventOccurrencesDao
 import me.proton.android.calendar.data.db.EventsDao
+import me.proton.android.calendar.data.db.PassphrasesDao
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.CalendarsRepository
@@ -33,9 +34,13 @@ class GetUiEventsUseCaseTest {
 
     private val occurrencesDao = mockk<EventOccurrencesDao>()
     private val eventsDao = mockk<EventsDao>()
+    private val passphrasesDao = mockk<PassphrasesDao> {
+        every { flowCountByCalendarIds(any()) } returns flowOf(0)
+    }
     private val database = mockk<AppDatabase>() {
         every { this@mockk.eventsDao() } returns eventsDao
         every { this@mockk.eventOccurrencesDao() } returns occurrencesDao
+        every { this@mockk.passphrasesDao() } returns passphrasesDao
     }
     private val decryptor = mockk<EventDecryptor>(relaxed = true)
 
