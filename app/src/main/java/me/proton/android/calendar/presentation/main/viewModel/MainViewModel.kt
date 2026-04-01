@@ -69,6 +69,13 @@ class MainViewModel @Inject constructor(
 
     private val intents = mutableMapOf<String, Intent>()
 
+    var isLaunchedFromExternalCalendarIntent = false
+        private set
+
+    fun markLaunchedFromExternalCalendarIntent() {
+        isLaunchedFromExternalCalendarIntent = true
+    }
+
     val isConnectedToNetwork get() = networkManager.isConnectedToNetwork()
 
     // Used to notify us that user is back on the main view so we can trigger actions there

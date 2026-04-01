@@ -48,6 +48,8 @@ const val DEFAULT_HOLIDAY_CALENDAR_COLOR: String = "#F78400"
 
 const val INVITE_ICS_FILE_NAME = "invite.ics"
 const val INVITE_ICS_MIME_TYPE = "text/calendar"
+const val CALENDAR_TIME_EPOCH_MIME_TYPE = "time/epoch"
+const val CALENDAR_EVENT_ITEM_MIME_TYPE = "vnd.android.cursor.item/event"
 const val INVITE_ICS_MIME_TYPE_TEMPLATE = "text/calendar; method=%s"
 const val INVITE_EMAIL_MIME_TYPE = "text/plain"
 const val INVITE_PROTON_INTENT_ACTION = "me.proton.android.calendar.intent.action.CTA_OPEN_ICS"

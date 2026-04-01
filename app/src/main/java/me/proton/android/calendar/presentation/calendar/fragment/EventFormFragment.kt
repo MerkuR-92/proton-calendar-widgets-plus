@@ -92,6 +92,7 @@ import me.proton.core.user.domain.extension.hasSubscriptionForMail
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import java.time.Instant
+import java.time.LocalTime
 import java.time.ZoneId
 import kotlin.coroutines.CoroutineContext
 
@@ -356,22 +357,32 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         } else {
                             Instant.ofEpochMilli(endMillis).atZone(ZoneId.of(timeZoneId))
                         }
+
+                    // when an external app (e.g. SMS) sends a specific non-midnight start time
+                    // but also sets allDay=true, prefer the specific time over the all-day flag;
+                    // nullify end time so the default event duration from settings is used.
+                    val hasExplicitNonMidnightStart = startMillis != 0L &&
+                        startZonedDateTime.toLocalTime() != LocalTime.MIDNIGHT
+                    val effectiveAllDay = allDay && !hasExplicitNonMidnightStart
+                    val effectiveEndZonedDateTime =
+                        if (allDay && !effectiveAllDay) null else endZonedDateTime
+
                     eventViewModel.initialise(
                         userId,
                         editMode = true,
                         meetIntegrations = featureFlagViewModel.enabledMeetIntegrations(),
-                        null,
-                        null,
-                        startZonedDateTime.toLocalDate().toString(),
-                        startZonedDateTime.toLocalTime().toString(),
-                        endZonedDateTime?.toLocalDate()?.toString(),
-                        endZonedDateTime?.toLocalTime()?.toString(),
-                        allDay,
-                        timeZoneId,
-                        title,
-                        description,
-                        location,
-                        rRule
+                        eventId = null,
+                        occurrenceNumber = null,
+                        initStartDate = startZonedDateTime.toLocalDate().toString(),
+                        initStartTime = startZonedDateTime.toLocalTime().toString(),
+                        initEndDate = effectiveEndZonedDateTime?.toLocalDate()?.toString(),
+                        initEndTime = effectiveEndZonedDateTime?.toLocalTime()?.toString(),
+                        isAllDay = effectiveAllDay,
+                        timeZoneId = timeZoneId,
+                        title = title,
+                        description = description,
+                        location = location,
+                        rRule = rRule
                     )
                 } else {
                     eventViewModel.initialise(

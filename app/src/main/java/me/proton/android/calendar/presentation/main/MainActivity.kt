@@ -75,6 +75,8 @@ import me.proton.android.calendar.common.AppLinksQueryParameters.RECURRENCE_ID
 import me.proton.android.calendar.common.EventEditDeleteOption
 import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.HOLIDAY_CALENDAR_VERSION_CODE
+import me.proton.android.calendar.common.CALENDAR_EVENT_ITEM_MIME_TYPE
+import me.proton.android.calendar.common.CALENDAR_TIME_EPOCH_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
@@ -591,19 +593,19 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.fallbackValue) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
-                        } else if (actionViewIntent != null && actionViewIntent.data?.isCalendarTimeUri() == true) {
+                        } else if (actionViewIntent?.type == CALENDAR_TIME_EPOCH_MIME_TYPE) {
+                            mainViewModel.markLaunchedFromExternalCalendarIntent()
                             val epochMillis = actionViewIntent.data?.lastPathSegment?.toLongOrNull()
                             if (epochMillis != null && epochMillis > 0) {
-                                val localDate = Instant.ofEpochMilli(epochMillis)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
-                                safeNavigateToMonth(localDate)
+                                navigateToEventCreate(startMillis = epochMillis)
                             } else {
                                 safeNavigateToMonth()
                             }
-                        } else if (actionViewIntent != null && actionViewIntent.data?.isCalendarEventItemUri() == true) {
+                        } else if (actionViewIntent?.type == CALENDAR_EVENT_ITEM_MIME_TYPE) {
+                            mainViewModel.markLaunchedFromExternalCalendarIntent()
                             safeNavigateToMonth()
                         } else if (actionViewIntent != null && actionViewIntent.data?.isGoogleCalendarUrl() == true) {
+                            mainViewModel.markLaunchedFromExternalCalendarIntent()
                             safeNavigateToMonth()
                         } else if (actionViewIntent != null &&
                             CalendarFeatureFlag.AppLinks.fallbackValue) {
@@ -628,59 +630,46 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                             }
                         } else if (actionEditOrInsertIntent != null) {
                             // Handle extras
+                            mainViewModel.markLaunchedFromExternalCalendarIntent()
                             actionEditOrInsertIntent.extras?.let { intentExtras ->
-                                lifecycleScope.launch {
-                                    val hasActiveWritableCalendars = calendarViewModel.getUserCalendars()?.any { it.isActive && it.allowEditEvents }
-                                    if (hasActiveWritableCalendars != true) {
-                                        this@MainActivity.displaySnackBar(resources.getString(R.string.snack_create_event_no_active_calendar))
-                                        safeNavigateToMonth()
-                                        return@launch
-                                    }
-                                    val startMillis = run {
-                                        val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
-                                        if (dtStart == 0L) {
-                                            intentExtras.getLong(CalendarContract.EXTRA_EVENT_BEGIN_TIME)
-                                        } else dtStart
-                                    }
-                                    val endMillis = run {
-                                        val dtEnd = intentExtras.getLong(CalendarContract.Events.DTEND)
-                                        if (dtEnd == 0L) {
-                                            intentExtras.getLong(CalendarContract.EXTRA_EVENT_END_TIME)
-                                        } else dtEnd
-                                    }
-                                    val timeZoneId = fallbackTimeZone(
-                                        intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE)?.let {
-                                            if (it == "null") "" else it
-                                        } ?: ZoneId.systemDefault().id,
-                                        fallbackToDefault = true
-                                    )
-                                    val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
-                                    val title = intentExtras.getString(CalendarContract.Events.TITLE)?.let {
-                                        if (it == "null") "" else it
-                                    } ?: "" // We open event form so no need to provide title placeholder
-                                    val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION)?.let {
-                                        if (it == "null") "" else it
-                                    } ?: ""
-                                    val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION)?.let {
-                                        if (it == "null") "" else it
-                                    } ?: ""
-                                    val rRule = intentExtras.getString(CalendarContract.Events.RRULE)?.let {
-                                        if (it == "null") "" else it
-                                    } ?: ""
-                                    safeNavigateToDialogFragment(
-                                        Navigation.Deeplink.toEventCreatePrefill(
-                                            userId = "",
-                                            startMillis,
-                                            endMillis,
-                                            Uri.encode(timeZoneId),
-                                            allDay,
-                                            Uri.encode(title),
-                                            Uri.encode(description),
-                                            Uri.encode(location),
-                                            Uri.encode(rRule),
-                                        )
-                                    )
+                                val startMillis = run {
+                                    val dtStart = intentExtras.getLong(CalendarContract.Events.DTSTART)
+                                    if (dtStart == 0L) {
+                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_BEGIN_TIME)
+                                    } else dtStart
                                 }
+                                val endMillis = run {
+                                    val dtEnd = intentExtras.getLong(CalendarContract.Events.DTEND)
+                                    if (dtEnd == 0L) {
+                                        intentExtras.getLong(CalendarContract.EXTRA_EVENT_END_TIME)
+                                    } else dtEnd
+                                }
+                                val timeZoneId = intentExtras.getString(CalendarContract.Events.EVENT_TIMEZONE)?.let {
+                                    if (it == "null") "" else it
+                                } ?: ""
+                                val allDay = intentExtras.getInt(CalendarContract.Events.ALL_DAY).toBooleanOrFalse()
+                                val title = intentExtras.getString(CalendarContract.Events.TITLE)?.let {
+                                    if (it == "null") "" else it
+                                } ?: ""
+                                val description = intentExtras.getString(CalendarContract.Events.DESCRIPTION)?.let {
+                                    if (it == "null") "" else it
+                                } ?: ""
+                                val location = intentExtras.getString(CalendarContract.Events.EVENT_LOCATION)?.let {
+                                    if (it == "null") "" else it
+                                } ?: ""
+                                val rRule = intentExtras.getString(CalendarContract.Events.RRULE)?.let {
+                                    if (it == "null") "" else it
+                                } ?: ""
+                                navigateToEventCreate(
+                                    startMillis = startMillis,
+                                    endMillis = endMillis,
+                                    timeZoneId = timeZoneId,
+                                    allDay = allDay,
+                                    title = title,
+                                    description = description,
+                                    location = location,
+                                    rRule = rRule,
+                                )
                             } ?: run {
                                 this@MainActivity.displaySnackBar(
                                     getString(R.string.snack_ics_create_error),
@@ -808,6 +797,46 @@ class MainActivity : AppCompatActivity(), KoinComponent {
         navigateTo(uri)
     }
 
+    private fun navigateToEventCreate(
+        startMillis: Long,
+        endMillis: Long = 0L,
+        timeZoneId: String = "",
+        allDay: Boolean = false,
+        title: String = "",
+        description: String = "",
+        location: String = "",
+        rRule: String = "",
+    ) {
+        lifecycleScope.launch {
+            val hasActiveWritableCalendars = calendarViewModel.getUserCalendars()
+                ?.any { it.isActive && it.allowEditEvents }
+            if (hasActiveWritableCalendars != true) {
+                this@MainActivity.displaySnackBar(
+                    resources.getString(R.string.snack_create_event_no_active_calendar)
+                )
+                safeNavigateToMonth()
+                return@launch
+            }
+            val resolvedTimeZoneId = fallbackTimeZone(
+                timeZoneId.ifEmpty { ZoneId.systemDefault().id },
+                fallbackToDefault = true
+            )
+            safeNavigateToDialogFragment(
+                Navigation.Deeplink.toEventCreatePrefill(
+                    userId = "",
+                    startMillis = startMillis,
+                    endMillis = endMillis,
+                    timeZoneId = Uri.encode(resolvedTimeZoneId),
+                    allDay = allDay,
+                    title = Uri.encode(title),
+                    description = Uri.encode(description),
+                    location = Uri.encode(location),
+                    rRule = Uri.encode(rRule),
+                )
+            )
+        }
+    }
+
     private fun handleIcsIntent(openIcsIntent: Intent) {
         safeNavigateToMonth() // Workaround for blank screen on starting app through ics intent if it wasn't in background
         val uri = openIcsIntent.data
@@ -817,12 +846,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             handleOpenIcsIntent(uri, senderEmail, recipientEmail)
         } else safeNavigateToMonth()
     }
-
-    private fun Uri.isCalendarTimeUri(): Boolean =
-        scheme == "content" && authority == CalendarContract.AUTHORITY && path?.startsWith("/time/") == true
-
-    private fun Uri.isCalendarEventItemUri(): Boolean =
-        scheme == "content" && authority == CalendarContract.AUTHORITY && path?.startsWith("/events/") == true
 
     private fun Uri.isGoogleCalendarUrl(): Boolean {
         val h = host ?: return false
@@ -1933,7 +1956,11 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             calendarViewModel.viewMode.postValue(ViewMode.THREE_DAY)
             mainViewModel.setLastViewMode(ViewMode.THREE_DAY)
         } else if (navController.currentDestination?.id == R.id.nav_calendar) {
-            moveTaskToBack(true)
+            if (mainViewModel.isLaunchedFromExternalCalendarIntent) {
+                finish()
+            } else {
+                moveTaskToBack(true)
+            }
         } else {
             super.onBackPressed()
         }
