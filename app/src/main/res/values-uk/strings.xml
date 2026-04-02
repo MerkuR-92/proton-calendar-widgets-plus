@@ -135,7 +135,7 @@
     <string name="zoom_meeting_title">Zoom-зустріч</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_passcode">Passcode: %1$s</string>
+    <string name="generic_meeting_passcode">Код доступу: %1$s</string>
     <string name="generic_meeting_more_details">Докладніше</string>
     <string name="generic_meeting_less_details">Менше деталей</string>
     <string name="generic_meeting_host">Організатор зустрічі</string>
@@ -405,7 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s приймає ваше запрошення, але сумнівається, що відвідає</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s відхиляє ваше запрошення</string>
     <string name="snack_app_link_invalid">Недійсне посилання на подію</string>
-    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
+    <string name="error_deeplink_user_mismatch">Це посилання для іншого облікового запису</string>
     <string name="snack_app_link_error">Помилка відкриття події</string>
     <string name="snack_app_link_import_error">Автентифікацію скасовано</string>
     <string name="snack_notification_already_added">Сповіщення вже було додано</string>
