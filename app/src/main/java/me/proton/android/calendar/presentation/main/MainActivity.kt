@@ -604,9 +604,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         } else if (actionViewIntent?.type == CALENDAR_EVENT_ITEM_MIME_TYPE) {
                             mainViewModel.markLaunchedFromExternalCalendarIntent()
                             safeNavigateToMonth()
-                        } else if (actionViewIntent != null && actionViewIntent.data?.isGoogleCalendarUrl() == true) {
-                            mainViewModel.markLaunchedFromExternalCalendarIntent()
-                            safeNavigateToMonth()
                         } else if (actionViewIntent != null &&
                             CalendarFeatureFlag.AppLinks.fallbackValue) {
                             // Handle app link
@@ -845,12 +842,6 @@ class MainActivity : AppCompatActivity(), KoinComponent {
             val recipientEmail = openIcsIntent.getStringExtra(INVITE_PROTON_EXTRA_RECIPIENT_EMAIL)
             handleOpenIcsIntent(uri, senderEmail, recipientEmail)
         } else safeNavigateToMonth()
-    }
-
-    private fun Uri.isGoogleCalendarUrl(): Boolean {
-        val h = host ?: return false
-        return (h == "www.google.com" || h == "calendar.google.com") &&
-            path?.startsWith("/calendar/") == true
     }
 
     private fun handleEventDetailsAppLink(eventId: String, calendarId: String, recurrenceId: String) {
