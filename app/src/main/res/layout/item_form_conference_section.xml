@@ -32,6 +32,9 @@
         android:paddingEnd="16dp"
         android:paddingBottom="8dp"
         android:textColor="@color/white"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toStartOf="@id/image_button_action"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Join with []" />
@@ -52,17 +55,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/join_meeting_button"
+        android:orientation="vertical"
         android:paddingTop="8dp"
-        android:orientation="vertical">
+        app:layout_constraintTop_toBottomOf="@+id/join_meeting_button">
 
         <TextView
             android:id="@+id/text_conference_id"
             style="@style/Text.Default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textIsSelectable="true"
             android:layout_marginStart="@dimen/default_margin_text_start"
+            android:textIsSelectable="true"
             android:visibility="gone"
             tools:text="ID: 12345678901"
             tools:visibility="visible" />
@@ -72,8 +75,8 @@
             style="@style/Text.Default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textIsSelectable="true"
             android:layout_marginStart="@dimen/default_margin_text_start"
+            android:textIsSelectable="true"
             android:visibility="gone"
             tools:text="Passcode: BvBmT8Uo9i"
             tools:visibility="visible" />
@@ -113,8 +116,8 @@
             android:id="@+id/conference_more_details_content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:layout_marginStart="@dimen/default_margin_text_start"
+            android:animateLayoutChanges="true"
             android:orientation="vertical"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@+id/text_conference_id"
