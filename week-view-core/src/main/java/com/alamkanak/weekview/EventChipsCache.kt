@@ -8,6 +8,9 @@ internal typealias EventChipsCacheProvider = () -> EventChipsCache?
 
 internal class EventChipsCache {
 
+    var generation: Long = 0
+        private set
+
     val allEventChips: List<EventChip>
         get() = normalEventChipsByDate.values.flatten() + allDayEventChipsByDate.values.flatten()
 
@@ -27,7 +30,11 @@ internal class EventChipsCache {
 
     fun normalEventChipsByDate(
         date: Calendar
-    ): List<EventChip> = if (normalEventChipsByDate.isNotEmpty()) normalEventChipsByDate[date.atStartOfDay.timeInMillis].orEmpty() else emptyList()
+    ): List<EventChip> = normalEventChipsByDate(date.atStartOfDay.timeInMillis)
+
+    fun normalEventChipsByDate(
+        dateMillis: Long
+    ): List<EventChip> = if (normalEventChipsByDate.isNotEmpty()) normalEventChipsByDate[dateMillis].orEmpty() else emptyList()
 
     fun allDayEventChipsByDate(
         date: Calendar
@@ -65,6 +72,7 @@ internal class EventChipsCache {
                 normalEventChipsByDate.addOrReplace(key, eventChip)
             }
         }
+        generation++
     }
 
     fun findHitEvent(x: Float, y: Float): EventChip? {
@@ -87,6 +95,7 @@ internal class EventChipsCache {
         val eventIds = events.map { it.id }
         val eventChips = allEventChips.filter { it.event.id in eventIds }
         eventChips.forEach(this::remove)
+        generation++
     }
 
     private fun remove(eventChip: EventChip) {
@@ -100,13 +109,10 @@ internal class EventChipsCache {
         }
     }
 
-    fun clearSingleEventsCache() {
-        allEventChips.filter { it.event.isNotAllDay && it.event.isSingleDay }.forEach(EventChip::setEmpty)
-    }
-
     fun clear() {
         allDayEventChipsByDate.clear()
         normalEventChipsByDate.clear()
+        generation++
     }
 
     private fun ConcurrentHashMap<Long, CopyOnWriteArrayList<EventChip>>.addOrReplace(
