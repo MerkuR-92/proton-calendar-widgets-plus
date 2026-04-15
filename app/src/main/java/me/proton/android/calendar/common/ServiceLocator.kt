@@ -3,9 +3,9 @@
 package me.proton.android.calendar.common
 
 import kotlinx.serialization.json.Json
-import me.proton.android.calendar.CalendarWidgetRefresher
-import me.proton.android.calendar.CalendarWidgetUpdater
-import me.proton.android.calendar.WidgetRefresher
+import me.proton.android.calendar.CalendarWidgetUpdateCoordinator
+import me.proton.android.calendar.InMemoryWidgetContentCache
+import me.proton.android.calendar.WidgetContentCache
 import me.proton.android.calendar.common.logger.TimberLogger
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
 import me.proton.android.calendar.common.provider.ResourceProviderImpl
@@ -114,8 +114,6 @@ val commonModule = module {
     single<ValueStoreProvider> { ValueStoreProviderImpl(get()) }
     single<ResourceProvider> { ResourceProviderImpl(androidApplication().resources) }
 
-    single<WidgetRefresher> { CalendarWidgetRefresher(androidApplication()) }
-
     single<LoadingStateUseCase> { LoadingStateUseCase() }
 //    factory { new instance every time }
 //    single(named("special logger")) { TimberLogger } -> single { SpecialRepository(get("special logger")) }
@@ -142,13 +140,16 @@ val repositoryModule = module {
 }
 
 val widgetModule = module {
+    single<WidgetContentCache> { InMemoryWidgetContentCache() }
+
     single {
-        CalendarWidgetUpdater(
+        CalendarWidgetUpdateCoordinator(
+            appContext = get(),
+            cache = get(),
             resourceProvider = get(),
             accountManager = get(),
             userAddressManager = get(),
             userSettingsRepository = get(),
-            logger = get(),
             database = get(),
             getUiEventsUseCase = get(),
         )
@@ -199,7 +200,6 @@ val useCaseModule = module {
     factory<ResetLocalEventDatabaseUseCase> { ResetLocalEventDatabaseUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<GetUserInfoUseCase> { GetUserInfoUseCase(get(), get(), get()) }
     factory<FixCalendarsUseCase> { FixCalendarsUseCase(get(), get(), get(), get(), get(), get(), get()) }
-    factory<GetUiEventsUseCase> { GetUiEventsUseCase(get(), get(), get(), get(), get()) }
     factory<UpdateFetchedEventsMetadataUseCase> { UpdateFetchedEventsMetadataUseCase(get(), get()) }
 }
 
@@ -219,6 +219,7 @@ fun coreModule(
     userSettingsRepository: UserSettingsRepository,
     getRecipientPublicAddresses: GetRecipientPublicAddresses,
     defaultSharedPreferencesProvider: DefaultSharedPreferencesProvider,
+    getUiEventsUseCase: GetUiEventsUseCase,
 ) = module {
     single<AppDatabase> { appDatabase }
     single<ApiProvider> { apiProvider }
@@ -235,4 +236,5 @@ fun coreModule(
     single<GetRecipientPublicAddresses> { getRecipientPublicAddresses }
     single<EventDecryptor> { eventDecryptor }
     single<DefaultSharedPreferencesProvider> { defaultSharedPreferencesProvider }
+    single<GetUiEventsUseCase> { getUiEventsUseCase }
 }

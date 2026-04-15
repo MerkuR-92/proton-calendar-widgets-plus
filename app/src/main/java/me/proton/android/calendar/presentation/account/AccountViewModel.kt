@@ -140,7 +140,7 @@ class AccountViewModel @Inject constructor(
             }
             return
         }
-
+        widgetRefresher.broadcastPostLoginRefresh()
         _state.tryEmit(State.Ready)
     }
 
