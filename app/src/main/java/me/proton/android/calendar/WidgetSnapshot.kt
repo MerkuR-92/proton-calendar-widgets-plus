@@ -128,7 +128,7 @@ private fun UiEvent.toWidgetEvent(
 
     return WidgetEvent(
         id = this.id,
-        summary = this.summary?.takeIfNotBlank()
+        summary = this.summary?.replace("\n", " ")?.takeIfNotBlank()
             ?: resourceProvider.provideString(R.string.default_event_summary),
         subheaderContent = subheaderContent,
         happensOn = happensOn,

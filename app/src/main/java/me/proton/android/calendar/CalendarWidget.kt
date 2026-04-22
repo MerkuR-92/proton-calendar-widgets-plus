@@ -52,6 +52,10 @@ class CalendarWidgetRefresher @Inject constructor(
         broadcast(ACTION_WIDGET_REFRESH_AFTER_LOGIN)
     }
 
+    override fun refreshEventList() {
+        broadcast(ACTION_WIDGET_DEFERRED_REFRESH)
+    }
+
     private fun broadcast(intentAction: String) {
         val mgr = AppWidgetManager.getInstance(context)
         val ids = mgr.getAppWidgetIds(ComponentName(context, CalendarWidget::class.java))
@@ -64,16 +68,13 @@ class CalendarWidgetRefresher @Inject constructor(
             }
         )
     }
-
-    override fun refreshEventList() {
-        val mgr = AppWidgetManager.getInstance(context)
-        val ids = mgr.getAppWidgetIds(ComponentName(context, CalendarWidget::class.java))
-        mgr.notifyAppWidgetViewDataChanged(ids, R.id.lv_widget)
-    }
 }
 
 private const val ACTION_WIDGET_REFRESH_AFTER_LOGIN =
     "me.proton.android.calendar.action.WIDGET_REFRESH_AFTER_LOGIN"
+
+private const val ACTION_WIDGET_DEFERRED_REFRESH =
+    "me.proton.android.calendar.action.WIDGET_DEFERRED_REFRESH"
 
 class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
@@ -86,6 +87,11 @@ class CalendarWidget : AppWidgetProvider(), KoinComponent {
 
         if (action == ACTION_WIDGET_REFRESH_AFTER_LOGIN) {
             coordinator.requestRefreshAfterLogin()
+            return
+        }
+
+        if (action == ACTION_WIDGET_DEFERRED_REFRESH) {
+            coordinator.requestDeferredRefresh()
             return
         }
 
@@ -153,8 +159,11 @@ internal class CalendarWidgetRemoteViewsFactory(
             data = cached.events
             return
         }
-        // process restarted / cache missed: request a refresh and show empty until coordinator repopulates
-        coordinator.requestRefresh()
+        // process restarted / cache missed: request a refresh and show empty until coordinator repopulates.
+        // use requestRefreshIfIdle to avoid cancelling an in-progress refresh via collectLatest -
+        // this cache-miss callback can fire as a side effect of the coordinator itself emitting a
+        // loading state, which would otherwise create a feedback loop.
+        coordinator.requestRefreshIfIdle()
         data = emptyList()
     }
 

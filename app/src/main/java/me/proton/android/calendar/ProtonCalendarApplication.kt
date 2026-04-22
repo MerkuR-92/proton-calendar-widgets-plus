@@ -5,6 +5,8 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.ComponentCallbacks2
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
@@ -39,6 +41,8 @@ class ProtonCalendarApplication : Application() {
     @Inject
     lateinit var authDatabase: AuthDatabase
 
+    private var lastUiMode: Int = 0
+
     override fun onCreate() {
         super.onCreate()
         MainInitializer.init(this)
@@ -59,6 +63,21 @@ class ProtonCalendarApplication : Application() {
                 startActivity(ForceUpdateActivity(this, it.apiErrorMessage))
             }
         }
+
+        lastUiMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        registerComponentCallbacks(object : ComponentCallbacks2 {
+            override fun onConfigurationChanged(newConfig: Configuration) {
+                val newUiMode = newConfig.uiMode and Configuration.UI_MODE_NIGHT_MASK
+                if (newUiMode != lastUiMode) {
+                    lastUiMode = newUiMode
+                    refreshWidget()
+                }
+            }
+
+            @Deprecated("Deprecated in Java")
+            override fun onLowMemory() {}
+            override fun onTrimMemory(level: Int) {}
+        })
     }
 
     override fun attachBaseContext(base: Context) {

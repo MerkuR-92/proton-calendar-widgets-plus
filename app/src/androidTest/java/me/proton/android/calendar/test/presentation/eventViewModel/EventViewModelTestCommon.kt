@@ -49,6 +49,7 @@ import me.proton.android.calendar.test.shared.mocks.userId
 import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.UserManager
 import me.proton.core.usersettings.domain.repository.UserSettingsRepository
+import me.proton.core.util.kotlin.CoroutineScopeProvider
 import org.junit.Before
 import org.junit.Rule
 import org.koin.core.KoinComponent
@@ -147,6 +148,7 @@ open class EventViewModelTestCommon: KoinComponent {
             protonMeetCrypto = mockk(),
             getProtonMeetDetailsUseCase = mockk(),
             isProtonMeetAddEnabled = mockk(),
+            scopeProvider = mockk<CoroutineScopeProvider>(relaxed = true),
         )
     }
 
