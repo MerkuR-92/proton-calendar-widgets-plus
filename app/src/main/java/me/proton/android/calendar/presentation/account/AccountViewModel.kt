@@ -156,7 +156,7 @@ class AccountViewModel @Inject constructor(
         calendarsRepository.shutdown()
         eventDecryptor.clearCache()
         valueStoreProvider.provideValueStore(userId.id).clearAll()
-        widgetRefresher.refreshEventList()
+        widgetRefresher.broadcastRefresh()
     }
 
     // TODO: Merge State & Error in the same StateFlow.

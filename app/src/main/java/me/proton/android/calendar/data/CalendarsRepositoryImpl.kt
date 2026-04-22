@@ -544,7 +544,7 @@ class CalendarsRepositoryImpl @Inject constructor(
     override suspend fun updateCalendarDisplay(calendarId: String, display: Boolean) {
         selectCalendarUserMember(calendarId)?.let {
             database.membersDao().updateDisplay(calendarId, display.toInt())
-            widgetRefresher.refreshEventList()
+            widgetRefresher.broadcastRefresh()
         }
     }
 

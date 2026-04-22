@@ -327,7 +327,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             if (prefill) {
                 val deeplinkUserId = navigationArguments.userId.takeIf { it.isNotBlank() }
                 if (deeplinkUserId != null && userId?.id != deeplinkUserId) {
-                    view?.displaySnackBar(getString(R.string.error_deeplink_user_mismatch))
+                    requireActivity().displaySnackBar(getString(R.string.error_deeplink_user_mismatch))
                     findNavController().navigateUp()
                     return@launch
                 }

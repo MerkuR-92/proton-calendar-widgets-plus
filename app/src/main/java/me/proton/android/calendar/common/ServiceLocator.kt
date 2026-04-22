@@ -2,6 +2,8 @@
 
 package me.proton.android.calendar.common
 
+import android.content.Context
+import android.net.ConnectivityManager
 import kotlinx.serialization.json.Json
 import me.proton.android.calendar.CalendarWidgetUpdateCoordinator
 import me.proton.android.calendar.InMemoryWidgetContentCache
@@ -146,12 +148,13 @@ val widgetModule = module {
         CalendarWidgetUpdateCoordinator(
             appContext = get(),
             cache = get(),
-            resourceProvider = get(),
             accountManager = get(),
             userAddressManager = get(),
             userSettingsRepository = get(),
             database = get(),
             getUiEventsUseCase = get(),
+            connectivityManager = androidApplication()
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as? ConnectivityManager,
         )
     }
 }

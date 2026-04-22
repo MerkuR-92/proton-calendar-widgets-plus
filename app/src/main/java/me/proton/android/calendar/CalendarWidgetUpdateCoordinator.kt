@@ -3,6 +3,9 @@ package me.proton.android.calendar
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkRequest
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +25,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import me.proton.android.calendar.CalendarWidgetRenderer.render
 import me.proton.android.calendar.common.getUserSettingsEntity
+import me.proton.android.calendar.common.provider.ResourceProviderImpl
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.formatDayOfWeek
 import me.proton.android.calendar.common.utils.DateTimeUtilsImpl.toDate
 import me.proton.android.calendar.common.utils.getAddressesOrNull
@@ -46,13 +50,13 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(FlowPreview::class)
 class CalendarWidgetUpdateCoordinator(
     private val appContext: Context,
-    private val resourceProvider: ResourceProvider,
     private val cache: WidgetContentCache,
     private val accountManager: AccountManager,
     private val userAddressManager: UserAddressManager,
     private val userSettingsRepository: UserSettingsRepository,
     private val database: AppDatabase,
     private val getUiEventsUseCase: GetUiEventsUseCase,
+    connectivityManager: ConnectivityManager?,
 ) {
     private data object RefreshRequest
 
@@ -64,20 +68,55 @@ class CalendarWidgetUpdateCoordinator(
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+    private val deferredRequests = MutableSharedFlow<RefreshRequest>(
+        replay = 1,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+
     private var postLoginJob: Job? = null
 
     init {
         scope.launch {
-            requests
-                .debounce(500)
-                .collectLatest {
-                    retrieveDataAndNotify()
-                }
+            requests.debounce(500).collectLatest {
+                retrieveDataAndNotify()
+            }
         }
+
+        scope.launch {
+            deferredRequests.debounce(30.seconds).collect {
+                requests.tryEmit(RefreshRequest)
+            }
+        }
+
+        connectivityManager?.registerNetworkCallback(
+            NetworkRequest.Builder().build(),
+            object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    requestDeferredRefresh()
+                }
+            }
+        )
     }
+    
+    // to avoid requesting a redundant refresh that would cancel the in-progress one
+    @Volatile
+    var isRetrieving: Boolean = false
+        private set
 
     fun requestRefresh() {
         requests.tryEmit(RefreshRequest)
+    }
+
+    fun requestRefreshIfIdle() {
+        if (isRetrieving) {
+            return
+        }
+        requests.tryEmit(RefreshRequest)
+    }
+
+    fun requestDeferredRefresh() {
+        deferredRequests.tryEmit(RefreshRequest)
     }
 
     fun requestRefreshAfterLogin() {
@@ -128,7 +167,17 @@ class CalendarWidgetUpdateCoordinator(
     }
 
     private suspend fun retrieveDataAndNotify() {
+        isRetrieving = true
+        try {
+            retrieveDataAndNotifyImpl()
+        } finally {
+            isRetrieving = false
+        }
+    }
+
+    private suspend fun retrieveDataAndNotifyImpl() {
         val ctx = createFreshContext()
+        val resourceProvider = ResourceProviderImpl(ctx.resources)
         val mgr = AppWidgetManager.getInstance(ctx)
         val ids = mgr.getAppWidgetIds(ComponentName(ctx, CalendarWidget::class.java))
         if (ids.isEmpty()) return
@@ -156,6 +205,7 @@ class CalendarWidgetUpdateCoordinator(
 
         val content = loadEvents(
             context = ctx,
+            resourceProvider = resourceProvider,
             ck = ck,
             headerDayOfWeek = headerDayOfWeek,
             monthAndDay = monthAndDay,
@@ -170,6 +220,7 @@ class CalendarWidgetUpdateCoordinator(
 
     private suspend fun loadEvents(
         context: Context,
+        resourceProvider: ResourceProvider,
         ck: String,
         headerDayOfWeek: String,
         monthAndDay: String,

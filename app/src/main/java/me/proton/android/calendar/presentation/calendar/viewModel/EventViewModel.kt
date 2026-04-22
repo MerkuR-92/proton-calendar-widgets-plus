@@ -2516,7 +2516,7 @@ class EventViewModel @Inject constructor(
                 SaveResult.SUCCESS -> {
 
                     // Refresh the widget on success
-                    widgetRefresher.refreshEventList()
+                    widgetRefresher.broadcastRefresh()
 
                     // Display the event's calendar if it was hidden
                     if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
@@ -2647,7 +2647,7 @@ class EventViewModel @Inject constructor(
             if (saveResult == SaveResult.SUCCESS || saveResult == SaveResult.CREATE_ERROR_SEND_MAIL) {
 
                 // Refresh the widget on success
-                widgetRefresher.refreshEventList()
+                widgetRefresher.broadcastRefresh()
 
                 // Display the event's calendar if it was hidden
                 if (!event.calendar.display) updateCalendarDisplay(event.calendar, true)
@@ -3401,7 +3401,7 @@ class EventViewModel @Inject constructor(
         eventDetailsState.value = EventState.Idle
 
         if (deleteResult is UseCase.Result.Success<*>) {
-            widgetRefresher.refreshEventList()
+            widgetRefresher.broadcastRefresh()
             eventDetailsSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
                 if (deleteType == DeleteType.AS_AN_ORGANIZER && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_organizer)
                 else if (deleteType == DeleteType.AS_AN_ATTENDEE && mailSent == true) resourceProvider.provideString(R.string.snack_event_deleted_as_attendee)
@@ -3966,7 +3966,7 @@ class EventViewModel @Inject constructor(
         attendeeAnswerState.value = Pair(participationStatus, false)
 
         // Force the Widget to refresh, because we just changed the Event answer
-        widgetRefresher.refreshEventList()
+        widgetRefresher.broadcastRefresh()
 
         // Display part stat updated snack and return to month view with focus on the event's start date
         eventDetailsSnackState.value = EventSnackState.DisplaySnackReturnToMonth(
