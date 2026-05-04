@@ -405,7 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s je pogojno sprejel/-a vaše povabilo</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s je zavrnil/-a vaše povabilo</string>
     <string name="snack_app_link_invalid">Neveljavna povezava do dogodka</string>
-    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
+    <string name="error_deeplink_user_mismatch">Ta povezava je namenjena za drug račun</string>
     <string name="snack_app_link_error">Napaka pri odpiranju dogodka</string>
     <string name="snack_app_link_import_error">Preverjanje pristnosti preklicano</string>
     <string name="snack_notification_already_added">Obvestilo je že bilo dodano</string>

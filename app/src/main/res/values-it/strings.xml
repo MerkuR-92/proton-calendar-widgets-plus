@@ -405,7 +405,7 @@
     <string name="snack_event_attendee_tentative_answer" comment="attendee who tentatively accepted">%1$s ha accettato provvisoriamente il tuo invito</string>
     <string name="snack_event_attendee_declined_answer" comment="attendee who declined">%1$s ha rifiutato il tuo invito</string>
     <string name="snack_app_link_invalid">Link all\'evento non valido</string>
-    <string name="error_deeplink_user_mismatch">This link is for a different account</string>
+    <string name="error_deeplink_user_mismatch">Questo link rimanda a un account diverso.</string>
     <string name="snack_app_link_error">Errore nell\'apertura dell\'evento</string>
     <string name="snack_app_link_import_error">Autenticazione annullata</string>
     <string name="snack_notification_already_added">La notifica è già stata aggiunta</string>
