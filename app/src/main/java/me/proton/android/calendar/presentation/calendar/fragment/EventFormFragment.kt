@@ -637,7 +637,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                         requireContext().getDeviceContacts() ?: emptyList(),
                         protonContacts
                     ).take(ATTENDEE_MAX_CHIP_ALLOWED).forEach { attendee ->
-                        val chipTitle = if (attendee.commonName.isNotEmpty()) attendee.commonName else attendee.extractEmail()
+                        val chipTitle = if (!attendee.commonName.isNullOrEmpty()) attendee.commonName else attendee.extractEmail()
                         chipTitle?.let {
                             addAttendeeChip(chipTitle)
                         }
