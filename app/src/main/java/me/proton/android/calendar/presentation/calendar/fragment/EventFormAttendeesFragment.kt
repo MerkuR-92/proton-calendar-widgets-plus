@@ -264,7 +264,7 @@ class EventFormAttendeesFragment() : BaseDialogFragment<FragmentEventFormAttende
             val event = nullableEvent ?: return@Observer
             lifecycleScope.launch {
                 // Get non canonical email
-                val organizerEmail = event.calendar.email
+                val organizerEmail = event.iCalEvent.organizer?.extractEmail() ?: event.calendar.email
                 val userAddresses = calendarViewModel.getUserAddresses()
                 val organizerAddress = userAddresses?.firstOrNull {
                     canonicalizeProtonEmail(it.email, forceCanonicalization = true).equals(

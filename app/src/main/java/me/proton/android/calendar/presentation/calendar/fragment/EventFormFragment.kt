@@ -90,6 +90,7 @@ import me.proton.core.presentation.utils.SnackType
 import me.proton.core.presentation.utils.clearText
 import me.proton.core.presentation.utils.snack
 import me.proton.core.user.domain.extension.hasSubscriptionForMail
+import me.proton.core.util.kotlin.takeIfNotBlank
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 import java.time.Instant
@@ -646,7 +647,20 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             }
 
             if (!event.iCalEvent.attendees.isNullOrEmpty()) {
-                addAttendeeChip(getString(R.string.event_current_user_organizer))
+                lifecycleScope.launch {
+                    val canonicalUserEmails = calendarViewModel.getCanonicalUserEmails(forceCanonicalization = true)
+                    val isOrganizer = event.isUserOrganizer(canonicalUserEmails)
+                    withStarted {
+                        val chipTitle = if (isOrganizer) {
+                            getString(R.string.event_current_user_organizer)
+                        } else {
+                            event.iCalEvent.organizer?.let { org ->
+                                org.commonName?.takeIfNotBlank() ?: org.extractEmail()
+                            }
+                        }
+                        chipTitle?.let { addAttendeeChip(it) }
+                    }
+                }
 
                 if (event.iCalEvent.attendees.size > ATTENDEE_MAX_CHIP_ALLOWED) {
                     addAttendeeChip(
@@ -668,10 +682,11 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
             )
 
             lifecycleScope.launch {
-                binding.eventFormParticipantLayout.visibleOrGone(CalendarFeatureFlag.AddAttendees.fallbackValue &&
-                        eventViewModel.allowSendForCalendarAddress() &&
-                        event.hasProtonUid
-                )
+                val addAttendeesFlag = CalendarFeatureFlag.AddAttendees.fallbackValue
+                val allowSend = eventViewModel.allowSendForCalendarAddress()
+                val addToImported = featureFlagViewModel.isAddAttendeesToImportedEventsEnabled()
+                val canAddOnThisEvent = addToImported || event.hasProtonUid
+                binding.eventFormParticipantLayout.visibleOrGone(addAttendeesFlag && allowSend && canAddOnThisEvent)
 
                 binding.eventFormParticipantChipGroup.visibleOrGone(!event.iCalEvent.attendees.isNullOrEmpty())
 
@@ -704,7 +719,7 @@ class EventFormFragment() : BaseDialogFragment<FragmentEventFormBinding>(), Koin
                     binding.eventFormParticipantPress.root.visibleOrGone(false)
                 } else {
                     // Default state
-                    binding.eventFormParticipant.visibleOrGone(event.hasProtonUid && event.iCalEvent.attendees.isNullOrEmpty())
+                    binding.eventFormParticipant.visibleOrGone(canAddOnThisEvent && event.iCalEvent.attendees.isNullOrEmpty())
                     binding.eventFormParticipantDisclaimer.visibleOrGone(false)
                     binding.eventFormParticipantDisclaimer.text = ""
                     binding.eventFormParticipantPress.root.visibleOrGone(true)
