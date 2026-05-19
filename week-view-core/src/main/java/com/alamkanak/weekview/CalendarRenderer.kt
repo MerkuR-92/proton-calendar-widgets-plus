@@ -2,7 +2,6 @@ package com.alamkanak.weekview
 
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.RectF
 import android.text.StaticLayout
 import androidx.collection.ArrayMap
 import java.util.Calendar
@@ -36,6 +35,15 @@ internal class CalendarRenderer(
     }
 }
 
+/**
+ * Updates [EventChip] bounds and text layouts for the visible date range.
+ *
+ * Avoids the work of recomputing every chip's bounds on every frame by:
+ * 1. Pan fast-path: when only origin X/Y changes, offsets existing bounds instead of recalculating
+ * 2. Targeted stale cleanup — only clears bounds for dates that scrolled out of view
+ * 3. Periodically fully recalculates (to correct any accumulated error)
+ * 4. Prebuilds text layouts for one day ahead of the visible region
+ */
 private class SingleEventsUpdater(
     private val viewState: ViewState,
     private val chipsCacheProvider: EventChipsCacheProvider,
@@ -45,9 +53,69 @@ private class SingleEventsUpdater(
     private val boundsCalculator = EventChipBoundsCalculator(viewState)
     private val textFitter = TextFitter(viewState)
 
+    private data class SceneParams(
+        val minHour: Int,
+        val maxHour: Int,
+        val hourHeight: Float,
+        val headerHeight: Float,
+        val dayWidth: Float,
+        val isSingleDay: Boolean,
+        val singleDayPadding: Int,
+        val dateRangeSize: Int,
+    )
+
+    private var lastScene: SceneParams? = null
+    private var lastOriginX: Float? = null
+    private var lastOriginY: Float? = null
+    private var previousDateRange: List<Long>? = null
+    private var lastCacheGeneration: Long = -1
+    private var offsetFrameCount: Int = 0
+
     override fun update() {
-        val chipsCache = chipsCacheProvider()
-        chipsCache?.clearSingleEventsCache()
+        val cache = chipsCacheProvider() ?: return
+
+        val sceneNow = currentSceneParams()
+        val ox = viewState.currentOrigin.x
+        val oy = viewState.currentOrigin.y
+        val prevScene = lastScene
+        val prevOx = lastOriginX
+        val prevOy = lastOriginY
+
+        val sceneChanged = prevScene == null || prevScene != sceneNow
+        val dateRangeChanged = didDateRangeChange()
+        val cacheChanged = cache.generation != lastCacheGeneration
+
+        if (sceneChanged || dateRangeChanged || cacheChanged) {
+            if (cacheChanged) pruneStaleLabels(cache)
+            fullRecompute(cache)
+            offsetFrameCount = 0
+        } else if (prevOx != null && prevOy != null) {
+            val dx = ox - prevOx
+            val dy = oy - prevOy
+            if (dx != 0f || dy != 0f) {
+                if (offsetFrameCount < REANCHOR_INTERVAL) {
+                    offsetVisibleChips(cache, dx, dy)
+                    offsetFrameCount++
+                } else {
+                    fullRecompute(cache)
+                    offsetFrameCount = 0
+                }
+            }
+            // else: no movement, no work needed
+        }
+
+        lastScene = sceneNow
+        lastOriginX = ox
+        lastOriginY = oy
+        lastCacheGeneration = cache.generation
+        previousDateRange = viewState.dateRange.map { it.atStartOfDay.timeInMillis }
+    }
+
+    private fun fullRecompute(cache: EventChipsCache) {
+        cleanupStaleChips(cache)
+
+        val grid = viewState.calendarGridBounds
+        val prefetchRight = grid.right + viewState.dayWidth
 
         for ((date, startPixel) in viewState.dateRangeWithStartPixels) {
             // If we use a horizontal margin in the day view, we need to offset the start pixel.
@@ -55,36 +123,68 @@ private class SingleEventsUpdater(
                 viewState.isSingleDay -> startPixel + viewState.singleDayHorizontalPadding.toFloat()
                 else -> startPixel
             }
+            val endPixel = modifiedStartPixel + viewState.dayWidth
 
-            val eventChips = chipsCache?.normalEventChipsByDate(date).orEmpty().filter {
-                it.event.isWithin(viewState.minHour, viewState.maxHour)
-            }
+            val eventChips = cache.normalEventChipsByDate(date)
+            if (eventChips.isEmpty()) continue
 
-            eventChips.calculateBounds(startPixel = modifiedStartPixel)
-            eventChips.calculateTextLayouts()
-        }
-    }
+            for (eventChip in eventChips) {
+                if (!eventChip.event.isWithin(viewState.minHour, viewState.maxHour)) {
+                    eventChip.setEmpty()
+                    eventLabels.remove(eventChip.id)
+                    continue
+                }
 
-    private fun List<EventChip>.calculateBounds(startPixel: Float) {
-        for (eventChip in this) {
-            val chipRect = boundsCalculator.calculateSingleEvent(eventChip, startPixel)
-
-            if (chipRect.isValid) {
+                val chipRect = boundsCalculator.calculateSingleEvent(eventChip, modifiedStartPixel)
                 eventChip.bounds.set(chipRect)
-            } else {
-                eventChip.bounds.setEmpty()
+            }
+
+            if (endPixel > grid.left && modifiedStartPixel < prefetchRight) {
+                calculateTextLayouts(eventChips)
             }
         }
     }
 
-    private fun List<EventChip>.calculateTextLayouts() {
-        for (eventChip in this) {
-            val bounds = eventChip.bounds
-            val horizontalPadding = viewState.eventPaddingHorizontal
-            val verticalPadding = viewState.eventPaddingVertical * 2
+    private fun offsetVisibleChips(cache: EventChipsCache, dx: Float, dy: Float) {
+        for (date in viewState.dateRange) {
+            val chips = cache.normalEventChipsByDate(date)
+            for (chip in chips) {
+                if (!chip.bounds.isEmpty) {
+                    chip.bounds.offset(dx, dy)
+                }
+            }
+        }
+    }
 
-            val availableWidth = bounds.width().roundToInt() - horizontalPadding
-            val availableHeight = bounds.height().roundToInt() - verticalPadding
+    private fun cleanupStaleChips(cache: EventChipsCache) {
+        val prev = previousDateRange ?: return
+        val currentMillis = viewState.dateRange.map { it.atStartOfDay.timeInMillis }.toSet()
+
+        for (dateMillis in prev) {
+            if (dateMillis !in currentMillis) {
+                for (chip in cache.normalEventChipsByDate(dateMillis)) {
+                    chip.setEmpty()
+                    eventLabels.remove(chip.id)
+                }
+            }
+        }
+    }
+
+    private fun pruneStaleLabels(cache: EventChipsCache) {
+        val cacheIds = cache.allEventChips.mapTo(HashSet()) { it.id }
+        val iterator = eventLabels.entries.iterator()
+        while (iterator.hasNext()) {
+            if (iterator.next().key !in cacheIds) {
+                iterator.remove()
+            }
+        }
+    }
+
+    private fun calculateTextLayouts(eventChips: List<EventChip>) {
+        for (eventChip in eventChips) {
+            val bounds = eventChip.bounds
+            val availableWidth = bounds.width().roundToInt() - viewState.eventPaddingHorizontal
+            val availableHeight = bounds.height().roundToInt() - viewState.eventPaddingVertical * 2
 
             if (availableHeight <= 0 || availableWidth <= 0) {
                 // We can't fit any text into this
@@ -109,8 +209,30 @@ private class SingleEventsUpdater(
         }
     }
 
-    private val RectF.isValid: Boolean
-        get() = viewState.calendarGridBounds.intersects(this)
+    private fun didDateRangeChange(): Boolean {
+        val prev = previousDateRange ?: return true
+        val current = viewState.dateRange
+        if (prev.size != current.size) return true
+        for (i in prev.indices) {
+            if (prev[i] != current[i].atStartOfDay.timeInMillis) return true
+        }
+        return false
+    }
+
+    private fun currentSceneParams() = SceneParams(
+        minHour = viewState.minHour,
+        maxHour = viewState.maxHour,
+        hourHeight = viewState.hourHeight,
+        headerHeight = viewState.headerHeight,
+        dayWidth = viewState.dayWidth,
+        isSingleDay = viewState.isSingleDay,
+        singleDayPadding = viewState.singleDayHorizontalPadding,
+        dateRangeSize = viewState.dateRange.size,
+    )
+
+    companion object {
+        private const val REANCHOR_INTERVAL = 120
+    }
 }
 
 private class DayBackgroundDrawer(
