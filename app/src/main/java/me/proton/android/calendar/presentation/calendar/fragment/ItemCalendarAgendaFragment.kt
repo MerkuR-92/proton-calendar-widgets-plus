@@ -40,6 +40,7 @@ import me.proton.android.calendar.domain.CalendarsRepository.EventsWindow
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
+import me.proton.android.calendar.domain.usecase.DecryptionPriority
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.calendar.adapter.EventAdapter
 import me.proton.android.calendar.presentation.calendar.viewModel.CalendarViewModel
@@ -180,7 +181,18 @@ class ItemCalendarAgendaFragment: Fragment() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId).map {
+                    val priority =
+                        if (position != null && position == calendarViewModel.visibleAgendaPagerPosition.value) {
+                            DecryptionPriority.Visible
+                        } else {
+                            DecryptionPriority.Offscreen
+                        }
+                    calendarViewModel.getUiEventsLookupFlow(
+                        range.fromDate,
+                        range.toDate,
+                        range.timeZoneId,
+                        priority = priority,
+                    ).map {
                         range to it
                     }
                 }.collectLatest { (range, events) ->

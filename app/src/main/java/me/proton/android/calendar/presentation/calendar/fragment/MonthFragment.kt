@@ -17,6 +17,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.whenStarted
@@ -40,7 +41,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -86,6 +89,7 @@ import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
 import me.proton.android.calendar.domain.model.getActualEventId
 import me.proton.android.calendar.domain.model.toWeekViewCalendarEntityEvent
 import me.proton.android.calendar.domain.usecase.HandleAlarmsUseCase
+import me.proton.android.calendar.domain.usecase.DecryptionPriority
 import me.proton.android.calendar.domain.usecase.UseCase
 import me.proton.android.calendar.presentation.account.AccountViewModel
 import me.proton.android.calendar.presentation.calendar.adapter.WeekViewAdapter
@@ -262,6 +266,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
         miniCalendarPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
+                calendarViewModel.visibleTopPagerPosition.value = position
 
                 val monthStartingPosition = miniCalendarPagerAdapter.startingPosition
                 val monthStartingDate = miniCalendarPagerAdapter.firstDayOfMonth
@@ -280,6 +285,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
     private val agendaPageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
+            calendarViewModel.visibleAgendaPagerPosition.value = position
             // Agenda view pager is hidden when displaying other views
             if (currentViewMode == ViewMode.AGENDA) {
                 val currentDate =
@@ -666,11 +672,31 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId)
-                }.collectLatest {
-                    updateUiEvents(it)
-                }
+                combine(
+                    calendarViewModel.viewMode.asFlow(),
+                    currentRange,
+                ) { mode, range -> mode to range }
+                    .filter { (mode, range) ->
+                        // skip when the week view body is hidden
+                        range != null && (
+                            mode == ViewMode.WEEK ||
+                            mode == ViewMode.DAY ||
+                            mode == ViewMode.THREE_DAY
+                        )
+                    }
+                    .map { (_, range) -> range!! }
+                    .distinctUntilChanged()
+                    .flatMapLatest { range ->
+                        calendarViewModel.getUiEventsLookupFlow(
+                            range.fromDate,
+                            range.toDate,
+                            range.timeZoneId,
+                            priority = DecryptionPriority.Visible,
+                        )
+                    }
+                    .collectLatest {
+                        updateUiEvents(it)
+                    }
             }
         }
         lifecycleScope.launch {
@@ -1105,6 +1131,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
 
                     adapter = agendaPagerAdapter
                     val item = if (currentItem > 0) currentItem else agendaPagerAdapter.startingPosition
+                    calendarViewModel.visibleAgendaPagerPosition.value = item
                     setCurrentItem(item, false)
                     offscreenPageLimit = 1
                 }
@@ -1205,6 +1232,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             offscreenPageLimit = 1
 
             val item = if (currentItem > 0) currentItem else monthPagerAdapter.startingPosition
+            calendarViewModel.visibleTopPagerPosition.value = item
             setCurrentItem(item, false)
         }
         // TODO Try and see if this is still needed
@@ -1227,6 +1255,7 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             offscreenPageLimit = 1
 
             val item = if (currentItem > 0) currentItem else miniCalendarPagerAdapter.startingPosition
+            calendarViewModel.visibleTopPagerPosition.value = item
             setCurrentItem(item, false)
         }
         // TODO Try and see if this is still needed

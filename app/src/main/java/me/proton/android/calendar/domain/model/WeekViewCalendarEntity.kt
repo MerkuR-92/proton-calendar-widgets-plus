@@ -73,8 +73,12 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
         listOf(
             WeekViewCalendarEntity.Event(
                 id = weekViewEventId,
-                // Use empty title for failed to decrypt event state
-                title = if (this.decryptionStatus is Event.DecryptionStatus.Failure) "" else this.summary ?: defaultEventTitle,
+                // Empty title for skeleton (pre-decryption) and failed-decryption events
+                title = when {
+                    this.isSkeleton -> UiEvent.SkeletonTitle
+                    this.decryptionStatus is Event.DecryptionStatus.Failure -> ""
+                    else -> this.summary ?: defaultEventTitle
+                },
                 location = "",
                 startTime = this.dateStart.toLocalDateTime(),
                 endTime = this.dateEnd.toLocalDateTime(),
@@ -93,8 +97,12 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
         // If event last less than 24h but happens over two days, we split it in two
         val startEvent = WeekViewCalendarEntity.Event(
             id = weekViewEventId,
-            // Use empty title for failed to decrypt event state
-            title = if (this.decryptionStatus is Event.DecryptionStatus.Failure) "" else this.summary ?: defaultEventTitle,
+            // Empty title for skeleton (pre-decryption) and failed-decryption events
+            title = when {
+                this.isSkeleton -> UiEvent.SkeletonTitle
+                this.decryptionStatus is Event.DecryptionStatus.Failure -> ""
+                else -> this.summary ?: defaultEventTitle
+            },
             location = "",
             startTime = this.dateStart.toLocalDateTime(),
             endTime = this.dateStart.with(LocalTime.MAX).toLocalDateTime(),

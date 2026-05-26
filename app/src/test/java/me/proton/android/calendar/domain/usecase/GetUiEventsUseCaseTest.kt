@@ -6,6 +6,7 @@ import io.mockk.coVerify
 import io.mockk.coVerifySequence
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import me.proton.android.calendar.common.utils.EventUtilsImpl.getParticipationStatus
@@ -399,7 +400,18 @@ class GetUiEventsUseCaseTest {
         calendarsRepository = calendarsRepo,
         getUserInfoUseCase = getUserInfo,
         loadingStateUseCase = loadingState,
-    ).execute(userId, from, to, tz, false)
+        priorityRunner = PriorityDecryptionRunner(),
+        skeletonCalculator = mockk {
+            coEvery { computeSkeletonUiEvents(any(), any(), any(), any()) } returns emptyList()
+        },
+    ).execute(
+        userId = userId,
+        fromDate = from,
+        toDate = to,
+        timeZoneId = tz,
+        onlyVisibleCalendars = false,
+        priority = DecryptionPriority.Visible, // skip the 1s low-priority stagger
+    ).drop(1) // skip the empty-skeleton emission
 
     private fun mockCalendar(id: String): Calendar =
         mockk(relaxed = true) { every { this@mockk.id } returns id }

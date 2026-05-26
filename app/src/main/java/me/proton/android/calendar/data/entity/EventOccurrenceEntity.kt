@@ -32,6 +32,11 @@ data class EventOccurrenceEntity(
     val lastOccurrenceEndTime: Long? = null, // if non-null it means we generated last occurrence in one of the windows
     val rRule: String? = null,
     val modifyTime: Long,
+    // metadata from EventEntityMetadata so we can expand RRULEs and apply EXDATE/RECURRENCE-ID masking
+    val startTimeZone: String = "",
+    val endTimeZone: String = "",
+    val exDates: List<Long> = emptyList(),
+    val recurrenceID: Long? = null,
 
     @PrimaryKey(autoGenerate = true)
     var _id: Int = 0

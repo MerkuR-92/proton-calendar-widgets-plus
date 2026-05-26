@@ -9,15 +9,16 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import me.proton.android.calendar.common.utils.KotlinUtilsImpl.debounceExceptFirst
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
+import me.proton.android.calendar.domain.indicators.MetadataIndicatorsCalculator
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.EventDecryptor
 import me.proton.android.calendar.domain.model.Event
@@ -29,6 +30,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,17 +41,17 @@ class GetUiEventsUseCase @Inject constructor(
     private val calendarsRepository: CalendarsRepository,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val loadingStateUseCase: LoadingStateUseCase,
+    private val priorityRunner: PriorityDecryptionRunner,
+    private val skeletonCalculator: MetadataIndicatorsCalculator,
 ) : UseCase {
-
-    // Ensures parallel invocations await behind a mutex during their decrypt+expand stage, to allow the cache to get populated and avoid thread starvation
-    private val mutex = Mutex()
 
     fun execute(
         userId: UserId,
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-        onlyVisibleCalendars: Boolean = true
+        onlyVisibleCalendars: Boolean = true,
+        priority: DecryptionPriority = DecryptionPriority.Offscreen,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> {
         val eventsWindow = CalendarsRepository.EventsWindow(fromDate, toDate, timeZoneId)
         Timber.d("getUiEventsUseCase: $eventsWindow")
@@ -60,7 +62,7 @@ class GetUiEventsUseCase @Inject constructor(
         val fromEpochSec = fromEpochZdt.toEpochSecond()
         val toEpochSec = toEpochZdt.toEpochSecond()
 
-        return calendarsRepository.flowAllCalendars(userId.id)
+        val realFlow = calendarsRepository.flowAllCalendars(userId.id)
             .map { if (onlyVisibleCalendars) it.filterVisibleCalendars() else it }
             .onEach { eventDecryptor.setCalendars(it) }
             .distinctUntilChanged()
@@ -96,46 +98,47 @@ class GetUiEventsUseCase @Inject constructor(
                 ) { userInfo, nonRecurring, finiteRecurring, infiniteRecurring, _ ->
                     Timber.d("for $eventsWindow nonRecurring: ${nonRecurring.size}, finiteRecurring: ${finiteRecurring.size}, infiniteRecurring: ${infiniteRecurring.size}")
                     withContext(Dispatchers.Default) {
-                        // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
-                        // to filter out even more events here, before decryption takes place
+                        // submit heavy work into a priority runner
+                        priorityRunner.submit(priority) {
+                            // potential optimization: we have rrule, we can generate occurrences quickly without decrypting the event
+                            // to filter out even more events here, before decryption takes place
 
-                        // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
-                        //  - select from by windowStart and windowEnd, only the rows that overlap with eventsWindow (problem: false negatives if the window was never generated for those events)
-                        //  - groupBy events before performing discarding below and early-return for each event that for sure happens or doesn't happen in the window (problem: higher memory usage)
+                            // potential optimizations, but debatable if we're not dealing with huge amount of infinitely recurring events:
+                            //  - select from by windowStart and windowEnd, only the rows that overlap with eventsWindow (problem: false negatives if the window was never generated for those events)
+                            //  - groupBy events before performing discarding below and early-return for each event that for sure happens or doesn't happen in the window (problem: higher memory usage)
 
-                        // infinite recurring that don't occur in <from,to>
-                        val notOccurring = infiniteRecurring.filter { occurrence ->
-                            val windowPair = fromEpochSec to toEpochSec
-                            val occPair = occurrence.windowStartTime to occurrence.windowEndTime
-                            val isSelectedWindowFullyInOccurrenceWindow = isFullyBetween(windowPair, occPair)
-                            val isEventNotHappeningInOccurrenceWindow = occurrence.startTime == null
-                            val isFirstEventOccurenceAfterSelectedWindow = (occurrence.startTime ?: 0) > toEpochSec
+                            // infinite recurring that don't occur in <from,to>
+                            val notOccurring = infiniteRecurring.filter { occurrence ->
+                                val windowPair = fromEpochSec to toEpochSec
+                                val occPair = occurrence.windowStartTime to occurrence.windowEndTime
+                                val isSelectedWindowFullyInOccurrenceWindow = isFullyBetween(windowPair, occPair)
+                                val isEventNotHappeningInOccurrenceWindow = occurrence.startTime == null
+                                val isFirstEventOccurenceAfterSelectedWindow = (occurrence.startTime ?: 0) > toEpochSec
 
-                            isSelectedWindowFullyInOccurrenceWindow && (isEventNotHappeningInOccurrenceWindow || isFirstEventOccurenceAfterSelectedWindow)
-                        }
-
-                        val filteredInfiniteRecurring = infiniteRecurring.filterNot { recurring ->
-                            notOccurring.any {
-                                recurring.userId == it.userId &&
-                                        recurring.calendarId == it.calendarId &&
-                                        recurring.eventId == it.eventId
+                                isSelectedWindowFullyInOccurrenceWindow && (isEventNotHappeningInOccurrenceWindow || isFirstEventOccurenceAfterSelectedWindow)
                             }
-                        }
 
-                        val neededUids: Set<String> =
-                            (finiteRecurring.asSequence().map { it.eventUid } +
-                                    filteredInfiniteRecurring.asSequence().map { it.eventUid })
-                                .distinct()
-                                .toSet()
+                            val filteredInfiniteRecurring = infiniteRecurring.filterNot { recurring ->
+                                notOccurring.any {
+                                    recurring.userId == it.userId &&
+                                            recurring.calendarId == it.calendarId &&
+                                            recurring.eventId == it.eventId
+                                }
+                            }
 
-                        val byUidMap = calendarsRepository.selectEventEntitiesByUids(neededUids)
+                            val neededUids: Set<String> =
+                                (finiteRecurring.asSequence().map { it.eventUid } +
+                                        filteredInfiniteRecurring.asSequence().map { it.eventUid })
+                                    .distinct()
+                                    .toSet()
 
-                        suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? =
-                            (eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
-                                ?: database.eventsDao().selectById(occ.eventId)?.let { eventDecryptor.decrypt(it) })
-                                ?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+                            val byUidMap = calendarsRepository.selectEventEntitiesByUids(neededUids)
 
-                        mutex.withLock {
+                            suspend fun fetchEventFor(occ: EventOccurrenceEntity): Event? =
+                                (eventDecryptor.getFromCache(occ.eventId, occ.calendarId, occ.modifyTime)
+                                    ?: database.eventsDao().selectById(occ.eventId)?.let { eventDecryptor.decrypt(it) })
+                                    ?.takeIf { it.decryptionStatus != Event.DecryptionStatus.Failure.NoAddressKey }
+
                             val transformedNonRecurring =
                                 nonRecurring.parallelMap { occ ->
                                     fetchEventFor(occ)?.toUiEvent(
@@ -193,6 +196,19 @@ class GetUiEventsUseCase @Inject constructor(
                 .distinctUntilChanged()) { events, inProgress ->
                 CalendarsRepository.GetEventsResult.Success(events, fullyLoaded = inProgress.not())
             }
+
+        return flow {
+            val skeleton = try {
+                skeletonCalculator.computeSkeletonUiEvents(userId.id, fromDate, toDate, timeZoneId)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (t: Throwable) {
+                Timber.w(t, "skeleton calculator threw for $fromDate..$toDate")
+                emptyList()
+            }
+            emit(CalendarsRepository.GetEventsResult.Success(skeleton, fullyLoaded = false, isSkeleton = true))
+            emitAll(realFlow)
+        }
     }
 
     /**

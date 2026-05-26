@@ -26,7 +26,8 @@ data class UiEvent(
     val decryptionStatus: Event.DecryptionStatus,
 
     val participationStatus: ParticipationStatus?,
-    val status: Status
+    val status: Status,
+    val isSkeleton: Boolean = false, // not yet decrypted
 
 ) : BaseModel() {
 
@@ -78,6 +79,9 @@ data class UiEvent(
 
     fun isCancelled(): Boolean = this.status.isCancelled
 
+    companion object {
+        const val SkeletonTitle = "..."
+    }
 }
 
 
