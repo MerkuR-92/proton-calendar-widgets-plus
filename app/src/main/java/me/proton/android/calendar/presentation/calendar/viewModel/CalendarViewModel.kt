@@ -9,12 +9,9 @@ import android.text.Spanned
 import android.text.format.DateFormat
 import android.view.LayoutInflater
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.flowWithLifecycle
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.work.Operation
 import androidx.work.WorkManager
@@ -29,11 +26,11 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
@@ -75,6 +72,8 @@ import me.proton.android.calendar.common.worker.UpdateTimeFormatWorker
 import me.proton.android.calendar.common.worker.UpdateWeekStartWorker
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.CalendarSubscriptionEntity
+import me.proton.android.calendar.domain.indicators.MetadataIndicatorsCalculator
+import me.proton.android.calendar.domain.usecase.DecryptionPriority
 import me.proton.android.calendar.databinding.DialogCheckboxBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
@@ -137,6 +136,7 @@ class CalendarViewModel @Inject constructor(
     private val getUiEventsUseCase: GetUiEventsUseCase,
     private val workManager: WorkManager,
     private val manualRefreshUseCase: ManualRefreshUseCase,
+    private val metadataIndicatorsCalculator: MetadataIndicatorsCalculator,
 ) : AndroidViewModel(application) {
 
     val initialised = MutableLiveData(false)
@@ -177,6 +177,10 @@ class CalendarViewModel @Inject constructor(
 
     // Position of the currently resumed month view fragment. We use to start loading the next view only after the swipe is finished.
     val resumedMonthViewPosition = MutableLiveData<Int>()
+
+    // Visible page positions; hosted fragments use them to tag their priority.
+    val visibleTopPagerPosition = MutableStateFlow(Int.MIN_VALUE)
+    val visibleAgendaPagerPosition = MutableStateFlow(Int.MIN_VALUE)
 
     var currentLoadingProcesses: Int = 0 // Amount of currently loading processes
     var viewPagerFragmentsLoadingState: HashMap<Int, Boolean> = hashMapOf() // Map of fragment position in the view pager and their loading states
@@ -444,23 +448,13 @@ class CalendarViewModel @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
-    ): Flow<Map<LocalDate, List<String>>> {
-        // TODO we could optimize this by operating on EventOccurrenceEntity only, not full UiEvents
-        return getUiEventsLookupFlow(fromDate, toDate, timeZoneId).map { eventsResult ->
-            when (eventsResult) {
-                CalendarsRepository.GetEventsResult.InProgress -> {
-                    emptyMap()
-                }
-                is CalendarsRepository.GetEventsResult.Success -> calculateCalendarIndicators(
-                    eventsResult.events,
-                    timeZoneId
-                )
-                is CalendarsRepository.GetEventsResult.Exception -> {
-                    logger.e("exception getting skeletonEventsLiveData", eventsResult.throwable)
-                    emptyMap()
-                }
-            }
+    ): Flow<Map<LocalDate, List<String>>> = flow {
+        val uid = userId.value?.id ?: accountManager.getPrimaryUserId().firstOrNull()?.id
+        if (uid == null) {
+            emit(emptyMap())
+            return@flow
         }
+        emit(metadataIndicatorsCalculator.compute(uid, fromDate, toDate, timeZoneId))
     }
 
     val fetchingState: Flow<CalendarsRepository.FetchingState> = calendarsRepository.fetchingState
@@ -484,13 +478,14 @@ class CalendarViewModel @Inject constructor(
         fromDate: LocalDate,
         toDate: LocalDate,
         timeZoneId: String,
+        priority: DecryptionPriority = DecryptionPriority.Offscreen,
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
             logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
             return@flow
         }
-        emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId))
+        emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId, priority = priority))
     }.distinctUntilChanged()
         .onStart { emit(CalendarsRepository.GetEventsResult.InProgress) }
 
@@ -1120,7 +1115,6 @@ class CalendarViewModel @Inject constructor(
         events: List<UiEvent>,
         fromDate: LocalDate,
         maxEventCount: Int,
-        isSkeletonEvent: Boolean
     ): Map<Int, List<MonthView.MonthViewEvent>> {
 
         val monthGridMap = mutableMapOf<Int, ArrayList<UiEvent>>()
@@ -1207,13 +1201,12 @@ class CalendarViewModel @Inject constructor(
                         indexInDay = indexInDay,
                         daySpanCount = fullDayCounter.second,
                         daySpanIndex = fullDayCounter.first,
-                        calendarColor = if (isSkeletonEvent) resourceProvider.provideColor(R.color.interaction_weak_norm)
-                        else Color.parseColor(event.displayColor),
+                        calendarColor = Color.parseColor(event.displayColor),
                         pastEvent = event.isInThePast(),
                         isUnanswered = !event.isCancelled() && event.participationStatus == ParticipationStatus.NEEDS_ACTION,
                         strikeThroughTitle = event.isCancelled() || event.participationStatus == ParticipationStatus.DECLINED,
                         decryptionFailed = event.decryptionStatus is Event.DecryptionStatus.Failure,
-                        eventTitle = if (isSkeletonEvent) null
+                        eventTitle = if (event.isSkeleton) null
                         else event.summary?.nullIfBlank() ?: resourceProvider.provideString(R.string.default_event_summary)
                     )
                 )

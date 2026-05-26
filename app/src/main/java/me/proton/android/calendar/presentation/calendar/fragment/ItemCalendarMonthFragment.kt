@@ -41,6 +41,7 @@ import me.proton.android.calendar.databinding.ItemMonthViewGridBinding
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.CalendarsRepository.EventsWindow
 import me.proton.android.calendar.domain.model.UiEvent
+import me.proton.android.calendar.domain.usecase.DecryptionPriority
 import me.proton.android.calendar.presentation.calendar.customView.MonthView
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.COLUMNS_MAX
 import me.proton.android.calendar.presentation.calendar.customView.MonthView.MonthViewSettings.MONTH_GRID_ITEMS_MAX
@@ -157,7 +158,18 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 currentRange.filterNotNull().flatMapLatest { range ->
-                    calendarViewModel.getUiEventsLookupFlow(range.fromDate, range.toDate, range.timeZoneId).map {
+                    val priority =
+                        if (position != null && position == calendarViewModel.visibleTopPagerPosition.value) {
+                            DecryptionPriority.Visible
+                        } else {
+                            DecryptionPriority.Offscreen
+                        }
+                    calendarViewModel.getUiEventsLookupFlow(
+                        range.fromDate,
+                        range.toDate,
+                        range.timeZoneId,
+                        priority = priority,
+                    ).map {
                         range to it
                     }
                 }.collectLatest { (range, events) ->
@@ -341,7 +353,6 @@ class ItemCalendarMonthFragment : Fragment(), KoinComponent {
             events,
             fromDate,
             monthViewMaxEventCount,
-            false
         )
 
         // Set the month view events so that they can be drawn

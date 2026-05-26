@@ -101,7 +101,8 @@ class EventAdapter(
                         ZoneId.of(timeZoneId)
                     ))?.formatTime(timeZoneId, is24Hour)}"
 
-                textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = if (event.isSkeleton) UiEvent.SkeletonTitle
+                    else event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)
@@ -178,7 +179,8 @@ class EventAdapter(
                     textViewHeader.visibleOrGone(false)
                 }
 
-                textViewSubheader.text = event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
+                textViewSubheader.text = if (event.isSkeleton) UiEvent.SkeletonTitle
+                    else event.summary?.nullIfBlank() ?: context.resources.getString(R.string.default_event_summary)
 
                 if (event.spansSingleDay()) {
                     textViewSubheaderSide.visibleOrGone(false)

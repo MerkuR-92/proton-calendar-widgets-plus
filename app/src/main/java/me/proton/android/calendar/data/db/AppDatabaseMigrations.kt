@@ -664,4 +664,32 @@ object AppDatabaseMigrations {
             )
         }
     }
+
+    val MIGRATION_81_82 = object : Migration(81, 82) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.addTableColumn(
+                table = TABLE_EVENTS_OCCURRENCES,
+                column = "startTimeZone",
+                type = "TEXT NOT NULL",
+                defaultValue = "",
+            )
+            db.addTableColumn(
+                table = TABLE_EVENTS_OCCURRENCES,
+                column = "endTimeZone",
+                type = "TEXT NOT NULL",
+                defaultValue = "",
+            )
+            db.addTableColumn(
+                table = TABLE_EVENTS_OCCURRENCES,
+                column = "exDates",
+                type = "TEXT NOT NULL",
+                defaultValue = "",
+            )
+            db.addTableColumn(
+                table = TABLE_EVENTS_OCCURRENCES,
+                column = "recurrenceID",
+                type = "INTEGER",
+            )
+        }
+    }
 }

@@ -49,7 +49,11 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                     windowStartTime = eventEntityMetadata.startTime,
                     windowEndTime = eventEntityMetadata.endTime,
                     modifyTime = eventEntityMetadata.modifyTime,
-                    firstOccurrenceStartTime = eventEntityMetadata.startTime
+                    firstOccurrenceStartTime = eventEntityMetadata.startTime,
+                    startTimeZone = eventEntityMetadata.startTimeZone,
+                    endTimeZone = eventEntityMetadata.endTimeZone,
+                    exDates = eventEntityMetadata.exDates,
+                    recurrenceID = eventEntityMetadata.recurrenceID,
                 )
             )
         } else { // recurring event
@@ -125,7 +129,11 @@ class UpdateEventOccurrencesUseCase @Inject constructor(
                             windowEndTime = windowEnd.toEpochSecond(),
                             firstOccurrenceStartTime = firstOccurrenceStartTime,
                             lastOccurrenceEndTime = lastOccurrenceEndTime,
-                            modifyTime = eventEntityMetadata.modifyTime
+                            modifyTime = eventEntityMetadata.modifyTime,
+                            startTimeZone = eventEntityMetadata.startTimeZone,
+                            endTimeZone = eventEntityMetadata.endTimeZone,
+                            exDates = eventEntityMetadata.exDates,
+                            recurrenceID = eventEntityMetadata.recurrenceID,
                         )
                     )
                 }

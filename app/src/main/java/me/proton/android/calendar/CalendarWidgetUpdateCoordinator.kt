@@ -262,7 +262,8 @@ class CalendarWidgetUpdateCoordinator(
             .timeFormatIs24Hour(DateFormat.is24HourFormat(context))
 
         val res = withTimeoutOrNull(1.minutes) {
-            getUiEventsUseCase.execute(userId, fromDate, toDate, zoneId.id).firstOrNull()
+            getUiEventsUseCase.execute(userId, fromDate, toDate, zoneId.id)
+                .firstOrNull { it !is CalendarsRepository.GetEventsResult.Success || !it.isSkeleton }
         }
 
         if (res == null) {
