@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import me.proton.android.calendar.common.INVITE_ICS_APPLICATION_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_INTENT_ACTION
 import me.proton.android.calendar.common.Navigation
@@ -241,6 +242,7 @@ class MainViewModel @Inject constructor(
         return intent.action == INVITE_PROTON_INTENT_ACTION ||
                 intent.action == Intent.ACTION_VIEW ||
                 intent.type == INVITE_ICS_MIME_TYPE ||
+                intent.type == INVITE_ICS_APPLICATION_MIME_TYPE ||
                 intent.action == INTENT_ACTION_NEW_EVENT ||
                 intent.action == INTENT_ACTION_SHOW_DAY ||
                 intent.action == INTENT_ACTION_SHOW_EVENT_DETAILS ||

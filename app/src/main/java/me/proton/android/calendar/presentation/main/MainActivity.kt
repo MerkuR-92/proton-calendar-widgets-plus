@@ -77,6 +77,7 @@ import me.proton.android.calendar.common.GoogleSignInCodes
 import me.proton.android.calendar.common.HOLIDAY_CALENDAR_VERSION_CODE
 import me.proton.android.calendar.common.CALENDAR_EVENT_ITEM_MIME_TYPE
 import me.proton.android.calendar.common.CALENDAR_TIME_EPOCH_MIME_TYPE
+import me.proton.android.calendar.common.INVITE_ICS_APPLICATION_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_ICS_MIME_TYPE
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_RECIPIENT_EMAIL
 import me.proton.android.calendar.common.INVITE_PROTON_EXTRA_SENDER_EMAIL
@@ -590,7 +591,10 @@ class MainActivity : AppCompatActivity(), KoinComponent {
                         val actionEditOrInsertIntent =
                             mainViewModel.consumeIntent(Intent.ACTION_INSERT) ?:
                             mainViewModel.consumeIntent(Intent.ACTION_EDIT)
-                        if (actionViewIntent?.type == INVITE_ICS_MIME_TYPE && CalendarFeatureFlag.ImportIcs.fallbackValue) {
+                        val viewType = actionViewIntent?.type
+                        if ((viewType == INVITE_ICS_MIME_TYPE || viewType == INVITE_ICS_APPLICATION_MIME_TYPE) &&
+                            CalendarFeatureFlag.ImportIcs.fallbackValue
+                        ) {
                             // Handle ics file
                             handleIcsIntent(actionViewIntent)
                         } else if (actionViewIntent?.type == CALENDAR_TIME_EPOCH_MIME_TYPE) {

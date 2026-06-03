@@ -125,10 +125,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="content" android:host="*" android:mimeType="text/calendar" />
+                <!-- Google Calendar invites opened from Proton Mail -->
+                <data android:scheme="content" android:host="*" android:mimeType="application/ics" />
             </intent-filter>
             <intent-filter>
                 <action android:name="me.proton.android.calendar.intent.action.CTA_OPEN_ICS" />
                 <data android:scheme="content" android:host="*" android:mimeType="text/calendar" />
+                <data android:scheme="content" android:host="*" android:mimeType="application/ics" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter android:autoVerify="true">
