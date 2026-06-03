@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.HiltAndroidApp
+import okhttp3.OkHttpClient
 import me.proton.android.calendar.common.AppTheme
 import me.proton.android.calendar.common.SharedPreferencesKeys
 import me.proton.android.calendar.common.provider.DefaultSharedPreferencesProvider
@@ -20,6 +21,7 @@ import me.proton.android.calendar.domain.usecase.ShowNotificationUseCase
 import me.proton.android.calendar.init.MainInitializer
 import me.proton.android.calendar.presentation.forceUpdate.ForceUpdateViewModel
 import me.proton.core.auth.data.db.AuthDatabase
+import me.proton.core.network.data.di.SharedOkHttpClient
 import me.proton.core.presentation.ui.alert.ForceUpdateActivity
 import me.proton.core.util.android.sentry.TimberLogger
 import me.proton.core.util.kotlin.CoreLogger
@@ -40,12 +42,20 @@ class ProtonCalendarApplication : Application() {
 
     @Inject
     lateinit var authDatabase: AuthDatabase
+    @Inject
+    @SharedOkHttpClient
+    lateinit var sharedOkHttpClient: OkHttpClient
 
     private var lastUiMode: Int = 0
 
     override fun onCreate() {
         super.onCreate()
         MainInitializer.init(this)
+
+        // This is mainly to cover same-host fetches of event bodies during first load or after event loop resets.
+        // Default was 5 but was unnecessarily throttling the speed.
+        // Past ~18 the api-side latency starts growing so the speedup benefit would flip.
+        sharedOkHttpClient.dispatcher.maxRequestsPerHost = 18
 
         // Forward Core Logs to Timber, using TimberLogger.
         CoreLogger.set(TimberLogger)

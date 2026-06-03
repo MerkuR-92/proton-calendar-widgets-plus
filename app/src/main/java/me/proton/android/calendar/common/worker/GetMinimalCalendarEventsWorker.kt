@@ -14,7 +14,7 @@ object GetMinimalCalendarEventsWorker {
                 UseCaseWorker.INPUT_USE_CASE_ID to UseCaseWorker.UseCaseId.GET_MINIMAL_CALENDAR_EVENTS,
                 UseCaseWorker.INPUT_USER_ID to userId,
                 UseCaseWorker.INPUT_CALENDAR_ID to calendarId
-            ), "GET_MINIMAL_CALENDAR_EVENTS_${userId}",
+            ), "GET_MINIMAL_CALENDAR_EVENTS_${userId}_${calendarId}",
         ).state
     }
 }
