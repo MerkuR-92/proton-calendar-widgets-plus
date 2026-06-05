@@ -2,6 +2,8 @@ package me.proton.android.calendar.data
 
 import android.database.sqlite.SQLiteConstraintException
 import androidx.annotation.VisibleForTesting
+import androidx.sqlite.db.SimpleSQLiteQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 import biweekly.property.RecurrenceId
 import biweekly.property.Status
 import kotlinx.coroutines.CoroutineScope
@@ -925,9 +927,9 @@ class CalendarsRepositoryImpl @Inject constructor(
         uids: Collection<String>,
     ): Map<String, List<EventEntity>> {
         if (uids.isEmpty()) return emptyMap()
-        return uids.associateWith {
-            eventUid -> database.eventsDao().selectByUid(formatUidForICal(eventUid))
-        }
+        val markers = uids.map(::uidMarker)
+        val candidates = fetchUidCandidates(markers) { database.eventsDao().selectEventsMatchingRaw(it) }
+        return candidates.attributeByUids(uids)
     }
 
     override suspend fun fetchEventById(userId: UserId, calendarId: String, eventId: String): ApiResponse<EventApiResponse> {
@@ -1383,5 +1385,32 @@ private fun List<MemberEntity>.getUserMember(userAddresses: List<AddressEntity>)
                 )
             }
         }
+    }
+}
+
+// safe max chunk size
+private const val UID_LIKE_BATCH_SIZE = 400
+
+// how a UID appears inside an event's sharedEvents tex
+private fun uidMarker(uid: String): String = "UID:" + formatUidForICal(uid)
+
+internal suspend fun fetchUidCandidates(
+    markers: List<String>,
+    runQuery: suspend (SupportSQLiteQuery) -> List<EventEntity>,
+): List<EventEntity> =
+    markers.chunked(UID_LIKE_BATCH_SIZE).flatMap { chunk ->
+        val where = chunk.joinToString(" OR ") { "sharedEvents LIKE ?" }
+        val args = chunk.map { "%$it%" }.toTypedArray()
+        runQuery(SimpleSQLiteQuery("SELECT * FROM events WHERE $where", args))
+    }.distinctBy { it.id }
+
+internal fun List<EventEntity>.attributeByUids(
+    uids: Collection<String>,
+): Map<String, List<EventEntity>> {
+    if (uids.isEmpty()) return emptyMap()
+    val candidateText = associate { it.id to it.sharedEvents.joinToString("") { part -> part.toString() } }
+    return uids.associateWith { eventUid ->
+        val marker = uidMarker(eventUid)
+        filter { candidateText[it.id]?.contains(marker) ?: false }
     }
 }

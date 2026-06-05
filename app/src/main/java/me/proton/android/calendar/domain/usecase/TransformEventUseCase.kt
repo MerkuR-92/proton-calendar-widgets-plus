@@ -14,12 +14,10 @@ import me.proton.android.calendar.common.utils.ICalUtilsImpl.extractEmail
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.generateXPmToken
 import me.proton.android.calendar.common.utils.ICalUtilsImpl.sanitise
 import me.proton.android.calendar.common.utils.ProtonUtilsImpl.canonicalizeProtonEmail
-import me.proton.android.calendar.common.utils.getAddressesOrNull
-import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.NotificationEntity
-import me.proton.android.calendar.data.joinToCalendar
 import me.proton.android.calendar.domain.*
+import me.proton.android.calendar.domain.crypto.DecryptionKeyCache
 import me.proton.android.calendar.domain.model.Calendar
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.NotificationMigration
@@ -28,12 +26,10 @@ import me.proton.core.domain.entity.UserId
 import me.proton.core.featureflag.domain.FeatureFlagManager
 import me.proton.core.featureflag.domain.entity.FeatureFlag
 import me.proton.core.key.domain.decryptDataOrNull
-import me.proton.core.key.domain.decryptSessionKey
+import me.proton.core.key.domain.decryptSessionKeyOrNull
 import me.proton.core.key.domain.entity.key.PublicKey
 import me.proton.core.key.domain.extension.publicKeyRing
-import me.proton.core.key.domain.useKeys
 import me.proton.core.key.domain.verifyData
-import me.proton.core.user.domain.UserAddressManager
 import me.proton.core.user.domain.entity.UserAddress
 import me.proton.core.util.kotlin.equalsNoCase
 import me.proton.core.util.kotlin.toBoolean
@@ -42,45 +38,30 @@ import javax.inject.Inject
 
 class TransformEventUseCase @Inject constructor(
     private val json: Json,
-    private val database: AppDatabase,
-    private val userAddressManager: UserAddressManager,
+    private val keyCache: DecryptionKeyCache,
     private val logger: Logger,
-    private val valueStoreProvider: ValueStoreProvider,
     private val crypto: Crypto,
     private val iCal: ICalUtilsImpl,
     private val obtainPinnedKeysUseCase: ObtainPinnedKeysUseCase,
     private val cryptoContext: CryptoContext,
     private val featureFlagManager: FeatureFlagManager
-) : UseCase { // TODO ADD TEST
+) : UseCase {
 
     /**
      * @param allowApiCall only set to [true] if you don't need "synchronous" result
      */
-    suspend fun execute(eventEntity: EventEntity, allowApiCall: Boolean = false) : Event? {
+    suspend fun execute(eventEntity: EventEntity, allowApiCall: Boolean = false): Event? =
+        keyCache.withActiveDecryption { executeInternal(eventEntity, allowApiCall) }
 
-        val calendarEntity = database.calendarsDao().selectById(eventEntity.calendarId) ?: return null
-        val userId = calendarEntity.fkUserId
-        val calendar = calendarEntity.joinToCalendar(database, json) ?: return null
+    private suspend fun executeInternal(eventEntity: EventEntity, allowApiCall: Boolean): Event? {
+        val ctx = keyCache.calendarContext(eventEntity.calendarId) ?: return null
+        val calendarEntity = ctx.calendarEntity
+        val userId = ctx.userId
+        val calendar = ctx.calendar
+        val calendarPrivateKeys = ctx.calendarPrivateKeys
+        val keyPassphrase = ctx.keyPassphrase
 
-        val calendarPrivateKeys = database.calendarKeysDao().select(eventEntity.calendarId).filter { it.isActive }.map { it.privateKey }
-        if (calendarPrivateKeys.isEmpty()) {
-            logger.e("TransformEventUseCase, calendarKey is null")
-            return null
-        }
-
-        val calendarPassphrase = database.passphrasesDao().select(eventEntity.calendarId).map { it.toPassphrase(json) }.firstOrNull() { it.isActive }
-        if (calendarPassphrase == null) {
-            logger.e("TransformEventUseCase, calendarPassphrase is null")
-            return null
-        }
-
-        val keyPassphrase = valueStoreProvider.provideValueStore(userId).getStringFromSet(ValueSet.CALENDAR_PASSPHRASE, calendarPassphrase.id) // gitleaks:allow
-        if (keyPassphrase == null) {
-            logger.e("TransformEventUseCase, keyPassphrase is null")
-            return null
-        }
-
-        val userAddresses = userAddressManager.getAddressesOrNull(UserId(userId))
+        val userAddresses = keyCache.userAddresses(userId)
         if (userAddresses == null) {
             logger.e("TransformEventUseCase, userAddresses is null")
             return null
@@ -390,13 +371,16 @@ class TransformEventUseCase @Inject constructor(
                         crypto.decryptText(cipherText.asArmoredPGPMessage(), encryptedWith.privateKeys, encryptedWith.privateKeysPassphrase.toByteArray())
                     }
                     is EncryptedWith.AddressKey -> {
-                        encryptedWith.userAddress.useKeys(cryptoContext) {
-                            kotlin.runCatching {
-                                decryptSessionKey(Base64.decode(keyPacket, Base64.DEFAULT)).use {
-                                    it.decryptDataOrNull(cryptoContext, Base64.decode(eventPart.data, Base64.DEFAULT))
-                                }?.toString(StandardCharsets.UTF_8)
-                            }.getOrNull()
-                        }
+                        // reused cached unlocked context, serialized per-context for thread safety
+                        val keyCtx = keyCache.addressKeyContext(encryptedWith.userAddress)
+                        runCatching {
+                            synchronized(keyCtx) {
+                                keyCtx.decryptSessionKeyOrNull(Base64.decode(keyPacket, Base64.DEFAULT))?.use { sk ->
+                                    keyCtx.decryptDataOrNull(Base64.decode(eventPart.data, Base64.DEFAULT), sk)
+                                        ?.toString(StandardCharsets.UTF_8)
+                                }
+                            }
+                        }.getOrNull()
                     }
                 }
             } else null
