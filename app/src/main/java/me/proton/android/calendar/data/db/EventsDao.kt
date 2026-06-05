@@ -1,6 +1,7 @@
 package me.proton.android.calendar.data.db
 
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import me.proton.android.calendar.data.entity.EventEntity
 import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.entity.SkeletonEventEntity
@@ -24,6 +25,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Query("SELECT * FROM events WHERE id IN (:uids)")
     abstract suspend fun selectByUidIn(uids: Set<String>): List<EventEntity>
+
+    @RawQuery
+    abstract suspend fun selectEventsMatchingRaw(query: SupportSQLiteQuery): List<EventEntity>
 
     @Query("SELECT * FROM events")
     abstract fun selectEventsFlow(): Flow<List<EventEntity>>

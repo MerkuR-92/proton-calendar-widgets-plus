@@ -149,7 +149,7 @@ class GetUiEventsUseCase @Inject constructor(
                                 }
 
                             val transformedFiniteRecurring =
-                                finiteRecurring.parallelMap { occ ->
+                                finiteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
                                     fetchEventFor(occ)?.let { decr ->
                                         val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
                                             eventDecryptor.decrypt(it)
@@ -169,7 +169,7 @@ class GetUiEventsUseCase @Inject constructor(
                                 }.flatten()
 
                             val transformedInfiniteRecurring =
-                                filteredInfiniteRecurring.parallelMap { occ ->
+                                filteredInfiniteRecurring.distinctBy { it.eventId }.parallelMap { occ ->
                                         fetchEventFor(occ)?.let { decr ->
                                             val eventsSharingUid = byUidMap[occ.eventUid]?.mapNotNull {
                                                 eventDecryptor.decrypt(it)

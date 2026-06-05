@@ -44,6 +44,7 @@ import me.proton.android.calendar.domain.api.ProtonMeetApi
 import me.proton.android.calendar.domain.api.ServerEventsApi
 import me.proton.android.calendar.domain.api.SettingsApi
 import me.proton.android.calendar.domain.api.TestsApi
+import me.proton.android.calendar.domain.crypto.DecryptionKeyCache
 import me.proton.android.calendar.domain.usecase.BootstrapAllCalendarsUseCase
 import me.proton.android.calendar.domain.usecase.BootstrapCalendarUseCase
 import me.proton.android.calendar.domain.usecase.CacheCalendarPassphraseUseCase
@@ -167,7 +168,8 @@ val useCaseModule = module {
     factory<BootstrapAllCalendarsUseCase> { BootstrapAllCalendarsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<BootstrapCalendarUseCase> { BootstrapCalendarUseCase(get(), get(), get(), get(), get(), get(), get()) }
     factory<CacheCalendarPassphraseUseCase> { CacheCalendarPassphraseUseCase(get(), get(), get(), get(), get(), get()) }
-    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    single<DecryptionKeyCache> { DecryptionKeyCache(get(), get(), get(), get(), get(), get(), get()) }
+    factory<TransformEventUseCase> { TransformEventUseCase(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<HandleDeleteUseCase> { HandleDeleteUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get(), get()) }
     factory<UpdateCalendarUseCase> { UpdateCalendarUseCase(get(), get(), get(), get()) }
     factory<SyncAlarmsUseCase> { SyncAlarmsUseCase(get(), get(), get(), get(), get(), get(), get(), get(), get()) }

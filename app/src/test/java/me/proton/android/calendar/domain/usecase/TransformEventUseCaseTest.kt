@@ -26,6 +26,7 @@ import me.proton.android.calendar.data.entity.EventEntity
 import me.proton.android.calendar.data.entity.PassphraseEntity
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.ValueStoreProvider
+import me.proton.android.calendar.domain.crypto.DecryptionKeyCache
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.MemberPassphrase
 import me.proton.android.calendar.test.shared.mocks.CalendarMocks
@@ -177,12 +178,19 @@ internal class TransformEventUseCaseTest {
                 CalendarFeatureFlag.RsvpCommentsAndroid.fallbackValue
             )
 
+            val keyCache = DecryptionKeyCache(
+                database = database,
+                json = json,
+                valueStoreProvider = valueStoreProviderMock,
+                userAddressManager = userAddressManagerMock,
+                cryptoContext = cryptoContextMock,
+                crypto = crypto,
+                logger = testsLogger,
+            )
             val useCase = TransformEventUseCase(
                 json,
-                database,
-                userAddressManagerMock,
+                keyCache,
                 testsLogger,
-                valueStoreProviderMock,
                 crypto,
                 iCal,
                 obtainPinnedKeysUseCase,

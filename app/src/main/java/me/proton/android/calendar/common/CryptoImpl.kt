@@ -9,16 +9,49 @@ import com.proton.gopenpgp.crypto.Crypto.newKeyFromArmored
 import com.proton.gopenpgp.crypto.Crypto.newKeyRing
 import com.proton.gopenpgp.crypto.KeyRing
 import com.proton.gopenpgp.crypto.PGPMessage
-import com.proton.gopenpgp.crypto.PGPSignature
 import com.proton.gopenpgp.crypto.PlainMessage
 import com.proton.gopenpgp.crypto.SessionKey
 import com.proton.gopenpgp.helper.Helper
 import me.proton.android.calendar.domain.Crypto
 import me.proton.android.calendar.domain.Logger
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.inject.Inject
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
 class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
+
+    // cached unlocked key rings per [armored keys+passphrase], released after decryption pass
+    private val unlockedKeyRingCache = ConcurrentHashMap<String, KeyRing>()
+
+    // guards the key cache from being wiped mid-decrypt
+    private val cacheLock = ReentrantReadWriteLock()
+
+    private fun unlockedKeyRing(armoredPrivateKeys: List<String>, passphrase: ByteArray): KeyRing {
+        val cacheKey = buildString {
+            armoredPrivateKeys.forEach { append(it).append(' ') }
+            append('|').append(String(passphrase, StandardCharsets.ISO_8859_1))
+        }
+        return unlockedKeyRingCache.computeIfAbsent(cacheKey) {
+            newKeyRing(null).apply {
+                armoredPrivateKeys.forEach {
+                    try {
+                        addKey(newKeyFromArmored(it).unlock(passphrase))
+                    } catch (e: Exception) {
+                        logger.i("Unlocking key failed", e)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun clearKeyRingCache() = cacheLock.write {
+        val rings = unlockedKeyRingCache.values.toList()
+        unlockedKeyRingCache.clear()
+        rings.forEach { runCatching { it.clearPrivateParams() } }
+    }
 
     override fun generateUserPassphrase(passphrase: ByteArray, encodedSalt: String): ByteArray {
         val decodedKeySalt: ByteArray = Base64.decode(encodedSalt, Base64.DEFAULT)
@@ -43,36 +76,27 @@ class CryptoImpl @Inject constructor(private val logger: Logger) : Crypto {
         cipherText: String,
         armoredPrivateKeys: List<String>,
         passphrase: ByteArray
-    ): String? {
-        var keyRing: KeyRing? = null
-        return try {
-            keyRing = newKeyRing(null)
-            armoredPrivateKeys.forEach {
-                try {
-                    val unlockedKey = newKeyFromArmored(it).unlock(passphrase)
-                    keyRing.addKey(unlockedKey)
-                } catch (e: Exception) {
-                    logger.i("Unlocking key failed", e)
-                }
+    ): String? = cacheLock.read {
+        try {
+            val keyRing = unlockedKeyRing(armoredPrivateKeys, passphrase)
+            // reuse cached ring but synchronize it for thread safety
+            synchronized(keyRing) {
+                String(
+                    keyRing.decrypt(
+                        PGPMessage(
+                            cipherText
+                        ),
+                        null,
+                        0L
+                    ).data,
+                    StandardCharsets.UTF_8
+                )
             }
-
-            String(
-                keyRing.decrypt(
-                    PGPMessage(
-                        cipherText
-                    ),
-                    null,
-                    0L
-                ).data,
-                StandardCharsets.UTF_8
-            )
         } catch (e: Exception) {
             if (e.message?.contains("incorrect key") == false) {
                 logger.i("decrypt failed", e)
             }
             null
-        } finally {
-            keyRing?.clearPrivateParams()
         }
     }
 

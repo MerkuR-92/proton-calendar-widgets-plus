@@ -21,6 +21,11 @@ interface Crypto {
     fun decryptText(cipherText: String, armoredPrivateKeys: List<String>, passphrase: ByteArray): String?
 
     /**
+     * Wipes cached unlocked key rings.
+     */
+    fun clearKeyRingCache()
+
+    /**
      * Encrypts plaintext with armored PublicKey and returns Armored PGPMessage as String. This message contains KeyPacket and DataPacket.
      */
     fun encryptText(plainText: String, armoredPublicKey: String): String?
