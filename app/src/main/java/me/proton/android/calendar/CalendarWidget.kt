@@ -171,7 +171,7 @@ internal class CalendarWidgetRemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews? {
         val event = data.getOrNull(position) ?: run {
-            logger.e("widget item position out of bounds: position=$position size=${data.size}")
+            logger.w("widget item position out of bounds: position=$position size=${data.size}")
             return null
         }
 

@@ -77,6 +77,7 @@ class BootstrapAllCalendarsUseCase @Inject constructor( // TODO TEST
         // We need to create a default calendar if user has none or has only subscribed or shared calendars
         var ownedUserCalendars = userCalendars.filter { it.isOwner }
         if (ownedUserCalendars.isEmpty()) {
+            logger.w("BootstrapAllCalendarsUseCase: no owned calendars on backend (backendCalendars=${allCalendarEntities.size}), creating default calendar")
 
             val createDefaultCalendarResult = createCalendarUseCase.execute(
                 userId,

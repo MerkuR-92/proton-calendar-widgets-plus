@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.usecase
 
+import android.database.sqlite.SQLiteConstraintException
 import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.entity.EventEntityMetadata
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
@@ -35,7 +36,9 @@ class InsertEventOccurrencesUseCase @Inject constructor(
                 database.eventOccurrencesDao().insert(*eventOccurrenceEntities.toTypedArray())
             }
         }.onFailure {
-            logger.e("UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} (event likely does not exist)", it)
+            // a FK violation is the expected race when the parent event was deleted concurrently
+            val message = "UpdateEventOccurrencesUseCase failed for cal=${eventEntityMetadata.calendarId} (event likely does not exist)"
+            if (it is SQLiteConstraintException) logger.w(message, it) else logger.e(message, it)
         }
     }
 }

@@ -47,7 +47,7 @@ class UpdateAlarmsUseCase @Inject constructor(
     private suspend fun handleAlarms(userId: String, dbEvents: List<EventEntity>): UseCase.Result {
         val primaryTimezone = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
         val fromZonedDateTime = if (primaryTimezone == null) {
-            logger.e("no primary timezone in UpdateAlarmsUseCase")
+            logger.w("no primary timezone in UpdateAlarmsUseCase")
             ZonedDateTime.now(ZoneId.systemDefault())
         } else ZonedDateTime.now(ZoneId.of(primaryTimezone))
 

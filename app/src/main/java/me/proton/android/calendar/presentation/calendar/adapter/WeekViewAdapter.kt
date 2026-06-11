@@ -5,6 +5,7 @@ import com.alamkanak.weekview.WeekViewEntity
 import com.alamkanak.weekview.WeekViewPagingAdapterJsr310
 import me.proton.android.calendar.common.utils.CalendarFeatureFlag
 import me.proton.android.calendar.domain.model.WeekViewCalendarEntity
+import me.proton.android.calendar.domain.model.WeekViewEntityColors
 import me.proton.android.calendar.domain.model.toWeekViewEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,7 +21,9 @@ class WeekViewAdapter(
     private val onHourHeightChangedHandler: (Float) -> Unit
 ) : WeekViewPagingAdapterJsr310<WeekViewCalendarEntity>() {
 
-    override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity(context)
+    private val weekViewColors by lazy { WeekViewEntityColors.resolve(context) }
+
+    override fun onCreateEntity(item: WeekViewCalendarEntity): WeekViewEntity = item.toWeekViewEntity(weekViewColors)
 
     override fun onEventClick(data: WeekViewCalendarEntity, bounds: RectF) {
         if (data is WeekViewCalendarEntity.Event) {

@@ -351,17 +351,19 @@ private class SingleEventsDrawer(
     private val eventChipDrawer = EventChipDrawer(viewState)
 
     override fun draw(canvas: Canvas) {
-        canvas.drawInBounds(viewState.calendarGridBounds) {
+        val grid = viewState.calendarGridBounds
+        canvas.drawInBounds(grid) {
             for (date in viewState.dateRange) {
-                drawEventsForDate(date)
+                drawEventsForDate(date, grid.top, grid.bottom)
             }
         }
     }
 
-    private fun Canvas.drawEventsForDate(date: Calendar) {
+    private fun Canvas.drawEventsForDate(date: Calendar, gridTop: Float, gridBottom: Float) {
+        // only draw chips that actually intersect the visible vertical range
         val eventChips = chipsCacheProvider()?.normalEventChipsByDate(date)
             .orEmpty()
-            .filterNot { it.bounds.isEmpty }
+            .filter { !it.bounds.isEmpty && it.bounds.bottom > gridTop && it.bounds.top < gridBottom }
 
         if (eventChips.isEmpty()) {
             return

@@ -35,6 +35,12 @@ interface ICalUtils {
     fun normaliseICalendar(calendar: ICalendar)
 
     /**
+     * Parses a bare RRULE valu into a [Recurrence] (without parsing a whole
+     * iCalendar document); null if the value can't be parsed
+     */
+    fun parseRecurrence(rRule: String): Recurrence?
+
+    /**
      * Takes iCalendar parts split according to "the matrix" and returns one iCalendar object.
      */
     fun mergeCalendarPartsIntoICalendar(calendarStrings: List<String>): ICalendar?

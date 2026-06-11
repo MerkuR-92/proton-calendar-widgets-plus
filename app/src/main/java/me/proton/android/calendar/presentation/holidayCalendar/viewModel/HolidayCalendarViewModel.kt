@@ -388,7 +388,7 @@ class HolidayCalendarViewModel @Inject constructor(
         val calendarColor = _calendarColor.value
 
         if (userId == null || holidayCalendar == null || calendarColor == null) {
-            userId ?: logger.e("User ID was null in HolidayCalendarViewModel handleSaveHolidayCalendar")
+            userId ?: logger.w("User ID was null in HolidayCalendarViewModel handleSaveHolidayCalendar")
             holidayCalendar ?: logger.e("Holiday calendar was null in HolidayCalendarViewModel handleSaveHolidayCalendar")
             calendarColor ?: logger.e("Calendar color was null in HolidayCalendarViewModel handleSaveHolidayCalendar")
             holidayCalendarSnackState.value = HolidayCalendarSnackState.DisplaySnack(
@@ -611,7 +611,7 @@ class HolidayCalendarViewModel @Inject constructor(
     private suspend fun getManagedHolidayCalendars(showHidden: Boolean): List<ManagedHolidayCalendarEntity>? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in HolidayCalendarViewModel getCalendar")
+            logger.w("User ID was null in HolidayCalendarViewModel getCalendar")
             return null
         }
         val dbManagedHolidayCalendars = calendarsRepository.getManagedHolidayCalendars(userId)?.let {

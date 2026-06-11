@@ -335,7 +335,7 @@ class CalendarFormViewModel @Inject constructor(
     suspend fun handleSaveCalendarForm(returnToSettings: Boolean) {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarFormViewModel handleSaveCalendarForm")
+            logger.w("User ID was null in CalendarFormViewModel handleSaveCalendarForm")
             return
         }
         _calendarId?.let { calendarId ->
@@ -485,7 +485,7 @@ class CalendarFormViewModel @Inject constructor(
     private suspend fun getCalendar(calendarId: String): Calendar? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarFormViewModel getCalendar")
+            logger.w("User ID was null in CalendarFormViewModel getCalendar")
             return null
         }
         return calendarsRepository.selectCalendar(calendarId)
@@ -494,7 +494,7 @@ class CalendarFormViewModel @Inject constructor(
     private suspend fun getCalendarSettings(calendarId: String): CalendarSettingsEntity? {
         val userId = userId.value
         if (userId == null) {
-            logger.e("User ID was null in CalendarFormViewModel getDefaultCalendarSettings")
+            logger.w("User ID was null in CalendarFormViewModel getDefaultCalendarSettings")
             return null
         }
         return calendarsRepository.selectCalendarSettings(calendarId)

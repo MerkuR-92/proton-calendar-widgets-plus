@@ -2,6 +2,7 @@
 
 package me.proton.android.calendar.domain.usecase
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -89,6 +90,8 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                     results.flatMap { it.second ?: arrayListOf() }
                 )
             }
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             logger.e("Exception in splitFetchEvents", e)
             ResultData(
@@ -283,7 +286,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
                                 } else if (eventsResponse is ApiResponse.Error) {
                                     if (eventsResponse.isNotFound()) {
                                         notFoundErrors[calendarId] = (notFoundErrors[calendarId] ?: 0) + 1
-                                        logger.e("NOT_FOUND requesting events in fetchMetadataOnly, type = $type")
+                                        logger.w("NOT_FOUND requesting events in fetchMetadataOnly, type = $type")
                                     } else {
                                         eventsResponse.logErrorIfNeeded("api error fetching events for calendar in fetchMetadataOnly", logger)
                                         eventMetadatasChannel.close(Exception("api error in fetchMetadataOnly: ${eventsResponse}"))
@@ -305,7 +308,7 @@ class FetchEventsUseCase @Inject constructor( // TODO TESTS, ALSO FOR MERGING MU
             notFoundErrors.forEach { calendarId, notFoundErrorCount ->
                 if (notFoundErrorCount == 4) {
                     launch {
-                        logger.e("NOT_FOUND requesting events in fetchMetadataOnly, calling deleteCalendarIfNeededUseCase")
+                        logger.w("NOT_FOUND requesting events in fetchMetadataOnly, calling deleteCalendarIfNeededUseCase")
                         deleteCalendarIfNeededUseCase.execute(userId.id, calendarId)
                     }
                 }

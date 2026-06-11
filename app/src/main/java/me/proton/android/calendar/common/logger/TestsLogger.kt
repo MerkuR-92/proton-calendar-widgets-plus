@@ -9,6 +9,8 @@ object TestsLogger : Logger {
     override fun d(message: String, throwable: Throwable) = println(message + ": " + throwable.message)
     override fun i(message: String) = println(message)
     override fun i(message: String, throwable: Throwable) = println(message + ": " + throwable.message)
+    override fun w(message: String) = println(message)
+    override fun w(message: String, throwable: Throwable) = println(message + ": " + throwable.message)
     override fun e(message: String) = println(message)
     override fun e(message: String, throwable: Throwable) = println(message + ": " + throwable.message)
 }

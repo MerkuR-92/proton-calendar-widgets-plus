@@ -59,7 +59,7 @@ class ShowNotificationUseCase @Inject constructor(
         val displayTimeZoneId = database.calendarUserSettingsDao().select(userId)?.primaryTimezone
 
         if (displayTimeZoneId == null) {
-            logger.e("empty displayTimeZoneId in ShowNotificationUseCase")
+            logger.w("empty displayTimeZoneId in ShowNotificationUseCase")
         }
 
         val is24Hour = when (userSettingsRepository.getTimeFormat(UserId(userId), database)) {
@@ -73,7 +73,7 @@ class ShowNotificationUseCase @Inject constructor(
 
             val eventEntity = database.eventsDao().selectById(eventAlarm.eventId)
             if (eventEntity == null) {
-                logger.e("could not find EventEntity to show notification")
+                logger.w("could not find EventEntity to show notification")
             } else {
                 val dbEvent = if (CalendarFeatureFlag.UseEventDecryptor.fallbackValue) {
                     eventDecryptor.decrypt(eventEntity)
@@ -81,7 +81,7 @@ class ShowNotificationUseCase @Inject constructor(
                     transformEventUseCase.execute(eventEntity)
                 }
                 if (dbEvent == null) {
-                    logger.e("could not transform EventEntity to show notification")
+                    logger.w("could not transform EventEntity to show notification")
                 } else {
 
                     val eventWithOccurrence = if (dbEvent.isRecurring()) {

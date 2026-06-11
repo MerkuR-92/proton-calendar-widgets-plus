@@ -7,8 +7,11 @@ import biweekly.ICalendar
 import biweekly.component.VAlarm
 import biweekly.component.VEvent
 import biweekly.component.VTimezone
+import biweekly.io.ParseContext
 import biweekly.io.TimezoneAssignment
 import biweekly.io.TimezoneInfo
+import biweekly.io.scribe.property.RecurrenceRuleScribe
+import biweekly.parameter.ICalParameters
 import biweekly.parameter.ParticipationStatus
 import biweekly.property.*
 import biweekly.util.Duration
@@ -72,6 +75,18 @@ object ICalUtilsImpl : ICalUtils {
             Biweekly.parse(iCalendar).first().also { normaliseICalendar(it) }
         } catch (e: Exception) {
             TimberLogger.e("error parsing iCalendar", e)
+            null
+        }
+    }
+
+    private val recurrenceRuleScribe = RecurrenceRuleScribe()
+
+    override fun parseRecurrence(rRule: String): Recurrence? {
+        return try {
+            val context = ParseContext().apply { version = ICalVersion.V2_0 }
+            recurrenceRuleScribe.parseText(rRule, ICalDataType.RECUR, ICalParameters(), context).value
+        } catch (t: Throwable) {
+            TimberLogger.e("error parsing RRULE '$rRule'", t)
             null
         }
     }
@@ -1016,11 +1031,11 @@ object ICalUtilsImpl : ICalUtils {
         val groupedByAllDayEvents = this.groupBy { it.isAllDay || !it.spansSingleDay() }
         val result = mutableListOf<UiEvent>()
         result.addAll(
-            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
+            groupedByAllDayEvents.get(true)?.sortedWith(compareBy({ it.dateStart }, { it.id }, { it.occurrenceNumber }))
                 ?: emptyList()
         )
         result.addAll(
-            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart }, { it.summary }))
+            groupedByAllDayEvents.get(false)?.sortedWith(compareBy({ it.dateStart }, { it.id }, { it.occurrenceNumber }))
                 ?: emptyList()
         )
         return result

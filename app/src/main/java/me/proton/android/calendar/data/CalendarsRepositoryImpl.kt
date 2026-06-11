@@ -969,7 +969,7 @@ class CalendarsRepositoryImpl @Inject constructor(
                         } else throw e
                     }
                 } else {
-                    logger.e("persistEvents couldn't insert because calendar $calendarId doesn't exist")
+                    logger.w("persistEvents couldn't insert because calendar $calendarId doesn't exist")
                 }
             }
         }

@@ -111,6 +111,7 @@ class ItemCalendarAgendaFragment: Fragment() {
         val eventsListLayoutManager =
             LinearLayoutManager(this@ItemCalendarAgendaFragment.context)
         binding.rvAgenda.layoutManager = eventsListLayoutManager
+        binding.rvAgenda.itemAnimator = null
         eventsListLayoutAdapter =
             EventAdapter {
                 if (it.decryptionStatus == Event.DecryptionStatus.Success) {
@@ -246,6 +247,10 @@ class ItemCalendarAgendaFragment: Fragment() {
         currentRange.value = EventsWindow(fromDate = date, toDate = date, timeZoneId)
     }
 
+    // index 0 is always the fixed mini-calendar header row (fakeHeaderEvent); the rest are event rows
+    private fun isAlreadyShowingRealEvents(): Boolean =
+        eventsListLayoutAdapter.currentList.drop(1).any { !it.isSkeleton }
+
     private fun updateEvents(eventsResult: CalendarsRepository.GetEventsResult<UiEvent>, immutableDate: LocalDate, timeZoneId: String) {
         when (eventsResult) {
             CalendarsRepository.GetEventsResult.InProgress -> {
@@ -257,6 +262,10 @@ class ItemCalendarAgendaFragment: Fragment() {
                 }
             }
             is CalendarsRepository.GetEventsResult.Success -> {
+                if (eventsResult.isSkeleton && isAlreadyShowingRealEvents()) {
+                    // already showing real events; don't replace them with a skeleton, wait for the real update
+                    return
+                }
                 // Sort the events
                 val sortedEvents = eventsResult.events.filter {
                     // filter all-day events that are technically happening until Midnight the next day,

@@ -187,7 +187,10 @@ class GetUiEventsUseCase @Inject constructor(
                                                 )
                                         }
                                     }.flatten()
-                            (transformedNonRecurring + transformedFiniteRecurring + transformedInfiniteRecurring).distinct()
+                           (transformedNonRecurring + transformedFiniteRecurring + transformedInfiniteRecurring)
+                                    .distinct()
+                                    // deterministic order (independend of db row order)
+                                    .sortedWith(compareBy({ it.dateStart }, { it.id }, { it.occurrenceNumber }))
                         }
                     }
                 }
