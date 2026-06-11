@@ -1764,8 +1764,7 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         fun submitList(elements: List<T>) {
             val viewState = weekView?.viewState ?: return
-            val entities = elements.map(this::onCreateEntity)
-            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
+            eventsProcessor.submit(elements, this::onCreateEntity, viewState, onFinished = this::updateObserver)
         }
     }
 
@@ -1796,8 +1795,7 @@ class WeekView @JvmOverloads constructor(
         @PublicApi
         fun submitList(elements: List<T>) {
             val viewState = weekView?.viewState ?: return
-            val entities = elements.map(this::onCreateEntity)
-            eventsProcessor.submit(entities, viewState, onFinished = this::updateObserver)
+            eventsProcessor.submit(elements, this::onCreateEntity, viewState, onFinished = this::updateObserver)
         }
 
         /**

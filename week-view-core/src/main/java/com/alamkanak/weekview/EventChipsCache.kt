@@ -56,11 +56,8 @@ internal class EventChipsCache {
     }
 
     fun addAll(eventChips: List<EventChip>) {
-        for (eventChip in eventChips) {
-            val isExistingEvent = allEventChips.any { it.eventId == eventChip.eventId }
-            if (isExistingEvent) {
-                remove(eventId = eventChip.eventId)
-            }
+        if (eventChips.isNotEmpty()) {
+            removeByEventIds(eventChips.mapTo(HashSet(eventChips.size)) { it.eventId })
         }
 
         for (eventChip in eventChips) {
@@ -73,6 +70,15 @@ internal class EventChipsCache {
             }
         }
         generation++
+    }
+
+    private fun removeByEventIds(eventIds: Set<String>) {
+        for (bucket in normalEventChipsByDate.values) {
+            bucket.removeAll { it.event.id in eventIds }
+        }
+        for (bucket in allDayEventChipsByDate.values) {
+            bucket.removeAll { it.event.id in eventIds }
+        }
     }
 
     fun findHitEvent(x: Float, y: Float): EventChip? {
@@ -92,9 +98,8 @@ internal class EventChipsCache {
     }
 
     fun removeAll(events: List<ResolvedWeekViewEntity>) {
-        val eventIds = events.map { it.id }
-        val eventChips = allEventChips.filter { it.event.id in eventIds }
-        eventChips.forEach(this::remove)
+        if (events.isEmpty()) return
+        removeByEventIds(events.mapTo(HashSet(events.size)) { it.id })
         generation++
     }
 

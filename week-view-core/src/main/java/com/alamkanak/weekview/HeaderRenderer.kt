@@ -79,8 +79,6 @@ private class HeaderUpdater(
     private val onHeaderHeightChanged: () -> Unit
 ) : Updater {
 
-    private val animator = ValueAnimator()
-
     override fun update() {
         val missingDates = viewState.dateRange.filterNot { labelLayouts.hasKey(it.toEpochDays()) }
         for (date in missingDates) {
@@ -106,25 +104,13 @@ private class HeaderUpdater(
         val currentHeaderHeight = viewState.headerHeight
         val newHeaderHeight = viewState.calculateHeaderHeight()
 
-        if (currentHeaderHeight == 0f || currentHeaderHeight == newHeaderHeight) {
-            // The height hasn't been set yet or didn't change; simply update without an animation
-            viewState.updateHeaderHeight(newHeaderHeight)
+        if (currentHeaderHeight == newHeaderHeight) {
             return
         }
-
-        if (animator.isRunning) {
-            // We're already running the animation to change the header height
-            return
+        viewState.updateHeaderHeight(newHeaderHeight)
+        if (currentHeaderHeight != 0f) {
+            onHeaderHeightChanged()
         }
-
-        animator.animate(
-            fromValue = currentHeaderHeight,
-            toValue = newHeaderHeight,
-            onUpdate = { height ->
-                viewState.updateHeaderHeight(height)
-                onHeaderHeightChanged()
-            }
-        )
     }
 
     private fun calculateStaticLayoutForDate(date: Calendar): Pair<StaticLayout, StaticLayout> {

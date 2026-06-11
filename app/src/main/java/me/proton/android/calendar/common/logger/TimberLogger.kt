@@ -10,6 +10,8 @@ object TimberLogger : Logger {
     override fun d(message: String, throwable: Throwable) = Timber.d(throwable, message)
     override fun i(message: String) = Timber.i(message)
     override fun i(message: String, throwable: Throwable) = Timber.i(throwable, message)
+    override fun w(message: String) = Timber.w(message)
+    override fun w(message: String, throwable: Throwable) = Timber.w(throwable, message)
     override fun e(message: String) = Timber.e(message)
     override fun e(message: String, throwable: Throwable) = Timber.e(throwable, message)
 }

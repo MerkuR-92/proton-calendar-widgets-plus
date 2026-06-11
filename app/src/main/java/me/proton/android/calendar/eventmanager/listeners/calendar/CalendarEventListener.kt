@@ -71,9 +71,13 @@ class CalendarEventListener @Inject constructor(
         return when (val result = calendarsRepository.fetchEventById(userId, response.calendarId, response.id)) {
             is ApiResponse.Success<EventApiResponse> -> result.data.event.toEventEntity()
             is ApiResponse.Error -> {
-                // If event was not found just omit it, otherwise we'll retry this indefinitely
-                if (result.isNotFound()) return null
-                else throw IllegalStateException(result.error)
+                // if event not found just omit it, otherwise we'll retry this indefinitely
+                if (result.isNotFound()) {
+                    logger.e("CalendarEventListener: dropping event — fetchEventById ${response.id} returned 404; announced by sync but not fetchable, not retried")
+                    null
+                } else {
+                    throw IllegalStateException(result.error)
+                }
             }
             is ApiResponse.Exception -> throw result.exception
         }
@@ -127,8 +131,7 @@ class CalendarEventListener @Inject constructor(
 
     override suspend fun onResetAll(config: EventManagerConfig) {
         super.onResetAll(config)
-
-        logger.i("CalendarEventListener onResetAll [${config.asCalendar().calendarId}]")
+        logger.w("CalendarEventListener onResetAll: wiping events for calendar [${config.asCalendar().calendarId}], refetch enqueued")
 
         val userId = config.userId
         val calendarId = config.asCalendar().calendarId

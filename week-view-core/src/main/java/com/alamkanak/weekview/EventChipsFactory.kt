@@ -11,12 +11,10 @@ internal class EventChipsFactory {
     ): List<EventChip> {
         val eventChips = convertEventsToEventChips(events, viewState)
         val groups = eventChips.groupedByDate().values
-
         for (group in groups) {
             computePositionOfEvents(group, viewState)
             columnCount = 0
         }
-
         return eventChips
     }
 
@@ -28,7 +26,7 @@ internal class EventChipsFactory {
     }
 
     private fun List<ResolvedWeekViewEntity>.sortedByTime(): List<ResolvedWeekViewEntity> {
-        return sortedWith(compareBy({ it.startTime }, { it.endTime }))
+        return sortedWith(compareBy({ it.startTime }, { it.endTime }, { it.id }))
     }
 
     private fun List<ResolvedWeekViewEntity>.sanitize(viewState: ViewState): List<ResolvedWeekViewEntity> {
@@ -50,8 +48,8 @@ internal class EventChipsFactory {
     }
 
     internal class EventTimeRange(
-        private val startMinute: Int,
-        private val endMinute: Int
+        val startMinute: Int,
+        val endMinute: Int
     ) {
         fun conflicts(range: EventTimeRange): Boolean {
             return startMinute >= range.startMinute && startMinute < range.endMinute
@@ -68,6 +66,8 @@ internal class EventChipsFactory {
 
     private var timeRanges: ArrayList<EventTimeRange> = arrayListOf()
     private var columnSpans: ArrayList<EventColumnSpan> = arrayListOf()
+    // event indices grouped by their assigned start column, so isColumnEmpty only checks that column's events
+    private var eventsByColumn: ArrayList<MutableList<Int>> = arrayListOf()
     private var columnCount = 0
 
     private fun computeSingleEvents(eventChips: List<EventChip>, viewState: ViewState) {
@@ -85,9 +85,27 @@ internal class EventChipsFactory {
         )
 
         columnSpans = ArrayList(timeRanges.size)
+        eventsByColumn = ArrayList()
 
+        // assign each event (already sorted by start time) to the first column free at its start time.
+        // for start-sorted events,
+        // a column is free if the end of its latest-placed event (== that column's max end) is <= this event's start; We track that per column.
+        val columnMaxEnd = ArrayList<Int>()
         for (i in timeRanges.indices) {
-            findStartColumn(i)
+            val range = timeRanges[i]
+            var columnIndex = 0
+            while (columnIndex < columnMaxEnd.size && columnMaxEnd[columnIndex] > range.startMinute) {
+                columnIndex++
+            }
+            columnSpans.add(EventColumnSpan().apply { startColumn = columnIndex; endColumn = columnIndex + 1 })
+            if (columnIndex < columnMaxEnd.size) {
+                columnMaxEnd[columnIndex] = range.endMinute
+                eventsByColumn[columnIndex].add(i)
+            } else {
+                columnMaxEnd.add(range.endMinute)
+                eventsByColumn.add(mutableListOf(i))
+            }
+            columnCount = max(columnCount, columnIndex + 1)
         }
 
         for (i in timeRanges.indices) {
@@ -110,19 +128,6 @@ internal class EventChipsFactory {
         }
     }
 
-    private fun findStartColumn(position: Int) {
-        for (i in timeRanges.indices) {
-            if (isColumnEmpty(i, position)) {
-                val columnSpan = EventColumnSpan()
-                columnSpan.startColumn = i
-                columnSpan.endColumn = i + 1
-                columnSpans.add(columnSpan)
-                columnCount = max(columnCount, i + 1)
-                break
-            }
-        }
-    }
-
     private fun findEndColumn(position: Int) {
         val columnSpan: EventColumnSpan = columnSpans[position]
         for (i in columnSpan.endColumn until columnCount) {
@@ -133,15 +138,14 @@ internal class EventChipsFactory {
         }
     }
 
-    private fun isColumnEmpty(column: Int, position: Int): Boolean {
+    private fun isColumnEmpty(columnIndex: Int, position: Int): Boolean {
+        // columns are allocated lazily; an index past the last allocated column holds no events yet
+        if (columnIndex !in eventsByColumn.indices) return true
         val timeRange: EventTimeRange = timeRanges[position]
-        for (i in columnSpans.indices) {
-            if (position == i) {
-                continue
-            }
-            val compareTimeRange: EventTimeRange = timeRanges[i]
-            val compareColumnSpan: EventColumnSpan = columnSpans[i]
-            if (compareColumnSpan.startColumn == column && compareTimeRange.conflicts(timeRange)) {
+        // only the events whose start column is columnIndex can occupy it
+        for (i in eventsByColumn[columnIndex]) {
+            if (i == position) continue
+            if (timeRanges[i].conflicts(timeRange)) {
                 return false
             }
         }

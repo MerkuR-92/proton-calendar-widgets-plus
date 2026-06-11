@@ -1,6 +1,8 @@
 package me.proton.android.calendar.domain.indicators
 
 import biweekly.property.Status
+import biweekly.util.Frequency
+import biweekly.util.Recurrence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -8,13 +10,13 @@ import me.proton.android.calendar.common.MAX_CALENDAR_INDICATORS
 import me.proton.android.calendar.common.utils.EventUtilsImpl.generateOccurrencesUntil
 import me.proton.android.calendar.common.utils.ICalUtilsImpl
 import me.proton.android.calendar.data.db.AppDatabase
-import me.proton.android.calendar.data.entity.EventOccurrenceEntity
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Event
 import me.proton.android.calendar.domain.model.UiEvent
 import me.proton.android.calendar.domain.model.filterVisibleCalendars
 import me.proton.android.calendar.domain.usecase.GetUserInfoUseCase
+import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -96,7 +98,7 @@ class MetadataIndicatorsCalculator @Inject constructor(
                 status = Status.confirmed(),
                 isSkeleton = true,
             )
-        }
+        }.distinct() // mirror GetUiEventsUseCase's .distinct() so skeleton rows align with the real ones
     }
 
      // mirrors GetUiEventsUseCase for row fetch, filter and expansion
@@ -154,7 +156,7 @@ class MetadataIndicatorsCalculator @Inject constructor(
         } else {
             val eventIds = allRows.map { it.eventId }.distinct()
             if (eventIds.isEmpty()) emptyMap()
-            else database.eventsDao().selectSkeletonEventsById(eventIds)
+            else database.eventsDao().selectEventColorsById(eventIds)
                 .associate { it.id to it.color }
         }
 
@@ -217,18 +219,17 @@ class MetadataIndicatorsCalculator @Inject constructor(
                         dtEndInstant = dtEnd,
                         fullDay = rep.fullDay != 0,
                         expansionTimeZoneId = expansionTz,
-                        // generateOccurrencesUntil localizes to displayTz, which is what we want
+                        // arithmetic generators / generateOccurrencesUntil localize to displayTz, which is what we want
                         formatTimeZoneId = timeZoneId,
+                        fromDate = fromDate,
                         toDate = toDate,
                     ) ?: continue
 
-                    var occurrenceNumber = 0
                     for (occ in occurrences) {
-                        occurrenceNumber++
-                        val sInst = occ.first.toInstant()
+                        val sInst = occ.start
                         if (sInst in exDateInstants) continue
                         if (sInst in overrideRecurrenceInstants) continue
-                        val eInst = occ.second.toInstant()
+                        val eInst = occ.end
                         if (!eInst.isAfter(fromInstant) || !sInst.isBefore(toEndInstant)) continue
 
                         result.add(
@@ -240,7 +241,8 @@ class MetadataIndicatorsCalculator @Inject constructor(
                                 fullDay = rep.fullDay != 0,
                                 startInstant = sInst,
                                 endInstant = eInst,
-                                occurrenceNumber = occurrenceNumber,
+                                // absolute, DTSTART-relative number (matches the real expansion path)
+                                occurrenceNumber = occ.number,
                             )
                         )
                     }
@@ -301,9 +303,35 @@ class MetadataIndicatorsCalculator @Inject constructor(
         fullDay: Boolean,
         expansionTimeZoneId: String,
         formatTimeZoneId: String,
+        fromDate: LocalDate,
         toDate: LocalDate,
-    ): List<Pair<java.time.ZonedDateTime, java.time.ZonedDateTime>>? {
+    ): List<ExpandedOccurrence>? {
+        val recurrence = ICalUtilsImpl.parseRecurrence(rrule) ?: return null
         val expansionZone = ZoneId.of(expansionTimeZoneId)
+        val displayZone = ZoneId.of(formatTimeZoneId)
+        val durationSec = dtEndInstant.epochSecond - dtStartInstant.epochSecond
+        val timed = !fullDay && durationSec > 0
+
+        // the common repeating events (plain daily and weekly-on-weekdays) take the fast date-math path
+        val winStart = fromDate.atStartOfDay(displayZone).toInstant()
+        val winEnd = toDate.plusDays(1).atStartOfDay(displayZone).toInstant()
+        if (timed && isSimpleInfiniteDaily(recurrence)) {
+            return FastOccurrenceGenerator.dailyOccurrencesInWindow(
+                dtStartInstant, durationSec, recurrence.interval ?: 1, expansionZone, winStart, winEnd,
+            )
+        }
+        if (timed && isSimpleInfiniteWeekly(recurrence)) {
+            val byDays = recurrence.byDay.mapNotNull { bd -> bd.day?.let { runCatching { DayOfWeek.valueOf(it.name) }.getOrNull() } }.toSet()
+            val wkst = recurrence.workweekStarts?.let { runCatching { DayOfWeek.valueOf(it.name) }.getOrNull() } ?: DayOfWeek.MONDAY
+            if (byDays.size == recurrence.byDay.size) { // all weekdays converted cleanly
+                FastOccurrenceGenerator.weeklyOccurrencesInWindow(
+                    dtStartInstant, durationSec, recurrence.interval ?: 1, byDays, wkst, expansionZone, winStart, winEnd,
+                )?.let { return it }
+            }
+        }
+
+        // everything else (monthly, yearly, anything with COUNT/UNTIL or fancier BY* rules) is rarer and cheaper:
+        // build a throwaway event and let biweekly expand it. the caller trims the result to the window.
         val startLocal = dtStartInstant.atZone(expansionZone).toLocalDateTime()
         val endLocalRaw = dtEndInstant.atZone(expansionZone).toLocalDateTime()
         val endLocal = if (!fullDay && !endLocalRaw.isAfter(startLocal)) {
@@ -312,7 +340,29 @@ class MetadataIndicatorsCalculator @Inject constructor(
 
         val dummy = generateDummyEvent(startLocal, endLocal, rrule, expansionZone, fullDay) ?: return null
         val occurrences = dummy.generateOccurrencesUntil(toDate, formatTimeZoneId) ?: return null
-        return occurrences.map { it.startDateTime to it.endDateTime }
+        return occurrences.map { ExpandedOccurrence(it.startDateTime.toInstant(), it.endDateTime.toInstant(), it.occurrenceNumber) }
+    }
+
+    // plain FREQ=DAILY with no BY* parts and no COUNT/UNTIL — i.e. infinite, fixed-interval daily
+    private fun isSimpleInfiniteDaily(recurrence: Recurrence): Boolean {
+        if (recurrence.frequency != Frequency.DAILY) return false
+        if (recurrence.count != null || recurrence.until != null) return false
+        return recurrence.byDay.isEmpty() && recurrence.byMonth.isEmpty() &&
+            recurrence.byMonthDay.isEmpty() && recurrence.byYearDay.isEmpty() &&
+            recurrence.byWeekNo.isEmpty() && recurrence.bySetPos.isEmpty() &&
+            recurrence.byHour.isEmpty() && recurrence.byMinute.isEmpty() &&
+            recurrence.bySecond.isEmpty()
+    }
+
+    // plain FREQ=WEEKLY;BYDAY=... (weekday list, no ordinals), no COUNT/UNTIL, no other BY* parts
+    private fun isSimpleInfiniteWeekly(recurrence: Recurrence): Boolean {
+        if (recurrence.frequency != Frequency.WEEKLY) return false
+        if (recurrence.count != null || recurrence.until != null) return false
+        if (recurrence.byDay.isEmpty() || recurrence.byDay.any { it.num != null }) return false
+        return recurrence.byMonth.isEmpty() && recurrence.byMonthDay.isEmpty() &&
+            recurrence.byYearDay.isEmpty() && recurrence.byWeekNo.isEmpty() &&
+            recurrence.bySetPos.isEmpty() && recurrence.byHour.isEmpty() &&
+            recurrence.byMinute.isEmpty() && recurrence.bySecond.isEmpty()
     }
 
     private fun generateDummyEvent(

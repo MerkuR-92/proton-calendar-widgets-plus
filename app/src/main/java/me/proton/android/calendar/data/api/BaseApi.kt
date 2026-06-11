@@ -33,13 +33,25 @@ abstract class BaseApiResponse {
 @Serializable
 class StatusCodeApiResponse(@SerialName("Code") override val code: Int) : BaseApiResponse()
 
+
+// Warn for these - transient or expected errors
+private val EXPECTED_HTTP_CODES = setOf(401, 403, 404, 408, 429, 503, 504)
+
+private fun ApiResponse.Error.logAtAppropriateLevel(message: String, logger: Logger) {
+    if (this.httpCode in EXPECTED_HTTP_CODES) {
+        logger.w(message)
+    } else {
+        logger.e(message)
+    }
+}
+
 /**
  * @return response object or `null` and logs errors, if they should be logged
  */
 fun <T : Any> ApiResponse<T>.valueOrNullAndLogErrors(logger: Logger, tag: String? = null): T? = when (this) {
     is ApiResponse.Error -> {
         if (shouldLog) {
-            logger.e("${if (tag != null) { "[$tag] " } else ""}ApiResponse Error: ${this.httpCode}, ${this.errorCode}, ${this.error}")
+            logAtAppropriateLevel("${if (tag != null) { "[$tag] " } else ""}ApiResponse Error: ${this.httpCode}, ${this.errorCode}, ${this.error}", logger)
         }
         null
     }
@@ -57,7 +69,7 @@ fun <T : Any> ApiResponse<T>.logErrorIfNeeded(message: String, logger: Logger, t
     when (this) {
         is ApiResponse.Error -> {
             if (shouldLog) {
-                logger.e("${if (tag != null) { "[$tag] " } else ""}$message, ApiResponse Error: ${this.httpCode}, ${this.errorCode}, ${this.error}")
+                logAtAppropriateLevel("${if (tag != null) { "[$tag] " } else ""}$message, ApiResponse Error: ${this.httpCode}, ${this.errorCode}, ${this.error}", logger)
             }
         }
         is ApiResponse.Exception -> {

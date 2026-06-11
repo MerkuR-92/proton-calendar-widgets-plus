@@ -1,5 +1,6 @@
 package me.proton.android.calendar.domain.indicators
 
+import biweekly.util.DayOfWeek as BiweeklyDayOfWeek
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -10,7 +11,7 @@ import me.proton.android.calendar.data.db.AppDatabase
 import me.proton.android.calendar.data.db.EventOccurrencesDao
 import me.proton.android.calendar.data.db.EventsDao
 import me.proton.android.calendar.data.entity.EventOccurrenceEntity
-import me.proton.android.calendar.data.entity.SkeletonEventEntity
+import me.proton.android.calendar.data.entity.EventColorRow
 import me.proton.android.calendar.domain.CalendarsRepository
 import me.proton.android.calendar.domain.Logger
 import me.proton.android.calendar.domain.model.Calendar
@@ -18,6 +19,7 @@ import me.proton.android.calendar.domain.model.UserInfo
 import me.proton.android.calendar.domain.usecase.GetUserInfoUseCase
 import me.proton.core.domain.entity.UserId
 import org.junit.jupiter.api.Test
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.test.assertEquals
@@ -66,15 +68,8 @@ class MetadataIndicatorsCalculatorTest {
                 flowOf(finiteRecurring)
         every { occurrencesDao.selectInfiniteRecurring(any(), any(), any()) } returns
                 flowOf(infiniteRecurring)
-        every { eventsDao.selectSkeletonEventsById(any()) } returns eventColorOverrides.map { (id, color) ->
-            SkeletonEventEntity(
-                id = id,
-                calendarId = "c1",
-                sharedEvents = emptyList(),
-                modifyTime = 0L,
-                addressId = null,
-                color = color,
-            )
+        every { eventsDao.selectEventColorsById(any()) } returns eventColorOverrides.map { (id, color) ->
+            EventColorRow(id = id, color = color)
         }
     }
 
@@ -279,6 +274,87 @@ class MetadataIndicatorsCalculatorTest {
     }
 
     @Test
+    fun `compute expands infinite daily RRULE via arithmetic path with DTSTART-relative occurrence numbers`() = runTest {
+        // DTSTART is 4 days before the window, so the first in-window occurrence is #5 (not #1); this guards the
+        // arithmetic DAILY fast path AND that occurrenceNumber stays absolute/DTSTART-relative for tap-navigation
+        val tzId = "UTC"
+        val z = ZoneId.of(tzId)
+        val dtStart = LocalDate.of(2025, 5, 29).atStartOfDay(z).plusHours(9) // 4 days before `from`
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(recurring("eD", "uD", "c1", dtStart, "FREQ=DAILY", tzId)),
+        )
+
+        val events = calculator.computeSkeletonUiEvents(userId.id, from, to, tzId)
+
+        // window is from(06-02)..to(06-08) inclusive -> 7 daily occurrences
+        assertEquals(7, events.size)
+        val numberByDate = events.associate { it.dateStart.toLocalDate() to it.occurrenceNumber }
+        assertEquals(5, numberByDate[LocalDate.of(2025, 6, 2)])
+        assertEquals(8, numberByDate[LocalDate.of(2025, 6, 5)])
+        assertEquals(11, numberByDate[LocalDate.of(2025, 6, 8)])
+
+        val indicators = calculator.compute(userId.id, from, to, tzId)
+        assertEquals((2..8).map { LocalDate.of(2025, 6, it) }.toSet(), indicators.keys)
+    }
+
+    @Test
+    fun `compute expands infinite weekly BYDAY RRULE via arithmetic path with DTSTART-relative numbers`() = runTest {
+        // DTSTART Mon 2025-05-19; MO/WE/FR weekly; the window's Mon/Wed/Fri are occurrences #7/#8/#9
+        val tzId = "UTC"
+        val z = ZoneId.of(tzId)
+        val dtStart = LocalDate.of(2025, 5, 19).atStartOfDay(z).plusHours(9) // a Monday, 2 weeks before window
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(recurring("eW", "uW", "c1", dtStart, "FREQ=WEEKLY;BYDAY=MO,WE,FR", tzId)),
+        )
+
+        val events = calculator.computeSkeletonUiEvents(userId.id, from, to, tzId)
+
+        assertEquals(3, events.size)
+        val numberByDate = events.associate { it.dateStart.toLocalDate() to it.occurrenceNumber }
+        assertEquals(7, numberByDate[LocalDate.of(2025, 6, 2)]) // Mon
+        assertEquals(8, numberByDate[LocalDate.of(2025, 6, 4)]) // Wed
+        assertEquals(9, numberByDate[LocalDate.of(2025, 6, 6)]) // Fri
+
+        val indicators = calculator.compute(userId.id, from, to, tzId)
+        assertEquals(
+            setOf(LocalDate.of(2025, 6, 2), LocalDate.of(2025, 6, 4), LocalDate.of(2025, 6, 6)),
+            indicators.keys,
+        )
+    }
+
+    @Test
+    fun `biweekly weekday names map onto java-time DayOfWeek`() {
+        // expandRecurring converts each BYDAY via DayOfWeek.valueOf(biweeklyDay.name)
+        BiweeklyDayOfWeek.values().forEach { day ->
+            val converted = runCatching { DayOfWeek.valueOf(day.name) }.getOrNull()
+            assertEquals(day.name, converted?.name)
+        }
+    }
+
+    @Test
+    fun `compute masks EXDATE occurrence in arithmetic daily expansion`() = runTest {
+        val tzId = "UTC"
+        val z = ZoneId.of(tzId)
+        val dtStart = from.atStartOfDay(z).plusHours(9) // first occurrence on the window's first day
+        val exDate = LocalDate.of(2025, 6, 4).atStartOfDay(z).plusHours(9).toEpochSecond()
+        stubBaseHappyPath(
+            infiniteRecurring = listOf(
+                recurring("eD", "uD", "c1", dtStart, "FREQ=DAILY", tzId, exDates = listOf(exDate)),
+            ),
+        )
+
+        val events = calculator.computeSkeletonUiEvents(userId.id, from, to, tzId)
+
+        // 7 days in window minus the masked 06-04 = 6 occurrences
+        assertEquals(6, events.size)
+        assertTrue(events.none { it.dateStart.toLocalDate() == LocalDate.of(2025, 6, 4) })
+        // numbering stays DTSTART-relative across the gap: 06-03 is #2, 06-05 is #4
+        val numberByDate = events.associate { it.dateStart.toLocalDate() to it.occurrenceNumber }
+        assertEquals(2, numberByDate[LocalDate.of(2025, 6, 3)])
+        assertEquals(4, numberByDate[LocalDate.of(2025, 6, 5)])
+    }
+
+    @Test
     fun `computeSkeletonUiEvents emits one UiEvent per occurrence with metadata`() = runTest {
         val start = from.atStartOfDay(zone).plusHours(9)
         val end = start.plusHours(1)
@@ -320,6 +396,34 @@ class MetadataIndicatorsCalculatorTest {
         firstOccurrenceStartTime = start.toEpochSecond(),
         rRule = null,
         modifyTime = 1L,
+    )
+
+    private fun recurring(
+        eventId: String,
+        uid: String,
+        calendarId: String,
+        dtStart: java.time.ZonedDateTime,
+        rRule: String,
+        tzId: String,
+        durationHours: Long = 1,
+        exDates: List<Long> = emptyList(),
+    ): EventOccurrenceEntity = EventOccurrenceEntity(
+        userId = userId.id,
+        calendarId = calendarId,
+        eventId = eventId,
+        eventUid = uid,
+        fullDay = 0,
+        startTime = dtStart.toEpochSecond(),
+        endTime = dtStart.plusHours(durationHours).toEpochSecond(),
+        // wide occurrence-window so the notOccurring filter keeps it (startTime is non-null and inside)
+        windowStartTime = dtStart.toEpochSecond() - 86_400,
+        windowEndTime = dtStart.toEpochSecond() + 86_400L * 365,
+        firstOccurrenceStartTime = dtStart.toEpochSecond(),
+        rRule = rRule,
+        modifyTime = 1L,
+        startTimeZone = tzId,
+        endTimeZone = tzId,
+        exDates = exDates,
     )
 
     private fun calendar(id: String, color: String) = Calendar(

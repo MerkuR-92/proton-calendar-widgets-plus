@@ -209,7 +209,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun selectCalendars() {
         val userId = userId.value?.id ?: accountManager.getPrimaryUserId().firstOrNull()?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel selectDisabledCalendars")
+            logger.w("User ID was null in CalendarViewModel selectDisabledCalendars")
             return
         }
         visibleCalendarIds = calendarsRepository.flowVisibleCalendarIds(userId).asLiveData(Dispatchers.Default)
@@ -228,7 +228,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun selectUser(): User? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel selectUser")
+            logger.w("User ID was null in CalendarViewModel selectUser")
             return null
         }
         return userManager.getUserOrNull(userId, logger)
@@ -249,6 +249,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun initForUser(userId: UserId): Flow<CalendarsRepository.InitingState> {
         return flow {
             _userId.postValue(userId)
+            logger.w("initForUser reconciliation: userId=${userId.id}, calendarsInDb=${calendarsRepository.countCalendars()}")
 
             // TODO make this prettier
             val calendarUserSettings = calendarsRepository.selectCalendarUserSettings(userId.id)
@@ -466,7 +467,7 @@ class CalendarViewModel @Inject constructor(
 
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel fetchEvents")
+            logger.w("User ID was null in CalendarViewModel fetchEvents")
             return
         }
         coroutineScope.launch {
@@ -482,7 +483,7 @@ class CalendarViewModel @Inject constructor(
     ): Flow<CalendarsRepository.GetEventsResult<UiEvent>> = flow {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getUiEventsLookup")
+            logger.w("User ID was null in CalendarViewModel getUiEventsLookup")
             return@flow
         }
         emitAll(getUiEventsUseCase.execute(userId, fromDate, toDate, timeZoneId, priority = priority))
@@ -497,7 +498,7 @@ class CalendarViewModel @Inject constructor(
         // TODO ÜBER IMPORTANT -- FIXME, PUT INTO WORKER!!!!!!!
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel handleDeleteEvent")
+            logger.w("User ID was null in CalendarViewModel handleDeleteEvent")
             return UseCase.Result.Error("User ID was null in CalendarViewModel handleDeleteEvent")
         }
 
@@ -517,7 +518,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun prepareDeleteCalendar(calendarId: String): DeleteCalendarUseCase.DeleteCalendarOption {
         val userId = userId.value?.id ?: accountManager.getPrimaryUserId().firstOrNull()?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel prepareDeleteCalendar")
+            logger.w("User ID was null in CalendarViewModel prepareDeleteCalendar")
             return DeleteCalendarUseCase.DeleteCalendarOption.Error("userID == null in prepareDeleteCalendar")
         }
         return deleteCalendarUseCase.prepare(UserId(userId), calendarId)
@@ -526,7 +527,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun deleteCalendar(deleteOption: DeleteCalendarUseCase.DeleteCalendarOption): UseCase.Result {
         val userId = userId.value?.id ?: accountManager.getPrimaryUserId().firstOrNull()?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel deleteCalendar")
+            logger.w("User ID was null in CalendarViewModel deleteCalendar")
             return UseCase.Result.Error("userID == null in deleteCalendar")
         }
         return deleteCalendarUseCase.execute(UserId(userId), deleteOption)
@@ -535,7 +536,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun recreateCalendar(calendarId: String): UseCase.Result {
         val userId = userId.value?.id ?: accountManager.getPrimaryUserId().firstOrNull()?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel recreateCalendar")
+            logger.w("User ID was null in CalendarViewModel recreateCalendar")
             return UseCase.Result.Error("userID == null in recreateCalendar")
         }
         return recreateCalendarUseCase.execute(UserId(userId), calendarId)
@@ -544,7 +545,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun leaveSharedCalendar(calendarId: String, memberId: String?): UseCase.Result {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel leaveCalendar")
+            logger.w("User ID was null in CalendarViewModel leaveCalendar")
             return UseCase.Result.Error("userID == null in leaveCalendar")
         }
         return leaveSharedCalendarUseCase.execute(UserId(userId), calendarId, memberId)
@@ -553,7 +554,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun leaveHolidayCalendar(calendarId: String): UseCase.Result {
         val userId = userId.value?.id
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel leaveHolidayCalendar")
+            logger.w("User ID was null in CalendarViewModel leaveHolidayCalendar")
             return UseCase.Result.Error("userID == null in leaveHolidayCalendar")
         }
         return leaveManagedCalendarUseCase.execute(UserId(userId), calendarId)
@@ -578,7 +579,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun updateDefaultCalendarId(defaultCalendarId: String): Boolean {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel updateDefaultCalendarId")
+            logger.w("User ID was null in CalendarViewModel updateDefaultCalendarId")
             return false
         }
         val updateCalendarUserSettingsUseCaseResult = updateCalendarUserSettingsUseCase.executeDefaultCalendarId(
@@ -634,7 +635,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun updateInactiveCalendarsPassphrase() {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel updateInactiveCalendarsPassphrase")
+            logger.w("User ID was null in CalendarViewModel updateInactiveCalendarsPassphrase")
             updatingCalendarPassphrase = false
             return
         }
@@ -654,7 +655,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun fetchCalendars(): List<Calendar>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel fetchCalendars")
+            logger.w("User ID was null in CalendarViewModel fetchCalendars")
             return null
         }
         return calendarsRepository.fetchCalendars(userId)
@@ -663,7 +664,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun refreshCalendars(calendarIds: List<String>) {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel refreshCalendars")
+            logger.w("User ID was null in CalendarViewModel refreshCalendars")
             return
         }
         calendarsRepository.refreshCalendars(userId, calendarIds)
@@ -672,7 +673,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun refreshMember(calendarId: String): Boolean {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel refreshMember")
+            logger.w("User ID was null in CalendarViewModel refreshMember")
             return false
         }
         val memberEntity = calendarsRepository.fetchMembers(userId, calendarId)?.firstOrNull() ?: run {
@@ -686,7 +687,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun getCalendarUserSettingsPrimaryTimezone(): String? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
+            logger.w("User ID was null in CalendarViewModel getCalendarUserSettingsPrimaryTimezone")
             return null
         }
         return calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)
@@ -761,7 +762,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun getCanonicalEmails(emails: List<String>): Map<String, String?>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getCanonicalEmails")
+            logger.w("User ID was null in CalendarViewModel getCanonicalEmails")
             return null
         }
         return getCanonicalEmailsUseCase.invoke(userId, emails)
@@ -802,7 +803,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun isFreeUser(): Boolean? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel isFreeUser")
+            logger.w("User ID was null in CalendarViewModel isFreeUser")
             return null
         }
         val user = userManager.getUserOrNull(userId, logger)
@@ -816,7 +817,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun isDelinquentUser(): Boolean? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel isDelinquentUser")
+            logger.w("User ID was null in CalendarViewModel isDelinquentUser")
             return null
         }
         val user = userManager.getUserOrNull(userId, logger)
@@ -876,7 +877,7 @@ class CalendarViewModel @Inject constructor(
         return userCalendars.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getUserCalendars")
+                logger.w("User ID was null in CalendarViewModel getUserCalendars")
                 return null
             }
             calendarsRepository.selectUserCalendars(userId.id)
@@ -887,7 +888,7 @@ class CalendarViewModel @Inject constructor(
         return userPersonalCalendars.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getUserCalendars")
+                logger.w("User ID was null in CalendarViewModel getUserCalendars")
                 return null
             }
             calendarsRepository.selectUserPersonalCalendars(userId.id)
@@ -898,7 +899,7 @@ class CalendarViewModel @Inject constructor(
         return otherCalendars.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getUserCalendars")
+                logger.w("User ID was null in CalendarViewModel getUserCalendars")
                 return null
             }
             calendarsRepository.selectOtherCalendars(userId.id)
@@ -912,7 +913,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun getUserAddresses(): List<UserAddress>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getUserAddresses")
+            logger.w("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
         return userAddressManager.getAddressesOrNull(userId)
@@ -921,7 +922,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun observeUserAddresses(): LiveData<List<UserAddress>>? {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel getUserAddresses")
+            logger.w("User ID was null in CalendarViewModel getUserAddresses")
             return null
         }
         return kotlin.runCatching {
@@ -936,7 +937,7 @@ class CalendarViewModel @Inject constructor(
         return timeZoneId.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getTimeZoneId")
+                logger.w("User ID was null in CalendarViewModel getTimeZoneId")
                 return null
             }
             calendarsRepository.selectCalendarUserSettingsPrimaryTimezone(userId.id)?.let {
@@ -949,7 +950,7 @@ class CalendarViewModel @Inject constructor(
         return timeFormat.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getTimeFormat")
+                logger.w("User ID was null in CalendarViewModel getTimeFormat")
                 return null
             }
             userSettingsRepository.getTimeFormat(userId, database)
@@ -960,7 +961,7 @@ class CalendarViewModel @Inject constructor(
         return defaultCalendarId.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getDefaultCalendarId")
+                logger.w("User ID was null in CalendarViewModel getDefaultCalendarId")
                 return null
             }
             calendarsRepository.getDefaultCalendarIdWithFallback(userId.id, allowShared)
@@ -971,7 +972,7 @@ class CalendarViewModel @Inject constructor(
         return autoDetectPrimaryTimezone.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getAutoDetectPrimaryTimezone")
+                logger.w("User ID was null in CalendarViewModel getAutoDetectPrimaryTimezone")
                 return null
             }
             calendarsRepository.selectCalendarUserSettingsAutoDetectPrimaryTimezone(userId.id)?.toBoolean()
@@ -982,7 +983,7 @@ class CalendarViewModel @Inject constructor(
         return displayWeekNumber.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getDisplayWeekNumber")
+                logger.w("User ID was null in CalendarViewModel getDisplayWeekNumber")
                 return null
             }
             calendarsRepository.selectCalendarUserSettingsDisplayWeekNumber(userId.id)?.toBoolean()
@@ -993,7 +994,7 @@ class CalendarViewModel @Inject constructor(
         return weekStart.value ?: run {
             val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
             if (userId == null) {
-                logger.e("User ID was null in CalendarViewModel getWeekStart")
+                logger.w("User ID was null in CalendarViewModel getWeekStart")
                 return null
             }
             userSettingsRepository.getWeekStart(userId, database)
@@ -1228,7 +1229,7 @@ class CalendarViewModel @Inject constructor(
     suspend fun hasHolidayCalendars(): Boolean {
         val userId = userId.value ?: accountManager.getPrimaryUserId().firstOrNull()
         if (userId == null) {
-            logger.e("User ID was null in CalendarViewModel hasHolidayCalendars")
+            logger.w("User ID was null in CalendarViewModel hasHolidayCalendars")
             return false
         }
         return calendarsRepository.hasHolidayCalendars(userId.id)

@@ -129,22 +129,40 @@ fun UiEvent.toWeekViewCalendarEntityEvent(defaultEventTitle: String): List<WeekV
     }
 }
 
-fun WeekViewCalendarEntity.toWeekViewEntity(context: Context): WeekViewEntity {
+class WeekViewEntityColors(
+    val backgroundNorm: Int,
+    val interactionWeakNorm: Int,
+    val textWeak: Int,
+    val textNorm: Int,
+    val textOnCalendarColor: Int,
+) {
+    companion object {
+        fun resolve(context: Context) = WeekViewEntityColors(
+            backgroundNorm = ContextCompat.getColor(context, R.color.background_norm),
+            interactionWeakNorm = ContextCompat.getColor(context, R.color.interaction_weak_norm),
+            textWeak = ContextCompat.getColor(context, R.color.text_weak),
+            textNorm = ContextCompat.getColor(context, R.color.text_norm),
+            textOnCalendarColor = ContextCompat.getColor(context, R.color.text_on_calendar_color),
+        )
+    }
+}
+
+fun WeekViewCalendarEntity.toWeekViewEntity(colors: WeekViewEntityColors): WeekViewEntity {
     return when (this) {
-        is WeekViewCalendarEntity.Event -> toWeekViewEntity(context)
+        is WeekViewCalendarEntity.Event -> toWeekViewEntity(colors)
         is WeekViewCalendarEntity.BlockedTimeSlot -> toWeekViewEntity()
     }
 }
 
-fun WeekViewCalendarEntity.Event.toWeekViewEntity(context: Context): WeekViewEntity {
+fun WeekViewCalendarEntity.Event.toWeekViewEntity(colors: WeekViewEntityColors): WeekViewEntity {
     val backgroundColor =
-        if (isUnanswered || (strikeThroughTitle && decrypted)) ContextCompat.getColor(context, R.color.background_norm)
-        else if (isPastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+        if (isUnanswered || (strikeThroughTitle && decrypted)) colors.backgroundNorm
+        else if (isPastEvent) colors.interactionWeakNorm
         else color
     val textColor =
-        if (isPastEvent) ContextCompat.getColor(context, R.color.text_weak)
-        else if (isUnanswered || strikeThroughTitle) ContextCompat.getColor(context, R.color.text_norm)
-        else ContextCompat.getColor(context, R.color.text_on_calendar_color)
+        if (isPastEvent) colors.textWeak
+        else if (isUnanswered || strikeThroughTitle) colors.textNorm
+        else colors.textOnCalendarColor
     val borderWidthResId = if (!strikeThroughTitle) R.dimen.week_view_no_border_width else R.dimen.week_view_border_width
     val borderColor = Color.parseColor(
         AndroidUtils.darkenCalendarColor(
@@ -160,7 +178,7 @@ fun WeekViewCalendarEntity.Event.toWeekViewEntity(context: Context): WeekViewEnt
 
     if (isUnanswered) {
         styleBuilder.setStripesColorResource(
-            if (isPastEvent) ContextCompat.getColor(context, R.color.interaction_weak_norm)
+            if (isPastEvent) colors.interactionWeakNorm
             else Color.parseColor(
                 AndroidUtils.brightenCalendarColor(
                     "#${Integer.toHexString(color and 0x00ffffff)}",

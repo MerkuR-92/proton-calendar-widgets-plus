@@ -2,6 +2,7 @@ package me.proton.android.calendar.data.db
 
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import me.proton.android.calendar.data.entity.EventColorRow
 import me.proton.android.calendar.data.entity.EventEntity
 import kotlinx.coroutines.flow.Flow
 import me.proton.android.calendar.data.entity.SkeletonEventEntity
@@ -37,6 +38,9 @@ abstract class EventsDao : BaseDao<EventEntity> {
 
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE id IN (:ids) ORDER BY ID")
     abstract fun selectSkeletonEventsById(ids: List<String>): List<SkeletonEventEntity>
+
+    @Query("SELECT ID, Color FROM events WHERE id IN (:ids)")
+    abstract fun selectEventColorsById(ids: List<String>): List<EventColorRow>
 
     @Query("SELECT ID, CalendarID, SharedEvents, ModifyTime, AddressID, Color FROM events WHERE calendarId = :calendarId")
     abstract fun getSkeletonEventsInCalendarFlow(calendarId: String): Flow<List<SkeletonEventEntity>>

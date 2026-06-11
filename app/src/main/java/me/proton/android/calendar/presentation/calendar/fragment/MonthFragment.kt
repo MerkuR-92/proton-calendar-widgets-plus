@@ -868,9 +868,20 @@ class MonthFragment : BaseFragment<FragmentMonthBinding>() {
             }
 
             is CalendarsRepository.GetEventsResult.Success -> {
-                rawUiEvents.value = events.events
+                val incoming = if (events.isSkeleton) {
+                    // a skeleton emission arrived while real (decrypted) events are already on screen.
+                    // for each skeleton entry, reuse the real event we already have (matched by id + start
+                    // instant) so cells don't flash decrypted -> skeleton; entries we don't have yet stay skeleton.
+                    val realByKey = rawUiEvents.value.orEmpty()
+                        .filter { !it.isSkeleton }
+                        .associateBy { it.id to it.dateStart.toInstant() }
+                    events.events.map { realByKey[it.id to it.dateStart.toInstant()] ?: it }
+                } else {
+                    events.events
+                }
+                rawUiEvents.value = incoming
 
-                binding.weekView.showLoadingEvents = events.events.isEmpty() && events.fullyLoaded.not()
+                binding.weekView.showLoadingEvents = incoming.isEmpty() && events.fullyLoaded.not()
                 binding.calendarProgress.isVisible = events.fullyLoaded.not()
             }
 

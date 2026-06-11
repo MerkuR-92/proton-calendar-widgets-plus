@@ -25,8 +25,9 @@ class DeleteCalendarIfNeededUseCase @Inject constructor(
         // fetch Calendar from API, if it doesn't exist, delete it from local DB
         if (calendarExistsOnServer(UserId(userId), calendarId) == false) {
             // TODO clear search database too
-            logger.e("DeleteCalendarIfNeededUseCase deleting calendar from local DB")
-            database.calendarsDao().deleteById(calendarId)
+            // server confirmed the calendar is gone; delete locally (events cascade with it)
+            val deletedRows = database.calendarsDao().deleteById(calendarId)
+            logger.w("DeleteCalendarIfNeededUseCase: calendar not on server (404), deleted locally ($deletedRows rows)")
         }
 
     }

@@ -149,6 +149,7 @@ class AccountViewModel @Inject constructor(
     }
 
     private suspend fun cleanUser(userId: UserId) {
+        logger.w("cleanUser: wiping all local calendars+events for userId=${userId.id} (account removed/disabled)")
         workManager.cancelAllWork()
         calendarsRepository.clearSearchDatabase()
         // Calendar currently do not support multi user.
@@ -222,7 +223,7 @@ class AccountViewModel @Inject constructor(
     fun resetCalendarsKey() {
         viewModelScope.launch {
             val userId = getPrimaryUserId() ?: run {
-                logger.e("User ID was null in resetCalendarsKey")
+                logger.w("User ID was null in resetCalendarsKey")
                 return@launch
             }
             val resetCalendarsKeyResult = resetCalendarsKeyUseCase.execute(userId)
@@ -239,7 +240,7 @@ class AccountViewModel @Inject constructor(
     fun updatePassphrase() {
         viewModelScope.launch {
             val userId = getPrimaryUserId() ?: run {
-                logger.e("User ID was null in updatePassphrase")
+                logger.w("User ID was null in updatePassphrase")
                 return@launch
             }
             setupUser(userId, false)

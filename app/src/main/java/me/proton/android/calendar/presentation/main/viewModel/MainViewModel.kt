@@ -298,10 +298,12 @@ class MainViewModel @Inject constructor(
     }
 
     suspend fun resetLocalEventsDatabase(userId: UserId) {
+        logger.w("MainViewModel: resetLocalEventsDatabase invoked for userId=${userId.id}")
         resetLocalEventDatabaseUseCase.invoke(userId)
     }
 
     suspend fun clearLocalEventsDatabase() {
+        logger.w("MainViewModel: clearLocalEventsDatabase invoked (deleting all local events)")
         calendarsRepository.deleteAllEvents()
     }
 

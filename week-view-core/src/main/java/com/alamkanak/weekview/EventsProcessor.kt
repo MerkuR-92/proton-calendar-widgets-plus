@@ -27,12 +27,14 @@ internal class EventsProcessor(
      * @param viewState The current [ViewState] of [WeekView]
      * @param onFinished Callback to inform the caller whether [WeekView] should invalidate.
      */
-    fun submit(
-        entities: List<WeekViewEntity>,
+    fun <T> submit(
+        elements: List<T>,
+        toEntity: (T) -> WeekViewEntity,
         viewState: ViewState,
         onFinished: () -> Unit
     ) {
         backgroundExecutor.execute {
+            val entities = elements.map(toEntity)
             submitEntities(entities, viewState)
             mainThreadExecutor.execute {
                 onFinished()
@@ -84,7 +86,12 @@ internal class EventsProcessor(
         val eventChips = eventChipsFactory.create(diffResult.itemsToAddOrUpdate, viewState)
 
         // We remove the events sharing the same ID so that we make sure we removed all multi day events chips before updating
-        val removeBeforeAdding = eventChipsCache.allEventChips.map { it.event }.filter { it.id in diffResult.itemsToAddOrUpdate.map { it.id } }.distinctBy { it.id }
+        val addOrUpdateIds = diffResult.itemsToAddOrUpdate.mapTo(HashSet(diffResult.itemsToAddOrUpdate.size)) { it.id }
+        val removeBeforeAdding = eventChipsCache.allEventChips.asSequence()
+            .map { it.event }
+            .filter { it.id in addOrUpdateIds }
+            .distinctBy { it.id }
+            .toList()
         eventChipsCache.removeAll(removeBeforeAdding)
 
         eventChipsCache.addAll(eventChips)
@@ -108,18 +115,20 @@ internal class EventsProcessor(
                 existingEntities: List<ResolvedWeekViewEntity>,
                 newEntities: List<ResolvedWeekViewEntity>,
             ): DiffResult {
-                val existingEntityIds = existingEntities.map { it.id }
+                val existingById = HashMap<String, ResolvedWeekViewEntity>(existingEntities.size)
+                for (entity in existingEntities) existingById[entity.id] = entity
+                val submittedIds = newEntities.mapTo(HashSet(newEntities.size)) { it.id }
 
-                val submittedEntityIds = newEntities.map { it.id }
-                val addedEvents = newEntities.filter { it.id !in existingEntityIds }
-                val deletedEvents = existingEntities.filter { it.id !in submittedEntityIds }
-
-                val updatedEvents = newEntities.filter { it.id in existingEntityIds }
-                val changed = updatedEvents.filter { it !in existingEntities }
+                // added (no existing with this id) or changed (existing differs by value)
+                val itemsToAddOrUpdate = newEntities.filter { entity ->
+                    val existing = existingById[entity.id]
+                    existing == null || existing != entity
+                }
+                val itemsToRemove = existingEntities.filter { it.id !in submittedIds }
 
                 return DiffResult(
-                    itemsToAddOrUpdate = addedEvents + changed,
-                    itemsToRemove = deletedEvents,
+                    itemsToAddOrUpdate = itemsToAddOrUpdate,
+                    itemsToRemove = itemsToRemove,
                 )
             }
         }
