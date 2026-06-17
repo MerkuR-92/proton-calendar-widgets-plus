@@ -131,7 +131,7 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">недействительная подпись контакта</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Присоединиться к встрече в Zoom</string>
-    <string name="join_proton_meet_action">Присоединиться через Proton Meet</string>
+    <string name="join_proton_meet_action">Подключиться в Proton Meet</string>
     <string name="zoom_meeting_title">Встреча в Zoom</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>

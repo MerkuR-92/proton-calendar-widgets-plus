@@ -131,11 +131,11 @@
     <string name="event_send_prefs_trusted_keys_signature_invalid">tanda tangan kontak tidak valid</string>
     <string name="event_send_prefs_error_template" comment="email address and (reason why we failed to send email)">%1$s (%2$s)</string>
     <string name="join_zoom_meeting_action">Gabung ke pertemuan Zoom</string>
-    <string name="join_proton_meet_action">Join with Proton Meet</string>
+    <string name="join_proton_meet_action">Bergabunglah dengan Proton Meet</string>
     <string name="zoom_meeting_title">Pertemuan Zoom</string>
     <string name="proton_meet_title">Proton Meet</string>
     <string name="generic_meeting_id">ID: %1$s</string>
-    <string name="generic_meeting_passcode">Passcode: %1$s</string>
+    <string name="generic_meeting_passcode">Kata sandi: %1$s</string>
     <string name="generic_meeting_more_details">Tambah rincian</string>
     <string name="generic_meeting_less_details">Kurangi rincian</string>
     <string name="generic_meeting_host">Tuan rumah pertemuan</string>
@@ -147,7 +147,7 @@
     <string name="event_hint_title">Tambahkan judul</string>
     <string name="event_hint_location">Tambah lokasi</string>
     <string name="event_text_add_participants">Tambah peserta</string>
-    <string name="event_add_proton_meet">Add Proton Meet conferencing</string>
+    <string name="event_add_proton_meet">Tambahkan konferensi Proton Meet</string>
     <string name="event_creating_proton_meet">Creating Proton Meet…</string>
     <string name="event_creating_proton_meet_error">Failed to create a Proton Meet conference. Please try again.</string>
     <string name="event_text_participants" comment="Max participant counter, Example: Participants (1/1000)">Peserta (%1$d/%2$d)</string>

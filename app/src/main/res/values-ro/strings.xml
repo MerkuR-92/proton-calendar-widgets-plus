@@ -237,7 +237,7 @@
     <string name="event_recurring_edit_this">Acest eveniment</string>
     <string name="event_recurring_edit_this_and_future">Acesta și viitoarele evenimente</string>
     <string name="event_recurring_edit_all_events">Toate evenimentele</string>
-    <string name="event_discard_changes_title">Anulare modificări?</string>
+    <string name="event_discard_changes_title">Anulați modificările?</string>
     <string name="event_discard_changes_description">Veți pierde toate modificările nesalvate.</string>
     <string name="event_discard_changes_cancel">Continuare editare</string>
     <string name="event_discard_changes_confirm">Anulare</string>
@@ -309,11 +309,11 @@
     <string name="nav_view_syncing_calendars">%1$s (se sincronizează)</string>
     <string name="nav_view_more">Mai mult</string>
     <string name="nav_view_switcher">Afișare</string>
-    <string name="nav_view_switcher_day">zi</string>
+    <string name="nav_view_switcher_day">Zilnic</string>
     <string name="nav_view_switcher_three_day">3 zile</string>
-    <string name="nav_view_switcher_week">Săptămână</string>
+    <string name="nav_view_switcher_week">Săptămânal</string>
     <string name="nav_view_switcher_agenda">Agendă</string>
-    <string name="nav_view_switcher_month">lună</string>
+    <string name="nav_view_switcher_month">Lunar</string>
     <string name="nav_view_timezone">Fus orar</string>
     <string name="nav_view_settings">Setări</string>
     <string name="nav_view_refresh">Împrospătare</string>
@@ -676,7 +676,7 @@
     <string name="import_assistant_cancel_import_positive_button">Anulare importare</string>
     <string name="import_assistant_cancel_import_negative_button">Reluare importare</string>
     <string name="import_assistant_in_progress_snack">Importare în derulare</string>
-    <string name="import_assistant_discard_import_title">Anulare importare?</string>
+    <string name="import_assistant_discard_import_title">Anulați importarea?</string>
     <string name="import_assistant_discard_import_message">Importarea nu este completă și nu se poate relua dacă o anulați.</string>
     <string name="import_assistant_discard_import_positive">Anulare importare</string>
     <string name="import_assistant_discard_import_negative">Reluare importare</string>
